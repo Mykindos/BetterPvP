@@ -61,7 +61,7 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .material(Material.FILLED_MAP)
                     .displayName(Component.text("Map Player Names", color))
                     .lore(Component.text("Whether or not to display player names on the map", NamedTextColor.GRAY))
-                    .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                    .hideAdditionalTooltip(true)
                     .frameLore(true)
                     .build()
                     .get();
@@ -77,7 +77,7 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .material(Material.WRITABLE_BOOK)
                     .displayName(Component.text("Territory Popups", color))
                     .lore(Component.text("Whether or not to display territory popups", NamedTextColor.GRAY))
-                    .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                    .hideAdditionalTooltip(true)
                     .frameLore(true)
                     .build()
                     .get();

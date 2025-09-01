@@ -143,13 +143,12 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
             double extraDamage = barbedData.damage;
             event.addModifier(new SkillDamageModifier.Flat(this, extraDamage));
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, extraDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
             championsManager.getEffects().addEffect(damagee, EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
             player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
 
-            targetsMap.remove(event.getDamagee());
+            targetsMap.remove(event.getLivingDamagee());
             if (targetsMap.isEmpty()) {
                 playerToTargetsMap.remove(playerUuid);
             }
@@ -158,15 +157,14 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Projectile projectile) {
-            if (event.getHitBlock() != null || event.getHitEntity() == null) {
-                barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
-            }
-
-            UtilServer.runTaskLater(champions, () -> {
-                barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
-            }, 2L);
+        Projectile projectile = event.getEntity();
+        if (event.getHitBlock() != null || event.getHitEntity() == null) {
+            barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
         }
+
+        UtilServer.runTaskLater(champions, () -> {
+            barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
+        }, 2L);
     }
 
     @UpdateEvent

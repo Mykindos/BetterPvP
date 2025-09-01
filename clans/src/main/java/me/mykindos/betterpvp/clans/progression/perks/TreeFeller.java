@@ -55,7 +55,7 @@ public class TreeFeller implements Listener {
     private final BlockTagManager blockTagManager;
 
     @Inject
-    public TreeFeller(ClientManager clientManager, ItemFactory itemFactory, ClanManager clanManager, ItemHandler itemHandler, BlockTagManager blockTagManager) {
+    public TreeFeller(ClientManager clientManager, ItemFactory itemFactory, ClanManager clanManager, BlockTagManager blockTagManager) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.itemFactory = itemFactory;

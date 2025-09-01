@@ -70,7 +70,7 @@ public class Rule {
                 .lore(this.getDescription().stream()
                         .map(UtilMessage::deserialize).toList())
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+                .hideAdditionalTooltip(true);
         return itemViewBuilder.build();
     }
 }

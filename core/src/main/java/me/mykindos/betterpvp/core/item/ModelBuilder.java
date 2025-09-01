@@ -2,14 +2,18 @@ package me.mykindos.betterpvp.core.item;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.CustomModelData;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -29,7 +33,7 @@ public class ModelBuilder {
     private Integer maxStackSize;
     private Boolean hideTooltip;
     private Integer customModelData;
-    private String displayName;
+    private Component displayName;
     private Boolean consumable;
     private Boolean unbreakable;
 
@@ -93,7 +97,7 @@ public class ModelBuilder {
      * @param displayName The display name
      * @return This builder for chaining
      */
-    public ModelBuilder displayName(@NotNull String displayName) {
+    public ModelBuilder displayName(@NotNull Component displayName) {
         this.displayName = displayName;
         return this;
     }
@@ -129,12 +133,12 @@ public class ModelBuilder {
 
         // Set custom model data if specified
         if (customModelData != null) {
-            meta.setCustomModelData(customModelData);
+            result.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addFloat(customModelData).build());
         }
 
         // Set display name if specified
         if (displayName != null) {
-            meta.setDisplayName(displayName);
+            meta.displayName(displayName);
         }
 
         // Set unbreakable if specified
@@ -156,7 +160,7 @@ public class ModelBuilder {
         }
 
         if (hideTooltip != null && hideTooltip) {
-            result.setData(DataComponentTypes.HIDE_TOOLTIP);
+            result.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hideTooltip(true).build());
         }
 
         if (consumable != null && consumable) {
