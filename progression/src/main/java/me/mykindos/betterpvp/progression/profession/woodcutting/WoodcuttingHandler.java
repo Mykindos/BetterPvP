@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.progression.profession.woodcutting;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -8,8 +9,8 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.droptables.DropTable;
@@ -22,6 +23,7 @@ import me.mykindos.betterpvp.progression.profession.woodcutting.repository.Woodc
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Item;
@@ -47,7 +49,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
     private final LeaderboardManager leaderboardManager;
     private final BlockTagManager blockTagManager;
     private final EffectManager effectManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     /**
      * Maps the log type (key) to its base experience value for chopping it (value)
@@ -63,13 +65,13 @@ public class WoodcuttingHandler extends ProfessionHandler {
     @Inject
     public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager,
                               WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager,
-                              BlockTagManager blockTagManager, EffectManager effectManager, ItemHandler itemHandler) {
+                              BlockTagManager blockTagManager, EffectManager effectManager, ItemFactory itemFactory) {
         super(progression, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;
         this.effectManager = effectManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
 
@@ -235,11 +237,19 @@ public class WoodcuttingHandler extends ProfessionHandler {
             int maxAmount = lootItemSection.getInt("maxAmount");
             DropTableItemStack itemStack = null;
             if (lootItemKey.contains(":")) {
-                BPvPItem item = itemHandler.getItem(lootItemKey);
-                if (item != null) {
-                    if (!item.isEnabled()) continue;
-                    itemStack = new DropTableItemStack(item.getItemStack(1), minAmount, maxAmount);
+                final NamespacedKey key = NamespacedKey.fromString(lootItemKey);
+                if (key == null) {
+                    log.error("Invalid namespaced key for loot item: " + lootItemKey).submit();
+                    continue;
                 }
+
+                final BaseItem baseItem = itemFactory.getItemRegistry().getItem(key);
+                if (baseItem == null) {
+                    log.warn("No item found for key: " + key).submit();
+                } else {
+                    itemStack = new DropTableItemStack(itemFactory.create(baseItem).createItemStack(), minAmount, maxAmount);
+                }
+
             } else {
                 Material item = Material.valueOf(itemMaterialAsString);
                 itemStack = new DropTableItemStack(UtilItem.createItemStack(item, 1, customModelData), minAmount, maxAmount);

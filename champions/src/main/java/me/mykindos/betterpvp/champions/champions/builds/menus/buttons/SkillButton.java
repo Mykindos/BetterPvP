@@ -115,7 +115,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             builder.action(ClickActions.RIGHT, Component.text("Decrease Level"));
         }
 
-        return builder.flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP).frameLore(true).build();
+        return builder.hideAdditionalTooltip(true).frameLore(true).build();
     }
 
     @Override
