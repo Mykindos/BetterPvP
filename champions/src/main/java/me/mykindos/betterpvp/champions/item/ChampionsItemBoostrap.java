@@ -4,10 +4,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.scythe.ScytheOfTheFallenLord;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
+
+import static me.mykindos.betterpvp.core.utilities.Resources.ItemModel.INVISIBLE;
 
 @Singleton
 public class ChampionsItemBoostrap {

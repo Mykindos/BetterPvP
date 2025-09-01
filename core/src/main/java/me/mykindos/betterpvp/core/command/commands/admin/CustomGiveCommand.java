@@ -99,7 +99,7 @@ public class CustomGiveCommand extends Command {
 
         ItemInstance instance = itemFactory.create(baseItem);
         clientManager.sendMessageToRank("Core", UtilMessage.deserialize("<yellow>%s</yellow> gave <yellow>%s</yellow> [<green>%s</green>] x<green>%s</green>",
-                player.getName(), target.getName(), item.getIdentifier(), count), Rank.TRIAL_MOD);
+                player.getName(), target.getName(), namespacedKey, count), Rank.TRIAL_MOD);
 
         // Give Uncommon+ rarities a UUID
         if (instance.getRarity().isImportant()) {

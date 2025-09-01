@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.game.framework.model.setting.hotbar;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.inject.Inject;
@@ -267,7 +268,10 @@ public class HotBarLayoutManager {
         final HotBarLayout layout = getLayout(player, build);
         final HotBarItem hotBarItem = layout.getLayout().get(slot);
         if (hotBarItem == null) return null;
-        final BPvPItem bPvPItem = itemHandler.getItem(hotBarItem.getNamespacedKey());
-        return itemHandler.updateNames(bPvPItem.getItemStack(hotBarItem.getAmount()));
+        final BaseItem item = itemFactory.getItemRegistry().getItem(hotBarItem.getNamespacedKey());
+        Preconditions.checkNotNull(item, "Item for HotBarItemButton cannot be null");
+        final ItemStack itemStack = itemFactory.create(item).createItemStack();
+        itemStack.setAmount(hotBarItem.getAmount());
+        return itemStack;
     }
 }

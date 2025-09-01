@@ -18,7 +18,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
 import me.mykindos.betterpvp.core.combat.damage.ModifierType;
 import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -334,7 +334,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      * thus, "absorbing" the damage.
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamageTaken(CustomDamageEvent event) {
+    public void onDamageTaken(DamageEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player player)) return;
 

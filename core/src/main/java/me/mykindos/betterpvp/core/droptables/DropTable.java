@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemWrapper;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -121,7 +121,7 @@ public class DropTable extends WeighedList<DropTableItemStack> {
             sortedItems.sort(Map.Entry.<DropTableItemStack, Float>comparingByValue().reversed());
 
             Core core = JavaPlugin.getPlugin(Core.class);
-            ItemHandler itemHandler = core.getInjector().getInstance(ItemHandler.class);
+            ItemFactory itemFactory = core.getInjector().getInstance(ItemFactory.class);
 
             // Add the sorted items to the inventory
             sortedItems.forEach(entry -> {
@@ -129,7 +129,7 @@ public class DropTable extends WeighedList<DropTableItemStack> {
                     return;
                 }
 
-                ItemStack itemStack = itemHandler.updateNames(entry.getKey().clone());
+                ItemStack itemStack = itemFactory.convertItemStack(entry.getKey().clone()).orElse(null);
                 double chance = entry.getValue();
 
                 if (itemStack == null) return;

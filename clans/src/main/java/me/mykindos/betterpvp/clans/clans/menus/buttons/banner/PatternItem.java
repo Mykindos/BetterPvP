@@ -36,7 +36,7 @@ public class PatternItem extends ControlItem<BannerMenu> {
         return ItemView.of(BannerWrapper.builder().pattern(pattern).build().get())
                 .toBuilder()
                 .displayName(Component.text("Pattern " + (index + 1), NamedTextColor.GREEN, TextDecoration.BOLD))
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .action(ClickActions.LEFT, Component.text("Add Pattern Before"))
                 .action(ClickActions.RIGHT, Component.text("Replace Pattern"))
                 .action(ClickActions.SHIFT, Component.text("Remove Pattern"))

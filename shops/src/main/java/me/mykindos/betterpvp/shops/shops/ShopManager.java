@@ -79,7 +79,7 @@ public class ShopManager {
                 .addIngredient('<', new PreviousButton())
                 .addIngredient('-', new BackButton(null))
                 .addIngredient('>', new ForwardButton())
-                .addIngredient('s', new SellAllButton(shopkeeperItems, clientManager, itemHandler, shopItemSellService));
+                .addIngredient('s', new SellAllButton(shopkeeperItems, shopItemSellService));
         for (int i = 1; i <= maxPages; i++) {
             builder.addContent(new ShopMenu(i,
                     shopkeeperItems,

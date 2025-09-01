@@ -7,17 +7,14 @@ import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.droptables.DropTable;
+import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.utilities.model.DropTable;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.droptables.DropTable;
-import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -106,48 +103,6 @@ public class UtilItem {
         meta.getPersistentDataContainer().set(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN, true);
         shield.setItemMeta(meta);
         return shield;
-    }
-
-    /**
-     * Updates an ItemStack, giving it a custom name and lore
-     *
-     * @param item ItemStack to modify
-     * @param name Name to give the ItemStack
-     * @param lore Lore to give the ItemStack
-     * @return Returns the ItemStack with the newly adjusted name and lore
-     */
-    public static ItemStack setItemNameAndLore(ItemStack item, String name, String[] lore) {
-        if (lore != null) {
-            return setItemNameAndLore(item, name, Arrays.asList(lore));
-        }
-
-        return setItemNameAndLore(item, name, new ArrayList<>());
-
-    }
-
-    /**
-     * Updates an ItemStack, giving it a custom name and lore
-     *
-     * @param item ItemStack to modify
-     * @param name Name to give the ItemStack
-     * @param lore Lore to give the ItemStack
-     * @return Returns the ItemStack with the newly adjusted name and lore
-     */
-    public static ItemStack setItemNameAndLore(ItemStack item, String name, List<String> lore) {
-        ItemMeta im = item.getItemMeta();
-        im.displayName(Component.text(name));
-        if (lore != null) {
-            List<Component> components = new ArrayList<>();
-            for (String loreEntry : lore) {
-                components.add(Component.text(loreEntry));
-            }
-            im.lore(components);
-        }
-
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-
-        item.setItemMeta(im);
-        return item;
     }
 
     /**
@@ -416,8 +371,7 @@ public class UtilItem {
                 final NamespacedKey namespacedKey = Objects.requireNonNull(NamespacedKey.fromString(key));
                 final BaseItem item = itemFactory.getItemRegistry().getItem(namespacedKey);
                 if (item != null) {
-                    if (!item.isEnabled()) continue;
-                    itemStack = new DropTableItemStack(item.getItemStack(amount), minAmount, maxAmount);
+                    itemStack = new DropTableItemStack(itemFactory.create(item).createItemStack(), minAmount, maxAmount);
                 } else {
                     log.error("Failed to load item {}", key).submit();
                 }
@@ -433,17 +387,6 @@ public class UtilItem {
 
             droptable.add(categoryWeight, weight, itemStack);
         }
-    }
-
-    /**
-     * Parses a configuration section into a DropTable.
-     *
-     * @param itemFactory The itemFactory to use for resolving items
-     * @param droptableSection The configuration section to parse
-     * @param droptable The DropTable to add items to
-     */
-    private static void parseDropTable(ItemFactory itemFactory, ConfigurationSection droptableSection, DropTable droptable) {
-        parseDropTable(itemFactory, droptableSection, (WeighedList<ItemStack>) droptable);
     }
 
     /**

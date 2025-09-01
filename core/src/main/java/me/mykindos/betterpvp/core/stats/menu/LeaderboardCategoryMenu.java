@@ -34,7 +34,7 @@ public class LeaderboardCategoryMenu extends AbstractGui implements Windowed {
         final ItemView professionItem = ItemView.builder().material(Material.COD_BUCKET).displayName(Component.text("Professions", NamedTextColor.GREEN, TextDecoration.BOLD)).build();
         setItem(14, new SimpleItem(professionItem, click -> new LeaderboardListMenu(manager, LeaderboardCategory.PROFESSION, this).show(click.getPlayer())));
 
-        final ItemView dungeonsItem = ItemView.builder().material(Material.SPAWNER).flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP).displayName(Component.text("Dungeons", NamedTextColor.YELLOW, TextDecoration.BOLD)).build();
+        final ItemView dungeonsItem = ItemView.builder().material(Material.SPAWNER).hideAdditionalTooltip(true).displayName(Component.text("Dungeons", NamedTextColor.YELLOW, TextDecoration.BOLD)).build();
         setItem(16, new SimpleItem(dungeonsItem, click -> new LeaderboardListMenu(manager, LeaderboardCategory.DUNGEONS, this).show(click.getPlayer())));
 
         setBackground(Menu.BACKGROUND_ITEM);
