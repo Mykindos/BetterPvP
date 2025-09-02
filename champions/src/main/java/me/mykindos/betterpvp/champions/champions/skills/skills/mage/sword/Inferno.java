@@ -172,8 +172,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 iterator.remove();
             } else {
                 Item fire = cur.getWorld().dropItem(cur.getEyeLocation(), new ItemStack(Material.BLAZE_POWDER));
-                Bukkit.getScheduler().runTaskLater(champions, fire::remove, 10L);
-                ThrowableItem throwableItem = new ThrowableItem(this, fire, cur, getName(), 5000L);
+                
+                ThrowableItem throwableItem = new ThrowableItem(this, fire, cur, getName(), 500L);
                 throwableItem.setCanHitFriendlies(false);
                 throwableItem.setRemoveInWater(true);
                 throwableItem.setRemoveOnCollision(true);
