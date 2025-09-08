@@ -1,30 +1,41 @@
 package me.mykindos.betterpvp.core.framework.hat;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketEvent;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.packet.play.serverbound.WrapperPlayClientWindowClick;
-import org.bukkit.inventory.ItemStack;
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import org.jetbrains.annotations.NotNull;
 
-public class RemapperIn extends PacketAdapter {
+import java.util.Map;
+import java.util.Optional;
+
+public class RemapperIn implements PacketListener {
 
     private final PacketHatController controller;
     private final HatProtocol protocol;
 
-    public RemapperIn(Core plugin, PacketHatController controller, HatProtocol protocol) {
-        super(plugin, PacketType.Play.Client.WINDOW_CLICK);
+    public RemapperIn(PacketHatController controller, HatProtocol protocol) {
         this.controller = controller;
         this.protocol = protocol;
     }
 
     @Override
-    public void onPacketReceiving(PacketEvent event) {
-        final WrapperPlayClientWindowClick packet = new WrapperPlayClientWindowClick(event.getPacket());
-        final Int2ObjectMap<ItemStack> slots = packet.getChangedSlots();
-        for (Int2ObjectMap.Entry<ItemStack> entry : slots.int2ObjectEntrySet()) {
-            entry.setValue(controller.fromHatItem(entry.getValue()).orElse(null));
+    public void onPacketReceive(@NotNull PacketReceiveEvent event) {
+        if (event.getPacketType() != PacketType.Play.Client.CLICK_WINDOW) return;
+
+        final WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
+        final Optional<Map<Integer, ItemStack>> slotsOpt = packet.getSlots();
+        if (slotsOpt.isEmpty()) return;
+
+        final Map<Integer, ItemStack> slots = slotsOpt.get();
+        for (Map.Entry<Integer, ItemStack> entry : slots.entrySet()) {
+            final ItemStack itemStack = entry.getValue();
+            final org.bukkit.inventory.ItemStack bukkitStack = SpigotConversionUtil.toBukkitItemStack(itemStack);
+            entry.setValue(controller.fromHatItem(bukkitStack)
+                    .map(SpigotConversionUtil::fromBukkitItemStack)
+                    .orElse(null));
         }
 //        packet.setCarriedItem(controller.fromHatItem(packet.getCarriedItem()).orElse(null));
 

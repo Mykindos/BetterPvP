@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.framework.hat;
 
-import com.comphenix.protocol.ProtocolLibrary;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -45,8 +46,8 @@ public class PacketHatController {
 
     @Inject
     public PacketHatController(Core core, HatProtocol protocol, ItemFactory itemFactory) {
-        ProtocolLibrary.getProtocolManager().addPacketListener(new RemapperIn(core, this, protocol));
-        ProtocolLibrary.getProtocolManager().addPacketListener(new RemapperOut(core, this));
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(this, protocol), PacketListenerPriority.HIGH);
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperOut(this), PacketListenerPriority.HIGH);
         this.itemFactory = itemFactory;
         this.protocol = protocol;
     }
@@ -84,7 +85,7 @@ public class PacketHatController {
                     ? itemStack.getItemMeta().displayName()
                     : itemStack.getData(DataComponentTypes.ITEM_NAME);
 
-            if (helmet != null) {
+            if (helmet != null && !helmet.getType().isAir()) {
                 final ItemStack view = itemFactory.fromItemStack(helmet).orElseThrow().getView().get();
                 Integer model = itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData()
                         ? itemStack.getItemMeta().getCustomModelData()

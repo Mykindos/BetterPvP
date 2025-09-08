@@ -28,7 +28,8 @@ pluginManagement {
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://mvn.lumine.io/repository/maven-public/")
         maven("https://repo.xenondevs.xyz/releases")
-        maven("https://repo.md-5.net/repository/public/")
+        maven("https://repo.md-5.net/content/groups/public/")
+        maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://jitpack.io")
         maven {
             url =  uri("http://mykindos.me:8081/repository/maven-public/")
@@ -42,12 +43,12 @@ dependencyResolutionManagement {
         create("libs") {
             // Versions
             version("kotlin", "2.1.0")
-            version("paper", "1.21.6-R0.1-SNAPSHOT")
+            version("paper", "1.21.8-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-SNAPSHOT")
             version("jackson", "2.17.2")
-            version("mineplex", "1.19.3")
-            version("sidebar", "2.2.2")
-            version("mockbukkit", "4.45.0")
+            version("mineplex", "1.21.0-PREVIEW")
+            version("sidebar", "2.4.1")
+            version("mockbukkit", "4.72.8")
             version("junit", "5.13.0-M2")
 
             // Library - Mineplex SDK
@@ -74,7 +75,7 @@ dependencyResolutionManagement {
             plugin("paperweight-userdev", "io.papermc.paperweight.userdev").versionRef("paperweight")
 
             // Library - Kyori Adventure (does not come with Paper)
-            library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:2.3.0")
+            library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:3.0.1")
 
             // Library - Jackson
             library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
@@ -112,23 +113,22 @@ dependencyResolutionManagement {
             library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
 
             // Library - Mythic
-            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.0-SNAPSHOT")
+            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.5")
 
             // Library - Nexo
             library("nexo", "com.nexomc", "nexo").version("1.10.0")
 
-            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
+            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.9")
 
             // Library - McPets
             library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
 
             // Library - Protocol
-            library("protocollib", "net.dmulloy2", "ProtocolLib").version("5.4.0")
-            library("libsdisguises", "LibsDisguises", "LibsDisguises").version("10.0.44")
+            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.7")
+            library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.9.5")
 
             // Library - Mixins
-            library("ignite", "space.vectrix.ignite", "ignite-api").version("0.8.1")
-            library("mixin", "org.spongepowered", "mixin").version("0.8.5")
+            library("mixin", "org.spongepowered", "mixin").version("0.8.7")
 
             // Library - Guice
             library("guice", "com.google.inject", "guice").version("7.0.0")
@@ -152,7 +152,7 @@ dependencyResolutionManagement {
                     "okhttp",
                     "zip4j"))
             bundle("data", listOf("jedis", "flyway-core", "flyway-mysql"))
-            bundle("mixins", listOf("ignite", "mixin"))
+            bundle("mixins", listOf("mixin"))
         }
     }
 }

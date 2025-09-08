@@ -1,11 +1,9 @@
 package me.mykindos.betterpvp.core.utilities;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.WrappedDataValue;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
@@ -213,35 +211,19 @@ public class UtilPlayer {
      */
     @SneakyThrows
     public static void setGlowing(Player player, Entity target, boolean glowing) {
-        PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
-        packet.getIntegers().write(0, target.getEntityId()); //Set packet's entity id
-        WrappedDataWatcher watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
-        WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(Byte.class); //Found this through google, needed for some stupid reason
-        watcher.setEntity(target); //Set the new data watcher's target
-        byte entityByte = 0x00;
+        byte glowingByte = 0x00;
         if (glowing) {
-            entityByte = (byte) (entityByte | 0x40);
+            glowingByte = (byte) (glowingByte | 0x40);
         }
 
-        watcher.setObject(0, serializer, entityByte); //Set status to glowing, found on protocol page
+        // https://minecraft.wiki/w/Java_Edition_protocol/Entity_metadata#Entity_Metadata_Format
+        EntityData<?> data = new EntityData<>(0, EntityDataTypes.BYTE, glowingByte);
+        final WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(
+                target.getEntityId(),
+                List.of(data)
+        );
 
-        final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
-
-        for (final WrappedWatchableObject entry : watcher.getWatchableObjects()) {
-            if (entry == null) continue;
-
-            final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
-            wrappedDataValueList.add(
-                    new WrappedDataValue(
-                            watcherObject.getIndex(),
-                            watcherObject.getSerializer(),
-                            entry.getRawValue()
-                    )
-            );
-        }
-
-        packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
-        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+        PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
     }
 
     /**
