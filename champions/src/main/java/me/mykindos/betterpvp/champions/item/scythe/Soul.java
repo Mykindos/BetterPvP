@@ -1,13 +1,15 @@
 package me.mykindos.betterpvp.champions.item.scythe;
 
-import com.comphenix.protocol.wrappers.WrappedDataValue;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.destroystokyo.paper.ParticleBuilder;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerEntityMetadata;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -16,7 +18,6 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
@@ -73,14 +74,16 @@ public class Soul {
         final Vector3f scale = selected ? new Vector3f(1.5f, 1.5f, 1.5f) : new Vector3f(1f, 1f, 1f);
         player.showEntity(JavaPlugin.getPlugin(Champions.class), display);
 
-        final WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata();
-        List<WrappedDataValue> items = List.of(
-                new WrappedDataValue(22, WrappedDataWatcher.Registry.get(Integer.class), color.asRGB()),
-                new WrappedDataValue(12, WrappedDataWatcher.Registry.get(Vector3f.class), scale)
+        List<EntityData<?>> items = List.of(
+                new EntityData<>(22, EntityDataTypes.INT, color.asRGB()),
+                new EntityData<>(12, EntityDataTypes.VECTOR3F, scale)
         );
-        packet.setId(display.getEntityId());
-        packet.setPackedItems(items);
-        packet.sendPacket(player);
+        final WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(
+                display.getEntityId(),
+                items
+        );
+        UtilPlayer.setGlowing(player, display, true);
+        PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
     }
 
     public void hide(Player player) {
