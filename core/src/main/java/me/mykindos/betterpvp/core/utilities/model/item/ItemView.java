@@ -164,7 +164,7 @@ public class ItemView implements ItemProvider {
         }
 
         if (hideTooltip) {
-            final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay().hideTooltip(hideTooltip);
+            final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay().hideTooltip(true);
             itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, builder.build());
         } else if (hideAdditionalTooltip) {
             final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay().

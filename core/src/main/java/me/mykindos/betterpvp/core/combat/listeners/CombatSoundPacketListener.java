@@ -1,24 +1,25 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketEvent;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
-import org.bukkit.event.Listener;
 
 import java.util.List;
 
 @Singleton
 @PluginAdapter("ProtocolLib")
 @BPvPListener
-public class CombatSoundPacketListener extends PacketAdapter implements Listener {
+public class CombatSoundPacketListener implements PacketListener {
 
     private final List<Sound> blockedSounds = List.of(
             Sound.ENTITY_PLAYER_ATTACK_SWEEP,
@@ -31,17 +32,17 @@ public class CombatSoundPacketListener extends PacketAdapter implements Listener
 
     @Inject
     private CombatSoundPacketListener(Core core) {
-        super(core, ListenerPriority.NORMAL, PacketType.Play.Server.NAMED_SOUND_EFFECT);
-        ProtocolLibrary.getProtocolManager().addPacketListener(this);
+        PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.NORMAL);
     }
 
     @Override
-    public void onPacketSending(PacketEvent event) {
+    public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Play.Server.NAMED_SOUND_EFFECT) {
             return;
         }
 
-        Sound sound = event.getPacket().getSoundEffects().read(0);
+        final WrapperPlayServerSoundEffect packet = new WrapperPlayServerSoundEffect(event);
+        Sound sound = Registry.SOUNDS.get(packet.getSound().getSoundId().key());
         if (sound != null && blockedSounds.contains(sound)) {
             event.setCancelled(true);
         }
