@@ -32,7 +32,7 @@ public class MetalRecipeBootstrap {
         builder.setPrimaryResult(steel, 1000);
         builder.addIngredient(itemFactory.getFallbackItem(Material.IRON_INGOT), 10);
         builder.addIngredient(itemFactory.getFallbackItem(Material.COAL_BLOCK), 2);
-        recipeRegistry.registerSmeltingRecipe(builder.build(itemFactory));
+        recipeRegistry.registerRecipe(builder.build(itemFactory));
         alloyRegistry.registerAlloy(steel);
     }
 
@@ -44,7 +44,7 @@ public class MetalRecipeBootstrap {
         builder.addIngredient(blackroot, 10);
         builder.addIngredient(runebloodOre, 1);
         builder.addIngredient(fissureQuartz, 2);
-        recipeRegistry.registerSmeltingRecipe(builder.build(itemFactory));
+        recipeRegistry.registerRecipe(builder.build(itemFactory));
         alloyRegistry.registerAlloy(runesteel);
     }
 

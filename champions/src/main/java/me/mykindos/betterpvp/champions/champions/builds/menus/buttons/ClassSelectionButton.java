@@ -85,6 +85,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
         List<Component> roleLore = new ArrayList<>(List.of(
                 Component.text("While wearing base armor:", NamedTextColor.GRAY),
                 Component.empty()
+                        .append(Component.text("+", TextColor.color(255, 0, 0)))
                         .append(Component.text(UtilFormat.formatNumber(reduction), TextColor.color(255, 0, 0)))
                         .appendSpace()
                         .append(Component.text("❤", TextColor.color(255, 0, 0)))

@@ -20,6 +20,12 @@ import java.util.Objects;
 @UtilityClass
 public class Menu {
 
+    public static final ItemProvider INVISIBLE_BACKGROUND_ITEM = ItemView.builder()
+            .material(Material.PAPER)
+            .itemModel(Resources.ItemModel.INVISIBLE)
+            .hideTooltip(true)
+            .build();
+
     /**
      * The {@link ItemProvider} for {@link ItemStack}s used as background items in menus.
      */
@@ -73,10 +79,6 @@ public class Menu {
 
     public static void registerGlobalIngredients() {
         Structure.addGlobalIngredient('X', BACKGROUND_GUI_ITEM);
-        Structure.addGlobalIngredient('0', ItemView.builder()
-                .material(Material.PAPER)
-                .itemModel(Resources.ItemModel.INVISIBLE)
-                .hideTooltip(true)
-                .build());
+        Structure.addGlobalIngredient('0', INVISIBLE_BACKGROUND_ITEM);
     }
 }

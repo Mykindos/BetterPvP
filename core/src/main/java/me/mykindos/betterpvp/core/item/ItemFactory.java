@@ -218,7 +218,10 @@ public class ItemFactory {
         List<ItemInstance> instances = new ArrayList<>();
         for (ItemStack stack : stacks) {
             if (stack != null) {
-                fromItemStack(stack).ifPresent(instances::add);
+                final ItemInstance instance = fromItemStack(stack).orElse(null);
+                instances.add(instance);
+            } else {
+                instances.add(null);
             }
         }
         return instances;

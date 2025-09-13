@@ -9,8 +9,8 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.AuctionButton;
@@ -42,9 +42,9 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
                 "# # # < - > # s #")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(previous))
-                .addIngredient('>', new ForwardButton())
+                .addIngredient('>', new PageForwardButton())
                 .addIngredient('s', new SearchListingButton(auctionManager)));
         this.player = player;
         this.title = "Auction House";

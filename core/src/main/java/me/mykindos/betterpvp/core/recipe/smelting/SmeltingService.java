@@ -62,14 +62,13 @@ public class SmeltingService {
     }
     
     /**
-     * Finds a smelting recipe that matches the given items and temperature.
+     * Finds a smelting recipe that matches the given items
      * @param items Map of slot positions to item stacks
-     * @param currentTemperature The current temperature of the smelter
      * @return The matching smelting recipe, or empty if none found
      */
-    public Optional<SmeltingRecipe> findMatchingRecipe(@NotNull Map<Integer, ItemStack> items, float currentTemperature) {
-        return smeltingRecipeRegistry.getSmeltingRecipes().stream()
-                .filter(recipe -> recipe.matches(items) && recipe.getMinimumTemperature() <= currentTemperature)
+    public Optional<SmeltingRecipe> findMatchingRecipe(@NotNull Map<Integer, ItemStack> items) {
+        return smeltingRecipeRegistry.getRecipes().stream()
+                .filter(recipe -> recipe.matches(items))
                 .findFirst();
     }
     
@@ -94,7 +93,7 @@ public class SmeltingService {
      * @return A list of possible smelting recipes
      */
     public List<SmeltingRecipe> getPossibleRecipes(@NotNull Map<Integer, ItemStack> items) {
-        return smeltingRecipeRegistry.getSmeltingRecipes().stream()
+        return smeltingRecipeRegistry.getRecipes().stream()
                 .filter(recipe -> recipe.matches(items))
                 .toList();
     }

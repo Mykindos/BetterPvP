@@ -69,4 +69,8 @@ public class SmelterEffectsManager {
                 .extra(0)
                 .spawn();
     }
-} 
+
+    public void playEmptyEffect(Location location) {
+        new SoundEffect(Sound.ITEM_BUCKET_EMPTY, 1.5f, 1f).play(location);
+    }
+}

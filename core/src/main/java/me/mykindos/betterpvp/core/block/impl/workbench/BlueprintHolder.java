@@ -41,7 +41,7 @@ public class BlueprintHolder extends AbstractItem {
         if (item == null) {
             return ItemView.builder()
                     .material(Material.PAPER)
-                    .itemModel(Resources.ItemModel.STOP)
+                    .itemModel(Resources.ItemModel.INVISIBLE)
                     .displayName(Component.text("Add Blueprint", NamedTextColor.GREEN))
                     .lore(Component.text("Drag a blueprint from your", NamedTextColor.GRAY))
                     .lore(Component.text("inventory into this slot to", NamedTextColor.GRAY))
@@ -71,9 +71,6 @@ public class BlueprintHolder extends AbstractItem {
                 event.setCursor(virtualInventory.getItem(0));
                 virtualInventory.setItem(new PlayerUpdateReason(player, event), 0, null);
                 notifyWindows();
-            } else {
-                // Otherwise cancel
-                SoundEffect.WRONG_ACTION.play(player);
             }
             return;
         }
@@ -81,7 +78,6 @@ public class BlueprintHolder extends AbstractItem {
         // Try to convert the cursor item to ItemInstance and check if it's a blueprint
         final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(cursorItem);
         if (instanceOpt.isEmpty()) {
-            SoundEffect.WRONG_ACTION.play(player);
             return;
         }
 
@@ -89,7 +85,6 @@ public class BlueprintHolder extends AbstractItem {
         final Optional<BlueprintComponent> componentOpt = itemInstance.getComponent(BlueprintComponent.class);
         if (componentOpt.isEmpty()) {
             // Not a blueprint
-            SoundEffect.WRONG_ACTION.play(player);
             return;
         }
 
@@ -109,7 +104,5 @@ public class BlueprintHolder extends AbstractItem {
 
         // Update all GUI sections to reflect the addition
         notifyWindows();
-
-        SoundEffect.HIGH_PITCH_PLING.play(player);
     }
 }

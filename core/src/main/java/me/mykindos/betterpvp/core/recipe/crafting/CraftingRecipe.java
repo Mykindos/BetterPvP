@@ -14,19 +14,6 @@ import java.util.List;
 public interface CraftingRecipe extends Recipe<BaseItem, ItemInstance> {
 
     /**
-     * Gets all results of this recipe.
-     *
-     * @return A list of ItemInstances that will be created when this recipe is crafted
-     */
-    @NotNull List<BaseItem> getResults();
-
-    /**
-     * Creates all results of this recipe.
-     * @return A list of ItemInstances representing all results of this recipe
-     */
-    @NotNull List<ItemInstance> createResults();
-
-    /**
      * Checks if this recipe requires a blueprint to be crafted.
      * @return true if a blueprint is needed, false otherwise
      */

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.menu.AbstractCraftingGui;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -36,23 +37,27 @@ public class GuiCraftingTableAdvanced extends AbstractCraftingGui {
 
     @SneakyThrows
     GuiCraftingTableAdvanced(GuiWorkbench parent, CraftingManager craftingManager, ItemFactory itemFactory) {
-        super(craftingManager, itemFactory);
+        super(craftingManager, itemFactory, 9, 6);
         this.parent = parent;
         this.blueprintInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
 
         // Setup GUI structure with crafting grid, result, quick crafts, and blueprint button
         applyStructure(new Structure(
+                "0000000AI",
+                "0XXX00000",
+                "0XXXB0R00",
+                "0XXX00000",
                 "000000000",
-                "0XXX0000H",
-                "0XXX00R0K",
-                "0XXX0000J",
-                "000000B0V",
-                "00000000I")
+                "V01234567")
                 .addIngredient('X', craftingMatrix)
                 .addIngredient('R', resultInventory)
-                .addIngredient('H', new QuickCraftingButton(0, parent))
-                .addIngredient('K', new QuickCraftingButton(1, parent))
-                .addIngredient('J', new QuickCraftingButton(2, parent))
+                .addIngredient('1', new QuickCraftingButton(0, parent))
+                .addIngredient('2', new QuickCraftingButton(1, parent))
+                .addIngredient('3', new QuickCraftingButton(2, parent))
+                .addIngredient('4', new QuickCraftingButton(3, parent))
+                .addIngredient('5', new QuickCraftingButton(4, parent))
+                .addIngredient('6', new QuickCraftingButton(5, parent))
+                .addIngredient('7', new QuickCraftingButton(6, parent))
                 .addIngredient('V', new QuickCraftViewerButton())
                 .addIngredient('B', new BlueprintHolder(itemFactory, blueprintInventory))
                 .addIngredient('I', InfoTabButton.builder()
@@ -103,7 +108,7 @@ public class GuiCraftingTableAdvanced extends AbstractCraftingGui {
         public ItemProvider getItemProvider() {
             return ItemView.builder()
                     .material(Material.PAPER)
-                    .itemModel(Resources.ItemModel.INVISIBLE)
+                    .itemModel(Key.key("betterpvp", "menu/icon/regular/book_icon"))
                     .displayName(Component.text("More Quick Crafts", TextColor.color(0, 207, 41)))
                     .build();
         }

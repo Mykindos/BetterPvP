@@ -63,6 +63,7 @@ public class ClearCommand extends Command {
         final List<ItemInstance> items = itemFactory.fromArray(target.getInventory().getContents());
         final Map<ItemInstance, UUID> map = new HashMap<>();
         for (ItemInstance item : items) {
+            if (item == null) continue;
             final Optional<UUIDProperty> uuidCompt = item.getComponent(UUIDProperty.class);
             uuidCompt.ifPresent(uuidProperty -> map.put(item, uuidProperty.getUniqueId()));
         }

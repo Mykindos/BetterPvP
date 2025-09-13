@@ -11,5 +11,5 @@ import java.util.Map;
  * This includes the primary result item, any additional results,
  * and the new crafting matrix that should be used after the crafting operation.
  */
-public record CraftingResult(ItemInstance result, List<ItemInstance> additionalResults, Map<Integer, ItemInstance> newCraftingMatrix) {
+public record CraftingResult(ItemInstance result, Map<Integer, ItemInstance> newCraftingMatrix) {
 }
