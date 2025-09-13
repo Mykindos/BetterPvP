@@ -15,6 +15,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
+
 /**
  * Button that shows a description and wiki entries.
  */
@@ -23,7 +25,11 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public class BackTabButton extends AbstractItem {
 
-    private final Runnable onBack;
+    private final Consumer<Player> onBack;
+
+    public BackTabButton(Runnable onBack) {
+        this.onBack = player -> onBack.run();
+    }
 
     @Override
     public ItemProvider getItemProvider() {
@@ -36,6 +42,6 @@ public class BackTabButton extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        onBack.run();
+        onBack.accept(player);
     }
 }

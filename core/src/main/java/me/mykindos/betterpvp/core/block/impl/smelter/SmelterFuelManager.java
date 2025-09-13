@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static me.mykindos.betterpvp.core.block.impl.smelter.SmelterConstants.BURN_TIME_DECREASE_PER_TICK;
@@ -34,6 +35,7 @@ public class SmelterFuelManager {
     private final StorageBlockData fuelItems;
 
     private long burnTime = 0L; // Millis
+    private long lastBurnTime = -1L; // Millis
     private float temperature = 0.0f; // Celsius
 
     public SmelterFuelManager(@NotNull ItemFactory itemFactory, long maxBurnTime) {
@@ -55,11 +57,6 @@ public class SmelterFuelManager {
      * Updates the burn time and temperature each tick.
      */
     public void updatePerTick() {
-        // Decrease burn time
-        if (burnTime > 0) {
-            setBurnTime(Math.max(0, getBurnTime() - BURN_TIME_DECREASE_PER_TICK));
-        }
-
         // Handle temperature
         if (burnTime > 0) {
             // Increase temperature while burning
@@ -67,6 +64,11 @@ public class SmelterFuelManager {
         } else {
             // Decrease temperature when not burning
             setTemperature(Math.max(0, getTemperature() - TEMPERATURE_DECREASE_PER_TICK));
+        }
+
+        // Decrease burn time
+        if (burnTime > 0) {
+            setBurnTime(Math.max(0, getBurnTime() - BURN_TIME_DECREASE_PER_TICK));
         }
     }
 
@@ -86,7 +88,7 @@ public class SmelterFuelManager {
         long fuelBurnTime = fuelComponent.getBurnTime();
 
         // Check if we should burn this fuel (only if it won't exceed max burn time)
-        if (burnTime + fuelBurnTime <= maxBurnTime) {
+        if (burnTime == 0 && burnTime + fuelBurnTime <= maxBurnTime) {
             // Consume one fuel item
             ItemStack fuelStack = fuelItems.getContent().getFirst().createItemStack();
             if (fuelStack.getAmount() > 1) {
@@ -102,7 +104,8 @@ public class SmelterFuelManager {
             }
 
             // Add burn time
-            setBurnTime(burnTime + fuelBurnTime);
+            setBurnTime(fuelBurnTime);
+            lastBurnTime = fuelBurnTime;
 
             // Play sound effect
             new SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, FUEL_CONSUME_VOLUME, FUEL_CONSUME_PITCH).play(location);
@@ -120,11 +123,14 @@ public class SmelterFuelManager {
      */
     private Optional<FuelComponent> getFuel() {
         List<ItemInstance> currentFuel = fuelItems.getContent();
-        if (currentFuel.isEmpty()) {
+        if (currentFuel.stream().noneMatch(Objects::nonNull)) {
             return Optional.empty(); // No fuel available
         }
 
         ItemInstance fuelItem = currentFuel.getFirst();
+        if (fuelItem == null) {
+            return Optional.empty(); // No fuel available
+        }
         return fuelItem.getComponent(FuelComponent.class);
     }
 

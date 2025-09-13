@@ -83,7 +83,7 @@ public class SmartBlockDataChunkManager {
     private void loadChunkAsync(Chunk chunk) {
         long chunkKey = chunk.getChunkKey();
         
-        storage.loadChunk(chunk).thenAccept(chunkData -> {
+        storage.loadChunk(chunk).thenAcceptAsync(chunkData -> {
             try {
                 processLoadedChunkData(chunkData);
             } finally {

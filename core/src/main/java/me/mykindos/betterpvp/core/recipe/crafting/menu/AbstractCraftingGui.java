@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -45,8 +46,8 @@ public abstract class AbstractCraftingGui extends AbstractGui {
     protected boolean blocked = false;
 
     @Inject
-    protected AbstractCraftingGui(CraftingManager craftingManager, ItemFactory itemFactory) {
-        super(9, 6);
+    protected AbstractCraftingGui(CraftingManager craftingManager, ItemFactory itemFactory, int width, int height) {
+        super(width, height);
         this.craftingManager = craftingManager;
         this.itemFactory = itemFactory;
         this.craftingMatrix = new VirtualInventory(UUID.randomUUID(), new ItemStack[3 * 3]);
@@ -115,12 +116,12 @@ public abstract class AbstractCraftingGui extends AbstractGui {
             // Attempt to craft an item, if it fails, cancel the player clicking the result
             if (!craft(player)) {
                 event.setCancelled(true);
-                playCrafted(player);
                 return;
             }
 
             // If crafting was successful, update the matrix again because the result may have changed
             event.setNewItem(processResult(player, craftingMatrix.getItems()));
+            playCrafted(player);
         });
     }
 
@@ -241,11 +242,6 @@ public abstract class AbstractCraftingGui extends AbstractGui {
             return false;
         }
 
-        if (!result.additionalResults().isEmpty()) {
-            log.warn("Crafting result contains additional items, which are not supported in this GUI.").submit();
-            return false;
-        }
-
         final Map<Integer, ItemInstance> newMatrix = result.newCraftingMatrix();
         for (int i = 0; i < craftingMatrix.getSize(); i++) {
             ItemInstance instance = newMatrix.get(i);
@@ -272,6 +268,7 @@ public abstract class AbstractCraftingGui extends AbstractGui {
             blocked = true;
             return ItemView.builder()
                     .material(Material.BARRIER)
+                    .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_crafting_table_disabled"))
                     .displayName(Component.text("You cannot craft this!", NamedTextColor.RED))
                     .lore(Component.text("This recipe cannot be crafted by you.", NamedTextColor.GRAY))
                     .build()
@@ -282,7 +279,7 @@ public abstract class AbstractCraftingGui extends AbstractGui {
             blocked = true;
             return ItemView.builder()
                     .material(Material.BARRIER)
-                    .itemModel(Resources.ItemModel.STOP)
+                    .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_crafting_table_disabled"))
                     .displayName(Component.text("You need a blueprint to craft this!", NamedTextColor.RED))
                     .lore(Component.text("This recipe requires a blueprint to be crafted.", NamedTextColor.GRAY))
                     .build()
