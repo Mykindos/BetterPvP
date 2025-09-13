@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.block.impl.smelter;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.CustomModelData;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
@@ -9,7 +8,6 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.builder.ItemBuilder;
 import me.mykindos.betterpvp.core.inventory.item.impl.AutoUpdateItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -35,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
@@ -50,7 +47,6 @@ public class GuiSmelter extends AbstractGui implements Windowed {
 
     private final SmelterData data;
     private final ItemFactory itemFactory;
-    private final int maxFuelSegments = 4;
     private final VirtualInventory contentInventory;
     private final VirtualInventory fuelInventory;
     private final VirtualInventory resultInventory;
@@ -181,30 +177,26 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         });
 
         applyStructure(new Structure(
-                "0000000A0",
-                "0YYYYY0BT",
-                "0YYYYY0CT",
-                "000X000DT",
-                "000WH00E0",
-                "000Z000FI")
-                // Fuel meter
-                .addIngredient('A', new FuelMeter(4))
-                .addIngredient('B', new FuelMeter(3))
-                .addIngredient('C', new FuelMeter(2))
-                .addIngredient('D', new FuelMeter(1))
-                .addIngredient('E', new FuelMeter())
-                // Fuel inventory
-                .addIngredient('F', fuelInventory)
-                // Casting mold slot
-                .addIngredient('H', new CastingMoldPicker())
-                // Temperature meter
-                .addIngredient('T', new TemperatureMeter())
+                "00000000I",
+                "0AAA00000",
+                "0AAA0W0D0",
+                "00B0GggE0",
+                "00C0H00F0",
+                "000000000")
                 // Content inventory
-                .addIngredient('Y', contentInventory)
+                .addIngredient('A', contentInventory)
+                // Fuel meter
+                .addIngredient('B', new FuelMeter())
+                // Fuel inventory
+                .addIngredient('C', fuelInventory)
+                // Casting mold slot
+                .addIngredient('D', new CastingMoldPicker())
                 // Results (liquid and casting molds)
-                .addIngredient('X', new AlloyStorage(false))
-                .addIngredient('W', new AlloyStorage(true))
-                .addIngredient('Z', resultInventory)
+                .addIngredient('E', new AlloyStorage())
+                .addIngredient('F', resultInventory)
+                .addIngredient('G', new ProgressArrow(false))
+                .addIngredient('g', new ProgressArrow(true))
+                .addIngredient('W', new WarningIcon())
                 .addIngredient('I', InfoTabButton.builder()
                         .description(Component.text("The smelter allows you to melt down metals and " +
                                 "alloys into liquid form, which can then be cast into various shapes using casting molds." +
@@ -229,29 +221,6 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         if (!data.getProcessingEngine().getResultItems().isEmpty()) {
             // We have a valid recipe, sync normally
             syncFromStorage(resultInventory, data.getProcessingEngine().getResultItems().getContent());
-            return;
-        }
-
-        // Check if we have a casting mold selected
-        if (data.getProcessingEngine().getCastingMold() == null) {
-            // No casting mold selected, show barrier
-            ItemStack barrier = ItemStack.of(Material.BARRIER);
-            barrier.setData(DataComponentTypes.ITEM_MODEL, (Resources.ItemModel.STOP));
-            barrier.editMeta(meta -> meta.displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED)
-                    .decoration(TextDecoration.ITALIC, false)));
-            resultInventory.setItemSilently(0, barrier);
-            return;
-        }
-
-        // Check if we have stored liquid and if there's a valid recipe
-        if (data.getLiquidManager().getStoredLiquid() == null || data.getProcessingEngine().getCurrentRecipe() == null) {
-            // No valid recipe available, show barrier
-            ItemStack barrier = ItemStack.of(Material.BARRIER);
-            barrier.setData(DataComponentTypes.ITEM_MODEL, (Resources.ItemModel.STOP));
-            barrier.editMeta(meta -> meta.displayName(Component.text("No Recipe Found", NamedTextColor.RED)
-                    .decoration(TextDecoration.ITALIC, false)));
-            resultInventory.setItemSilently(0, barrier);
-            return;
         }
     }
 
@@ -275,7 +244,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         }
         for (int i = 0; i < items.size(); i++) {
             ItemInstance item = items.get(i);
-            final ItemStack stack = item.createItemStack();
+            final ItemStack stack = item == null ? null : item.createItemStack();
             inventory.setItemSilently(i, stack);
         }
     }
@@ -287,88 +256,85 @@ public class GuiSmelter extends AbstractGui implements Windowed {
 
     private class FuelMeter extends AutoUpdateItem {
 
-        private final int segment;
-
-        private FuelMeter(int segment) {
-            super(1, null); // we can use null here because we override getItemProvider
-            this.segment = segment;
-        }
-
         private FuelMeter() {
-            this(-1);
+            super(1, null); // we can use null here because we override getItemProvider
         }
 
-        private Component getDisplayName(float percentage) {
+        private Component getFuelComponent() {
+            final float percentage = Math.max(0, Math.min(1, data.getBurnTime() / (float) data.getFuelManager().getLastBurnTime()));
             final ProgressColor progressColor = new ProgressColor(percentage);
-            return Component.text("Fuel:", TextColor.color(214, 214, 214))
+            return Component.text("Burn Time:", TextColor.color(214, 214, 214))
                     .appendSpace()
-                    .append(Component.text((int) (percentage * 100) + "%", progressColor.getTextColor()));
+                    .append(Component.text((int) Math.ceil(data.getBurnTime() / 1000.) + "s", progressColor.getTextColor()));
         }
 
-        @Override
-        public ItemProvider getItemProvider() {
-            final float percentage = Math.max(0, Math.min(1, data.getBurnTime() / (float) data.getMaxBurnTime()));
-            final float totalFill = percentage * maxFuelSegments;
-
-            final ItemStack itemStack = ItemStack.of(Material.PAPER);
-            final ItemMeta meta = itemStack.getItemMeta();
-            meta.displayName(getDisplayName(percentage).decoration(TextDecoration.ITALIC, false));
-            itemStack.setItemMeta(meta);
-
-            // Calculate how full this specific segment is
-            if (segment != -1) {
-                float segmentFill = totalFill - (segment - 1); // 1.0 = full, 0.0 = empty
-                if (segmentFill <= 0) {
-                    // Empty → invisible
-                    itemStack.setData(DataComponentTypes.ITEM_MODEL, Resources.ItemModel.INVISIBLE);
-                    return new ItemBuilder(itemStack);
-                }
-
-                // Clamp to [0.0, 1.0] range
-                segmentFill = Math.min(1.0f, segmentFill);
-
-                // Determine the stage (0 = full, 3 = 25%)
-                int fillStage = 3 - Math.min(3, (int) (segmentFill * 4.0f));
-                int modelIndex = (4 - segment) * 4 + fillStage;
-
-                itemStack.setData(DataComponentTypes.ITEM_MODEL, Key.key("betterpvp", "menu/gui/smelter/fuel_bar_generic"));
-                itemStack.setData(DataComponentTypes.CUSTOM_MODEL_DATA,
-                        CustomModelData.customModelData().addString(String.valueOf(modelIndex)).build());
-            } else {
-                itemStack.setData(DataComponentTypes.ITEM_MODEL, Resources.ItemModel.INVISIBLE);
-            }
-
-            return new ItemBuilder(itemStack);
-        }
-    }
-
-    private class TemperatureMeter extends AutoUpdateItem {
-
-        private TemperatureMeter() {
-            super(1, null);
-        }
-
-        @Override
-        public ItemProvider getItemProvider() {
+        private Component getTemperatureComponent() {
             final float temperature = data.getTemperature();
             final TextColor color = new ProgressColor(temperature / 1_000).inverted().getTextColor();
+            return Component.text("Temperature:", TextColor.color(214, 214, 214))
+                    .appendSpace()
+                    .append(Component.text((int) temperature + " °C", color));
+        }
+
+        @Override
+        public ItemProvider getItemProvider() {
+            if (!data.isBurning()) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Resources.ItemModel.INVISIBLE)
+                        .displayName(getFuelComponent())
+                        .lore(getTemperatureComponent())
+                        .build();
+            }
+
+            final float percentage =  data.getBurnTime() / (float) data.getFuelManager().getLastBurnTime();
+            final int phase = 12 - Math.max(0, Math.min(12, (int) Math.round(percentage * 12))); // 13 available phases (0-based)
             return ItemView.builder()
                     .material(Material.PAPER)
-                    .itemModel(Resources.ItemModel.INVISIBLE)
-                    .displayName(Component.text("Temperature: ", TextColor.color(214, 214, 214))
-                            .appendSpace()
-                            .append(Component.text((int) temperature + " °C", color)))
+                    .itemModel(Key.key("betterpvp", "menu/sprite/smelter/fuel_indicator"))
+                    .customModelData(phase)
+                    .displayName(getFuelComponent())
+                    .lore(getTemperatureComponent())
                     .build();
         }
     }
 
-    private class AlloyStorage extends AutoUpdateItem {
+    private class ProgressArrow extends AutoUpdateItem {
 
         private final boolean invisible;
 
-        private AlloyStorage(boolean invisible) {
+        private ProgressArrow(boolean invisible) {
             super(1, null); // we can use null here because we override getItemProvider
             this.invisible = invisible;
+        }
+
+        @Override
+        public ItemProvider getItemProvider() {
+            final float percentage = data.getProcessingEngine().getSmeltingProgress();
+            final int phase = Math.max(0, Math.min(14, Math.round(percentage * 14))); // 15 available phases
+            if (phase == 0 || data.getProcessingEngine().getSmeltingAlloy() == null) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Resources.ItemModel.INVISIBLE)
+                        .hideTooltip(true)
+                        .build();
+            }
+            final int seconds = (int) (Math.ceil(data.getProcessingEngine().getSmeltingTime() * (1 - percentage) / 1000));
+            final ProgressColor progressColor = new ProgressColor(percentage);
+            return ItemView.builder()
+                    .material(Material.PAPER)
+                    .itemModel(invisible ? Resources.ItemModel.INVISIBLE : Key.key("betterpvp", "menu/sprite/smelter/progress_indicator"))
+                    .customModelData(phase)
+                    .displayName(Component.text(seconds + "s", progressColor.getTextColor()))
+                    .build();
+        }
+
+    }
+
+    private class AlloyStorage extends AutoUpdateItem {
+
+        private AlloyStorage() {
+            super(1, null); // we can use null here because we override getItemProvider
         }
 
         @Override
@@ -376,34 +342,42 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             final LiquidAlloy storedLiquid = data.getLiquidManager().getStoredLiquid();
             final int millibuckets = storedLiquid == null ? 0 : storedLiquid.getMillibuckets();
             final int maxMillibuckets = data.getMaxLiquidCapacity();
-            final Key model = storedLiquid == null
-                    ? Resources.ItemModel.INVISIBLE
-                    : Key.key("betterpvp", "menu/gui/smelter/output");
             final TextColor storedColor = new ProgressColor(millibuckets / (float) maxMillibuckets).inverted().getTextColor();
-            final TextComponent name = storedLiquid == null
-                    ? Component.text("Empty", TextColor.color(255, 86, 74))
-                    : Component.text(storedLiquid.getName(), TextColor.color(storedLiquid.getAlloyType().getColor().asRGB()), TextDecoration.BOLD);
-
-            final ItemStack item = ItemView.builder()
-                    .material(Material.PAPER)
-                    .itemModel(invisible ? Resources.ItemModel.INVISIBLE : model)
-                    .displayName(name)
-                    .lore(Component.text("Stored: ", TextColor.color(214, 214, 214))
+            final ItemView.ItemViewBuilder builder = ItemView.builder();
+            builder.material(Material.PAPER);
+            builder.lore(Component.text("Stored: ", TextColor.color(214, 214, 214))
                             .appendSpace()
-                            .append(Component.text(millibuckets + " mB", storedColor)))
-                    .lore(Component.text("Max Capacity: ", TextColor.color(214, 214, 214))
+                            .append(Component.text(millibuckets + " mB", storedColor)));
+            builder.lore(Component.text("Max Capacity: ", TextColor.color(214, 214, 214))
                             .appendSpace()
-                            .append(Component.text(maxMillibuckets + " mB", TextColor.color(255, 0, 0))))
-                    .build().get();
+                            .append(Component.text(maxMillibuckets + " mB", TextColor.color(255, 0, 0))));
+            builder.action(ClickActions.RIGHT_SHIFT, Component.text("Clear", NamedTextColor.RED));
 
-            if (storedLiquid != null) {
-                final CustomModelData modelData = CustomModelData.customModelData()
-                        .addColor(storedLiquid.getAlloyType().getColor())
+            final float progress = millibuckets / (float) maxMillibuckets;
+            final int phase = Math.max(0, Math.min(15, Math.round(progress * 15))); // 16 available phases
+            if (storedLiquid == null || phase == 0) {
+                return builder
+                        .itemModel(Resources.ItemModel.INVISIBLE)
+                        .displayName(Component.text("Empty", TextColor.color(255, 86, 74)))
                         .build();
-                item.setData(DataComponentTypes.CUSTOM_MODEL_DATA, modelData);
             }
 
-            return new ItemBuilder(item);
+            final TextColor color = TextColor.color(storedLiquid.getAlloyType().getColor().asRGB());
+            final TextComponent name = Component.text(storedLiquid.getName(), color, TextDecoration.BOLD);
+            return builder.itemModel(Key.key("betterpvp", "menu/sprite/smelter/alloy_indicator/" + storedLiquid.getAlloyType().getTextureKey()))
+                    .displayName(name)
+                    .customModelData(phase)
+                    .build();
+        }
+
+        @Override
+        public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+            if (clickType != ClickType.SHIFT_RIGHT) {
+                return;
+            }
+
+            data.getLiquidManager().setStoredLiquid(null);
+            SoundEffect.LOW_PITCH_PLING.play(player);
         }
     }
 
@@ -431,6 +405,98 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
             // Open casting mold picker GUI
             picker.show(player);
+        }
+    }
+
+    private class WarningIcon extends AutoUpdateItem {
+
+        private WarningIcon() {
+            super(1, null); // we can use null here because we override getItemProvider
+        }
+
+        @Override
+        public ItemProvider getItemProvider() {
+            // If we have items and there isnt a matching recipe
+            if (!contentInventory.isEmpty() && data.getProcessingEngine().getCurrentSmeltingRecipe() == null) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
+                        .displayName(Component.text("No smelting recipe found!", NamedTextColor.RED))
+                        .lore(Component.text("No matching smelting recipe was found for the given items.", NamedTextColor.GRAY))
+                        .build();
+            }
+
+            // If we're not burning and we have a recipe'
+            if (!data.isBurning() && data.getProcessingEngine().getCurrentSmeltingRecipe() != null) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
+                        .displayName(Component.text("Not burning!", NamedTextColor.RED))
+                        .lore(Component.text("The smelter is not currently burning. Add fuel to start the smelting process.", NamedTextColor.GRAY))
+                        .build();
+            }
+
+            // If we have an alloy and there isnt a matching casting recipe
+            if (data.getLiquidManager().hasLiquid() && data.getProcessingEngine().getCurrentCastingRecipe() == null) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
+                        .displayName(Component.text("No casting recipe found!", NamedTextColor.RED))
+                        .lore(Component.text("No matching casting recipe was found for the given items.", NamedTextColor.GRAY))
+                        .build();
+            }
+
+            // If what we're smelting isn't compatible with what's in already
+            if (!data.getLiquidManager().isCompatibleWith(data.getProcessingEngine().getSmeltingAlloy())) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
+                        .displayName(Component.text("Incompatible alloy!", NamedTextColor.RED))
+                        .lore(Component.text("The smelter already contains a different type of alloy.", NamedTextColor.GRAY))
+                        .build();
+            }
+
+            // If what we're smelting can't fit into the liquid storage
+            if (data.getProcessingEngine().getSmeltingAlloy() != null
+                    && !data.getLiquidManager().hasCapacityFor(data.getProcessingEngine().getSmeltingAlloy().getMillibuckets())) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
+                        .displayName(Component.text("Not enough liquid capacity!", NamedTextColor.RED))
+                        .lore(Component.text("The smelter does not have enough capacity to store the resulting liquid.", NamedTextColor.GRAY))
+                        .build();
+            }
+
+            // If the liquid storage is full
+            if (data.getLiquidManager().getRemainingLiquidCapacity() <= 0) {
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
+                        .displayName(Component.text("Liquid storage full!", NamedTextColor.RED))
+                        .lore(Component.text("The smelter's liquid storage is full. Clear some space to continue smelting.", NamedTextColor.GRAY))
+                        .build();
+            }
+
+            // If we're not at the necessary temperature and we have a recipe
+            if (data.getProcessingEngine().getCurrentSmeltingRecipe() != null
+                    && data.getTemperature() < data.getProcessingEngine().getCurrentSmeltingRecipe().getMinimumTemperature()) {
+                float correctTemp = data.getProcessingEngine().getCurrentSmeltingRecipe().getMinimumTemperature();
+                final TextColor color = new ProgressColor(correctTemp / 1_000).inverted().getTextColor();
+                return ItemView.builder()
+                        .material(Material.PAPER)
+                        .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
+                        .displayName(Component.text("Insufficient temperature!", NamedTextColor.RED))
+                        .lore(Component.text("The smelter's temperature is too low. Minimum required: ", TextColor.color(214, 214, 214))
+                                .appendSpace()
+                                .append(Component.text((int) correctTemp + " °C", color)))
+                        .build();
+            }
+
+            return ItemView.builder()
+                    .material(Material.PAPER)
+                    .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace"))
+                    .hideTooltip(true)
+                    .build();
         }
     }
 }

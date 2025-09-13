@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -41,11 +42,11 @@ public class ImbuementPedestalItemManager implements RemovalHandler, LoadHandler
      * @return true if the item was added successfully
      */
     public boolean addItem(@NotNull ItemInstance item) {
-        List<ItemInstance> currentItems = pedestalItems.getContent();
         if (isFull()) {
             return false;
         }
 
+        List<ItemInstance> currentItems = pedestalItems.getContent();
         currentItems.add(item);
         pedestalItems.setContent(currentItems);
         checkForRecipe();
@@ -59,11 +60,11 @@ public class ImbuementPedestalItemManager implements RemovalHandler, LoadHandler
      */
     @Nullable
     public ItemInstance removeLastItem() {
-        List<ItemInstance> currentItems = pedestalItems.getContent();
-        if (currentItems.isEmpty()) {
+        if (!hasItems()) {
             return null;
         }
 
+        List<ItemInstance> currentItems = pedestalItems.getContent();
         ItemInstance removedItem = currentItems.removeLast();
         pedestalItems.setContent(currentItems);
         checkForRecipe();
@@ -84,7 +85,7 @@ public class ImbuementPedestalItemManager implements RemovalHandler, LoadHandler
     private void checkForRecipe() {
         currentRecipe = null;
 
-        if (pedestalItems.getContent().isEmpty()) {
+        if (!hasItems()) {
             return;
         }
 
@@ -105,7 +106,7 @@ public class ImbuementPedestalItemManager implements RemovalHandler, LoadHandler
 
     // Utility methods
     public int getItemCount() {
-        return pedestalItems.getContent().size();
+        return pedestalItems.getContent().stream().filter(Objects::nonNull).toList().size();
     }
 
     public boolean isFull() {
@@ -113,7 +114,7 @@ public class ImbuementPedestalItemManager implements RemovalHandler, LoadHandler
     }
 
     public boolean hasItems() {
-        return !pedestalItems.getContent().isEmpty();
+        return getItemCount() > 0;
     }
 
     public boolean hasRecipe() {

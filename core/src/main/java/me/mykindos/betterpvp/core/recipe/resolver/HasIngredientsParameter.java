@@ -1,26 +1,30 @@
-package me.mykindos.betterpvp.core.recipe.crafting.resolver;
+package me.mykindos.betterpvp.core.recipe.resolver;
 
 import com.google.common.base.Preconditions;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
-import me.mykindos.betterpvp.core.recipe.resolver.LookupParameter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Matches a {@link me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe} if the player has all ingredients
  * in their inventory.
  */
-public class HasIngredientsParameter implements LookupParameter<CraftingRecipe> {
+public class HasIngredientsParameter implements LookupParameter {
 
     private final WeakReference<Player> player;
     private final ItemFactory itemFactory;
@@ -31,7 +35,11 @@ public class HasIngredientsParameter implements LookupParameter<CraftingRecipe> 
     }
 
     @Override
-    public boolean test(CraftingRecipe recipe) {
+    public boolean test(Recipe<?, ?> recipe) {
+        if (!(recipe instanceof CraftingRecipe)) {
+            return false;
+        }
+
         final Collection<RecipeIngredient> required = new HashMap<>(recipe.getIngredients()).values();
         final Player player = this.player.get();
         if (player == null || required.isEmpty()) {

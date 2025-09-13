@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import java.util.Map;
 public class ShapedCraftingRecipe implements CraftingRecipe {
 
     private final BaseItem result;
-    private final List<BaseItem> additionalResults;
     private final Map<Integer, RecipeIngredient> ingredients;
     private final ItemFactory itemFactory;
     private final int width;
@@ -39,22 +37,7 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
      * @param itemFactory The ItemFactory to use for item matching
      */
     public ShapedCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this(result, Collections.emptyList(), ingredients, itemFactory, needsBlueprint);
-    }
-    
-    /**
-     * Creates a new shaped recipe with multiple results.
-     *
-     * @param primaryResult     The primary result of the recipe
-     * @param additionalResults Additional results of the recipe
-     * @param ingredients       The ingredients and their positions (0-8 for a 3x3 grid)
-     * @param itemFactory       The ItemFactory to use for item matching
-     * @param needsBlueprint
-     */
-    public ShapedCraftingRecipe(@NotNull BaseItem primaryResult, @NotNull List<BaseItem> additionalResults,
-                                @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this.result = primaryResult;
-        this.additionalResults = new ArrayList<>(additionalResults);
+        this.result = result;
         this.ingredients = new HashMap<>(ingredients);
         this.itemFactory = itemFactory;
         this.needsBlueprint = needsBlueprint;
@@ -69,22 +52,13 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
             maxX = Math.max(maxX, x);
             maxY = Math.max(maxY, y);
         }
-        
+
         this.width = maxX - minX + 1;
-        this.height = maxY - minY + 1;
-    }
+        this.height = maxY - minY + 1;    }
 
     @Override
     public @NotNull BaseItem getPrimaryResult() {
         return result;
-    }
-    
-    @Override
-    public @NotNull List<BaseItem> getResults() {
-        List<BaseItem> allResults = new ArrayList<>();
-        allResults.add(result);
-        allResults.addAll(additionalResults);
-        return allResults;
     }
 
     @Override
@@ -95,16 +69,6 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
     @Override
     public @NotNull ItemInstance createPrimaryResult() {
         return itemFactory.create(result);
-    }
-
-    @Override
-    public @NotNull List<ItemInstance> createResults() {
-        List<ItemInstance> instances = new ArrayList<>();
-        instances.add(itemFactory.create(result));
-        for (BaseItem additional : additionalResults) {
-            instances.add(itemFactory.create(additional));
-        }
-        return instances;
     }
 
     @Override
@@ -242,7 +206,6 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
      */
     public static class Builder {
         private final BaseItem result;
-        private final List<BaseItem> additionalResults = new ArrayList<>();
         private final String[] pattern;
         private final Map<Character, RecipeIngredient> ingredients = new HashMap<>();
         private final ItemFactory itemFactory;
@@ -306,17 +269,6 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
         }
         
         /**
-         * Adds a result to the recipe.
-         * 
-         * @param result The additional result to add
-         * @return This builder
-         */
-        public Builder addResult(@NotNull BaseItem result) {
-            additionalResults.add(result);
-            return this;
-        }
-        
-        /**
          * Builds the shaped recipe.
          * 
          * @return The built recipe
@@ -339,7 +291,7 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
                 }
             }
             
-            return new ShapedCraftingRecipe(result, additionalResults, recipeIngredients, itemFactory, needsBlueprint);
+            return new ShapedCraftingRecipe(result, recipeIngredients, itemFactory, needsBlueprint);
         }
     }
 } 

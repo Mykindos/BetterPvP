@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.block.impl.smelter;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.recipe.smelting.LiquidAlloy;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.bukkit.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
