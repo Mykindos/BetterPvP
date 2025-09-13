@@ -69,7 +69,7 @@ public class ImbuementPedestalData implements RemovalHandler, LoadHandler, TickH
      * @return The removed item, or null if the pedestal is empty
      */
     public ItemInstance removeLastItem() {
-        if (itemManager.getItems().isEmpty() || recipeExecutor.isExecutingRecipe()) {
+        if (!itemManager.hasItems() || recipeExecutor.isExecutingRecipe()) {
             return null;
         }
 

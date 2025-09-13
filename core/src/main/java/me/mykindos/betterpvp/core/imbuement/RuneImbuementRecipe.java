@@ -100,6 +100,7 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
         
         // Identify rune and target items
         for (ItemInstance item : items) {
+            if (item == null) continue;
             ItemStack stack = item.createItemStack();
             
             // Check if this is a rune item

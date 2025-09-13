@@ -308,7 +308,9 @@ public class ImbuementPedestalDisplayManager {
 
         // Recreate displays for current items
         for (ItemInstance item : items) {
-            createFlyingItemDisplay(item);
+            if (item != null) {
+                createFlyingItemDisplay(item);
+            }
         }
     }
 
