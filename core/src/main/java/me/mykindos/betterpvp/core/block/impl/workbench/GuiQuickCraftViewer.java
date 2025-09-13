@@ -5,22 +5,13 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.button.*;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
-import me.mykindos.betterpvp.core.recipe.crafting.resolver.HasIngredientsParameter;
-import me.mykindos.betterpvp.core.utilities.Resources;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class GuiQuickCraftViewer extends AbstractPagedGui<QuickCraftingButton> {
@@ -39,15 +30,15 @@ public class GuiQuickCraftViewer extends AbstractPagedGui<QuickCraftingButton> {
 
     GuiQuickCraftViewer(GuiWorkbench parentWorkbench) {
         super(9, 6, false, new Structure(
-                "000000000",
-                "0XXXXXXX0",
-                "0XXXXXXX0",
-                "0XXXXXXX0",
-                "000000000",
-                "000<0>0BI")
+                "0000000BI",
+                        "0XXXXXXX0",
+                        "0XXXXXXX0",
+                        "0XXXXXXX0",
+                        "000000000",
+                        "000<0>000")
                 .addIngredient('X', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                .addIngredient('<', new PreviousButton(() -> ItemView.builder().material(Material.PAPER).itemModel(Resources.ItemModel.INVISIBLE).build()))
-                .addIngredient('>', new ForwardButton(() -> ItemView.builder().material(Material.PAPER).itemModel(Resources.ItemModel.INVISIBLE).build()))
+                .addIngredient('<', PageBackwardButton.defaultTexture())
+                .addIngredient('>', PageForwardButton.defaultTexture())
                 .addIngredient('B', new BackTabButton(parentWorkbench::setCraftingTab))
                 .addIngredient('I', InfoTabButton.builder()
                         // todo: wiki entry

@@ -13,8 +13,8 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
@@ -105,9 +105,9 @@ public class DropTable extends WeighedList<DropTableItemStack> {
                     "# # # < - > # # #")
                     .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                     .addIngredient('#', Menu.BACKGROUND_ITEM)
-                    .addIngredient('<', new PreviousButton())
+                    .addIngredient('<', new PageBackwardButton())
                     .addIngredient('-', new BackButton(previous))
-                    .addIngredient('>', new ForwardButton()));
+                    .addIngredient('>', new PageForwardButton()));
 
             this.dropTable = dropTable;
 

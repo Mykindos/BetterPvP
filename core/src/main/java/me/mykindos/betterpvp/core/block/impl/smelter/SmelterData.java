@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.block.data.LoadHandler;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingService;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -114,9 +116,6 @@ public class SmelterData implements RemovalHandler, LoadHandler, TickHandler {
             return;
         }
 
-        // Update fuel and temperature
-        fuelManager.updatePerTick();
-
         // Try to consume fuel if needed
         if (fuelManager.tryConsumeFuel(instance.getLocation())) {
             // Sync storage to update GUI if fuel was consumed
@@ -125,13 +124,15 @@ public class SmelterData implements RemovalHandler, LoadHandler, TickHandler {
             }
         }
 
+        // Update fuel and temperature
+        fuelManager.updatePerTick();
+
         // Process smelting if we have heat and valid items
-        if (fuelManager.hasHeat()) {
-            if (processingEngine.processSmelting(liquidManager, fuelManager.getTemperature())) {
-                // Sync GUI if smelting occurred
-                if (gui != null) {
-                    gui.syncFromStorage();
-                }
+        processingEngine.matchRecipe();
+        if (processingEngine.processSmelting(liquidManager, fuelManager)) {
+            // Sync GUI if smelting occurred
+            if (gui != null) {
+                gui.syncFromStorage();
             }
         }
 

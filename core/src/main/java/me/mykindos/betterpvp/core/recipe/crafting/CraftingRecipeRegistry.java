@@ -6,6 +6,8 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftRecipeAdapter;
@@ -28,22 +30,22 @@ import java.util.Set;
  */
 @CustomLog
 @Singleton
-public class CraftingRecipeRegistry {
+public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
 
-    private final ItemFactory itemFactory;
     private final ItemRegistry itemRegistry;
     private final MinecraftRecipeAdapter minecraftAdapter;
     private final RecipeResolver<CraftingRecipe> resolver;
     private final Set<CraftingRecipe> craftingRecipes = new HashSet<>();
 
     @Inject
-    private CraftingRecipeRegistry(ItemFactory itemFactory, ItemRegistry itemRegistry, MinecraftRecipeAdapter minecraftAdapter) {
-        this.itemFactory = itemFactory;
+    private CraftingRecipeRegistry(RecipeRegistries registries, ItemRegistry itemRegistry, MinecraftRecipeAdapter minecraftAdapter) {
         this.itemRegistry = itemRegistry;
         this.minecraftAdapter = minecraftAdapter;
-        this.resolver = new RecipeResolver<>(craftingRecipes);
+        this.resolver = new RecipeResolver<>(this);
+        registries.register(this);
     }
 
+    @Override
     public RecipeResolver<CraftingRecipe> getResolver() {
         return resolver;
     }
@@ -68,7 +70,7 @@ public class CraftingRecipeRegistry {
      * @return An unmodifiable set of all recipes
      */
     @NotNull
-    public Set<CraftingRecipe> getAllRecipes() {
+    public Set<CraftingRecipe> getRecipes() {
         return Collections.unmodifiableSet(craftingRecipes);
     }
     

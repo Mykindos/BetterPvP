@@ -1,8 +1,12 @@
 package me.mykindos.betterpvp.core.recipe.smelting;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -16,10 +20,16 @@ import java.util.Set;
  */
 @CustomLog
 @Singleton
-public class SmeltingRecipeRegistry {
+public class SmeltingRecipeRegistry implements RecipeRegistry<SmeltingRecipe> {
     
     private final Set<SmeltingRecipe> smeltingRecipes = new HashSet<>();
     private final Set<BaseItem> smeltableItems = new HashSet<>();
+    private final RecipeResolver<SmeltingRecipe> resolver = new RecipeResolver<>(this);
+
+    @Inject
+    private SmeltingRecipeRegistry(RecipeRegistries registries) {
+        registries.register(this);
+    }
     
     /**
      * Registers a new smelting recipe.
@@ -28,7 +38,8 @@ public class SmeltingRecipeRegistry {
      * @param recipe The smelting recipe to register
      * @throws IllegalArgumentException if a recipe with the same ingredient types already exists
      */
-    public void registerSmeltingRecipe(@NotNull SmeltingRecipe recipe) {
+    @Override
+    public void registerRecipe(@NotNull SmeltingRecipe recipe) {
         // Check for duplicate recipes (same ingredient types, ignoring quantities)
         Set<BaseItem> newIngredientTypes = recipe.getIngredientTypes();
         
@@ -63,10 +74,15 @@ public class SmeltingRecipeRegistry {
      * Gets all registered smelting recipes.
      * @return An unmodifiable set of all smelting recipes
      */
-    public @NotNull Set<SmeltingRecipe> getSmeltingRecipes() {
+    public @NotNull Set<SmeltingRecipe> getRecipes() {
         return Collections.unmodifiableSet(smeltingRecipes);
     }
-    
+
+    @Override
+    public RecipeResolver<SmeltingRecipe> getResolver() {
+        return resolver;
+    }
+
     /**
      * Gets all smelting recipes that use the specified item as an ingredient.
      * @param item The item to search for

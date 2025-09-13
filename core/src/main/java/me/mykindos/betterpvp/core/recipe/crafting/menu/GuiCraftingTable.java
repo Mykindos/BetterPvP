@@ -18,14 +18,13 @@ public class GuiCraftingTable extends AbstractCraftingGui implements Windowed {
 
     @Inject
     private GuiCraftingTable(CraftingManager craftingManager, ItemFactory itemFactory) {
-        super(craftingManager, itemFactory);
+        super(craftingManager, itemFactory,9, 5);
         
         applyStructure(new Structure(
                 "000000000",
                 "0XXX00000",
-                "0XXX000R0",
+                "0XXX00R00",
                 "0XXX00000",
-                "000000000",
                 "000000000")
                 .addIngredient('X', craftingMatrix)
                 .addIngredient('R', resultInventory));

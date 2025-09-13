@@ -1,8 +1,12 @@
 package me.mykindos.betterpvp.core.imbuement;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,14 +23,21 @@ import java.util.stream.Collectors;
  */
 @CustomLog
 @Singleton
-public class ImbuementRecipeRegistry {
+public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> {
     
     private final List<ImbuementRecipe> recipes = new ArrayList<>();
-    
+    private final RecipeResolver<ImbuementRecipe> resolver = new RecipeResolver<>(this);
+
+    @Inject
+    private ImbuementRecipeRegistry(RecipeRegistries registries) {
+        registries.register(this);
+    }
+
     /**
      * Registers a new imbuement recipe.
      * @param recipe The recipe to register
      */
+    @Override
     public void registerRecipe(@NotNull ImbuementRecipe recipe) {
         // Check for duplicate recipes for standard recipes only
         if (recipe instanceof StandardImbuementRecipe) {
@@ -46,7 +57,12 @@ public class ImbuementRecipeRegistry {
         // Log registration differently based on recipe type
         log.info("Registered custom imbuement recipe: {}", recipe.getClass().getSimpleName()).submit();
     }
-    
+
+    @Override
+    public RecipeResolver<ImbuementRecipe> getResolver() {
+        return resolver;
+    }
+
     /**
      * Finds an imbuement recipe that matches the given items.
      * @param items Map of slot indices to ItemStacks
@@ -71,7 +87,7 @@ public class ImbuementRecipeRegistry {
      * Gets all registered imbuement recipes.
      * @return An unmodifiable list of all recipes
      */
-    public @NotNull List<ImbuementRecipe> getAllRecipes() {
+    public @NotNull List<ImbuementRecipe> getRecipes() {
         return Collections.unmodifiableList(recipes);
     }
     

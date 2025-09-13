@@ -39,7 +39,9 @@ public final class StorageBlockDataSerializer<T extends StorageBlockData> extend
             oos.writeInt(data.maxSize());
 
             // Get content and write the count
-            final List<ItemStack> content = data.getContent().stream().map(ItemInstance::createItemStack).toList();
+            final List<ItemStack> content = data.getContent().stream()
+                    .map(item -> item == null ? null : item.createItemStack())
+                    .toList();
             oos.writeInt(content.size());
 
             // Write byte size

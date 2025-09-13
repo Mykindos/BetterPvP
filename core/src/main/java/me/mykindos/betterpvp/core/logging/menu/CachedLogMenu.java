@@ -21,8 +21,8 @@ import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -80,9 +80,9 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                 "# # # < - > # # R")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(previous))
-                .addIngredient('>', new ForwardButton())
+                .addIngredient('>', new PageForwardButton())
                 .addIngredient('R', new RefreshButton<>())
                 .addIngredient('A', new StringFilterButton<>("Select Action", 9, Material.ANVIL, 0))
                 .addIngredient('C', new StringFilterButton<>("Select Category", contexts, 9, Material.WRITABLE_BOOK, 0))

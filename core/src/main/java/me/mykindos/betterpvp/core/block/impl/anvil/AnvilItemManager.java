@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -65,9 +66,12 @@ public class AnvilItemManager implements RemovalHandler, LoadHandler {
         }
 
         ItemInstance removedItem = currentItems.removeLast();
-        anvilItems.setContent(currentItems);
-        checkForRecipe();
-        return removedItem;
+        if (removedItem != null) {
+            anvilItems.setContent(currentItems);
+            checkForRecipe();
+            return removedItem;
+        }
+        return null;
     }
 
     /**
@@ -122,7 +126,7 @@ public class AnvilItemManager implements RemovalHandler, LoadHandler {
 
     // Utility methods
     public int getItemCount() {
-        return anvilItems.getContent().size();
+        return anvilItems.getContent().stream().filter(Objects::nonNull).toList().size();
     }
 
     public boolean isFull() {
@@ -130,7 +134,7 @@ public class AnvilItemManager implements RemovalHandler, LoadHandler {
     }
 
     public boolean hasItems() {
-        return !anvilItems.getContent().isEmpty();
+        return getItemCount() > 0;
     }
 
     public boolean hasRecipe() {

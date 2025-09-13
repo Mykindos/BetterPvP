@@ -54,20 +54,10 @@ public class SimpleMinecraftCraftingRecipe implements CraftingRecipe {
     public @NotNull BaseItem getPrimaryResult() {
         return result;
     }
-    
-    @Override
-    public @NotNull List<BaseItem> getResults() {
-        return Collections.singletonList(result);
-    }
 
     @Override
     public @NotNull ItemInstance createPrimaryResult() {
         return itemFactory.create(result);
-    }
-
-    @Override
-    public @NotNull List<ItemInstance> createResults() {
-        return Collections.singletonList(createPrimaryResult());
     }
 
     @Override

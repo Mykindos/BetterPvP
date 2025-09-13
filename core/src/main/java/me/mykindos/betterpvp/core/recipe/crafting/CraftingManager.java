@@ -124,22 +124,8 @@ public class CraftingManager {
         // Update the crafting matrix by consuming ingredients
         Map<Integer, ItemInstance> updatedMatrix = new HashMap<>(craftingMatrix);
         consumeIngredients(craftingRecipe, updatedMatrix);
-        
-        // Get all results
-        List<ItemInstance> results = new ArrayList<>();
-        results.add(result); // Primary result (possibly modified by the event)
-        
-        // Add additional results
-        List<ItemInstance> additionalResults = craftingRecipe.createResults();
-        if (additionalResults.size() > 1) {
-            for (int i = 1; i < additionalResults.size(); i++) {
-                results.add(additionalResults.get(i));
-            }
-        }
 
-        return new CraftingResult(result,
-                results.size() > 1 ? results.subList(1, results.size()) : Collections.emptyList(),
-                updatedMatrix);
+        return new CraftingResult(result, updatedMatrix);
     }
     
     /**

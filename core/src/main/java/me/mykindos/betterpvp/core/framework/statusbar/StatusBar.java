@@ -58,7 +58,7 @@ public class StatusBar extends DisplayComponent {
                 .append(getHealthComponent(player))
                 .append(Component.text(" ".repeat(3)))
                 .append(getEnergyComponent(player))
-                .append(Component.text(" ".repeat(25)))
+//                .append(Component.text(" ".repeat(25)))
                 .append(Component.empty()); // For padding to work
     }
 }

@@ -118,7 +118,9 @@ public class AnvilDisplayManager {
 
         // Recreate display entities for current items
         for (int i = 0; i < items.size(); i++) {
-            createDisplayEntityForItem(items.get(i), i);
+            if (items.get(i) != null) {
+                createDisplayEntityForItem(items.get(i), i);
+            }
         }
     }
 

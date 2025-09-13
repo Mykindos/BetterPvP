@@ -32,6 +32,10 @@ public class EntityHealthService {
         final List<ItemInstance> itemInstances = itemFactory.fromArray(healthItems);
         double health = 0;
         for (ItemInstance itemInstance : itemInstances) {
+            if (itemInstance == null) {
+                continue;
+            }
+
             final Optional<StatContainerComponent> componentOpt = itemInstance.getComponent(StatContainerComponent.class);
             if (componentOpt.isEmpty()) {
                 continue;

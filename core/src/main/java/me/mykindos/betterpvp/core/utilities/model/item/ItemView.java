@@ -144,11 +144,6 @@ public class ItemView implements ItemProvider {
             }
         }
 
-
-        if (customModelData != null && customModelData != 0) {
-            itemStack.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addFloat(customModelData).build());
-        }
-
         if (flags != null) {
             meta.addItemFlags(flags.toArray(ItemFlag[]::new));
         }
@@ -179,6 +174,10 @@ public class ItemView implements ItemProvider {
                             DataComponentTypes.ATTRIBUTE_MODIFIERS
                     );
             itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, builder.build());
+        }
+
+        if (customModelData != null) {
+            itemStack.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addFloat(customModelData).build());
         }
 
         if (maxStackSize != null && maxStackSize > 0) {

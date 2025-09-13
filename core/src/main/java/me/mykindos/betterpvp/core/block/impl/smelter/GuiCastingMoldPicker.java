@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.impl.GuiSelectOne;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.ScrollLeftButton;
+import me.mykindos.betterpvp.core.menu.button.ScrollRightButton;
 import me.mykindos.betterpvp.core.metal.casting.CastingMold;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldRecipe;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldRecipeRegistry;
@@ -20,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -32,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -59,7 +64,7 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
 
         // Set up the layout manually since we can't use nested GUIs in structures
         fillRectangle(0, 1, defaultMoldsGui, false);
-        fillRectangle(0, 3, storedMoldsGui, false);
+        fillRectangle(0, 4, storedMoldsGui, false);
     }
 
     /**
@@ -101,8 +106,8 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
         public GuiDefaultMolds() {
             super(9, 1, false, new Structure("<SSSSSSS>")
                     .addIngredient('S', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                    .addIngredient('<', new GuiSelectOne.ScrollLeftItem())
-                    .addIngredient('>', new GuiSelectOne.ScrollRightItem())
+                    .addIngredient('<', ScrollLeftButton.defaultTexture())
+                    .addIngredient('>', ScrollRightButton.defaultTexture())
             );
 
             // Because its column
@@ -116,7 +121,7 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
 
         private void refresh() {
             // Get all unique default casting molds from registered recipes
-            List<ItemInstance> defaultMolds = recipeRegistry.getAllRecipes().stream()
+            List<ItemInstance> defaultMolds = recipeRegistry.getRecipes().stream()
                     .map(CastingMoldRecipe::getBaseMold)
                     .distinct()
                     .map(itemFactory::create)
@@ -141,8 +146,8 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
         private GuiStoredMolds() {
             super(9, 1, false, new Structure("<SSSSSS>+")
                     .addIngredient('S', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                    .addIngredient('<', new GuiSelectOne.ScrollLeftItem())
-                    .addIngredient('>', new GuiSelectOne.ScrollRightItem())
+                    .addIngredient('<', ScrollLeftButton.defaultTexture())
+                    .addIngredient('>', ScrollRightButton.defaultTexture())
                     .addIngredient('+', new AddMoldButton())
             );
             refresh();
@@ -156,6 +161,7 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
         public void bake() {
             ArrayList<SlotElement> elements = new ArrayList<>(content.size());
             for (ItemInstance item : content) {
+                if (item == null) continue;
                 elements.add(new SlotElement.ItemSlotElement(new StoredMold(item)));
             }
 
@@ -281,7 +287,7 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
         public ItemProvider getItemProvider(GuiStoredMolds gui) {
             return ItemView.builder()
                     .material(Material.PAPER)
-                    .itemModel(Resources.ItemModel.INVISIBLE)
+                    .itemModel(Key.key("betterpvp", "menu/icon/regular/chest_open_icon"))
                     .displayName(Component.text("Add Casting Mold", NamedTextColor.GREEN))
                     .lore(Component.text("Drag a casting mold from your", NamedTextColor.GRAY))
                     .lore(Component.text("inventory and click this button", NamedTextColor.GRAY))
@@ -314,6 +320,7 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
 
             // Disallow repeats
             if (smelterData.getProcessingEngine().getCastingMoldItems().getContent().stream()
+                    .filter(Objects::nonNull)
                     .anyMatch(item -> item.getBaseItem().equals(itemInstance.getBaseItem()))) {
                 SoundEffect.LOW_PITCH_PLING.play(player);
                 return;

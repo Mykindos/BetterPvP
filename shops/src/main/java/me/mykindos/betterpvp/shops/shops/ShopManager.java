@@ -12,8 +12,8 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.impl.PagedSingleWindow;
 import me.mykindos.betterpvp.shops.shops.items.ShopItemRepository;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
@@ -76,9 +76,9 @@ public class ShopManager {
                         "x x x < - > x x s")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(null))
-                .addIngredient('>', new ForwardButton())
+                .addIngredient('>', new PageForwardButton())
                 .addIngredient('s', new SellAllButton(shopkeeperItems, shopItemSellService));
         for (int i = 1; i <= maxPages; i++) {
             builder.addContent(new ShopMenu(i,

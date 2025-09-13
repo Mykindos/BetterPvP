@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.block.impl.smelter;
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
@@ -13,12 +14,14 @@ import me.mykindos.betterpvp.core.recipe.smelting.LiquidAlloy;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingRecipe;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingResult;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingService;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +49,15 @@ public class SmelterProcessingEngine {
     private final StorageBlockData castingMoldItems;
 
     @Nullable
+    private LiquidAlloy smeltingAlloy;
+    @Nullable
     private CastingMold castingMold; // The casting mold used for casting
     @Nullable
-    private CastingMoldRecipe currentRecipe; // The current casting mold recipe being used
+    private CastingMoldRecipe currentCastingRecipe; // The current casting mold recipe being used
+    @Nullable
+    private SmeltingRecipe currentSmeltingRecipe;
+    private long lastCast;
+    private float smeltingProgress = 0.0f;
 
     public SmelterProcessingEngine(@NotNull SmeltingService smeltingService,
                                    @NotNull ItemFactory itemFactory,
@@ -62,17 +71,20 @@ public class SmelterProcessingEngine {
         this.castingMoldItems = new StorageBlockData();
     }
 
+    private long getCastTime() {
+        return 2_000L; // 2 seconds per cast
+    }
+
     /**
-     * Processes smelting if conditions are met.
-     *
-     * @param liquidManager The liquid manager to store results
-     * @param temperature   Current temperature
-     * @return true if smelting was processed
+     * Gets the smelting time in milliseconds. This represents the time required to complete one smelting cycle.
+     * @return Smelting time in milliseconds
      */
-    public boolean processSmelting(@NotNull SmelterLiquidManager liquidManager, float temperature) {
-        if (smeltingService == null || itemFactory == null) {
-            return false; // Dependencies not available
-        }
+    public long getSmeltingTime() {
+        return 4_000L; // 4 seconds per cycle
+    }
+
+    public boolean matchRecipe() {
+        currentSmeltingRecipe = null;
 
         // Convert content items to the format expected by SmeltingService
         Map<Integer, ItemStack> itemMap = new HashMap<>();
@@ -85,40 +97,72 @@ public class SmelterProcessingEngine {
         }
 
         // Check if we have a matching recipe
-        Optional<SmeltingRecipe> recipeOpt = smeltingService.findMatchingRecipe(itemMap, temperature);
+        Optional<SmeltingRecipe> recipeOpt = smeltingService.findMatchingRecipe(itemMap);
         if (recipeOpt.isEmpty()) {
+            smeltingProgress = 0.0f;
+            smeltingAlloy = null;
+            currentSmeltingRecipe = null;
             return false; // No matching recipe
         }
 
-        SmeltingRecipe recipe = recipeOpt.get();
+        currentSmeltingRecipe = recipeOpt.get();
+        return true;
+    }
+
+    /**
+     * Processes smelting if conditions are met.
+     *
+     * @param liquidManager The liquid manager to store results
+     * @param fuelManager   The fuel manager to check temperature
+     * @return true if smelting was processed
+     */
+    public boolean processSmelting(@NotNull SmelterLiquidManager liquidManager, SmelterFuelManager fuelManager) {
+        if (currentSmeltingRecipe == null || !fuelManager.isBurning()) {
+            smeltingProgress = 0.0f;
+            return false;
+        }
 
         // Convert content to ItemInstance map for recipe execution
+        List<ItemInstance> content = contentItems.getContent();
         Map<Integer, ItemInstance> itemInstanceMap = new HashMap<>();
         for (int i = 0; i < content.size(); i++) {
             ItemInstance item = content.get(i);
-            if (item != null) {
-                itemInstanceMap.put(i, item);
-            }
+            itemInstanceMap.put(i, item);
+        }
+
+        if (fuelManager.getTemperature() < currentSmeltingRecipe.getMinimumTemperature()) {
+            smeltingProgress = 0.0f;
+            return false;
         }
 
         // Execute the recipe to get the result
-        SmeltingResult smeltingResult = smeltingService.executeRecipe(recipe, itemInstanceMap);
+        SmeltingResult smeltingResult = smeltingService.executeRecipe(currentSmeltingRecipe, itemInstanceMap);
         LiquidAlloy resultLiquid = smeltingResult.getPrimaryResult();
 
         // Check if we can add the liquid
         if (!liquidManager.canAddLiquid(resultLiquid)) {
+            smeltingProgress = 0.0f;
             return false; // Cannot add liquid (incompatible or not enough capacity)
         }
 
-        // Update content items after consumption
-        List<ItemInstance> newContent = itemInstanceMap.values().stream()
-                .filter(Objects::nonNull)
-                .toList();
-        contentItems.setContent(newContent);
+        // If the last smelting alloy is different, reset the smelting progress with this new one
+        if (resultLiquid != smeltingAlloy) {
+            smeltingProgress = 0.0f;
+            smeltingAlloy = resultLiquid;
+            return false;
+        }
 
-        // Store the liquid alloy
-        liquidManager.addLiquid(resultLiquid);
+        // Increment smelting progress
+        if (smeltingProgress < 1.0f) {
+            smeltingProgress += 1.0f / 20L / (getSmeltingTime() / 1000f); // This is called every tick
+        } else {
+            // Update content items after consumption
+            contentItems.setContent(new ArrayList<>(itemInstanceMap.values()));
 
+            // Store the liquid alloy
+            liquidManager.addLiquid(resultLiquid);
+            smeltingProgress = 0.0f; // Start counting down again
+        }
         return true;
     }
 
@@ -131,9 +175,9 @@ public class SmelterProcessingEngine {
      */
     public boolean tryFillCastingMold(@NotNull SmelterLiquidManager liquidManager,
                                       @NotNull SmartBlockInstance instance) {
-        currentRecipe = null; // Reset current recipe for casting mold
+        currentCastingRecipe = null; // Reset current recipe for casting mold
 
-        if (castingMoldRecipeRegistry == null || !liquidManager.hasLiquid()) {
+        if (!liquidManager.hasLiquid()) {
             return false; // No registry or no liquid to work with
         }
 
@@ -143,7 +187,7 @@ public class SmelterProcessingEngine {
 
         // Find a recipe for this casting mold
         Optional<CastingMoldRecipe> recipeOpt = castingMoldRecipeRegistry.findRecipeForAlloy(
-                castingMold, liquidManager.getStoredLiquid().getAlloyType()
+                castingMold, Objects.requireNonNull(liquidManager.getStoredLiquid()).getAlloyType()
         );
 
         if (recipeOpt.isEmpty()) {
@@ -151,35 +195,36 @@ public class SmelterProcessingEngine {
         }
 
         CastingMoldRecipe recipe = recipeOpt.get();
-        currentRecipe = recipe; // Set the current recipe for GUI updates
+        currentCastingRecipe = recipe; // Set the current recipe for GUI updates
 
         // Check if we have enough liquid
         if (!liquidManager.hasLiquid(recipe.getRequiredMillibuckets())) {
             return false; // Not enough liquid
         }
 
-        // Get the result item
-        Optional<ItemInstance> resultOpt = recipe.getResult(liquidManager.getStoredLiquid().getAlloyType())
-                .map(itemFactory::create);
-
-        if (resultOpt.isEmpty()) {
-            return false; // Could not create result item
+        // Check if the alloy type is compatible
+        if (!recipe.acceptsAlloy(liquidManager.getStoredLiquid().getAlloyType())) {
+            return false;
         }
 
-        // Check if we can add the result
-        ItemInstance result = resultOpt.get();
-        if (!canAddResultItem(result)) {
-            return false; // Cannot add result item
+        if (UtilTime.elapsed(lastCast, getCastTime())) {
+            // Get the result item
+            // Check if we can add the result
+            ItemInstance result = recipe.createPrimaryResult();
+            if (!canAddResultItem(result)) {
+                return false; // Cannot add result item
+            }
+
+            // Add the result item
+            addResultItem(result);
+            lastCast = System.currentTimeMillis();
+
+            // Consume the liquid
+            liquidManager.consumeLiquid(recipe.getRequiredMillibuckets());
+
+            // Play sound effect
+            new SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, CASTING_VOLUME, CASTING_PITCH).play(instance.getLocation());
         }
-
-        // Add the result item
-        addResultItem(result);
-
-        // Consume the liquid
-        liquidManager.consumeLiquid(recipe.getRequiredMillibuckets());
-
-        // Play sound effect
-        new SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, CASTING_VOLUME, CASTING_PITCH).play(instance.getLocation());
 
         return true;
     }
@@ -193,7 +238,7 @@ public class SmelterProcessingEngine {
     private boolean canAddResultItem(@NotNull ItemInstance result) {
         List<ItemInstance> currentResults = resultItems.getContent();
 
-        if (currentResults.isEmpty()) {
+        if (currentResults.stream().noneMatch(Objects::isNull)) {
             return true; // Empty, can add
         }
 
@@ -220,7 +265,7 @@ public class SmelterProcessingEngine {
     private void addResultItem(@NotNull ItemInstance result) {
         List<ItemInstance> currentResults = resultItems.getContent();
 
-        if (currentResults.isEmpty() || currentResults.getFirst() == null) {
+        if (currentResults.stream().noneMatch(Objects::nonNull) || currentResults.getFirst() == null) {
             // Replace with new item
             resultItems.setContent(List.of(result));
         } else {
@@ -236,4 +281,8 @@ public class SmelterProcessingEngine {
             }
         }
     }
-} 
+
+    public float getSmeltingProgress() {
+        return Math.max(0.0f, Math.min(1.0f, smeltingProgress));
+    }
+}

@@ -22,7 +22,6 @@ import java.util.Map;
 public class ShapelessCraftingRecipe implements CraftingRecipe {
 
     private final BaseItem result;
-    private final List<BaseItem> additionalResults;
     private final Map<Integer, RecipeIngredient> ingredients;
     private final ItemFactory itemFactory;
     private final boolean needsBlueprint;
@@ -35,21 +34,7 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
      * @param itemFactory The ItemFactory to use for item matching
      */
     public ShapelessCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this(result, Collections.emptyList(), ingredients, itemFactory, needsBlueprint);
-    }
-    
-    /**
-     * Creates a new shapeless recipe with multiple results.
-     * 
-     * @param primaryResult The primary result of the recipe
-     * @param additionalResults Additional results of the recipe
-     * @param ingredients The ingredients required (slot positions are ignored for matching)
-     * @param itemFactory The ItemFactory to use for item matching
-     */
-    public ShapelessCraftingRecipe(@NotNull BaseItem primaryResult, @NotNull List<BaseItem> additionalResults,
-                                   @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this.result = primaryResult;
-        this.additionalResults = new ArrayList<>(additionalResults);
+        this.result = result;
         this.ingredients = new HashMap<>(ingredients);
         this.itemFactory = itemFactory;
         this.needsBlueprint = needsBlueprint;
@@ -59,28 +44,10 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
     public @NotNull BaseItem getPrimaryResult() {
         return result;
     }
-    
-    @Override
-    public @NotNull List<BaseItem> getResults() {
-        List<BaseItem> allResults = new ArrayList<>();
-        allResults.add(result);
-        allResults.addAll(additionalResults);
-        return allResults;
-    }
 
     @Override
     public @NotNull ItemInstance createPrimaryResult() {
         return itemFactory.create(result);
-    }
-
-    @Override
-    public @NotNull List<ItemInstance> createResults() {
-        List<ItemInstance> instances = new ArrayList<>();
-        instances.add(itemFactory.create(result));
-        for (BaseItem additional : additionalResults) {
-            instances.add(itemFactory.create(additional));
-        }
-        return instances;
     }
 
     @Override

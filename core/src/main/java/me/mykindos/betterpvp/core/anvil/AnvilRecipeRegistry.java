@@ -1,12 +1,17 @@
 package me.mykindos.betterpvp.core.anvil;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +24,21 @@ import java.util.stream.Collectors;
  */
 @CustomLog
 @Singleton
-public class AnvilRecipeRegistry {
+public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
     
     private final List<AnvilRecipe> recipes = new ArrayList<>();
-    
+    private final RecipeResolver<AnvilRecipe> resolver = new RecipeResolver<>(this);
+
+    @Inject
+    private AnvilRecipeRegistry(RecipeRegistries registries) {
+        registries.register(this);
+    }
+
     /**
      * Registers a new anvil recipe.
      * @param recipe The recipe to register
      */
+    @Override
     public void registerRecipe(@NotNull AnvilRecipe recipe) {
         recipes.add(recipe);
         log.info("Registered anvil recipe for {} requiring {} hammer swings with {} ingredients",
@@ -34,7 +46,12 @@ public class AnvilRecipeRegistry {
                 recipe.getHammerSwings(),
                 recipe.getIngredients().size()).submit();
     }
-    
+
+    @Override
+    public RecipeResolver<AnvilRecipe> getResolver() {
+        return resolver;
+    }
+
     /**
      * Finds an anvil recipe that matches the given items.
      * @param items Map of slot indices to ItemStacks
@@ -93,7 +110,7 @@ public class AnvilRecipeRegistry {
      * Gets all registered anvil recipes.
      * @return An unmodifiable list of all recipes
      */
-    public @NotNull List<AnvilRecipe> getAllRecipes() {
+    public @NotNull Collection<AnvilRecipe> getRecipes() {
         return Collections.unmodifiableList(recipes);
     }
     

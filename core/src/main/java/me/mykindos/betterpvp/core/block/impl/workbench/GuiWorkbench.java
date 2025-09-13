@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
-import me.mykindos.betterpvp.core.recipe.crafting.resolver.HasIngredientsParameter;
+import me.mykindos.betterpvp.core.recipe.resolver.HasIngredientsParameter;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
