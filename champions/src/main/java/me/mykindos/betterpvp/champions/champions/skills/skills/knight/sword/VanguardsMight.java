@@ -33,6 +33,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -76,9 +77,9 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 if (abilityData == null) return null;
 
                 final int chargeAsPercentage = (int) (abilityData.getCharge() * 100);
-                return Component.text(chargeAsPercentage )
-                        .color(NamedTextColor.LIGHT_PURPLE)
-                        .append(Component.text("%").color(NamedTextColor.GRAY));
+
+                // ex: Charge: 5%
+                return createComponentMessage("Charge", String.valueOf(chargeAsPercentage), "%");
             }
     );
 
@@ -104,10 +105,10 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.STRENGTH_EFFECT);
                 if (abilityData == null) return null;
 
-                String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1);
-                return Component.text(timeLeftWithOneDecimalPlace)
-                        .color(NamedTextColor.LIGHT_PURPLE)
-                        .append(Component.text("s").color(NamedTextColor.GRAY));
+                final String timeLeft = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1, true);
+
+                // ex: Strength For: 4.2s
+                return createComponentMessage("Strength For", timeLeft, "s");
             }
     );
 
@@ -134,8 +135,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         return new String[] {
                 "Right click with a Sword to channel",
                 "",
-                "While channeling, absorb all damage",
-                "damage, thus, charging this ability.",
+                "While channeling, build charge",
+                "over time and by absorbing damage.",
                 "",
                 "Stop channeling to gain <effect>Strength</effect>",
                 "for up to " + getValueString(this::getMaxStrengthDuration, level) + " seconds.",
@@ -155,6 +156,21 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         if (abilityData == null || !phase.equals(abilityData.getPhase())) return null;
 
         return abilityData;
+    }
+
+    /**
+     * A helper method used to construct an adventure component given a few strings.
+     * <p>
+     * The returned component will be in this format:
+     * <code>`label`: `numberValue``symbol`</code>
+     * <p>
+     * Example:
+     * <code>Charge: 5%</code>
+     */
+    private @NotNull Component createComponentMessage(String label, String numberValue, String symbol) {
+        return Component.text(label + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(Component.text(numberValue).color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.BOLD, false))
+                .append(Component.text(symbol).color(NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false));
     }
 
     /**
