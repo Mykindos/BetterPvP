@@ -1,36 +1,33 @@
-package me.mykindos.betterpvp.core.recipe.command;
+package me.mykindos.betterpvp.core.item.command;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
-import me.mykindos.betterpvp.core.recipe.menu.GuiCraftingRecipeViewer;
-import me.mykindos.betterpvp.core.recipe.menu.GuiItemViewer;
-import me.mykindos.betterpvp.core.recipe.menu.GuiRecipeViewer;
+import me.mykindos.betterpvp.core.item.menu.GuiItemViewer;
 import org.bukkit.entity.Player;
 
-@SuppressWarnings("UnstableApiUsage")
 @Singleton
-public class RecipeCommand extends Command {
+public class ItemsCommand extends Command {
 
     private final ItemFactory itemFactory;
 
     @Inject
-    public RecipeCommand(ItemFactory itemFactory) {
+    public ItemsCommand(ItemFactory itemFactory) {
         this.itemFactory = itemFactory;
         this.aliases.add("recipes");
+        this.aliases.add("recipe");
     }
 
     @Override
     public String getName() {
-        return "recipe";
+        return "items";
     }
 
     @Override
     public String getDescription() {
-        return "View all crafting recipes";
+        return "View all items and their recipes";
     }
 
     @Override

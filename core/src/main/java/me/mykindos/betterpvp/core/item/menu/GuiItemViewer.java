@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.recipe.menu;
+package me.mykindos.betterpvp.core.item.menu;
 
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.registry.RegistryBuilderFactory;
@@ -51,7 +51,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
