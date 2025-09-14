@@ -46,6 +46,7 @@ subprojects {
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
         maven("https://repo.opencollab.dev/main/")
+        maven("https://repo.polar.top/repository/polar/")
         maven {
           url =  uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true

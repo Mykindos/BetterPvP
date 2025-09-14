@@ -5,12 +5,17 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.ItemStackWithSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -22,7 +27,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -225,14 +229,25 @@ public class UtilInventory {
      * @param inventory the inventory of the player to save
      */
     public static void saveOfflineInventory(UUID id, CraftInventoryPlayer inventory) {
-        ////get the player's current data
-        //CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
-        ////overwrite the Inventory data with the modified inventory
-        //compound.put("Inventory", inventory.getInventory().save(new ListTag()));
-        ////save the players data
-        //UtilNBT.savePlayerData(id, compound);
-        // TODO fix?
+        //get the player's current data
+        CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+
+        //Use the new ValueOutput API to save inventory
+        TagValueOutput output = TagValueOutput.createWrappingGlobal(ProblemReporter.DISCARDING, compound);
+        ValueOutput.TypedOutputList<ItemStackWithSlot> invOutput = output.list("Inventory", ItemStackWithSlot.CODEC);
+
+        for (int i = 0; i < inventory.getInventory().getContainerSize(); i++) {
+            net.minecraft.world.item.ItemStack itemStack = inventory.getInventory().getItem(i);
+            if (!itemStack.isEmpty()) {
+                invOutput.add(new ItemStackWithSlot(i, itemStack));
+            }
+        }
+
+        //The output automatically updates the compound tag, no need to manually add anything
+        //save the players data
+        UtilNBT.savePlayerData(id, compound);
     }
+
 
     /**
      * Gets the offline inventory of a player with the specified name and id
@@ -247,28 +262,27 @@ public class UtilInventory {
         //so instead we just recreate how inventories are loaded
         //by using those exact methods
 
-        //get data from the player.dat file
-        CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+        //in order to load the inventory, we need a ServerPlayer, server players require this
+        //data. Defaults are fine, this is only used to load the inventory
+        MinecraftServer server = MinecraftServer.getServer();
+        ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
+        if(serverLevel == null) return null;
 
-        //get the inventory nbt data
-        Optional<ListTag> nbttaglist = compound.getList("Inventory");
-        if(nbttaglist.isPresent()) {
+        GameProfile gameProfile = new GameProfile(id, name);
+        ClientInformation clientOptions= ClientInformation.createDefault();
+        ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, gameProfile, clientOptions);
 
-            //in order to load the inventory, we need a ServerPlayer, server players require this
-            //data. Defaults are fine, this is only used to load the inventory
-            MinecraftServer server = MinecraftServer.getServer();
-            ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
-            GameProfile gameProfile = new GameProfile(id, name);
-            ClientInformation clientOptions = ClientInformation.createDefault();
+        ValueInput loadedData = server.getPlayerList().playerIo.load(serverPlayer, ProblemReporter.DISCARDING).orElse(null);
+        if(loadedData == null) return null;
 
-            ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, gameProfile, clientOptions);
+        //create Minecraft Inventory
+        Inventory inventory = serverPlayer.getInventory();
 
-            //return the BukkitPlayerInventory (same one you get from player#getInventory())
-            return new CraftInventoryPlayer(serverPlayer.getInventory());
-        }
+        inventory.load(loadedData.listOrEmpty("Inventory", ItemStackWithSlot.CODEC));
 
 
-        return null;
+        //return the BukkitPlayerInventory (same one you get from player#getInventory())
+        return new CraftInventoryPlayer(inventory);
 
     }
 }
