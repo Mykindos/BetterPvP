@@ -6,6 +6,9 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -13,10 +16,12 @@ import java.util.Optional;
 
 public class RemapperIn implements PacketListener {
 
+    private final Core core;
     private final PacketHatController controller;
     private final HatProtocol protocol;
 
-    public RemapperIn(PacketHatController controller, HatProtocol protocol) {
+    public RemapperIn(Core core, PacketHatController controller, HatProtocol protocol) {
+        this.core = core;
         this.controller = controller;
         this.protocol = protocol;
     }
@@ -27,21 +32,23 @@ public class RemapperIn implements PacketListener {
 
         final WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
         final Optional<Map<Integer, ItemStack>> slotsOpt = packet.getSlots();
-        if (slotsOpt.isEmpty()) return;
-
-        final Map<Integer, ItemStack> slots = slotsOpt.get();
-        for (Map.Entry<Integer, ItemStack> entry : slots.entrySet()) {
-            final ItemStack itemStack = entry.getValue();
-            final org.bukkit.inventory.ItemStack bukkitStack = SpigotConversionUtil.toBukkitItemStack(itemStack);
-            entry.setValue(controller.fromHatItem(bukkitStack)
-                    .map(SpigotConversionUtil::fromBukkitItemStack)
-                    .orElse(null));
+        boolean update = packet.getSlot() == 5;
+        if (slotsOpt.isPresent()) {
+            final Map<Integer, ItemStack> slots = slotsOpt.get();
+            for (Map.Entry<Integer, ItemStack> entry : slots.entrySet()) {
+                final ItemStack itemStack = entry.getValue();
+                final org.bukkit.inventory.ItemStack bukkitStack = SpigotConversionUtil.toBukkitItemStack(itemStack);
+                entry.setValue(controller.fromHatItem(bukkitStack)
+                        .map(SpigotConversionUtil::fromBukkitItemStack)
+                        .orElse(null));
+            }
+            update = update || slots.containsKey(5);
         }
 //        packet.setCarriedItem(controller.fromHatItem(packet.getCarriedItem()).orElse(null));
 
         // Re-send their hat because they took it off
-        if (slots.containsKey(5)) {
-            this.protocol.broadcast(event.getPlayer(), false);
+        if (update) {
+            this.protocol.broadcast(event.getPlayer(), true);
         }
     }
 

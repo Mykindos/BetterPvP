@@ -37,6 +37,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +137,7 @@ public class ItemPacketRemapper implements PacketListener {
         final List<ItemStack> items = packet.getItems().stream()
                         .map(this::mapTo)
                         .toList();
-        packet.setItems(items);
+        packet.setItems(new ArrayList<>(items));
         packet.setCarriedItem(mapTo(packet.getCarriedItem().orElse(null)));
     }
 
