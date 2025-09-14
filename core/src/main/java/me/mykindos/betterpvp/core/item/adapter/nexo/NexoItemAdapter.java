@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.nexo;
+package me.mykindos.betterpvp.core.item.adapter.nexo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -19,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Singleton
@@ -28,17 +30,29 @@ public class NexoItemAdapter implements Listener {
 
     private final ItemFactory itemFactory;
     private final ItemRegistry itemRegistry;
+    private final List<NexoItem> nexoItems = new ArrayList<>();
 
     @Inject
     private NexoItemAdapter(ItemFactory itemFactory, ItemRegistry itemRegistry) {
         this.itemFactory = itemFactory;
         this.itemRegistry = itemRegistry;
         itemFactory.registerDefaultBuilder(this::populateNexoItem);
+
+        nexoItems.addAll(itemRegistry.getItems().values().stream()
+                .filter(item -> item instanceof NexoItem)
+                .map(item -> (NexoItem) item)
+                .toList());
+        itemRegistry.addRegisterCallback((key, item) -> {
+            if (item instanceof NexoItem nexoItem) {
+                nexoItems.add(nexoItem);
+            }
+        });
     }
 
     private BaseItem getBaseNexoItem(String id) {
-        return itemRegistry.getItems().values().stream()
-                .filter(item -> item instanceof NexoItem nexoItem && nexoItem.getId().equals(id))
+        return nexoItems.stream()
+                .filter(item -> item.getId().equals(id))
+                .map(item -> (BaseItem) item)
                 .findFirst()
                 .orElse(null);
     }

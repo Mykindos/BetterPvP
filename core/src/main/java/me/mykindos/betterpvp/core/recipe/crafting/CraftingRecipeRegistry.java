@@ -4,13 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
-import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftRecipeAdapter;
+import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -33,15 +32,14 @@ import java.util.Set;
 public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
 
     private final ItemRegistry itemRegistry;
-    private final MinecraftRecipeAdapter minecraftAdapter;
     private final RecipeResolver<CraftingRecipe> resolver;
     private final Set<CraftingRecipe> craftingRecipes = new HashSet<>();
 
     @Inject
-    private CraftingRecipeRegistry(RecipeRegistries registries, ItemRegistry itemRegistry, MinecraftRecipeAdapter minecraftAdapter) {
+    private CraftingRecipeRegistry(RecipeRegistries registries, ItemRegistry itemRegistry, MinecraftCraftingRecipeAdapter minecraftAdapter) {
         this.itemRegistry = itemRegistry;
-        this.minecraftAdapter = minecraftAdapter;
         this.resolver = new RecipeResolver<>(this);
+        minecraftAdapter.registerDefaults(craftingRecipes);
         registries.register(this);
     }
 
@@ -62,7 +60,7 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
         craftingRecipes.add(craftingRecipe);
         log.info("Registered recipe for item: {}", itemKey).submit();
     }
-    
+
     
     /**
      * Gets all registered recipes.
@@ -108,15 +106,6 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
             
             if (craftingRecipe.matches(items)) {
                 return Optional.of(craftingRecipe);
-            }
-        }
-        
-        // If no custom recipe matches and Minecraft recipes are enabled, check Minecraft recipes
-        if (minecraftAdapter.isEnabled() && (type == null || type == RecipeType.SHAPED_CRAFTING || type == RecipeType.SHAPELESS_CRAFTING)) {
-            Optional<org.bukkit.inventory.Recipe> minecraftRecipe = minecraftAdapter.findMatchingRecipe(items);
-            if (minecraftRecipe.isPresent()) {
-                // Convert Minecraft recipe to our recipe format
-                return Optional.of(minecraftAdapter.convertToCustomRecipe(minecraftRecipe.get()));
             }
         }
         

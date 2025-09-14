@@ -25,6 +25,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,11 +45,19 @@ public class InfoTabButton extends AbstractItem {
     @Singular("wikiEntry")
     private final Map<String, URL> wikiEntries;
 
+    private final @Nullable ItemStack icon;
+
     @Override
     public ItemProvider getItemProvider() {
-        final ItemView.ItemViewBuilder builder = ItemView.builder();
-        builder.material(Material.PAPER);
-        builder.itemModel(Key.key("betterpvp", "menu/tab/info"));
+        final ItemView.ItemViewBuilder builder;
+
+        if (icon == null) {
+            builder = ItemView.builder();
+            builder.material(Material.PAPER);
+            builder.itemModel(Key.key("betterpvp", "menu/tab/info"));
+        } else {
+            builder = ItemView.of(icon).toBuilder();
+        }
 
         boolean started = false;
         if (description != null) {

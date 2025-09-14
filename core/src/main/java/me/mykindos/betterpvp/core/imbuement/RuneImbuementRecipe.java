@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.imbuement;
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -16,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Specialized imbuement recipe for applying runes to items.
@@ -24,25 +24,32 @@ import java.util.Set;
  */
 @Getter
 public class RuneImbuementRecipe extends ImbuementRecipe {
-    
+
+    private final BaseItem baseItem;
+    private final RuneItem runeItem;
+
     /**
      * Creates a new rune imbuement recipe.
      * @param itemFactory The item factory for item operations
      */
-    public RuneImbuementRecipe(@NotNull ItemFactory itemFactory) {
+    public RuneImbuementRecipe(@NotNull ItemFactory itemFactory, BaseItem baseItem, RuneItem rune) {
         super(itemFactory);
+        final Optional<RuneContainerComponent> containerOpt = baseItem.getComponent(RuneContainerComponent.class);
+        Preconditions.checkArgument(containerOpt.isPresent(), "Base item must have a rune container component");
+        final RuneContainerComponent container = containerOpt.get();
+        Preconditions.checkArgument(rune.getRune().canApply(baseItem), "Rune cannot be applied to base item");
+        this.baseItem = baseItem;
+        this.runeItem = rune;
     }
     
     @Override
     public @NotNull ImbuementRecipeResult getPrimaryResult() {
-        // This will be dynamically determined based on the target item
-        throw new UnsupportedOperationException("Rune recipes determine result dynamically");
+        return new ImbuementRecipeResult(baseItem);
     }
     
     @Override
     public @NotNull ItemInstance createPrimaryResult() {
-        // This should be called with context from the matching process
-        throw new UnsupportedOperationException("Use createPrimaryResult(List<ItemInstance>) for rune recipes");
+        return createPrimaryResult(List.of(itemFactory.create(baseItem), itemFactory.create(runeItem)));
     }
     
     /**
@@ -56,7 +63,7 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
             throw new IllegalArgumentException("Invalid rune recipe items");
         }
         
-        return applyRuneToItem(runeData.targetItem, runeData.rune);
+        return applyRuneToItem(runeData.targetItem);
     }
     
     @Override
@@ -67,11 +74,10 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
             if (stack == null || stack.getType().isAir()) {
                 continue;
             }
-            
-            Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(stack);
-            instanceOpt.ifPresent(itemInstances::add);
+
+            itemFactory.fromItemStack(stack).ifPresent(itemInstances::add);
         }
-        
+
         return isValidRuneRecipe(itemInstances);
     }
     
@@ -96,7 +102,6 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
     private RuneData extractRuneData(@NotNull List<ItemInstance> items) {
         ItemInstance runeItemInstance = null;
         ItemInstance targetItemInstance = null;
-        Rune rune = null;
         
         // Identify rune and target items
         for (ItemInstance item : items) {
@@ -104,7 +109,7 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
             ItemStack stack = item.createItemStack();
             
             // Check if this is a rune item
-            if (item.getBaseItem() instanceof RuneItem runeItem) {
+            if (item.getBaseItem() == runeItem) {
                 if (runeItemInstance != null) {
                     return null; // Multiple rune items not allowed
                 }
@@ -112,7 +117,6 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
                     return null; // Rune stack must be exactly 1
                 }
                 runeItemInstance = item;
-                rune = runeItem.getRune();
             } else {
                 if (targetItemInstance != null) {
                     return null; // Multiple target items not allowed
@@ -125,12 +129,12 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
         }
         
         // Both rune and target must be present
-        if (runeItemInstance == null || targetItemInstance == null || rune == null) {
+        if (runeItemInstance == null || targetItemInstance == null) {
             return null;
         }
         
         // Check if rune can be applied to target item
-        if (!rune.canApply(targetItemInstance)) {
+        if (!runeItem.getRune().canApply(targetItemInstance)) {
             return null;
         }
         
@@ -141,17 +145,17 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
         }
 
         // Check if rune is already applied
-        if (containerOpt.get().hasRune(rune)) {
+        if (containerOpt.get().hasRune(runeItem.getRune())) {
             return null; // Rune already applied to target item
         }
         
-        return new RuneData(rune, runeItemInstance, targetItemInstance);
+        return new RuneData(runeItem.getRune(), runeItemInstance, targetItemInstance);
     }
     
     /**
      * Applies a rune to an item and returns the modified item instance.
      */
-    private ItemInstance applyRuneToItem(@NotNull ItemInstance targetItem, @NotNull Rune rune) {
+    private ItemInstance applyRuneToItem(@NotNull ItemInstance targetItem) {
         // Get existing rune container - we should only work with existing containers
         Optional<RuneContainerComponent> containerOpt = targetItem.getComponent(RuneContainerComponent.class);
         if (containerOpt.isEmpty()) {
@@ -167,7 +171,7 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
         
         // Create a new container with the rune added
         List<Rune> newRunes = new ArrayList<>(existing.getRunes());
-        newRunes.add(rune);
+        newRunes.add(runeItem.getRune());
         RuneContainerComponent newContainer = new RuneContainerComponent(existing.getSockets(), newRunes);
         
         // Apply the updated container to the target item
@@ -176,14 +180,10 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
     
     @Override
     public @NotNull Map<Integer, RecipeIngredient> getIngredients() {
-        // Rune recipes don't have fixed ingredients
-        return new HashMap<>();
-    }
-    
-    @Override
-    public @NotNull Set<BaseItem> getIngredientTypes() {
-        // Rune recipes don't have fixed ingredient types
-        return Set.of();
+        return Map.of(
+                0, new RecipeIngredient(runeItem, 1),
+                1, new RecipeIngredient(baseItem, 1)
+        );
     }
     
     /**
