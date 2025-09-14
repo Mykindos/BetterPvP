@@ -16,7 +16,10 @@ import me.mykindos.betterpvp.core.metal.casting.CastingMoldRecipe;
 import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingRecipe;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,6 +51,12 @@ public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
         addPageChangeHandler((previousPage, nextPage) -> {
             for (Window window : findAllWindows()) {
                 window.changeTitle(getTitle(content.get(nextPage)));
+            }
+        });
+
+        addPageChangeHandler((previousPage, nextPage) -> {
+            for (Player player : findAllCurrentViewers()) {
+                new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN).play(player);
             }
         });
     }
