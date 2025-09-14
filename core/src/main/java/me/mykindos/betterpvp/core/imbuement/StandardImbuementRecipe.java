@@ -104,16 +104,6 @@ public class StandardImbuementRecipe extends ImbuementRecipe {
     }
     
     /**
-     * Gets the ingredient types used in this recipe (ignoring quantities).
-     * Used for duplicate recipe detection.
-     * @return A set of base items used as ingredients
-     */
-    @Override
-    public @NotNull Set<BaseItem> getIngredientTypes() {
-        return ingredients.keySet();
-    }
-    
-    /**
      * Gets the imbuement recipe result containing all outputs.
      * @return The imbuement recipe result
      */
