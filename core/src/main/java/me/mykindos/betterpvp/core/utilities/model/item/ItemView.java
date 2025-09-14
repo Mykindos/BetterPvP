@@ -96,6 +96,10 @@ public class ItemView implements ItemProvider {
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) {
             meta = Bukkit.getItemFactory().getItemMeta(material);
+
+            if (meta == null) {
+                return new ItemStack(fallbackMaterial != null ? fallbackMaterial : Material.BARRIER, Math.max(1, amount));
+            }
         }
 
         if (durability != null && meta instanceof Damageable damageable) {
@@ -217,6 +221,10 @@ public class ItemView implements ItemProvider {
             this.baseMeta(meta);
             this.material(itemStack.getType());
             this.amount(itemStack.getAmount());
+
+            if (meta == null) {
+                return this;
+            }
 
             final Component displayName = meta.displayName();
             if (displayName != null) {

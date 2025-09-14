@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.block.impl.workbench;
 
+import lombok.CustomLog;
 import lombok.NonNull;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractTabGui;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -12,10 +14,13 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.resolver.HasIngredientsParameter;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
@@ -25,6 +30,7 @@ import java.util.List;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
+@CustomLog
 public class GuiWorkbench extends AbstractTabGui implements Windowed {
 
     protected final GuiCraftingTableAdvanced craftingGui;
@@ -62,11 +68,23 @@ public class GuiWorkbench extends AbstractTabGui implements Windowed {
     }
 
     public void updateQuickCrafts() {
-        this.quickCrafts = this.craftingManager.getRegistry()
+        this.craftingManager.getRegistry()
                 .getResolver()
-                .lookup(lookupParameter);
-        this.craftingGui.updateControlItems();
-        this.quickCraftGui.refresh();
+                .lookup(lookupParameter)
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        log.error("Error looking up quick crafts for workbench", ex).submit();
+                        return;
+                    }
+                    // update state with the result
+                    this.quickCrafts = result;
+
+                    // switch back to main thread for GUI updates
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                        this.craftingGui.updateControlItems();
+                        this.quickCraftGui.refresh();
+                    });
+                });
     }
 
     public void setCraftingTab() {

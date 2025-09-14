@@ -63,6 +63,7 @@ public class ItemInstanceView implements ItemProvider {
 
         // lol bug so we can hide attributes
         final ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) return itemStack;
         for (EquipmentSlot value : EquipmentSlot.values()) {
             meta.removeAttributeModifier(value);
         }

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Looks up recipes based on a given set of parameters.
@@ -24,11 +25,15 @@ public class RecipeResolver<T extends Recipe<?, ?>> {
         this.registry = registry;
     }
 
+    // Async because we're looping through a lot of items and this becomes
+    // n*m
+    // n = size of recipes
+    // m = size of parameters
     @Contract("null -> fail")
-    public final LinkedList<T> lookup(LookupParameter... parameters) {
+    public final CompletableFuture<LinkedList<T>> lookup(LookupParameter... parameters) {
         Preconditions.checkNotNull(parameters, "Parameters must not be null");
         Preconditions.checkArgument(parameters.length > 0, "At least one parameter must be provided");
-        return registry.getRecipes().stream()
+        return CompletableFuture.supplyAsync(() -> registry.getRecipes().stream()
                 .filter(recipe -> {
                     for (LookupParameter parameter : parameters) {
                         if (!parameter.test(recipe)) {
@@ -37,6 +42,6 @@ public class RecipeResolver<T extends Recipe<?, ?>> {
                     }
                     return true;
                 })
-                .collect(LinkedList::new, LinkedList::add, LinkedList::addAll);
+                .collect(LinkedList::new, LinkedList::add, LinkedList::addAll));
     }
 }

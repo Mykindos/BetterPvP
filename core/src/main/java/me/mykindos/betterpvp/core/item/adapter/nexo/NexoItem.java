@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.nexo;
+package me.mykindos.betterpvp.core.item.adapter.nexo;
 
 import org.jetbrains.annotations.NotNull;
 
