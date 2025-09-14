@@ -44,7 +44,6 @@ public class FlagInventoryCache {
                 ItemView.builder().material(Material.STICK).itemModel(INVISIBLE).hideTooltip(true).build().get(),
                 ItemGroup.MISC,
                 ItemRarity.COMMON);
-        registry.registerItem(new NamespacedKey(plugin, "flag_placeholder"), placeholderItem);
     }
 
     public boolean hasCache(Player player) {
