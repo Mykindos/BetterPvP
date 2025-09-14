@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -36,6 +37,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -103,9 +105,16 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
             return Menu.INVISIBLE_BACKGROUND_ITEM;
         }));
 
+        addPageChangeHandler((previousPage, nextPage) -> {
+            for (Player player : findAllCurrentViewers()) {
+                new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN).play(player);
+            }
+        });
+
         this.itemFactory = itemFactory;
         refresh();
     }
+
     public void refresh() {
         this.searchFuture = CompletableFuture.supplyAsync(() -> {
             // do heavy work off-thread
@@ -140,10 +149,13 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
         }).thenAccept(result -> {
             if (result != null) {
                 setContent(result);
+
+                for (Player player : findAllCurrentViewers()) {
+                    new SoundEffect(Sound.ITEM_SPYGLASS_USE).play(player);
+                }
             }
         });
     }
-
 
     @Override
     public void bake() {
