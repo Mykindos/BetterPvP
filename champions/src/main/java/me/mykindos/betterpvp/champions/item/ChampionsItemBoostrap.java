@@ -154,12 +154,13 @@ public class ChampionsItemBoostrap {
     }
     
     private void registerFallbackItem(String key, Material material, BaseItem item, boolean keepRecipe) {
-        itemRegistry.registerFallbackItem(championsKey(key), material, item);
+        final NamespacedKey namespacedKey = championsKey(key);
+        itemRegistry.registerFallbackItem(namespacedKey, material, item);
         if (keepRecipe) {
             final Recipe old = Bukkit.getRecipe(material.getKey());
             if (old == null) return;
             final CraftingRecipe craftingRecipe = adapter.convertToCustomRecipe(old);
-            if (craftingRecipe != null) registry.registerRecipe(craftingRecipe);
+            if (craftingRecipe != null) registry.registerRecipe(namespacedKey, craftingRecipe);
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.Objects;
 @Getter
 public class RuneContainerComponent implements ItemComponent, LoreComponent {
 
-    private static final NamespacedKey COMPONENT_KEY = new NamespacedKey("champions", "rune-container");
+    private static final NamespacedKey COMPONENT_KEY = new NamespacedKey("core", "rune-container");
     
     private final int sockets;
     private final List<Rune> runes;

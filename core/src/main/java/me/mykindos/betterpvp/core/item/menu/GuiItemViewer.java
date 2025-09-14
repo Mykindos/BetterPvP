@@ -191,7 +191,7 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
         public ItemProvider getItemProvider() {
             return ItemView.builder()
                     .material(Material.PAPER)
-                    .itemModel(Key.key("betterpvp", "menu/icon/regular/sun_icon"))
+                    .itemModel(Key.key("betterpvp", "menu/icon/regular/star_icon"))
                     .displayName(Component.text("Custom Items Only", customOnly ? NamedTextColor.GREEN : NamedTextColor.RED))
                     .build();
         }

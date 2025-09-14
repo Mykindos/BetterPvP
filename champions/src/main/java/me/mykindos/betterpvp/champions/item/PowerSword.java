@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
@@ -46,6 +47,6 @@ public class PowerSword extends WeaponItem {
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('D', new RecipeIngredient(diamondBlock, 1));
         builder.setIngredient('S', new RecipeIngredient(stick, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "power_sword"), builder.build());
     }
 }

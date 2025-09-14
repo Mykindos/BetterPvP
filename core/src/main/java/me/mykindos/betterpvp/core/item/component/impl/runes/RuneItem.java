@@ -24,6 +24,7 @@ public abstract class RuneItem extends BaseItem {
     protected RuneItem(Rune rune, ItemStack model, ItemRarity rarity) {
         super(rune.getName() + " Rune", model, ItemGroup.MATERIAL, rarity);
         this.rune = rune;
+        addBaseComponent(new RuneDescriptionComponent(rune));
     }
 
 }
