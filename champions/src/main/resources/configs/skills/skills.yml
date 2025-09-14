@@ -293,12 +293,13 @@ skills:
     vanguardsmight:
       enabled: true
       maxlevel: 3
+      passiveChargePerSecond: 0.5
       chargePerDamageTaken: 2.0
       blockDuration: 3.0
       transferencePhaseDuration: 0.5
       strengthLevel: 1
-      maxStrengthDuration: 6.0
-      maxStrengthDurationIncreasePerLevel: 1.0
+      maxStrengthDuration: 3.0
+      maxStrengthDurationIncreasePerLevel: 2.5
       noDamageAbsorbedMessageDuration: 2.0
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0

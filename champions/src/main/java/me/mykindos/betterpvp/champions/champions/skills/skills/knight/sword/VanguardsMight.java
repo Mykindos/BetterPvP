@@ -115,6 +115,14 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
             }
     );
 
+    /**
+     * Used to specify how often the action bars should update. <code>50</code> is the default value for {@link UpdateEvent}.
+     * <p>
+     * This value is also used in calculations; therefore, it must be declared here (as a constant).
+     */
+    private final long ACTION_BAR_UPDATE_DELAY = 50;  // In milliseconds
+
+    private double passiveChargePerSecond;
     private double chargePerDamageTaken;
     private double blockDuration;
     private double transferencePhaseDuration;
@@ -380,8 +388,9 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     /**
      * This method is called every 50ms to update the action bars for players who are not currently channeling the skill
      * but are still using it. This method is also responsible for updating the strength effect action bar.
+     * This method is also responsible for doing the passive charging during the Channeling Phase.
      */
-    @UpdateEvent
+    @UpdateEvent(delay = ACTION_BAR_UPDATE_DELAY)
     public void updateActionBars() {
         final Iterator<Map.Entry<Player, VanguardsMightData>> iterator = data.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -400,7 +409,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 continue;
             }
 
-            VanguardsMightAbilityPhase phase = abilityData.getPhase();
+            final @NotNull VanguardsMightAbilityPhase phase = abilityData.getPhase();
 
             if (phase.equals(VanguardsMightAbilityPhase.TRANSFERENCE)) {
                 updateActionBarForTransferencePhase(abilityData, player);
@@ -409,14 +418,25 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 if (abilityData.isAlreadyAppliedStrengthEffectOrActionBar()) {
 
                     // this update event is called every 50ms or every 0.05 seconds
-                    abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - 0.05);
+                    final double delayInSeconds = ACTION_BAR_UPDATE_DELAY / 1000d;  // if delay=50 -> delayInSeconds=0.05
+                    abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - delayInSeconds);
                     continue;
                 }
 
                 applyStrengthEffectAndAddToActionBar(abilityData, player, level);
                 abilityData.setAlreadyAppliedStrengthEffectOrActionBar(true);
-            }
 
+            } else if (phase.equals(VanguardsMightAbilityPhase.CHANNELING)) {  // passive charging is done here
+
+                final float chargePerSecondAsFloat = (float) passiveChargePerSecond;
+
+                // This is just in case the delay of this update event ever changes.
+                // So things have to be calculated dynamically here.
+                final float ticksPerSecond = 1000f / ACTION_BAR_UPDATE_DELAY;
+                final float additionalCharge = chargePerSecondAsFloat / ticksPerSecond;
+
+                abilityData.setCharge(abilityData.getCharge() + additionalCharge);
+            }
         }
     }
 
@@ -519,12 +539,13 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
     @Override
     public void loadSkillConfig() {
+        passiveChargePerSecond = getConfig("passiveChargePerSecond ", 0.5, Double.class);
         chargePerDamageTaken = getConfig("chargePerDamageTaken", 2.0, Double.class);
         blockDuration = getConfig("blockDuration", 3.0, Double.class);
         transferencePhaseDuration = getConfig("transferencePhaseDuration", 0.5, Double.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
-        maxStrengthDuration = getConfig("maxStrengthDuration", 6.0, Double.class);
-        maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 1.0, Double.class);
+        maxStrengthDuration = getConfig("maxStrengthDuration", 3.0, Double.class);
+        maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 2.5, Double.class);
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
     }
 }
