@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
@@ -90,6 +91,6 @@ public class Mjolnir extends WeaponItem implements ReloadHook, NexoItem {
         builder.setIngredient('S', new RecipeIngredient(stormInABottle, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         builder.setIngredient('V', new RecipeIngredient(voidglassCore, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "mjolnir"), builder.build());
     }
 }

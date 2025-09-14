@@ -7,11 +7,15 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
+import net.kyori.adventure.key.Namespaced;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,29 +26,34 @@ import java.util.Set;
 @Singleton
 public class SmeltingRecipeRegistry implements RecipeRegistry<SmeltingRecipe> {
     
-    private final Set<SmeltingRecipe> smeltingRecipes = new HashSet<>();
+    private final Map<NamespacedKey, SmeltingRecipe> smeltingRecipes = new HashMap<>();
     private final Set<BaseItem> smeltableItems = new HashSet<>();
     private final RecipeResolver<SmeltingRecipe> resolver = new RecipeResolver<>(this);
 
     @Inject
     private SmeltingRecipeRegistry(RecipeRegistries registries) {
-        registries.register(this);
+        registries.register(new NamespacedKey("betterpvp", "smelting"), this);
     }
     
     /**
      * Registers a new smelting recipe.
      * Validates that no duplicate recipe exists with the same ingredient types.
-     * 
+     *
+     * @param key The key to register the recipe under
      * @param recipe The smelting recipe to register
      * @throws IllegalArgumentException if a recipe with the same ingredient types already exists
      */
     @Override
-    public void registerRecipe(@NotNull SmeltingRecipe recipe) {
+    public void registerRecipe(NamespacedKey key, @NotNull SmeltingRecipe recipe) {
+        if (smeltingRecipes.containsKey(key)) {
+            log.warn("Recipe with key {} is already registered, overwriting", key).submit();
+        }
+
         // Check for duplicate recipes (same ingredient types, ignoring quantities)
         Set<BaseItem> newIngredientTypes = recipe.getIngredientTypes();
         
         // Add to our smelting-specific collections
-        smeltingRecipes.add(recipe);
+        smeltingRecipes.put(key, recipe);
         smeltableItems.addAll(recipe.getIngredientTypes());
         
         log.info("Registered smelting recipe with ingredients: {} -> {}", 
@@ -75,7 +84,7 @@ public class SmeltingRecipeRegistry implements RecipeRegistry<SmeltingRecipe> {
      * @return An unmodifiable set of all smelting recipes
      */
     public @NotNull Set<SmeltingRecipe> getRecipes() {
-        return Collections.unmodifiableSet(smeltingRecipes);
+        return Set.copyOf(smeltingRecipes.values());
     }
 
     @Override
@@ -89,20 +98,8 @@ public class SmeltingRecipeRegistry implements RecipeRegistry<SmeltingRecipe> {
      * @return A list of recipes that use the item
      */
     public @NotNull List<SmeltingRecipe> getRecipesUsingItem(@NotNull BaseItem item) {
-        return smeltingRecipes.stream()
+        return smeltingRecipes.values().stream()
                 .filter(recipe -> recipe.getIngredientTypes().contains(item))
                 .toList();
-    }
-    
-    /**
-     * Validates that all ingredients in the recipe are valid.
-     * Currently just logs a warning for items that aren't used in any recipes,
-     * but could be extended for more complex validation.
-     * 
-     * @param recipe The recipe to validate
-     */
-    private void validateRecipe(@NotNull SmeltingRecipe recipe) {
-        // Future: Add validation logic here
-        // For example, checking that alloy ingredients make sense together
     }
 } 

@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerCo
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,6 +70,6 @@ public class RunedPickaxe extends BaseItem implements ReloadHook {
                 diamondPickaxe, 1
         );
         final StandardImbuementRecipe recipe = new StandardImbuementRecipe(ingredients, this, itemFactory);
-        registry.registerRecipe(recipe);
+        registry.registerRecipe(new NamespacedKey("champions", "runed_pickaxe"), recipe);
     }
 }

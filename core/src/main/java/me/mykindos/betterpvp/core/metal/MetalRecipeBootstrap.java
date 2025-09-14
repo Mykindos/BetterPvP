@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.recipe.smelting.AlloyRegistry;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingRecipeBuilder;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingRecipeRegistry;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 
 @Singleton
 @PluginAdapter("Core")
@@ -32,7 +33,7 @@ public class MetalRecipeBootstrap {
         builder.setPrimaryResult(steel, 1000);
         builder.addIngredient(itemFactory.getFallbackItem(Material.IRON_INGOT), 10);
         builder.addIngredient(itemFactory.getFallbackItem(Material.COAL_BLOCK), 2);
-        recipeRegistry.registerRecipe(builder.build(itemFactory));
+        recipeRegistry.registerRecipe(new NamespacedKey("core", "steel"), builder.build(itemFactory));
         alloyRegistry.registerAlloy(steel);
     }
 
@@ -44,7 +45,7 @@ public class MetalRecipeBootstrap {
         builder.addIngredient(blackroot, 10);
         builder.addIngredient(runebloodOre, 1);
         builder.addIngredient(fissureQuartz, 2);
-        recipeRegistry.registerRecipe(builder.build(itemFactory));
+        recipeRegistry.registerRecipe(new NamespacedKey("core", "runesteel"), builder.build(itemFactory));
         alloyRegistry.registerAlloy(runesteel);
     }
 

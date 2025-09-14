@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -140,7 +141,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('C', new RecipeIngredient(colossusFragment, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "giants_broadsword"), builder.build());
         registeredRecipe = true;
     }
 } 

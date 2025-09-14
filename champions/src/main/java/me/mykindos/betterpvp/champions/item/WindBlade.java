@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
@@ -120,7 +121,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
         builder.setIngredient('F', new RecipeIngredient(featherOfZephyr, 1));
         builder.setIngredient('A', new RecipeIngredient(aetherCore, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "windblade"), builder.build());
         registeredRecipe = true;
     }
 }

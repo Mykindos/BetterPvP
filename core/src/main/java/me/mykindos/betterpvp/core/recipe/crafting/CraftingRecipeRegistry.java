@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapter;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +33,14 @@ import java.util.Set;
 @Singleton
 public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
 
-    private final ItemRegistry itemRegistry;
     private final RecipeResolver<CraftingRecipe> resolver;
-    private final Set<CraftingRecipe> craftingRecipes = new HashSet<>();
+    private final Map<NamespacedKey, CraftingRecipe> craftingRecipes = new HashMap<>();
 
     @Inject
-    private CraftingRecipeRegistry(RecipeRegistries registries, ItemRegistry itemRegistry, MinecraftCraftingRecipeAdapter minecraftAdapter) {
-        this.itemRegistry = itemRegistry;
+    private CraftingRecipeRegistry(RecipeRegistries registries, MinecraftCraftingRecipeAdapter minecraftAdapter) {
         this.resolver = new RecipeResolver<>(this);
         minecraftAdapter.registerDefaults(craftingRecipes);
-        registries.register(this);
+        registries.register(new NamespacedKey("betterpvp", "crafting"), this);
     }
 
     @Override
@@ -50,15 +50,16 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
 
     /**
      * Registers a new recipe.
-     *
+     * @param key The key to register the recipe under
      * @param craftingRecipe The recipe to register
      */
-    public void registerRecipe(@NotNull CraftingRecipe craftingRecipe) {
-        // Add to result lookup multimap
-        BaseItem resultItem = craftingRecipe.getPrimaryResult();
-        NamespacedKey itemKey = itemRegistry.getKey(resultItem);
-        craftingRecipes.add(craftingRecipe);
-        log.info("Registered recipe for item: {}", itemKey).submit();
+    public void registerRecipe(@NotNull NamespacedKey key, @NotNull CraftingRecipe craftingRecipe) {
+        if (craftingRecipes.containsKey(key)) {
+            log.warn("Recipe with key {} is already registered, overwriting", key).submit();
+        }
+
+        craftingRecipes.put(key, craftingRecipe);
+        log.info("Registered recipe: {}", key).submit();
     }
 
     
@@ -69,26 +70,9 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
      */
     @NotNull
     public Set<CraftingRecipe> getRecipes() {
-        return Collections.unmodifiableSet(craftingRecipes);
+        return Set.copyOf(craftingRecipes.values());
     }
-    
-    /**
-     * Gets all recipes of a specific type.
-     * 
-     * @param type The recipe type to filter by
-     * @return A list of recipes of the specified type
-     */
-    @NotNull
-    public List<CraftingRecipe> getRecipesByType(@NotNull RecipeType type) {
-        List<CraftingRecipe> result = new ArrayList<>();
-        for (CraftingRecipe craftingRecipe : craftingRecipes) {
-            if (craftingRecipe.getType() == type) {
-                result.add(craftingRecipe);
-            }
-        }
-        return result;
-    }
-    
+
     /**
      * Finds the first recipe that matches the provided items.
      * 
@@ -99,7 +83,7 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
     @NotNull
     public Optional<CraftingRecipe> findMatchingRecipe(@NotNull Map<Integer, ItemStack> items, @Nullable RecipeType type) {
         // First check custom recipes
-        for (CraftingRecipe craftingRecipe : craftingRecipes) {
+        for (CraftingRecipe craftingRecipe : craftingRecipes.values()) {
             if (type != null && craftingRecipe.getType() != type) {
                 continue;
             }
@@ -111,5 +95,4 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
         
         return Optional.empty();
     }
-    
-} 
+}

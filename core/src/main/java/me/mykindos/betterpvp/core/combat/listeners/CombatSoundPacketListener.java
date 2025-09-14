@@ -17,7 +17,7 @@ import org.bukkit.Sound;
 import java.util.List;
 
 @Singleton
-@PluginAdapter("ProtocolLib")
+@PluginAdapter("packetevents")
 @BPvPListener
 public class CombatSoundPacketListener implements PacketListener {
 
