@@ -251,7 +251,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
     private boolean matches(ItemStack itemStack) {
         if (itemStack == null) return false;
-        return itemFactory.isItemOfType(itemStack, placeholderItem);
+        return itemFactory.create(placeholderItem).getItemStack().isSimilar(itemStack);
     }
 
     @EventHandler

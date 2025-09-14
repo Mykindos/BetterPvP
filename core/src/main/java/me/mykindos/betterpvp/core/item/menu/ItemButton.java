@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -95,7 +96,6 @@ public class ItemButton extends ControlItem<AbstractGui> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (!loadFuture.isDone() || cachedResult == null) {
-            SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }
 
@@ -109,7 +109,6 @@ public class ItemButton extends ControlItem<AbstractGui> {
         }
 
         if (result.isEmpty()) {
-            SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }
 
@@ -121,6 +120,10 @@ public class ItemButton extends ControlItem<AbstractGui> {
                 previous = windowed;
                 break;
             }
+        }
+
+        for (Player viewer : getGui().findAllCurrentViewers()) {
+            new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN).play(viewer);
         }
         new GuiRecipeViewer(result, previous).show(player);
     }
