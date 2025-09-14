@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapelessCraftingRecipe;
+import net.kyori.adventure.key.Namespaced;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -41,13 +42,13 @@ public class MinecraftCraftingRecipeAdapter {
         this.itemFactory = itemFactory;
     }
 
-    public List<CraftingRecipe> getRecipes() {
-        List<CraftingRecipe> recipes = new ArrayList<>();
+    public Map<NamespacedKey, CraftingRecipe> getRecipes() {
+        Map<NamespacedKey, CraftingRecipe> recipes = new HashMap<>();
         Bukkit.recipeIterator().forEachRemaining(recipe -> {
             if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe) {
                 CraftingRecipe convertedRecipe = convertToCustomRecipe(craftingRecipe);
                 if (convertedRecipe != null) {
-                    recipes.add(convertedRecipe);
+                    recipes.put(craftingRecipe.getKey(), convertedRecipe);
                 }
             }
         });
@@ -148,12 +149,12 @@ public class MinecraftCraftingRecipeAdapter {
         return new ShapelessCraftingRecipe(result, ingredientMap, itemFactory, false);
     }
 
-    public void registerDefaults(Set<CraftingRecipe> craftingRecipes) {
+    public void registerDefaults(Map<NamespacedKey, CraftingRecipe> craftingRecipes) {
         log.info("Registering default Minecraft crafting recipes").submit();
 
         long start = System.nanoTime();
 
-        craftingRecipes.addAll(getRecipes());
+        craftingRecipes.putAll(getRecipes());
 
         long elapsed = System.nanoTime() - start;
         double ms = elapsed / 1_000_000.0;

@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
@@ -79,6 +80,6 @@ public class AlligatorsTooth extends WeaponItem implements ReloadHook {
         builder.setIngredient('S', new RecipeIngredient(alligatorScale, 1));
         builder.setIngredient('F', new RecipeIngredient(fangOfTheDeep, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "alligators_tooth"), builder.build());
     }
 } 

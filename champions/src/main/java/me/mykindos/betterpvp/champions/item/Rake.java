@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 
 import java.util.Map;
 
@@ -66,6 +67,6 @@ public class Rake extends WeaponItem implements ReloadHook {
                 diamondHoe, 1
         );
         final StandardImbuementRecipe recipe = new StandardImbuementRecipe(ingredients, this, itemFactory);
-        registry.registerRecipe(recipe);
+        registry.registerRecipe(new NamespacedKey("champions", "rake"), recipe);
     }
 }

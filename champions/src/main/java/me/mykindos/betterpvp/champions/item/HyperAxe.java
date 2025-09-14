@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.components.ToolComponent;
@@ -110,6 +111,6 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
         builder.setIngredient('R', new RecipeIngredient(razorEdge, 1));
         builder.setIngredient('O', new RecipeIngredient(overchargedCrystal, 1));
         builder.setIngredient('S', new RecipeIngredient(stick, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "hyper_axe"), builder.build());
     }
 } 

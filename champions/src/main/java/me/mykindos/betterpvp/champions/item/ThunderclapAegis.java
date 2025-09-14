@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
@@ -82,6 +83,6 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('S', new RecipeIngredient(stormsteelPlate, 1));
         builder.setIngredient('V', new RecipeIngredient(volticShield, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "thunderclap_aegis"), builder.build());
     }
 } 

@@ -52,7 +52,7 @@ public class ItemPacketRemapper implements PacketListener {
     @Inject
     private ItemPacketRemapper(Core core, ItemFactory itemFactory) {
         this.itemFactory = itemFactory;
-        PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.HIGHEST);
+        PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.LOW);
     }
 
     // Map to

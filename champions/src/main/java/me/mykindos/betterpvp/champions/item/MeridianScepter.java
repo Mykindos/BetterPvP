@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 
 @Singleton
@@ -93,7 +94,7 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('O', new RecipeIngredient(orb, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "meridian_scepter"), builder.build());
         registeredRecipe = true;
     }
 } 

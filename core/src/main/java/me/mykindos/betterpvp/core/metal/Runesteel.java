@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapelessCraftingRecipe;
 import org.bukkit.Color;
+import org.bukkit.NamespacedKey;
 
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class Runesteel {
                     0, new RecipeIngredient(ingot, 1),
                     1, new RecipeIngredient(ingot, 1)
             );
-            registry.registerRecipe(new ShapelessCraftingRecipe(this,
+            registry.registerRecipe(new NamespacedKey("core", "runesteel_billet"), new ShapelessCraftingRecipe(this,
                     ingredients,
                     itemFactory,
                     false));
@@ -98,7 +99,7 @@ public class Runesteel {
             };
             final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
             builder.setIngredient('A', new RecipeIngredient(billet, 1));
-            registry.registerRecipe(builder.build());
+            registry.registerRecipe(new NamespacedKey("core", "runesteel_block"), builder.build());
         }
     }
 

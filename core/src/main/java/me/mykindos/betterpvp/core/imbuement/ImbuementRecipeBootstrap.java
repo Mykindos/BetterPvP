@@ -75,7 +75,8 @@ public class ImbuementRecipeBootstrap {
 
         for (RuneItem runeItem : runes) {
             if (!container.hasRune(runeItem.getRune()) && runeItem.getRune().canApply(baseItem)) {
-                imbuementRecipeRegistry.registerRecipe(new RuneImbuementRecipe(itemFactory, baseItem, runeItem));
+                final NamespacedKey key = itemRegistry.getKey(baseItem);
+                imbuementRecipeRegistry.registerRecipe(key, new RuneImbuementRecipe(itemFactory, baseItem, runeItem));
             }
         }
     }

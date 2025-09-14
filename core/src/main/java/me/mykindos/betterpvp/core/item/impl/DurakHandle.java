@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import org.bukkit.NamespacedKey;
 
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class DurakHandle extends BaseItem {
                 5,
                 itemFactory
         );
-        registry.registerRecipe(recipe);
+        registry.registerRecipe(new NamespacedKey("core", "durak_handle"), recipe);
     }
 }
 
