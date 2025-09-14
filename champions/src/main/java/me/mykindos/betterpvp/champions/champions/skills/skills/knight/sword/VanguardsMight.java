@@ -15,6 +15,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -342,16 +345,13 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         final double rateAtDamageTaken = chargePerDamageTaken / 100.0;
         final double addedCharge = event.getDamage() * rateAtDamageTaken;
         float newCharge = abilityData.getCharge() + (float) addedCharge;
-        if (newCharge > 1f) {
-            newCharge = 1f;  // Cap the charge at 1
-        }
 
-        // update charge + play old defensive stance sound
+        // Update charge & play sound
         abilityData.setCharge(newCharge);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.8F, 2.0F);
 
+        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, 100, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
         event.setKnockback(false);
-        event.setDamage(0);
     }
 
     /**

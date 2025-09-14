@@ -43,4 +43,8 @@ public class VanguardsMightData extends ChargeData {
         this.phase = phase;
     }
 
+    @Override
+    public void setCharge(float newCharge) {
+        super.setCharge(Math.min(newCharge, 1f));  // cant go higher than 1
+    }
 }
