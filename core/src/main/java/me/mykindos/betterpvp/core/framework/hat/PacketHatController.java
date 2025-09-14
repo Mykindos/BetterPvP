@@ -46,7 +46,7 @@ public class PacketHatController {
 
     @Inject
     public PacketHatController(Core core, HatProtocol protocol, ItemFactory itemFactory) {
-        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(this, protocol), PacketListenerPriority.HIGH);
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(core, this, protocol), PacketListenerPriority.HIGH);
         PacketEvents.getAPI().getEventManager().registerListener(new RemapperOut(this), PacketListenerPriority.HIGH);
         this.itemFactory = itemFactory;
         this.protocol = protocol;
