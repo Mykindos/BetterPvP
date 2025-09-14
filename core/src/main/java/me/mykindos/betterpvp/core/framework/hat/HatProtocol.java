@@ -41,15 +41,14 @@ public class HatProtocol implements Listener {
             for (Player player : wearer.getTrackedBy()) {
                 PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
             }
-        } else {
-            // Just send to self
-            final WrapperPlayServerSetSlot packet2 = new WrapperPlayServerSetSlot(0,
-                    0, // Allows changing player inventory
-                    5,
-                    helmet);
-            PacketEvents.getAPI().getPlayerManager().getUser(wearer).sendPacket(packet2);
         }
 
+        // Just send to self
+        final WrapperPlayServerSetSlot packet2 = new WrapperPlayServerSetSlot(0,
+                0, // Allows changing player inventory
+                5,
+                helmet);
+        PacketEvents.getAPI().getPlayerManager().getUser(wearer).sendPacket(packet2);
     }
 
     @EventHandler
