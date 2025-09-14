@@ -34,7 +34,7 @@ public class ShadowChatFilterManager extends Manager<String> {
      * Loads all filtered words from the database into memory
      */
     public void loadFilteredWords() {
-        log.info("Loading filtered words...");
+        log.info("Loading filtered words...").submit();
         filteredWords.clear();
 
         Statement statement = new Statement("SELECT word FROM filtered_words");
