@@ -23,7 +23,6 @@ import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRe
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
-import me.mykindos.betterpvp.progression.weapons.ProgressionItemBootstrap;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;

@@ -138,7 +138,7 @@ public class Core extends BPvPPlugin {
         } catch (NoPacketAdapterAvailableException e) {
             // If no packet adapter was found, you can fallback to the no-op implementation:
             scoreboardLibrary = new NoopScoreboardLibrary();
-            log.warn("No packet adapter found, falling back to no-op implementation");
+            log.warn("No packet adapter found, falling back to no-op implementation").submit();
         }
 
         final Adapters adapters = new Adapters(this);
@@ -173,25 +173,25 @@ public class Core extends BPvPPlugin {
 
     @Override
     public void onDisable() {
-        log.info("Shutting down...");
+        log.info("Shutting down...").submit();
 
         injector.getInstance(SmartBlockDataManager.class).saveWorlds().join();
-        log.info("Saved all cust0om blocks");
+        log.info("Saved all cust0om blocks").submit();
 
         clientManager.processStatUpdates(false);
         clientManager.shutdown();
-        log.info("Processed all pending stat updates and shut down client manager");
+        log.info("Processed all pending stat updates and shut down client manager").submit();
 
         redis.shutdown();
-        log.info("Redis connection closed");
+        log.info("Redis connection closed").submit();
 
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
-        log.info("Global combat stats repository shut down");
+        log.info("Global combat stats repository shut down").submit();
 
         scoreboardLibrary.close();
-        log.info("Scoreboard library closed");
+        log.info("Scoreboard library closed").submit();
 
-        log.info("Closing logger factory...");
+        log.info("Closing logger factory...").submit();
         LoggerFactory.getInstance().close();
     }
 

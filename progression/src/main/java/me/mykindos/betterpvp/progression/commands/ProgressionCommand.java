@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
-import me.mykindos.betterpvp.progression.weapons.ProgressionItemBootstrap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

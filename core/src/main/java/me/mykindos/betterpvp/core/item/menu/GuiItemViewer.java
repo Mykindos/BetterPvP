@@ -143,7 +143,7 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
 
             return result;
         }).exceptionally(ex -> {
-            log.error("Failed to refresh item viewer", ex);
+            log.error("Failed to refresh item viewer", ex).submit();
             return null;
         }).thenAccept(result -> {
             if (result != null) {
