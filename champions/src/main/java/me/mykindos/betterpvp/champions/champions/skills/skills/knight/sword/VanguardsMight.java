@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
@@ -330,7 +331,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
         // update charge + play old defensive stance sound
         abilityData.setCharge(newCharge);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 2.0F);
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.8F, 2.0F);
 
         event.setKnockback(false);
         event.setDamage(0);
@@ -434,17 +435,17 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         final Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
 
         // (condition) ? failure : success
-        final Sound soundToPlay;
+        final SoundEffect soundEffectToPlay;
         final double calculatedCharge;
 
         if (abilityData.getCharge() <= 0f) {
-            soundToPlay = Sound.BLOCK_BEACON_DEACTIVATE;  // failure sound
+            soundEffectToPlay = new SoundEffect(Sound.BLOCK_BEACON_DEACTIVATE, 0.5f);  // failure sound
             calculatedCharge = 0.0;
 
             final TextComponent message = Component.text("No Damage Absorbed").color(NamedTextColor.DARK_RED);
             gamer.getActionBar().add(400, new TimedComponent(noDamageAbsorbedMessageDuration, true, gmr -> message));
         } else {
-            soundToPlay = Sound.ENTITY_ENDER_DRAGON_GROWL;  // success sound
+            soundEffectToPlay = new SoundEffect(Sound.BLOCK_ANVIL_LAND, 1.5f);  // success sound
             calculatedCharge = abilityData.getCharge() * getMaxStrengthDuration(level);
             final long strengthDuration = (long) (calculatedCharge * 1000L);
 
@@ -455,7 +456,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         }
 
         // Strength effect sound
-        player.getWorld().playSound(player.getLocation(), soundToPlay, 1f, 0.5f);
+        soundEffectToPlay.play(player.getLocation());
 
         // Start cooldown when strength effect phase ends
         UtilServer.runTaskLater(champions, () -> {
