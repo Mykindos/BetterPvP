@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.metal.casting.CastingMoldRecipeRegistry;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.xml.stream.events.Namespace;
+
 @Singleton
 @PluginAdapter("Core")
 public class CastingMoldBootstrap {
@@ -42,8 +44,8 @@ public class CastingMoldBootstrap {
                                 Runesteel.Ingot runesteelIngot, Runesteel.Alloy runesteelAlloy) {
         final CastingMold ingotBase = new CastingMold("Ingot Casting Mold", "ingot");
         itemRegistry.registerItem(key("ingot_casting_mold"), ingotBase);
-        recipeRegistry.registerRecipe(new CastingMoldRecipe(ingotBase, 1000, steelAlloy, steelIngot, itemFactory));
-        recipeRegistry.registerRecipe(new CastingMoldRecipe(ingotBase, 1000, runesteelAlloy, runesteelIngot, itemFactory));
+        recipeRegistry.registerRecipe(new NamespacedKey("core", "steel"), new CastingMoldRecipe(ingotBase, 1000, steelAlloy, steelIngot, itemFactory));
+        recipeRegistry.registerRecipe(new NamespacedKey("core", "runesteel"), new CastingMoldRecipe(ingotBase, 1000, runesteelAlloy, runesteelIngot, itemFactory));
     }
 
 }

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
@@ -30,6 +31,6 @@ public class RangerChestplate extends ArmorItem {
         };
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('E', new RecipeIngredient(emerald, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "ranger_chestplate"), builder.build());
     }
 }

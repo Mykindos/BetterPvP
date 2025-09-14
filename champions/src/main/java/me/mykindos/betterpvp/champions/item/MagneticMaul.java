@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
@@ -72,6 +73,6 @@ public class MagneticMaul extends WeaponItem implements ReloadHook {
         builder.setIngredient('P', new RecipeIngredient(polariteChunk, 1));
         builder.setIngredient('M', new RecipeIngredient(magneticShard, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
-        registry.registerRecipe(builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "magnetic_maul"), builder.build());
     }
 } 
