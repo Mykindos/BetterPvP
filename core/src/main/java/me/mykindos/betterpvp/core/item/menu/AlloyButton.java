@@ -23,6 +23,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -128,7 +129,6 @@ public class AlloyButton extends ControlItem<Gui> {
                             @NotNull Player player,
                             @NotNull InventoryClickEvent event) {
         if (viewOnly || !loadFuture.isDone() || cachedResult == null) {
-            SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }
 
@@ -142,7 +142,6 @@ public class AlloyButton extends ControlItem<Gui> {
         }
 
         if (result.isEmpty()) {
-            SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }
 
@@ -154,6 +153,10 @@ public class AlloyButton extends ControlItem<Gui> {
                 previous = windowed;
                 break;
             }
+        }
+
+        for (Player viewer : getGui().findAllCurrentViewers()) {
+            new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN).play(viewer);
         }
         new GuiRecipeViewer(result, previous).show(player);
     }
