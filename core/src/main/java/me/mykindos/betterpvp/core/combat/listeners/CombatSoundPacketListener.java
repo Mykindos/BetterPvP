@@ -37,7 +37,7 @@ public class CombatSoundPacketListener implements PacketListener {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacketType() != PacketType.Play.Server.NAMED_SOUND_EFFECT) {
+        if (event.getPacketType() != PacketType.Play.Server.SOUND_EFFECT) {
             return;
         }
 
