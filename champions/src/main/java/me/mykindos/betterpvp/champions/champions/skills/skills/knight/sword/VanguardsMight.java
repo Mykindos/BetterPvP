@@ -159,7 +159,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     }
 
     /**
-     * A helper method used to construct an adventure component given a few strings.
+     * A helper method used to construct an adventure component given a few strings. This method is only used in
+     * the action bars above.
      * <p>
      * The returned component will be in this format:
      * <code>`label`: `numberValue``symbol`</code>
@@ -169,7 +170,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      */
     private @NotNull Component createComponentMessage(String label, String numberValue, String symbol) {
         return Component.text(label + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                .append(Component.text(numberValue).color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.BOLD, false))
+                .append(Component.text(numberValue).color(NamedTextColor.GREEN).decoration(TextDecoration.BOLD, false))
                 .append(Component.text(symbol).color(NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false));
     }
 
