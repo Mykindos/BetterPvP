@@ -52,11 +52,4 @@ public abstract class ImbuementRecipe implements Recipe<ImbuementRecipeResult, I
         
         return consumedSlots;
     }
-    
-    /**
-     * Gets the ingredient types used in this recipe (ignoring quantities).
-     * Used for duplicate recipe detection.
-     * @return A set of base items used as ingredients
-     */
-    public abstract @NotNull Set<BaseItem> getIngredientTypes();
 } 

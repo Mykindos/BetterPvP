@@ -4,24 +4,36 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.model.VanillaItem;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.Recipe;
 
 import java.util.List;
+import java.util.Objects;
 
 @PluginAdapter("Clans")
 @Singleton
 public class ExplosiveResistanceBootstrap {
 
     private final ItemRegistry itemRegistry;
+    private final CraftingRecipeRegistry craftingRegistry;
+    private final MinecraftCraftingRecipeAdapter adapter;
 
     @Inject
-    private ExplosiveResistanceBootstrap(ItemRegistry itemRegistry) {
+    private ExplosiveResistanceBootstrap(ItemRegistry itemRegistry, CraftingRecipeRegistry craftingRegistry, MinecraftCraftingRecipeAdapter adapter) {
         this.itemRegistry = itemRegistry;
+        this.craftingRegistry = craftingRegistry;
+        this.adapter = adapter;
     }
 
     @Inject
@@ -39,8 +51,18 @@ public class ExplosiveResistanceBootstrap {
                 final Material material = tiers.get(i);
                 final VanillaItem item = new VanillaItem(name, material, ItemRarity.COMMON);
                 item.addBaseComponent(new ExplosiveResistanceComponent(explosiveResistance));
-                itemRegistry.registerFallbackItem(material.getKey(), material, item);
+                registerFallbackItem(material.translationKey(), material, item, true);
             }
+        }
+    }
+
+    private void registerFallbackItem(String key, Material material, BaseItem item, boolean keepRecipe) {
+        itemRegistry.registerFallbackItem(new NamespacedKey("minecraft", key), material, item);
+        if (keepRecipe) {
+            final Recipe old = Bukkit.getRecipe(material.getKey());
+            if (old == null) return;
+            final CraftingRecipe craftingRecipe = adapter.convertToCustomRecipe(old);
+            if (craftingRecipe != null) craftingRegistry.registerRecipe(craftingRecipe);
         }
     }
 

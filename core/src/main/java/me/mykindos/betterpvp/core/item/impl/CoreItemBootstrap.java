@@ -14,8 +14,17 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingR
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapter;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Namespaced;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.Recipe;
+
+import java.util.Objects;
 
 @Singleton
 public class CoreItemBootstrap {
@@ -23,12 +32,16 @@ public class CoreItemBootstrap {
     private final Core core;
     private final ItemRegistry itemRegistry;
     private final RuneRegistry runeRegistry;
+    private final CraftingRecipeRegistry craftingRegistry;
+    private final MinecraftCraftingRecipeAdapter adapter;
 
     @Inject
-    private CoreItemBootstrap(Core core, ItemRegistry itemRegistry, RuneRegistry runeRegistry) {
+    private CoreItemBootstrap(Core core, ItemRegistry itemRegistry, RuneRegistry runeRegistry, CraftingRecipeRegistry craftingRegistry, MinecraftCraftingRecipeAdapter adapter) {
         this.core = core;
         this.itemRegistry = itemRegistry;
         this.runeRegistry = runeRegistry;
+        this.craftingRegistry = craftingRegistry;
+        this.adapter = adapter;
     }
 
     private NamespacedKey key(String name) {
@@ -110,7 +123,17 @@ public class CoreItemBootstrap {
 
     @Inject
     private void registerFuels(CoalItem coalItem, CharcoalItem charcoalItem) {
-        itemRegistry.registerFallbackItem(key("coal"), Material.COAL, coalItem);
-        itemRegistry.registerFallbackItem(key("charcoal"), Material.CHARCOAL, charcoalItem);
+        registerFallbackItem("coal", Material.COAL, coalItem, true);
+        registerFallbackItem("charcoal", Material.CHARCOAL, charcoalItem, true);
+    }
+
+    private void registerFallbackItem(String key, Material material, BaseItem item, boolean keepRecipe) {
+        itemRegistry.registerFallbackItem(new NamespacedKey("minecraft", key), material, item);
+        if (keepRecipe) {
+            final Recipe old = Bukkit.getRecipe(material.getKey());
+            if (old == null) return;
+            final CraftingRecipe craftingRecipe = adapter.convertToCustomRecipe(old);
+            if (craftingRecipe != null) craftingRegistry.registerRecipe(craftingRecipe);
+        }
     }
 }

@@ -21,7 +21,6 @@ public class CoalItem extends BaseItem {
     @Inject
     private CoalItem() {
         super("Coal", model, ItemGroup.MATERIAL, ItemRarity.COMMON);
-        // Coal burns for 30 seconds (30,000ms) and can reach 800°C
-        addBaseComponent(new FuelComponent(5_000L, 800.0f));
+        addBaseComponent(new FuelComponent(10_000L, 800.0f));
     }
 } 

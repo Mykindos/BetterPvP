@@ -40,18 +40,6 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
     @Override
     public void registerRecipe(@NotNull ImbuementRecipe recipe) {
         // Check for duplicate recipes for standard recipes only
-        if (recipe instanceof StandardImbuementRecipe) {
-            for (ImbuementRecipe existingRecipe : recipes) {
-                if (existingRecipe instanceof StandardImbuementRecipe && 
-                    existingRecipe.getIngredients().equals(recipe.getIngredients())) {
-                    throw new IllegalArgumentException(
-                        "Duplicate imbuement recipe detected! Recipe with ingredients " + 
-                        recipe.getIngredientTypes() + " already exists."
-                    );
-                }
-            }
-        }
-        
         recipes.add(recipe);
         
         // Log registration differently based on recipe type
@@ -89,17 +77,6 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
      */
     public @NotNull List<ImbuementRecipe> getRecipes() {
         return Collections.unmodifiableList(recipes);
-    }
-    
-    /**
-     * Gets all recipes that use a specific ingredient.
-     * @param ingredient The ingredient to search for
-     * @return A list of recipes that use the ingredient
-     */
-    public @NotNull List<ImbuementRecipe> getRecipesWithIngredient(@NotNull BaseItem ingredient) {
-        return recipes.stream()
-                .filter(recipe -> recipe.getIngredientTypes().contains(ingredient))
-                .collect(Collectors.toList());
     }
     
     /**

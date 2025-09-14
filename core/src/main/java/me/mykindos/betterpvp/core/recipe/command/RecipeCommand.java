@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.menu.GuiCraftingRecipeViewer;
+import me.mykindos.betterpvp.core.recipe.menu.GuiItemViewer;
+import me.mykindos.betterpvp.core.recipe.menu.GuiRecipeViewer;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -14,12 +16,10 @@ import org.bukkit.entity.Player;
 public class RecipeCommand extends Command {
 
     private final ItemFactory itemFactory;
-    private final CraftingRecipeRegistry registry;
 
     @Inject
-    public RecipeCommand(ItemFactory itemFactory, CraftingRecipeRegistry registry) {
+    public RecipeCommand(ItemFactory itemFactory) {
         this.itemFactory = itemFactory;
-        this.registry = registry;
         this.aliases.add("recipes");
     }
 
@@ -35,6 +35,6 @@ public class RecipeCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-//        new GuiCraftingRecipeViewer(recipes, () -> open(player)).show(player);
+        new GuiItemViewer(itemFactory).show(player);
     }
 }

@@ -43,7 +43,7 @@ public class CustomGiveCommand extends Command {
     @Singleton
     @Override
     public String getName() {
-        return "customgive";
+        return "give";
     }
 
     @Override
@@ -127,7 +127,7 @@ public class CustomGiveCommand extends Command {
     }
 
     public Component getUsage() {
-        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>customgive <player> <item> [amount]");
+        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>give <player> <item> [amount]");
     }
 
     @Override
@@ -149,7 +149,7 @@ public class CustomGiveCommand extends Command {
 
         String lowercaseArg = args[args.length - 1].toLowerCase();
         if (getArgumentType(args.length).equals("CUSTOMITEM")) {
-            tabCompletions.addAll(itemRegistry.getItems().keySet().stream()
+            tabCompletions.addAll(itemRegistry.getItemsSorted().keySet().stream()
                     .map(NamespacedKey::toString)
                     .filter(key -> key.toLowerCase().contains(lowercaseArg))
                     .toList());

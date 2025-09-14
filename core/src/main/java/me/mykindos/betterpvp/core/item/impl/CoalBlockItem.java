@@ -10,18 +10,17 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
-public class CharcoalItem extends BaseItem {
+public class CoalBlockItem extends BaseItem {
 
     private static final ItemStack model;
 
     static {
-        model = ItemStack.of(Material.CHARCOAL);
+        model = ItemStack.of(Material.COAL);
     }
 
     @Inject
-    private CharcoalItem() {
-        super("Charcoal", model, ItemGroup.MATERIAL, ItemRarity.COMMON);
-        // Coal burns for 30 seconds (30,000ms) and can reach 800°C
-        addBaseComponent(new FuelComponent(10_000L, 950.0f));
+    private CoalBlockItem() {
+        super("Coal Block", model, ItemGroup.MATERIAL, ItemRarity.COMMON);
+        addBaseComponent(new FuelComponent(90_000L, 800.0f));
     }
 } 

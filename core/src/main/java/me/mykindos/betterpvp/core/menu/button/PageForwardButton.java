@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.menu.button;
 
+import lombok.With;
 import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.PageItem;
@@ -16,6 +17,8 @@ import java.util.function.Supplier;
 public class PageForwardButton extends PageItem {
 
     private final Supplier<ItemProvider> itemProvider;
+    @With
+    private boolean disabledInvisible = false;
 
     public PageForwardButton() {
         super(true);
@@ -26,6 +29,12 @@ public class PageForwardButton extends PageItem {
     public PageForwardButton(Supplier<ItemProvider> builder) {
         super(true);
         this.itemProvider = builder;
+    }
+
+    public PageForwardButton(Supplier<ItemProvider> itemProvider, boolean disabledInvisible) {
+        super(true);
+        this.itemProvider = itemProvider;
+        this.disabledInvisible = disabledInvisible;
     }
 
     public static PageForwardButton invisible() {
@@ -44,6 +53,14 @@ public class PageForwardButton extends PageItem {
 
     @Override
     public ItemProvider getItemProvider(PagedGui<?> gui) {
+        if (disabledInvisible && !gui.hasNextPage()) {
+            return ItemView.builder()
+                    .material(Material.PAPER)
+                    .itemModel(Resources.ItemModel.INVISIBLE)
+                    .hideTooltip(true)
+                    .build();
+        }
+
         final ItemView.ItemViewBuilder builder = ItemView.of(itemProvider.get().get()).toBuilder();
         builder.clearLore();
         if (gui.hasNextPage()) {

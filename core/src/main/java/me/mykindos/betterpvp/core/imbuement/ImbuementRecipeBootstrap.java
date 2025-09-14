@@ -4,10 +4,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Bootstrap class for registering imbuement recipes.
@@ -42,8 +53,30 @@ public class ImbuementRecipeBootstrap {
      * This method sets up the core imbuement system.
      */
     @Inject
-    private void registerRecipes() {
-        // Register the rune imbuement recipe handler
-        imbuementRecipeRegistry.registerRecipe(new RuneImbuementRecipe(itemFactory));
+    private void registerRecipes(ScorchingRuneItem scorchingRune, UnbreakingRuneItem unbreakingRune) {
+        final List<RuneItem> runes = List.of(scorchingRune, unbreakingRune);
+        for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
+            registerRecipe(alreadyRegistered, runes);
+        }
+
+        itemRegistry.addRegisterCallback((key, item) -> registerRecipe(item, runes));
+    }
+
+    private void registerRecipe(BaseItem baseItem, List<RuneItem> runes) {
+        final Optional<RuneContainerComponent> containerOpt = baseItem.getComponent(RuneContainerComponent.class);
+        if (containerOpt.isEmpty()) {
+            return;
+        }
+
+        final RuneContainerComponent container = containerOpt.get();
+        if (!container.hasAvailableSockets()) {
+            return;
+        }
+
+        for (RuneItem runeItem : runes) {
+            if (!container.hasRune(runeItem.getRune()) && runeItem.getRune().canApply(baseItem)) {
+                imbuementRecipeRegistry.registerRecipe(new RuneImbuementRecipe(itemFactory, baseItem, runeItem));
+            }
+        }
     }
 } 
