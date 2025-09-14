@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression.injector;
 
 import com.google.inject.AbstractModule;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.weapons.ProgressionItemBootstrap;
+import me.mykindos.betterpvp.progression.item.ProgressionItemBootstrap;
 
 public class ProgressionInjectorModule extends AbstractModule {
 
