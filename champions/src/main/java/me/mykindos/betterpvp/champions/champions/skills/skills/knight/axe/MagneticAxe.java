@@ -72,7 +72,6 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
                 ItemView.builder().material(Material.STICK).itemModel(INVISIBLE).hideTooltip(true).build().get(),
                 ItemGroup.MISC,
                 ItemRarity.COMMON);
-        registry.registerItem(new NamespacedKey(champions, "magnetic_axe_placeholder"), placeholderItem);
     }
 
     @Override
@@ -134,9 +133,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         int slot = player.getInventory().getHeldItemSlot();
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 1.0F);
 
-        final BaseItem item = itemFactory.getItemRegistry().getItem("champions:magnetic_axe_placeholder");
-        Preconditions.checkNotNull(item, "Item champions:magnetic_axe_placeholder not found in registry");
-        player.getInventory().setItemInMainHand(itemFactory.create(item).createItemStack());
+        player.getInventory().setItemInMainHand(itemFactory.create(placeholderItem).createItemStack());
 
         Vector perpendicularAxis = player.getLocation().getDirection().crossProduct(new Vector(0, 1, 0)).normalize();
         Location rightHandPosition = player.getLocation().add(0, 1, 0).add(perpendicularAxis.multiply(0.3));
