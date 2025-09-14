@@ -8,12 +8,16 @@ import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import me.mykindos.betterpvp.core.recipe.smelting.Alloy;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Registry for managing casting mold recipes.
@@ -23,20 +27,25 @@ import java.util.Optional;
 @Singleton
 public class CastingMoldRecipeRegistry implements RecipeRegistry<CastingMoldRecipe> {
     
-    private final List<CastingMoldRecipe> recipes = new ArrayList<>();
+    private final Map<NamespacedKey, CastingMoldRecipe> recipes = new HashMap<>();
     private final RecipeResolver<CastingMoldRecipe> resolver = new RecipeResolver<>(this);
 
     @Inject
     private CastingMoldRecipeRegistry(RecipeRegistries registries) {
-        registries.register(this);
+        registries.register(new NamespacedKey("betterpvp", "casting_mold"), this);
     }
 
     /**
      * Registers a new casting mold recipe.
+     * @param key The key to register the recipe under
      * @param recipe The recipe to register
      */
-    public void registerRecipe(@NotNull CastingMoldRecipe recipe) {
-        recipes.add(recipe);
+    public void registerRecipe(NamespacedKey key, @NotNull CastingMoldRecipe recipe) {
+        if (recipes.containsKey(key)) {
+            log.warn("Recipe with key {} is already registered, overwriting", key).submit();
+        }
+
+        recipes.put(key, recipe);
         log.info("Registered casting mold recipe for {} requiring {} mB for alloy {}",
                 recipe.getBaseMold().getClass().getSimpleName(),
                 recipe.getRequiredMillibuckets(),
@@ -49,7 +58,7 @@ public class CastingMoldRecipeRegistry implements RecipeRegistry<CastingMoldReci
      * @return The recipe if found, empty otherwise
      */
     public @NotNull List<CastingMoldRecipe> findRecipes(@NotNull BaseItem baseMold) {
-        return recipes.stream()
+        return recipes.values().stream()
                 .filter(recipe -> recipe.matches(baseMold))
                 .toList();
     }
@@ -60,7 +69,7 @@ public class CastingMoldRecipeRegistry implements RecipeRegistry<CastingMoldReci
      * @return true if a recipe exists, false otherwise
      */
     public boolean hasRecipe(@NotNull BaseItem baseMold) {
-        return recipes.stream().anyMatch(recipe -> recipe.matches(baseMold));
+        return recipes.values().stream().anyMatch(recipe -> recipe.matches(baseMold));
     }
     
     /**
@@ -80,8 +89,8 @@ public class CastingMoldRecipeRegistry implements RecipeRegistry<CastingMoldReci
      * Gets all registered casting mold recipes.
      * @return An unmodifiable list of all recipes
      */
-    public @NotNull List<CastingMoldRecipe> getRecipes() {
-        return Collections.unmodifiableList(recipes);
+    public @NotNull Set<CastingMoldRecipe> getRecipes() {
+        return Set.copyOf(recipes.values());
     }
 
     @Override

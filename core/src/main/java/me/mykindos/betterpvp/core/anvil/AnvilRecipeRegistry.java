@@ -6,16 +6,20 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -26,21 +30,21 @@ import java.util.stream.Collectors;
 @Singleton
 public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
     
-    private final List<AnvilRecipe> recipes = new ArrayList<>();
+    private final Map<NamespacedKey, AnvilRecipe> recipes = new HashMap<>();
     private final RecipeResolver<AnvilRecipe> resolver = new RecipeResolver<>(this);
 
     @Inject
     private AnvilRecipeRegistry(RecipeRegistries registries) {
-        registries.register(this);
+        registries.register(new NamespacedKey("betterpvp", "anvil"), this);
     }
 
-    /**
-     * Registers a new anvil recipe.
-     * @param recipe The recipe to register
-     */
     @Override
-    public void registerRecipe(@NotNull AnvilRecipe recipe) {
-        recipes.add(recipe);
+    public void registerRecipe(@NotNull NamespacedKey key, @NotNull AnvilRecipe recipe) {
+        if (recipes.containsKey(key)) {
+            log.warn("Recipe with key {} is already registered, overwriting", key).submit();
+        }
+
+        recipes.put(key, recipe);
         log.info("Registered anvil recipe for {} requiring {} hammer swings with {} ingredients",
                 recipe.getResult().getPrimaryResult().getClass().getSimpleName(),
                 recipe.getHammerSwings(),
@@ -58,7 +62,7 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
      * @return The matching recipe if found, empty otherwise
      */
     public @NotNull Optional<AnvilRecipe> findRecipe(@NotNull Map<Integer, ItemStack> items) {
-        return recipes.stream()
+        return recipes.values().stream()
                 .filter(recipe -> recipe.matches(items))
                 .findFirst();
     }
@@ -78,7 +82,7 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
      * @return List of recipes that use this ingredient
      */
     public @NotNull List<AnvilRecipe> findRecipesWithIngredient(@NotNull BaseItem ingredient) {
-        return recipes.stream()
+        return recipes.values().stream()
                 .filter(recipe -> recipe.getIngredientTypes().contains(ingredient))
                 .collect(Collectors.toList());
     }
@@ -89,20 +93,9 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
      * @return List of recipes that produce this result
      */
     public @NotNull List<AnvilRecipe> findRecipesWithResult(@NotNull BaseItem result) {
-        return recipes.stream()
+        return recipes.values().stream()
                 .filter(recipe -> recipe.getResult().getPrimaryResult().equals(result) ||
                                 recipe.getResult().getSecondaryResults().contains(result))
-                .collect(Collectors.toList());
-    }
-    
-    /**
-     * Finds anvil recipes that require a specific number of hammer swings.
-     * @param hammerSwings The required hammer swing count
-     * @return List of recipes with the specified hammer swing requirement
-     */
-    public @NotNull List<AnvilRecipe> findRecipesByHammerSwings(int hammerSwings) {
-        return recipes.stream()
-                .filter(recipe -> recipe.getHammerSwings() == hammerSwings)
                 .collect(Collectors.toList());
     }
     
@@ -110,8 +103,8 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
      * Gets all registered anvil recipes.
      * @return An unmodifiable list of all recipes
      */
-    public @NotNull Collection<AnvilRecipe> getRecipes() {
-        return Collections.unmodifiableList(recipes);
+    public @NotNull Set<AnvilRecipe> getRecipes() {
+        return Set.copyOf(recipes.values());
     }
     
     /**
