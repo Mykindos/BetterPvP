@@ -34,10 +34,7 @@ public class ProgressionFishBootstrap {
     }
 
     @Inject
-    private void registerFishing(Sharkbait sharkbait) {
-        itemRegistry.registerItem(new NamespacedKey(progression, "sharkbait"), sharkbait);
-
-        // Register fish types
+    private void registerFishing() {
         itemRegistry.registerItem(key("trout"), new FishItem("Trout", "trout"));
         itemRegistry.registerItem(key("salmon"), new FishItem("Salmon", "salmon"));
         itemRegistry.registerItem(key("bluegill"), new FishItem("Bluegill", "bluegill"));
