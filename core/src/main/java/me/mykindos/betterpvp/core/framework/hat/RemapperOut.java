@@ -1,65 +1,66 @@
 package me.mykindos.betterpvp.core.framework.hat;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.Pair;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerEntityEquipment;
-import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerSetSlot;
-import me.mykindos.betterpvp.core.packet.play.clientbound.WrapperPlayServerWindowItems;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-public class RemapperOut extends PacketAdapter implements Listener {
+public class RemapperOut implements PacketListener {
 
     private final PacketHatController controller;
 
-    public RemapperOut(Core core, PacketHatController controller) {
-        super(core, PacketType.Play.Server.ENTITY_EQUIPMENT,
-                PacketType.Play.Server.WINDOW_ITEMS,
-                PacketType.Play.Server.SET_SLOT);
+    public RemapperOut(PacketHatController controller) {
         this.controller = controller;
     }
 
     @Override
-    public void onPacketSending(PacketEvent event) {
-        final PacketType type = event.getPacketType();
-        if (type == PacketType.Play.Server.ENTITY_EQUIPMENT) {
-            this.onEntityEquipment(event);
-        } else if (type == PacketType.Play.Server.WINDOW_ITEMS ) {
-            this.onWindowItems(event);
-        } else if (type == PacketType.Play.Server.SET_SLOT) {
-            this.onSetSlot(event);
+    public void onPacketSend(PacketSendEvent event) {
+        final PacketTypeCommon type = event.getPacketType();
+        switch (type) {
+            case PacketType.Play.Server.ENTITY_EQUIPMENT -> this.onEntityEquipment(event);
+            case PacketType.Play.Server.WINDOW_ITEMS -> this.onWindowItems(event);
+            case PacketType.Play.Server.SET_SLOT -> this.onSetSlot(event);
+            default -> { }
         }
     }
 
-    private void onWindowItems(PacketEvent event) {
-        final WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event.getPacket());
-        if (!UtilInventory.isPlayerInventory(event.getPlayer(), packet.getContainerId())) {
+    private void onWindowItems(PacketSendEvent event) {
+        final WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event);
+        if (!UtilInventory.isPlayerInventory(event.getPlayer(), packet.getWindowId())) {
             return; // Not a player inventory
         }
 
         final List<ItemStack> items = packet.getItems();
-        items.set(5, this.controller.getHatItem(event.getPlayer()).orElse(items.get(5)));
+        items.set(5, this.controller.getHatItem(event.getPlayer())
+                .map(SpigotConversionUtil::fromBukkitItemStack)
+                .orElse(items.get(5)));
         packet.setItems(items);
 
-        packet.setCarriedItem(this.controller.fromHatItem(packet.getCarriedItem()).orElse(null));
+        packet.setCarriedItem(packet.getCarriedItem()
+                .flatMap(stack -> this.controller.fromHatItem(SpigotConversionUtil.toBukkitItemStack(stack)))
+                .map(SpigotConversionUtil::fromBukkitItemStack)
+                .orElse(null));
     }
 
-    private void onSetSlot(PacketEvent event) {
-        final WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(event.getPacket());
+    private void onSetSlot(PacketSendEvent event) {
+        final WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(event);
         final Player player = event.getPlayer();
-        if (!UtilInventory.isPlayerInventory(player, packet.getContainerId())) {
+        if (!UtilInventory.isPlayerInventory(player, packet.getWindowId())) {
             return; // Not a player inventory
         }
 
@@ -67,39 +68,35 @@ public class RemapperOut extends PacketAdapter implements Listener {
             return; // Return if it's not in the helmet slot
         }
 
-        final Optional<ItemStack> hatItem = this.controller.getHatItem(player);
+        final Optional<org.bukkit.inventory.ItemStack> hatItem = this.controller.getHatItem(player);
         if (hatItem.isEmpty()) {
             return; // No hat
         }
 
         // Replace helmet with hat
-        packet.setItemStack(hatItem.get());
+        packet.setItem(SpigotConversionUtil.fromBukkitItemStack(hatItem.get()));
     }
 
-    private void onEntityEquipment(PacketEvent event) {
-        final WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event.getPacket());
-        final Optional<Entity> entityOpt = UtilEntity.getEntity(event.getPlayer().getWorld(), packet.getEntity());
-        if (entityOpt.isEmpty()) {
-            return; // Entity not found
-        }
-
-        final Entity entity = entityOpt.get();
+    private void onEntityEquipment(PacketSendEvent event) {
+        final WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
+        final Player receiver = event.getPlayer();
+        final Entity entity = SpigotConversionUtil.getEntityById(receiver.getWorld(), packet.getEntityId());
         if (!(entity instanceof Player player)) {
             return; // Only players can wear hats
         }
 
-        final Optional<ItemStack> hatItem = this.controller.getHatItem(player);
+        final Optional<org.bukkit.inventory.ItemStack> hatItem = this.controller.getHatItem(player);
         if (hatItem.isEmpty()) {
             return; // No hat
         }
 
         // Remove any existing helmets
-        final List<Pair<EnumWrappers.ItemSlot, ItemStack>> slots = packet.getSlots();
-        final Iterator<Pair<EnumWrappers.ItemSlot, ItemStack>> iterator = slots.iterator();
+        final List<Equipment> slots = new ArrayList<>(packet.getEquipment());
+        final Iterator<Equipment> iterator = slots.iterator();
         boolean hasHelmet = false;
         while (iterator.hasNext()) {
-            final Pair<EnumWrappers.ItemSlot, ItemStack> pair = iterator.next();
-            if (pair.getFirst() == EnumWrappers.ItemSlot.HEAD) {
+            final Equipment equipment = iterator.next();
+            if (equipment.getSlot() == EquipmentSlot.HELMET) {
                 hasHelmet = true;
                 iterator.remove();
             }
@@ -110,9 +107,7 @@ public class RemapperOut extends PacketAdapter implements Listener {
         }
 
         // Replace helmet with hat
-        slots.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, hatItem.get()));
-        packet.setSlots(slots);
+        slots.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(hatItem.get())));
+        packet.setEquipment(slots);
     }
-
-
 }

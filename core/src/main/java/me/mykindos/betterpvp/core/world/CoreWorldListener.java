@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -70,6 +71,8 @@ public class CoreWorldListener implements Listener {
         if(world.getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
             worldHandler.loadSpawnLocations();
         }
+
+        world.setGameRule(GameRule.LOCATOR_BAR, false);
 
         var paperConfig = ((CraftWorld) world).getHandle().getLevel().paperConfig();
         paperConfig.misc.disableRelativeProjectileVelocity = true;

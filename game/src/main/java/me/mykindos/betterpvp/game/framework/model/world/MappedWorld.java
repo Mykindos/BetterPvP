@@ -87,6 +87,7 @@ public class MappedWorld extends BPvPWorld {
         regions.forEach(region -> region.setWorld(world));
         world.setClearWeatherDuration(Integer.MAX_VALUE);
         world.setGameRule(GameRule.KEEP_INVENTORY, true);
+        world.setGameRule(GameRule.LOCATOR_BAR, false);
         world.setGameRule(GameRule.MOB_GRIEFING, false);
         world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         world.setGameRule(GameRule.DO_FIRE_TICK, false);
