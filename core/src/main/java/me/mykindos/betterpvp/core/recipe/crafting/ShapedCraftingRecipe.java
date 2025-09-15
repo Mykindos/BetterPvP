@@ -54,7 +54,8 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
         }
 
         this.width = maxX - minX + 1;
-        this.height = maxY - minY + 1;    }
+        this.height = maxY - minY + 1;
+    }
 
     @Override
     public @NotNull BaseItem getPrimaryResult() {
