@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.config.implementations;
 import jakarta.inject.Provider;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.framework.hat;
 
-import com.comphenix.protocol.ProtocolLibrary;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -17,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -32,7 +34,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @Singleton
-@PluginAdapter("ProtocolLib")
+@PluginAdapter("PacketEvents")
 public class PacketHatController {
 
     private final Multimap<Integer, HatProvider> providers = ArrayListMultimap.create();
@@ -43,8 +45,8 @@ public class PacketHatController {
 
     @Inject
     public PacketHatController(Core core, HatProtocol protocol) {
-        ProtocolLibrary.getProtocolManager().addPacketListener(new RemapperIn(core, this, protocol));
-        ProtocolLibrary.getProtocolManager().addPacketListener(new RemapperOut(core, this));
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(core, this, protocol), PacketListenerPriority.HIGH);
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperOut(this), PacketListenerPriority.HIGH);
         this.protocol = protocol;
     }
 
@@ -85,7 +87,7 @@ public class PacketHatController {
                 Integer model = itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData()
                         ? itemStack.getItemMeta().getCustomModelData()
                         : null;
-                itemStack = UtilItem.convertType(helmet, itemStack.getType(), model);
+                itemStack = helmet.getType() == Material.AIR ? itemStack : UtilItem.convertType(helmet, itemStack.getType(), model);
             } else {
                 final ItemMeta meta = itemStack.getItemMeta();
                 meta.displayName(Component.text("No helmet")

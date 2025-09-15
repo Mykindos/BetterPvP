@@ -13,6 +13,9 @@ plugins {
     id("org.sonarqube") version "6.2.0.5505" apply true
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
 
 repositories {
 
@@ -43,6 +46,7 @@ subprojects {
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
         maven("https://repo.opencollab.dev/main/")
+        maven("https://repo.polar.top/repository/polar/")
         maven {
           url =  uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true

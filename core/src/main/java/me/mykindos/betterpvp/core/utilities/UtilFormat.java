@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.text.WordUtils;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Contract;
