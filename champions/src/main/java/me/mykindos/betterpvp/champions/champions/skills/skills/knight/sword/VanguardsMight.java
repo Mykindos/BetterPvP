@@ -15,6 +15,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -26,12 +29,14 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -75,9 +80,9 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 if (abilityData == null) return null;
 
                 final int chargeAsPercentage = (int) (abilityData.getCharge() * 100);
-                return Component.text(chargeAsPercentage )
-                        .color(NamedTextColor.LIGHT_PURPLE)
-                        .append(Component.text("%").color(NamedTextColor.GRAY));
+
+                // ex: Charge: 5%
+                return createComponentMessage("Charge", String.valueOf(chargeAsPercentage), "%");
             }
     );
 
@@ -103,13 +108,21 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.STRENGTH_EFFECT);
                 if (abilityData == null) return null;
 
-                String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1);
-                return Component.text(timeLeftWithOneDecimalPlace)
-                        .color(NamedTextColor.LIGHT_PURPLE)
-                        .append(Component.text("s").color(NamedTextColor.GRAY));
+                final String timeLeft = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1, true);
+
+                // ex: Strength For: 4.2s
+                return createComponentMessage("Strength For", timeLeft, "s");
             }
     );
 
+    /**
+     * Used to specify how often the action bars should update. <code>50</code> is the default value for {@link UpdateEvent}.
+     * <p>
+     * This value is also used in calculations; therefore, it must be declared here (as a constant).
+     */
+    private final long ACTION_BAR_UPDATE_DELAY = 50;  // In milliseconds
+
+    private double passiveChargePerSecond;
     private double chargePerDamageTaken;
     private double blockDuration;
     private double transferencePhaseDuration;
@@ -133,8 +146,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         return new String[] {
                 "Right click with a Sword to channel",
                 "",
-                "While channeling, absorb all damage",
-                "damage, thus, charging this ability.",
+                "While channeling, build charge",
+                "over time and by absorbing damage.",
                 "",
                 "Stop channeling to gain <effect>Strength</effect>",
                 "for up to " + getValueString(this::getMaxStrengthDuration, level) + " seconds.",
@@ -154,6 +167,22 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         if (abilityData == null || !phase.equals(abilityData.getPhase())) return null;
 
         return abilityData;
+    }
+
+    /**
+     * A helper method used to construct an adventure component given a few strings. This method is only used in
+     * the action bars above.
+     * <p>
+     * The returned component will be in this format:
+     * <code>`label`: `numberValue``symbol`</code>
+     * <p>
+     * Example:
+     * <code>Charge: 5%</code>
+     */
+    private @NotNull Component createComponentMessage(String label, String numberValue, String symbol) {
+        return Component.text(label + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(Component.text(numberValue).color(NamedTextColor.GREEN).decoration(TextDecoration.BOLD, false))
+                .append(Component.text(symbol).color(NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false));
     }
 
     /**
@@ -324,16 +353,13 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         final double rateAtDamageTaken = chargePerDamageTaken / 100.0;
         final double addedCharge = event.getDamage() * rateAtDamageTaken;
         float newCharge = abilityData.getCharge() + (float) addedCharge;
-        if (newCharge > 1f) {
-            newCharge = 1f;  // Cap the charge at 1
-        }
 
-        // update charge + play old defensive stance sound
+        // Update charge & play sound
         abilityData.setCharge(newCharge);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 2.0F);
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.8F, 2.0F);
 
+        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, 100, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
         event.setKnockback(false);
-        event.setDamage(0);
     }
 
     /**
@@ -362,8 +388,9 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     /**
      * This method is called every 50ms to update the action bars for players who are not currently channeling the skill
      * but are still using it. This method is also responsible for updating the strength effect action bar.
+     * This method is also responsible for doing the passive charging during the Channeling Phase.
      */
-    @UpdateEvent
+    @UpdateEvent(delay = ACTION_BAR_UPDATE_DELAY)
     public void updateActionBars() {
         final Iterator<Map.Entry<Player, VanguardsMightData>> iterator = data.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -382,7 +409,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 continue;
             }
 
-            VanguardsMightAbilityPhase phase = abilityData.getPhase();
+            final @NotNull VanguardsMightAbilityPhase phase = abilityData.getPhase();
 
             if (phase.equals(VanguardsMightAbilityPhase.TRANSFERENCE)) {
                 updateActionBarForTransferencePhase(abilityData, player);
@@ -391,14 +418,25 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 if (abilityData.isAlreadyAppliedStrengthEffectOrActionBar()) {
 
                     // this update event is called every 50ms or every 0.05 seconds
-                    abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - 0.05);
+                    final double delayInSeconds = ACTION_BAR_UPDATE_DELAY / 1000d;  // if delay=50 -> delayInSeconds=0.05
+                    abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - delayInSeconds);
                     continue;
                 }
 
                 applyStrengthEffectAndAddToActionBar(abilityData, player, level);
                 abilityData.setAlreadyAppliedStrengthEffectOrActionBar(true);
-            }
 
+            } else if (phase.equals(VanguardsMightAbilityPhase.CHANNELING)) {  // passive charging is done here
+
+                final float chargePerSecondAsFloat = (float) passiveChargePerSecond;
+
+                // This is just in case the delay of this update event ever changes.
+                // So things have to be calculated dynamically here.
+                final float ticksPerSecond = 1000f / ACTION_BAR_UPDATE_DELAY;
+                final float additionalCharge = chargePerSecondAsFloat / ticksPerSecond;
+
+                abilityData.setCharge(abilityData.getCharge() + additionalCharge);
+            }
         }
     }
 
@@ -434,17 +472,17 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         final Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
 
         // (condition) ? failure : success
-        final Sound soundToPlay;
+        final SoundEffect soundEffectToPlay;
         final double calculatedCharge;
 
         if (abilityData.getCharge() <= 0f) {
-            soundToPlay = Sound.BLOCK_BEACON_DEACTIVATE;  // failure sound
+            soundEffectToPlay = new SoundEffect(Sound.BLOCK_BEACON_DEACTIVATE, 0.5f);  // failure sound
             calculatedCharge = 0.0;
 
             final TextComponent message = Component.text("No Damage Absorbed").color(NamedTextColor.DARK_RED);
             gamer.getActionBar().add(400, new TimedComponent(noDamageAbsorbedMessageDuration, true, gmr -> message));
         } else {
-            soundToPlay = Sound.ENTITY_ENDER_DRAGON_GROWL;  // success sound
+            soundEffectToPlay = new SoundEffect(Sound.BLOCK_ANVIL_LAND, 1.5f);  // success sound
             calculatedCharge = abilityData.getCharge() * getMaxStrengthDuration(level);
             final long strengthDuration = (long) (calculatedCharge * 1000L);
 
@@ -455,7 +493,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         }
 
         // Strength effect sound
-        player.getWorld().playSound(player.getLocation(), soundToPlay, 1f, 0.5f);
+        soundEffectToPlay.play(player.getLocation());
 
         // Start cooldown when strength effect phase ends
         UtilServer.runTaskLater(champions, () -> {
@@ -501,12 +539,13 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
     @Override
     public void loadSkillConfig() {
+        passiveChargePerSecond = getConfig("passiveChargePerSecond ", 0.5, Double.class);
         chargePerDamageTaken = getConfig("chargePerDamageTaken", 2.0, Double.class);
         blockDuration = getConfig("blockDuration", 3.0, Double.class);
         transferencePhaseDuration = getConfig("transferencePhaseDuration", 0.5, Double.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
-        maxStrengthDuration = getConfig("maxStrengthDuration", 6.0, Double.class);
-        maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 1.0, Double.class);
+        maxStrengthDuration = getConfig("maxStrengthDuration", 3.0, Double.class);
+        maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 2.5, Double.class);
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
     }
 }
