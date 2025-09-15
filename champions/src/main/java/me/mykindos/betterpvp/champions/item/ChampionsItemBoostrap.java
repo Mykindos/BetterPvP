@@ -3,24 +3,18 @@ package me.mykindos.betterpvp.champions.item;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.item.bloomrot.Bloomrot;
 import me.mykindos.betterpvp.champions.item.scythe.ScytheOfTheFallenLord;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemGroup;
-import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapter;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
-
-import static me.mykindos.betterpvp.core.utilities.Resources.ItemModel.INVISIBLE;
 
 @Singleton
 public class ChampionsItemBoostrap {
@@ -75,16 +69,17 @@ public class ChampionsItemBoostrap {
     }
 
     @Inject
-    private void registerLegendaries(MagneticMaul magneticMaul,
-                                     GiantsBroadsword giantsBroadsword,
-                                     HyperAxe hyperAxe,
-                                     WindBlade windBlade,
-                                     MeridianScepter meridianScepter,
-                                     ScytheOfTheFallenLord scythe,
-                                     ThunderclapAegis thunderclapAegis,
-                                     AlligatorsTooth alligatorsTooth,
-                                     Rake rake,
-                                     RunedPickaxe runedPickaxe) {
+    private void registerSpecials(MagneticMaul magneticMaul,
+                                  GiantsBroadsword giantsBroadsword,
+                                  HyperAxe hyperAxe,
+                                  WindBlade windBlade,
+                                  MeridianScepter meridianScepter,
+                                  ScytheOfTheFallenLord scythe,
+                                  ThunderclapAegis thunderclapAegis,
+                                  AlligatorsTooth alligatorsTooth,
+                                  Rake rake,
+                                  RunedPickaxe runedPickaxe,
+                                  Bloomrot bloomrot) {
         itemRegistry.registerItem(championsKey("magnetic_maul"), magneticMaul);
         itemRegistry.registerItem(championsKey("giants_broadsword"), giantsBroadsword);
         itemRegistry.registerItem(championsKey("hyper_axe"), hyperAxe);
@@ -95,6 +90,7 @@ public class ChampionsItemBoostrap {
         itemRegistry.registerItem(championsKey("alligators_tooth"), alligatorsTooth);
         itemRegistry.registerItem(championsKey("rake"), rake);
         itemRegistry.registerItem(championsKey("runed_pickaxe"), runedPickaxe);
+        itemRegistry.registerItem(championsKey("bloomrot"), bloomrot);
     }
 
     @Inject

@@ -41,7 +41,7 @@ public class QuickCraftingButton extends ControlItem<Gui> {
         LinkedList<CraftingRecipe> quickCrafts = workbenchGui.quickCrafts;
         if (slot < quickCrafts.size()) {
             CraftingRecipe recipe = quickCrafts.get(slot);
-            return ItemView.of(workbenchGui.itemFactory.create(recipe.getPrimaryResult()).getView().get())
+            return ItemView.of(recipe.createPrimaryResult().getView().get())
                     .toBuilder()
                     .action(ClickActions.LEFT, Component.text("Quick Craft", TextColor.color(0, 255, 30)))
                     .action(ClickActions.LEFT_SHIFT, Component.text("Bulk Quick Craft", TextColor.color(255, 215, 0)))
