@@ -91,7 +91,7 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
             flyway.repair();
             flyway.migrate();
         } catch (Exception ex) {
-            log.error("Please correctly configure the MariaDB database connection in the core plugin config.", ex);
+            log.error("Please correctly configure the MariaDB database connection in the core plugin config.", ex).submit();
         }
 
     }

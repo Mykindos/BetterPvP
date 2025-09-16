@@ -12,11 +12,11 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "27821:3306"
+      - "5000:3306"
 
   redis:
     image: redis
     container_name: redis
     command: redis-server --requirepass BetterPvPAdmin123!
     ports:
-      - "27822:6379"
+      - "5001:6379"
