@@ -16,6 +16,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Represents a view-only version of an {@link ItemInstance}.
  * This item will not work with the item system, but can be used to display the item in an inventory
@@ -47,19 +49,25 @@ public class ItemInstanceView implements ItemProvider {
         itemStack.setData(DataComponentTypes.ITEM_NAME, getName());
 
         // Tooltip
-        if (!itemStack.hasData(DataComponentTypes.TOOLTIP_DISPLAY)) {
-            final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay().addHiddenComponents(DataComponentTypes.EQUIPPABLE,
-                    DataComponentTypes.ENCHANTMENTS,
-                    DataComponentTypes.BANNER_PATTERNS,
-                    DataComponentTypes.INSTRUMENT,
-                    DataComponentTypes.BASE_COLOR,
-                    DataComponentTypes.UNBREAKABLE,
-                    DataComponentTypes.CAN_BREAK,
-                    DataComponentTypes.CAN_PLACE_ON,
-                    DataComponentTypes.ATTRIBUTE_MODIFIERS
-            );
-            itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, builder.build());
+        TooltipDisplay.Builder tooltipBuilder = TooltipDisplay.tooltipDisplay();
+        if (itemStack.hasData(DataComponentTypes.TOOLTIP_DISPLAY)) {
+            final TooltipDisplay existing = Objects.requireNonNull(itemStack.getData(DataComponentTypes.TOOLTIP_DISPLAY));
+            tooltipBuilder = TooltipDisplay.tooltipDisplay()
+                    .hiddenComponents(existing.hiddenComponents())
+                    .hideTooltip(existing.hideTooltip());
         }
+        tooltipBuilder.addHiddenComponents(DataComponentTypes.EQUIPPABLE,
+                DataComponentTypes.ENCHANTMENTS,
+                DataComponentTypes.BANNER_PATTERNS,
+                DataComponentTypes.INSTRUMENT,
+                DataComponentTypes.BASE_COLOR,
+                DataComponentTypes.UNBREAKABLE,
+                DataComponentTypes.CAN_BREAK,
+                DataComponentTypes.CAN_PLACE_ON,
+                DataComponentTypes.ATTRIBUTE_MODIFIERS,
+                DataComponentTypes.CHARGED_PROJECTILES
+        );
+        itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, tooltipBuilder.build());
 
         // lol bug so we can hide attributes
         final ItemMeta meta = itemStack.getItemMeta();
