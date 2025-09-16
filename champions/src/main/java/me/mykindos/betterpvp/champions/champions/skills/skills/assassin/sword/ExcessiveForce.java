@@ -209,7 +209,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
-        return !active.containsKey(gamer.getPlayer());  // only show if the player is actively using the skill
+        return !active.containsKey(gamer.getPlayer());  // only show if the player is actively NOT using the skill
     }
 
     @Override
