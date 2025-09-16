@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.gamer;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,8 @@ import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.ShieldItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -78,9 +81,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         if (player != null) {
             final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
-            final boolean sword = Compatibility.SWORD_BLOCKING && (UtilItem.isSword(main) || UtilItem.isSword(off));
-            final boolean shield = main.getType().equals(Material.SHIELD) || off.getType().equals(Material.SHIELD);
-            return sword || shield;
+            return main.getMaxItemUseDuration(player) > 0 || off.getMaxItemUseDuration(player) > 0;
         }
 
         return false;
