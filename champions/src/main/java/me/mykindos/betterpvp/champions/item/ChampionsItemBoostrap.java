@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.bloomrot.Bloomrot;
+import me.mykindos.betterpvp.champions.item.ivybolt.Ivybolt;
 import me.mykindos.betterpvp.champions.item.scythe.ScytheOfTheFallenLord;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
@@ -79,7 +80,8 @@ public class ChampionsItemBoostrap {
                                   AlligatorsTooth alligatorsTooth,
                                   Rake rake,
                                   RunedPickaxe runedPickaxe,
-                                  Bloomrot bloomrot) {
+                                  Bloomrot bloomrot,
+                                  Ivybolt ivybolt) {
         itemRegistry.registerItem(championsKey("magnetic_maul"), magneticMaul);
         itemRegistry.registerItem(championsKey("giants_broadsword"), giantsBroadsword);
         itemRegistry.registerItem(championsKey("hyper_axe"), hyperAxe);
@@ -91,6 +93,7 @@ public class ChampionsItemBoostrap {
         itemRegistry.registerItem(championsKey("rake"), rake);
         itemRegistry.registerItem(championsKey("runed_pickaxe"), runedPickaxe);
         itemRegistry.registerItem(championsKey("bloomrot"), bloomrot);
+        itemRegistry.registerItem(championsKey("ivybolt"), ivybolt);
     }
 
     @Inject
