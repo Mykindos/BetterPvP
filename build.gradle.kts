@@ -9,7 +9,7 @@ plugins {
     id("com.gradleup.shadow") version "9.1.0" apply false // Building fat jar
     id("org.inferred.processors") version "3.7.0" apply false  // Annotation processing
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
-    id("org.flywaydb.flyway") version "11.11.2" apply false // Flyway
+    id("org.flywaydb.flyway") version "11.13.0" apply false // Flyway
     id("org.sonarqube") version "6.3.1.5724" apply true
 }
 
@@ -70,6 +70,7 @@ subprojects {
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir/build/"))
         mergeServiceFiles()
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE // required for flywayg
     }
 
     tasks.assemble.configure {

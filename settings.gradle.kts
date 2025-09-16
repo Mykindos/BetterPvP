@@ -83,8 +83,8 @@ dependencyResolutionManagement {
 
             // Libraries - Data Management
             library("jedis", "redis.clients:jedis:6.2.0")
-            library("flyway-core", "org.flywaydb", "flyway-core").version("11.1.0")
-            library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.1.0")
+            library("flyway-core", "org.flywaydb", "flyway-core").version("11.13.0")
+            library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.13.0")
             library("hikari-cp", "com.zaxxer", "HikariCP").version("5.1.0")
 
             // Libraries - Utilities
