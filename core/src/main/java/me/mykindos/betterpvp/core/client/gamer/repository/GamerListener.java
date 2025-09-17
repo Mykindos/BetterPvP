@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
@@ -20,9 +22,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.util.Objects;
-import java.util.Optional;
 
 @BPvPListener
 @Singleton
@@ -71,6 +70,8 @@ public class GamerListener implements Listener {
                 gamer.getActionBar().show(gamer);
                 gamer.getTitleQueue().show(gamer);
                 gamer.getPlayerList().show(gamer);
+                gamer.getExperienceBar().show(gamer);
+                gamer.getExperienceLevel().show(gamer);
             });
         }catch(Exception ex) {
             log.error("Error with gamer async onUpdate", ex).submit();
