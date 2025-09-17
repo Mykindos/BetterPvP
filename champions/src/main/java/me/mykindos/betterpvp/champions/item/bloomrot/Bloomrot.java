@@ -62,18 +62,4 @@ public class Bloomrot extends WeaponItem implements ReloadHook {
         nectarOfDecayAbility.setCloudSeconds(config.getConfig("cloudSeconds", 6.0, Double.class));
         nectarOfDecayAbility.setHealPercent(config.getConfig("healPercent", 0.80, Double.class));
     }
-
-    @Inject
-    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
-//        String[] pattern = new String[] {
-//                "SFS",
-//                "SFS",
-//                "SDS"
-//        };
-//        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-//        builder.setIngredient('S', new RecipeIngredient(alligatorScale, 1));
-//        builder.setIngredient('F', new RecipeIngredient(fangOfTheDeep, 1));
-//        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
-//        registry.registerRecipe(new NamespacedKey("champions", "alligators_tooth"), builder.build());
-    }
 } 
