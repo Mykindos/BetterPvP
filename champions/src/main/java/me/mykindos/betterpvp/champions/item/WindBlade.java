@@ -50,7 +50,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
         
         // Create abilities
         this.windDashAbility = new WindDashAbility(championsManager, champions);
-        this.windSlashAbility = new WindSlashAbility(cooldownManager, energyHandler);
+        this.windSlashAbility = new WindSlashAbility(cooldownManager, energyHandler, this);
         
         // Add ability container
         addBaseComponent(AbilityContainerComponent.builder()

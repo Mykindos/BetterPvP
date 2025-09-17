@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Material;
@@ -39,8 +40,11 @@ public class BowListener implements Listener {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player player)) return;
         if (event.getBow() == null || event.getBow().getType() != Material.CROSSBOW) return;
-        event.setCancelled(true);
-        UtilMessage.simpleMessage(player, "Combat", "Crossbows are disabled.");
+        final ItemFactory itemFactory = champions.getInjector().getInstance(ItemFactory.class);
+        if (!itemFactory.isCustomItem(event.getBow())) {
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(player, "Combat", "Crossbows are disabled.");
+        }
 
        // if (crossbowTracker.containsKey(player.getUniqueId())) {
        //     long lastShot = crossbowTracker.get(player.getUniqueId());

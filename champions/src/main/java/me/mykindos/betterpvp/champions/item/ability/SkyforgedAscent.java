@@ -74,14 +74,7 @@ public class SkyforgedAscent extends ItemAbility implements Listener {
     @Override
     public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
         final Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        if (!cooldownManager.use(player, getName(), cooldown, false, true, true, gmr -> {
-            final ItemStack item = player.getEquipment().getItemInMainHand();
-            final Optional<ItemInstance> instance = itemFactory.fromItemStack(item);
-            if (instance.isEmpty()) {
-                return false;
-            }
-            return instance.orElseThrow().getBaseItem() == heldItem;
-        })) {
+        if (!cooldownManager.use(player, getName(), cooldown, true, true, true, (BaseItem) null)) {
             return false;
         }
 

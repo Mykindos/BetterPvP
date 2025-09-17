@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
@@ -54,17 +55,20 @@ public class WindSlashAbility extends ItemAbility {
     private final EnergyHandler energyHandler;
     @EqualsAndHashCode.Exclude
     private final CooldownManager cooldownManager;
+    @EqualsAndHashCode.Exclude
+    private final BaseItem heldItem;
 
     // Active slashes
     @EqualsAndHashCode.Exclude
     private final Set<Slash> slashSet = new HashSet<>();
 
-    public WindSlashAbility(CooldownManager cooldownManager, EnergyHandler energyHandler) {
+    public WindSlashAbility(CooldownManager cooldownManager, EnergyHandler energyHandler, BaseItem heldItem) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "wind_slash"),
                 "Wind Slash",
                 "Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.",
                 TriggerTypes.LEFT_CLICK);
         this.cooldownManager = cooldownManager;
+        this.heldItem = heldItem;
         this.energyHandler = energyHandler;
     }
 
@@ -72,7 +76,7 @@ public class WindSlashAbility extends ItemAbility {
     public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
         Player player = Objects.requireNonNull(client.getGamer().getPlayer());
         
-        if (!cooldownManager.use(player, getName(), slashCooldown, true, true, false)) {
+        if (!cooldownManager.use(player, getName(), slashCooldown, true, true, false, (BaseItem) null)) {
             return false;
         }
 
