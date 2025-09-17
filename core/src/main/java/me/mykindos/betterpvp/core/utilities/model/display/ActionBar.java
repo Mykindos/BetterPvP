@@ -21,7 +21,7 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityDataBlockingQueue<GamerDisplayObject<Component>> components = new PriorityDataBlockingQueue<>(5);
+    private final PriorityDataBlockingQueue<GamerDisplayObject<Component>> components = new PriorityDataBlockingQueue<>(20);
 
     // Use a lock to synchronize access to the components PriorityQueue
     private final Object lock = new Object();
