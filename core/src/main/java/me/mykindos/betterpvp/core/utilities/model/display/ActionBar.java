@@ -22,7 +22,7 @@ public class ActionBar {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityDataBlockingQueue<DisplayComponent> components = new PriorityDataBlockingQueue<>(5);
+    private final PriorityDataBlockingQueue<DisplayComponent> components = new PriorityDataBlockingQueue<>(20);
 
     // Use a lock to synchronize access to the components PriorityQueue
     private final Object lock = new Object();
