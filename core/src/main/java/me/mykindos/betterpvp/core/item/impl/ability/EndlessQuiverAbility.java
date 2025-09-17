@@ -10,39 +10,41 @@ import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUseItem;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPlayerInventory;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.event.player.PlayerCustomClickEvent;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.component.ChargedProjectiles;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -52,12 +54,12 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.player.PlayerInputEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -71,26 +73,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @SuppressWarnings("ALL")
 @CustomLog
 @EqualsAndHashCode(callSuper = true)
 @PluginAdapter("ProtocolLib")
-@BPvPListener
 @Singleton
 public class EndlessQuiverAbility extends ItemAbility implements Listener, PacketListener {
 
+    @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
+    @EqualsAndHashCode.Exclude
     private final Map<Player, Integer> activeTicks = new MapMaker().weakKeys().makeMap();
+    @EqualsAndHashCode.Exclude
+    private static Core core;
+    @Getter
+    @Setter
+    private Consumer<LivingEntity> useFunction;
+    @Getter
+    @Setter
+    private Predicate<LivingEntity> useCheck;
 
     @Inject
-    private EndlessQuiverAbility(ItemFactory itemFactory) {
+    private EndlessQuiverAbility(Core plugin, ItemFactory itemFactory) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Core.class), "endless_quiver"),
                 "Endless Quiver",
                 "Automatically conjures arrows, letting any quiver fire endlessly without requiring ammunition.",
                 TriggerTypes.PASSIVE);
         this.itemFactory = itemFactory;
+        this.core = plugin;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
         PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.HIGHEST);
+        UtilServer.runTaskTimer(plugin, this::onTick, 0, 1);
     }
 
     @Override
@@ -118,13 +133,43 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
     }
 
-    @UpdateEvent
-    public void onTick() {
+    private boolean isAmmo(ItemStack itemStack) {
+        return itemStack.getType() == Material.ARROW || itemStack.getType() == Material.FIREWORK_ROCKET;
+    }
+
+    private void showArrows(Player player) {
+        for (int i = 0; i < player.getInventory().getContents().length; i++) {
+            ItemStack content = player.getInventory().getContents()[i];
+            if (content == null || !isAmmo(content)) continue;
+
+            final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(i, SpigotConversionUtil.fromBukkitItemStack(content));
+            PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
+        }
+    }
+
+    private void hideArrows(Player player) {
+        for (int i = 0; i < player.getInventory().getContents().length; i++) {
+            ItemStack content = player.getInventory().getContents()[i];
+            if (content == null || !isAmmo(content)) continue;
+
+            ItemStack mock = new ItemStack(Material.PAPER);
+//            if (content.hasData(DataComponentTypes.ITEM_MODEL)) {
+//                mock.setData(DataComponentTypes.ITEM_MODEL, content.getData(DataComponentTypes.ITEM_MODEL));
+//            }
+//            if (content.hasData(DataComponentTypes.CUSTOM_MODEL_DATA)) {
+//                mock.setData(DataComponentTypes.CUSTOM_MODEL_DATA, content.getData(DataComponentTypes.CUSTOM_MODEL_DATA));
+//            }
+            final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(i, SpigotConversionUtil.fromBukkitItemStack(mock));
+            PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
+        }
+    }
+
+    private void onTick() {
         final Iterator<Player> iterator = activeTicks.keySet().iterator();
         while (iterator.hasNext()) {
             final Player player = iterator.next();
             final int ticks = activeTicks.get(player);
-            if (player == null || !player.isValid()) {
+            if (player == null || !player.isValid() || player.getActiveItemRemainingTime() <= 0) {
                 if (player != null && player.isValid()) {
                     takePacketArrow(player);
                     player.clearActiveItem();
@@ -133,6 +178,8 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
                 iterator.remove();
                 continue;
             }
+
+            player.setActiveItemRemainingTime(ticks);
         }
     }
 
@@ -140,6 +187,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
     void onItemSwap(PlayerInventorySlotChangeEvent event) {
         if (event.getRawSlot() == event.getPlayer().getInventory().getHeldItemSlot()) {
             takePacketArrow(event.getPlayer());
+            showArrows(event.getPlayer());
             activeTicks.remove(event.getPlayer());
             event.getPlayer().clearActiveItem();
         }
@@ -148,6 +196,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
     @EventHandler(priority = EventPriority.MONITOR)
     void onHeldItem(PlayerItemHeldEvent event) {
         takePacketArrow(event.getPlayer());
+        showArrows(event.getPlayer());
         activeTicks.remove(event.getPlayer());
         event.getPlayer().clearActiveItem();
     }
@@ -156,27 +205,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
     void onClick(RightClickEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         final Player player = event.getPlayer();
-        if (!event.isHoldClick()) {
-            final ItemStack item = player.getEquipment().getItem(event.getHand());
-            final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(Objects.requireNonNull(item));
-            if (instanceOpt.isEmpty()) return;
-
-            if (item.hasData(DataComponentTypes.CHARGED_PROJECTILES)) {
-                final io.papermc.paper.datacomponent.item.@Nullable ChargedProjectiles charged = item.getData(DataComponentTypes.CHARGED_PROJECTILES);
-                if (!charged.projectiles().isEmpty()) return;
-            }
-
-            final ItemInstance instance = instanceOpt.get();
-            final Optional<AbilityContainerComponent> containerOpt = instance.getComponent(AbilityContainerComponent.class);
-            if (containerOpt.isEmpty()) return;
-
-            final AbilityContainerComponent container = containerOpt.get();
-            if (container.getAbilities().contains(this)) {
-                activeTicks.put(player, item.getMaxItemUseDuration(player));
-                givePacketArrow(player);
-                player.startUsingItem(event.getHand());
-            }
-        } else if (activeTicks.containsKey(player)) {
+        if (activeTicks.containsKey(player)) {
             final int ticks = activeTicks.getOrDefault(player, 0);
             activeTicks.put(player, ticks - 1);
 
@@ -189,12 +218,15 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
     @EventHandler(priority = EventPriority.MONITOR)
     void onClickEnd(RightClickEndEvent event) {
         if (activeTicks.containsKey(event.getPlayer())) {
-             takePacketArrow(event.getPlayer());
-             activeTicks.remove(event.getPlayer());
-             event.getPlayer().clearActiveItem();
+            takePacketArrow(event.getPlayer());
+            showArrows(event.getPlayer());
+            activeTicks.remove(event.getPlayer());
+            event.getPlayer().clearActiveItem();
         }
     }
 
+    // Disables picking up arrows
+    // And calls useFunction
     @EventHandler(priority = EventPriority.LOWEST)
     void onShoot(EntityShootBowEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
@@ -211,25 +243,70 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         final AbilityContainerComponent container = containerOpt.get();
         if (container.getAbilities().contains(this)) {
             arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+            if (useFunction != null) {
+                useFunction.accept(event.getEntity());
+            }
         }
     }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (event.getPacketType() != PacketType.Play.Client.PLAYER_DIGGING) {
+        switch (event.getPacketType()) {
+            case PacketType.Play.Client.PLAYER_DIGGING -> release(event);
+            case PacketType.Play.Client.USE_ITEM -> press(event);
+            default -> { }
+        }
+    }
+
+    private void press(PacketReceiveEvent event) {
+        Player player = event.getPlayer();
+        WrapperPlayClientUseItem packet = new WrapperPlayClientUseItem(event);
+        final ItemStack activeItem = player.getEquipment().getItem(EquipmentSlot.values()[packet.getHand().ordinal()]);
+        final EquipmentSlot activeHand = EquipmentSlot.HAND;
+        final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(activeItem);
+        if (instanceOpt.isEmpty()) {
             return;
         }
 
+        final ItemInstance activeInstance = instanceOpt.get();
+        final Optional<AbilityContainerComponent> containerOpt = activeInstance.getComponent(AbilityContainerComponent.class);
+        if (containerOpt.isEmpty()) {
+            return;
+        }
+
+        final AbilityContainerComponent container = containerOpt.get();
+        if (!container.getAbilities().contains(this)) {
+            return;
+        }
+
+        if (!useCheck.test(player)) {
+            // Can't use
+            activeTicks.remove(player);
+            event.setCancelled(true);
+            takePacketArrow(player);
+            player.clearActiveItem();
+            showArrows(player);
+        } else {
+            // Start using
+            if (activeItem.hasData(DataComponentTypes.CHARGED_PROJECTILES)) {
+                final io.papermc.paper.datacomponent.item.@Nullable ChargedProjectiles charged = activeItem.getData(DataComponentTypes.CHARGED_PROJECTILES);
+                if (!charged.projectiles().isEmpty()) return;
+            }
+
+            if (useCheck != null && !useCheck.test(player)) return;
+
+            activeTicks.put(player, activeItem.getMaxItemUseDuration(player));
+            hideArrows(player);
+            givePacketArrow(player);
+        }
+        return;
+    }
+
+    private void release(PacketReceiveEvent event) {
+        Player player = event.getPlayer();
         WrapperPlayClientPlayerDigging packet = new WrapperPlayClientPlayerDigging(event);
         if (packet.getAction() != DiggingAction.RELEASE_USE_ITEM) {
             return; // They didnt shoow their bow/charge their crossbow
-        }
-
-        Player player = event.getPlayer();
-        if (activeTicks.containsKey(player)) {
-            activeTicks.remove(player);
-            takePacketArrow(player);
-            player.clearActiveItem();
         }
 
         // These are the necessary conditions for this packet to be sent as a
@@ -261,11 +338,20 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             return; // doesnt have endless quiver
         }
 
+        int usedTime = player.getActiveItemUsedTime();
+        // this fixes a rollover caused by a single tap to the bow
+        if (activeTicks.containsKey(player)) {
+            activeTicks.remove(player);
+            takePacketArrow(player);
+            showArrows(player);
+            player.clearActiveItem();
+        }
+
         // It does have endless quiver, cancel this packet and automatically charge/send
         final ItemStack itemStack = activeInstance.getItemStack();
         switch (itemStack.getType()) {
             case BOW:
-                shootBow(itemStack, player, activeHand);
+                shootBow(itemStack, player, activeHand, usedTime);
                 event.setCancelled(true);
                 break;
             case CROSSBOW:
@@ -277,7 +363,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         }
     }
 
-    private static void shootBow(ItemStack itemStack, Player player, EquipmentSlot activeHand) {
+    private static void shootBow(ItemStack itemStack, Player player, EquipmentSlot activeHand, int usedTime) {
         final net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.unwrap(itemStack);
         final Item nmsItem = nmsStack.getItem();
         Preconditions.checkState(nmsItem instanceof BowItem, "Expected BowItem, got %s", nmsItem.getClass());
@@ -286,33 +372,41 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         final ServerPlayer playerHandle = ((CraftPlayer) player).getHandle();
         final ServerLevel serverLevel = ((CraftWorld) player.getWorld()).getHandle();
         final InteractionHand hand = activeHand == EquipmentSlot.HAND ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-        final float powerForTime = BowItem.getPowerForTime(player.getActiveItemUsedTime());
+        final float powerForTime = BowItem.getPowerForTime(usedTime);
 
         try {
-            final Method method = BowItem.class.getMethod("a", // shoot
+            final Method method = ProjectileWeaponItem.class.getDeclaredMethod("shoot", // shoot
                     ServerLevel.class,
-                    ServerPlayer.class,
+                    net.minecraft.world.entity.LivingEntity.class,
                     InteractionHand.class,
                     net.minecraft.world.item.ItemStack.class,
                     List.class,
-                    Float.class,
-                    Float.class,
-                    Boolean.class,
-                    LivingEntity.class,
-                    Float.class);
+                    float.class,
+                    float.class,
+                    boolean.class,
+                    net.minecraft.world.entity.LivingEntity.class,
+                    float.class
+            );
 
-            method.invoke(bowItem, serverLevel,
-                    playerHandle,
-                    hand,
-                    nmsStack,
-                    List.of(new net.minecraft.world.item.ItemStack(Items.ARROW)),
-                    powerForTime * 3.0f,
-                    1.0F,
-                    powerForTime == 1.0f,
-                    null,
-                    powerForTime);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            log.error("Failed to reflectively find shoot method with extra power parameter, this may be due to a version change. Endless Quiver did not work correctly.", e);
+            method.setAccessible(true);
+            UtilServer.runTask(core, () -> {
+                try {
+                    method.invoke(bowItem, serverLevel,
+                            playerHandle,
+                            hand,
+                            nmsStack,
+                            List.of(new net.minecraft.world.item.ItemStack(Items.ARROW)),
+                            powerForTime * 3.0f,
+                            1.0F,
+                            powerForTime == 1.0f,
+                            null,
+                            powerForTime);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    log.error("Failed to invoke shoot method reflectively, Endless Quiver did not work correctly.", e).submit();
+                }
+            });
+        } catch (NoSuchMethodException e) {
+            log.error("Failed to reflectively find shoot method with extra power parameter, this may be due to a version change. Endless Quiver did not work correctly.", e).submit();
         }
     }
 
@@ -323,7 +417,9 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
 
         final float powerForTime = BowItem.getPowerForTime(player.getActiveItemUsedTime());
         if (powerForTime >= 1f) {
-            nmsStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new net.minecraft.world.item.ItemStack(Items.ARROW)));
+            UtilServer.runTask(core, () -> {
+                nmsStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new net.minecraft.world.item.ItemStack(Items.ARROW)));
+            });
             return true;
         }
         return false;
