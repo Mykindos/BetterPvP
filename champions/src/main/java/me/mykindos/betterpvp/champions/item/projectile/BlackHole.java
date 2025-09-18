@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
-import me.mykindos.betterpvp.core.utilities.model.Projectile;
+import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.Location;

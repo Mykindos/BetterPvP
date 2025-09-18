@@ -17,7 +17,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.Projectile;
+import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
