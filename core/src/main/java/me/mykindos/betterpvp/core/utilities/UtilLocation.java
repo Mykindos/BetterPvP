@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import net.objecthunter.exp4j.tokenizer.OperatorToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -551,6 +552,26 @@ public class UtilLocation {
             result.setZ(location.getZ());
         }
         return Optional.of(result);
+    }
+
+    public static Optional<Location> getClosestSurfaceBelow(final Location location) {
+        return getClosestSurfaceBelow(location, location.getY() - location.getWorld().getMinHeight());
+    }
+
+    public static Optional<Location> getClosestSurfaceBelow(final Location location, final double maxHeight) {
+        return getClosestSurfaceBelow(location, maxHeight, loc -> UtilBlock.solid(loc.getBlock()));
+    }
+
+    public static Optional<Location> getClosestSurfaceBelow(final Location location, final double maxHeight, final @NotNull Predicate<@NotNull Location> filter) {
+        Preconditions.checkState(maxHeight > 0, "Max height must be greater than 0");
+        final Location clone = location.clone();
+        while (Math.abs(clone.getY() - location.getY()) <= maxHeight) {
+            if (filter.test(clone)) {
+                return Optional.of(clone);
+            }
+            clone.add(0, -1, 0);
+        }
+        return Optional.empty();
     }
 
     /**
