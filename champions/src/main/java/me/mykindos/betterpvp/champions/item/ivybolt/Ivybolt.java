@@ -31,7 +31,7 @@ public class Ivybolt extends WeaponItem implements ReloadHook {
 
     @Inject
     private Ivybolt(Champions champions, EndlessQuiverAbility endlessQuiverAbility, ItemFactory itemFactory, CooldownManager cooldownManager) {
-        super(champions, "Ivybolt", Item.model(Material.CROSSBOW, "ivybolt"), ItemRarity.LEGENDARY);
+        super(champions, "Ivybolt", Item.model(Material.BOW, "ivybolt"), ItemRarity.LEGENDARY);
         this.itemFactory = itemFactory;
         this.endlessQuiverAbility = endlessQuiverAbility;
         this.cooldownManager = cooldownManager;
