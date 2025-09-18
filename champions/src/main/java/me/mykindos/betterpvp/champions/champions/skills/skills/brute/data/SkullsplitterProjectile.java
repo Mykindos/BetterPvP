@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.Projectile;
+import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
