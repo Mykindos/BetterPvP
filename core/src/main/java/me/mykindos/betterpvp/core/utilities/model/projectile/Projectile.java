@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.utilities.model;
+package me.mykindos.betterpvp.core.utilities.model.projectile;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;

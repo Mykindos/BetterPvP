@@ -206,7 +206,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         if (event.getHand() != EquipmentSlot.HAND) return;
         final Player player = event.getPlayer();
         if (activeTicks.containsKey(player)) {
-            final int ticks = activeTicks.getOrDefault(player, 0);
+            final int ticks = activeTicks.get(player);
             activeTicks.put(player, ticks - 1);
 
             if (player.getActiveItem().getType() == Material.CROSSBOW) {
@@ -296,6 +296,8 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             if (useCheck != null && !useCheck.test(player)) return;
 
             activeTicks.put(player, activeItem.getMaxItemUseDuration(player));
+            player.startUsingItem(activeHand);
+            player.setActiveItemRemainingTime(activeItem.getMaxItemUseDuration(player));
             hideArrows(player);
             givePacketArrow(player);
         }
