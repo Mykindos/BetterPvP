@@ -4,6 +4,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.ReturningLinkProjectile;
 import org.bukkit.Location;
@@ -55,7 +57,7 @@ public class VineProjectile extends ReturningLinkProjectile {
             return;
         }
 
-        if (hasFinishedPulling() && target != null) {
+        if (target != null && (hasFinishedPulling() || UtilBlock.isGrounded(target))) {
             effectManager.addEffect(target, caster, EffectTypes.POISON, name, poisonAmplifier, poisonDuration, false);
             finished = true;
         }
