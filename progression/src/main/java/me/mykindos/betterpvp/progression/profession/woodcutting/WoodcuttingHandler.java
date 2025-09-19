@@ -232,31 +232,18 @@ public class WoodcuttingHandler extends ProfessionHandler {
             Material material = Material.getMaterial(itemMaterialAsString.toUpperCase());
             if (material == null) continue;
 
-            int customModelData = lootItemSection.getInt("customModelData");
+            String itemKey = lootItemSection.getString("item");
+            Preconditions.checkNotNull(itemKey, "Item key cannot be null!");
+            BaseItem item = itemFactory.getItemRegistry().getItem(itemKey);
+            Preconditions.checkNotNull(item, "No item found for key: " + itemKey);
+            final ItemStack itemStack = itemFactory.create(item).createItemStack();
+
             int frequency = lootItemSection.getInt("frequency");
             int minAmount = lootItemSection.getInt("minAmount");
             int maxAmount = lootItemSection.getInt("maxAmount");
-            DropTableItemStack itemStack = null;
-            if (lootItemKey.contains(":")) {
-                final NamespacedKey key = NamespacedKey.fromString(lootItemKey);
-                if (key == null) {
-                    log.error("Invalid namespaced key for loot item: " + lootItemKey).submit();
-                    continue;
-                }
+            DropTableItemStack dropTableItemStack = new DropTableItemStack(itemStack, minAmount, maxAmount);
 
-                final BaseItem baseItem = itemFactory.getItemRegistry().getItem(key);
-                if (baseItem == null) {
-                    log.warn("No item found for key: " + key).submit();
-                } else {
-                    itemStack = new DropTableItemStack(itemFactory.create(baseItem).createItemStack(), minAmount, maxAmount);
-                }
-
-            } else {
-                Material item = Material.valueOf(itemMaterialAsString);
-                itemStack = new DropTableItemStack(UtilItem.createItemStack(item, 1, customModelData), minAmount, maxAmount);
-            }
-
-            lootTypes.add(frequency, 1, itemStack);
+            lootTypes.add(frequency, 1, dropTableItemStack);
         }
 
         log.info("Loaded " + lootTypes.size() + " woodcutting loot types").submit();

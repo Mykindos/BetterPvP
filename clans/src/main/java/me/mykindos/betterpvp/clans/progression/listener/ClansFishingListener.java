@@ -56,11 +56,9 @@ public class ClansFishingListener implements Listener {
             return;
         }
 
-        ItemStack itemStack = new ItemStack(treasureType.getMaterial());
-        itemStack.editMeta(meta -> meta.setCustomModelData(treasureType.getCustomModelData()));
-
+        final ItemStack itemStack = treasureType.generateItem(1);
         final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(itemStack);
-        if (itemOpt.isEmpty() || itemOpt.get().getRarity().isAtLeast(ItemRarity.LEGENDARY)) {
+        if (itemOpt.isEmpty() || !itemOpt.get().getRarity().isAtLeast(ItemRarity.LEGENDARY)) {
             return;
         }
 
