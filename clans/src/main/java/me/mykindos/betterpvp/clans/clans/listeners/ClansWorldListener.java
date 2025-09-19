@@ -390,29 +390,26 @@ public class ClansWorldListener extends ClanListener {
                     return;
                 }
 
-                if (UtilBlock.usable(block)) {
-
-                    if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                        if (material == Material.ENDER_CHEST) {
-                            return;
-                        }
-                    }
-
-                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.INTERACT);
-                    tie.callEvent();
-                    if (tie.getResult() != Event.Result.DENY) {
+                if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    if (material == Material.ENDER_CHEST) {
                         return;
                     }
+                }
 
-                    event.setCancelled(true);
-                    event.setUseInteractedBlock(Event.Result.DENY);
+                final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.INTERACT);
+                tie.callEvent();
+                if (tie.getResult() != Event.Result.DENY) {
+                    return;
+                }
 
-                    if (tie.isInform()) {
-                        UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
-                                UtilFormat.cleanString(material.toString()),
-                                relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
-                        );
-                    }
+                event.setCancelled(true);
+                event.setUseInteractedBlock(Event.Result.DENY);
+
+                if (UtilBlock.usable(block) && tie.isInform()) {
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
+                            UtilFormat.cleanString(material.toString()),
+                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                    );
                 }
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
