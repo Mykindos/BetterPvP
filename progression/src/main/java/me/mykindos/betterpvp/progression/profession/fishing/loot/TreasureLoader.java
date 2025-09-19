@@ -1,10 +1,18 @@
 package me.mykindos.betterpvp.progression.profession.fishing.loot;
 
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingConfigLoader;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 public class TreasureLoader implements FishingConfigLoader<TreasureType> {
+
+    private final ItemFactory itemFactory;
+
+    public TreasureLoader(ItemFactory itemFactory) {
+        this.itemFactory = itemFactory;
+    }
+
     @Override
     public String getTypeKey() {
         return "treasure";
@@ -12,6 +20,6 @@ public class TreasureLoader implements FishingConfigLoader<TreasureType> {
 
     @Override
     public @NotNull TreasureType read(ConfigurationSection section) {
-        return new TreasureType(section.getName());
+        return new TreasureType(section.getName(), itemFactory);
     }
 }
