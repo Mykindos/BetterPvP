@@ -38,11 +38,15 @@ public class AbilityContainerComponent extends AbstractItemComponent implements 
         this.abilities = abilities;
 
         Preconditions.checkArgument(!abilities.isEmpty(), "Abilities cannot be empty");
-        Preconditions.checkArgument(abilities.stream()
+        final long nonPassiveCount = abilities.stream()
+                .filter(a -> !a.getTriggerType().equals(TriggerTypes.PASSIVE))
+                .count();
+        final long nonPassiveDistinct = abilities.stream()
                 .map(ItemAbility::getTriggerType)
+                .filter(triggerType -> !triggerType.equals(TriggerTypes.PASSIVE))
                 .distinct()
-                .count() == abilities.size(),
-                "Abilities cannot have the same trigger type");
+                .count();
+        Preconditions.checkArgument(nonPassiveDistinct == nonPassiveCount, "Non-passive abilities cannot have the same trigger type");
     }
 
     public @NotNull Optional<ItemAbility> getAbility(@NotNull TriggerTypes triggerType) {

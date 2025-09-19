@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.item.ability.VineSnareAbility;
 import me.mykindos.betterpvp.champions.item.bloomrot.NectarOfDecay;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -28,16 +30,19 @@ public class Ivybolt extends WeaponItem implements ReloadHook {
     private final ItemFactory itemFactory;
     private final CooldownManager cooldownManager;
     private final EndlessQuiverAbility endlessQuiverAbility;
+    private final VineSnareAbility vineSnareAbility;
 
     @Inject
-    private Ivybolt(Champions champions, EndlessQuiverAbility endlessQuiverAbility, ItemFactory itemFactory, CooldownManager cooldownManager) {
+    private Ivybolt(Champions champions, EndlessQuiverAbility endlessQuiverAbility, ItemFactory itemFactory, EffectManager effectManager, CooldownManager cooldownManager) {
         super(champions, "Ivybolt", Item.model(Material.BOW, "ivybolt"), ItemRarity.LEGENDARY);
         this.itemFactory = itemFactory;
+        this.vineSnareAbility = new VineSnareAbility(champions, itemFactory, this, effectManager);
         this.endlessQuiverAbility = endlessQuiverAbility;
         this.cooldownManager = cooldownManager;
 
         // Add abilities to container
         addBaseComponent(AbilityContainerComponent.builder()
+                .ability(vineSnareAbility)
                 .ability(endlessQuiverAbility)
                 .build());
     }
@@ -67,5 +72,11 @@ public class Ivybolt extends WeaponItem implements ReloadHook {
             this.endlessQuiverAbility.setUseFunction(null);
             this.endlessQuiverAbility.setUseCheck(null);
         }
+
+        this.vineSnareAbility.setHitboxSize(config.getConfig("hitbox", 0.7, Double.class));
+        this.vineSnareAbility.setSpeed(config.getConfig("speed", 50.0, Double.class));
+        this.vineSnareAbility.setAliveTime((config.getConfig("aliveTime", 3000L, Long.class)));
+        this.vineSnareAbility.setEntangleAmplifier(config.getConfig("entangleAmplifier", 1, Integer.class));
+        this.vineSnareAbility.setEntangleSeconds(config.getConfig("entangleSeconds", 5.0, Double.class));
     }
 } 
