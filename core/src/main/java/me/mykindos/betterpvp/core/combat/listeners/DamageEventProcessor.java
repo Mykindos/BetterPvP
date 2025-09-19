@@ -89,6 +89,10 @@ public class DamageEventProcessor implements Listener {
         // Fire our custom event
         UtilServer.callEvent(damageEvent);
 
+        if (damageEvent.isCancelled()) {
+            return false;
+        }
+
         // Call the finalizer
         finalizer.finalizeEvent(damageEvent);
         return true;
