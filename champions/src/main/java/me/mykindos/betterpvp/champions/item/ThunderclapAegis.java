@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.item;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.BlocksAttacks;
 import io.papermc.paper.datacomponent.item.Consumable;
 import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.EqualsAndHashCode;
@@ -35,12 +36,7 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
     private final ItemFactory itemFactory;
 
     static {
-        model = Item.model("thunderclap_aegis", 1);
-        model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
-                .consumeSeconds(Float.MAX_VALUE)
-                .animation(ItemUseAnimation.BLOCK)
-                .build());
-
+        model = Item.model(Material.SHIELD, "thunderclap_aegis", 1);
         // Set unbreakable flag on the item meta
         model.editMeta(meta -> meta.setUnbreakable(true));
         model.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
