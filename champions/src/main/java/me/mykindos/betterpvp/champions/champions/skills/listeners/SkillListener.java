@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.StateSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes;
 import me.mykindos.betterpvp.core.client.Client;
@@ -139,22 +140,20 @@ public class SkillListener implements Listener {
 
         }
 
-        if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
+        final boolean isPrepareArrowSkill = skill instanceof PrepareArrowSkill;
+        final boolean isStateSkill = skill instanceof StateSkill;
 
-            // I think you could refactor the cooldownManager.use call below but it would get messy.
-            if (cooldownSkill.isPlayerCurrentlyUsingSkill(player)) {
-                event.setCancelled(true);
-                return;  // return early to not show cd message to player
-            }
-
+        // You should definitely swap the order of these branches to GREATLY improve readability
+        if (skill instanceof CooldownSkill cooldownSkill && !isPrepareArrowSkill && !isStateSkill) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
             }
-        } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {
+        } else if (isPrepareArrowSkill || isStateSkill) {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
 
-                if (prepareArrowSkill.showCooldownFinished()) {
+                final CooldownSkill cooldownSkill = (CooldownSkill) skill;
+                if (cooldownSkill.showCooldownFinished()) {
                     UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", skill.getName(),
                             Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
                 }
@@ -367,7 +366,6 @@ public class SkillListener implements Listener {
                     }
 
                     int level = getLevel(player, build.getBuildSkill(skillType));
-                    player.sendMessage("using skill");
                     UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
 
                 }

@@ -26,17 +26,6 @@ public interface CooldownSkill extends IChampionsSkill {
         return isHolding(gamer.getPlayer());
     }
 
-    /**
-     * Tells {@link me.mykindos.betterpvp.champions.champions.skills.listeners.SkillListener} that the player is still
-     * using the skill based on the return value of this function.
-     * <p>
-     * This is overridden for channeling skills and stateful skills
-     * like Excessive Force where the cooldown shouldn't start until after the effects of the ability have ended.
-     */
-    default boolean isPlayerCurrentlyUsingSkill(@NotNull Player player) {
-        return false;
-    }
-
     default int getPriority() {
         return 1000;
     }
