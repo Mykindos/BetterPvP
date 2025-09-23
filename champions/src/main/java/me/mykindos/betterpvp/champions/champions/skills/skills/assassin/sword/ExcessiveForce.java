@@ -72,8 +72,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
                 final String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(timeLeftInSeconds, 1);
 
                 // ex: Excessive Force: 2.6s
-                return Component.text(getName() + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                        .append(Component.text(timeLeftWithOneDecimalPlace + "s").color(NamedTextColor.GREEN).decoration(TextDecoration.BOLD, false));
+                return getActionBarComponentForDuration(timeLeftWithOneDecimalPlace);
             }
     );
 

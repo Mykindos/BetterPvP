@@ -3,7 +3,10 @@ package me.mykindos.betterpvp.champions.champions.skills;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.IntToDoubleFunction;
+import java.util.function.Predicate;
+
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -39,12 +42,15 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @CustomLog
@@ -401,4 +407,49 @@ public abstract class Skill implements IChampionsSkill {
     public boolean isHolding(Player player) {
         return hasSkill(player) && SkillWeapons.isHolding(player, getType());
     }
+
+
+    /**
+     * A helper method used to construct an adventure component (to be used in an action bar) given a few strings.
+     * <p>
+     * The returned component will be in this format:
+     * <code>`label`: `numberValue``symbol`</code>
+     * <p>
+     * Example:
+     * <code>Charge: 5%</code>
+     */
+    protected @NotNull Component getActionBarComponent(@NotNull String label, @NotNull String numberValue,
+                                                       @NotNull String symbol) {
+        return Component.text(label + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(Component.text(numberValue).color(NamedTextColor.GREEN).decoration(TextDecoration.BOLD, false))
+                .append(Component.text(symbol).color(NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false));
+    }
+
+    /**
+     * A helper method used to construct an adventure component (to be used in an action bar) given a display value
+     * and a symbol.
+     * <p>
+     * The returned component will be in this format:
+     * <code>`name of ability`: `numberValue``symbol`</code>
+     * <p>
+     * Example:
+     * <code>Hilt Smash: 5s</code>
+     */
+    protected @NotNull Component getActionBarComponent(@NotNull String numberValue, @NotNull String symbol) {
+        return getActionBarComponent(getName(), numberValue, symbol);
+    }
+
+    /**
+     * A helper method used to construct an adventure component (to be used in an action bar) given a display value.
+     * <p>
+     * The returned component will be in this format:
+     * <code>`name of ability`: `numberValue`s</code>
+     * <p>
+     * Example:
+     * <code>Hilt Smash: 5s</code>
+     */
+    protected @NotNull Component getActionBarComponentForDuration(@NotNull String numberValue) {
+        return getActionBarComponent(numberValue, "s");
+    }
+
 }
