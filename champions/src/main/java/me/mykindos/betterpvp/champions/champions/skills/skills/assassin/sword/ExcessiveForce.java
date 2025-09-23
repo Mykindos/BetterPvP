@@ -71,8 +71,8 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
                 double timeLeftInSeconds = timeLeftInMillis / 1000.0D;
                 final String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(timeLeftInSeconds, 1);
 
-                // ex: Excessive Force: 2.6s
-                return getActionBarComponentForDuration(timeLeftWithOneDecimalPlace);
+                // ex: Dealing Knockback For: 2.6s
+                return getActionBarComponentForDuration("Dealing Knockback For", timeLeftWithOneDecimalPlace);
             }
     );
 

@@ -440,7 +440,8 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     /**
-     * A helper method used to construct an adventure component (to be used in an action bar) given a display value.
+     * A helper method used to construct an adventure component (to be used in an action bar) given a label and
+     * a display value.
      * <p>
      * The returned component will be in this format:
      * <code>`name of ability`: `numberValue`s</code>
@@ -448,8 +449,8 @@ public abstract class Skill implements IChampionsSkill {
      * Example:
      * <code>Hilt Smash: 5s</code>
      */
-    protected @NotNull Component getActionBarComponentForDuration(@NotNull String numberValue) {
-        return getActionBarComponent(numberValue, "s");
+    protected @NotNull Component getActionBarComponentForDuration(@NotNull String label, @NotNull String numberValue) {
+        return getActionBarComponent(label, numberValue, "s");
     }
 
 }
