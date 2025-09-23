@@ -111,7 +111,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 final String timeLeft = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1, true);
 
                 // ex: Strength For: 4.2s
-                return getActionBarComponentForDuration("Strength For", timeLeft);
+                return getActionBarComponentForDuration("Strength", timeLeft);
             }
     );
 

@@ -140,6 +140,13 @@ public class SkillListener implements Listener {
         }
 
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
+
+            // I think you could refactor the cooldownManager.use call below but it would get messy.
+            if (cooldownSkill.isPlayerCurrentlyUsingSkill(player)) {
+                event.setCancelled(true);
+                return;  // return early to not show cd message to player
+            }
+
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
@@ -154,7 +161,6 @@ public class SkillListener implements Listener {
                 event.setCancelled(true);
             }
         }
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -361,6 +367,7 @@ public class SkillListener implements Listener {
                     }
 
                     int level = getLevel(player, build.getBuildSkill(skillType));
+                    player.sendMessage("using skill");
                     UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
 
                 }
