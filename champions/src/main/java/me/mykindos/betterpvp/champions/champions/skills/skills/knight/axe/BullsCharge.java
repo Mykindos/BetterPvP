@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
@@ -16,12 +15,10 @@ import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,15 +29,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class BullsCharge extends StateSkill implements Listener, InteractSkill, CooldownSkill, MovementSkill, DebuffSkill, BuffSkill {
+public class BullsCharge extends StateSkill implements Listener, InteractSkill, MovementSkill, DebuffSkill, BuffSkill {
 
     private double speedDuration;
     private double speedDurationIncreasePerLevel;
@@ -89,7 +81,7 @@ public class BullsCharge extends StateSkill implements Listener, InteractSkill, 
         return slowDuration + (level - 1) * slowDurationIncreasePerLevel;
     }
 
-    // entrypt
+    // entrypoint
     @Override
     public void activate(Player player, int level) {
 
@@ -101,7 +93,6 @@ public class BullsCharge extends StateSkill implements Listener, InteractSkill, 
         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN);
     }
-
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event) {
@@ -148,50 +139,9 @@ public class BullsCharge extends StateSkill implements Listener, InteractSkill, 
         }
     }
 
-    @UpdateEvent(delay = 100)
-    public void onUpdate() {
-        final Iterator<Map.Entry<UUID, Long>> iterator = activeState.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Map.Entry<UUID, Long> entry = iterator.next();
-            final @Nullable Player player = Bukkit.getPlayer(entry.getKey());
-            final long expirationTime = entry.getValue();
-
-            if (player == null || player.isDead() || !player.isOnline()) {
-                iterator.remove();
-                continue;
-            }
-
-            // If ability ends naturally
-            final boolean didPlayerTimeout = expirationTime - System.currentTimeMillis() <= 0;
-            final int level = getLevel(player);
-
-            if (level <= 0 || didPlayerTimeout) {
-                doWhenStateExpires(player.getUniqueId());
-            }
-
-            // play some particles
-        }
-    }
-
     @Override
-    protected void doWhenStateExpires(@NotNull UUID uuid) {
-        super.doWhenStateExpires(uuid);
-
-        final @Nullable Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return;
-
-        final int level = getLevel(player);
-        if (level <= 0) return;  // dont show a msg if they dont have the skill anymore
-
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), level));
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        final double calculatedCooldown = cooldown - ((level - 1) * cooldownDecreasePerLevel);
-        final double calculatedDuration = getSpeedDuration(level);
-
-        return calculatedCooldown - calculatedDuration;
+    protected double getStateDuration(int level) {
+        return getSpeedDuration(level);
     }
 
     @Override
