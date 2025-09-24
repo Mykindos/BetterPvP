@@ -23,8 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @BPvPListener
-public class ExcessiveForce extends StateSkill implements InteractSkill, Listener, OffensiveSkill {
-
+public class ExcessiveForce extends StateSkill implements Listener, OffensiveSkill {
 
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -64,7 +63,7 @@ public class ExcessiveForce extends StateSkill implements InteractSkill, Listene
     // entrypoint
     @Override
     public void activate(Player player, int level) {
-        startState(player.getUniqueId());
+        super.activate(player, level);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1f, 1.7f);
     }
 

@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @BPvPListener
-public class BullsCharge extends StateSkill implements Listener, InteractSkill, MovementSkill, DebuffSkill, BuffSkill {
+public class BullsCharge extends StateSkill implements Listener, MovementSkill, DebuffSkill, BuffSkill {
 
     private double speedDuration;
     private double speedDurationIncreasePerLevel;
@@ -84,7 +84,7 @@ public class BullsCharge extends StateSkill implements Listener, InteractSkill, 
     // entrypoint
     @Override
     public void activate(Player player, int level) {
-        startState(player.getUniqueId());
+        super.activate(player, level);
 
         final long speedDurationMillis = (long) (getSpeedDuration(level) * 1000L);
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, speedDurationMillis);

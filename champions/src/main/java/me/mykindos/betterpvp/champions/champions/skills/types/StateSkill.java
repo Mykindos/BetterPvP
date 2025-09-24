@@ -31,7 +31,7 @@ import java.util.WeakHashMap;
  * States end either by reaching its natural end (just through the passage of time) or when some other action is
  * performed (like when a bulls charge user hits an enemy; thus, ending the state).
  */
-public abstract class StateSkill extends Skill implements Listener, CooldownSkill {
+public abstract class StateSkill extends Skill implements Listener, CooldownSkill, InteractSkill {
 
     /**
      * Contains all players who currently in an active state with this skill mapped to the duration of this ability's
@@ -104,15 +104,12 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
     abstract protected double getStateDuration(int level);
 
     /**
-     * Adds the player to {@link #activeState} and tracks the millisecond time when this aiblity started.
+     * Adds the player to {@link #activeState} and tracks the current time when this ability started.
      */
-    protected void startState(@NotNull UUID uuid) {
-
-        final @Nullable Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return;  // should be unreachable
-
-        final int level = getLevel(player);
+    @Override
+    public void activate(Player player, int level) {
         final double stateDurationInSeconds = getStateDuration(level);
+        final @NotNull UUID uuid = player.getUniqueId();
 
         activeState.put(uuid, stateDurationInSeconds);
         startStateTime.put(uuid, System.currentTimeMillis());
