@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import org.bukkit.Bukkit;
@@ -29,8 +30,28 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
      * Contains all players who currently in an active state with this skill mapped to the duration of this ability's
      * state.
      */
-    protected final Map<UUID, Long> activeState = new WeakHashMap<>();
+    protected final Map<UUID, Double> activeState = new WeakHashMap<>();
 
+    /**
+     * Maps a player to their start time (in milliseconds); this player is removed from the map when the state ends
+     * which is should coincide with them being removed from {@link #activeState}.
+     */
+    private final Map<UUID, Long> startStateTime = new WeakHashMap<>();
+
+    /**
+     * The action bar component that is updated in {@link #onUpdate()} and shown to the player while they are in
+     * {@link #activeState}. This component will display the duration of this skill's state, in seconds.
+     * <p>
+     * Format:
+     * <code>
+     *     `name of skill`: `remaining duration of skill`s
+     * </code>
+     * <p>
+     * Example:
+     * <code>
+     *     Excessive Force: 8.6s
+     * </code>
+     */
     private final DisplayComponent durationActionBar = new PermanentComponent(
             gamer -> {
                 final @Nullable Player player = gamer.getPlayer();
@@ -42,12 +63,16 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
                 final @NotNull UUID uuid = gamer.getPlayer().getUniqueId();
                 if (!activeState.containsKey(uuid)) return null;
 
-                final long timeLeftInMillis = activeState.get(uuid) - System.currentTimeMillis();
+                final long startTime = startStateTime.get(uuid);
+                final long stateDurationInMillis = (long) (activeState.get(uuid) * 1000L);
+
+                // startTime + duration - currentTime
+                final long timeLeftInMillis = (startTime + stateDurationInMillis) - System.currentTimeMillis();
 
                 // If true, ability has expired and `activeState` will be updated in the #onUpdate method within a couple ticks
                 if (timeLeftInMillis <= 0) return null;
                 final double timeLeftInSeconds = timeLeftInMillis / 1000.0D;
-                final String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(timeLeftInSeconds, 1);
+                final String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(timeLeftInSeconds, 1, true);
 
                 return getActionBarComponentForDuration(getActionBarLabel(), timeLeftWithOneDecimalPlace);
             }
@@ -67,16 +92,32 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
     abstract protected @NotNull String getActionBarLabel();
 
     /**
-     * The duration of the state. This is needed to calculate the cooldown of the ability.
+     * The duration of the state (in seconds). This is needed to calculate the cooldown of the ability.
      */
     abstract protected double getStateDuration(int level);
+
+    /**
+     * Adds the player to {@link #activeState} and tracks the millisecond time when this aiblity started.
+     */
+    protected void startState(@NotNull UUID uuid) {
+
+        final @Nullable Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;  // should be unreachable
+
+        final int level = getLevel(player);
+        final double stateDurationInSeconds = getStateDuration(level);
+
+        activeState.put(uuid, stateDurationInSeconds);
+        startStateTime.put(uuid, System.currentTimeMillis());
+    }
 
     /**
      * Removes the player from {@link #activeState}, starts the cooldown for this skill, and sends a message to the
      * player signifying that the ability has ended.
      */
-    protected void doWhenStateExpires(@NotNull UUID uuid) {
+    protected void doWhenStateEnds(@NotNull UUID uuid) {
         activeState.remove(uuid);
+        startStateTime.remove(uuid);
 
         final @Nullable Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
@@ -97,36 +138,49 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
         UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), level));
     }
 
+    /**
+     * Cleanup state when player dies.
+     */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        doWhenStateExpires(event.getPlayer().getUniqueId());
+        doWhenStateEnds(event.getPlayer().getUniqueId());
     }
 
+    /**
+     * Cleanup state when player quits.
+     */
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        doWhenStateExpires(event.getPlayer().getUniqueId());
+        doWhenStateEnds(event.getPlayer().getUniqueId());
     }
 
+    /**
+     * Verify player's data is still valid; check if the player is dead or offline, or if the skill has timed out (i.e.
+     * the state has expired).
+     */
     @UpdateEvent(delay = 100)
     public void onUpdate() {
-        final Iterator<Map.Entry<UUID, Long>> iterator = activeState.entrySet().iterator();
+        final Iterator<Map.Entry<UUID, Double>> iterator = activeState.entrySet().iterator();
         while (iterator.hasNext()) {
-            final Map.Entry<UUID, Long> entry = iterator.next();
-            final @Nullable Player player = Bukkit.getPlayer(entry.getKey());
-            final long expirationTime = entry.getValue();
+            final Map.Entry<UUID, Double> entry = iterator.next();
+
+            final @NotNull UUID uuid = entry.getKey();
+            final double stateDuration = entry.getValue();
 
             // we dont care about cds or messages if the player is dead or gone
+            final @Nullable Player player = Bukkit.getPlayer(entry.getKey());
             if (player == null || player.isDead() || !player.isOnline()) {
                 iterator.remove();
+                startStateTime.remove(uuid);
                 continue;
             }
 
             // If ability ends naturally
-            final boolean didPlayerTimeout = expirationTime - System.currentTimeMillis() <= 0;
-            final int level = getLevel(player);
+            final long stateDurationInMillis = (long) (stateDuration * 1000L);
+            final boolean hasTimedOut = UtilTime.elapsed(startStateTime.get(uuid), stateDurationInMillis);
 
-            if (level <= 0 || didPlayerTimeout) {
-                doWhenStateExpires(player.getUniqueId());
+            if (getLevel(player) <= 0 || hasTimedOut) {
+                doWhenStateEnds(player.getUniqueId());
             }
         }
     }
@@ -153,5 +207,4 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
 
         return calculatedCooldown - calculatedDuration;
     }
-
 }

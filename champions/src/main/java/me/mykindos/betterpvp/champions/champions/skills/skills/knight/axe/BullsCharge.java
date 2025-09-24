@@ -86,7 +86,7 @@ public class BullsCharge extends StateSkill implements Listener, InteractSkill, 
     public void activate(Player player, int level) {
 
         final long speedDurationMillis = (long) (getSpeedDuration(level) * 1000L);
-        activeState.put(player.getUniqueId(), System.currentTimeMillis() + speedDurationMillis);
+        startState(player.getUniqueId());
 
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, speedDurationMillis);
 
@@ -112,7 +112,7 @@ public class BullsCharge extends StateSkill implements Listener, InteractSkill, 
 
         if (activeState.containsKey(caster.getUniqueId())) {
             final int level = getLevel(caster);
-            doWhenStateExpires(caster.getUniqueId());
+            doWhenStateEnds(caster.getUniqueId());
 
             event.setKnockback(false);
 
