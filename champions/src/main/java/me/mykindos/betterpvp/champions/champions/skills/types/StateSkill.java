@@ -104,6 +104,14 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
     abstract protected double getStateDuration(int level);
 
     /**
+     * Every time {@link #onUpdate()} is called, this method will be called on whenever there is a successful update.
+     * Pretty much it will hook into the update-event for this state skill.
+     */
+    protected void doOnSuccessfulUpdate(@NotNull Player player) {
+
+    }
+
+    /**
      * Adds the player to {@link #activeState} and tracks the current time when this ability started.
      */
     @Override
@@ -185,7 +193,10 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
 
             if (getLevel(player) <= 0 || hasTimedOut || !championsManager.getRoles().hasRole(player, getClassType())) {
                 doWhenStateEnds(player.getUniqueId());
+                continue;
             }
+
+            doOnSuccessfulUpdate(player);
         }
     }
 

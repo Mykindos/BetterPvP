@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.StateSkill;
 import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
 import me.mykindos.betterpvp.core.combat.damage.ModifierType;
 import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
@@ -35,6 +36,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,10 +48,10 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Agility extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill, MovementSkill, DefensiveSkill {
+public class Agility extends StateSkill implements Listener, BuffSkill, MovementSkill, DefensiveSkill {
 
-    private final HashMap<UUID, Long> active = new HashMap<>();
     private final WeakHashMap<Player, Integer> missedSwings = new WeakHashMap<>();
+
     private double baseDuration;
     private double durationIncreasePerLevel;
     private double baseDamageReduction;
@@ -60,11 +63,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @Inject
     public Agility(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-    }
-
-    @Override
-    public String getName() {
-        return "Agility";
     }
 
     @Override
@@ -96,18 +94,11 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public Role getClassType() {
-        return Role.RANGER;
-    }
+    public void activate(Player player, int level) {
+        super.activate(player, level);
 
-    @Override
-    public SkillType getType() {
-        return SkillType.AXE;
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
+        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getDuration(level) * 1000));
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
     }
 
     @EventHandler
@@ -117,55 +108,43 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
         Player player = event.getPlayer();
 
-        int level = getLevel(player);
+        final int level = getLevel(player);
+        if (level <= 0) return;
 
-        if (level > 0) {
-            if (active.containsKey(player.getUniqueId())) {
-                missedSwings.put(player, missedSwings.getOrDefault(player, 0) + 1);
-                if (missedSwings.get(player) >= getMaxMissedSwings(level)) {
-                    deactivate(player);
-                    active.remove(player.getUniqueId());
-                }
-            }
+        final @NotNull UUID uuid = player.getUniqueId();
+        if (!activeState.containsKey(uuid)) return;
+
+        missedSwings.put(player, missedSwings.getOrDefault(player, 0) + 1);
+        if (missedSwings.get(player) >= getMaxMissedSwings(level)) {
+            doWhenStateEnds(uuid);
         }
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
-        if (active.containsKey(damagee.getUniqueId())) {
+
+        // on player taking damage
+        if (activeState.containsKey(damagee.getUniqueId())) {
             int level = getLevel(damagee);
+
             // Add a percentage-based damage reduction modifier
             double reductionPercent = getDamageReduction(level);
             event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
         }
 
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (!active.containsKey(damager.getUniqueId())) return;
+        if (!activeState.containsKey(damager.getUniqueId())) return;
+
+        // honestly not sure what tf i am looking at
+        // Why is it called missedSwings??? Why do we need a map for this????????
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             missedSwings.put(damager, 0);
         }
     }
 
-    @UpdateEvent
-    public void onUpdate() {
-        Iterator<Map.Entry<UUID, Long>> iterator = active.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, Long> entry = iterator.next();
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player == null) {
-                iterator.remove();
-            } else {
-                spawnSkillParticles(player);
-                if (entry.getValue() - System.currentTimeMillis() <= 0) {
-                    deactivate(player);
-                    iterator.remove();
-                }
-            }
-        }
-    }
-
-    private void spawnSkillParticles(Player player) {
+    @Override
+    protected void doOnSuccessfulUpdate(@NotNull Player player) {
         Location loc = player.getLocation();
 
         Random random = UtilMath.RANDOM;
@@ -182,22 +161,43 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 .spawn();
     }
 
-
     @Override
-    public void activate(Player player, int level) {
-        if (!active.containsKey(player.getUniqueId())) {
-            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getDuration(level) * 1000));
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
-            active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
-        }
-    }
+    protected void doWhenStateEnds(@NotNull UUID uuid) {
+        super.doWhenStateEnds(uuid);
 
-    public void deactivate(Player player) {
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        final @Nullable Player player = Bukkit.getPlayer(uuid);
+        missedSwings.remove(player);  // if possible, try to remove
+        if (player == null) return;
+
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.01F);
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
-        missedSwings.remove(player);
     }
+
+    @Override
+    protected @NotNull String getActionBarLabel() {
+        return "Agile Speed";
+    }
+
+    @Override
+    protected double getStateDuration(int level) {
+        return getDuration(level);
+    }
+
+    @Override
+    public Role getClassType() {
+        return Role.RANGER;
+    }
+
+    @Override
+    public SkillType getType() {
+        return SkillType.AXE;
+    }
+
+    @Override
+    public String getName() {
+        return "Agility";
+    }
+
 
     @Override
     public Action[] getActions() {

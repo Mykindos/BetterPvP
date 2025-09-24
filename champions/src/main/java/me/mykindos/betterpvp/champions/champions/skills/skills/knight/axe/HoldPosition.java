@@ -87,25 +87,10 @@ public class HoldPosition extends StateSkill implements Listener, BuffSkill {
         championsManager.getEffects().addEffect(player, player, EffectTypes.NO_SPRINT, duration);
         player.setSprinting(false);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
-        
-        long durationTicks = (long) (getDuration(level) * 20);
-        new BukkitRunnable() {
-            long ticksRun = 0;
-
-            @Override
-            public void run() {
-                if (ticksRun > durationTicks || getLevel(player) <= 0) {
-                    this.cancel();
-                    return;
-                }
-
-                spawnMobSpellParticles(player);
-                ticksRun++;
-            }
-        }.runTaskTimer(champions, 0, 1);
     }
 
-    private void spawnMobSpellParticles(Player player) {
+    @Override
+    protected void doOnSuccessfulUpdate(@NotNull Player player) {
         Location loc = player.getLocation();
         Random random = UtilMath.RANDOM;
         for (int i = 0; i < 5; i++) {
