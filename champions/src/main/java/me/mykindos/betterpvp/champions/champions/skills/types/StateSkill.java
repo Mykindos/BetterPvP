@@ -24,6 +24,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
+/**
+ * A state skill is a skill that has a start time (contained in {@link #startStateTime}) and an end time given by
+ * {@link #getStateDuration(int)}. Some state skills include Bulls Charge and Excessive Force.
+ * <p>
+ * States end either by reaching its natural end (just through the passage of time) or when some other action is
+ * performed (like when a bulls charge user hits an enemy; thus, ending the state).
+ */
 public abstract class StateSkill extends Skill implements Listener, CooldownSkill {
 
     /**
@@ -179,7 +186,7 @@ public abstract class StateSkill extends Skill implements Listener, CooldownSkil
             final long stateDurationInMillis = (long) (stateDuration * 1000L);
             final boolean hasTimedOut = UtilTime.elapsed(startStateTime.get(uuid), stateDurationInMillis);
 
-            if (getLevel(player) <= 0 || hasTimedOut) {
+            if (getLevel(player) <= 0 || hasTimedOut || !championsManager.getRoles().hasRole(player, getClassType())) {
                 doWhenStateEnds(player.getUniqueId());
             }
         }

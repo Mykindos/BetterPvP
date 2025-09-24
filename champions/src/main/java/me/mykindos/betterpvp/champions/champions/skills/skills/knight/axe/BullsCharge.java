@@ -84,10 +84,9 @@ public class BullsCharge extends StateSkill implements Listener, InteractSkill, 
     // entrypoint
     @Override
     public void activate(Player player, int level) {
-
-        final long speedDurationMillis = (long) (getSpeedDuration(level) * 1000L);
         startState(player.getUniqueId());
 
+        final long speedDurationMillis = (long) (getSpeedDuration(level) * 1000L);
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, speedDurationMillis);
 
         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);

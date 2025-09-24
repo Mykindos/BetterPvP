@@ -3,9 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.IntToDoubleFunction;
-import java.util.function.Predicate;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
@@ -42,8 +40,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
