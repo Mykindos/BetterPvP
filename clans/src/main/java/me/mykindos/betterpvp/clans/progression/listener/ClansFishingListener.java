@@ -54,7 +54,7 @@ public class ClansFishingListener implements Listener {
 
         final ItemStack itemStack = treasureType.generateItem(1);
         final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(itemStack);
-        if (itemOpt.isEmpty() || !itemOpt.get().getRarity().isAtLeast(ItemRarity.LEGENDARY)) {
+        if (itemOpt.isEmpty() || !itemOpt.get().getRarity().isImportant()) {
             return;
         }
 
@@ -73,9 +73,9 @@ public class ClansFishingListener implements Listener {
              }
         });
 
-        final ItemRarity rarity = itemOpt.get().getRarity();
+        final ItemInstance instance = itemOpt.get();
         final Component text = Component.text("You would have caught a ", NamedTextColor.GRAY)
-                .append(Component.text(rarity.getName(), rarity.getColor()))
+                .append(instance.getBaseItem().getItemNameRenderer().createName(instance))
                 .append(Component.text(", but you were not at Fields!", NamedTextColor.GRAY));
 
         UtilMessage.simpleMessage(event.getPlayer(), "Fishing", text);
