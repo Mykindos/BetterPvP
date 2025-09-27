@@ -1,0 +1,152 @@
+magnetic_maul:
+  damage: 8.0
+  pullRange: 10.0
+  pullFov: 80.3
+  energyPerTick: 2.0
+  knockbackMultiplier: -1.0
+  bypassMinimumKnockback: true
+  durability: 1000
+rake:
+  damage: 6.0
+  tremorCooldown: 3.0
+  tremorDamage: 5.0
+  durability: 1000
+alligators_tooth:
+  damage: 8.0
+  velocityStrength: 0.7
+  energyPerTick: 1.0
+  skimmingEnergyMultiplier: 3.0
+  bonusDamage: 4.0
+  durability: 1000
+giants_broadsword:
+  damage: 9.0
+  regenAmplifier: 5
+  energyPerTick: 1.5
+  durability: 1000
+throwing_web:
+  duration: 2.5
+  throwableExpiry: 10.0
+  cooldown: 10.0
+scythe:
+  damage: 7.0
+  baseHeal: 0.7
+  healPerSoul: 0.1
+  maxSoulsDamage: 4.0
+  maxSouls: 3
+  soulHarvestSeconds: 1.5
+  soulExpirySeconds: 10.0
+  soulExpiryPerSecond: 0.3
+  soulDespawnSeconds: 7.5
+  soulViewDistanceBlocks: 60
+  soulsPerPlayer: 1.0
+  soulsPerMob: 1.0
+  summonPlayerSoulChance: 1.0
+  summonMobSoulChance: 0.4
+  speedAmplifierPerSoul: 1.0
+  durability: 1000
+hyper_axe:
+  damage: 6.0
+  hyperRushCooldown: 16.0
+  hyperRushSpeedLevel: 3
+  hyperRushDuration: 160
+  attackSpeedPercentage: 1.3
+  durability: 1000
+thunderclap_aegis:
+  damage: 5.0
+  velocity: 0.8
+  maxChargeTicks: 60
+  energyOnCollide: 25.0
+  chargeDamage: 7.0
+  energyPerTick: 1.0
+  durability: 1000
+meridian_scepter:
+  damage: 5.0
+  blackHoleRadius: 0.5
+  blackHoleSpeed: 40.0
+  blackHoleHitbox: 0.5
+  blackHolePullStrength: 0.12
+  blackHolePullRadius: 3.5
+  blackHoleAliveSeconds: 1.3
+  blackHoleExpandSeconds: 0.75
+  blackHoleTravelSeconds: 2.0
+  blackHoleCooldown: 10.0
+  beamCooldown: 1.0
+  beamDamage: 4.0
+  beamSpeed: 70.0
+  beamHitbox: 0.5
+  beamTravelSeconds: 0.3
+  durability: 1000
+wind_blade:
+  damage: 7.0
+  dashVelocity: 1.2
+  dashParticleTicks: 2
+  dashEnergyCost: 24
+  dashImpactVelocity: 1.0
+  slashCooldown: 2.5
+  slashHitboxSize: 0.6
+  slashEnergyCost: 0
+  slashDamage: 5.0
+  slashEnergyRefundPercent: 0.2
+  slashVelocity: 0.5
+  slashAliveMillis: 1000
+  slashSpeed: 30.0
+  durability: 1000
+ancient_axe:
+  damage: 7.0
+  durability: 500
+booster_sword:
+  damage: 6.0
+  durability: 500
+standard_sword:
+  damage: 6.0
+  durability: 500
+power_sword:
+  damage: 6.5
+  durability: 500
+ancient_sword:
+  damage: 7.0
+  durability: 500
+standard_axe:
+  damage: 6.0
+  durability: 500
+booster_axe:
+  damage: 6.0
+  durability: 500
+power_axe:
+  damage: 6.5
+  durability: 500
+mjolnir:
+  damage: 9.0
+  skyforged-ascent:
+    velocity: 3.0
+    cooldown: 5.0
+    speed-amplifier: 2
+    speed-duration: 10.0
+  heavensplitter:
+    damage: 4.0
+    hitbox: 0.4
+    air-time: 5.0
+    velocity: 40.0
+    impact-velocity: 1.0
+  durability: 1000
+bloomrot:
+  damage: 6.0
+  durability: 500
+  beamCooldown: 15.0
+  poisonSeconds: 3.0
+  poisonAmplifier: 3
+  beamSpeed: 50.0
+  beamHitbox: 0.6
+  beamTravelSeconds: 5.0
+  cloudRadius: 4.0
+  cloudSeconds: 6.0
+  healPercent: 2.0
+ivybolt:
+  damage: 1.0
+  durability: 500
+  cooldown: 2.0
+  hitbox: 2.5
+  speed: 50.0
+  aliveTime: 3000
+  entangleAmplifier: 1
+  entangleSeconds: 5.0
