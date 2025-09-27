@@ -40,7 +40,7 @@ public class AuctionButton extends ControlItem<AuctionListingMenu> {
     @Override
     public ItemProvider getItemProvider(AuctionListingMenu gui) {
 
-        ItemStack itemStack = auction.getItemStack().clone();
+        ItemStack itemStack = auctionManager.getItemFactory().fromItemStack(auction.getItemStack()).orElseThrow().getView().get();
         itemStack.editMeta(meta -> {
             List<Component> lore = meta.lore();
             if (lore == null) {
