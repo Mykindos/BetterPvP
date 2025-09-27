@@ -62,7 +62,7 @@ public class ReverseKnockbackAbility extends ItemAbility implements Listener {
         }
 
         DamageCause cause = event.getDamageEvent().getCause();
-        if (cause.getCategories().contains(DamageCauseCategory.MELEE)) {
+        if (!cause.getCategories().contains(DamageCauseCategory.MELEE)) {
             return; // Only apply to melee attacks
         }
 
