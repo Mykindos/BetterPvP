@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.combat.cause.DamageCauseRegistry;
 import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -19,9 +20,11 @@ import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -83,8 +86,22 @@ public class DamageEventProcessor implements Listener {
     }
 
     public boolean processDamageEvent(DamageEvent damageEvent) {
+        if (damageEvent.getDamagee().isInvulnerable()
+                || (damageEvent.getDamagee() instanceof HumanEntity human && human.getGameMode().isInvulnerable())) {
+            return false; // Entity is invulnerable
+        }
+
         // Check if we can proceed with damage due to damage delays
         if (!delayManager.processDamageDelay(damageEvent)) return false;
+
+        // Check if they can be hurt
+        if (damageEvent.isDamageeLiving() && damageEvent.getDamager() instanceof LivingEntity livingDamager) {
+            final EntityCanHurtEntityEvent event = new EntityCanHurtEntityEvent(livingDamager, damageEvent.getLivingDamagee());
+            event.callEvent();
+            if (!event.isAllowed()) {
+                return false; // Entity cannot be hurt
+            }
+        }
 
         // Fire our custom event
         UtilServer.callEvent(damageEvent);
@@ -220,6 +237,13 @@ public class DamageEventProcessor implements Listener {
         
         log.debug("Registered fire damage source: {} -> {}", 
                  combusterEntity.getName(), livingEntity.getName()).submit();
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    void onEntityCanHurt(EntityCanHurtEntityEvent event) {
+        if (event.getDamagee() instanceof HumanEntity human && human.getGameMode().isInvulnerable()) {
+            event.setResult(Event.Result.DENY);
+        }
     }
 
     @UpdateEvent
