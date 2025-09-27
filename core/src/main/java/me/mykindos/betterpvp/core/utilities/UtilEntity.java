@@ -170,6 +170,13 @@ public class UtilEntity {
         final Vector directionRaw = destination.toVector().subtract(lastLocation.toVector());
         final double distance = directionRaw.length();
         final Vector direction = distance < 1e-6 ? lastLocation.getDirection() : directionRaw.normalize();
+        if (!direction.toVector3d().isFinite()) {
+            return destination.getNearbyEntities(raySize, raySize, raySize).stream()
+                    .filter(entityFilter == null ? entity -> true : entityFilter)
+                    .findFirst()
+                    .map(entity -> new RayTraceResult(destination.toVector(), entity));
+        }
+
         return Optional.ofNullable(lastLocation.getWorld().rayTraceEntities(lastLocation,
                 direction,
                 distance,
