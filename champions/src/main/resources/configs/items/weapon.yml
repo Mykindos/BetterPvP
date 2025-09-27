@@ -77,7 +77,8 @@ meridian_scepter:
   beamTravelSeconds: 0.3
   durability: 1000
 wind_blade:
-  damage: 7.0
+  enabled: true
+  baseDamage: 8.0
   dashVelocity: 1.2
   dashParticleTicks: 2
   dashEnergyCost: 24
@@ -88,9 +89,12 @@ wind_blade:
   slashDamage: 5.0
   slashEnergyRefundPercent: 0.2
   slashVelocity: 0.5
-  slashAliveMillis: 1000
+  slashAliveTicks: 20
   slashSpeed: 30.0
-  durability: 1000
+  slashAliveMillis: 1000
+  velocityStrength: 0.5
+  damage: 1.0
+  durability: 500
 ancient_axe:
   damage: 7.0
   durability: 500
@@ -130,22 +134,22 @@ mjolnir:
     impact-velocity: 1.0
   durability: 1000
 bloomrot:
-  damage: 6.0
-  durability: 500
-  beamCooldown: 15.0
-  poisonSeconds: 3.0
-  poisonAmplifier: 3
-  beamSpeed: 50.0
-  beamHitbox: 0.6
-  beamTravelSeconds: 5.0
-  cloudRadius: 4.0
-  cloudSeconds: 6.0
-  healPercent: 2.0
-ivybolt:
   damage: 1.0
   durability: 500
-  cooldown: 2.0
-  hitbox: 2.5
+  beamCooldown: 15.0
+  poisonSeconds: 2.0
+  poisonAmplifier: 1
+  beamSpeed: 30.0
+  beamHitbox: 0.6
+  beamTravelSeconds: 3.0
+  cloudRadius: 4.0
+  cloudSeconds: 6.0
+  healPercent: 0.8
+ivybolt:
+  damage: 1.0
+  cooldown: 5.0
+  durability: 500
+  hitbox: 0.7
   speed: 50.0
   aliveTime: 3000
   entangleAmplifier: 1
