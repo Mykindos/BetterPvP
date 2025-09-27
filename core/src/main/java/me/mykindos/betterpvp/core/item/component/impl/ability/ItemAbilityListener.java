@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.item.component.impl.ability;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import lombok.Value;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.client.Client;
@@ -142,6 +143,15 @@ public class ItemAbilityListener implements Listener {
         Player player = event.getPlayer();
         ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
         updateHeldItem(player, newItem);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onSlotChange(PlayerInventorySlotChangeEvent event) {
+        Player player = event.getPlayer();
+        ItemStack newItem = event.getNewItemStack();
+        if (event.getSlot() == player.getInventory().getHeldItemSlot()) {
+            updateHeldItem(player, newItem);
+        }
     }
 
     @EventHandler
