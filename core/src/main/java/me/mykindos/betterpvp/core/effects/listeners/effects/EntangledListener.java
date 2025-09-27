@@ -37,7 +37,6 @@ public class EntangledListener implements Listener {
 
         Optional<Effect> effectOpt = effectManager.getEffect(entity, EffectTypes.ENTANGLED);
         if (effectOpt.isPresent() && !event.getVelocityType().equals(VelocityType.KNOCKBACK_CUSTOM)) {
-            event.setCancelled(true); // cancel all knockback except for applied by others
         }
     }
 
