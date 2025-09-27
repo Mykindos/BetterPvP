@@ -9,6 +9,10 @@ public interface RecipeRegistry<T extends Recipe<?, ?>> {
 
     void registerRecipe(NamespacedKey key, T recipe);
 
+    default void clearRecipe(NamespacedKey key) {
+        throw new UnsupportedOperationException("Cannot clear recipes from this registry");
+    }
+
     Collection<T> getRecipes();
 
     RecipeResolver<T> getResolver();
