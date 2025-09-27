@@ -279,7 +279,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             return;
         }
 
-        if (!useCheck.test(player)) {
+        if (useCheck != null && !useCheck.test(player)) {
             // Can't use
             activeTicks.remove(player);
             event.setCancelled(true);

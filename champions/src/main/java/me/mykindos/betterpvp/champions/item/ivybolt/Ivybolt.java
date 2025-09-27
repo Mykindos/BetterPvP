@@ -51,7 +51,7 @@ public class Ivybolt extends WeaponItem implements ReloadHook {
     public void reload() {
         super.reload();
         final Config config = Config.item(Champions.class, this);
-        final Double reloadCooldown = config.getConfig("cooldown", null, Double.class);
+        final Double reloadCooldown = config.getConfig("cooldown", 2.0d, Double.class);
         if (reloadCooldown != null) {
             this.endlessQuiverAbility.setUseFunction(livingEntity -> {
                 if (livingEntity instanceof Player player) {
