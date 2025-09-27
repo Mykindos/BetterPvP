@@ -68,7 +68,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
         // Wind Dash
         double dashVelocity = config.getConfig("dashVelocity", 1.2, Double.class);
         int dashParticleTicks = config.getConfig("dashParticleTicks", 2, Integer.class);
-        int dashEnergyCost = config.getConfig("dashEnergyCost", 40, Integer.class);
+        int dashEnergyCost = config.getConfig("dashEnergyCost", 24, Integer.class);
         double dashImpactVelocity = config.getConfig("dashImpactVelocity", 1.0, Double.class);
         
         windDashAbility.setDashVelocity(dashVelocity);
@@ -84,7 +84,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
         double slashEnergyRefundPercent = config.getConfig("slashEnergyRefundPercent", 0.2, Double.class);
         double slashVelocity = config.getConfig("slashVelocity", 0.5, Double.class);
         int slashAliveMillis = config.getConfig("slashAliveMillis", 1000, Integer.class);
-        double slashSpeed = config.getConfig("slashSpeed", 1.5, Double.class);
+        double slashSpeed = config.getConfig("slashSpeed", 30.0, Double.class);
         
         windSlashAbility.setSlashCooldown(slashCooldown);
         windSlashAbility.setSlashHitboxSize(slashHitboxSize);
