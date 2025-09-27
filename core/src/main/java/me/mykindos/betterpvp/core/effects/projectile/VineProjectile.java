@@ -2,10 +2,8 @@ package me.mykindos.betterpvp.core.effects.projectile;
 
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.ReturningLinkProjectile;
 import org.bukkit.Location;
@@ -15,22 +13,27 @@ import org.bukkit.Sound;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
 public class VineProjectile extends ReturningLinkProjectile {
 
+    private final LivingEntity target;
     private final int poisonAmplifier;
     private final long poisonDuration;
     private final String name;
     private final EffectManager effectManager;
     private boolean finished;
 
-    public VineProjectile(Player caster, double hitboxSize, Location location, long aliveTime, long pullTime, double pullSpeed, int poisonAmplifier, long poisonDuration, String name) {
+    public VineProjectile(Player caster, double hitboxSize, Location location, LivingEntity target, long aliveTime, long pullTime, double pullSpeed, int poisonAmplifier, long poisonDuration, String name) {
         super(caster, hitboxSize, location, aliveTime, pullTime, pullSpeed);
+        this.target = target;
         this.poisonAmplifier = poisonAmplifier;
         this.poisonDuration = poisonDuration;
         this.name = name;
@@ -53,14 +56,25 @@ public class VineProjectile extends ReturningLinkProjectile {
         }
         super.onTick();
 
+        if (hit == null) {
+            final double length = getVelocity().length();
+            final Vector direction = target.getLocation().toVector().subtract(location.toVector()).normalize();
+            redirect(direction.multiply(length));
+        }
+
         if (finished) {
             return;
         }
 
-        if (target != null && (hasFinishedPulling() || UtilBlock.isGrounded(target))) {
-            effectManager.addEffect(target, caster, EffectTypes.POISON, name, poisonAmplifier, poisonDuration, false);
+        if (hit != null && (hasFinishedPulling() || UtilBlock.isGrounded(hit))) {
+            effectManager.addEffect(hit, caster, EffectTypes.POISON, name, poisonAmplifier, poisonDuration, false);
             finished = true;
         }
+    }
+
+    @Override
+    protected boolean canCollideWith(Entity entity) {
+        return super.canCollideWith(entity) && entity == target;
     }
 
     @Override
@@ -78,14 +92,14 @@ public class VineProjectile extends ReturningLinkProjectile {
     protected Display createLink(double height) {
         final Location location = lead.getLocation();
         return location.getWorld().spawn(location, BlockDisplay.class, spawned -> {
-            spawned.setBlock(Material.KELP_PLANT.createBlockData());
+            spawned.setBlock(Material.CHAIN.createBlockData());
             spawned.setGlowing(false);
 
             Transformation transformation = spawned.getTransformation();
-            transformation.getTranslation().set(-1, 1, -1);
+            transformation.getTranslation().set(-0.5, 0, -0.5);
             transformation.getLeftRotation().rotateLocalX((float) Math.toRadians(90));
             transformation.getLeftRotation().rotateLocalZ(0f);
-            transformation.getScale().set(2, height, 2);
+            transformation.getScale().set(1, height, 1);
             spawned.setTransformation(transformation);
 
             spawned.setPersistent(false);
