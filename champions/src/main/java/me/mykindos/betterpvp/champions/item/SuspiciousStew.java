@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.EffectRouletteAbility;
@@ -18,11 +19,18 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = false)
 public class SuspiciousStew extends BaseItem implements ReloadHook {
 
+    private static final ItemStack model;
     private final EffectRouletteAbility effectRouletteAbility;
+
+    static {
+        model = ItemStack.of(Material.SUSPICIOUS_STEW);
+        model.setData(DataComponentTypes.MAX_STACK_SIZE, 64);
+        model.unsetData(DataComponentTypes.CONSUMABLE);
+    }
 
     @Inject
     private SuspiciousStew(EffectRouletteAbility effectRouletteAbility) {
-        super("Suspicious Stew", ItemStack.of(Material.SUSPICIOUS_STEW), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super("Suspicious Stew", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.effectRouletteAbility = effectRouletteAbility;
         this.effectRouletteAbility.setConsumesItem(true);
         addBaseComponent(AbilityContainerComponent.builder().ability(effectRouletteAbility).build());

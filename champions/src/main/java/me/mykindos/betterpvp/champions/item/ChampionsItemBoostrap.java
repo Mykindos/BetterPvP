@@ -41,12 +41,12 @@ public class ChampionsItemBoostrap {
                                      RabbitStew rabbitStew,
                                      SuspiciousStew suspiciousStew,
                                      ThrowingWeb throwingWeb) {
-        itemRegistry.registerItem(championsKey("energy_apple"), energyApple);
+        registerFallbackItem("energy_apple", Material.APPLE, energyApple, false);
         registerFallbackItem("energy_elixir", Material.POTION, energyElixir, false);
         registerFallbackItem("mushroom_stew", Material.MUSHROOM_STEW, mushroomStew, false);
         itemRegistry.registerItem(championsKey("purification_potion"), purificationPotion);
         registerFallbackItem("rabbit_stew", Material.RABBIT_STEW, rabbitStew, false);
-        itemRegistry.registerItem(championsKey("suspicious_stew"), suspiciousStew);
+        registerFallbackItem("suspicious_stew", Material.SUSPICIOUS_STEW, suspiciousStew, false);
         registerFallbackItem("throwing_web", Material.COBWEB, throwingWeb, false);
     }
 
