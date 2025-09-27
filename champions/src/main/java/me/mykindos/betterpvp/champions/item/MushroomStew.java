@@ -24,8 +24,8 @@ public class MushroomStew extends BaseItem implements ReloadHook {
 
     static {
         model = ItemStack.of(Material.MUSHROOM_STEW);
-        //noinspection UnstableApiUsage
         model.setData(DataComponentTypes.MAX_STACK_SIZE, 64);
+        model.unsetData(DataComponentTypes.CONSUMABLE);
     }
 
     @Inject
