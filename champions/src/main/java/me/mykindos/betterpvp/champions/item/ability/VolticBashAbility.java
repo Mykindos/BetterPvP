@@ -64,8 +64,6 @@ public class VolticBashAbility extends ItemAbility {
     private final EnergyHandler energyHandler;
     @EqualsAndHashCode.Exclude
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
-    @EqualsAndHashCode.Exclude
-    private final Map<Player, Boolean> activeUsageNotifications = new HashMap<>();
 
     @Inject
     private VolticBashAbility(Champions champions, ClientManager clientManager, EffectManager effectManager, EnergyHandler energyHandler) {
@@ -92,14 +90,9 @@ public class VolticBashAbility extends ItemAbility {
         
         // Check if player is in liquid
         if (UtilBlock.isInLiquid(player)) {
-            if (!activeUsageNotifications.getOrDefault(player, false)) {
-                UtilMessage.simpleMessage(player, "Thunderclap Aegis", "You cannot use <green>Voltic Bash <gray>while in water.");
-                activeUsageNotifications.put(player, true);
-            }
+            UtilMessage.simpleMessage(player, "Thunderclap Aegis", "You cannot use <green>Voltic Bash <gray>while in water.");
             return false;
         }
-        
-        activeUsageNotifications.put(player, false);
         
         // Initialize or continue the charge
         processCharge(player);
@@ -134,13 +127,7 @@ public class VolticBashAbility extends ItemAbility {
         final var collisions = UtilEntity.interpolateMultiCollision(data.getLastLocation(),
                         newLocation,
                         0.6f,
-                        ent -> {
-                            if (ent instanceof LivingEntity livingEntity) {
-                                EntityCanHurtEntityEvent entityCanHurtEntityEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(player, livingEntity));
-                                return entityCanHurtEntityEvent.isAllowed();
-                            }
-                            return false;
-                        })
+                        ent -> UtilEntity.IS_ENEMY.test(player, ent))
                 .stream()
                 .flatMap(MultiRayTraceResult::stream)
                 .map(RayTraceResult::getHitEntity)
