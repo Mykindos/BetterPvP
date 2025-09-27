@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -30,15 +31,15 @@ public class RuneAuctionListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPrepareListing(PlayerPrepareListingEvent event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.getType() == Material.NETHERITE_AXE || itemStack.getType() == Material.NETHERITE_SWORD){
-            return;
-        }
-
         if (!UtilItem.isTool(itemStack) && !UtilItem.isWeapon(itemStack) && !UtilItem.isArmour(itemStack.getType())){
             return;
         }
 
         itemFactory.fromItemStack(itemStack).ifPresent(item -> {
+            if (item.getRarity().isAtLeast(ItemRarity.UNCOMMON)) {
+                return;
+            }
+
             item.getComponent(RuneContainerComponent.class).ifPresent(container -> {
                 if (container.getRunes().isEmpty()) {
                     event.cancel("You cannot list this type of item unless it has a rune applied.");
