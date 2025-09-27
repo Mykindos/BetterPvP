@@ -81,7 +81,7 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
             spawned.setGlowing(false);
 
             Transformation transformation = spawned.getTransformation();
-            transformation.getTranslation().set(-0.5, 0.5, -0.5);
+            transformation.getTranslation().set(-0.5, 0, -0.5);
             transformation.getLeftRotation().rotateLocalX((float) Math.toRadians(90));
             transformation.getLeftRotation().rotateLocalZ(0f);
             transformation.getScale().set(1, height, 1);
@@ -111,11 +111,11 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
     @Override
     protected void onImpact(Location location, RayTraceResult result) {
         super.onImpact(location, result);
-        if (target == null) {
+        if (hit == null) {
             return;
         }
 
-        final DamageEvent event = new DamageEvent(target,
+        final DamageEvent event = new DamageEvent(hit,
                 caster,
                 null,
                 new SkillDamageCause(skill),
@@ -125,7 +125,7 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
         event.setDamageDelay(0);
         UtilDamage.doDamage(event);
 
-        UtilMessage.simpleMessage(target, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
-        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", target.getName(), skill.getName());
+        UtilMessage.simpleMessage(hit, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
+        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", hit.getName(), skill.getName());
     }
 }

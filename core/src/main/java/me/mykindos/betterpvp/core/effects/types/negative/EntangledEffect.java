@@ -20,6 +20,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.joml.AxisAngle4f;
@@ -33,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * Causes vines to pull down the player and slow them down (attribute modifier)
@@ -42,6 +45,7 @@ public class EntangledEffect extends EffectType {
     private static final NamespacedKey NAMESPACED_KEY = new NamespacedKey("betterpvp", "entangled");
     private final Multimap<Effect, VineDecoration> decorations = HashMultimap.create();
     private final Map<Effect, VineProjectile> vines = new HashMap<>();
+    private final Set<LivingEntity> floored = Collections.newSetFromMap(new WeakHashMap<>());
 
     private double getSpeedModifier(int amplifier) {
         return Math.pow(0.75, Math.max(1, amplifier + 1));
@@ -63,43 +67,27 @@ public class EntangledEffect extends EffectType {
             return;
         }
 
-        // Slow the player down
-        final Location targetLocation = closestSurfaceBelow.get();
-        Objects.requireNonNull(livingEntity.getAttribute(Attribute.MOVEMENT_SPEED)).removeModifier(NAMESPACED_KEY);
-        Objects.requireNonNull(livingEntity.getAttribute(Attribute.JUMP_STRENGTH)).removeModifier(NAMESPACED_KEY);
-        Objects.requireNonNull(livingEntity.getAttribute(Attribute.MOVEMENT_SPEED)).addTransientModifier(getModifier(effect.getAmplifier()));
-        Objects.requireNonNull(livingEntity.getAttribute(Attribute.JUMP_STRENGTH)).addTransientModifier(getJumpModifier(effect.getAmplifier()));
-
         // Only pull them down if theyre in the air
+        final Location targetLocation = closestSurfaceBelow.get();
         final Location vineLocation = UtilLocation.getClosestSurfaceBlock(targetLocation, 3.0, true)
                 .orElse(targetLocation.clone());
         final Vector distance = livingEntity.getLocation().clone().subtract(vineLocation).toVector();
         // we want it to reach in half a second
         final double length = distance.length();
-        final double speed = Math.min(250, length * 4);
+        final double speed = Math.min(250, length);
         final VineProjectile projectile = new VineProjectile(null,
-                0.6,
+                1.5,
                 vineLocation.add(0, 1.1, 0).setDirection(new Vector()),
+                livingEntity,
                 effect.getRawLength(),
                 0, // We don't want pull time to extend over alive time
-                speed / 7,
+                speed,
                 effect.getAmplifier(),
                 effect.getRawLength(),
                 "Entangled Vines");
         final Vector direction = distance.normalize();
         projectile.redirect(direction.multiply(speed));
         this.vines.put(effect, projectile);
-
-        // Spawn 10 decorations around
-        for (int i = 0; i < 50; i++) {
-            final Vector offset = new Vector(Math.random() * 7 - 3.5, 0,Math.random() * 7 - 3.5);
-            final Location offsetLoc = targetLocation.clone().add(offset);
-            final Optional<Location> closestSurfaceBlock = UtilLocation.getClosestSurfaceBlock(offsetLoc, 3.0, true);
-            if (closestSurfaceBlock.isEmpty()) continue;
-
-            final Location result = closestSurfaceBlock.get().clone().add(0, 1.1, 0);
-            this.decorations.put(effect, new VineDecoration(result));
-        }
     }
 
     @Override
@@ -114,7 +102,39 @@ public class EntangledEffect extends EffectType {
             for (VineDecoration decoration : decorations) {
                 decoration.remove();
             }
+
+            this.decorations.removeAll(effect);
+            this.floored.remove(livingEntity);
             return;
+        }
+
+        // If they arent floored and they are on the floor, spawn
+        if (!this.floored.contains(livingEntity) && UtilBlock.isGrounded(livingEntity)) {
+            // Get immediate highest location below location
+            final Optional<Location> closestSurfaceBelow = UtilLocation.getClosestSurfaceBelow(livingEntity.getLocation());
+            if (closestSurfaceBelow.isEmpty()) {
+                return;
+            }
+
+            // Slow the player down
+            final Location targetLocation = closestSurfaceBelow.get();
+            Objects.requireNonNull(livingEntity.getAttribute(Attribute.MOVEMENT_SPEED)).removeModifier(NAMESPACED_KEY);
+            Objects.requireNonNull(livingEntity.getAttribute(Attribute.JUMP_STRENGTH)).removeModifier(NAMESPACED_KEY);
+            Objects.requireNonNull(livingEntity.getAttribute(Attribute.MOVEMENT_SPEED)).addTransientModifier(getModifier(effect.getAmplifier()));
+            Objects.requireNonNull(livingEntity.getAttribute(Attribute.JUMP_STRENGTH)).addTransientModifier(getJumpModifier(effect.getAmplifier()));
+
+            // Spawn 10 decorations around
+            for (int i = 0; i < 50; i++) {
+                final Vector offset = new Vector(Math.random() * 7 - 3.5, 0,Math.random() * 7 - 3.5);
+                final Location offsetLoc = targetLocation.clone().add(offset);
+                final Optional<Location> closestSurfaceBlock = UtilLocation.getClosestSurfaceBlock(offsetLoc, 3.0, true);
+                if (closestSurfaceBlock.isEmpty()) continue;
+
+                final Location result = closestSurfaceBlock.get().clone().add(0, 1.1, 0);
+                this.decorations.put(effect, new VineDecoration(result));
+            }
+
+            this.floored.add(livingEntity);
         }
 
         // Tick projectiles
@@ -146,6 +166,8 @@ public class EntangledEffect extends EffectType {
         // Remove decorations
         final Collection<VineDecoration> decorations = this.decorations.get(effect);
         decorations.forEach(VineDecoration::remove);
+        this.decorations.removeAll(effect);
+        this.floored.remove(livingEntity);
     }
 
     @Override

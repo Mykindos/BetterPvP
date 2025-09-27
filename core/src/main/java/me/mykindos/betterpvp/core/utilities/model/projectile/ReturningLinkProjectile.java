@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.core.utilities.model.projectile;
 
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,7 +15,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Transformation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,7 +29,7 @@ public abstract class ReturningLinkProjectile extends Projectile {
     private final LinkedHashMap<Display, Double> links = new LinkedHashMap<>();
     private final long pullTime;
     private final double pullSpeed;
-    protected LivingEntity target;
+    protected LivingEntity hit;
 
     protected ReturningLinkProjectile(Player caster, double hitboxSize, Location location, long aliveTime, long pullTime, double pullSpeed) {
         super(caster, hitboxSize, location, aliveTime);
@@ -64,8 +69,9 @@ public abstract class ReturningLinkProjectile extends Projectile {
 
     @Override
     protected void onTick() {
-        final double speed = this.velocity.length() / 20;
-        lead.teleport(location.clone().setDirection(lead.getLocation().getDirection()));
+        final double length = this.velocity.length();
+        final double speed = length / 20;
+        lead.teleport(location.clone().setDirection(lead.getLocation().getDirection()));;
 
         if (!impacted) {
 
@@ -75,18 +81,25 @@ public abstract class ReturningLinkProjectile extends Projectile {
                 Map.Entry<Display, Double> toMove = this.links.isEmpty() ? appendLink(speed) : this.links.lastEntry();
                 if (toMove.getValue() >= 1.0) {
                     toMove = appendLink(speed);
+                    toMove.getKey().setMetadata("height", new FixedMetadataValue(
+                            JavaPlugin.getPlugin(Core.class), toMove.getKey().getTransformation().getScale().y));
                 }
 
                 final double progress = toMove.getValue() + remaining <= 1.0 ? remaining : 1.0 - toMove.getValue();
                 this.links.replace(toMove.getKey(), toMove.getValue(), toMove.getValue() + progress);
-                toMove.getKey().getTransformation().getScale().mul(1, (float) progress, 1);
                 remaining -= progress;
+
+                final double height = toMove.getKey().getMetadata("height").getFirst().asDouble();
+                final Transformation transformation = toMove.getKey().getTransformation();
+                transformation.getScale().set(transformation.getScale().x, (float) (height * progress), transformation.getScale().z);
+                toMove.getKey().setTransformation(transformation);
+                toMove.getKey().teleport(toMove.getKey().getLocation().setDirection(getVelocity()));
             }
             // end link
 
             pushSound().play(location);
         } else if (!links.isEmpty()) {
-            if (target == null || !target.isValid()) {
+            if (hit == null || !hit.isValid()) {
                 setMarkForRemoval(true);
                 return;
             }
@@ -105,6 +118,8 @@ public abstract class ReturningLinkProjectile extends Projectile {
                     toMove = links.lastEntry();
                 }
 
+                redirect(toMove.getKey().getLocation().subtract(location).toVector().normalize().multiply(pullSpeed));
+
                 final double progress = toMove.getValue() - remaining >= 0.0 ? remaining : toMove.getValue();
                 this.links.replace(toMove.getKey(), toMove.getValue(), toMove.getValue() - progress);
                 toMove.getKey().getTransformation().getScale().mul(1, (float) progress, 1);
@@ -112,12 +127,12 @@ public abstract class ReturningLinkProjectile extends Projectile {
                 // end link
 
                 // pull the target
-                if (target != null) {
+                if (hit != null) {
 //                final Location tp = UtilLocation.shiftOutOfBlocks(target.getLocation().add(direction), target.getBoundingBox());
 //                target.teleport(tp, TeleportFlag.Relative.PITCH, TeleportFlag.Relative.YAW);
                     final VelocityData velocity = new VelocityData(this.velocity.clone().normalize(), pullSpeed / 20, 0, 100, false);
-                    UtilVelocity.velocity(target, caster, velocity);
-                    target.setFallDistance(0);
+                    UtilVelocity.velocity(hit, caster, velocity);
+                    hit.setFallDistance(0);
                 }
             }
             // end pull
@@ -153,9 +168,7 @@ public abstract class ReturningLinkProjectile extends Projectile {
             return;
         }
 
-        redirect(getVelocity().clone().normalize().multiply(-1).multiply(pullSpeed));
-
-        target = (LivingEntity) hit;
+        this.hit = (LivingEntity) hit;
     }
 
     public void remove() {
