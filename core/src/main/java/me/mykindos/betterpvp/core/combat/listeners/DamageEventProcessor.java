@@ -241,7 +241,7 @@ public class DamageEventProcessor implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     void onEntityCanHurt(EntityCanHurtEntityEvent event) {
-        if (event.getDamagee() instanceof HumanEntity human && human.getGameMode().isInvulnerable()) {
+        if (event.getDamagee().isInvulnerable() || event.getDamagee() instanceof HumanEntity human && human.getGameMode().isInvulnerable()) {
             event.setResult(Event.Result.DENY);
         }
     }
