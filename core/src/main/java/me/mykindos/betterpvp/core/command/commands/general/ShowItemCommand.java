@@ -53,21 +53,23 @@ public class ShowItemCommand extends Command {
         }
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(itemStack);
-        if (instanceOpt.isPresent()) {
-            itemStack = instanceOpt.get().getView().get();
-        }
-
         final Component name;
-        if (itemStack.getItemMeta().hasDisplayName()) {
-            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+        if (instanceOpt.isPresent()) {
+            final ItemInstance instance = instanceOpt.get();
+            name = instance.getBaseItem().getItemNameRenderer().createName(instance);
+            itemStack = instance.getView().get();
         } else {
-            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
-                    Component.translatable(itemStack.getType().translationKey()));
+            if (itemStack.getItemMeta().hasDisplayName()) {
+                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+            } else {
+                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                        Component.translatable(itemStack.getType().translationKey()));
+            }
         }
 
-        Component messageComponent = Component.text("I am currently holding ", NamedTextColor.WHITE)
+        Component messageComponent = Component.text("I am currently holding [", NamedTextColor.WHITE)
                 .decoration(TextDecoration.BOLD, false)
-                .append(Objects.requireNonNull(name).hoverEvent(itemStack.asHoverEvent())
-                );
+                .append(Objects.requireNonNull(name).hoverEvent(itemStack.asHoverEvent()))
+                .append(Component.text("]", NamedTextColor.WHITE));
         UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player, client.getGamer().getChatChannel(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));    }
 }
