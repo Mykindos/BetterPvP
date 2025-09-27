@@ -36,14 +36,12 @@ import java.util.WeakHashMap;
 public class RightClickListener implements Listener {
 
     private final ClientManager clientManager;
-    private final Core core;
     private final WeakHashMap<Player, RightClickContext> rightClickCache = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> lastDrop = new WeakHashMap<>();
 
     @Inject
-    public RightClickListener(ClientManager clientManager, Core core) {
+    public RightClickListener(ClientManager clientManager) {
         this.clientManager = clientManager;
-        this.core = core;
     }
 
     // Fix for interact event triggering when dropping items
@@ -66,7 +64,7 @@ public class RightClickListener implements Listener {
         // Refund items from offhand to all players
         for (Player player : Bukkit.getOnlinePlayers()) {
             ItemStack offhand = player.getInventory().getItemInOffHand();
-            if (offhand.getType() != Material.AIR && !UtilItem.isCosmeticShield(offhand)) {
+            if (offhand.getType() != Material.AIR && !UtilItem.isUndroppable(offhand)) {
                 ItemStack temp = player.getInventory().getItemInOffHand().clone();
                 player.getInventory().setItemInOffHand(null);
                 UtilItem.insert(player, temp);
@@ -84,7 +82,7 @@ public class RightClickListener implements Listener {
             if (!player.isOnline()) {
                 iterator.remove();
                 gamer.setLastBlock(-1);
-                if (UtilItem.isCosmeticShield(player.getInventory().getItemInOffHand())) {
+                if (UtilItem.isUndroppable(player.getInventory().getItemInOffHand())) {
                     player.getInventory().setItemInOffHand(null);
                 }
                 continue;
@@ -115,8 +113,7 @@ public class RightClickListener implements Listener {
             gamer.setLastBlock(System.currentTimeMillis());
             final RightClickEvent previousEvent = context.getEvent();
             final RightClickEvent event = new RightClickEvent(player,
-                    previousEvent.isUseShield(),
-                    previousEvent.getShieldModelData(),
+                    previousEvent.getBlockingItem(),
                     true,
                     previousEvent.getHand());
             UtilServer.callEvent(event);
@@ -140,13 +137,14 @@ public class RightClickListener implements Listener {
 
             rightClickCache.remove(player);
             gamer.setLastBlock(-1);
-            if (UtilItem.isCosmeticShield(off)) {
+            if (UtilItem.isUndroppable(off)) {
                 player.getInventory().setItemInOffHand(null);
             }
             return;
         }
 
         Block clickedBlock = event.getClickedBlock();
+        //noinspection deprecation
         if (clickedBlock != null && (clickedBlock.getType().isInteractable() && !clickedBlock.getType().name().contains("STAIR"))
                 || event.getAction() == Action.PHYSICAL
                 || event.getHand() != EquipmentSlot.HAND) {
@@ -160,13 +158,12 @@ public class RightClickListener implements Listener {
         final Player player = event.getPlayer();
         final Gamer gamer = clientManager.search().online(player).getGamer();
         gamer.setLastBlock(System.currentTimeMillis());
-        final RightClickEvent clickEvent = new RightClickEvent(player, false, 0, false, event.getHand());
+        final RightClickEvent clickEvent = new RightClickEvent(player, null, false, event.getHand());
         final RightClickContext context = new RightClickContext(gamer, clickEvent, item);
         final RightClickContext previous = rightClickCache.remove(player);
         if (previous != null) {
             clickEvent.setHoldClick(true);
-            clickEvent.setUseShield(previous.getEvent().isUseShield());
-            clickEvent.setShieldModelData(previous.getEvent().getShieldModelData());
+            clickEvent.setBlockingItem(previous.getEvent().getBlockingItem());
         }
 
         UtilServer.callEvent(clickEvent);
@@ -175,7 +172,7 @@ public class RightClickListener implements Listener {
 
     @EventHandler
     public void onPickupShield(EntityPickupItemEvent event) {
-        if (UtilItem.isCosmeticShield(event.getItem().getItemStack())) {
+        if (UtilItem.isUndroppable(event.getItem().getItemStack())) {
             event.setCancelled(true);
             event.getItem().remove();
         }
@@ -186,7 +183,7 @@ public class RightClickListener implements Listener {
         // Prevent from touching the shield
         if (event.getClickedInventory() != null) {
             if (event.getCurrentItem() != null) {
-                if (UtilItem.isCosmeticShield(event.getCurrentItem())) {
+                if (UtilItem.isUndroppable(event.getCurrentItem())) {
                     event.setCancelled(true);
                 }
             }
@@ -196,7 +193,7 @@ public class RightClickListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onReleaseClick(RightClickEndEvent event) {
         Player player = event.getPlayer();
-        if (UtilItem.isCosmeticShield(player.getInventory().getItemInOffHand())) {
+        if (UtilItem.isUndroppable(player.getInventory().getItemInOffHand())) {
             player.getInventory().setItemInOffHand(null);
         }
     }
@@ -211,25 +208,25 @@ public class RightClickListener implements Listener {
 
         // Remove shield if we are not blocking
         final ItemStack offhand = player.getInventory().getItemInOffHand();
-        if (!event.isUseShield()) {
-            if (offhand.getType() == Material.SHIELD) {
+        if (!event.hasBlockingItem() || event.getBlockingItem().getType().isAir()) {
+            if (UtilItem.isUndroppable(offhand)) {
                 player.getInventory().setItemInOffHand(null);
             }
             return;
         }
 
-        if (UtilItem.isCosmeticShield(offhand)) {
+        if (UtilItem.isUndroppable(offhand)) {
             return; // Don't replace if we are already holding a cosmetic shield
         }
 
         // Replace offhand with shield because we are blocking
-        player.getInventory().setItemInOffHand(UtilItem.createCosmeticShield(event.getShieldModelData()));
+        player.getInventory().setItemInOffHand(UtilItem.makeUndroppable(event.getBlockingItem()));
     }
 
     @EventHandler
     public void onDropOffhand(PlayerDropItemEvent event) {
         final ItemStack item = event.getItemDrop().getItemStack();
-        if (UtilItem.isCosmeticShield(item)) {
+        if (UtilItem.isUndroppable(item)) {
             event.setCancelled(true);
         }
     }
