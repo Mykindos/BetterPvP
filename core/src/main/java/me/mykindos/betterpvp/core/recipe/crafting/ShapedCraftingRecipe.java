@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A shaped recipe that requires ingredients to be in specific positions.
@@ -22,7 +23,7 @@ import java.util.Map;
 @Getter
 public class ShapedCraftingRecipe implements CraftingRecipe {
 
-    private final BaseItem result;
+    private final Supplier<ItemInstance> resultSupplier;
     private final Map<Integer, RecipeIngredient> ingredients;
     private final ItemFactory itemFactory;
     private final int width;
@@ -30,14 +31,14 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
     private final boolean needsBlueprint;
     
     /**
-     * Creates a new shaped recipe with a single result.
+     * Creates a new shaped recipe with a single resultSupplier.
      * 
-     * @param result The result of the recipe
+     * @param resultSupplier The resultSupplier of the recipe
      * @param ingredients The ingredients and their positions (0-8 for a 3x3 grid)
      * @param itemFactory The ItemFactory to use for item matching
      */
-    public ShapedCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this.result = result;
+    public ShapedCraftingRecipe(@NotNull Supplier<ItemInstance> resultSupplier, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
+        this.resultSupplier = resultSupplier;
         this.ingredients = new HashMap<>(ingredients);
         this.itemFactory = itemFactory;
         this.needsBlueprint = needsBlueprint;
@@ -58,8 +59,8 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
     }
 
     @Override
-    public @NotNull BaseItem getPrimaryResult() {
-        return result;
+    public @NotNull ItemInstance getPrimaryResult() {
+        return resultSupplier.get();
     }
 
     @Override
@@ -69,7 +70,7 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
 
     @Override
     public @NotNull ItemInstance createPrimaryResult() {
-        return itemFactory.create(result);
+        return resultSupplier.get();
     }
 
     @Override
@@ -206,7 +207,7 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
      * A builder for creating shaped recipes using a character-based pattern.
      */
     public static class Builder {
-        private final BaseItem result;
+        private final Supplier<ItemInstance> resultSupplier;
         private final String[] pattern;
         private final Map<Character, RecipeIngredient> ingredients = new HashMap<>();
         private final ItemFactory itemFactory;
@@ -215,12 +216,12 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
         /**
          * Creates a new builder for a shaped recipe.
          * 
-         * @param result The result of the recipe
+         * @param resultSupplier The resultSupplier of the recipe
          * @param pattern The pattern of the recipe (up to 3 rows of up to 3 characters each)
          * @param itemFactory The ItemFactory to use for item matching
          */
-        public Builder(@NotNull BaseItem result, @NotNull String[] pattern, @NotNull ItemFactory itemFactory) {
-            this.result = result;
+        public Builder(@NotNull Supplier<ItemInstance> resultSupplier, @NotNull String[] pattern, @NotNull ItemFactory itemFactory) {
+            this.resultSupplier = resultSupplier;
             this.pattern = pattern;
             this.itemFactory = itemFactory;
             
@@ -234,6 +235,10 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
                     throw new IllegalArgumentException("Pattern rows cannot be longer than 3 characters");
                 }
             }
+        }
+
+        public Builder(@NotNull BaseItem result, @NotNull String[] pattern, @NotNull ItemFactory itemFactory) {
+            this(() -> itemFactory.create(result), pattern, itemFactory);
         }
 
         /**
@@ -292,7 +297,7 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
                 }
             }
             
-            return new ShapedCraftingRecipe(result, recipeIngredients, itemFactory, needsBlueprint);
+            return new ShapedCraftingRecipe(resultSupplier, recipeIngredients, itemFactory, needsBlueprint);
         }
     }
 } 

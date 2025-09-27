@@ -11,7 +11,7 @@ import java.util.List;
  * Base interface for all recipe types in the system.
  * Recipes define how items can be combined to create new items.
  */
-public interface CraftingRecipe extends Recipe<BaseItem, ItemInstance> {
+public interface CraftingRecipe extends Recipe<ItemInstance, ItemInstance> {
 
     /**
      * Checks if this recipe requires a blueprint to be crafted.
