@@ -49,7 +49,8 @@ public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
         this.lifestealAbility = new LifestealAbility(champions, itemFactory, this, this::getHeal);
         this.soulHarvestAbility = soulHarvestAbility;
         this.itemFactory = itemFactory;
-        
+
+
         // Link this scythe to the SoulHarvestAbility
         this.soulHarvestAbility.setScythe(this);
         
@@ -61,7 +62,7 @@ public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
 
     private double getHeal(Player player) {
         // Calculate heal based on base heal and souls
-        double soulCount = soulHarvestAbility.getPlayerData().get(player).getSoulCount();
+        double soulCount = soulHarvestAbility.getPlayerData().get(player.getUniqueId()).getSoulCount();
         return baseHeal + (soulCount * healPerSoul);
     }
     

@@ -46,6 +46,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -259,8 +260,7 @@ public class SkillListener implements Listener {
 
                     if (skill instanceof ChannelSkill channelSkill) {
                         if (channelSkill.shouldShowShield(player)) {
-                            event.setUseShield(true);
-                            event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
+                            event.setBlockingItem(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_BLOCKING_ITEM : ItemStack.of(Material.SHIELD));
                         }
                     }
                 }
