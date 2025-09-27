@@ -12,6 +12,6 @@ public class StormsteelPlate extends BaseItem {
 
     @Inject
     private StormsteelPlate() {
-        super("StormsteelPlate", Item.model("stormsteel_plate", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super("Stormsteel Plate", Item.model("stormsteel_plate", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }
