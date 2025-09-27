@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.recipe.crafting;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -10,10 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A shapeless recipe that requires specific ingredients but not in any particular arrangement.
@@ -21,33 +24,37 @@ import java.util.Map;
 @Getter
 public class ShapelessCraftingRecipe implements CraftingRecipe {
 
-    private final BaseItem result;
+    private final Supplier<ItemInstance> resultSupplier;
     private final Map<Integer, RecipeIngredient> ingredients;
     private final ItemFactory itemFactory;
     private final boolean needsBlueprint;
     
     /**
-     * Creates a new shapeless recipe with a single result.
+     * Creates a new shapeless recipe with a single resultSupplier.
      * 
-     * @param result The result of the recipe
+     * @param resultSupplier The resultSupplier of the recipe
      * @param ingredients The ingredients required (slot positions are ignored for matching)
      * @param itemFactory The ItemFactory to use for item matching
      */
-    public ShapelessCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this.result = result;
+    public ShapelessCraftingRecipe(@NotNull Supplier<ItemInstance> resultSupplier, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
+        this.resultSupplier = resultSupplier;
         this.ingredients = new HashMap<>(ingredients);
         this.itemFactory = itemFactory;
         this.needsBlueprint = needsBlueprint;
     }
+
+    public ShapelessCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
+        this(() -> itemFactory.create(result), ingredients, itemFactory, needsBlueprint);
+    }
     
     @Override
-    public @NotNull BaseItem getPrimaryResult() {
-        return result;
+    public @NotNull ItemInstance getPrimaryResult() {
+        return resultSupplier.get();
     }
 
     @Override
     public @NotNull ItemInstance createPrimaryResult() {
-        return itemFactory.create(result);
+        return resultSupplier.get();
     }
 
     @Override
@@ -64,7 +71,7 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
         }
         
         // Create a map of BaseItem to available amounts
-        Map<BaseItem, Integer> availableIngredients = new HashMap<>();
+        Multimap<BaseItem, Integer> availableIngredients = ArrayListMultimap.create();
         for (ItemStack stack : items.values()) {
             if (stack == null || stack.getType().isAir()) {
                 continue;
@@ -72,22 +79,33 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
             
             itemFactory.fromItemStack(stack).ifPresent(instance -> {
                 BaseItem baseItem = instance.getBaseItem();
-                availableIngredients.merge(baseItem, stack.getAmount(), Integer::sum);
+                availableIngredients.put(baseItem, stack.getAmount());
             });
         }
         
         // Check if all required ingredients are available in sufficient quantities
+        outer:
         for (Map.Entry<BaseItem, Integer> entry : requiredIngredients.entrySet()) {
             BaseItem baseItem = entry.getKey();
             int requiredAmount = entry.getValue();
-            
-            int availableAmount = availableIngredients.getOrDefault(baseItem, 0);
-            if (availableAmount < requiredAmount) {
+
+            if (!availableIngredients.containsKey(baseItem)) {
                 return false;
             }
+            
+            Collection<Integer> availableAmounts = availableIngredients.get(baseItem);
+            for (int availableAmount : availableAmounts) {
+                if (availableAmount >= requiredAmount) {
+                    // remove entry
+                    availableIngredients.remove(baseItem, availableAmount);
+                    continue outer;
+                }
+            }
+
+            return false;
         }
         
-        return true;
+        return availableIngredients.isEmpty();
     }
 
     @Override
