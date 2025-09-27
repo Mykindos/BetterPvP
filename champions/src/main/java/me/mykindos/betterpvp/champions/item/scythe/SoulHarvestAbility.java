@@ -8,15 +8,15 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
-import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -36,7 +36,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -55,7 +59,13 @@ import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @Getter
@@ -90,14 +100,14 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     @EqualsAndHashCode.Exclude
     private final Map<UUID, Soul> souls = new HashMap<>();
     @EqualsAndHashCode.Exclude
-    private final WeakHashMap<Player, ScytheData> playerData = new WeakHashMap<>();
+    private final Map<UUID, ScytheData> playerData = new HashMap<>();
     @EqualsAndHashCode.Exclude
     private ScytheOfTheFallenLord scythe;
 
     @EqualsAndHashCode.Exclude
     private final DisplayComponent actionBar = ChargeData.getActionBar(
-            gmr -> gmr.isOnline() && playerData.containsKey(gmr.getPlayer()) && scythe.isHoldingWeapon(gmr.getPlayer()),
-            gmr -> playerData.get(gmr.getPlayer()).getChargeData()
+            gmr -> gmr.isOnline() && playerData.containsKey(gmr.getPlayer().getUniqueId()) && scythe.isHoldingWeapon(gmr.getPlayer()),
+            gmr -> playerData.get(gmr.getPlayer().getUniqueId()).getChargeData()
     );
 
     @Inject
@@ -130,7 +140,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     @Override
     public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
         Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        final ScytheData data = playerData.get(player);
+        final ScytheData data = playerData.get(player.getUniqueId());
         if (data == null) {
             return false;
         }
@@ -141,7 +151,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
         var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, itemInstance, true));
         if (checkUsageEvent.isCancelled()) {
             UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
-            playerData.remove(player);
+            playerData.remove(player.getUniqueId());
             pause(player, data);
             return false;
         }
@@ -157,13 +167,14 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
                 souls.remove(soul.getUniqueId());
                 Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(Champions.class), soul.getDisplay()::remove, 2);
             }
+            return true;
         } else if (target != null && !target.isHarvesting()) {
-
             // If they're not harvesting, but they are clicking in the direction of a soul, start harvesting
             data.startHarvesting();
             data.playHarvestStart();
+            return true;
         }
-        return true;
+        return false;
     }
     
     /**
@@ -201,7 +212,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     }
 
     private void deactivate(Player player) {
-        final ScytheData data = playerData.get(player);
+        final ScytheData data = playerData.get(player.getUniqueId());
         if (data != null) {
             data.setMarkForRemoval(true);
             pause(player, data);
@@ -212,14 +223,14 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
      * Track player for soul collection and management
      */
     private void active(Player player) {
-        playerData.compute(player,
-                (p, prev) -> {
+        playerData.compute(player.getUniqueId(),
+                (playerId, prev) -> {
                     if (prev != null) {
                         prev.setMarkForRemoval(false);
                         prev.getGamer().getActionBar().add(350, actionBar);
                         return prev;
                     }
-                    final ScytheData data = new ScytheData(scythe, clientManager.search().online(p).getGamer());
+                    final ScytheData data = new ScytheData(scythe, clientManager.search().online(playerId).orElseThrow().getGamer());
                     data.getGamer().getActionBar().add(350, actionBar);
                     return data;
                 });
@@ -233,7 +244,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
      * Clear soul data for a player
      */
     public void clearSoulData(Player player) {
-        ScytheData data = playerData.get(player);
+        ScytheData data = playerData.get(player.getUniqueId());
         if (data != null) {
             data.setSoulCount(0);
             data.setHarvesting(false);
@@ -253,7 +264,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
      * Give souls directly to a player without spawning a physical soul
      */
     public void grantSoulsToPlayer(Player player, double count) {
-        ScytheData data = playerData.get(player);
+        ScytheData data = playerData.get(player.getUniqueId());
         if (data != null && data.gainSoul(count)) {
             data.playHarvest(null);
         }
@@ -272,13 +283,14 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
      */
     @UpdateEvent(priority = 999)
     public void doScythe() {
-        final Iterator<Map.Entry<Player, ScytheData>> iterator = playerData.entrySet().iterator();
+        final Iterator<Map.Entry<UUID, ScytheData>> iterator = playerData.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            final Map.Entry<Player, ScytheData> cur = iterator.next();
-            final Player player = cur.getKey();
+            final Map.Entry<UUID, ScytheData> cur = iterator.next();
+            final UUID playerId = cur.getKey();
             final ScytheData data = cur.getValue();
-            if (player == null) {
+            final Player player = Bukkit.getPlayer(playerId);
+            if (player == null || !player.isOnline()) {
                 iterator.remove();
                 continue;
             }
@@ -359,7 +371,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        playerData.remove(event.getPlayer());
+        playerData.remove(event.getPlayer().getUniqueId());
     }
 
     /**
@@ -395,8 +407,8 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
         final Player player = event.getPlayer();
         if (scythe.isScythe(player.getInventory().getItem(event.getNewSlot()))) {
             active(event.getPlayer());
-        } else if (playerData.containsKey(player)) {
-            pause(event.getPlayer(), playerData.get(player));
+        } else if (playerData.containsKey(player.getUniqueId())) {
+            pause(event.getPlayer(), playerData.get(player.getUniqueId()));
         }
     }
 
@@ -433,11 +445,10 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
 
         // If the entity was killed by a scythe, give the killer a soul
         final double soulCount = getSoulCount(event.getEntity());
-        final EntityDamageEvent cause = event.getEntity().getLastDamageCause();
-        if (lastDamager.getDamager() instanceof Player attacker && cause != null && cause.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && scythe.isHoldingWeapon(attacker)
+        final DamageCause cause = lastDamager.getDamageCause();
+        if (lastDamager.getDamager() instanceof Player attacker && cause.getCategories().contains(DamageCauseCategory.MELEE) && scythe.isHoldingWeapon(attacker)
                 && event.getEntity() instanceof Player) {
-
-            final ScytheData data = playerData.get(attacker);
+            final ScytheData data = playerData.get(attacker.getUniqueId());
             final boolean success = data.gainSoul(soulCount);
             if (success) {
                 data.playHarvest(null);
@@ -523,11 +534,12 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
         souls.put(soul.getUniqueId(), soul);
 
         // Show to everyone who can see the soul
-        for (Player toShow : playerData.keySet()) {
-            if (!scythe.isHoldingWeapon(toShow)) {
+        for (UUID playerId : playerData.keySet()) {
+            final Player player = Bukkit.getPlayer(playerId);
+            if (!scythe.isHoldingWeapon(player)) {
                 continue;
             }
-            soul.show(toShow, false, scythe);
+            soul.show(player, false, scythe);
         }
     }
 }

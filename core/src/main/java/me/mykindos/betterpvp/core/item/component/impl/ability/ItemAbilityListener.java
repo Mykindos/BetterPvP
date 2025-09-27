@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.event.PlayerPreIte
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -32,13 +33,18 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @BPvPListener
 @Singleton
 public class ItemAbilityListener implements Listener {
 
-    private final Map<Player, HoldData> heldMap = new WeakHashMap<>();
+    private final Map<UUID, HoldData> heldMap = new HashMap<>();
     private final ClientManager clientManager;
     private final ItemFactory itemFactory;
     private final SmartBlockFactory smartBlockFactory;
@@ -147,16 +153,12 @@ public class ItemAbilityListener implements Listener {
 
     @UpdateEvent
     public void onHold() {
-        final Iterator<Player> iterator = heldMap.keySet().iterator();
+        final Iterator<UUID> iterator = heldMap.keySet().iterator();
         while (iterator.hasNext()) {
-            Player player = iterator.next();
+            UUID uuid = iterator.next();
+            Player player = Bukkit.getPlayer(uuid);
+            final HoldData holdData = heldMap.get(uuid);
             if (player == null || !player.isOnline()) {
-                iterator.remove();
-                continue;
-            }
-
-            final HoldData holdData = heldMap.get(player);
-            if (holdData == null) {
                 iterator.remove();
                 continue;
             }
@@ -183,7 +185,7 @@ public class ItemAbilityListener implements Listener {
             return; // Only handle main hand
         }
 
-        final HoldData data = heldMap.get(event.getPlayer());
+        final HoldData data = heldMap.get(event.getPlayer().getUniqueId());
         if (data == null) {
             return; // No hold data for this player
         }
@@ -207,15 +209,15 @@ public class ItemAbilityListener implements Listener {
         } else if (holdBlock.isPresent()) {
             final ItemAbility ability = holdBlock.get();
             final Client client = clientManager.search().online(event.getPlayer());
-            event.setUseShield(true);
-            event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
-            invoke(ability, client, itemInstance, event.getPlayer().getInventory().getItemInMainHand());
+            if (invoke(ability, client, itemInstance, event.getPlayer().getInventory().getItemInMainHand())) {
+                event.setBlockingItem(RightClickEvent.INVISIBLE_BLOCKING_ITEM);
+            }
         }
     }
 
     private void updateHeldItem(Player player, ItemStack itemStack) {
         // Remove player from tracking
-        heldMap.remove(player);
+        heldMap.remove(player.getUniqueId());
 
         // Check if they're now holding our item
         if (itemStack == null) {
@@ -241,6 +243,6 @@ public class ItemAbilityListener implements Listener {
                 .toList();
 
         // Add player to tracking
-        heldMap.put(player, new HoldData(item, abilities));
+        heldMap.put(player.getUniqueId(), new HoldData(item, abilities));
     }
 }

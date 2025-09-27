@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.combat.offhand.OffhandExecutor;
-import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
@@ -28,12 +27,9 @@ import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
-import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.ShieldItem;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceBar;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceLevel;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -106,7 +102,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
             // Otherwise, this would return false
             final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
-            if (UtilItem.isCosmeticShield(main) || UtilItem.isCosmeticShield(off)) {
+            if (UtilItem.isUndroppable(main) || UtilItem.isUndroppable(off)) {
                 return timeSinceLastBlock() <= 250;
             }
 

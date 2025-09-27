@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -45,7 +44,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -90,19 +88,18 @@ public class UtilItem {
         return itemStack;
     }
 
-    public static boolean isCosmeticShield(ItemStack item) {
-        return item.getType() == Material.SHIELD && item.hasItemMeta()
+    public static boolean isUndroppable(ItemStack item) {
+        return item.hasItemMeta()
                 && item.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN)
                 && Boolean.TRUE.equals(item.getItemMeta().getPersistentDataContainer().get(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN));
     }
 
-    public static ItemStack createCosmeticShield(int modelData) {
-        ItemStack shield = new ItemStack(Material.SHIELD);
-        final ItemMeta meta = shield.getItemMeta();
-        meta.setCustomModelData(modelData);
+    public static ItemStack makeUndroppable(ItemStack itemStack) {
+        ItemStack result = itemStack.clone();
+        final ItemMeta meta = result.getItemMeta();
         meta.getPersistentDataContainer().set(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN, true);
-        shield.setItemMeta(meta);
-        return shield;
+        result.setItemMeta(meta);
+        return result;
     }
 
     /**

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -43,6 +44,8 @@ public class Soul {
 
     private Collection<Player> getNearbyActive(ScytheOfTheFallenLord scythe) {
         return scythe.getSoulHarvestAbility().getPlayerData().keySet().stream()
+                .map(Bukkit::getPlayer)
+                .filter(player -> player != null && player.isOnline())
                 .filter(player -> canSee(player, scythe) && scythe.isHoldingWeapon(player))
                 .toList();
     }
