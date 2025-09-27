@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.energy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -27,12 +28,18 @@ public class EnergyHandler {
     private double consumptionRegenDelay;
 
     private final WeakHashMap<Player, Long> lastUsedEnergy = new WeakHashMap<>();
+    private final CooldownManager cooldownManager;
 
     public static final double BASE_ENERGY = 150.0D;
     public static final double PLAYER_ENERGY = 0.0D;
     public static final double BASE_ENERGY_REGEN = 0.006D;
     public static final double NERFED_ENERGY_REGEN = 0.0008D;
     public static final long UPDATE_RATE = 50L;
+
+    @Inject
+    private EnergyHandler(CooldownManager cooldownManager) {
+        this.cooldownManager = cooldownManager;
+    }
 
     public double getEnergy(Player player) {
         return player.getExp();
@@ -54,7 +61,7 @@ public class EnergyHandler {
         amount = 0.99999999999 * (amount / 100);
 
         if (amount > getEnergy(player)) {
-            if (inform) {
+            if (inform && this.cooldownManager.use(player, ability + "_no_energy", 0.5, false, false)) {
                 UtilMessage.simpleMessage(player, "Energy", "You are too exhausted to use <green>" + ability + "</green>.");
                 player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
             }
