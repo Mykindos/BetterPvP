@@ -26,7 +26,9 @@ import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -97,7 +99,21 @@ public class Clans extends BPvPPlugin {
             final Reflections reflectionAdapters = new Reflections(PACKAGE);
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
+            clearCraftingRecipes();
         }
+    }
+
+    private void clearCraftingRecipes() {
+        CraftingRecipeRegistry recipeRegistry = injector.getInstance(CraftingRecipeRegistry.class);
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:oak_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:spruce_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:jungle_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:acacia_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:dark_oak_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:mangrove_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:cherry_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:pale_oak_boat"));
     }
 
     @Override

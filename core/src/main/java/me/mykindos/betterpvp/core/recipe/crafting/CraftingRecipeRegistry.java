@@ -48,6 +48,15 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
         return resolver;
     }
 
+    @Override
+    public void clearRecipe(NamespacedKey key) {
+        if (craftingRecipes.remove(key) != null) {
+            log.info("Cleared recipe: {}", key).submit();
+        } else {
+            log.warn("No recipe found with key {}, cannot clear", key).submit();
+        }
+    }
+
     /**
      * Registers a new recipe.
      * @param key The key to register the recipe under
