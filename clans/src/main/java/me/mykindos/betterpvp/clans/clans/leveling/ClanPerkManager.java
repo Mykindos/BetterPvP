@@ -34,7 +34,10 @@ public class ClanPerkManager extends Manager<String, ClanPerk> {
         registerSlots(1, 5);
         registerSlots(2, 15);
         registerSlots(3, 25);
-        registerSlots(4, 35);
+        registerSlots(3, 35);
+        registerSlots(3, 50);
+        registerSlots(3, 65);
+        registerSlots(4, 80);
 
         //registerLegends(1, 15);
         //registerLegends(2, 35);

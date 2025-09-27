@@ -48,7 +48,7 @@ public class GuiClanVault extends AbstractGui implements Windowed {
         final Clans clans = JavaPlugin.getPlugin(Clans.class);
         final ClanVaultRestrictions restrictions = clans.getInjector().getInstance(ClanVaultRestrictions.class);
         final int maxSize = clans.getConfig().getOrSaveInt("clans.clan.vault.max-size", 28);
-        final int size = vault.getSize();
+        final int size = Math.min(vault.getSize(), maxSize);
 
         // Initialize ItemStack[] array with size of 'size' and contents of vault.getContents(). Empty slots are filled with null.
         final ItemStack[] contents = new ItemStack[size];
