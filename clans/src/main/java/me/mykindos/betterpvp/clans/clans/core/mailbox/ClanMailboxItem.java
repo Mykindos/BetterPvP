@@ -40,7 +40,7 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
 
     @Override
     public ItemProvider getItemProvider(GuiClanMailbox gui) {
-        ItemStack item = itemStack.clone();
+        ItemStack item = itemFactory.fromItemStack(itemStack).orElseThrow().getView().get();
         item.editMeta(meta -> {
             List<Component> lore = meta.lore();
             if (lore == null) {
