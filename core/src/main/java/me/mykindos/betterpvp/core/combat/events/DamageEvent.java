@@ -260,11 +260,31 @@ public class DamageEvent extends CustomCancellableEvent {
      * @return array of reasons
      */
     public String[] getReasons() {
-        final HashSet<String> set = new HashSet<>(reasons);
-        for (DamageModifier appliedModifier : getAppliedModifiers()) {
-            set.add(appliedModifier.getName());
+        final List<String> reasons = new ArrayList<>(this.reasons);
+        final List<String> modifierReasons = new ArrayList<>();
+        final ArrayList<DamageModifier> modifiers = new ArrayList<>(this.modifiers.values());
+        modifiers.sort(Comparator.comparingInt(DamageModifier::getPriority).reversed());
+
+        for (DamageModifier modifier : modifiers) {
+            if (isModifierExcluded(modifier) || !modifier.canApply(this)) {
+                continue;
+            }
+
+            ModifierResult result = modifier.apply(this);
+            Preconditions.checkNotNull(result, "Modifier %s returned null result", modifier.getName());
+
+            // Apply the modification
+            if (!result.isReductive()) { // If it reduces damage, don't add it to the reasons because it tried impeding death
+                modifierReasons.add(modifier.getName());
+            }
+
+            // If this modifier cancels others, stop processing
+            if (result.isCancelOtherModifiers()) {
+                break;
+            }
         }
-        return set.toArray(new String[0]);
+        reasons.addAll(modifierReasons);
+        return reasons.toArray(new String[0]);
     }
     
     /**
