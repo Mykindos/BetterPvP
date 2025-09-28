@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
@@ -252,7 +253,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         velocityMultiplier = getConfig("velocityMultiplier", 0.4, Double.class);
         yComponentVelocityMultiplier = getConfig("yComponentVelocityMultiplier", 1.0, Double.class);
-        damageDelay = getConfig("damageDelay", 50, Integer.class);
+        damageDelay = getConfig("damageDelay", DamageCause.DEFAULT_DELAY, Integer.class);
         numFlames = getConfig("numFlames", 75, Integer.class);
     }
 }
