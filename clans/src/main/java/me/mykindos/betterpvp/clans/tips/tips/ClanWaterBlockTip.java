@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,15 +33,14 @@ public class ClanWaterBlockTip extends ClanTip {
 
     @Override
     public Component generateComponent() {
-        waterBlock = itemRegistry.getItemByClass(UnbreakingRuneItem.class);
+        waterBlock = itemRegistry.getItem(new NamespacedKey("clans", "water_block"));
         if (waterBlock == null) {
             return Component.empty();
         }
 
         final ItemInstance instance = itemFactory.create(waterBlock);
-        final ItemStack itemStack = instance.createItemStack();
         return Component.empty().append(Component.text("You can place water in your territory by buying or crafting a "))
-                .append(instance.getView().getName()).hoverEvent(itemStack.asHoverEvent())
+                .append(instance.getView().getName()).hoverEvent(instance.getView().get().asHoverEvent())
                 .append(Component.text(" (lapis block), then placing it like you would a water bucket"));
     }
 
