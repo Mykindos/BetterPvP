@@ -76,6 +76,14 @@ public class GameMapStat extends TeamMapStat implements IBuildableStat {
                 .sum();
     }
 
+    private Double getActionStat(StatContainer statContainer, String period) {
+        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
+                .filter(entry ->
+                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action.name())
+                ).mapToDouble(Map.Entry::getValue)
+                .sum();
+    }
+
     /**
      * Get the stat represented by this object from the statContainer
      *
@@ -86,6 +94,9 @@ public class GameMapStat extends TeamMapStat implements IBuildableStat {
     @Override
     public Double getStat(StatContainer statContainer, String period) {
         //todo action composites stats
+        if (Strings.isNullOrEmpty(gameName)) {
+            return getActionStat(statContainer, period);
+        }
         if (Strings.isNullOrEmpty(mapName)) {
             return getGameStat(statContainer, period);
         }
