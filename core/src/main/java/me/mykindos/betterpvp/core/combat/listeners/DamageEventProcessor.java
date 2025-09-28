@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.data.FireData;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseRegistry;
 import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
@@ -32,7 +34,10 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.WeakHashMap;
 
 /**
@@ -41,6 +46,7 @@ import java.util.WeakHashMap;
 @SuppressWarnings("ALL")
 @CustomLog
 @BPvPListener
+@Singleton
 public class DamageEventProcessor implements Listener {
 
     private final Core core;
@@ -48,13 +54,18 @@ public class DamageEventProcessor implements Listener {
     private final DamageDelayManager delayManager;
     private final DamageEventFinalizer finalizer;
     private final WeakHashMap<LivingEntity, FireData> fireDamageSource = new WeakHashMap<>();
-    
+    private final List<CustomDamageAdapter> customDamageAdapters = new ArrayList<>();
+
     @Inject
     private DamageEventProcessor(Core core, DamageCauseRegistry causeRegistry, DamageDelayManager delayManager, DamageEventFinalizer finalizer) {
         this.core = core;
         this.causeRegistry = causeRegistry;
         this.delayManager = delayManager;
         this.finalizer = finalizer;
+    }
+
+    public void registerCustomDamageAdapter(@NotNull CustomDamageAdapter adapter) {
+        customDamageAdapters.add(adapter);
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -103,6 +114,15 @@ public class DamageEventProcessor implements Listener {
             }
         }
 
+        // Get the appropriate adapter and verify we can proceed
+        CustomDamageAdapter adapter = this.customDamageAdapters.stream()
+                .filter(registered -> registered.isValid(damageEvent))
+                .findFirst()
+                .orElse(null);
+        if (adapter != null && !adapter.processPreCustomDamage(damageEvent))  {
+            return false; // The adapter has cancelled the event
+        }
+
         // Fire our custom event
         UtilServer.callEvent(damageEvent);
 
@@ -111,7 +131,7 @@ public class DamageEventProcessor implements Listener {
         }
 
         // Call the finalizer
-        finalizer.finalizeEvent(damageEvent);
+        finalizer.finalizeEvent(damageEvent, adapter);
         return true;
     }
 

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.combat.listeners.mythicmobs;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import io.lumine.mythic.api.skills.damage.DamageMetadata;
@@ -11,6 +13,9 @@ import io.lumine.mythic.core.skills.SkillTriggers;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.listeners.DamageEventProcessor;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -18,7 +23,14 @@ import org.bukkit.metadata.MetadataValue;
 
 import java.util.List;
 
+@PluginAdapter("MythicMobs")
+@Singleton
 public class MythicMobsAdapter implements CustomDamageAdapter {
+
+    @Inject
+    private MythicMobsAdapter(DamageEventProcessor damageEventProcessor) {
+        damageEventProcessor.registerCustomDamageAdapter(this);
+    }
 
     @Override
     public boolean isValid(DamageEvent event) {

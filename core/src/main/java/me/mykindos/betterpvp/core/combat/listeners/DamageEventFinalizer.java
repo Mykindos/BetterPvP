@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.combat.listeners;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
 import me.mykindos.betterpvp.core.combat.durability.DurabilityProcessor;
@@ -17,8 +18,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -33,7 +38,7 @@ public class DamageEventFinalizer implements Listener {
     private final DurabilityProcessor durabilityProcessor;
     private final DamageDelayManager delayManager;
     private final Set<UUID> delayKillSet = new HashSet<>();
-    
+
     @Inject
     private DamageEventFinalizer(Core core, DurabilityProcessor durabilityProcessor, DamageDelayManager delayManager) {
         this.core = core;
@@ -41,7 +46,7 @@ public class DamageEventFinalizer implements Listener {
         this.delayManager = delayManager;
     }
     
-    protected void finalizeEvent(DamageEvent event) {
+    protected void finalizeEvent(@NotNull DamageEvent event, @Nullable CustomDamageAdapter adapter) {
         // Skip if damage is 0 or negative
         if (event.getDamage() <= 0) {
             return;
@@ -60,9 +65,14 @@ public class DamageEventFinalizer implements Listener {
         
         // Play hit sounds
         playHitSounds(event);
-        
-        // Play damage effects
-        playDamageEffects(event);
+
+        if (adapter != null) {
+            // Process custom damage adapter
+            adapter.processCustomDamageAdapter(event);
+        } else {
+            // Play damage effects
+            playDamageEffects(event);
+        }
         
         // Apply final damage
         applyFinalDamage(event);
