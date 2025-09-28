@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
 import me.mykindos.betterpvp.core.combat.damage.ModifierType;
@@ -356,7 +357,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         abilityData.setCharge(newCharge);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.8F, 2.0F);
 
-        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, 100, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+        // executes last
+        event.addModifier(new SkillDamageModifier.Multiplier(this, 0.0, -Integer.MAX_VALUE));
         event.setKnockback(false);
     }
 
