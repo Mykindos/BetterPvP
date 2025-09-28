@@ -69,11 +69,11 @@ public class DamageEventFinalizer implements Listener {
         if (adapter != null) {
             // Process custom damage adapter
             adapter.processCustomDamageAdapter(event);
-        } else {
-            // Play damage effects
-            playDamageEffects(event);
         }
-        
+
+        // Play damage effects
+        playDamageEffects(event);
+
         // Apply final damage
         applyFinalDamage(event);
         
@@ -175,13 +175,14 @@ public class DamageEventFinalizer implements Listener {
      * Applies the final damage to the entity
      */
     private void applyFinalDamage(DamageEvent event) {
-        if (!event.isDamageeLiving()) {
+        if (!event.getDamagee().isValid() || !event.isDamageeLiving() || event.getLivingDamagee().getHealth() <= 0) {
             return;
         }
         
         LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
         double finalHealth = damagee.getHealth() - event.getModifiedDamage();
         
+
         if (finalHealth < 1.0) {
             // Handle entity death with delay to fix Paper issue
             // Temporary measure to fix https://github.com/PaperMC/Paper/issues/12148
