@@ -49,7 +49,7 @@ public class VanillaDamageCause implements DamageCause {
     @Override
     public long getDefaultDelay() {
         return switch (vanillaCause) {
-            case ENTITY_ATTACK, CUSTOM, LAVA, SUFFOCATION -> DEFAULT_DELAY;
+            case ENTITY_ATTACK, CUSTOM, LAVA, SUFFOCATION, FIRE, FIRE_TICK -> DEFAULT_DELAY;
             case POISON -> 1000L;
             default -> 0L;
         };
