@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.metal.casting.CastingMold;
 import me.mykindos.betterpvp.core.recipe.smelting.LiquidAlloy;
 import me.mykindos.betterpvp.core.utilities.Resources;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -344,13 +345,16 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             final int maxMillibuckets = data.getMaxLiquidCapacity();
             final TextColor storedColor = new ProgressColor(millibuckets / (float) maxMillibuckets).inverted().getTextColor();
             final ItemView.ItemViewBuilder builder = ItemView.builder();
+            final int buckets = millibuckets / 1000;
+            final String bucketsString = buckets == 1 ? "bucket" : "buckets";
+
             builder.material(Material.PAPER);
-            builder.lore(Component.text("Stored: ", TextColor.color(214, 214, 214))
+            builder.lore(Component.text("Stored:", TextColor.color(214, 214, 214))
                             .appendSpace()
-                            .append(Component.text(millibuckets + " mB", storedColor)));
-            builder.lore(Component.text("Max Capacity: ", TextColor.color(214, 214, 214))
+                            .append(Component.text(UtilFormat.formatNumber(buckets, 1) + " " + bucketsString, storedColor)));
+            builder.lore(Component.text("Max Capacity:", TextColor.color(214, 214, 214))
                             .appendSpace()
-                            .append(Component.text(maxMillibuckets + " mB", TextColor.color(255, 0, 0))));
+                            .append(Component.text(UtilFormat.formatNumber(maxMillibuckets / 1000, 1) + " buckets", TextColor.color(255, 0, 0))));
             builder.action(ClickActions.RIGHT_SHIFT, Component.text("Clear", NamedTextColor.RED));
 
             final float progress = millibuckets / (float) maxMillibuckets;
