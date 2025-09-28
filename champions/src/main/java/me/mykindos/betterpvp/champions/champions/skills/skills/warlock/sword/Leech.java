@@ -300,7 +300,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         baseRange = getConfig("baseRange", 7.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.0, Double.class);
 
-        baseLeechedHealth = getConfig("baseLeechedHealth", 1.0, Double.class);
+        baseLeechedHealth = getConfig("baseLeechedHealth", 2.0, Double.class);
         leachedHealthIncreasePerLevel = getConfig("leachedHealthIncreasePerLevel", 0.0, Double.class);
 
         maximumEnemies = getConfig("maximumEnemies", 2, Integer.class);

@@ -146,12 +146,13 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
         for (KeyValue<Player, EntityProperty> keyValue : nearbyPlayerKeyValues) {
             Player p = keyValue.getKey();
             double health = p.getHealth();
+            boolean maxHealth = health == UtilPlayer.getMaxHealth(p);
 
             if (health > highestHealth) {
                 highestHealth = health;
                 highestHealthPlayer = p;
             }
-            if (health < lowestHealth) {
+            if (!maxHealth && health < lowestHealth) {
                 lowestHealth = health;
                 lowestHealthPlayer = p;
             }

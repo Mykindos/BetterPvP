@@ -226,9 +226,9 @@ skills:
     fortitude:
       enabled: true
       maxlevel: 3
-      healRate: 1.0
-      baseHeal: 3.0
-      healIncreasePerLevel: 1.0
+      healRate: 2.5
+      baseHeal: 7.5
+      healIncreasePerLevel: 2.5
       healInterval: 1.5
     vengeance:
       enabled: true
@@ -260,8 +260,8 @@ skills:
       bonusDamageDurationIncreasePerLevel: 0.0
       baseBonusDamage: 0.5
       bonusDamageIncreasePerLevel: 1.0
-      baseHealing: 1.0
-      healingIncreasePerLevel: 1.0
+      baseHealing: 2.5
+      healingIncreasePerLevel: 2.5
     holdposition:
       enabled: true
       maxlevel: 5
@@ -713,7 +713,7 @@ skills:
       maxStacks: 3
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
-      health: 4.0
+      health: 10.0
     fortify:
       enabled: true
       maxlevel: 3
@@ -921,7 +921,7 @@ skills:
       maxSporeChargesIncreasePerLevel: 1
       sporeRemovalTime: 5.0
       healingIncreasePerLevel: 0.0
-      healing: 1.5
+      healing: 3.0
     sharpshooter:
       enabled: true
       maxlevel: 3
@@ -988,8 +988,8 @@ skills:
       maxlevel: 3
       cooldown: 5.0
       cooldownDecreasePerLevel: 0.5
-      baseFriendlyHealthRestoredOnHit: 5.0
-      friendlyHealthRestoredOnHitIncreasedPerLevel: 1.0
+      baseFriendlyHealthRestoredOnHit: 10.0
+      friendlyHealthRestoredOnHitIncreasedPerLevel: 2.0
       baseNaturalRegenerationDisabledDuration: 2.0
       increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
     stormsphere:
@@ -1012,9 +1012,9 @@ skills:
       cooldownDecreasePerLevel: 3.0
       baseRange: 8.0
       rangeIncreasePerLevel: 1.0
-      baseHealthReduction: 6.0
-      healthReductionDecreasePerLevel: 0.5
-      baseHealthReductionPerPlayerAffected: 1.0
+      baseHealthReduction: 12.0
+      healthReductionDecreasePerLevel: 1.0
+      baseHealthReductionPerPlayerAffected: 2.0
       healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
       baseDuration: 20.0
       durationIncreasePerLevel: 2.5
@@ -1048,8 +1048,10 @@ skills:
       durationIncreasePerLevel: 0.0
       cooldownDecreasePerLevel: 1.0
       speedStrength: 2
-      baseHealthReduction: 4.0
-      healthReductionDecreasePerLevel: 0.5
+      baseHealthReduction: 8.0
+      healthReductionDecreasePerLevel: 1.0
+      baseHealthReductionPerPlayerAffected: 2.0
+      healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
     bloodthirst:
       enabled: true
       maxlevel: 3
@@ -1087,8 +1089,8 @@ skills:
       rangeIncreasePerLevel: 0.5
       baseDamageIncrease: 33.0
       damageIncreasePerLevel: 0.0
-      baseHealthReduction: 4.0
-      healthReductionDecreasePerLevel: 0.5
+      baseHealthReduction: 8.0
+      healthReductionDecreasePerLevel: 1.0
     cleanse:
       enabled: true
       maxlevel: 5
@@ -1097,8 +1099,10 @@ skills:
       canUseWhileStunned: true
       canUseWhileLevitating: true
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 2.0
+      baseHealthReduction: 4.0
       healthReductionDecreasePerLevel: 0.0
+      baseHealthReductionPerPlayerAffected: 2.0
+      healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0
       baseDuration: 2.0
@@ -1110,12 +1114,12 @@ skills:
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 4.0
-      healthReductionDecreasePerLevel: 0.5
+      baseHealthReduction: 8.0
+      healthReductionDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
       baseHealth : 10.0
-      healthPerEnemyHit: 1.0
+      healthPerEnemyHit: 2.0
       leapStrength : 1.3
       blindnessLevel : 2
       slownessLevel : 1
@@ -1149,9 +1153,8 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseRange: 7.0
       rangeIncreasePerLevel: 0.0
-      baseLeechedHealth: 1.0
+      baseLeechedHealth: 2.0
       leachedHealthIncreasePerLevel: 0.0
-      leechedHealth: 1.0
       maximumEnemies: 2
       maximumEnemiesIncreasePerLevel: 0
     wreath:
@@ -1163,12 +1166,12 @@ skills:
       damageIncreasePerLevel: 0.66
       slowStrength: 2
       slowDuration: 2.0
-      healthPerEnemyHit: 1.0
+      healthPerEnemyHit: 2.0
+      healthPerEnemyHitIncreasePerLevel: 0.0
       maxCharges: 3
       maxChargesIncreasePerLevel: 0
       rechargeSeconds: 10.0
       rechargeSecondsDecreasePerLevel: 1.0
-      healthPerEnemyHitIncreasePerLevel: 0.0
     frailty:
       enabled: true
       maxlevel: 3
@@ -1188,7 +1191,7 @@ skills:
       radius: 4
       energySiphoned: 1.0
       elapsedTimeToProcAbility: 2.0
-      healthGainedOnRandomSiphon: 1.0
+      healthGainedOnRandomSiphon: 2.0
       randomSiphonHealthGainChance: 0.1
     bloodsphere:
       enabled: true
@@ -1205,8 +1208,8 @@ skills:
       applyTravelSpeed: 6.0
       damagePerSecond: 3.0
       damageIncreasePerLevel: 1.0
-      regenPerSecond: 5.0
-      regenIncreasePerLevel: 0.5
+      regenPerSecond: 10.0
+      regenIncreasePerLevel: 1.0
       impactHealthMultiplier: 0.1
       impactHealthMultiplierIncreasePerLevel: 0.05
       healthSeconds: 0.5

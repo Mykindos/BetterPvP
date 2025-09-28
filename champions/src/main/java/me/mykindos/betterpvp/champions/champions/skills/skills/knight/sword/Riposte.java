@@ -264,7 +264,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         baseBonusDamage = getConfig("baseBonusDamage", 1.0, Double.class);
         bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.5, Double.class);
 
-        baseHealing = getConfig("baseHealing", 1.0, Double.class);
-        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 1.0, Double.class);
+        baseHealing = getConfig("baseHealing", 2.5, Double.class);
+        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 2.5, Double.class);
     }
 }

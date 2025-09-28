@@ -283,7 +283,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
 
-        healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
+        healthPerEnemyHit = getConfig("healthPerEnemyHit", 2.0, Double.class);
         healthPerEnemyHitIncreasePerLevel = getConfig("healthPerEnemyHitIncreasePerLevel", 0.0, Double.class);
 
         slowStrength = getConfig("slowStrength", 2, Integer.class);
