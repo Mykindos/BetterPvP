@@ -113,8 +113,9 @@ public class CustomGiveCommand extends Command {
 
         final ItemStack itemStack = instance.createItemStack();
         itemStack.setAmount(Math.min(count, itemStack.getMaxStackSize())); // Ensure the amount does not exceed max stack size
-        if (itemStack.getAmount() < count) {
-            UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>Warning:</yellow> <red>Item stack size is limited to <green>%s</green>, giving only x<green>%s</green>.", itemStack.getMaxStackSize(), itemStack.getAmount()));
+        final int amount = itemStack.getAmount();
+        if (amount < count) {
+            UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>Warning:</yellow> <red>Item stack size is limited to <green>%s</green>, giving only x<green>%s</green>.", itemStack.getMaxStackSize(), amount));
         }
 
         target.getInventory().addItem(itemStack);
@@ -122,7 +123,7 @@ public class CustomGiveCommand extends Command {
                 player.getName(),
                 target.getName(),
                 namespacedKey,
-                itemStack.getAmount()), Rank.HELPER);
+                amount), Rank.HELPER);
         // todo handle items that do not fit in inventory
     }
 
