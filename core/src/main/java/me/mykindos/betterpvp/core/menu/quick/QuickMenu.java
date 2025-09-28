@@ -51,32 +51,47 @@ public class QuickMenu {
         final Core plugin = JavaPlugin.getPlugin(Core.class);
         return switch (button) {
             case 1 -> {
-                UtilServer.runTask(plugin, () -> new SettingsMenu(player, client).show(player));
+                UtilServer.runTask(plugin, () -> {
+                    swapCursor(player, () -> new SettingsMenu(player, client).show(player));
+                });
                 yield true;
             }
             case 2 -> {
                 UtilServer.runTask(plugin, () -> {
-                    final GuiCraftingTable gui = plugin.getInjector().getInstance(GuiCraftingTable.class);
-                    gui.show(player);
+                    swapCursor(player, () -> {
+                        final GuiCraftingTable gui = plugin.getInjector().getInstance(GuiCraftingTable.class);
+                        gui.show(player);
+                    });
                 });
                 yield true;
             }
             case 3 -> {
                 UtilServer.runTask(plugin, () -> {
-                    final ItemFactory factory = plugin.getInjector().getInstance(ItemFactory.class);
-                    new GuiItemViewer(factory).show(player);
+                    swapCursor(player, () -> {
+                        final ItemFactory factory = plugin.getInjector().getInstance(ItemFactory.class);
+                        new GuiItemViewer(factory).show(player);
+                    });
                 });
                 yield true;
             }
             case 4 -> {
                 UtilServer.runTask(plugin, () -> {
-                    final LeaderboardManager leaderboards = plugin.getInjector().getInstance(LeaderboardManager.class);
-                    new LeaderboardCategoryMenu(leaderboards).show(player);
+                    swapCursor(player, () -> {
+                        final LeaderboardManager leaderboards = plugin.getInjector().getInstance(LeaderboardManager.class);
+                        new LeaderboardCategoryMenu(leaderboards).show(player);
+                    });
                 });
                 yield true;
             }
             default -> false;
         };
+    }
+
+    private static void swapCursor(Player player, Runnable runnable) {
+        final ItemStack cursor = player.getItemOnCursor();
+        player.setItemOnCursor(null);
+        runnable.run();
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> player.setItemOnCursor(cursor));
     }
 
     private static ItemProvider craftingButton() {
