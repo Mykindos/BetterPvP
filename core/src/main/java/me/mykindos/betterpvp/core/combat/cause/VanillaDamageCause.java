@@ -28,6 +28,11 @@ public class VanillaDamageCause implements DamageCause {
     
     @Override
     public String getDisplayName() {
+        if (vanillaCause == EntityDamageEvent.DamageCause.FIRE || vanillaCause == EntityDamageEvent.DamageCause.FIRE_TICK
+            || vanillaCause == EntityDamageEvent.DamageCause.CAMPFIRE) {
+            return "Fire";
+        }
+
         return UtilFormat.cleanString(vanillaCause.name());
     }
     

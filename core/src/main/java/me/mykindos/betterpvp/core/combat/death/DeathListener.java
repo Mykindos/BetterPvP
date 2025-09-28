@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -31,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 @BPvPListener
 public class DeathListener implements Listener {
@@ -77,13 +79,20 @@ public class DeathListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCustomDeath(CustomDeathMessageEvent event) {
         final String[] reasonRaw = Objects.requireNonNullElse(event.getReason(), new String[]{});
-        final Component[] reasons = Arrays.stream(reasonRaw).map(text -> Component.text(text, NamedTextColor.GREEN)).toArray(Component[]::new);
+        Component[] reasons = Arrays.stream(reasonRaw).map(text -> Component.text(text, NamedTextColor.GREEN)).toArray(Component[]::new);
         Component reason = Component.join(JoinConfiguration.separator(Component.text(", ", NamedTextColor.GRAY)), reasons).applyFallbackStyle(NamedTextColor.GRAY);
         Component message;
         final Component killedName = event.getKilledName().applyFallbackStyle(NamedTextColor.YELLOW);
         if (event.getKiller() == null) {
             if (reasons.length == 0) {
-                message = killedName.append(Component.text(" was killed", NamedTextColor.GRAY));
+                final Optional<ConcurrentLinkedDeque<DamageLog>> damageLog = damageLogManager.getObject(event.getDeathEvent().getKilled().getUniqueId());
+                if (damageLog.isPresent() && !damageLog.get().isEmpty()) {
+                    final DamageLog lastDamage = damageLog.get().getLast();
+                    final TextComponent name = Component.text(lastDamage.getDamageCause().getDisplayName());
+                    message = killedName.append(Component.text(" was killed by ", NamedTextColor.GRAY)).append(name);
+                } else {
+                    message = killedName.append(Component.text(" was killed", NamedTextColor.GRAY));
+                }
             } else {
                 message = killedName.append(Component.text(" was killed by ", NamedTextColor.GRAY)).append(reason);
             }

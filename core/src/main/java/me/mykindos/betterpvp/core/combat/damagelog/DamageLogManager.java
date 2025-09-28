@@ -28,7 +28,7 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
     private static final Collector<DamageLog, ?, Map<String, List<DamageLog>>> SUMMARY_COLLECTOR =
             Collectors.groupingBy(log -> log.getDamager() != null
                     ? log.getDamager().getName()
-                    : log.getDamageCause().getName());
+                    : log.getDamageCause().getDisplayName());
     
     public void add(Entity damagee, DamageLog damageLog) {
         ConcurrentLinkedDeque<DamageLog> logs = objects.computeIfAbsent(damagee.getUniqueId().toString(), k -> new ConcurrentLinkedDeque<>());
@@ -84,7 +84,7 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
             component.append(UtilMessage.deserialize("<yellow>%s</yellow>'s Damage Summary:", player.getName()));
 
             logQueue.stream().collect(SUMMARY_COLLECTOR).forEach((source, logs) -> {
-                String cause = UtilFormat.cleanString(logs.getFirst().getDamageCause().getName());
+                String cause = logs.getFirst().getDamageCause().getDisplayName();
                 final double damage = logs.stream().mapToDouble(DamageLog::getDamage).sum();
                 final double timePrior = logs.stream()
                         .mapToDouble(DamageLog::getTime)
