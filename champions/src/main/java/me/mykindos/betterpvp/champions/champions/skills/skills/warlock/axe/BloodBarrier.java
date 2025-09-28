@@ -244,10 +244,10 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         baseRange = getConfig("baseRange", 8.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 6.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.50, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 12.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);
 
-        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 1.0, Double.class);
+        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 2.0, Double.class);
         healthReductionPerPlayerAffectedDecreasePerLevel = getConfig("healthReductionPerPlayerAffectedDecreasePerLevel", 0.0, Double.class);
 
         baseDuration = getConfig("baseDuration", 20.0, Double.class);

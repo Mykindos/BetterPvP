@@ -186,6 +186,6 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
         maxSporeChargesIncreasePerLevel = getConfig("maxSporeChargesIncreasePerLevel", 1, Integer.class);
         sporeRemovalTime = getConfig("sporeRemovalTime", 5.0, Double.class);
         healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 0.0, Double.class);
-        healing = getConfig("healing", 1.5, Double.class);
+        healing = getConfig("healing", 3.0, Double.class);
     }
 }
