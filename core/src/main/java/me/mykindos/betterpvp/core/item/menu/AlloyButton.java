@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.menu.GuiRecipeViewer;
 import me.mykindos.betterpvp.core.recipe.smelting.Alloy;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingRecipe;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -94,6 +95,8 @@ public class AlloyButton extends ControlItem<Gui> {
     }
 
     private ItemView.ItemViewBuilder baseBuilder() {
+        final int buckets = millibuckets / 1000;
+        final String bucketsString = buckets == 1 ? "bucket" : "buckets";
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/sprite/smelter/alloy_indicator/" + alloy.getTextureKey()))
@@ -102,8 +105,8 @@ public class AlloyButton extends ControlItem<Gui> {
                 .customModelData(15)
                 .lore(Component.text(millibucketPrefix + ":", TextColor.color(214, 214, 214))
                         .appendSpace()
-                        .append(Component.text(millibuckets, NamedTextColor.WHITE))
-                        .append(Component.text(" mb", NamedTextColor.WHITE)));
+                        .append(Component.text(UtilFormat.formatNumber(millibuckets / 1000d, 1), NamedTextColor.WHITE))
+                        .append(Component.text(" " + bucketsString, NamedTextColor.WHITE)));
     }
 
     @Override
