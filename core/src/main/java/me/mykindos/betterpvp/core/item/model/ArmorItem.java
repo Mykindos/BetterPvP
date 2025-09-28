@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.HealthStat;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -20,6 +21,7 @@ public abstract class ArmorItem extends BaseItem implements ReloadHook {
         this.plugin = plugin;
         addSerializableComponent(new StatContainerComponent().withBaseStat(new HealthStat(1)));
         addSerializableComponent(new DurabilityComponent(500));
+        addSerializableComponent(new RuneContainerComponent(2));
     }
 
     @Override
