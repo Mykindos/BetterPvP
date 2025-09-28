@@ -44,7 +44,7 @@ public class SkillDamageCause implements DamageCause {
      * @param skill the skill causing the damage
      */
     public SkillDamageCause(Skill skill) {
-        this(skill, false, 0L, false);
+        this(skill, false, DEFAULT_DELAY, false);
     }
 
     public SkillDamageCause withBukkitCause(EntityDamageEvent.DamageCause bukkitCause) {
