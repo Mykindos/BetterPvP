@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 
 /**
  * Base class for skill-based damage modifiers
@@ -43,7 +44,7 @@ public class SkillDamageModifier implements DamageModifier {
     
     @Override
     public String getName() {
-        return skill.getName().toLowerCase().replace(" ", "_");
+        return UtilFormat.cleanString(skill.getName().toLowerCase());
     }
     
     @Override
