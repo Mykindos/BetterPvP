@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -90,7 +91,7 @@ public class StatContainer implements Unique, IMapListener {
     @Override
     public void onMapValueChanged(String key, Object newValue, @Nullable Object oldValue) {
         try {
-            new StatPropertyUpdateEvent(this, key, (Double) newValue, (Double) oldValue).callEvent();
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), new StatPropertyUpdateEvent(this, key, (Double) newValue, (Double) oldValue)::callEvent);
         } catch (Exception e) {
             log.error("Exception on map value change {}", key, e).submit();
         }
