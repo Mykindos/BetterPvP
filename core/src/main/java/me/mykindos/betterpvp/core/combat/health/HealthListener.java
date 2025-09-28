@@ -54,6 +54,6 @@ public class HealthListener implements Listener {
         }
 
         // Update relative health. We don't want people equipping sets and staying half health
-        entity.setHealth(Math.max(1.0, previousPercentage * attribute.getValue()));
+        entity.setHealth(Math.max(0.0, previousPercentage * attribute.getValue()));
     }
 }
