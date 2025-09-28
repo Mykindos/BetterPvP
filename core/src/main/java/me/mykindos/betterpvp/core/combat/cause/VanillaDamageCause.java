@@ -23,7 +23,7 @@ public class VanillaDamageCause implements DamageCause {
     
     @Override
     public String getName() {
-        return vanillaCause.name().toLowerCase();
+        return vanillaCause.name();
     }
     
     @Override

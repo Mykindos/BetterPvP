@@ -64,16 +64,17 @@ public class MythicMobsDamageAdapter implements Listener {
         var mobManager = MythicBukkit.inst().getMobManager();
         ActiveMob damagee = mobManager.getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
         if (damagee != null) {
+            final EntityDamageEvent.DamageCause cause = event.getBukkitCause();
 
             if(damagee.getType().getDigOutOfGround()) {
-                if(event.getCause().getName().equals("vanilla_suffocation")) {
+                if(cause == EntityDamageEvent.DamageCause.SUFFOCATION) {
                     Entity bukkitEntity = damagee.getEntity().getBukkitEntity();
                     bukkitEntity.teleport(bukkitEntity.getLocation().add(0, 2, 0));
                 }
             }
 
-            if (damagee.getType().getDamageModifiers().containsKey(event.getCause().getName())) {
-                event.setDamage(event.getDamage() * damagee.getType().getDamageModifiers().get(event.getCause().getName()));
+            if (damagee.getType().getDamageModifiers().containsKey(cause.toString())) {
+                event.setDamage(event.getDamage() * damagee.getType().getDamageModifiers().get(cause.toString()));
             }
 
             if (event.getDamager() instanceof Player player) {
