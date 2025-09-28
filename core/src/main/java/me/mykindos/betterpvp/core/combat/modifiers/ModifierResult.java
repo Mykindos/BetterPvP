@@ -55,4 +55,8 @@ public class ModifierResult {
     public static ModifierResult noChange(String reason) {
         return new ModifierResult(1.0, 0.0, false, reason);
     }
+
+    public boolean isReductive() {
+        return damageMultiplier <= 1.0 && damageAddition <= 0.0;
+    }
 }
