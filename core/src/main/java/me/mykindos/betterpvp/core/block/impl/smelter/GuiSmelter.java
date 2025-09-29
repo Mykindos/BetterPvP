@@ -451,7 +451,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             }
 
             // If what we're smelting isn't compatible with what's in already
-            if (!data.getLiquidManager().isCompatibleWith(data.getProcessingEngine().getSmeltingAlloy())) {
+            if (data.getProcessingEngine().getSmeltingAlloy() != null
+                    && !data.getLiquidManager().isCompatibleWith(data.getProcessingEngine().getSmeltingAlloy())) {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
