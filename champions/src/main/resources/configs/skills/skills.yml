@@ -868,7 +868,7 @@ skills:
       maxDistance: 64.0
       deathMessageThreshold: 32.0
     heavyarrows:
-      enabled: true
+      enabled: false
       maxlevel: 3
       energy: 24
       basePushBack: 1.0
