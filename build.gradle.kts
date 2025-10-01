@@ -6,10 +6,10 @@ plugins {
     `java-gradle-plugin` apply true
     `version-catalog` apply true
     kotlin("jvm") version libs.versions.kotlin apply true
-    id("com.gradleup.shadow") version "9.2.1" apply false // Building fat jar
+    id("com.gradleup.shadow") version "9.2.2" apply false // Building fat jar
     id("org.inferred.processors") version "3.7.0" apply false  // Annotation processing
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
-    id("org.flywaydb.flyway") version "11.13.0" apply false // Flyway
+    id("org.flywaydb.flyway") version "11.13.2" apply false // Flyway
     id("org.sonarqube") version "6.3.1.5724" apply true
 }
 
