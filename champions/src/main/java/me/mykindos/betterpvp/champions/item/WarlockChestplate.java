@@ -31,6 +31,6 @@ public class WarlockChestplate extends ArmorItem {
         };
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('N', new RecipeIngredient(netherite, 1));
-        registry.registerRecipe(new NamespacedKey("warlock_chestplate", "hyper_axe"), builder.build());
+        registry.registerRecipe(new NamespacedKey("champions", "warlock_chestplate"), builder.build());
     }
 }

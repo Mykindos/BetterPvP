@@ -3,6 +3,9 @@ core:
     server: Clans-1
     season: Season 1
   database:
+    supabase:
+      url: https://abcdefghijklmnop.supabase.co
+      service-key: my-supabase-service-key
     global:
       databaseName: betterpvp
       username: user

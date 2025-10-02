@@ -10,13 +10,13 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
-import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
+import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -43,36 +43,34 @@ public class WeaponListener implements Listener {
     }
 
     @EventHandler
-    public void onSpecialItemDrop(SpecialItemDropEvent event) {
-        var itemStack = event.getEntity().getItemStack();
-        itemFactory.fromItemStack(itemStack).ifPresent(item -> {
-            if (!item.getRarity().isImportant()) {
-                return;
-            }
+    public void onSpecialItemDrop(SpecialItemLootEvent event) {
+        final ItemInstance item = event.getItemInstance();
+        if (!item.getRarity().isImportant()) {
+            return;
+        }
 
-            final String clazzName = item.getBaseItem().getClass().getSimpleName();
-            final Component name = item.getView().getName();
-            if (event.getSource().equalsIgnoreCase("Fishing")) {
-                UtilMessage.broadcast(Component.text("A ", NamedTextColor.YELLOW).append(name.hoverEvent(itemStack))
-                        .append(Component.text(" was caught by a fisherman!", NamedTextColor.YELLOW)));
-                log.info("A legendary weapon was caught by a fisherman! ({})", clazzName)
-                        .setAction("FISH_LEGENDARY")
-                        .addLocationContext(event.getEntity().getLocation())
-                        .addContext("Source", event.getSource()).submit();
+        final String clazzName = item.getBaseItem().getClass().getSimpleName();
+        final Component name = item.getView().getName();
+        if (event.getSource().equalsIgnoreCase("Fishing")) {
+            UtilMessage.broadcast(Component.text("A ", NamedTextColor.YELLOW).append(name.hoverEvent(item.getView().get()))
+                    .append(Component.text(" was caught by a fisherman!", NamedTextColor.YELLOW)));
+            log.info("A legendary weapon was caught by a fisherman! ({})", clazzName)
+                    .setAction("FISH_LEGENDARY")
+                    .addLocationContext(event.getLootContext().getLocation())
+                    .addContext("Source", event.getSource()).submit();
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    UtilSound.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0f, 1.0f, false);
-                }
-            } else {
-                UtilMessage.broadcast(Component.text("Announcement> ", NamedTextColor.BLUE)
-                        .append(Component.text(event.getSource(), NamedTextColor.RED)
-                                .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
-                                .append(name.hoverEvent(itemStack))));
-                log.info("A legendary weapon was dropped by {}! ({})", event.getSource(), clazzName)
-                        .addLocationContext(event.getEntity().getLocation())
-                        .addContext("Source", event.getSource()).submit();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                UtilSound.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0f, 1.0f, false);
             }
-        });
+        } else {
+            UtilMessage.broadcast(Component.text("Announcement> ", NamedTextColor.BLUE)
+                    .append(Component.text(event.getSource(), NamedTextColor.RED)
+                            .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
+                            .append(name.hoverEvent(item.getView().get()))));
+            log.info("A legendary weapon was dropped by {}! ({})", event.getSource(), clazzName)
+                    .addLocationContext(event.getLootContext().getLocation())
+                    .addContext("Source", event.getSource()).submit();
+        }
     }
 
     @EventHandler

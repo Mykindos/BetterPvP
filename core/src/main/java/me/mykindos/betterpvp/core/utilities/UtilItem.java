@@ -6,13 +6,7 @@ import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.droptables.DropTable;
-import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
-import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,7 +16,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -45,10 +38,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -309,81 +300,6 @@ public class UtilItem {
             newComponents.add(component.decoration(TextDecoration.ITALIC, false));
         }
         return newComponents;
-    }
-
-    public static DropTable getDropTable(ItemFactory itemFactory, BPvPPlugin plugin, String source, String config, String configKey) {
-        return getDropTable(itemFactory, plugin.getConfig(config), source, configKey);
-    }
-
-    public static DropTable getDropTable(ItemFactory itemFactory, BPvPPlugin plugin, String source, String configKey) {
-        return getDropTable(itemFactory, plugin, source, "config", configKey);
-    }
-
-    public static DropTable getDropTable(ItemFactory itemFactory, ExtendedYamlConfiguration config, String source, String configKey) {
-        DropTable droptable = new DropTable(source, configKey);
-
-        var configSection = config.getConfigurationSection(configKey);
-        if (configSection == null) return droptable;
-
-        parseDropTable(itemFactory, configSection, droptable);
-
-        return droptable;
-    }
-
-    public static Map<String, DropTable> getDropTables(ItemFactory itemFactory, ExtendedYamlConfiguration config, String source, String configKey) {
-        Map<String, DropTable> droptableMap = new HashMap<>();
-
-        var configSection = config.getConfigurationSection(configKey);
-        if (configSection == null) return droptableMap;
-
-        configSection.getKeys(false).forEach(key -> {
-            var droptableSection = configSection.getConfigurationSection(key);
-            if (droptableSection == null) return;
-            DropTable droptable = new DropTable(source, key);
-            parseDropTable(itemFactory, droptableSection, droptable);
-
-            droptableMap.put(key, droptable);
-
-            log.info("Droptable: " + key).submit();
-            droptable.getAbsoluteElementChances().forEach((element, chance) -> {
-                log.info(element + ": " + (chance * 100)).submit();
-            });
-
-        });
-
-        return droptableMap;
-    }
-
-    private static void parseDropTable(ItemFactory itemFactory, ConfigurationSection droptableSection, DropTable droptable) {
-        for (String key : droptableSection.getKeys(false)) {
-            DropTableItemStack itemStack = null;
-            int weight = droptableSection.getInt(key + ".weight");
-            int categoryWeight = droptableSection.getInt(key + ".category-weight");
-            int amount = droptableSection.getInt(key + ".amount", 1);
-
-            int minAmount = droptableSection.getInt(key + ".minAmount", amount);
-            int maxAmount = droptableSection.getInt(key + ".maxAmount", amount);
-
-            if (key.contains(":")) {
-                final NamespacedKey namespacedKey = Objects.requireNonNull(NamespacedKey.fromString(key));
-                final BaseItem item = itemFactory.getItemRegistry().getItem(namespacedKey);
-                if (item != null) {
-                    itemStack = new DropTableItemStack(itemFactory.create(item).createItemStack(), minAmount, maxAmount);
-                } else {
-                    log.error("Failed to load item {}", key).submit();
-                }
-            } else {
-                Material item = Material.valueOf(key.toUpperCase());
-                int modelId = droptableSection.getInt(key + ".model-id", 0);
-                itemStack = new DropTableItemStack(UtilItem.createItemStack(item, amount, modelId), minAmount, maxAmount);
-            }
-
-            if (itemStack == null) {
-                log.warn("Tried to add invalid item to droptable: " + key).submit();
-            }
-
-            droptable.add(categoryWeight, weight, itemStack);
-        }
     }
 
     /**

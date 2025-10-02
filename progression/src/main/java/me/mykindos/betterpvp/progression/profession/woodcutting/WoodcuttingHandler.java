@@ -1,21 +1,23 @@
 package me.mykindos.betterpvp.progression.profession.woodcutting;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.loot.LootBundle;
+import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootTable;
+import me.mykindos.betterpvp.core.loot.LootTableRegistry;
+import me.mykindos.betterpvp.core.loot.session.LootSession;
+import me.mykindos.betterpvp.core.loot.session.LootSessions;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.droptables.DropTable;
-import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
@@ -23,13 +25,14 @@ import me.mykindos.betterpvp.progression.profession.woodcutting.leaderboards.Tot
 import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -43,8 +46,7 @@ import java.util.function.DoubleUnaryOperator;
 @Singleton
 @CustomLog
 @Getter
-public class WoodcuttingHandler extends ProfessionHandler {
-
+public class WoodcuttingHandler extends ProfessionHandler implements ReloadHook {
 
     private final WoodcuttingRepository woodcuttingRepository;
     private final LeaderboardManager leaderboardManager;
@@ -57,24 +59,31 @@ public class WoodcuttingHandler extends ProfessionHandler {
      */
     private Map<Material, Long> experiencePerWood;
 
-
-    /**
-     * DropTable containing every loot type that can drop for the Woodcutting profession
-     */
-    private DropTable lootTypes;
+    private final LootTableRegistry lootTableRegistry;
+    private final LootSessions lootSessions = LootSessions.playerBound();
+    private LootTable lootTable;
 
     @Inject
     public WoodcuttingHandler(Progression progression, ClientManager clientManager, ProfessionProfileManager professionProfileManager,
                               WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager,
-                              BlockTagManager blockTagManager, EffectManager effectManager, ItemFactory itemFactory) {
+                              BlockTagManager blockTagManager, EffectManager effectManager, ItemFactory itemFactory,
+                              LootTableRegistry lootTableRegistry) {
         super(progression, clientManager, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;
         this.effectManager = effectManager;
         this.itemFactory = itemFactory;
+        this.lootTableRegistry = lootTableRegistry;
     }
 
+    /**
+     * Reloads the configuration or state of this class.
+     */
+    @Override
+    public void reload() {
+        this.lootTable = lootTableRegistry.loadLootTable("woodcutting");
+    }
 
     /**
      * @param material The (type of) wood material that was mined by the player
@@ -163,24 +172,10 @@ public class WoodcuttingHandler extends ProfessionHandler {
      * Gets a random item from the loot table with a random amount between min and max
      * @return An ItemStack with a random amount
      */
-    public ItemStack getRandomLoot() {
-        DropTableItemStack item = lootTypes.random();
-        if (item == null) return null;
-
-        return item.create();
-    }
-
-    /**
-     * Represents a type of loot one can obtain from the *Woodcutting* profession
-     * @deprecated Use DropTable instead
-     */
-    @Data
-    @Deprecated
-    public static class WoodcuttingLootType {
-        private final Material material;
-        private final int customModelData;
-        private final int minAmount;
-        private final int maxAmount;
+    public @NotNull LootBundle getRandomLoot(Player player, Location location) {
+        final LootSession session = lootSessions.getSession(player);
+        final LootContext context = new LootContext(player, location, session, "Woodcutting");
+        return this.lootTable.generateLoot(context);
     }
 
     /**
@@ -217,35 +212,5 @@ public class WoodcuttingHandler extends ProfessionHandler {
         }
 
         log.info("Loaded " + experiencePerWood.size() + " woodcutting blocks").submit();
-
-        lootTypes = new DropTable("woodcutting", "main");
-        ConfigurationSection lootSection = createOrGetSection(woodcuttingSection, "loot");
-
-        for (String lootItemKey : lootSection.getKeys(false)) {
-
-            ConfigurationSection lootItemSection = lootSection.getConfigurationSection(lootItemKey);
-            if (lootItemSection == null) continue;
-
-            String itemMaterialAsString = lootItemSection.getString("material");
-            if (itemMaterialAsString == null) continue;
-
-            Material material = Material.getMaterial(itemMaterialAsString.toUpperCase());
-            if (material == null) continue;
-
-            String itemKey = lootItemSection.getString("item");
-            Preconditions.checkNotNull(itemKey, "Item key cannot be null!");
-            BaseItem item = itemFactory.getItemRegistry().getItem(itemKey);
-            Preconditions.checkNotNull(item, "No item found for key: " + itemKey);
-            final ItemStack itemStack = itemFactory.create(item).createItemStack();
-
-            int frequency = lootItemSection.getInt("frequency");
-            int minAmount = lootItemSection.getInt("minAmount");
-            int maxAmount = lootItemSection.getInt("maxAmount");
-            DropTableItemStack dropTableItemStack = new DropTableItemStack(itemStack, minAmount, maxAmount);
-
-            lootTypes.add(frequency, 1, dropTableItemStack);
-        }
-
-        log.info("Loaded " + lootTypes.size() + " woodcutting loot types").submit();
     }
 }

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.loot;
+package me.mykindos.betterpvp.core.loot.chest;
 
 import com.google.inject.Singleton;
 import lombok.Getter;
