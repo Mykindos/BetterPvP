@@ -39,7 +39,10 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Bukkit.broadcastMessage(player.getHealth() + "");
+        final ItemRegistry registry = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemRegistry.class);
+        for (NamespacedKey namespacedKey : registry.getItems().keySet()) {
+            System.out.println(namespacedKey.toString());
+        }
     }
 
     @Override

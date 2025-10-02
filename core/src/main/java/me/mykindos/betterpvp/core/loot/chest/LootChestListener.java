@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.loot;
+package me.mykindos.betterpvp.core.loot.chest;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -15,12 +15,10 @@ import org.bukkit.event.Listener;
 @PluginAdapter("MythicMobs")
 public class LootChestListener implements Listener {
 
-    private final Core core;
     private final LootChestManager lootChestManager;
 
     @Inject
-    public LootChestListener(Core core, LootChestManager lootChestManager) {
-        this.core = core;
+    public LootChestListener(LootChestManager lootChestManager) {
         this.lootChestManager = lootChestManager;
     }
 
@@ -30,7 +28,7 @@ public class LootChestListener implements Listener {
 
         LootChest lootChest = lootChestManager.getLootChest(event.getActiveMob().getEntity().getBukkitEntity());
         if (lootChest != null) {
-            lootChest.onOpen(core);
+            lootChest.open(event.getPlayer());
             lootChestManager.getLootChests().remove(lootChest);
         }
     }
