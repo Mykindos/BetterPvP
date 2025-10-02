@@ -31,7 +31,7 @@ public class StrengthListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onStrengthDamage(DamageEvent event) {
-        if (event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
             return;
         }
 
