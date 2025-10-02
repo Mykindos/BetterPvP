@@ -69,7 +69,8 @@ public class Clans extends BPvPPlugin {
                     new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations", "clans", TargetDatabase.LOCAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations/local", "clans", TargetDatabase.LOCAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations/global", "clans", TargetDatabase.GLOBAL);
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
 

@@ -67,7 +67,8 @@ public class Champions extends BPvPPlugin {
                     new SkillInjectorModule(this));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations", "champions", TargetDatabase.LOCAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations/local", "champions", TargetDatabase.LOCAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations/global", "champions", TargetDatabase.GLOBAL);
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Champions"));
 

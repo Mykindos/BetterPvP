@@ -3,14 +3,12 @@ package me.mykindos.betterpvp.clans.clans.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -30,7 +28,6 @@ import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
@@ -43,7 +40,6 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
@@ -57,7 +53,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 @CustomLog
 @Singleton
@@ -104,7 +99,7 @@ public class ClanRepository implements IRepository<Clan> {
                     clan.getCore().getVault().read(vault);
                 }
 
-                if(mailbox != null) {
+                if (mailbox != null) {
                     clan.getCore().getMailbox().read(mailbox);
                 }
 
@@ -132,7 +127,7 @@ public class ClanRepository implements IRepository<Clan> {
     private void loadProperties(Clan clan) {
         String query = "SELECT Property, Value FROM clan_properties WHERE Clan = ?";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()){
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
             propertyMapper.parseProperties(result, clan);
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Failed to load clan properties for {}", clan.getId(), ex).submit();
@@ -304,9 +299,9 @@ public class ClanRepository implements IRepository<Clan> {
 
                 String name = "";
                 // Doing it this way so we don't load the client into the cache unnecessarily, we'll remove this when we merge the databases
-                try(CachedRowSet nameResult =  database.executeQuery(new Statement("SELECT Name FROM clients WHERE UUID = ?",
+                try (CachedRowSet nameResult = database.executeQuery(new Statement("SELECT Name FROM clients WHERE UUID = ?",
                         new UuidStatementValue(UUID.fromString(uuid))), TargetDatabase.GLOBAL).join()) {
-                    while(nameResult.next()) {
+                    while (nameResult.next()) {
                         name = nameResult.getString(1);
                     }
                 }
@@ -514,99 +509,69 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void addClanKill(UUID killID, @Nullable Clan killerClan, @Nullable Clan victimClan, double dominance) {
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-
-            String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
-            database.executeUpdate(new Statement(query,
-                    new UuidStatementValue(killID),
-                    new UuidStatementValue(killerClan != null ? killerClan.getId() : null),
-                    new UuidStatementValue(victimClan != null ? victimClan.getId() : null),
-                    new DoubleStatementValue(dominance)
-            ));
-        });
+        String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
+        database.executeUpdate(new Statement(query,
+                new UuidStatementValue(killID),
+                new UuidStatementValue(killerClan != null ? killerClan.getId() : null),
+                new UuidStatementValue(victimClan != null ? victimClan.getId() : null),
+                new DoubleStatementValue(dominance)
+        ), TargetDatabase.GLOBAL);
     }
 
 
+
     /**
-     * Gets the related ClanKillLogs for the specified Clan
-     * Should be called async
-     * @param clan
-     * @param clanManager
-     * @param clientManager
-     * @return
+     * Retrieves a list of kill logs associated with a specific clan.
+     * The logs include details about killings such as killer, victim, their respective clans, dominance, and the timestamp.
+     *
+     * @param clan the clan for which the kill logs are to be retrieved
+     * @param clanManager the ClanManager instance used to fetch clan details and names
+     * @return a list of {@code KillClanLog} objects containing detailed information about the clan's kill history
      */
-    public List<KillClanLog> getClanKillLogs(Clan clan, ClanManager clanManager, ClientManager clientManager) {
-        //Completable future handling from https://www.baeldung.com/java-completablefuture-list-convert
+    public List<KillClanLog> getClanKillLogs(Clan clan, ClanManager clanManager) {
+
         String query = "CALL GetClanKillLogs(?)";
+        List<KillClanLog> killLogs = Collections.synchronizedList(new ArrayList<>());
 
-        CompletableFuture<List<KillClanLog>> listFuture = CompletableFuture.supplyAsync(() -> {
-            List<CompletableFuture<KillClanLog>> futures = Collections.synchronizedList(new ArrayList<>());
-            try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
-                while (result.next()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL).join()) {
 
-                    CompletableFuture<KillClanLog> killLogFuture = new CompletableFuture<>();
-                    futures.add(killLogFuture);
+            while (result.next()) {
 
-                    CompletableFuture<Boolean> killerNameFuture = new CompletableFuture<>();
+                UUID killer = UUID.fromString(result.getString("Killer"));
+                String killerName = result.getString("KillerName");
+                @Nullable String killerClanId = result.getString("KillerClan");
+                UUID killerClan = killerClanId == null ? null : UUID.fromString(killerClanId);
 
-                    UUID killer = UUID.fromString(result.getString(1));
+                String killerClanName = clanManager.getClanById(killerClan)
+                        .map(Clan::getName)
+                        .orElse("");
 
-                    AtomicReference<String> killerName = new AtomicReference<>("Unknown Player");
-                    clientManager.search().offline(killer).thenAcceptAsync((clientOptional) -> {
-                        clientOptional.ifPresent(client -> {
-                            killerName.set(client.getName());
-                        });
-                        killerNameFuture.complete(true);
-                    });
 
-                    @Nullable String killerClanId = result.getString(2);
-                    UUID killerClan = killerClanId == null ? null : UUID.fromString(killerClanId);
+                UUID victim = UUID.fromString(result.getString("Victim"));
+                String victimName = result.getString("VictimName");
 
-                    AtomicReference<String> killerClanName = new AtomicReference<>("");
-                    clanManager.getClanById(killerClan).ifPresent(clanName -> {
-                        killerClanName.set(clanName.getName());
-                    });
+                String victimClanId = result.getString("VictimClan");
 
-                    CompletableFuture<Boolean> victimNameFuture = new CompletableFuture<>();
-                    UUID victim = UUID.fromString(result.getString(3));
-                    AtomicReference<String> victimName = new AtomicReference<>("Unknown Player");
-                    clientManager.search().offline(victim).thenAcceptAsync((clientOptional) -> {
-                        clientOptional.ifPresent(client -> {
-                            victimName.set(client.getName());
-                        });
-                        victimNameFuture.complete(true);
-                    });
-
-                    String victimClanId = result.getString(4);
-                    //data can be null or empty to indicate no clan, remove after Beta 2
-                    //TODO remove after beta 2
-                    if (victimClanId != null && victimClanId.isEmpty()) {
-                        victimClanId = null;
-                    }
-                    UUID victimClan = victimClanId == null ? null : UUID.fromString(victimClanId);
-
-                    AtomicReference<String> victimClanName = new AtomicReference<>("");
-                    clanManager.getClanById(victimClan).ifPresent(clanName -> {
-                        victimClanName.set(clanName.getName());
-                    });
-
-                    double dominance = result.getDouble(5);
-                    long time = result.getLong(6);
-
-                    CompletableFuture.allOf(killerNameFuture, victimNameFuture).whenComplete((unused, throwable) -> {
-                        killLogFuture.complete(new KillClanLog(killerName.get(), killer, killerClanName.get(), killerClan,
-                                victimName.get(), victim, victimClanName.get(), victimClan,
-                                dominance, time));
-                    });
+                if (victimClanId != null && victimClanId.isEmpty()) {
+                    victimClanId = null;
                 }
-            } catch (SQLException ex) {
-                log.error("Failed to get ClanUUID logs", ex).submit();
+                UUID victimClan = victimClanId == null ? null : UUID.fromString(victimClanId);
+
+                String victimClanName = clanManager.getClanById(victimClan)
+                        .map(Clan::getName)
+                        .orElse("");
+
+                double dominance = result.getDouble("Dominance");
+                long time = result.getLong("Time");
+
+                killLogs.add(new KillClanLog(killerName, killer, killerClanName, killerClan,
+                        victimName, victim, victimClanName, victimClan,
+                        dominance, time));
             }
-            CompletableFuture<?>[] futuresArray = futures.toArray(new CompletableFuture<?>[0]);
-            return CompletableFuture.allOf(futuresArray).thenApply(v -> futures.stream()
-                    .map(CompletableFuture::join)
-                    .toList()).join();
-        });
-        return listFuture.join();
+        } catch (SQLException ex) {
+            log.error("Failed to get ClanUUID logs", ex).submit();
+        }
+
+        return killLogs;
     }
 }

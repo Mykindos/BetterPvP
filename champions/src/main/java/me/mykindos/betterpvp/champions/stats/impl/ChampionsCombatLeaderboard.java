@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatSort;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -165,7 +166,7 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
             } catch (SQLException e) {
                 log.error("Failed to load combat rating leaderboard for type " + sortType, e).submit();
             }
-        }).join();
+        }, TargetDatabase.GLOBAL).join();
         return map;
     }
 

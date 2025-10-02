@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.champions.stats.repository;
 
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.ChampionsKill;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -83,17 +85,19 @@ public class ChampionsCombatData extends CombatData {
         }
 
         // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO champions_combat_stats (Gamer, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";
+        String ratingStmt = "INSERT INTO champions_combat_stats (Gamer, Server, Season, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
+                new StringStatementValue(Core.getCurrentServer()),
+                new StringStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(role == null ? "" : role.toString()),
                 new IntegerStatementValue(getRating()),
                 new IntegerStatementValue(getKillStreak()),
                 new IntegerStatementValue(getHighestKillStreak()));
 
-        database.executeBatch(killStatements);
-        database.executeBatch(contributionStatements);
-        database.executeUpdate(victimRating);
+        database.executeBatch(killStatements, TargetDatabase.GLOBAL);
+        database.executeBatch(contributionStatements, TargetDatabase.GLOBAL);
+        database.executeUpdate(victimRating, TargetDatabase.GLOBAL);
         pendingKills.clear();
     }
 

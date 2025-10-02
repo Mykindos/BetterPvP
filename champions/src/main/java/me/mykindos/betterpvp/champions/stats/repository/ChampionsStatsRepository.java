@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
@@ -67,7 +68,7 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
                 } catch (SQLException e) {
                     log.error("Failed to load combat data for " + player, e).submit();
                 }
-            }).join();
+            }, TargetDatabase.GLOBAL).join();
             return roleStatistics;
         }).exceptionally(throwable -> {
             log.error("Failed to load combat data for " + player, throwable).submit();
@@ -80,18 +81,18 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
         Statement updateKillsStatement = new Statement(updateKills,
                 new BooleanStatementValue(isValid),
                 new UuidStatementValue(client.getUniqueId()));
-        database.executeUpdate(updateKillsStatement);
+        database.executeUpdate(updateKillsStatement, TargetDatabase.GLOBAL);
 
         String updateStats = "UPDATE combat_stats SET Valid = ? WHERE Gamer = ?";
         Statement updateStatsStatement = new Statement(updateStats,
                 new BooleanStatementValue(isValid),
                 new UuidStatementValue(client.getUniqueId()));
-        database.executeUpdate(updateStatsStatement);
+        database.executeUpdate(updateStatsStatement, TargetDatabase.GLOBAL);
 
         String updateCombatData = "UPDATE champions_combat_stats SET Valid = ? WHERE Gamer = ?";
         Statement updateCombatDataStatement = new Statement(updateCombatData,
                 new BooleanStatementValue(isValid),
                 new UuidStatementValue(client.getUniqueId()));
-        database.executeUpdate(updateCombatDataStatement);
+        database.executeUpdate(updateCombatDataStatement, TargetDatabase.GLOBAL);
     }
 }

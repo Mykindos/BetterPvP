@@ -23,7 +23,7 @@ public class GlobalCombatListener extends CombatStatsListener<GlobalCombatData> 
         this.repository = repository;
     }
 
-    @UpdateEvent(delay = 60_000 * 5) // save async every 5 minutes
+    @UpdateEvent(delay = 60_000 * 3) // save async every 3 minutes
     public void onUpdate() {
         repository.saveAll(true);
     }
