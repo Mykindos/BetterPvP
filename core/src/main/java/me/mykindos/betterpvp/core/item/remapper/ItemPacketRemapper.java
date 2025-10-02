@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCreativeInventoryAction;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCollectItem;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
@@ -80,7 +81,39 @@ public class ItemPacketRemapper implements PacketListener {
         final PacketTypeCommon type = event.getPacketType();
         switch (type) {
             case PacketType.Play.Client.CLICK_WINDOW -> this.onWindowClick(event);
+            case PacketType.Play.Client.CREATIVE_INVENTORY_ACTION -> this.onCreativeAction(event);
             default -> { }
+        }
+    }
+
+    private void onCreativeAction(PacketReceiveEvent event) {
+        WrapperPlayClientCreativeInventoryAction packet = new WrapperPlayClientCreativeInventoryAction(event);
+        final ItemStack stack = packet.getItemStack();
+        if (stack.isEmpty()) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        final org.bukkit.inventory.ItemStack inPlace = player.getOpenInventory().getItem(packet.getSlot());
+        final Optional<org.bukkit.inventory.ItemStack> converted = itemFactory.convertItemStack(SpigotConversionUtil.toBukkitItemStack(stack));
+        converted.ifPresent(itemStack -> packet.setItemStack(SpigotConversionUtil.fromBukkitItemStack(itemStack)));
+
+        if (inPlace == null) {
+            return;
+        }
+
+        final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(inPlace);
+        if (itemOpt.isEmpty()) {
+            return;
+        }
+
+        final ItemInstance item = itemOpt.get();
+        final org.bukkit.inventory.ItemStack existing = SpigotConversionUtil.toBukkitItemStack(stack);
+        final org.bukkit.inventory.ItemStack view = item.getView().get();
+        if (existing.equals(view)) {
+            event.setCancelled(true);
+        } else {
+            packet.setItemStack(mapTo(stack));
         }
     }
 
