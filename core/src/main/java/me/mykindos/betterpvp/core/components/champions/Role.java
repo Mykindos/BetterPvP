@@ -72,9 +72,7 @@ public enum Role {
     }
 
     private ItemStack getItem(ItemFactory itemFactory, ItemStack itemStack) {
-        final ItemInstance instance = itemFactory.fromItemStack(itemStack).orElseThrow();
-        final BaseItem baseItem = instance.getBaseItem();
-        return itemFactory.create(baseItem).createItemStack();
+        return itemFactory.convertItemStack(itemStack).orElseThrow();
     }
 
     private ItemStack getItem(ItemFactory itemFactory, Material material) {
