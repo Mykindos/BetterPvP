@@ -24,7 +24,7 @@ public class ExactResultParameter implements LookupParameter {
         if (recipe instanceof CastingMoldRecipe castingMoldRecipe) {
             return Objects.equals(castingMoldRecipe.getResult(), this.exactResult);
         } else if (recipe instanceof CraftingRecipe craftingRecipe) {
-            return Objects.equals(craftingRecipe.getPrimaryResult(), this.exactResult);
+            return Objects.equals(craftingRecipe.getPrimaryResult().getBaseItem(), this.exactResult);
         } else if (recipe instanceof AnvilRecipe anvilRecipe) {
             return Objects.equals(anvilRecipe.getPrimaryResult().getPrimaryResult(), this.exactResult);
         } else if (recipe instanceof ImbuementRecipe imbuementRecipe) {
