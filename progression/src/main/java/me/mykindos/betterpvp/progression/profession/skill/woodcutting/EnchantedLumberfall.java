@@ -4,9 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
+import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.loot.Loot;
+import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -28,6 +30,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,7 +38,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 
 @CustomLog
 @Singleton
@@ -134,50 +136,51 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 }, i);
             }
 
-            ItemStack itemStack = woodcuttingHandler.getRandomLoot();
-            if (itemStack == null) return;
-
-            int count = itemStack.getAmount();
-
-            double chance = UtilMath.randDouble(0, 100);
-            boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerSkillLevel(player));
-            if (shouldDoubleDrops) {
-                count *= 2;
-                itemStack.setAmount(count);
-            }
-            ItemStack finalItemStack = itemFactory.convertItemStack(itemStack).orElse(itemStack);
-            final Component name;
-            if (itemStack.getItemMeta().hasDisplayName()) {
-                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
-            } else {
-                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
-                        Component.translatable(itemStack.getType().translationKey()));
-            }
-
-
-            UtilItem.insert(player, finalItemStack);
-
-            TextComponent messageToPlayer = Component.text("You found ")
-                    .append(Component.text(UtilFormat.formatNumber(count)))
-                    .append(Component.text(" "))
-                    .append(name);
-
-            if (shouldDoubleDrops) {
-                messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));
-            }
-
-            UtilMessage.message(player, getProgressionTree(), messageToPlayer);
-
-            log.info("{} found {}x {}.", player.getName(), count, itemStack.getType().name().toLowerCase())
-                    .addClientContext(player).addLocationContext(loc).submit();
-
-            try {
-                ItemEntity entity = new ItemEntity(((CraftWorld) player.getWorld()).getHandle(), loc.getX(), loc.getY(), loc.getZ(), CraftItemStack.asNMSCopy(finalItemStack));
-                org.bukkit.entity.Item itemEntity = (org.bukkit.entity.Item) entity.getBukkitEntity();
-                UtilServer.callEvent(new SpecialItemDropEvent(itemEntity, "Woodcutting"));
-            } catch (Exception ex) {
-                log.error("Failed to create special item drop event for player " + player.getName(), ex).submit();
+            LootBundle bundle = woodcuttingHandler.getRandomLoot(event.getPlayer(), event.getLocationToActivatePerk());
+            for (Loot<?, ?> loot : bundle) {
+                final Object award = loot.award(bundle.getContext());
+                if (award instanceof Item item) {
+                    processItemStack(player, locationToActivatePerk, item.getItemStack());
+                } else if (award instanceof ItemStack itemStack) {
+                    processItemStack(player, locationToActivatePerk, itemStack);
+                }
             }
         }, 20L);
+    }
+
+    private void processItemStack(Player player, Location location, ItemStack itemStack) {
+        int count = itemStack.getAmount();
+
+        double chance = UtilMath.randDouble(0, 100);
+        boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerSkillLevel(player));
+        if (shouldDoubleDrops) {
+            count *= 2;
+            itemStack.setAmount(count);
+        }
+        ItemStack finalItemStack = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+        final Component name;
+        if (itemStack.getItemMeta().hasDisplayName()) {
+            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+        } else {
+            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                    Component.translatable(itemStack.getType().translationKey()));
+        }
+
+
+        UtilItem.insert(player, finalItemStack);
+
+        TextComponent messageToPlayer = Component.text("You found ")
+                .append(Component.text(UtilFormat.formatNumber(count)))
+                .append(Component.text(" "))
+                .append(name);
+
+        if (shouldDoubleDrops) {
+            messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));
+        }
+
+        UtilMessage.message(player, getProgressionTree(), messageToPlayer);
+
+        log.info("{} found {}x {}.", player.getName(), count, itemStack.getType().name().toLowerCase())
+                .addClientContext(player).addLocationContext(location).submit();
     }
 }
