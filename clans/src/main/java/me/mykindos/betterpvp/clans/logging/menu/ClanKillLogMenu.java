@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.clans.logging.button.ClanKillLogButton;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -36,14 +35,17 @@ import java.util.concurrent.CompletableFuture;
 @CustomLog
 public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed {
 
+    private static final String FILTER_ALL = "All";
+    private static final String FILTER_CLAN = "Clan";
+    private static final String FILTER_CLIENT = "Client";
+
     private final Clan clan;
     private final ClanManager clanManager;
-    private final ClientManager clientManager;
 
     private IStringFilterButton categoryButton;
     private IStringFilterValueButton valueButton;
 
-    public ClanKillLogMenu(Clan clan, ClanManager clanManager, ClientManager clientManager) {
+    public ClanKillLogMenu(Clan clan, ClanManager clanManager) {
         super(9, 5, false, new Structure(
                 "# # # # # # # C V",
                 "# x x x x x x x #",
@@ -56,12 +58,11 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                 .addIngredient('-', new BackButton(null))
                 .addIngredient('>', new ForwardButton())
                 .addIngredient('R', new RefreshButton<>())
-                .addIngredient('C', new StringFilterButton<>("Select Category", List.of("All", "Clan", "Client"), 9, Material.WRITABLE_BOOK, 0))
+                .addIngredient('C', new StringFilterButton<>("Select Category", List.of(FILTER_ALL, FILTER_CLAN, FILTER_CLIENT), 9, Material.WRITABLE_BOOK, 0))
                 .addIngredient('V', new StringFilterValueButton<>(9))
         );
         this.clan = clan;
         this.clanManager = clanManager;
-        this.clientManager = clientManager;
 
         if (getItem(8, 4) instanceof IRefreshButton refreshButton) {
             refreshButton.setRefresh(this::refresh);
@@ -85,49 +86,61 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
     }
 
     private CompletableFuture<Boolean> refresh() {
-        CompletableFuture<List<Item>> future = new CompletableFuture<>();
         valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
-        future.completeAsync(() -> {
+
+        return CompletableFuture.supplyAsync(() -> {
             List<KillClanLog> logs = clanManager.getRepository().getClanKillLogs(clan, clanManager);
-            System.out.println(logs.size());
-            logs.forEach(killClanLog -> {
-                valueButton.addValue("Clan", killClanLog.getKillerClanName());
-                valueButton.addValue("Clan", killClanLog.getVictimClanName());
-                valueButton.addValue("Client", killClanLog.getKillerName());
-                valueButton.addValue("Client", killClanLog.getVictimName());
 
-            });
+            // Populate filter values
+            populateFilterValues(logs);
+
             return logs.stream()
-                    .filter(killClanLog -> {
-                        String context = categoryButton.getSelectedFilter();
-                        String selectedValue = valueButton.getSelected();
-                        if (Objects.equals(context, "All")) {
-                            return true;
-                        }
-                        if (context.equals("Clan") && (killClanLog.getKillerClanName().equals(selectedValue) ||
-                                killClanLog.getVictimClanName().equals(selectedValue))) {
-                            return true;
-                        }
-
-                        return context.equals("Client") && (killClanLog.getKillerName().equals(selectedValue) ||
-                                killClanLog.getVictimName().equals(selectedValue));
-                    })
+                    .filter(this::matchesSelectedFilter)
                     .map(killClanLog -> new ClanKillLogButton(clan, killClanLog, clanManager))
-                    .map(Item.class::cast).toList();
-        });
-        future = future.exceptionally((throwable -> {
-            log.error("Error loading clan kill logs", throwable).submit();
+                    .map(Item.class::cast)
+                    .toList();
+        }).exceptionally(throwable -> {
+            log.error("Error loading clan kill logs for clan: {}", clan.getName(), throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
                     .displayName(Component.text("Error! Check console!"))
                     .lore(Component.text("Please inform staff if you see this"))
                     .build()));
-        }));
-        return future.thenApply(logs -> {
+        }).thenApply(logs -> {
             setContent(logs);
             return true;
         });
+    }
+
+    private void populateFilterValues(List<KillClanLog> logs) {
+        logs.forEach(killClanLog -> {
+            valueButton.addValue(FILTER_CLAN, killClanLog.getKillerClanName());
+            valueButton.addValue(FILTER_CLAN, killClanLog.getVictimClanName());
+            valueButton.addValue(FILTER_CLIENT, killClanLog.getKillerName());
+            valueButton.addValue(FILTER_CLIENT, killClanLog.getVictimName());
+        });
+    }
+
+    private boolean matchesSelectedFilter(KillClanLog killClanLog) {
+        String context = categoryButton.getSelectedFilter();
+        String selectedValue = valueButton.getSelected();
+
+        if (Objects.equals(context, FILTER_ALL)) {
+            return true;
+        }
+
+        if (FILTER_CLAN.equals(context)) {
+            return killClanLog.getKillerClanName().equals(selectedValue) ||
+                   killClanLog.getVictimClanName().equals(selectedValue);
+        }
+
+        if (FILTER_CLIENT.equals(context)) {
+            return killClanLog.getKillerName().equals(selectedValue) ||
+                   killClanLog.getVictimName().equals(selectedValue);
+        }
+
+        return false;
     }
 
     @Override

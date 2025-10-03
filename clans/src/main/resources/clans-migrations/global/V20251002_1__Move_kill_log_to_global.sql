@@ -22,5 +22,6 @@ BEGIN
              INNER JOIN kills ON kills.Id = clans_kills.KillId
     WHERE KillerClan = clanId_param
        OR VictimClan = clanId_param
-    ORDER BY Time DESC;
+    ORDER BY Time DESC
+    LIMIT 1000; # Prevent overloading the database until we have proper pagination
 END;
