@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.TillingTremorAbility;
-import me.mykindos.betterpvp.core.imbuement.ImbuementRecipe;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.BaseItem;
@@ -14,11 +13,9 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.item.impl.*;
+import me.mykindos.betterpvp.core.item.impl.MagicSeal;
+import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
-import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
-import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -33,6 +30,7 @@ public class Rake extends WeaponItem implements ReloadHook {
 
     @EqualsAndHashCode.Exclude
     private final Champions champions;
+    private transient boolean registered;
 
     @Inject
     public Rake(Champions champions, TillingTremorAbility tillingTremorAbility) {
@@ -60,6 +58,8 @@ public class Rake extends WeaponItem implements ReloadHook {
     @Inject
     private void registerRecipe(ImbuementRecipeRegistry registry, ItemFactory itemFactory,
                                 MagicSeal magicSeal, OverchargedCrystal overchargedCrystal) {
+        if (registered) return;
+        registered = true;
         final BaseItem diamondHoe = itemFactory.getFallbackItem(Material.DIAMOND_HOE);
         final Map<BaseItem, Integer> ingredients = Map.of(
                 magicSeal, 1,

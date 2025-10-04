@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.item.bloomrot;
 
-import com.github.retrooper.packetevents.protocol.world.states.enums.South;
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,7 +22,6 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

@@ -16,6 +16,9 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 public class RangerChestplate extends ArmorItem {
+
+    private transient boolean registered;
+
     @Inject
     private RangerChestplate(Champions champions) {
         super(champions, "Ranger Chestplate", ItemStack.of(Material.CHAINMAIL_CHESTPLATE), ItemRarity.COMMON);
@@ -23,6 +26,8 @@ public class RangerChestplate extends ArmorItem {
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
         final BaseItem emerald = itemFactory.getFallbackItem(Material.EMERALD);
         String[] pattern = new String[] {
                 "E E",

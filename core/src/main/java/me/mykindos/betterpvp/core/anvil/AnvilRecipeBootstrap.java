@@ -3,8 +3,7 @@ package me.mykindos.betterpvp.core.anvil;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
-import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,20 +13,11 @@ import org.bukkit.plugin.java.JavaPlugin;
  * This class is responsible for setting up all anvil crafting recipes in the system.
  */
 @Singleton
-@PluginAdapter("Core")
-public class AnvilRecipeBootstrap {
+public class AnvilRecipeBootstrap implements ItemBootstrap {
 
-    private final ItemFactory itemFactory;
-    private final ItemRegistry itemRegistry;
-    private final AnvilRecipeRegistry anvilRecipeRegistry;
+    private boolean registered = false;
 
-    @Inject
-    private AnvilRecipeBootstrap(ItemFactory itemFactory, ItemRegistry itemRegistry, AnvilRecipeRegistry anvilRecipeRegistry) {
-        this.itemFactory = itemFactory;
-        this.itemRegistry = itemRegistry;
-        this.anvilRecipeRegistry = anvilRecipeRegistry;
-    }
-
+    @Inject private ItemRegistry itemRegistry;    
     /**
      * Creates a namespaced key for the Core plugin.
      * @param name The key name
@@ -37,37 +27,18 @@ public class AnvilRecipeBootstrap {
         return new NamespacedKey(JavaPlugin.getPlugin(Core.class), name);
     }
 
-    /**
-     * Register example anvil recipes.
-     * This method can be expanded to include actual recipe registrations.
-     */
     @Inject
-    private void registerExampleRecipes() {
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
+
         // Example recipe registration would go here
         // For now, this serves as a placeholder for future recipe additions
-        
+
         // Example structure for future use:
         // registerToolRecipes();
         // registerWeaponRecipes();
         // registerArmorRecipes();
     }
-
-    // Example methods for organizing recipe registration:
-    
-    /*
-    private void registerToolRecipes() {
-        // Register tool crafting recipes
-        // Example: Iron Pickaxe requiring 3 iron ingots + 2 wood sticks + 8 hammer swings
-    }
-    
-    private void registerWeaponRecipes() {
-        // Register weapon crafting recipes
-        // Example: Iron Sword requiring 2 iron ingots + 1 wood stick + 5 hammer swings
-    }
-    
-    private void registerArmorRecipes() {
-        // Register armor crafting recipes
-        // Example: Iron Helmet requiring 5 iron ingots + 12 hammer swings
-    }
-    */
 } 

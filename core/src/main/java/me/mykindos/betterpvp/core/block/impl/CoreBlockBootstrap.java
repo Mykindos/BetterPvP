@@ -12,28 +12,33 @@ import me.mykindos.betterpvp.core.block.impl.smelter.Smelter;
 import me.mykindos.betterpvp.core.block.impl.smelter.SmelterItem;
 import me.mykindos.betterpvp.core.block.impl.workbench.Workbench;
 import me.mykindos.betterpvp.core.block.impl.workbench.WorkbenchItem;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import org.bukkit.NamespacedKey;
 
 @Singleton
-public class CoreBlockBootstrap {
+public class CoreBlockBootstrap implements ItemBootstrap {
 
-    private final Core core;
-    private final SmartBlockRegistry smartBlockRegistry;
-    private final ItemRegistry itemRegistry;
+    private boolean registered = false;
+
+    @Inject private ItemRegistry itemRegistry;
+    @Inject private Core core;
+    @Inject private SmartBlockRegistry smartBlockRegistry;
+    @Inject private Workbench workbench;
+    @Inject private WorkbenchItem workbenchItem;
+    @Inject private Smelter smelter;
+    @Inject private SmelterItem smelterItem;
+    @Inject private Anvil anvil;
+    @Inject private AnvilItem anvilItem;
+    @Inject private ImbuementPedestal imbuementPedestal;
+    @Inject private ImbuementPedestalItem imbuementPedestalItem;
 
     @Inject
-    private CoreBlockBootstrap(Core core, SmartBlockRegistry smartBlockRegistry, ItemRegistry itemRegistry) {
-        this.core = core;
-        this.smartBlockRegistry = smartBlockRegistry;
-        this.itemRegistry = itemRegistry;
-    }
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
 
-    @Inject
-    private void registerStations(Workbench workbench, WorkbenchItem workbenchItem,
-                                  Smelter smelter, SmelterItem smelterItem,
-                                  Anvil anvil, AnvilItem anvilItem,
-                                  ImbuementPedestal imbuementPedestal, ImbuementPedestalItem imbuementPedestalItem) {
         smartBlockRegistry.registerBlock(workbench);
         itemRegistry.registerItem(new NamespacedKey(core, "workbench"), workbenchItem);
 

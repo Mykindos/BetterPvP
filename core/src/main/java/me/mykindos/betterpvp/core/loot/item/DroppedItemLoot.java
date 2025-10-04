@@ -1,24 +1,23 @@
 package me.mykindos.betterpvp.core.loot.item;
 
-import me.mykindos.betterpvp.core.Core;
+import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
-import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.ReplacementStrategy;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
+@EqualsAndHashCode(callSuper = true)
 public final class DroppedItemLoot extends ItemLoot<Item> {
 
-    DroppedItemLoot(BaseItem reward, ReplacementStrategy replacementStrategy, Predicate<LootContext> condition, int minAmount, int maxAmount) {
-        super(reward, replacementStrategy, condition, minAmount, maxAmount);
+    DroppedItemLoot(NamespacedKey itemKey, ReplacementStrategy replacementStrategy, Predicate<LootContext> condition, int minAmount, int maxAmount) {
+        super(itemKey, replacementStrategy, condition, minAmount, maxAmount);
     }
 
     /**
@@ -29,9 +28,7 @@ public final class DroppedItemLoot extends ItemLoot<Item> {
     @Override
     public Item award(LootContext context) {
         final Location location = context.getLocation();
-        final Core plugin = JavaPlugin.getPlugin(Core.class);
-        final ItemFactory itemFactory = plugin.getInjector().getInstance(ItemFactory.class);
-        final ItemInstance reward = itemFactory.create(this.getReward());
+        final ItemInstance reward = this.getReward();
         int count;
         if (minAmount == maxAmount) {
             count = minAmount;

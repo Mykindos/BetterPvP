@@ -21,9 +21,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -189,6 +187,7 @@ public class DamageEventFinalizer implements Listener {
             if (!delayKillSet.contains(damagee.getUniqueId())) {
                 delayKillSet.add(damagee.getUniqueId());
                 UtilServer.runTaskLater(core, () -> {
+                    if (event.getDamager() instanceof Player killer) damagee.setKiller(killer);
                     damagee.setHealth(0);
                     delayKillSet.remove(damagee.getUniqueId());
                 }, 2L);

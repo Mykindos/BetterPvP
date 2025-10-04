@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
-import me.mykindos.betterpvp.core.loot.session.LootSessions;
+import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
@@ -59,14 +59,14 @@ public class WoodcuttingHandler extends ProfessionHandler implements ReloadHook 
     private Map<Material, Long> experiencePerWood;
 
     private final LootTableRegistry lootTableRegistry;
-    private final LootSessions lootSessions = LootSessions.playerBound();
+    private final LootSessionController sessionController;
     private LootTable lootTable;
 
     @Inject
     public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager,
                               WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager,
                               BlockTagManager blockTagManager, EffectManager effectManager, ItemFactory itemFactory,
-                              LootTableRegistry lootTableRegistry) {
+                              LootTableRegistry lootTableRegistry, LootSessionController sessionController) {
         super(progression, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
@@ -74,6 +74,7 @@ public class WoodcuttingHandler extends ProfessionHandler implements ReloadHook 
         this.effectManager = effectManager;
         this.itemFactory = itemFactory;
         this.lootTableRegistry = lootTableRegistry;
+        this.sessionController = sessionController;
     }
 
     /**
@@ -172,8 +173,8 @@ public class WoodcuttingHandler extends ProfessionHandler implements ReloadHook 
      * @return An ItemStack with a random amount
      */
     public @NotNull LootBundle getRandomLoot(Player player, Location location) {
-        final LootSession session = lootSessions.getSession(player);
-        final LootContext context = new LootContext(player, location, session, "Woodcutting");
+        final LootSession session = sessionController.resolve(player, lootTable, () -> LootSession.newSession(lootTable, player));
+        final LootContext context = new LootContext(session, location, "Woodcutting");
         return this.lootTable.generateLoot(context);
     }
 

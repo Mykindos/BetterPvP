@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.item.bloomrot.Bloomrot;
 import me.mykindos.betterpvp.champions.item.ivybolt.Ivybolt;
 import me.mykindos.betterpvp.champions.item.scythe.ScytheOfTheFallenLord;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -18,70 +19,97 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class ChampionsItemBoostrap {
+public class ChampionsItemBoostrap implements ItemBootstrap {
 
-    private final Champions champions;
-    private final ItemRegistry itemRegistry;
-    private final CraftingRecipeRegistry registry;
-    private final MinecraftCraftingRecipeAdapter adapter;
+    private boolean registered = false;
 
-    @Inject
-    private ChampionsItemBoostrap(Champions champions, ItemRegistry itemRegistry, CraftingRecipeRegistry registry, MinecraftCraftingRecipeAdapter adapter) {
-        this.champions = champions;
-        this.itemRegistry = itemRegistry;
-        this.registry = registry;
-        this.adapter = adapter;
+    @Inject private ItemRegistry itemRegistry;
+    @Inject private Champions champions;
+    @Inject private CraftingRecipeRegistry craftingRecipeRegistry;
+    @Inject private MinecraftCraftingRecipeAdapter adapter;
+    @Inject private EnergyApple energyApple;
+    @Inject private EnergyElixir energyElixir;
+    @Inject private MushroomStew mushroomStew;
+    @Inject private PurificationPotion purificationPotion;
+    @Inject private RabbitStew rabbitStew;
+    @Inject private SuspiciousStew suspiciousStew;
+    @Inject private ThrowingWeb throwingWeb;
+    @Inject private AncientSword ancientSword;
+    @Inject private AncientAxe ancientAxe;
+    @Inject private PowerSword powerSword;
+    @Inject private PowerAxe powerAxe;
+    @Inject private BoosterSword boosterSword;
+    @Inject private BoosterAxe boosterAxe;
+    @Inject private StandardSword standardSword;
+    @Inject private StandardAxe standardAxe;
+    @Inject private MagneticMaul magneticMaul;
+    @Inject private GiantsBroadsword giantsBroadsword;
+    @Inject private HyperAxe hyperAxe;
+    @Inject private WindBlade windBlade;
+    @Inject private MeridianScepter meridianScepter;
+    @Inject private ScytheOfTheFallenLord scythe;
+    @Inject private ThunderclapAegis thunderclapAegis;
+    @Inject private AlligatorsTooth alligatorsTooth;
+    @Inject private Rake rake;
+    @Inject private RunedPickaxe runedPickaxe;
+    @Inject private Bloomrot bloomrot;
+    @Inject private Ivybolt ivybolt;
+    @Inject private Mjolnir mjolnir;
+    @Inject private AssassinHelmet assassinHelmet;
+    @Inject private AssassinChestplate assassinChestplate;
+    @Inject private AssassinLeggings assassinLeggings;
+    @Inject private AssassinBoots assassinBoots;
+    @Inject private BruteHelmet bruteHelmet;
+    @Inject private BruteChestplate bruteChestplate;
+    @Inject private BruteLeggings bruteLeggings;
+    @Inject private BruteBoots bruteBoots;
+    @Inject private KnightHelmet knightHelmet;
+    @Inject private KnightChestplate knightChestplate;
+    @Inject private KnightLeggings knightLeggings;
+    @Inject private KnightBoots knightBoots;
+    @Inject private MageHelmet mageHelmet;
+    @Inject private MageChestplate mageChestplate;
+    @Inject private MageLeggings mageLeggings;
+    @Inject private MageBoots mageBoots;
+    @Inject private RangerHelmet rangerHelmet;
+    @Inject private RangerChestplate rangerChestplate;
+    @Inject private RangerLeggings rangerLeggings;
+    @Inject private RangerBoots rangerBoots;
+    @Inject private WarlockHelmet warlockHelmet;
+    @Inject private WarlockChestplate warlockChestplate;
+    @Inject private WarlockLeggings warlockLeggings;
+    @Inject private WarlockBoots warlockBoots;
+
+    private @NotNull NamespacedKey championsKey(@NotNull String key) {
+        return new NamespacedKey(champions, key);
     }
 
     @Inject
-    private void registerConsumables(EnergyApple energyApple,
-                                     EnergyElixir energyElixir,
-                                     MushroomStew mushroomStew,
-                                     PurificationPotion purificationPotion,
-                                     RabbitStew rabbitStew,
-                                     SuspiciousStew suspiciousStew,
-                                     ThrowingWeb throwingWeb) {
-        registerFallbackItem("energy_apple", Material.APPLE, energyApple, false);
-        registerFallbackItem("energy_elixir", Material.POTION, energyElixir, false);
-        registerFallbackItem("mushroom_stew", Material.MUSHROOM_STEW, mushroomStew, false);
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
+
+        // Weapons
+        registerFallbackItem(itemRegistry, "ancient_sword", Material.NETHERITE_SWORD, ancientSword, false);
+        registerFallbackItem(itemRegistry, "ancient_axe", Material.NETHERITE_AXE, ancientAxe, false);
+        registerFallbackItem(itemRegistry, "power_sword", Material.DIAMOND_SWORD, powerSword, false);
+        registerFallbackItem(itemRegistry, "power_axe", Material.DIAMOND_AXE, powerAxe, false);
+        registerFallbackItem(itemRegistry, "booster_sword", Material.GOLDEN_SWORD, boosterSword, false);
+        registerFallbackItem(itemRegistry, "booster_axe", Material.GOLDEN_AXE, boosterAxe, false);
+        registerFallbackItem(itemRegistry, "standard_sword", Material.IRON_SWORD, standardSword, true);
+        registerFallbackItem(itemRegistry, "standard_axe", Material.IRON_AXE, standardAxe, true);
+        
+        // Consumables
+        registerFallbackItem(itemRegistry, "energy_apple", Material.APPLE, energyApple, false);
+        registerFallbackItem(itemRegistry, "energy_elixir", Material.POTION, energyElixir, false);
+        registerFallbackItem(itemRegistry, "mushroom_stew", Material.MUSHROOM_STEW, mushroomStew, false);
         itemRegistry.registerItem(championsKey("purification_potion"), purificationPotion);
-        registerFallbackItem("rabbit_stew", Material.RABBIT_STEW, rabbitStew, false);
-        registerFallbackItem("suspicious_stew", Material.SUSPICIOUS_STEW, suspiciousStew, false);
-        registerFallbackItem("throwing_web", Material.COBWEB, throwingWeb, false);
-    }
-
-    @Inject
-    private void registerWeapons(AncientSword ancientSword,
-                                 AncientAxe ancientAxe,
-                                 PowerSword powerSword,
-                                 PowerAxe powerAxe,
-                                 BoosterSword boosterSword,
-                                 BoosterAxe boosterAxe,
-                                 StandardSword standardSword,
-                                 StandardAxe standardAxe) {
-        registerFallbackItem("ancient_sword", Material.NETHERITE_SWORD, ancientSword, false);
-        registerFallbackItem("ancient_axe", Material.NETHERITE_AXE, ancientAxe, false);
-        registerFallbackItem("power_sword", Material.DIAMOND_SWORD, powerSword, false);
-        registerFallbackItem("power_axe", Material.DIAMOND_AXE, powerAxe, false);
-        registerFallbackItem("booster_sword", Material.GOLDEN_SWORD, boosterSword, false);
-        registerFallbackItem("booster_axe", Material.GOLDEN_AXE, boosterAxe, false);
-        registerFallbackItem("standard_sword", Material.IRON_SWORD, standardSword, true);
-        registerFallbackItem("standard_axe", Material.IRON_AXE, standardAxe, true);
-    }
-
-    @Inject
-    private void registerSpecials(MagneticMaul magneticMaul,
-                                  GiantsBroadsword giantsBroadsword,
-                                  HyperAxe hyperAxe,
-                                  WindBlade windBlade,
-                                  MeridianScepter meridianScepter,
-                                  ScytheOfTheFallenLord scythe,
-                                  ThunderclapAegis thunderclapAegis,
-                                  AlligatorsTooth alligatorsTooth,
-                                  Rake rake,
-                                  RunedPickaxe runedPickaxe,
-                                  Bloomrot bloomrot,
-                                  Ivybolt ivybolt) {
+        registerFallbackItem(itemRegistry, "rabbit_stew", Material.RABBIT_STEW, rabbitStew, false);
+        registerFallbackItem(itemRegistry, "suspicious_stew", Material.SUSPICIOUS_STEW, suspiciousStew, false);
+        registerFallbackItem(itemRegistry, "throwing_web", Material.COBWEB, throwingWeb, false);
+        
+        // Specials
         itemRegistry.registerItem(championsKey("magnetic_maul"), magneticMaul);
         itemRegistry.registerItem(championsKey("giants_broadsword"), giantsBroadsword);
         itemRegistry.registerItem(championsKey("hyper_axe"), hyperAxe);
@@ -94,77 +122,43 @@ public class ChampionsItemBoostrap {
         itemRegistry.registerItem(championsKey("runed_pickaxe"), runedPickaxe);
         itemRegistry.registerItem(championsKey("bloomrot"), bloomrot);
         itemRegistry.registerItem(championsKey("ivybolt"), ivybolt);
-    }
-
-    @Inject
-    private void registerMythicals(Mjolnir mjolnir) {
         itemRegistry.registerItem(championsKey("mjolnir"), mjolnir);
+        
+        // Kits
+        registerFallbackItem(itemRegistry, "assassin_helmet", Material.LEATHER_HELMET, assassinHelmet, true);
+        registerFallbackItem(itemRegistry, "assassin_chestplate", Material.LEATHER_CHESTPLATE, assassinChestplate, true);
+        registerFallbackItem(itemRegistry, "assassin_leggings", Material.LEATHER_LEGGINGS, assassinLeggings, true);
+        registerFallbackItem(itemRegistry, "assassin_boots", Material.LEATHER_BOOTS, assassinBoots, true);
+        registerFallbackItem(itemRegistry, "brute_helmet", Material.DIAMOND_HELMET, bruteHelmet, true);
+        registerFallbackItem(itemRegistry, "brute_chestplate", Material.DIAMOND_CHESTPLATE, bruteChestplate, true);
+        registerFallbackItem(itemRegistry, "brute_leggings", Material.DIAMOND_LEGGINGS, bruteLeggings, true);
+        registerFallbackItem(itemRegistry, "brute_boots", Material.DIAMOND_BOOTS, bruteBoots, true);
+        registerFallbackItem(itemRegistry, "knight_helmet", Material.IRON_HELMET, knightHelmet, true);
+        registerFallbackItem(itemRegistry, "knight_chestplate", Material.IRON_CHESTPLATE, knightChestplate, true);
+        registerFallbackItem(itemRegistry, "knight_leggings", Material.IRON_LEGGINGS, knightLeggings, true);
+        registerFallbackItem(itemRegistry, "knight_boots", Material.IRON_BOOTS, knightBoots, true);
+        registerFallbackItem(itemRegistry, "mage_helmet", Material.GOLDEN_HELMET, mageHelmet, true);
+        registerFallbackItem(itemRegistry, "mage_chestplate", Material.GOLDEN_CHESTPLATE, mageChestplate, true);
+        registerFallbackItem(itemRegistry, "mage_leggings", Material.GOLDEN_LEGGINGS, mageLeggings, true);
+        registerFallbackItem(itemRegistry, "mage_boots", Material.GOLDEN_BOOTS, mageBoots, true);
+        registerFallbackItem(itemRegistry, "ranger_helmet", Material.CHAINMAIL_HELMET, rangerHelmet, false);
+        registerFallbackItem(itemRegistry, "ranger_chestplate", Material.CHAINMAIL_CHESTPLATE, rangerChestplate, false);
+        registerFallbackItem(itemRegistry, "ranger_leggings", Material.CHAINMAIL_LEGGINGS, rangerLeggings, false);
+        registerFallbackItem(itemRegistry, "ranger_boots", Material.CHAINMAIL_BOOTS, rangerBoots, false);
+        registerFallbackItem(itemRegistry, "warlock_helmet", Material.NETHERITE_HELMET, warlockHelmet, true);
+        registerFallbackItem(itemRegistry, "warlock_chestplate", Material.NETHERITE_CHESTPLATE, warlockChestplate, true);
+        registerFallbackItem(itemRegistry, "warlock_leggings", Material.NETHERITE_LEGGINGS, warlockLeggings, true);
+        registerFallbackItem(itemRegistry, "warlock_boots", Material.NETHERITE_BOOTS, warlockBoots, true);
     }
 
-    @Inject
-    private void registerArmor(AssassinHelmet assassinHelmet,
-                               AssassinChestplate assassinChestplate,
-                               AssassinLeggings assassinLeggings,
-                               AssassinBoots assassinBoots,
-                               BruteHelmet bruteHelmet,
-                               BruteChestplate bruteChestplate,
-                               BruteLeggings bruteLeggings,
-                               BruteBoots bruteBoots,
-                               KnightHelmet knightHelmet,
-                               KnightChestplate knightChestplate,
-                               KnightLeggings knightLeggings,
-                               KnightBoots knightBoots,
-                               MageHelmet mageHelmet,
-                               MageChestplate mageChestplate,
-                               MageLeggings mageLeggings,
-                               MageBoots mageBoots,
-                               RangerHelmet rangerHelmet,
-                               RangerChestplate rangerChestplate,
-                               RangerLeggings rangerLeggings,
-                               RangerBoots rangerBoots,
-                               WarlockHelmet warlockHelmet,
-                               WarlockChestplate warlockChestplate,
-                               WarlockLeggings warlockLeggings,
-                               WarlockBoots warlockBoots) {
-        registerFallbackItem("assassin_helmet", Material.LEATHER_HELMET, assassinHelmet, true);
-        registerFallbackItem("assassin_chestplate", Material.LEATHER_CHESTPLATE, assassinChestplate, true);
-        registerFallbackItem("assassin_leggings", Material.LEATHER_LEGGINGS, assassinLeggings, true);
-        registerFallbackItem("assassin_boots", Material.LEATHER_BOOTS, assassinBoots, true);
-        registerFallbackItem("brute_helmet", Material.DIAMOND_HELMET, bruteHelmet, true);
-        registerFallbackItem("brute_chestplate", Material.DIAMOND_CHESTPLATE, bruteChestplate, true);
-        registerFallbackItem("brute_leggings", Material.DIAMOND_LEGGINGS, bruteLeggings, true);
-        registerFallbackItem("brute_boots", Material.DIAMOND_BOOTS, bruteBoots, true);
-        registerFallbackItem("knight_helmet", Material.IRON_HELMET, knightHelmet, true);
-        registerFallbackItem("knight_chestplate", Material.IRON_CHESTPLATE, knightChestplate, true);
-        registerFallbackItem("knight_leggings", Material.IRON_LEGGINGS, knightLeggings, true);
-        registerFallbackItem("knight_boots", Material.IRON_BOOTS, knightBoots, true);
-        registerFallbackItem("mage_helmet", Material.GOLDEN_HELMET, mageHelmet, true);
-        registerFallbackItem("mage_chestplate", Material.GOLDEN_CHESTPLATE, mageChestplate, true);
-        registerFallbackItem("mage_leggings", Material.GOLDEN_LEGGINGS, mageLeggings, true);
-        registerFallbackItem("mage_boots", Material.GOLDEN_BOOTS, mageBoots, true);
-        registerFallbackItem("ranger_helmet", Material.CHAINMAIL_HELMET, rangerHelmet, false);
-        registerFallbackItem("ranger_chestplate", Material.CHAINMAIL_CHESTPLATE, rangerChestplate, false);
-        registerFallbackItem("ranger_leggings", Material.CHAINMAIL_LEGGINGS, rangerLeggings, false);
-        registerFallbackItem("ranger_boots", Material.CHAINMAIL_BOOTS, rangerBoots, false);
-        registerFallbackItem("warlock_helmet", Material.NETHERITE_HELMET, warlockHelmet, true);
-        registerFallbackItem("warlock_chestplate", Material.NETHERITE_CHESTPLATE, warlockChestplate, true);
-        registerFallbackItem("warlock_leggings", Material.NETHERITE_LEGGINGS, warlockLeggings, true);
-        registerFallbackItem("warlock_boots", Material.NETHERITE_BOOTS, warlockBoots, true);
-    }
-    
-    private void registerFallbackItem(String key, Material material, BaseItem item, boolean keepRecipe) {
+    private void registerFallbackItem(ItemRegistry registry, String key, Material material, BaseItem item, boolean keepRecipe) {
         final NamespacedKey namespacedKey = championsKey(key);
-        itemRegistry.registerFallbackItem(namespacedKey, material, item);
+        registry.registerFallbackItem(namespacedKey, material, item);
         if (keepRecipe) {
             final Recipe old = Bukkit.getRecipe(material.getKey());
             if (old == null) return;
             final CraftingRecipe craftingRecipe = adapter.convertToCustomRecipe(old);
-            if (craftingRecipe != null) registry.registerRecipe(namespacedKey, craftingRecipe);
+            if (craftingRecipe != null) craftingRecipeRegistry.registerRecipe(namespacedKey, craftingRecipe);
         }
     }
-
-    private @NotNull NamespacedKey championsKey(@NotNull String key) {
-        return new NamespacedKey(champions, key);
-    }
-
 }
