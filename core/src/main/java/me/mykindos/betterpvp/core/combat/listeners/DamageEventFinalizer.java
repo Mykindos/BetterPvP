@@ -165,7 +165,7 @@ public class DamageEventFinalizer implements Listener {
         
         // Set damager level to damage amount (for visual feedback)
         if (event.getDamager() instanceof Player player) {
-            player.setLevel((int) event.getDamage());
+            player.setLevel((int) event.getModifiedDamage());
         }
     }
     
