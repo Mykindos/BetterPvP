@@ -41,13 +41,10 @@ public class LootChest implements AwardStrategy {
         final Location location = bundle.getContext().getLocation().clone().add(0, 1, 0);
         location.setDirection(location.getDirection().multiply(-1));
 
-        ActiveMob activeMob;
-        try (MythicBukkit mythic = MythicBukkit.inst()) {
-            activeMob = mythic.getMobManager().spawnMob(mythicMobName, location);
-            final Entity entity = activeMob.getEntity().getBukkitEntity();
-            entity.setInvisible(true);
-            entity.setMetadata("bundle", new FixedMetadataValue(JavaPlugin.getPlugin(Core.class), bundle));
-        }
+        ActiveMob activeMob = MythicBukkit.inst().getMobManager().spawnMob(mythicMobName, location);
+        final Entity entity = activeMob.getEntity().getBukkitEntity();
+        entity.setInvisible(true);
+        entity.setMetadata("bundle", new FixedMetadataValue(JavaPlugin.getPlugin(Core.class), bundle));
 
         final Core plugin = JavaPlugin.getPlugin(Core.class);
         plugin.getInjector().getInstance(LootChestManager.class).addLootChest(this, activeMob);
