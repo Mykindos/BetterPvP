@@ -25,7 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -142,7 +141,7 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
             if (UtilPlayer.getHealthPercentage(damagee) < getHealthPercent(level)) {
                 Location locationToPlayEffect = event.getDamagee().getLocation().add(0, 1, 0);
                 event.getDamagee().getWorld().playEffect(locationToPlayEffect, Effect.COPPER_WAX_ON, 0);
-                double damageIncrease = 1 + getDamagePercent(level);
+                double damageIncrease = 1 + getDamagePercent(level) / 100;
                 event.addModifier(new SkillDamageModifier.Multiplier(this, damageIncrease));
 ;
             }
