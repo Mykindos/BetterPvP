@@ -988,9 +988,9 @@ skills:
       maxlevel: 3
       cooldown: 5.0
       cooldownDecreasePerLevel: 0.5
-      baseFriendlyHealthRestoredOnHit: 1.0
-      friendlyHealthRestoredOnHitIncreasedPerLevel: 0.25
-      baseNaturalRegenerationDisabledDuration: 2.0
+      baseFriendlyHealthRestoredOnHit: 2.5
+      friendlyHealthRestoredOnHitIncreasedPerLevel: 2.5
+      baseNaturalRegenerationDisabledDuration: 3.0
       increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
     stormsphere:
       enabled: false
