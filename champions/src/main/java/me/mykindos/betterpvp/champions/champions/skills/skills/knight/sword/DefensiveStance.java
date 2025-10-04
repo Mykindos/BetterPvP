@@ -22,7 +22,10 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -158,7 +161,14 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 iterator.remove();
             }
             else {
-                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_STEP, 0.5F, 1.0F);
+                new SoundEffect(Sound.BLOCK_STONE_STEP, 1.0f, 1.0f).play(player.getEyeLocation());
+                Particle.BLOCK.builder()
+                        .data(Material.STONE.createBlockData())
+                        .count(10)
+                        .location(player.getLocation().add(0, player.getHeight() / 2, 0))
+                        .offset(0.5, 0.25, 0.5)
+                        .allPlayers()
+                        .spawn();
             }
 
         }
@@ -168,11 +178,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     @Override
     public boolean isShieldInvisible() {
         return false;
-    }
-
-    @Override
-    public boolean shouldShowShield(Player player) {
-        return !championsManager.getCooldowns().hasCooldown(player, getName());
     }
 
     @Override
