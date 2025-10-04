@@ -12,13 +12,11 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -40,11 +38,8 @@ public class LootChest implements AwardStrategy {
     // Spawn the chest entity
     @Override
     public void award(LootBundle bundle) {
-        final Location location = bundle.getContext().getLocation().add(0, 1, 0);
-        final Collection<Player> nearbyPlayers = location.getNearbyPlayers(5);
-        if (!nearbyPlayers.isEmpty()) {
-            location.setDirection(nearbyPlayers.iterator().next().getLocation().getDirection());
-        }
+        final Location location = bundle.getContext().getLocation().clone().add(0, 1, 0);
+        location.setDirection(location.getDirection().multiply(-1));
 
         ActiveMob activeMob;
         try (MythicBukkit mythic = MythicBukkit.inst()) {
@@ -80,9 +75,9 @@ public class LootChest implements AwardStrategy {
     private void dropItem(LootContext context, Loot<?, ?> loot) {
         dropSound.play(context.getLocation());
         if (loot.award(context) instanceof Item item) {
-            final Vector direction = context.getLocation().getDirection().clone().multiply(-0.4);
-            direction.setY(0.45 + Math.random() * 0.15);
+            final Vector direction = context.getLocation().clone().getDirection().clone().multiply(0.2 + Math.random() * 0.15);
             direction.rotateAroundY(Math.toRadians(Math.random() * 25));
+            direction.setY(0.2 + Math.random() * 0.15);
             item.setVelocity(direction);
         }
     }
