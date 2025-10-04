@@ -42,7 +42,7 @@ public class ItemAbilityDamageModifier implements DamageModifier {
     
     @Override
     public String getName() {
-        return ability.getName().toLowerCase().replace(" ", "_");
+        return ability.getName();
     }
     
     @Override
