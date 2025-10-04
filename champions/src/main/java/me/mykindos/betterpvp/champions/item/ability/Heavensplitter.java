@@ -89,7 +89,8 @@ public class Heavensplitter extends ItemAbility implements Listener {
         projectiles.put(caster, projectile);
 
         // Consume durability
-        UtilItem.damageItem(caster, itemStack, 1);
+        // Run later because bug idk
+        UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> UtilItem.damageItem(caster, itemStack, 1));
         return true;
     }
 

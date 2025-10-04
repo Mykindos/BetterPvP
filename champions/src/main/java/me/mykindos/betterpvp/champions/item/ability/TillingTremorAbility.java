@@ -74,6 +74,9 @@ public class TillingTremorAbility extends ItemAbility {
             return false;
         }
 
+        // Consume durability
+        UtilItem.damageItem(player, itemStack, 1);
+
         UtilMessage.simpleMessage(player, "Rake", "You used <green>Tilling Tremor<gray>.");
 
         Location playerLocation = player.getLocation();

@@ -21,12 +21,14 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -153,6 +155,11 @@ public class VolticBashAbility extends ItemAbility {
         final Vector direction = player.getLocation().getDirection().setY(0).normalize();
         VelocityData velocityData = new VelocityData(direction, velocity, true, -0.1, 0.0, -0.1, false);
         UtilVelocity.velocity(player, null, velocityData);
+
+        // Durability
+        if (Bukkit.getCurrentTick() % 20 == 0) {
+            UtilItem.damageItem(player, player.getActiveItem(), 1);
+        }
         
         new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 0f, 1.5f).play(player.getLocation());
         new SoundEffect(Sound.BLOCK_HANGING_SIGN_WAXED_INTERACT_FAIL, 0f, 1.0f).play(player.getLocation());

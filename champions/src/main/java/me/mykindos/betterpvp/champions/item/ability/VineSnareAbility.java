@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
@@ -103,6 +104,11 @@ public class VineSnareAbility extends ItemAbility implements Listener {
 
         if (container.getAbilities().contains(this)) {
             event.setCancelled(true);
+
+            if (event.getEntity() instanceof Player player) {
+                // Consume durability
+                UtilItem.damageItem(player, instance, 1);
+            }
 
             final VineSnareProjectile projectile = new VineSnareProjectile(
                     event.getEntity() instanceof Player player ? player : null,
