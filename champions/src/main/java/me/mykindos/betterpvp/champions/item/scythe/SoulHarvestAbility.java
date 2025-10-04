@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -45,7 +44,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -114,7 +112,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     private SoulHarvestAbility(Champions champions, DamageLogManager damageLogManager, EffectManager effectManager, ClientManager clientManager, ItemFactory itemFactory) {
         super(new NamespacedKey(champions, "soul_harvest"),
                 "Soul Harvest",
-                "Collect souls of fallen players and mobs to harvest their souls, gaining power and speed.",
+                "Collect souls of fallen players and mobs to harvest their souls, gaining damage and speed.",
                 TriggerTypes.HOLD_BLOCK);
         this.champions = champions;
         this.damageLogManager = damageLogManager;
@@ -481,7 +479,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
             if (item.getBaseItem() != scythe) return;
 
             // Apply bonus damage based on soul count
-            double soulCount = getSoulCount(damager);
+            double soulCount =  getPlayerData().get(damager.getUniqueId()).getSoulCount();
             double maxSouls = getMaxSouls();
 
             // Calculate and apply bonus damage
