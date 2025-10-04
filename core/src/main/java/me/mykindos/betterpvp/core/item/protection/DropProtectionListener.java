@@ -26,7 +26,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.framework.qual.PreconditionAnnotation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -87,7 +86,7 @@ public class DropProtectionListener implements Listener {
      *
      * @param event PlayerDropItemEvent fired by the server when a player drops an item
      */
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrop(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
         final Player player = event.getPlayer();
