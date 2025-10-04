@@ -71,7 +71,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 "Sacrifice " + getValueString(this::getHealthReduction, level) + " health to create",
                 "a ring of torment for " + getValueString(this::getDuration, level) + " seconds.",
                 "",
-                "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 1, "%", 0) + " more damage.",
+                "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 100, "%", 0) + " more damage.",
                 "",
                 "Range: " + getValueString(this::getRange, level) + " blocks.",
                 "",
@@ -109,7 +109,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
             }
             for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange(torment.getLevel()))) {
                 if (target.equals(event.getDamagee())) {
-                    final double damage = 1 + getDamageIncrease(torment.getLevel()) / 100;
+                    final double damage = 1 + getDamageIncrease(torment.getLevel());
                     event.addModifier(new SkillDamageModifier.Multiplier(this, damage));
                     return;
                 }
@@ -197,7 +197,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         baseRange = getConfig("baseRange", 5.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
-        baseDamageIncrease = getConfig("baseDamageIncrease", 33.0, Double.class);
+        baseDamageIncrease = getConfig("baseDamageIncrease", 0.33, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseHealthReduction = getConfig("baseHealthReduction", 8.0, Double.class);
         healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);

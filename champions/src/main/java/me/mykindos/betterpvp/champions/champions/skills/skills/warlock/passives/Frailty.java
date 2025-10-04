@@ -59,7 +59,7 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Nearby enemies that fall below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
-                "take " + getValueString(this::getDamagePercent, level, 1, "%", 0) + " more damage from your melee attacks"
+                "take " + getValueString(this::getDamagePercent, level, 100, "%", 0) + " more damage from your melee attacks"
         };
     }
 
@@ -141,7 +141,7 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
             if (UtilPlayer.getHealthPercentage(damagee) < getHealthPercent(level)) {
                 Location locationToPlayEffect = event.getDamagee().getLocation().add(0, 1, 0);
                 event.getDamagee().getWorld().playEffect(locationToPlayEffect, Effect.COPPER_WAX_ON, 0);
-                double damageIncrease = 1 + getDamagePercent(level) / 100;
+                double damageIncrease = 1 + getDamagePercent(level);
                 event.addModifier(new SkillDamageModifier.Multiplier(this, damageIncrease));
 ;
             }
@@ -158,8 +158,8 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
         baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
         healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.10, Double.class);
 
-        baseDamagePercent = getConfig("baseDamagePercent", 15.0, Double.class);
-        damagePercentIncreasePerLevel = getConfig("damagePercentIncreasePerLevel", 5.0, Double.class);
+        baseDamagePercent = getConfig("baseDamagePercent", 0.15, Double.class);
+        damagePercentIncreasePerLevel = getConfig("damagePercentIncreasePerLevel", 0.05, Double.class);
     }
 
 }
