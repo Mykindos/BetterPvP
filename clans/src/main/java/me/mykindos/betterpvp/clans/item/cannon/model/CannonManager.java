@@ -7,8 +7,8 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.clans.item.cannon.event.CannonPlaceEvent;
+import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -40,23 +40,23 @@ import java.util.UUID;
 public class CannonManager extends Manager<String, Cannon> {
 
     @Inject
-    @Config(path = "cannon.fuse-seconds", defaultValue = "2.5", configName = "weapons/cannon")
+    @Config(path = "cannon.fuse-seconds", defaultValue = "2.5", configName = "items/weapon")
     private double fuseSeconds;
 
     @Inject
-    @Config(path = "cannon.shoot-cooldown", defaultValue = "30.0", configName = "weapons/cannon")
+    @Config(path = "cannon.shoot-cooldown", defaultValue = "30.0", configName = "items/weapon")
     private double shootCooldownSeconds;
 
     @Inject
-    @Config(path = "cannon.spawn-cooldown", defaultValue = "30.0", configName = "weapons/cannon")
+    @Config(path = "cannon.spawn-cooldown", defaultValue = "30.0", configName = "items/weapon")
     private double spawnCooldown;
 
     @Inject
-    @Config(path = "cannon.health", defaultValue = "200.0", configName = "weapons/cannon")
+    @Config(path = "cannon.health", defaultValue = "200.0", configName = "items/weapon")
     private double cannonHealth;
 
     @Inject
-    @Config(path = "cannon.size", defaultValue = "1.0", configName = "weapons/cannon")
+    @Config(path = "cannon.size", defaultValue = "1.0", configName = "items/weapon")
     private double cannonScale;
 
     private final Clans clans;
