@@ -64,8 +64,10 @@ public enum Role {
                 player.getInventory().addItem(getItem(itemFactory, Material.BOW));
             }
 
-            int numArrows = this == Role.RANGER ? 64 : 32;
-            player.getInventory().addItem(getItem(itemFactory, new ItemStack(Material.ARROW, numArrows)));
+            final ItemStack arrow = new ItemStack(Material.ARROW);
+            final ItemStack arrowItem = getItem(itemFactory, arrow);
+            arrowItem.setAmount(this == Role.RANGER ? 64 : 32);
+            player.getInventory().addItem(arrowItem);
         }
     }
 
