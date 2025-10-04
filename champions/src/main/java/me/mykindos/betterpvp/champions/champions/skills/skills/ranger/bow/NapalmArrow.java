@@ -21,8 +21,16 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -31,7 +39,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.FIRE;
 
@@ -153,7 +168,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
                     null,
                     new SkillDamageCause(this).withBukkitCause(FIRE),
                     getDamage(level),
-                    "Napalm");
+                    "Napalm Arrow");
             cde.setDamageDelay(damageDelay);
             if (!Objects.requireNonNull(UtilDamage.doDamage(cde)).isCancelled()) {
                 UtilEntity.setFire(hit, damager, (long) getBurnDuration(level) * 1000L);
