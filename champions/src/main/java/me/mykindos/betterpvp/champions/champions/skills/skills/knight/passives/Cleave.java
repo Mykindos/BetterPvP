@@ -22,7 +22,6 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.MELEE;
 
@@ -103,7 +102,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
                 DamageEvent cde = new DamageEvent(target.getKey(),
                         damager,
                         null,
-                        new SkillDamageCause(this).withCategory(MELEE),
+                        new SkillDamageCause(this).withCategory(MELEE).withKnockback(true),
                         event.getDamage() * getPercentageOfDamage(level),
                         getName());
                 cde.getDurabilityParameters().disableAttackerDurability();
