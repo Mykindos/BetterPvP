@@ -1,14 +1,9 @@
 package me.mykindos.betterpvp.core.loot.session;
 
 import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.LootTable;
-import me.mykindos.betterpvp.core.loot.LootTableRegistry;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import net.kyori.adventure.audience.Audience;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,7 +12,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,16 +24,10 @@ import java.util.function.Supplier;
  */
 @Singleton
 @BPvPListener
-public class LootSessionController implements Listener, ReloadHook {
+public class LootSessionController implements Listener {
 
-    private static final Map<LootTable, LootSession> GLOBAL_SCOPE = new HashMap<>();
+    public static final Map<LootTable, LootSession> GLOBAL_SCOPE = new HashMap<>();
     private final Map<UUID, Deque<LootSession>> playerScopes = new HashMap<>();
-    private final LootTableRegistry registry;
-
-    @Inject
-    private LootSessionController(LootTableRegistry registry) {
-        this.registry = registry;
-    }
 
     /** Push a new scope on top (takes precedence). */
     void pushScope(Player player, LootSession node) {
@@ -133,15 +121,5 @@ public class LootSessionController implements Listener, ReloadHook {
     void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         playerScopes.remove(player.getUniqueId());
-    }
-
-    /**
-     * Reloads the configuration or state of this class.
-     */
-    @Override
-    public void reload() {
-        final Collection<LootTable> tables = registry.getLoaded().values();
-        GLOBAL_SCOPE.clear();
-        tables.forEach(table -> GLOBAL_SCOPE.put(table, LootSession.newSession(table, Audience.audience(Bukkit.getOnlinePlayers()))));
     }
 }

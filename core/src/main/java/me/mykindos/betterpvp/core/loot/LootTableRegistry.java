@@ -6,11 +6,17 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.loot.loader.LootTableLoader;
 import me.mykindos.betterpvp.core.loot.loader.SupabaseLootTableLoader;
+import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import net.kyori.adventure.audience.Audience;
+import org.bukkit.Bukkit;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static me.mykindos.betterpvp.core.loot.session.LootSessionController.GLOBAL_SCOPE;
 
 /**
  * Registry for managing loot tables.
@@ -62,5 +68,9 @@ public class LootTableRegistry implements ReloadHook {
         for (LootTable lootTable : loader.load()) {
             this.lootTables.put(lootTable.getId(), lootTable);
         }
+
+        final Collection<LootTable> tables = this.lootTables.values();
+        GLOBAL_SCOPE.clear();
+        tables.forEach(table -> GLOBAL_SCOPE.put(table, LootSession.newSession(table, Audience.audience(Bukkit.getOnlinePlayers()))));
     }
 }

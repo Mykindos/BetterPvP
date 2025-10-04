@@ -16,10 +16,12 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,7 +58,7 @@ public class WeaponListener implements Listener {
                     .append(Component.text(" was caught by a fisherman!", NamedTextColor.YELLOW)));
             log.info("A legendary weapon was caught by a fisherman! ({})", clazzName)
                     .setAction("FISH_LEGENDARY")
-                    .addLocationContext(event.getLootContext().getLocation())
+                    .addLocationContext(event.getLocation())
                     .addContext("Source", event.getSource()).submit();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -68,9 +70,19 @@ public class WeaponListener implements Listener {
                             .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
                             .append(name.hoverEvent(item.getView().get()))));
             log.info("A legendary weapon was dropped by {}! ({})", event.getSource(), clazzName)
-                    .addLocationContext(event.getLootContext().getLocation())
+                    .addLocationContext(event.getLocation())
                     .addContext("Source", event.getSource()).submit();
         }
+
+        new SoundEffect(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 0.8f, 2.0f).play(event.getLocation());
+        new SoundEffect(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.2f, 2.0f).play(event.getLocation());
+        new SoundEffect(Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1.2f, 2.0f).play(event.getLocation());
+        Particle.FLASH.builder()
+                .location(event.getLocation())
+                .allPlayers()
+                .count(1)
+                .extra(0)
+                .spawn();
     }
 
     @EventHandler
