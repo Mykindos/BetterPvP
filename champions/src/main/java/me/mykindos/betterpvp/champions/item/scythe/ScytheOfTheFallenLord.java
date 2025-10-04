@@ -72,8 +72,8 @@ public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
         final Config config = Config.item(Champions.class, this);
         
         // Configure Lifesteal ability
-        this.baseHeal = config.getConfig("baseHeal", 0.7, Double.class);
-        this.healPerSoul = config.getConfig("healPerSoul", 0.1, Double.class);
+        this.baseHeal = config.getConfig("baseHeal", 1.0, Double.class);
+        this.healPerSoul = config.getConfig("healPerSoul", 1.0, Double.class);
         
         // Configure SoulHarvest ability
         soulHarvestAbility.setMaxSoulsDamage(config.getConfig("maxSoulsDamage", 4.0, Double.class));
