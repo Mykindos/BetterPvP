@@ -48,9 +48,9 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
                 "maximum of " + getValueString(this::getMaxEnemies, level) + " players",
                 "",
                 "Damage Reduction:",
-                "1 nearby enemy = <stat>" + String.format("%.1f",(calculateReduction(level, 1)))  + "%</stat>",
-                "2 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 2))) + "%</stat>",
-                "3 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 3))) + "%</stat>"
+                "1 nearby enemy = <stat>" + String.format("%.1f",(calculateReduction(level, 1)) * 100)  + "%</stat>",
+                "2 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 2)) * 100) + "%</stat>",
+                "3 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 3)) * 100) + "%</stat>"
         };
     }
 
@@ -98,8 +98,8 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
         baseRadius = getConfig("baseRadius", 4.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
 
-        baseDecrease = getConfig("baseDecrease", 15.0, Double.class);
-        baseDecreasePerPlayer = getConfig("baseDecreasePerPlayer", 5.0, Double.class);
+        baseDecrease = getConfig("baseDecrease", 0.15, Double.class);
+        baseDecreasePerPlayer = getConfig("baseDecreasePerPlayer", 0.05, Double.class);
         decreaseIncreasePerLevel = getConfig("decreaseIncreasePerLevel", 0.0, Double.class);
 
         maxEnemies = getConfig("maxEnemies", 3, Integer.class);
