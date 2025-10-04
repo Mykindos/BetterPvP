@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
@@ -55,7 +54,7 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
 
         int level = getLevel(dam);
         if (level > 0) {
-            double degeneration = getSiphonedEnergy(level) * 0.01;
+            double degeneration = getSiphonedEnergy(level) / 100;
 
             if (event.getDamagee() instanceof Player target) {
                 championsManager.getEnergy().degenerateEnergy(target, degeneration);
