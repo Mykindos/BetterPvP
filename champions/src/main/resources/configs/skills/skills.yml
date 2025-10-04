@@ -239,9 +239,9 @@ skills:
     fortitude:
       enabled: true
       maxlevel: 3
-      healRate: 1.0
-      baseHeal: 3.0
-      healIncreasePerLevel: 1.0
+      healRate: 2.5
+      baseHeal: 7.5
+      healIncreasePerLevel: 2.5
       healInterval: 1.5
     vengeance:
       enabled: true
