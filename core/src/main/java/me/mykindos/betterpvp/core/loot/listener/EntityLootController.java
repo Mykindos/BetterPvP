@@ -57,7 +57,7 @@ public class EntityLootController implements Listener {
             lootSession = sessionController.resolve(killer, lootTable, () -> LootSession.newSession(lootTable, killer));
         }
 
-        final LootContext context = new LootContext(lootSession, entity.getLocation(), entity.getName());
+        final LootContext context = new LootContext(lootSession, entity.getLocation(), entity.getName().replaceAll("§\\w", ""));
         final LootBundle bundle = lootTable.generateLoot(context);
         bundle.award();
     }
