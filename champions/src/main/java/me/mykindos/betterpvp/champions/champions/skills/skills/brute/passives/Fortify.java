@@ -79,7 +79,7 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             if (level > 0) {
                 doParticles(damagee);
                 double modifier = getPercent(level);
-                final double multiplier = event.getDamage() * (1.0 - (modifier / 100));
+                final double multiplier = 1.0 - (modifier / 100);
                 event.addModifier(new SkillDamageModifier.Multiplier(this, multiplier));
             }
         }
@@ -89,7 +89,7 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             int level = getLevel(damager);
             if (level > 0) {
                 double modifier = getPercent(level);
-                final double multiplier = event.getDamage() * (1.0 - (modifier / 100));
+                final double multiplier = 1.0 - (modifier / 100);
                 event.addModifier(new SkillDamageModifier.Multiplier(this, multiplier));
             }
 
