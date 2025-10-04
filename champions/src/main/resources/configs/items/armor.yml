@@ -1,0 +1,90 @@
+# Assassin
+# 31 health
+assassin_helmet:
+  health: 2
+  durability: 500
+assassin_chestplate:
+  health: 4
+  durability: 500
+assassin_leggings:
+  health: 3
+  durability: 500
+assassin_boots:
+  health: 2
+  durability: 500
+
+# Knight
+# 50 health
+knight_helmet:
+  health: 6
+  durability: 500
+knight_chestplate:
+  health: 10
+  durability: 500
+knight_leggings:
+  health: 8
+  durability: 500
+knight_boots:
+  health: 6
+  durability: 500
+
+
+# Brute
+# 50 health
+brute_helmet:
+  health: 6
+  durability: 500
+brute_chestplate:
+  health: 10
+  durability: 500
+brute_leggings:
+  health: 8
+  durability: 500
+brute_boots:
+  health: 6
+  durability: 500
+
+# Ranger
+# 37 health
+ranger_helmet:
+  health: 3
+  durability: 500
+ranger_chestplate:
+  health: 6
+  durability: 500
+ranger_leggings:
+  health: 5
+  durability: 500
+ranger_boots:
+  health: 3
+  durability: 500
+
+# Mage
+# 40 health
+mage_helmet:
+  health: 4
+  durability: 500
+mage_chestplate:
+  health: 7
+  durability: 500
+mage_leggings:
+  health: 5
+  durability: 500
+mage_boots:
+  health: 4
+  durability: 500
+
+# Warlock
+# 40 health
+warlock_helmet:
+  health: 4
+  durability: 500
+warlock_chestplate:
+  health: 7
+  durability: 500
+warlock_leggings:
+  health: 5
+  durability: 500
+warlock_boots:
+  health: 4
+  durability: 500
