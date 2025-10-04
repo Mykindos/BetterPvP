@@ -2,39 +2,30 @@ package me.mykindos.betterpvp.progression.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
-import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.Item;
-import me.mykindos.betterpvp.core.item.ItemGroup;
-import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.fishing.bait.EventBaitItem;
-import me.mykindos.betterpvp.progression.profession.fishing.bait.SpeedyBaitItem;
-import me.mykindos.betterpvp.progression.profession.fishing.legendaries.Sharkbait;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 @Singleton
-@PluginAdapter("Nexo")
-public class ProgressionFishBootstrap {
+public class ProgressionFishBootstrap implements ItemBootstrap {
 
-    private final Progression progression;
-    private final ItemRegistry itemRegistry;
+    private boolean registered = false;
 
-    @Inject
-    private ProgressionFishBootstrap(Progression progression, ItemRegistry itemRegistry) {
-        this.progression = progression;
-        this.itemRegistry = itemRegistry;
-    }
+    @Inject private ItemRegistry itemRegistry;
+    @Inject private Progression progression;
 
     private NamespacedKey key(String name) {
         return new NamespacedKey(progression, name);
     }
 
     @Inject
-    private void registerFishing() {
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
+
         itemRegistry.registerItem(key("trout"), new FishItem("Trout", "trout"));
         itemRegistry.registerItem(key("salmon"), new FishItem("Salmon", "salmon"));
         itemRegistry.registerItem(key("bluegill"), new FishItem("Bluegill", "bluegill"));

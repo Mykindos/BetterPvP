@@ -1,9 +1,7 @@
 package me.mykindos.betterpvp.core.loot;
 
 import lombok.Data;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,10 +14,6 @@ import java.util.List;
  */
 @Data
 public class LootProgress {
-    /**
-     * The player for whom the loot progress is being tracked.
-     */
-    @Nullable final Player player;
 
     /**
      * The history of generated loot bundles for the player.

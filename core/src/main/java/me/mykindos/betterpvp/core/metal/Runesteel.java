@@ -57,6 +57,9 @@ public class Runesteel {
 
     @Singleton
     public static class Billet extends MetalItem {
+
+        private transient boolean registered;
+
         @Inject
         public Billet() {
             super("Runesteel Billet", "runesteel_billet", ItemRarity.MYTHICAL);
@@ -64,6 +67,8 @@ public class Runesteel {
 
         @Inject
         private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory, Runesteel.Ingot ingot) {
+            if (registered) return;
+            registered = true;
             Map<Integer, RecipeIngredient> ingredients = Map.of(
                     0, new RecipeIngredient(ingot, 1),
                     1, new RecipeIngredient(ingot, 1)
@@ -85,6 +90,9 @@ public class Runesteel {
 
     @Singleton
     public static class BlockItem extends MetalBlockItem {
+
+        private transient boolean registered;
+
         @Inject
         public BlockItem() {
             super("Runesteel Block", "runesteel_block", ItemRarity.MYTHICAL);
@@ -92,6 +100,8 @@ public class Runesteel {
 
         @Inject
         private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory, Runesteel.Billet billet) {
+            if (registered) return;
+            registered = true;
             String[] pattern = new String[] {
                     "AAA",
                     "AAA",

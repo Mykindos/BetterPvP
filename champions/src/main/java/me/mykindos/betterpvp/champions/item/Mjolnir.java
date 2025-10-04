@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -19,7 +20,6 @@ import me.mykindos.betterpvp.core.item.impl.Rope;
 import me.mykindos.betterpvp.core.item.impl.StormInABottle;
 import me.mykindos.betterpvp.core.item.impl.VoidglassCore;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
-import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
 import me.mykindos.betterpvp.core.metal.Runesteel;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class Mjolnir extends WeaponItem implements ReloadHook, NexoItem {
 
+    private transient boolean registered;
     @EqualsAndHashCode.Exclude
     private final SkyforgedAscent skyforgedAscent;
     @EqualsAndHashCode.Exclude
@@ -80,6 +81,8 @@ public class Mjolnir extends WeaponItem implements ReloadHook, NexoItem {
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 Runesteel.BlockItem runesteelBlock, StormInABottle stormInABottle,
                                 VoidglassCore voidglassCore, Rope rope, DurakHandle durakHandle) {
+        if (registered) return;
+        registered = true;
         String[] pattern = new String[] {
                 "BBB",
                 "BRB",

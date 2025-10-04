@@ -2,8 +2,9 @@ package me.mykindos.betterpvp.core.metal;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.impl.Blackroot;
 import me.mykindos.betterpvp.core.recipe.smelting.AlloyRegistry;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingRecipeBuilder;
@@ -12,40 +13,41 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 @Singleton
-@PluginAdapter("Core")
-public class MetalRecipeBootstrap {
+public class MetalRecipeBootstrap implements ItemBootstrap {
 
-    private final ItemFactory itemFactory;
-    private final SmeltingRecipeRegistry recipeRegistry;
-    private final AlloyRegistry alloyRegistry;
+    private boolean registered = false;
+
+    @Inject private ItemRegistry itemRegistry;
+    @Inject private ItemFactory itemFactory;
+    @Inject private SmeltingRecipeRegistry recipeRegistry;
+    @Inject private AlloyRegistry alloyRegistry;
+    @Inject private Steel.Alloy steel;
+    @Inject private Runesteel.Alloy runesteel;
+    @Inject private Runesteel.Fragment runebloodOre;
+    @Inject private FissureQuartz.Item fissureQuartz;
+    @Inject private Blackroot blackroot;
 
     @Inject
-    private MetalRecipeBootstrap(ItemFactory itemFactory, SmeltingRecipeRegistry registry,
-                                 AlloyRegistry alloyRegistry) {
-        this.itemFactory = itemFactory;
-        this.recipeRegistry = registry;
-        this.alloyRegistry = alloyRegistry;
-    }
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
 
-    @Inject
-    private void registerSteel(Steel.Alloy steel) {
-        final SmeltingRecipeBuilder builder = new SmeltingRecipeBuilder();
-        builder.setPrimaryResult(steel, 1000);
-        builder.addIngredient(itemFactory.getFallbackItem(Material.IRON_INGOT), 10);
-        builder.addIngredient(itemFactory.getFallbackItem(Material.COAL_BLOCK), 2);
-        recipeRegistry.registerRecipe(new NamespacedKey("core", "steel"), builder.build(itemFactory));
+        // Steel
+        final SmeltingRecipeBuilder steelBuilder = new SmeltingRecipeBuilder();
+        steelBuilder.setPrimaryResult(steel, 1000);
+        steelBuilder.addIngredient(itemFactory.getFallbackItem(Material.IRON_INGOT), 10);
+        steelBuilder.addIngredient(itemFactory.getFallbackItem(Material.COAL_BLOCK), 2);
+        recipeRegistry.registerRecipe(new NamespacedKey("core", "steel"), steelBuilder.build(itemFactory));
         alloyRegistry.registerAlloy(steel);
-    }
 
-    @Inject
-    private void registerRunesteel(Runesteel.Alloy runesteel, Runesteel.Fragment runebloodOre,
-                                   FissureQuartz.Item fissureQuartz, Blackroot blackroot) {
-        final SmeltingRecipeBuilder builder = new SmeltingRecipeBuilder();
-        builder.setPrimaryResult(runesteel, 500);
-        builder.addIngredient(blackroot, 10);
-        builder.addIngredient(runebloodOre, 1);
-        builder.addIngredient(fissureQuartz, 2);
-        recipeRegistry.registerRecipe(new NamespacedKey("core", "runesteel"), builder.build(itemFactory));
+        // Runesteel
+        final SmeltingRecipeBuilder runesteelBuilder = new SmeltingRecipeBuilder();
+        runesteelBuilder.setPrimaryResult(runesteel, 500);
+        runesteelBuilder.addIngredient(blackroot, 10);
+        runesteelBuilder.addIngredient(runebloodOre, 1);
+        runesteelBuilder.addIngredient(fissureQuartz, 2);
+        recipeRegistry.registerRecipe(new NamespacedKey("core", "runesteel"), runesteelBuilder.build(itemFactory));
         alloyRegistry.registerAlloy(runesteel);
     }
 

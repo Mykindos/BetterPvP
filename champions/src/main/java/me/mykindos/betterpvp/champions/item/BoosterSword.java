@@ -30,6 +30,8 @@ public class BoosterSword extends WeaponItem {
                 .build());
     }
 
+    private transient boolean registered;
+
     @Inject
     private BoosterSword(Champions champions) {
         super(champions, "Booster Sword", model, ItemRarity.COMMON);
@@ -37,6 +39,8 @@ public class BoosterSword extends WeaponItem {
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
         final BaseItem goldBlock = itemFactory.getFallbackItem(Material.GOLD_BLOCK);
         final BaseItem stick = itemFactory.getFallbackItem(Material.STICK);
         String[] pattern = new String[] {
