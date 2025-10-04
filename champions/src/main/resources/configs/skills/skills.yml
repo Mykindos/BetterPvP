@@ -285,6 +285,15 @@ skills:
       internalCooldown: 2.0
       baseDamage: 0.8
       damageIncreasePerLevel: 0.8
+    risinguppercut:
+      enabled: true
+      maxlevel: 3
+      radius: 5.0
+      damage: 4.0
+      velocityStrength: 2.0
+      slashAnimationDuration: 0.3
+      cooldown: 10.0
+      cooldownDecreasePerLevel: 1.0
     sacrifice:
       enabled: true
       maxlevel: 3
