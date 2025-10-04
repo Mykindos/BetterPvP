@@ -76,7 +76,8 @@ public class EnergyHandler {
 
     public void regenerateEnergy(Player player, double energy) {
         try {
-            player.setExp(Math.min(0.999F, (float) getEnergy(player) + (float) energy));
+            float percentage = (float) (energy / (getMax(player) / 100));
+            player.setExp(Math.min(0.999F, (float) getEnergy(player) + percentage));
         } catch (Exception ignored) {
 
         }
