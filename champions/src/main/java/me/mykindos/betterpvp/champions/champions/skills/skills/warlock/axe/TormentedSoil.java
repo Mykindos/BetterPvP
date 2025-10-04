@@ -109,7 +109,8 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
             }
             for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange(torment.getLevel()))) {
                 if (target.equals(event.getDamagee())) {
-                    event.addModifier(new SkillDamageModifier.Multiplier(this, (1 + getDamageIncrease(torment.getLevel()))));
+                    final double damage = 1 + getDamageIncrease(torment.getLevel()) / 100;
+                    event.addModifier(new SkillDamageModifier.Multiplier(this, damage));
                     return;
                 }
             }
