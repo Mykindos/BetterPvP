@@ -5,7 +5,12 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -92,11 +97,34 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
     // Figure out how to track the arrows
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPreDamageEvent(DamageEvent event) {
+    public void onFriendly(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof Arrow arrow)) return;
+        if (!(event.getHitEntity() instanceof LivingEntity damagee)) return;;
+        if (!(arrow.getShooter() instanceof Player damager)) return;
+        if (!arrows.contains(arrow)) return;
+        if (!UtilEntity.isEntityFriendly(damager, damagee)) return; // Only friendly targets
+
+        upwardsArrows.remove(damager);
+
+        int level = getLevel(damager);
+        if (level > 0) {
+            onHit(damager, damagee, level);
+            arrows.remove(arrow);
+            arrow.remove();
+            if (UtilEntity.isEntityFriendly(damager, damagee)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    // Figure out how to track the arrows
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEnemy(DamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!event.isDamageeLiving()) return;;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
+        if (UtilEntity.isEntityFriendly(damager, event.getLivingDamagee())) return; // Only non-friendly targets
 
         upwardsArrows.remove(damager);
 
@@ -107,9 +135,6 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
             arrows.remove(arrow);
             arrow.remove();
             event.addReason(getName());
-            if (UtilEntity.isEntityFriendly(damager, damagee)) {
-                event.setCancelled(true);
-            }
         }
     }
 
@@ -238,9 +263,9 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseFriendlyHealthRestoredOnHit = getConfig("baseFriendlyHealthRestoredOnHit", 10.0, Double.class);
-        friendlyHealthRestoredOnHitIncreasedPerLevel = getConfig("friendlyHealthRestoredOnHitIncreasedPerLevel", 2, Double.class);
+        baseFriendlyHealthRestoredOnHit = getConfig("baseFriendlyHealthRestoredOnHit", 2.5, Double.class);
+        friendlyHealthRestoredOnHitIncreasedPerLevel = getConfig("friendlyHealthRestoredOnHitIncreasedPerLevel", 2.5, Double.class);
         baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.0, Double.class);
-        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 0.5, Double.class);
+        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 1.0, Double.class);
     }
 }
