@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.data;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.ItemDisplay;
 import org.jetbrains.annotations.NotNull;
@@ -10,26 +10,33 @@ import org.jetbrains.annotations.NotNull;
  * A data class used to track each player's current state and update the animation for each player.
  */
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RisingUppercutData {
 
     /**
      * The start time in milliseconds that this ability was activated by the player.
      */
-    private long startTimeInMillis;
+    private @NotNull Long risingAnimationStartTimeInMillis;
 
     /**
      * The duration of the slashing animation in milliseconds.
      */
-    private final long animationDurationInMillis;
+    private final long risingAnimationDurationInMillis;
 
     /**
      * The item display that is updated every tick and does the "slashing."
      */
-    private final @NotNull ItemDisplay slashingSword;
+    private final @NotNull ItemDisplay itemDisplay;
 
     /**
      * The initial location of the caster (player using the slash).
      */
-    private final @NotNull Location castigLocation;
+    private final @NotNull Location castingLocation;
+
+    /**
+     * Once the animation is done, the item display will linger around its final position for a few ticks. This field
+     * should be set to true when this lingering period happens.
+     */
+    private long lingeringAnimationStartTimeInMillis = -1L;
+    private long lingeringAnimationDurationInMillis = 1000L;
 }

@@ -46,10 +46,34 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
      */
     private final Map<Player, RisingUppercutData> data = new WeakHashMap<>();
 
+    // <editor-fold defaultstate="collapsed" desc="Config Variables">
     private double radius;
     private double damage;
-    private double velocityStrength;
+
+    // not sure if it's necessary to have this but always gotta account for the edge case!
+    private int maxEnemiesCanBeHit;
+
+    /**
+     * How long the upward cutting animation of the skill will play for. It's not recommended to change this.
+     */
     private double slashAnimationDuration;
+
+    /**
+     * After most movement abilities (like Disengage, Seismic Slam, etc.), the player is granted no fall for a limited
+     * time (this is so you don't get screwed over by your own movement). The no fall effect for this skill is intended
+     * to be short-lived (a few seconds).
+     */
+    private double noFallDurationInSeconds;
+
+    /**
+     * This is used to determine how far the player can be looking away from the enemy for this to still hit. A higher
+     * threshold means it's more forgiving. Lower means you have to be looking even more exactly at the target.
+     */
+    private double fovThreshold;
+    // </editor-fold>
+
+    final SoundEffect risingUppercutSwingSFX = new SoundEffect("minecraft", "rising_uppercut_swing");
+    final SoundEffect risingUppercutSlashSFX = new SoundEffect("minecraft", "rising_uppercut_slash");
 
     @Inject
     public RisingUppercut(Champions champions, ChampionsManager championsManager) {
@@ -73,21 +97,22 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
     @Override
     public void toggle(Player player, int level) {
         if (data.containsKey(player)) {
-            data.get(player).getSlashingSword().remove();
+            data.get(player).getItemDisplay().remove();
             data.remove(player);
         }
 
+        // Spawns the sword at waist-height (of the player) with the center of the sword being 2.5 blocks away
         final @NotNull Location location = player.getLocation().clone()
+                .add(player.getLocation().getDirection().normalize().multiply(2.5))
                 .add(0,1,0);
-        location.add(player.getLocation().getDirection().normalize().multiply(2.5));
 
-        final @NotNull ItemDisplay sword = location.getWorld().spawn(location, ItemDisplay.class, slashingSword -> {
+        final @NotNull ItemDisplay itemDisplay = location.getWorld().spawn(location, ItemDisplay.class, slashingSword -> {
 
-            // todo: you could make it based on the weapon they used to activate... that'd be cool
             slashingSword.setItemStack(new ItemStack(Material.DIAMOND_SWORD));
             slashingSword.setGlowing(false);
             slashingSword.setPersistent(false);
 
+            // This transformation amounts to a big sword that's angled slightly downwards.
             Transformation transformation = slashingSword.getTransformation();
             transformation.getScale().set(3);
             transformation.getLeftRotation().rotateLocalX((float) Math.toRadians(-80));
@@ -101,76 +126,75 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
 
         // If slashAnimationDuration is 0.3s then this is 300ms
         final long animationDurationInMillis = (long) (slashAnimationDuration * 1000L);
-        data.put(player, new RisingUppercutData(System.currentTimeMillis(), animationDurationInMillis, sword, player.getLocation().clone()));
+        final @NotNull Location casterLocation = player.getLocation().clone();
 
+        data.put(player, new RisingUppercutData(
+                System.currentTimeMillis(),  // start time of the skill
+                animationDurationInMillis,
+                itemDisplay,
+                casterLocation
+        ));
+
+        // do to enemies in radius
         doDamageToEnemies(player, data.get(player));
-        Vector vec = new Vector(0, 1, 0);
-        VelocityData velocityData = new VelocityData(vec, 1, false, 0, 1.1, 1.1, true);
-        UtilVelocity.velocity(player, player, velocityData, VelocityType.CUSTOM);
 
-        new SoundEffect("minecraft", "rising_uppercut_swing").play(player.getLocation());
+        // do to caster
+        doUppercutMovement(player, player);
+        risingUppercutSwingSFX.play(casterLocation);
 
-        championsManager.getEffects().addEffect(player, EffectTypes.NO_FALL, 3000);
+        final long noFallDurationInTicks = (long) (noFallDurationInSeconds * 1000L);
+        championsManager.getEffects().addEffect(player, EffectTypes.NO_FALL, noFallDurationInTicks);
     }
 
-    @UpdateEvent
-    public void onUpdate() {
-        final Iterator<Map.Entry<Player, RisingUppercutData>> iterator = data.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Map.Entry<Player, RisingUppercutData> entry = iterator.next();
-            final Player player = entry.getKey();
-            final RisingUppercutData abilityData = entry.getValue();
+    /**
+     * Moves the target, which is `forEntity` directly upwards. The source of this velocity event will be set to
+     * the caster parameter.
+     */
+    private void doUppercutMovement(@NotNull LivingEntity forEntity, @NotNull Player caster) {
+        final Vector upwardDirection = new Vector(0, 1, 0);
+        final VelocityData velocityData = new VelocityData(
+                upwardDirection, 1, false, 0, 1.1, 1.1, true
+        );
 
-            if (!player.isOnline()) {
-                iterator.remove();
-                abilityData.getSlashingSword().remove();  // todo: make it linger for like 100ms-200ms
-                continue;
-            }
-
-            int level = getLevel(player);
-            if (level <= 0) {
-                abilityData.getSlashingSword().remove();  // todo: make it linger for like 100ms-200ms
-                iterator.remove();
-                continue;
-            }
-
-            // animation is over
-            if (UtilTime.elapsed(abilityData.getStartTimeInMillis(), abilityData.getAnimationDurationInMillis())) {
-                iterator.remove();
-                abilityData.getSlashingSword().remove();  // todo: make it linger for like 100ms-200ms
-                continue;
-            }
-
-            // continue animation
-            var slashingSword = abilityData.getSlashingSword();
-            Transformation transformation = slashingSword.getTransformation();
-            transformation.getLeftRotation().rotateLocalX(transformation.getLeftRotation().x() + ((float) Math.toRadians(-5)));
-            slashingSword.setTransformation(transformation);
-            slashingSword.teleport(slashingSword.getLocation().clone().add(0,1.25,0));
-
-        }
+        UtilVelocity.velocity(forEntity, caster, velocityData, VelocityType.CUSTOM);
     }
 
+    /**
+     * Damages enemies within the radius that the player is also looking at. This method also spawns some particles
+     * and plays a sound when a hit is confirmed.
+     */
     private void doDamageToEnemies(@NotNull Player player, @NotNull RisingUppercutData abilityData) {
+
+        // gonna be honest, idk if these 3 lines are necessary but this is how defensive stance checks fov sooooo
         final @NotNull Vector directionPlayerIsLooking = abilityData.getCastingLocation().getDirection();
         directionPlayerIsLooking.setY(0);
         directionPlayerIsLooking.normalize();
 
         long delay = 0;
+        int enemiesHit = 0;
 
         for (LivingEntity enemy : UtilEntity.getNearbyEnemies(player, abilityData.getCastingLocation(), radius)) {
-            Vector from = UtilVelocity.getTrajectory(player, enemy);
-            from.normalize();
-            if (player.getLocation().getDirection().subtract(from).length() > 0.7D) continue;  // out of fov
+
+            if (enemiesHit > maxEnemiesCanBeHit) break;
+
+            // check if enemy out of fov
+            final @NotNull Vector from = UtilVelocity.getTrajectory(player, enemy).normalize();
+            if (player.getLocation().getDirection().subtract(from).length() > fovThreshold) continue;
+
+            doUppercutMovement(enemy, player);
 
             UtilServer.runTaskLater(champions, () -> {
-                new SoundEffect("minecraft", "rising_uppercut_slash").play(enemy.getLocation());
-
                 CustomDamageEvent customDamageEvent = new CustomDamageEvent(enemy, player, null,
                         EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName());
+
                 UtilDamage.doCustomDamage(customDamageEvent);
 
+                // Cues
+                UtilMessage.message(player, getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s</green>.", enemy.getName(), getName()));
+                UtilMessage.message(enemy, getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s</green>.", player.getName(), getName()));
 
+                // Effects
+                risingUppercutSlashSFX.play(enemy.getLocation());
                 Particle.ELECTRIC_SPARK.builder()
                         .count(40)
                         .location(enemy.getLocation())
@@ -180,11 +204,68 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
                         .spawn();
             }, delay);
 
-            delay += 3L;
+            delay += 3L;  // We don't want the slashes to play at the same time; delaying them sounds cooler
+            enemiesHit++;
+        }
+    }
 
-            Vector vec = new Vector(0, 1, 0);
-            VelocityData velocityData = new VelocityData(vec, 1, false, 0, 1.1, 1.1, true);
-            UtilVelocity.velocity(enemy, null, velocityData, VelocityType.CUSTOM);
+    /**
+     * Cleans up {@link #data} and handles the animation of this skill.
+     */
+    @UpdateEvent
+    public void onUpdate() {
+        final Iterator<Map.Entry<Player, RisingUppercutData>> iterator = data.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<Player, RisingUppercutData> entry = iterator.next();
+            final Player player = entry.getKey();
+            final RisingUppercutData abilityData = entry.getValue();
+
+            if (!player.isOnline() || getLevel(player) <= 0 || player.isDead()) {
+                abilityData.getItemDisplay().remove();
+                iterator.remove();
+                continue;
+            }
+
+            final @NotNull ItemDisplay itemDisplay = abilityData.getItemDisplay();
+            final boolean hasLingeringAnimationStarted = abilityData.getLingeringAnimationStartTimeInMillis() > 0L;
+
+            // ending lingering animation
+            if (hasLingeringAnimationStarted &&
+                    UtilTime.elapsed(abilityData.getLingeringAnimationStartTimeInMillis(), abilityData.getLingeringAnimationDurationInMillis())) {
+
+                final @NotNull Location locationForRemoval = abilityData.getItemDisplay().getLocation();
+                abilityData.getItemDisplay().remove();
+                Particle.SMOKE.builder()
+                        .count(40)
+                        .offset(0.5, 0.5, 0.5)
+                        .extra(0)
+                        .location(locationForRemoval)
+                        .receivers(60)
+                        .spawn();
+
+                iterator.remove();
+                continue;
+            }
+
+            // movement for lingering animation
+            if (hasLingeringAnimationStarted) {
+                itemDisplay.teleport(itemDisplay.getLocation().clone().add(0,0.5,0));
+                continue;
+            }
+
+            // ending primary/upward animation
+            if (UtilTime.elapsed(abilityData.getRisingAnimationStartTimeInMillis(), abilityData.getRisingAnimationDurationInMillis())) {
+                abilityData.setLingeringAnimationStartTimeInMillis(System.currentTimeMillis());
+                continue;
+            }
+
+            // movement for primary animation
+            final Transformation transformation = itemDisplay.getTransformation();
+            final float angleInRadians = (float) Math.toRadians(-5);
+
+            transformation.getLeftRotation().rotateLocalX(transformation.getLeftRotation().x() + angleInRadians);
+            itemDisplay.setTransformation(transformation);
+            itemDisplay.teleport(itemDisplay.getLocation().clone().add(0,1.25,0));
         }
     }
 
@@ -212,7 +293,9 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
     public void loadSkillConfig() {
         radius = getConfig("radius", 5.0, Double.class);
         damage = getConfig("damage", 4.0, Double.class);
-        velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
         slashAnimationDuration = getConfig("slashAnimationDuration", 0.3, Double.class);
+        noFallDurationInSeconds = getConfig("noFallDurationInSeconds ", 3.0, Double.class);
+        fovThreshold = getConfig("fovThreshold", 0.7, Double.class);
+        maxEnemiesCanBeHit = getConfig("maxEnemiesCanBeHit", 5, Integer.class);
     }
 }
