@@ -19,30 +19,19 @@ import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
 public class ThunderclapAegis extends WeaponItem implements ReloadHook {
 
-    private static final ItemStack model;
-
     private transient boolean registered;
     private final VolticBashAbility volticBashAbility;
-
-    static {
-        model = Item.model(Material.SHIELD, "thunderclap_aegis", 1);
-        // Set unbreakable flag on the item meta
-        model.editMeta(meta -> meta.setUnbreakable(true));
-        model.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-    }
 
     @Inject
     private ThunderclapAegis(Champions champions,
                             VolticBashAbility volticBashAbility,
                             ItemFactory itemFactory) {
-        super(champions, "Thunderclap Aegis", model, ItemRarity.LEGENDARY);
+        super(champions, "Thunderclap Aegis", Item.model(Material.SHIELD, "thunderclap_aegis", 1), ItemRarity.LEGENDARY);
         this.volticBashAbility = volticBashAbility;
 
         addBaseComponent(AbilityContainerComponent.builder()

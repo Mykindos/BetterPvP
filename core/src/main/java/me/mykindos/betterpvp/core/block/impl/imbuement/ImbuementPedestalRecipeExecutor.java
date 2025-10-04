@@ -21,10 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static me.mykindos.betterpvp.core.block.impl.imbuement.ImbuementPedestalConstants.EXPANSION_DURATION_MS;
-import static me.mykindos.betterpvp.core.block.impl.imbuement.ImbuementPedestalConstants.FAILURE_CHANCE;
-import static me.mykindos.betterpvp.core.block.impl.imbuement.ImbuementPedestalConstants.GROUPING_DURATION_MS;
-import static me.mykindos.betterpvp.core.block.impl.imbuement.ImbuementPedestalConstants.GROUPING_HEIGHT;
+import static me.mykindos.betterpvp.core.block.impl.imbuement.ImbuementPedestalConstants.*;
 
 /**
  * Handles recipe execution, timing, and effects for ImbuementPedestal
@@ -178,16 +175,16 @@ public class ImbuementPedestalRecipeExecutor {
         new SoundEffect(Sound.ITEM_TOTEM_USE, 1.5f, 0.4f).play(pedestalLocation);
 
         // Drop the primary result towards the nearest player
-        Player nearestPlayer = findNearestPlayer(pedestalLocation);
-        if (nearestPlayer != null) {
-            ItemStack primaryResult = createPrimaryResult(recipe, currentItems);
-
-            Vector direction = nearestPlayer.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
-            direction.multiply(0.3); // Gentle throw
-            direction.add(new Vector(0, 0.3, 0));
-
-            explosionCenter.getWorld().dropItem(explosionCenter, primaryResult).setVelocity(direction);
-        }
+        ItemStack primaryResult = createPrimaryResult(recipe, currentItems);
+        explosionCenter.getWorld().dropItem(explosionCenter, primaryResult, item -> {
+            Player nearestPlayer = findNearestPlayer(pedestalLocation);
+            if (nearestPlayer != null) {
+                Vector direction = nearestPlayer.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
+                direction.multiply(0.3); // Gentle throw
+                direction.add(new Vector(0, 0.3, 0));
+                item.setVelocity(direction);
+            }
+        });
 
         // Drop secondary results (only for standard recipes)
         if (recipe instanceof StandardImbuementRecipe standardRecipe) {

@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -87,6 +88,9 @@ public class WindSlashAbility extends ItemAbility {
         if (!energyHandler.use(player, getName(), slashEnergyCost, true)) {
             return false;
         }
+
+        // Consume durability
+        UtilItem.damageItem(player, itemStack, 1);
 
         // SFX
         new SoundEffect(Sound.ENTITY_PHANTOM_FLAP, 1.2F, 2.0F).play(player.getLocation());
