@@ -9,7 +9,9 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.fields.block.SimpleOre;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -54,16 +56,19 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     @Override
     public List<FieldsBlockEntry> getAll() {
         List<FieldsBlockEntry> ores = new ArrayList<>();
-        String query = "SELECT * FROM clans_fields_ores";
+        String query = "SELECT * FROM clans_fields_ores WHERE Server = ? AND Season = ?;";
 
-        try (ResultSet result = database.executeQuery(new Statement(query)).join()) {
+        try (ResultSet result = database.executeQuery(new Statement(query,
+                new StringStatementValue(Core.getCurrentServer()),
+                new StringStatementValue(Core.getCurrentSeason())
+        ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
-                final String world = result.getString(1);
-                final int x = result.getInt(2);
-                final int y = result.getInt(3);
-                final int z = result.getInt(4);
-                final String typeName = result.getString(5);
-                final String blockData = result.getString(6);
+                final String world = result.getString("World");
+                final int x = result.getInt("X");
+                final int y = result.getInt("Y");
+                final int z = result.getInt("Z");
+                final String typeName = result.getString("Type");
+                final String blockData = result.getString("Data");
                 FieldsInteractable type = types.stream()
                         .filter(t -> t.getName().equalsIgnoreCase(typeName))
                         .findFirst()
@@ -79,12 +84,14 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     }
 
     public void delete(String world, int x, int y, int z) {
-        String stmt = "DELETE FROM clans_fields_ores WHERE world = ? AND x = ? AND y = ? AND z = ?;";
+        String stmt = "DELETE FROM clans_fields_ores WHERE Server = ? AND Season = ? AND World = ? AND X = ? AND Y = ? AND Z = ?;";
         database.executeUpdate(new Statement(stmt,
+                new StringStatementValue(Core.getCurrentServer()),
+                new StringStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(world),
                 new IntegerStatementValue(x),
                 new IntegerStatementValue(y),
-                new IntegerStatementValue(z)));
+                new IntegerStatementValue(z)), TargetDatabase.GLOBAL);
     }
 
     @Override
@@ -94,19 +101,21 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             return;
         }
 
-        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type, data) VALUES (?, ?, ?, ?, ?, ?);";
+        String stmt = "INSERT INTO clans_fields_ores (Server, Season, World, X, Y, Z, Type, Data) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         database.executeUpdate(new Statement(stmt,
+                new StringStatementValue(Core.getCurrentServer()),
+                new StringStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(ore.getWorld()),
                 new IntegerStatementValue(ore.getX()),
                 new IntegerStatementValue(ore.getY()),
                 new IntegerStatementValue(ore.getZ()),
                 new StringStatementValue(ore.getType().getName()),
-                new StringStatementValue(ore.getData())));
+                new StringStatementValue(ore.getData())), TargetDatabase.GLOBAL);
     }
 
     @SneakyThrows
     public void saveBatch(@NotNull Collection<@NotNull FieldsBlockEntry> ores) {
-        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type, data) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE type = VALUES(type), data = VALUES(data);";
+        String stmt = "INSERT INTO clans_fields_ores (Server, Season, World, X, Y, Z, Type, Data) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE type = VALUES(type), data = VALUES(data);";
         List<Statement> statements = new ArrayList<>();
         for (FieldsBlockEntry ore : ores) {
             if (ore.getType() == null) {
@@ -115,6 +124,8 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             }
 
             Statement statement = new Statement(stmt,
+                    new StringStatementValue(Core.getCurrentServer()),
+                    new StringStatementValue(Core.getCurrentSeason()),
                     new StringStatementValue(ore.getWorld()),
                     new IntegerStatementValue(ore.getX()),
                     new IntegerStatementValue(ore.getY()),
@@ -123,6 +134,6 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
                     new StringStatementValue(ore.getData()));
             statements.add(statement);
         }
-        database.executeBatch(statements);
+        database.executeBatch(statements, TargetDatabase.GLOBAL);
     }
 }

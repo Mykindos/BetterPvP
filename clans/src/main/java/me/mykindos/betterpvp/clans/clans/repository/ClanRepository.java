@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -75,19 +76,22 @@ public class ClanRepository implements IRepository<Clan> {
     @Override
     public List<Clan> getAll() {
         List<Clan> clanList = new ArrayList<>();
-        String query = "SELECT * FROM clans;";
+        String query = "SELECT * FROM clans WHERE Server = ? AND Season = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                new StringStatementValue(Core.getCurrentServer()),
+                new StringStatementValue(Core.getCurrentSeason())
+        ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
-                UUID clanId = UUID.fromString(result.getString(1));
-                String name = result.getString(2);
-                String coreLocString = result.getString(3);
+                UUID clanId = UUID.fromString(result.getString("id"));
+                String name = result.getString("Name");
+                String coreLocString = result.getString("Home");
                 Location coreLoc = coreLocString == null || coreLocString.isEmpty() ? null : UtilWorld.stringToLocation(coreLocString);
-                boolean admin = result.getBoolean(4);
-                boolean safe = result.getBoolean(5);
-                String banner = result.getString(6);
-                String vault = result.getString(7);
-                String mailbox = result.getString(8);
+                boolean admin = result.getBoolean("Admin");
+                boolean safe = result.getBoolean("Safe");
+                String banner = result.getString("Banner");
+                String vault = result.getString("Vault");
+                String mailbox = result.getString("Mailbox");
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
@@ -127,7 +131,9 @@ public class ClanRepository implements IRepository<Clan> {
     private void loadProperties(Clan clan) {
         String query = "SELECT Property, Value FROM clan_properties WHERE Clan = ?";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                new UuidStatementValue(clan.getId())
+        ), TargetDatabase.GLOBAL).join()) {
             propertyMapper.parseProperties(result, clan);
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Failed to load clan properties for {}", clan.getId(), ex).submit();
@@ -152,7 +158,7 @@ public class ClanRepository implements IRepository<Clan> {
         queuedPropertyUpdates.clear();
 
         List<Statement> statementList = statements.values().stream().toList();
-        database.executeBatch(statementList);
+        database.executeBatch(statementList, TargetDatabase.GLOBAL);
 
         log.info("Updated clan properties with {} queries", statements.size()).submit();
     }
@@ -160,11 +166,14 @@ public class ClanRepository implements IRepository<Clan> {
     @Override
     public void save(Clan clan) {
 
-        String saveClanQuery = "INSERT INTO clans (id, Name, Admin) VALUES (?, ?, ?);";
+        String saveClanQuery = "INSERT INTO clans (id, Server, Season, Name, Admin) VALUES (?, ?, ?, ?, ?);";
         database.executeUpdate(new Statement(saveClanQuery,
+                new StringStatementValue(Core.getCurrentServer()),
+                new StringStatementValue(Core.getCurrentSeason()),
                 new UuidStatementValue(clan.getId()),
                 new StringStatementValue(clan.getName()),
-                new BooleanStatementValue(clan.isAdmin())));
+                new BooleanStatementValue(clan.isAdmin())
+        ), TargetDatabase.GLOBAL);
 
         for (var member : clan.getMembers()) {
             saveClanMember(clan, member);
@@ -175,24 +184,24 @@ public class ClanRepository implements IRepository<Clan> {
     public void delete(Clan clan) {
 
         String deleteMembersQuery = "DELETE FROM clan_members WHERE Clan = ?;";
-        database.executeUpdateAsync(new Statement(deleteMembersQuery, new UuidStatementValue(clan.getId())));
+        database.executeUpdateAsync(new Statement(deleteMembersQuery, new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
 
         String deleteAllianceQuery = "DELETE FROM clan_alliances WHERE Clan = ? OR AllyClan = ?;";
         database.executeUpdateAsync(new Statement(deleteAllianceQuery,
-                new UuidStatementValue(clan.getId()), new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId()), new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
 
         String deleteEnemiesQuery = "DELETE FROM clan_enemies WHERE Clan = ? OR EnemyClan = ?;";
         database.executeUpdateAsync(new Statement(deleteEnemiesQuery,
-                new UuidStatementValue(clan.getId()), new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId()), new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
 
         String deleteTerritoryQuery = "DELETE FROM clan_territory WHERE Clan = ?;";
-        database.executeUpdateAsync(new Statement(deleteTerritoryQuery, new UuidStatementValue(clan.getId())));
+        database.executeUpdateAsync(new Statement(deleteTerritoryQuery, new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
 
         String deletePropertiesQuery = "DELETE FROM clan_properties WHERE Clan = ?;";
-        database.executeUpdateAsync(new Statement(deletePropertiesQuery, new UuidStatementValue(clan.getId())));
+        database.executeUpdateAsync(new Statement(deletePropertiesQuery, new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
 
         String deleteClanQuery = "DELETE FROM clans WHERE id = ?;";
-        database.executeUpdateAsync(new Statement(deleteClanQuery, new UuidStatementValue(clan.getId())));
+        database.executeUpdateAsync(new Statement(deleteClanQuery, new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     public void updateClanCore(Clan clan) {
@@ -200,67 +209,75 @@ public class ClanRepository implements IRepository<Clan> {
         ClanCore core = clan.getCore();
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(core.getPosition() == null ? "" : UtilWorld.locationToString(core.getPosition(), false)),
-                new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     public void updateClanName(Clan clan) {
         String query = "UPDATE clans SET Name = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(clan.getName()),
-                new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     public void updateClanBanner(Clan clan) {
         String query = "UPDATE clans SET Banner = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(Base64.getEncoder().encodeToString(clan.getBanner().get().serializeAsBytes())),
-                new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     public void updateClanSafe(Clan clan) {
         String query = "UPDATE clans SET Safe = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new BooleanStatementValue(clan.isSafe()),
-                new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     public void updateClanAdmin(Clan clan) {
         String query = "UPDATE clans SET Admin = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new BooleanStatementValue(clan.isAdmin()),
-                new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     public void updateClanVault(Clan clan) {
         String query = "UPDATE clans SET Vault = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(clan.getCore().getVault().serialize()),
-                new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     public CompletableFuture<Void> updateClanMailbox(Clan clan) {
         String query = "UPDATE clans SET Mailbox = ? WHERE id = ?;";
         return database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(clan.getCore().getMailbox().serialize()),
-                new UuidStatementValue(clan.getId())));
+                new UuidStatementValue(clan.getId())), TargetDatabase.GLOBAL);
     }
 
     //region Clan territory
     public void saveClanTerritory(IClan clan, String chunk) {
         String query = "INSERT INTO clan_territory (Clan, Chunk) VALUES (?, ?);";
-        database.executeUpdateAsync(new Statement(query, new UuidStatementValue(clan.getId()), new StringStatementValue(chunk)));
+        database.executeUpdateAsync(new Statement(query,
+                new UuidStatementValue(clan.getId()),
+                new StringStatementValue(chunk)
+        ), TargetDatabase.GLOBAL);
     }
 
     public void deleteClanTerritory(IClan clan, String chunk) {
         String query = "DELETE FROM clan_territory WHERE Clan = ? AND Chunk = ?;";
-        database.executeUpdateAsync(new Statement(query, new UuidStatementValue(clan.getId()), new StringStatementValue(chunk)));
+        database.executeUpdateAsync(new Statement(query,
+                new UuidStatementValue(clan.getId()),
+                new StringStatementValue(chunk)
+        ), TargetDatabase.GLOBAL);
     }
 
     public List<ClanTerritory> getTerritory(Clan clan) {
         List<ClanTerritory> territory = new ArrayList<>();
         String query = "SELECT * FROM clan_territory WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                new UuidStatementValue(clan.getId())
+        ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 String chunk = result.getString(3);
                 territory.add(new ClanTerritory(chunk));
@@ -279,32 +296,29 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
                 new StringStatementValue(member.getUuid()),
-                new StringStatementValue(member.getRank().name())));
+                new StringStatementValue(member.getRank().name())
+        ), TargetDatabase.GLOBAL);
     }
 
     public void deleteClanMember(Clan clan, ClanMember member) {
         String deleteMembersQuery = "DELETE FROM clan_members WHERE Clan = ? AND Member = ?;";
-        database.executeUpdateAsync(new Statement(deleteMembersQuery, new UuidStatementValue(clan.getId()),
-                new StringStatementValue(member.getUuid())));
+        database.executeUpdateAsync(new Statement(deleteMembersQuery,
+                new UuidStatementValue(clan.getId()),
+                new StringStatementValue(member.getUuid())), TargetDatabase.GLOBAL);
     }
 
     public List<ClanMember> getMembers(Clan clan) {
         List<ClanMember> members = new ArrayList<>();
-        String query = "SELECT * FROM clan_members WHERE Clan = ?;";
+        String query = "SELECT * FROM clan_members INNER JOIN clients on clients.UUID = clan_members.Member WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                new UuidStatementValue(clan.getId())
+        ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
-                String uuid = result.getString(3);
+                String uuid = result.getString("Member");
                 ClanMember.MemberRank rank = ClanMember.MemberRank.valueOf(result.getString(4));
 
-                String name = "";
-                // Doing it this way so we don't load the client into the cache unnecessarily, we'll remove this when we merge the databases
-                try (CachedRowSet nameResult = database.executeQuery(new Statement("SELECT Name FROM clients WHERE UUID = ?",
-                        new UuidStatementValue(UUID.fromString(uuid))), TargetDatabase.GLOBAL).join()) {
-                    while (nameResult.next()) {
-                        name = nameResult.getString(1);
-                    }
-                }
+                String name = result.getString("Name");
                 members.add(new ClanMember(uuid, rank, name));
             }
         } catch (SQLException ex) {
@@ -319,7 +333,8 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(member.getRank().name()),
                 new UuidStatementValue(clan.getId()),
-                new StringStatementValue(member.getUuid())));
+                new StringStatementValue(member.getUuid())
+        ), TargetDatabase.GLOBAL);
     }
 
     //endregion
@@ -330,21 +345,25 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
                 new UuidStatementValue(alliance.getClan().getId()),
-                new BooleanStatementValue(alliance.isTrusted())));
+                new BooleanStatementValue(alliance.isTrusted())
+        ), TargetDatabase.GLOBAL);
     }
 
     public void deleteClanAlliance(IClan clan, ClanAlliance alliance) {
         String query = "DELETE FROM clan_alliances WHERE Clan = ? AND AllyClan = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
-                new UuidStatementValue(alliance.getClan().getId())));
+                new UuidStatementValue(alliance.getClan().getId())
+        ), TargetDatabase.GLOBAL);
     }
 
     public List<ClanAlliance> getAlliances(ClanManager clanManager, Clan clan) {
         List<ClanAlliance> alliances = new ArrayList<>();
         String query = "SELECT * FROM clan_alliances WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                new UuidStatementValue(clan.getId())
+        ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
                 if (otherClan.isPresent()) {
@@ -366,7 +385,8 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new BooleanStatementValue(alliance.isTrusted()),
                 new UuidStatementValue(clan.getId()),
-                new UuidStatementValue(alliance.getClan().getId())));
+                new UuidStatementValue(alliance.getClan().getId())
+        ), TargetDatabase.GLOBAL);
     }
     //endregion
 
@@ -376,14 +396,16 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
                 new UuidStatementValue(enemy.getClan().getId()),
-                new DoubleStatementValue(enemy.getDominance())));
+                new DoubleStatementValue(enemy.getDominance())
+        ), TargetDatabase.GLOBAL);
     }
 
     public void deleteClanEnemy(IClan clan, ClanEnemy enemy) {
         String query = "DELETE FROM clan_enemies WHERE Clan = ? AND EnemyClan = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
-                new UuidStatementValue(enemy.getClan().getId())));
+                new UuidStatementValue(enemy.getClan().getId())
+        ), TargetDatabase.GLOBAL);
     }
 
     public void updateDominance(IClan clan, ClanEnemy enemy) {
@@ -391,18 +413,21 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new DoubleStatementValue(enemy.getDominance()),
                 new UuidStatementValue(clan.getId()),
-                new UuidStatementValue(enemy.getClan().getId())));
+                new UuidStatementValue(enemy.getClan().getId())
+        ), TargetDatabase.GLOBAL);
     }
 
     public List<ClanEnemy> getEnemies(ClanManager clanManager, Clan clan) {
         List<ClanEnemy> enemies = new ArrayList<>();
         String query = "SELECT * FROM clan_enemies WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                new UuidStatementValue(clan.getId())
+        ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
-                var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
+                var otherClan = clanManager.getClanById(UUID.fromString(result.getString("EnemyClan")));
                 if (otherClan.isPresent()) {
-                    int dominance = result.getInt(4);
+                    int dominance = result.getInt("Dominance");
                     enemies.add(new ClanEnemy(otherClan.get(), dominance));
                 }
             }
@@ -418,9 +443,9 @@ public class ClanRepository implements IRepository<Clan> {
         HashMap<Integer, Double> dominanceScale = new HashMap<>();
         String query = "SELECT * FROM clans_dominance_scale;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
-                dominanceScale.put(result.getInt(1), result.getDouble(2));
+                dominanceScale.put(result.getInt("ClanSize"), result.getDouble("Dominance"));
             }
         } catch (SQLException ex) {
             log.error("Failed to load dominance scale", ex).submit();
@@ -432,12 +457,16 @@ public class ClanRepository implements IRepository<Clan> {
     //region Insurance
     public void deleteExpiredInsurance(long duration) {
         String query = "DELETE FROM clan_insurance WHERE ((Time+?) - ?) <= 0";
-        database.executeUpdate(new Statement(query, new LongStatementValue(duration), new LongStatementValue(System.currentTimeMillis())));
+        database.executeUpdate(new Statement(query,
+                new LongStatementValue(duration),
+                new LongStatementValue(System.currentTimeMillis())
+        ), TargetDatabase.GLOBAL);
     }
 
     public void deleteInsuranceForClan(Clan clan) {
         String query = "DELETE FROM clan_insurance WHERE Clan = ?";
-        database.executeUpdate(new Statement(query, new UuidStatementValue(clan.getId())));
+        database.executeUpdate(new Statement(query, new UuidStatementValue(clan.getId())
+        ), TargetDatabase.GLOBAL);
     }
 
     public void saveInsurance(Clan clan, Insurance insurance) {
@@ -449,22 +478,24 @@ public class ClanRepository implements IRepository<Clan> {
                 new StringStatementValue(insurance.getBlockMaterial().name()), new StringStatementValue(insurance.getBlockData()),
                 new LongStatementValue(insurance.getTime()), new IntegerStatementValue(location.getBlockX()),
                 new IntegerStatementValue(location.getBlockY()), new IntegerStatementValue(location.getBlockZ())
-        ));
+        ), TargetDatabase.GLOBAL);
     }
 
     public List<Insurance> getInsurance(Clan clan) {
         World world = Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME);
         List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
         String query = "SELECT * FROM clan_insurance WHERE Clan = ? ORDER BY Time ASC";
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                new UuidStatementValue(clan.getId())
+        ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
-                InsuranceType insuranceType = InsuranceType.valueOf(result.getString(2));
-                Material material = Material.valueOf(result.getString(3));
-                String blockData = result.getString(4);
-                long time = result.getLong(5);
-                int blockX = result.getInt(6);
-                int blockY = result.getInt(7);
-                int blockZ = result.getInt(8);
+                InsuranceType insuranceType = InsuranceType.valueOf(result.getString("InsuranceType"));
+                Material material = Material.valueOf(result.getString("Material"));
+                String blockData = result.getString("Data");
+                long time = result.getLong("Time");
+                int blockX = result.getInt("X");
+                int blockY = result.getInt("Y");
+                int blockZ = result.getInt("Z");
 
                 Location blockLocation = new Location(world, blockX, blockY, blockZ);
                 insurance.add(new Insurance(time, material, blockData, insuranceType, blockLocation));
