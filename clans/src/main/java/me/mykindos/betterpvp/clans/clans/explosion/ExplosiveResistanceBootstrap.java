@@ -2,9 +2,10 @@ package me.mykindos.betterpvp.clans.clans.explosion;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.model.VanillaItem;
@@ -19,25 +20,22 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Recipe;
 
 import java.util.List;
-import java.util.Objects;
 
-@PluginAdapter("Clans")
 @Singleton
-public class ExplosiveResistanceBootstrap {
+public class ExplosiveResistanceBootstrap implements ItemBootstrap {
 
-    private final ItemRegistry itemRegistry;
-    private final CraftingRecipeRegistry craftingRegistry;
-    private final MinecraftCraftingRecipeAdapter adapter;
+    private boolean registered = false;
 
-    @Inject
-    private ExplosiveResistanceBootstrap(ItemRegistry itemRegistry, CraftingRecipeRegistry craftingRegistry, MinecraftCraftingRecipeAdapter adapter) {
-        this.itemRegistry = itemRegistry;
-        this.craftingRegistry = craftingRegistry;
-        this.adapter = adapter;
-    }
+    @Inject private ItemRegistry itemRegistry;
+    @Inject private CraftingRecipeRegistry craftingRegistry;
+    @Inject private Provider<MinecraftCraftingRecipeAdapter> adapter;
 
     @Inject
-    private void registerExplosiveResistantBlocks() {
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
+
         for (ExplosiveResistantBlocks tree : ExplosiveResistantBlocks.values()) {
             // Hardest -> Weakest
             final List<Material> tiers = tree.getTiers();
@@ -51,18 +49,18 @@ public class ExplosiveResistanceBootstrap {
                 final Material material = tiers.get(i);
                 final VanillaItem item = new VanillaItem(name, material, ItemRarity.COMMON);
                 item.addBaseComponent(new ExplosiveResistanceComponent(explosiveResistance));
-                registerFallbackItem(material.translationKey(), material, item, true);
+                registerFallbackItem(itemRegistry, material.translationKey(), material, item, true);
             }
         }
     }
 
-    private void registerFallbackItem(String key, Material material, BaseItem item, boolean keepRecipe) {
+    private void registerFallbackItem(ItemRegistry itemRegistry, String key, Material material, BaseItem item, boolean keepRecipe) {
         final NamespacedKey namespacedKey = new NamespacedKey("minecraft", key);
         itemRegistry.registerFallbackItem(namespacedKey, material, item);
         if (keepRecipe) {
             final Recipe old = Bukkit.getRecipe(material.getKey());
             if (old == null) return;
-            final CraftingRecipe craftingRecipe = adapter.convertToCustomRecipe(old);
+            final CraftingRecipe craftingRecipe = adapter.get().convertToCustomRecipe(old);
             if (craftingRecipe != null) craftingRegistry.registerRecipe(namespacedKey, craftingRecipe);
         }
     }

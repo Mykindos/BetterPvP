@@ -10,7 +10,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.serialization.LootTableDeserializer;
 
@@ -37,11 +36,11 @@ public class SupabaseLootTableLoader implements LootTableLoader {
     private final Gson gson;
 
     @Inject
-    public SupabaseLootTableLoader(Core plugin, ItemFactory itemFactory) {
+    public SupabaseLootTableLoader(Core plugin) {
         this.plugin = plugin;
         // Initialize Gson with custom deserializer
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(LootTable.class, new LootTableDeserializer(itemFactory))
+                .registerTypeAdapter(LootTable.class, new LootTableDeserializer())
                 .create();
     }
 

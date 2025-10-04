@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsStatsRepository;
-import me.mykindos.betterpvp.champions.item.ChampionsItemBoostrap;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -74,9 +73,6 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
 
         @Inject
         private TipManager tipManager;
-
-        @Inject
-        private ChampionsItemBoostrap championsItemBoostrap;
 
         @Override
         public String getName() {

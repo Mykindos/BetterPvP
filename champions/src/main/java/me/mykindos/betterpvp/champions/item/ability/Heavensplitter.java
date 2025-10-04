@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

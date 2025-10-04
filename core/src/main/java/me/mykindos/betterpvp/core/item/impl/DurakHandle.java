@@ -18,6 +18,8 @@ import java.util.Map;
 @Singleton
 public class DurakHandle extends BaseItem {
 
+    private transient boolean registered;
+
     @Inject
     private DurakHandle() {
         super("Durak Handle", Item.model("durak_handle"), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
@@ -26,6 +28,8 @@ public class DurakHandle extends BaseItem {
     @Inject
     private void registerRecipe(AnvilRecipeRegistry registry, ItemRegistry itemRegistry, ItemFactory itemFactory,
                                 Duskhide duskhide, Blackroot blackroot, MagicSeal magicSeal) {
+        if (registered) return;
+        registered = true;
         final Map<BaseItem, Integer> ingredients = Map.of(
                 duskhide, 3,
                 blackroot, 10,

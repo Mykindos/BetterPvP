@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;

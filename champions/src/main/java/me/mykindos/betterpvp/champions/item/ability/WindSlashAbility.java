@@ -17,8 +17,8 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -33,7 +33,11 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
 
 import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
 

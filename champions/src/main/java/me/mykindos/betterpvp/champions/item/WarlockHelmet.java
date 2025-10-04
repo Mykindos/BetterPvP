@@ -16,6 +16,9 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 public class WarlockHelmet extends ArmorItem {
+
+    private transient boolean registered;
+
     @Inject
     private WarlockHelmet(Champions champions) {
         super(champions, "Warlock Helmet", ItemStack.of(Material.NETHERITE_HELMET), ItemRarity.COMMON);
@@ -23,6 +26,8 @@ public class WarlockHelmet extends ArmorItem {
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
         final BaseItem netherite = itemFactory.getFallbackItem(Material.NETHERITE_INGOT);
         String[] pattern = new String[] {
                 "NNN",

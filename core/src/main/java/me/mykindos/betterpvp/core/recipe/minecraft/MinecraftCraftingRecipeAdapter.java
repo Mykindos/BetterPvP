@@ -1,31 +1,25 @@
 package me.mykindos.betterpvp.core.recipe.minecraft;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapelessCraftingRecipe;
-import net.kyori.adventure.key.Namespaced;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Adapter for working with Minecraft's built-in recipes.
@@ -35,10 +29,10 @@ import java.util.Set;
 @Singleton
 public class MinecraftCraftingRecipeAdapter {
 
-    private final ItemFactory itemFactory;
+    private final Provider<ItemFactory> itemFactory;
 
     @Inject
-    private MinecraftCraftingRecipeAdapter(ItemFactory itemFactory) {
+    private MinecraftCraftingRecipeAdapter(Provider<ItemFactory> itemFactory) {
         this.itemFactory = itemFactory;
     }
 
@@ -86,8 +80,8 @@ public class MinecraftCraftingRecipeAdapter {
         
         // Create a builder for our shaped recipe
         ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(() -> {
-            return itemFactory.fromItemStack(result).orElseThrow();
-        }, shape, itemFactory);
+            return itemFactory.get().fromItemStack(result).orElseThrow();
+        }, shape, itemFactory.get());
         
         // Add the ingredients
         for (Map.Entry<Character, RecipeChoice> entry : choiceMap.entrySet()) {
@@ -98,12 +92,12 @@ public class MinecraftCraftingRecipeAdapter {
                 // Use the first material as the ingredient
                 Material material = materialChoice.getChoices().getFirst();
                 ItemStack itemStack = new ItemStack(material);
-                ItemInstance instance = itemFactory.fromItemStack(itemStack).orElseThrow();
+                ItemInstance instance = itemFactory.get().fromItemStack(itemStack).orElseThrow();
                 builder.setIngredient(key, new RecipeIngredient(instance.getBaseItem(), 1));
             } else if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
                 // Use the first item as the ingredient
                 ItemStack item = exactChoice.getChoices().getFirst();
-                ItemInstance instance = itemFactory.fromItemStack(item).orElseThrow();
+                ItemInstance instance = itemFactory.get().fromItemStack(item).orElseThrow();
                 builder.setIngredient(key, new RecipeIngredient(instance.getBaseItem(), 1));
             }
         }
@@ -120,19 +114,19 @@ public class MinecraftCraftingRecipeAdapter {
      */
     private ShapelessCraftingRecipe convertShapelessRecipe(org.bukkit.inventory.ShapelessRecipe shapelessRecipe, ItemStack result) {
         List<RecipeIngredient> ingredients = new ArrayList<>();
-        
+
         // Convert each choice to an ingredient
         for (RecipeChoice choice : shapelessRecipe.getChoiceList()) {
             if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
                 // Use the first material as the ingredient
                 Material material = materialChoice.getChoices().getFirst();
                 ItemStack itemStack = new ItemStack(material);
-                ItemInstance instance = itemFactory.fromItemStack(itemStack).orElseThrow();
+                ItemInstance instance = itemFactory.get().fromItemStack(itemStack).orElseThrow();
                 ingredients.add(new RecipeIngredient(instance.getBaseItem(), 1));
             } else if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
                 // Use the first item as the ingredient
                 ItemStack item = exactChoice.getChoices().getFirst();
-                ItemInstance instance = itemFactory.fromItemStack(item).orElseThrow();
+                ItemInstance instance = itemFactory.get().fromItemStack(item).orElseThrow();
                 ingredients.add(new RecipeIngredient(instance.getBaseItem(), 1));
             }
         }
@@ -143,8 +137,8 @@ public class MinecraftCraftingRecipeAdapter {
         }
         
         return new ShapelessCraftingRecipe(() -> {
-            return itemFactory.fromItemStack(result).orElseThrow();
-        }, ingredientMap, itemFactory, false);
+            return itemFactory.get().fromItemStack(result).orElseThrow();
+        }, ingredientMap, itemFactory.get(), false);
     }
 
     public void registerDefaults(Map<NamespacedKey, CraftingRecipe> craftingRecipes) {

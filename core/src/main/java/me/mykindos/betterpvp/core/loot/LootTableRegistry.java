@@ -46,7 +46,7 @@ public class LootTableRegistry implements ReloadHook {
      */
     public LootTable loadLootTable(String id) {
         if (!this.lootTables.containsKey(id)) {
-            log.warn("Tried to load loot table {} but it was not found in the loaded tables, using an empty loot table instead!", id).submit();
+            log.error("Tried to load loot table {} but it was not found in the loaded tables, using an empty loot table instead!", id).submit();
             return LootTable.builder().id(id).build();
         }
         return this.lootTables.get(id);

@@ -22,8 +22,6 @@ import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -33,6 +31,8 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = true)
 @Getter
 public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
+
+    private transient boolean registered;
 
     private final LifestealAbility lifestealAbility;
     private final SoulHarvestAbility soulHarvestAbility;
@@ -117,6 +117,8 @@ public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 BurntRemnant burntRemnant, ReapersEdge reapersEdge, DurakHandle durakHandle) {
+        if (registered) return;
+        registered = true;
         String[] pattern = new String[] {
                 "BRR",
                 "D",

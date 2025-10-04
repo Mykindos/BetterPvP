@@ -10,9 +10,6 @@ import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.loot.LootContext;
-import me.mykindos.betterpvp.core.loot.LootProgress;
-import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
@@ -74,9 +71,7 @@ public class TreasureType implements FishingLootType {
 
                 // todo: refactor to use loot tables
                 final ItemInstance itemInstance = itemFactory.fromItemStack(item.getItemStack()).orElseThrow();
-                final LootSession fishing = new LootSession(new LootProgress(null));
-                final LootContext context = new LootContext(event.getPlayer(), event.getCaught().getLocation(), fishing, "Fishing");
-                UtilServer.callEvent(new SpecialItemLootEvent(context, itemInstance, "Fishing"));
+                UtilServer.callEvent(new SpecialItemLootEvent(event.getCaught().getLocation(), itemInstance, "Fishing"));
 
                 log.info("{} caught {}x {}.", event.getPlayer().getName(), count, itemKey.toString())
                         .addClientContext(event.getPlayer()).addLocationContext(item.getLocation()).submit();

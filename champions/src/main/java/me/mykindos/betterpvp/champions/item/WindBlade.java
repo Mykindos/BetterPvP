@@ -16,19 +16,17 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.item.impl.*;
+import me.mykindos.betterpvp.core.item.impl.AetherCore;
+import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.FeatherOfZephyr;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.metal.Runesteel;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
@@ -38,8 +36,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
     private final WindDashAbility windDashAbility;
     private final WindSlashAbility windSlashAbility;
     private final FeatherFeetAbility featherFeetAbility;
-    @EqualsAndHashCode.Exclude
-    private boolean registeredRecipe;
+    private transient boolean registered;
 
     @Inject
     private WindBlade(Champions champions, ChampionsManager championsManager,
@@ -111,7 +108,8 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 AetherCore aetherCore, FeatherOfZephyr featherOfZephyr,
                                 DurakHandle durakHandle) {
-        if (registeredRecipe) return;
+        if (registered) return;
+        registered = true;
         String[] pattern = new String[] {
                 "F",
                 "A",
@@ -122,6 +120,5 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
         builder.setIngredient('A', new RecipeIngredient(aetherCore, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         registry.registerRecipe(new NamespacedKey("champions", "windblade"), builder.build());
-        registeredRecipe = true;
     }
 }

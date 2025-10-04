@@ -3,35 +3,35 @@ package me.mykindos.betterpvp.core.metal;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
-import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 
 @Singleton
-@PluginAdapter("Core")
-public class MetalBlockBootstrap {
+public class MetalBlockBootstrap implements ItemBootstrap {
 
-    private final SmartBlockRegistry registry;
+    private boolean registered = false;
+
+    @Inject private ItemRegistry itemRegistry;
+    @Inject private SmartBlockRegistry registry;
+    @Inject private FissureQuartz.DeepslateOre fissureQuartzDeepslateOre;
+    @Inject private FissureQuartz.Ore fissureQuartzOre;
+    @Inject private Runesteel.OreBlock runebloodOre;
+    @Inject private Steel.Block steelBlock;
+    @Inject private Runesteel.Block runesteelBlock;
 
     @Inject
-    private MetalBlockBootstrap(SmartBlockRegistry registry) {
-        this.registry = registry;
-    }
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
 
-    @Inject
-    private void registerOres(FissureQuartz.DeepslateOre fissureQuartzDeepslateOre,
-                              FissureQuartz.Ore fissureQuartzOre,
-                              Runesteel.OreBlock runebloodOre) {
+        // Ores
         registry.registerBlock(fissureQuartzDeepslateOre);
         registry.registerBlock(fissureQuartzOre);
         registry.registerBlock(runebloodOre);
-    }
 
-    @Inject
-    private void registerBlocks(Steel.Block steelBlock,
-                                Runesteel.Block runesteelBlock) {
+        // Blocks
         registry.registerBlock(steelBlock);
         registry.registerBlock(runesteelBlock);
     }
-
-
-
 }

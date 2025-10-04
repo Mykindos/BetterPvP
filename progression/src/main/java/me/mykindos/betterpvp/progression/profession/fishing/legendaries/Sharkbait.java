@@ -14,10 +14,8 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerCo
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
@@ -27,7 +25,6 @@ import org.bukkit.inventory.ItemStack;
 public class Sharkbait extends BaseItem implements ReloadHook {
     
     private final SharkbaitAuraAbility auraAbility;
-    private final ItemFactory itemFactory;
     private final Progression progression;
 
     @Inject
@@ -37,7 +34,6 @@ public class Sharkbait extends BaseItem implements ReloadHook {
         super("Sharkbait", Item.model(Material.FISHING_ROD, "sharkbait", 1), ItemGroup.TOOL, ItemRarity.LEGENDARY);
         this.progression = progression;
         this.auraAbility = auraAbility;
-        this.itemFactory = itemFactory;
         
         // Add ability container
         addBaseComponent(AbilityContainerComponent.builder()

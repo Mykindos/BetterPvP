@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.chat.ignore.impl.MineplexIgnoreService;
 import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
-import me.mykindos.betterpvp.core.item.impl.CoreItemBootstrap;
 import org.bukkit.Bukkit;
 
 @CustomLog
@@ -40,7 +39,7 @@ public class CoreInjectorModule extends AbstractModule {
             log.info("Using default integrations").submit();
         }
 
-        bind(CoreItemBootstrap.class).asEagerSingleton();
+        install(new CoreItemsModule());
     }
 
 }

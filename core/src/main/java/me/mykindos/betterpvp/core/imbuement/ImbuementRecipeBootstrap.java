@@ -3,21 +3,19 @@ package me.mykindos.betterpvp.core.imbuement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
-import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -25,19 +23,15 @@ import java.util.Optional;
  * This class is responsible for setting up all imbuement crafting recipes in the system.
  */
 @Singleton
-@PluginAdapter("Core")
-public class ImbuementRecipeBootstrap {
+public class ImbuementRecipeBootstrap implements ItemBootstrap {
 
-    private final ItemFactory itemFactory;
-    private final ItemRegistry itemRegistry;
-    private final ImbuementRecipeRegistry imbuementRecipeRegistry;
+    private boolean registered = false;
 
-    @Inject
-    private ImbuementRecipeBootstrap(ItemFactory itemFactory, ItemRegistry itemRegistry, ImbuementRecipeRegistry imbuementRecipeRegistry) {
-        this.itemFactory = itemFactory;
-        this.itemRegistry = itemRegistry;
-        this.imbuementRecipeRegistry = imbuementRecipeRegistry;
-    }
+    @Inject private ItemRegistry itemRegistry;
+    @Inject private ItemFactory itemFactory;
+    @Inject private ImbuementRecipeRegistry imbuementRecipeRegistry;
+    @Inject private ScorchingRuneItem scorchingRune;
+    @Inject private UnbreakingRuneItem unbreakingRune;
 
     /**
      * Creates a namespaced key for the Core plugin.
@@ -53,16 +47,20 @@ public class ImbuementRecipeBootstrap {
      * This method sets up the core imbuement system.
      */
     @Inject
-    private void registerRecipes(ScorchingRuneItem scorchingRune, UnbreakingRuneItem unbreakingRune) {
+    @Override
+    public void registerItems() {
+        if (registered) return;
+        registered = true;
+
         final List<RuneItem> runes = List.of(scorchingRune, unbreakingRune);
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
-            registerRecipe(alreadyRegistered, runes);
+            registerRecipe(itemRegistry, alreadyRegistered, runes);
         }
 
-        itemRegistry.addRegisterCallback((key, item) -> registerRecipe(item, runes));
+        itemRegistry.addRegisterCallback((key, item) -> registerRecipe(itemRegistry, item, runes));
     }
 
-    private void registerRecipe(BaseItem baseItem, List<RuneItem> runes) {
+    private void registerRecipe(ItemRegistry itemRegistry, BaseItem baseItem, List<RuneItem> runes) {
         final Optional<RuneContainerComponent> containerOpt = baseItem.getComponent(RuneContainerComponent.class);
         if (containerOpt.isEmpty()) {
             return;
@@ -73,10 +71,13 @@ public class ImbuementRecipeBootstrap {
             return;
         }
 
+        final NamespacedKey itemKey = Objects.requireNonNull(itemRegistry.getKey(baseItem));
         for (RuneItem runeItem : runes) {
             if (!container.hasRune(runeItem.getRune()) && runeItem.getRune().canApply(baseItem)) {
-                final NamespacedKey key = itemRegistry.getKey(baseItem);
-                imbuementRecipeRegistry.registerRecipe(key, new RuneImbuementRecipe(itemFactory, baseItem, runeItem));
+                final NamespacedKey runeKey = Objects.requireNonNull(itemRegistry.getKey(runeItem));
+                final String key = itemKey.getKey() + "_" + runeKey.getKey();
+                final NamespacedKey combinationKey = new NamespacedKey(itemKey.getNamespace(), key);
+                imbuementRecipeRegistry.registerRecipe(combinationKey, new RuneImbuementRecipe(itemFactory, baseItem, runeItem));
             }
         }
     }

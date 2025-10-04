@@ -2,9 +2,7 @@ package me.mykindos.betterpvp.core.components.champions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -72,7 +70,7 @@ public enum Role {
     }
 
     private ItemStack getItem(ItemFactory itemFactory, ItemStack itemStack) {
-        return itemFactory.convertItemStack(itemStack).orElseThrow();
+        return itemFactory.create(itemFactory.getFallbackItem(itemStack)).createItemStack();
     }
 
     private ItemStack getItem(ItemFactory itemFactory, Material material) {

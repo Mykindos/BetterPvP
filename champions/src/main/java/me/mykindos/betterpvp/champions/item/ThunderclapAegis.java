@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.BlocksAttacks;
-import io.papermc.paper.datacomponent.item.Consumable;
-import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.VolticBashAbility;
@@ -14,13 +10,13 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.item.impl.*;
+import me.mykindos.betterpvp.core.item.impl.StormsteelPlate;
+import me.mykindos.betterpvp.core.item.impl.VolticShield;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemFlag;
@@ -32,8 +28,8 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
 
     private static final ItemStack model;
 
+    private transient boolean registered;
     private final VolticBashAbility volticBashAbility;
-    private final ItemFactory itemFactory;
 
     static {
         model = Item.model(Material.SHIELD, "thunderclap_aegis", 1);
@@ -48,8 +44,7 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
                             ItemFactory itemFactory) {
         super(champions, "Thunderclap Aegis", model, ItemRarity.LEGENDARY);
         this.volticBashAbility = volticBashAbility;
-        this.itemFactory = itemFactory;
-        
+
         addBaseComponent(AbilityContainerComponent.builder()
                 .ability(volticBashAbility)
                 .build());
@@ -71,6 +66,8 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 StormsteelPlate stormsteelPlate, VolticShield volticShield) {
+        if (registered) return;
+        registered = true;
         String[] pattern = new String[] {
                 "SSS",
                 "SVS",

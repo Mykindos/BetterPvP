@@ -23,7 +23,6 @@ import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
@@ -36,6 +35,7 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
 
     private static final ItemStack model;
 
+    private transient boolean registered;
     private double attackSpeed;
     private final HyperRushAbility hyperRushAbility;
     private final ItemFactory itemFactory;
@@ -101,6 +101,8 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 RazorEdge razorEdge, OverchargedCrystal overchargedCrystal) {
+        if (registered) return;
+        registered = true;
         String[] pattern = new String[] {
                 " RO",
                 " SR",

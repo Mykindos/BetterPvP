@@ -39,14 +39,13 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook {
 
+    private transient boolean registered;
     private final RegenerationShieldAbility regenerationShieldAbility;
 
     @EqualsAndHashCode.Exclude
     private final Set<UUID> holdingPlayers = new HashSet<>();
     @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
-    @EqualsAndHashCode.Exclude
-    private boolean registeredRecipe;
 
     @Inject
     private GiantsBroadsword(Champions champions,
@@ -132,7 +131,8 @@ public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 ColossusFragment colossusFragment, DurakHandle durakHandle) {
-        if (registeredRecipe) return;
+        if (registered) return;
+        registered = true;
         String[] pattern = new String[] {
                 "C",
                 "C",
@@ -142,6 +142,5 @@ public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook
         builder.setIngredient('C', new RecipeIngredient(colossusFragment, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         registry.registerRecipe(new NamespacedKey("champions", "giants_broadsword"), builder.build());
-        registeredRecipe = true;
     }
 } 

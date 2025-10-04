@@ -17,6 +17,7 @@ public class ProgressionInjectorModule extends AbstractModule {
     protected void configure() {
         bind(Progression.class).toInstance(plugin);
         bind(ProgressionItemBootstrap.class).asEagerSingleton();
+        bind(ProgressionFishBootstrap.class).asEagerSingleton();
     }
 
 }
