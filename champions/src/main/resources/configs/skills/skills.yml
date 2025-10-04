@@ -827,7 +827,7 @@ skills:
       durationIncreasePerLevel: 1.0
       velocityMultiplier: 0.4
       yComponentVelocityMultiplier: 1.0
-      damageDelay: 50
+      damageDelay: 400
       numflames: 75
     ropedarrow:
       enabled: true
