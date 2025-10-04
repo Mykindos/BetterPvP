@@ -162,6 +162,17 @@ skills:
       internalCooldown: 0.6
       internalCooldownDecreasePerLevel: 0.1
   knight:
+    vanguardsmight:
+      cooldown: 15.0
+      cooldownDecreasePerLevel: 0.5
+      passiveChargePerSecond: 0.5
+      chargePerDamageTaken: 2.0
+      blockDuration: 3.0
+      transferencePhaseDuration: 0.5
+      strengthLevel: 1
+      maxStrengthDuration: 3.0
+      maxStrengthDurationIncreasePerLevel: 2.5
+      noDamageAbsorbedMessageDuration: 2.0
     battlebind:
       enabled: false
       maxlevel: 3
