@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -86,6 +87,9 @@ public class WindDashAbility extends ItemAbility {
         Vector vec = player.getLocation().getDirection().normalize().multiply(dashVelocity);
         VelocityData velocityData = new VelocityData(vec, dashVelocity, false, 0.0D, 0.4D, 0.8D, true);
         UtilVelocity.velocity(player, player, velocityData);
+
+        // Consume durability
+        UtilItem.damageItem(player, itemStack, 1);
 
         // SFX
         new SoundEffect(Sound.ITEM_TRIDENT_THROW, 0.5F, 2.0F).play(player.getLocation());

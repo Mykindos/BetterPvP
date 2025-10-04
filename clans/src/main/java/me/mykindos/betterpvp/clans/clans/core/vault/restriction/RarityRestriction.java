@@ -38,7 +38,7 @@ public final class RarityRestriction extends VaultRestriction {
     public boolean matches(@NotNull ItemStack itemStack) {
         return itemFactory.fromItemStack(itemStack)
                 .map(ItemInstance::getRarity)
-                .filter(rarity -> rarity == this.rarity)
+                .filter(rarity -> rarity.isAtLeast(rarity))
                 .isPresent();
     }
 }
