@@ -13,7 +13,12 @@ import com.ticxo.modelengine.api.generator.ModelGenerator;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.item.cannon.CannonballItem;
-import me.mykindos.betterpvp.clans.item.cannon.event.*;
+import me.mykindos.betterpvp.clans.item.cannon.event.CannonAimEvent;
+import me.mykindos.betterpvp.clans.item.cannon.event.CannonFuseEvent;
+import me.mykindos.betterpvp.clans.item.cannon.event.CannonPlaceEvent;
+import me.mykindos.betterpvp.clans.item.cannon.event.CannonReloadEvent;
+import me.mykindos.betterpvp.clans.item.cannon.event.CannonShootEvent;
+import me.mykindos.betterpvp.clans.item.cannon.event.PreCannonShootEvent;
 import me.mykindos.betterpvp.clans.item.cannon.model.Cannon;
 import me.mykindos.betterpvp.clans.item.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -26,7 +31,12 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
@@ -52,7 +62,14 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static me.mykindos.betterpvp.clans.item.cannon.model.Cannon.COOLDOWN_LERP_OUT;
 
@@ -81,35 +98,35 @@ public class CannonListener implements Listener {
     private ItemFactory itemFactory;
 
     @Inject
-    @Config(path = "cannon.entity-collision-explode", defaultValue = "true", configName = "weapons/cannon")
+    @Config(path = "cannon.entity-collision-explode", defaultValue = "true", configName = "items/weapon")
     private boolean entityCollisionExplode;
 
     @Inject
-    @Config(path = "cannon.block-collision-explode", defaultValue = "true", configName = "weapons/cannon")
+    @Config(path = "cannon.block-collision-explode", defaultValue = "true", configName = "items/weapon")
     private boolean blockCollisionExplode;
 
     @Inject
-    @Config(path = "cannon.cannonball-alive-seconds", defaultValue = "2.0", configName = "weapons/cannon")
+    @Config(path = "cannon.cannonball-alive-seconds", defaultValue = "2.0", configName = "items/weapon")
     private double cannonballAliveSeconds;
 
     @Inject
-    @Config(path = "cannon.cannonball-velocity-strengh", defaultValue = "1.3", configName = "weapons/cannon")
+    @Config(path = "cannon.cannonball-velocity-strengh", defaultValue = "1.3", configName = "items/weapon")
     private double cannonballVelocityStrength;
 
     @Inject
-    @Config(path = "cannon.cannonball-damage", defaultValue = "15.0", configName = "weapons/cannon")
+    @Config(path = "cannon.cannonball-damage", defaultValue = "15.0", configName = "items/weapon")
     private double cannonballDamage;
 
     @Inject
-    @Config(path = "cannon.cannonball-min-damage", defaultValue = "4.0", configName = "weapons/cannon")
+    @Config(path = "cannon.cannonball-min-damage", defaultValue = "4.0", configName = "items/weapon")
     private double cannonballMinDamage;
 
     @Inject
-    @Config(path = "cannon.cannonball-damage-max-radius", defaultValue = "4.0", configName = "weapons/cannon")
+    @Config(path = "cannon.cannonball-damage-max-radius", defaultValue = "4.0", configName = "items/weapon")
     private double cannonballDamageMaxRadius;
 
     @Inject
-    @Config(path = "cannon.cannonball-damage-min-radius", defaultValue = "1.0", configName = "weapons/cannon")
+    @Config(path = "cannon.cannonball-damage-min-radius", defaultValue = "1.0", configName = "items/weapon")
     private double cannonballDamageMinRadius;
 
     private TNTPrimed spawnCannonball(final @NotNull Cannon cannon, final @NotNull UUID caster) {
