@@ -22,7 +22,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
@@ -64,7 +63,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
         if (level <= 0) return;
 
         if (UtilMath.getAngle(damager.getLocation().getDirection(), event.getDamagee().getLocation().getDirection()) < 60) {
-            event.addModifier(new SkillDamageModifier.Multiplier(this, getDamageModifier(level)));
+            event.addModifier(new SkillDamageModifier.Flat(this, getDamageModifier(level)));
             damager.getWorld().playSound(event.getDamagee().getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 1f, 2f);
             damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
         }
