@@ -66,16 +66,16 @@ public class LootChestListener implements Listener {
 
         LootChest lootChest = lootChestManager.getLootChest(event.getActiveMob());
         if (lootChest != null) {
-            lootChest.dropItems();
-            lootChestManager.getLootChests().remove(lootChest);
+            lootChest.dropItems(event.getActiveMob());
+            lootChestManager.getLootChests().remove(event.getActiveMob());
         }
     }
 
     // Remove invalid loot chests every 1 second
     @UpdateEvent (delay = 1000)
     public void removeInvalidLootChests() {
-        lootChestManager.getLootChests().removeIf(lootChest -> {
-            return lootChest.getActiveMob().isDead() || !lootChest.getActiveMob().getEntity().getBukkitEntity().isValid();
+        lootChestManager.getLootChests().keySet().removeIf((mob) -> {
+            return mob.isDead() || !mob.getEntity().getBukkitEntity().isValid();
         });
     }
 }
