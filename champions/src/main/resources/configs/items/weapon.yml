@@ -29,8 +29,8 @@ throwing_web:
   cooldown: 10.0
 scythe:
   damage: 7.0
-  baseHeal: 0.7
-  healPerSoul: 0.1
+  baseHeal: 1.0
+  healPerSoul: 1.0
   maxSoulsDamage: 4.0
   maxSouls: 3
   soulHarvestSeconds: 1.5
