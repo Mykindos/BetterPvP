@@ -4,15 +4,14 @@ import com.google.inject.AbstractModule;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.filter.IFilterService;
-import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
-import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
-import me.mykindos.betterpvp.core.chat.ignore.impl.MineplexIgnoreService;
 import me.mykindos.betterpvp.core.chat.filter.impl.DefaultFilterService;
 import me.mykindos.betterpvp.core.chat.filter.impl.MineplexFilterService;
+import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
+import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
+import me.mykindos.betterpvp.core.chat.ignore.impl.MineplexIgnoreService;
 import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
-import me.mykindos.betterpvp.core.item.impl.CoreItemBootstrap;
 import org.bukkit.Bukkit;
 
 @CustomLog
@@ -40,7 +39,7 @@ public class CoreInjectorModule extends AbstractModule {
             log.info("Using default integrations").submit();
         }
 
-        bind(CoreItemBootstrap.class).asEagerSingleton();
+        install(new CoreItemsModule());
     }
 
 }

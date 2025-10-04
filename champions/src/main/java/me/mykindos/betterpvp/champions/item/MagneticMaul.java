@@ -19,15 +19,13 @@ import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
 public class MagneticMaul extends WeaponItem implements ReloadHook {
 
+    private transient boolean registered;
     private final MagnetismAbility magnetismAbility;
     private final ReverseKnockbackAbility reverseKnockbackAbility;
 
@@ -64,6 +62,8 @@ public class MagneticMaul extends WeaponItem implements ReloadHook {
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 MagneticShard magneticShard, PolariteChunk polariteChunk, DurakHandle durakHandle) {
+        if (registered) return;
+        registered = true;
         String[] pattern = new String[] {
                 "PPP",
                 "PMP",

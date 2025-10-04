@@ -17,6 +17,8 @@ import org.bukkit.inventory.ItemStack;
 @Singleton
 public class PowerAxe extends WeaponItem {
 
+    private transient boolean registered;
+
     @Inject
     private PowerAxe(Champions champions) {
         super(champions, "Power Axe", ItemStack.of(Material.DIAMOND_AXE), ItemRarity.COMMON);
@@ -24,6 +26,8 @@ public class PowerAxe extends WeaponItem {
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
         final BaseItem diamondBlock = itemFactory.getFallbackItem(Material.DIAMOND_BLOCK);
         final BaseItem stick = itemFactory.getFallbackItem(Material.STICK);
         String[] pattern = new String[] {

@@ -3,11 +3,8 @@ package me.mykindos.betterpvp.core.loot;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +32,12 @@ public class LootTable {
      */
     @Builder.Default
     @NotNull ReplacementStrategy replacementStrategy = ReplacementStrategy.WITH_REPLACEMENT;
+
+    /**
+     * The strategy for awarding loot. See {@link AwardStrategy}.
+     */
+    @Builder.Default
+    @NotNull AwardStrategy awardStrategy = AwardStrategy.DEFAULT;
 
     /**
      * The function to use for rolling the number of loot entries to generate. See {@link RollCountFunction}.
@@ -114,60 +117,60 @@ public class LootTable {
         // 2. Roll count
         int rolls = rollCountFunction.apply(context);
         if (rolls <= 0) {
-            final LootBundle bundle = new LootBundle(context, loot);
+            final LootBundle bundle = new LootBundle(context, awardStrategy, loot);
             context.getSession().getProgress().history.add(bundle);
             return bundle;
         }
 
         // 3. Flatten weighted loot into entries with base weight
         List<Loot<? ,?>> candidates = new ArrayList<>();
-        List<Integer> weights = new ArrayList<>();
+        List<Integer> baseWeights = new ArrayList<>();
         for (var entry : weightedLoot.entries()) {
             int weight = entry.getKey();
             Loot<? ,?> l = entry.getValue();
             if (weight <= 0) continue;
             candidates.add(l);
-            weights.add(weight);
+            baseWeights.add(weight);
         }
 
         if (candidates.isEmpty()) {
-            final LootBundle bundle = new LootBundle(context, loot);
+            final LootBundle bundle = new LootBundle(context,awardStrategy, loot);
             context.getSession().getProgress().history.add(bundle);
             return bundle;
         }
 
-        // 4. Adjust weights based on strategy
-        applyWeightDistribution(candidates, weights, context.getSession().getProgress());
-
-        // Compute initial total
-        int totalWeight = weights.stream().mapToInt(Integer::intValue).sum();
-        if (totalWeight <= 0) {
-            final LootBundle bundle = new LootBundle(context, loot);
-            context.getSession().getProgress().history.add(bundle);
-            return bundle;
-        }
-
-        // 5. Perform rolls
+        // 4. Perform rolls
         for (int i = 0; i < rolls; i++) {
+            // copy base -> effective, then apply distribution for this moment-in-bundle
+            final List<Integer> effectiveWeights = new ArrayList<>(baseWeights);
+            applyWeightDistribution(candidates, effectiveWeights, context.getSession().getProgress(), loot);
+
+            // total must be from effective weights
+            int totalWeight = 0;
+            for (int j = 0; j < candidates.size(); j++) {
+                if (candidates.get(j).getCondition().test(context)) {
+                    totalWeight += effectiveWeights.get(j);
+                }
+            }
+            if (totalWeight <= 0) break;
+
             int r = ThreadLocalRandom.current().nextInt(totalWeight);
             int cumulative = 0;
             for (int j = 0; j < candidates.size(); j++) {
-                cumulative += weights.get(j);
                 final Loot<?, ?> candidate = candidates.get(j);
-                if (!candidate.getCondition().test(context)) {
-                    continue;
-                }
 
+                // do not count weight for candidates that fail the condition
+                if (!candidate.getCondition().test(context)) continue;
+
+                cumulative += effectiveWeights.get(j);
                 if (r < cumulative) {
                     loot.add(candidate);
 
-                    // Replacement handling
                     final ReplacementStrategy strategy = candidate.getReplacementStrategy()
                             .orElse(this.replacementStrategy);
                     if (strategy == ReplacementStrategy.WITHOUT_REPLACEMENT) {
-                        totalWeight -= weights.get(j);
                         candidates.remove(j);
-                        weights.remove(j);
+                        baseWeights.remove(j); // <-- remove from base, not effective
                     }
                     break;
                 }
@@ -175,12 +178,13 @@ public class LootTable {
             if (candidates.isEmpty()) break;
         }
 
-        final LootBundle bundle = new LootBundle(context, loot);
+        final LootBundle bundle = new LootBundle(context,awardStrategy, loot);
         context.getSession().getProgress().history.add(bundle);
         return bundle;
     }
 
-    private void applyWeightDistribution(List<Loot<? ,?>> candidates, List<Integer> weights, @Nullable LootProgress progress) {
+    private void applyWeightDistribution(List<Loot<? ,?>> candidates, List<Integer> weights,
+                                         @Nullable LootProgress progress, List<Loot<?, ?>> awardedInThisBundle) {
         switch (weightDistributionStrategy) {
             case STATIC -> {
                 // do nothing
@@ -189,47 +193,56 @@ public class LootTable {
                 if (progress == null) return;
                 for (int i = 0; i < candidates.size(); i++) {
                     Loot<? ,?> candidate = candidates.get(i);
+
+                    // suppress pity if this bundle already contains this loot
+                    if (awardedInThisBundle.contains(candidate)) continue;
+
                     for (PityRule rule : pityRules) {
                         if (rule.getLoot().equals(candidate)) {
                             int failedRolls = progress.getFailedRolls(candidate);
                             if (failedRolls > 0) {
                                 int increments = failedRolls / rule.getMaxAttempts();
                                 int extra = increments * rule.getWeightIncrement();
-                                weights.set(i, weights.get(i) + extra);
+                                if (extra > 0) {
+                                    weights.set(i, weights.get(i) + extra);
+                                }
                             }
                         }
                     }
                 }
             }
             case PROGRESSIVE -> {
-                if (progress == null) return;
+                if (progress == null || weights.isEmpty()) return;
 
-                // Calculate center and total variance
-                int center = weights.stream().mapToInt(Integer::intValue).sum() / weights.size();
+                // mean of active weights (>=0)
+                long sum = 0;
+                int n = 0;
+                for (int w : weights) { if (w > 0) { sum += w; n++; } }
+                if (n == 0) return;
+                double avg = (double) sum / n;
 
-                for (int i = 0; i < progress.getHistory().size(); i++) {
-                    int totalVariance = weights.stream()
-                            .mapToInt(w -> Math.abs(w - center))
-                            .sum();
+                final int maxShift = progressiveWeightConfig.getMaxShift();
+                final double factor = progressiveWeightConfig.getShiftFactor();
+                final boolean scaleVar = progressiveWeightConfig.isEnableVarianceScaling();
 
-                    // Apply progressive weight adjustment
-                    for (int j = 0; j < weights.size(); j++) {
-                        int currentWeight = weights.get(j);
-                        int variance = Math.abs(currentWeight - center);
+                for (int j = 0; j < weights.size(); j++) {
+                    int w = weights.get(j);
+                    if (w <= 0) continue;
 
-                        // Calculate shift based on configuration
-                        double normalizedVariance = (double) variance / totalVariance;
-                        int shift = (int) (progressiveWeightConfig.getMaxShift() * normalizedVariance);
-
-                        // Adjust weight towards center
-                        if (currentWeight < center) {
-                            currentWeight = Math.min(center, currentWeight + shift);
-                        } else if (currentWeight > center) {
-                            currentWeight = Math.max(center, currentWeight - shift);
-                        }
-
-                        weights.set(j, currentWeight);
+                    double delta = avg - w;                  // move toward mean
+                    double shift = delta * factor;           // base shift
+                    if (scaleVar) {
+                        double spread = Math.abs(delta);
+                        double scale = (avg == 0.0) ? 1.0 : (spread / avg);
+                        shift *= scale;                      // variance scaling
                     }
+                    if (maxShift > 0) {
+                        if (shift >  maxShift) shift =  maxShift;
+                        if (shift < -maxShift) shift = -maxShift;
+                    }
+
+                    int newW = (int) Math.max(0, Math.round(w + shift));
+                    weights.set(j, newW);
                 }
             }
         }

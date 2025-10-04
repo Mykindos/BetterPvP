@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.loot.chest;
 
 import com.google.inject.Singleton;
+import io.lumine.mythic.core.mobs.ActiveMob;
 import lombok.Getter;
 import org.bukkit.entity.Entity;
 
@@ -18,7 +19,17 @@ public class LootChestManager {
     }
 
     public LootChest getLootChest(Entity entity) {
-        return lootChests.stream().filter(lootChest -> lootChest.getEntity().equals(entity)).findFirst().orElse(null);
+        return lootChests.stream()
+                .filter(lootChest -> lootChest.getActiveMob().getEntity().getBukkitEntity().equals(entity))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public LootChest getLootChest(ActiveMob mob) {
+        return lootChests.stream()
+                .filter(lootChest -> lootChest.getActiveMob().equals(mob))
+                .findFirst()
+                .orElse(null);
     }
 
 }

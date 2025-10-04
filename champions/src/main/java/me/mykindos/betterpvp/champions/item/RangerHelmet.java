@@ -6,9 +6,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.impl.AetherCore;
-import me.mykindos.betterpvp.core.item.impl.DurakHandle;
-import me.mykindos.betterpvp.core.item.impl.FeatherOfZephyr;
 import me.mykindos.betterpvp.core.item.model.ArmorItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -19,6 +16,9 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 public class RangerHelmet extends ArmorItem {
+
+    private transient boolean registered;
+
     @Inject
     private RangerHelmet(Champions champions) {
         super(champions, "Ranger Helmet", ItemStack.of(Material.CHAINMAIL_HELMET), ItemRarity.COMMON);
@@ -26,6 +26,8 @@ public class RangerHelmet extends ArmorItem {
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
         final BaseItem emerald = itemFactory.getFallbackItem(Material.EMERALD);
         String[] pattern = new String[] {
                 "EEE",

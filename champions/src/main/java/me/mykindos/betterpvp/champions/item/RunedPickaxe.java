@@ -6,12 +6,16 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
-import me.mykindos.betterpvp.core.item.*;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.Item;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.MagicSeal;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.ability.EnhancedMiningAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -23,6 +27,8 @@ import java.util.Map;
 @Singleton
 @EqualsAndHashCode(callSuper = true)
 public class RunedPickaxe extends BaseItem implements ReloadHook {
+
+    private transient boolean registered;
 
     private final EnhancedMiningAbility ability;
     @EqualsAndHashCode.Exclude
@@ -63,6 +69,8 @@ public class RunedPickaxe extends BaseItem implements ReloadHook {
     @Inject
     private void registerRecipe(ImbuementRecipeRegistry registry, ItemFactory itemFactory,
                                 MagicSeal magicSeal, OverchargedCrystal overchargedCrystal) {
+        if (registered) return;
+        registered = true;
         final BaseItem diamondPickaxe = itemFactory.getFallbackItem(Material.DIAMOND_PICKAXE);
         final Map<BaseItem, Integer> ingredients = Map.of(
                 magicSeal, 1,

@@ -17,6 +17,8 @@ import org.bukkit.inventory.ItemStack;
 @Singleton
 public class BoosterAxe extends WeaponItem {
 
+    private transient boolean registered;
+
     @Inject
     private BoosterAxe(Champions champions) {
         super(champions, "Booster Axe", ItemStack.of(Material.GOLDEN_AXE), ItemRarity.COMMON);
@@ -24,6 +26,8 @@ public class BoosterAxe extends WeaponItem {
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
         final BaseItem goldBlock = itemFactory.getFallbackItem(Material.GOLD_BLOCK);
         final BaseItem stick = itemFactory.getFallbackItem(Material.STICK);
         String[] pattern = new String[] {
