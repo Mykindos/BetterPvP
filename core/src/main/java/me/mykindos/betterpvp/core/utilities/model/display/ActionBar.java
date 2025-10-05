@@ -14,7 +14,7 @@ import java.util.UUID;
 @Slf4j
 public class ActionBar {
 
-    static final Component EMPTY = Component.empty();
+    protected static final Component EMPTY = Component.empty();
 
     /**
      * These components are sent to the player for a set amount of seconds, in order of priority, and are removed after being shown.
@@ -22,10 +22,10 @@ public class ActionBar {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityDataBlockingQueue<DisplayComponent> components = new PriorityDataBlockingQueue<>(20);
+    protected final PriorityDataBlockingQueue<DisplayComponent> components = new PriorityDataBlockingQueue<>(20);
 
     // Use a lock to synchronize access to the components PriorityQueue
-    private final Object lock = new Object();
+    protected final Object lock = new Object();
 
     public void add(int priority, DisplayComponent component) {
         synchronized (lock) {
@@ -74,7 +74,7 @@ public class ActionBar {
         }
     }
 
-    private Component nextComponent(Gamer gamer) {
+    protected Component nextComponent(Gamer gamer) {
         synchronized (lock) {
             if (components.isEmpty()) {
                 return EMPTY;
@@ -109,7 +109,7 @@ public class ActionBar {
         }
     }
 
-    private void cleanUp() {
+    protected void cleanUp() {
         synchronized (lock) {
             // Clean up dynamic components that have expired
             components.removeIf(pair -> pair.getRight().isInvalid());
