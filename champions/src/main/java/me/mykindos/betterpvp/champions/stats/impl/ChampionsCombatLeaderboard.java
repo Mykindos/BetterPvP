@@ -171,15 +171,17 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
     }
 
     private static @NotNull Statement getStatement(String className, CombatSort sortType) {
+        final StringStatementValue server = new StringStatementValue(Core.getCurrentServer());
+        final StringStatementValue season = new StringStatementValue(Core.getCurrentSeason());
         final IntegerStatementValue top = new IntegerStatementValue(10);
         final StringStatementValue classNameStmt = new StringStatementValue(className);
         return switch (sortType) {
-            case RATING -> new Statement("CALL GetTopRatingByClass(?, ?);", top, classNameStmt);
-            case KILLS -> new Statement("CALL GetTopKillsByClass(?, ?);", top, classNameStmt);
-            case KDR -> new Statement("CALL GetTopKDRByClass(?, ?);", top, classNameStmt);
-            case KILLSTREAK -> new Statement("CALL GetTopKillstreakByClass(?, ?);", top, classNameStmt);
-            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreakByClass(?, ?);", top, classNameStmt);
-            case DEATHS -> new Statement("CALL GetTopDeathsByClass(?, ?);", top, classNameStmt);
+            case RATING -> new Statement("CALL GetTopRatingByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
+            case KILLS -> new Statement("CALL GetTopKillsByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
+            case KDR -> new Statement("CALL GetTopKDRByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
+            case KILLSTREAK -> new Statement("CALL GetTopKillstreakByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
+            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreakByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
+            case DEATHS -> new Statement("CALL GetTopDeathsByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
         };
     }
 }

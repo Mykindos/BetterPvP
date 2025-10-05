@@ -1,6 +1,8 @@
 create table if not exists clans
 (
     id        varchar(36) not null,
+    Server    varchar(64) not null,
+    Season    varchar(64) not null,
     Name      varchar(32) not null,
     Home      varchar(64) null,
     Admin     tinyint     null default 0,
@@ -101,4 +103,17 @@ create table if not exists clan_properties
     Property varchar(255) not null,
     Value    varchar(255) null,
     primary key (Clan, Property)
+);
+
+create table if not exists clans_fields_ores
+(
+    Server varchar(64) not null,
+    Season varchar(64) not null,
+    World varchar(64) not null,
+    X int not null,
+    Y int not null,
+    Z int not null,
+    Type varchar(64) not null,
+    Data varchar(255) null,
+    primary key (Server, Season, World, X, Y, Z)
 );

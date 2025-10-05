@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.combat.stats.impl;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -8,8 +7,10 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatSort;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
@@ -38,15 +39,6 @@ import java.util.function.Function;
 @Singleton
 @CustomLog
 public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData> implements Sorted {
-
-    private static final Map<SortType, Statement> TOP_SORT_STATEMENTS = ImmutableMap.of(
-            CombatSort.RATING, new Statement("CALL GetTopRating(?)", new IntegerStatementValue(10)),
-            CombatSort.KILLS, new Statement("CALL GetTopKills(?)", new IntegerStatementValue(10)),
-            CombatSort.DEATHS, new Statement("CALL GetTopDeaths(?)", new IntegerStatementValue(10)),
-            CombatSort.KDR, new Statement("CALL GetTopKDR(?)", new IntegerStatementValue(10)),
-            CombatSort.KILLSTREAK, new Statement("CALL GetTopKillstreak(?)", new IntegerStatementValue(10)),
-            CombatSort.HIGHEST_KILLSTREAK, new Statement("CALL GetTopHighestKillstreak(?)", new IntegerStatementValue(10))
-    );
 
     private final GlobalCombatStatsRepository repository;
 
@@ -131,7 +123,7 @@ public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData>
     protected Map<UUID, CombatData> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
         Map<UUID, CombatData> map = new HashMap<>();
         final SortType sortType = Objects.requireNonNull(options.getSort());
-        Statement stmt = TOP_SORT_STATEMENTS.get(sortType);
+        Statement stmt = getStatement((CombatSort) sortType);
         database.executeProcedure(stmt, -1, result -> {
             try {
                 while (result.next()) {
@@ -143,8 +135,24 @@ public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData>
             } catch (SQLException e) {
                 log.error("Failed to load combat rating leaderboard for type " + sortType, e).submit();
             }
-        }).join();
+        }, TargetDatabase.GLOBAL).join();
         return map;
     }
+
+    private static @NotNull Statement getStatement(CombatSort sortType) {
+        final StringStatementValue server = new StringStatementValue(Core.getCurrentServer());
+        final StringStatementValue season = new StringStatementValue(Core.getCurrentSeason());
+        final IntegerStatementValue top = new IntegerStatementValue(10);
+        return switch (sortType) {
+            case RATING -> new Statement("CALL GetTopRating(?, ?, ?);", server, season, top);
+            case KILLS -> new Statement("CALL GetTopKills(?, ?, ?);", server, season, top);
+            case DEATHS -> new Statement("CALL GetTopDeaths(?, ?, ?);", server, season, top);
+            case KDR -> new Statement("CALL GetTopKDR(?, ?, ?);", server, season, top);
+            case KILLSTREAK -> new Statement("CALL GetTopKillstreak(?, ?, ?);", server, season, top);
+            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreak(?, ?, ?);", server, season, top);
+
+        };
+    }
+
 
 }

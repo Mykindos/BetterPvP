@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 @CustomLog
@@ -38,8 +39,8 @@ public class BlockTagRepository {
         this.database = database;;
     }
 
-    public HashMap<Integer, HashMap<String, BlockTag>> getBlockTagsForChunk(Chunk chunk) {
-        HashMap<Integer, HashMap<String, BlockTag>> blockTags = new HashMap<>();
+    public Map<Integer, Map<String, BlockTag>> getBlockTagsForChunk(Chunk chunk) {
+        Map<Integer, Map<String, BlockTag>> blockTags = new HashMap<>();
         String query = "SELECT * FROM chunk_block_tagging WHERE Server = ? AND Season = ? AND Chunk = ?";
         Statement statement = new Statement(query,
                 StringStatementValue.of(Core.getCurrentServer()),

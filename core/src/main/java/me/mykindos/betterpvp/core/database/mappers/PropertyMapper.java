@@ -51,7 +51,7 @@ public class PropertyMapper {
     public void parseProperties(CachedRowSet result, PropertyContainer container) throws SQLException, ClassNotFoundException {
 
         while (result.next()) {
-            String property = result.getString(1);
+            String property = result.getString("Property");
             String type = propertyMap.get(property);
 
             if(type == null){
@@ -60,12 +60,12 @@ public class PropertyMapper {
             }
 
             Object value = switch (type.toLowerCase()) {
-                case "int" -> result.getInt(2);
-                case "boolean" -> Boolean.parseBoolean(result.getString(2));
-                case "double" -> Double.parseDouble(result.getString(2));
-                case "long" -> Long.parseLong(result.getString(2));
-                case "string" -> result.getString(2);
-                default -> Class.forName(type).cast(result.getObject(2));
+                case "int" -> result.getInt("Value");
+                case "boolean" -> Boolean.parseBoolean(result.getString("Value"));
+                case "double" -> Double.parseDouble(result.getString("Value"));
+                case "long" -> Long.parseLong(result.getString("Value"));
+                case "string" -> result.getString("Value");
+                default -> Class.forName(type).cast(result.getObject("Value"));
             };
 
             container.putProperty(property, value, true);
