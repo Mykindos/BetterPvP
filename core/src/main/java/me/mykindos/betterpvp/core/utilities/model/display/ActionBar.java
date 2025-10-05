@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 @Slf4j
 public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
 
-    static final Component EMPTY = Component.empty();
+    protected static final Component EMPTY = Component.empty();
 
     /**
      * These components are sent to the player for a set amount of seconds, in order of priority, and are removed after being shown.
@@ -21,10 +21,10 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityDataBlockingQueue<GamerDisplayObject<Component>> components = new PriorityDataBlockingQueue<>(20);
+    protected final PriorityDataBlockingQueue<GamerDisplayObject<Component>> components = new PriorityDataBlockingQueue<>(20);
 
     // Use a lock to synchronize access to the components PriorityQueue
-    private final Object lock = new Object();
+    protected final Object lock = new Object();
 
     @Override
     public void add(int priority, GamerDisplayObject<Component> component) {
@@ -80,7 +80,7 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
         }
     }
 
-    private Component nextComponent(Gamer gamer) {
+    protected Component nextComponent(Gamer gamer) {
         synchronized (lock) {
             if (components.isEmpty()) {
                 return EMPTY;
