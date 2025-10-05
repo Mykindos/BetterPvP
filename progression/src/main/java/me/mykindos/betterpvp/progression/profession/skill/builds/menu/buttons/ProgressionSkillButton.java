@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.Skill
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -41,8 +42,9 @@ public class ProgressionSkillButton extends ControlItem<ProfessionMenu> {
         Component name = UtilMessage.deserialize("%s%s <white>- %d / %d", doesMeetRequirements() ? "<green>" : "<red>",
                 progressionNode.getDisplayName(), levelsApplied, progressionNode.getMaxLevel());
 
-        ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder().material(Material.YELLOW_DYE).customModelData(doesMeetRequirements() ? levelsApplied == progressionNode.getMaxLevel()
-                ? skillNodeType.getCompletedModelData() : levelsApplied > 0 ? skillNodeType.getStartedModelData() : 412 : 413).displayName(name);
+        ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder().material(Material.YELLOW_DYE)
+                .itemModel(new NamespacedKey("nexo", "l_skilltree_node" + getModelData(levelsApplied)))
+                .displayName(name);
         Optional.ofNullable(progressionNode.getFlag()).ifPresent(itemViewBuilder::flag);
         itemViewBuilder.glow(progressionNode.isGlowing());
 
@@ -124,6 +126,22 @@ public class ProgressionSkillButton extends ControlItem<ProfessionMenu> {
 
         getGui().updateControlItems();
 
+    }
+
+    private int getModelData(int levelsApplied) {
+        if (!doesMeetRequirements()) {
+            return 413;
+        }
+
+        if (levelsApplied == progressionNode.getMaxLevel()) {
+            return skillNodeType.getCompletedModelData();
+        }
+
+        if (levelsApplied > 0) {
+            return skillNodeType.getStartedModelData();
+        }
+
+        return 412;
     }
 
     private boolean doesMeetRequirements() {
