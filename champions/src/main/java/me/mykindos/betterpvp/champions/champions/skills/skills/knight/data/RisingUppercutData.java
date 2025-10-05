@@ -16,12 +16,12 @@ public class RisingUppercutData {
     /**
      * The start time in milliseconds that this ability was activated by the player.
      */
-    private @NotNull Long risingAnimationStartTimeInMillis;
+    private @NotNull Long startTime;
 
     /**
      * The duration of the slashing animation in milliseconds.
      */
-    private final long risingAnimationDurationInMillis;
+    private final long animationDuration;
 
     /**
      * The item display that is updated every tick and does the "slashing."
@@ -32,11 +32,4 @@ public class RisingUppercutData {
      * The initial location of the caster (player using the slash).
      */
     private final @NotNull Location castingLocation;
-
-    /**
-     * Once the animation is done, the item display will linger around its final position for a few ticks. This field
-     * should be set to true when this lingering period happens.
-     */
-    private long lingeringAnimationStartTimeInMillis = -1L;
-    private long lingeringAnimationDurationInMillis = 1000L;
 }

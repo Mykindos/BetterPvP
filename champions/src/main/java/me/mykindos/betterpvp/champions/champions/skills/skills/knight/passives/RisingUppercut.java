@@ -102,11 +102,12 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
         }
 
         // Spawns the sword at waist-height (of the player) with the center of the sword being 2.5 blocks away
-        final @NotNull Location location = player.getLocation().clone()
-                .add(player.getLocation().getDirection().normalize().multiply(2.5))
+        final @NotNull Location swordSpawnLocation = player.getLocation().clone()
+                .add(player.getLocation().getDirection().normalize().multiply(3))
                 .add(0,1,0);
 
-        final @NotNull ItemDisplay itemDisplay = location.getWorld().spawn(location, ItemDisplay.class, slashingSword -> {
+        final @NotNull ItemDisplay itemDisplay = swordSpawnLocation.getWorld()
+                .spawn(swordSpawnLocation, ItemDisplay.class, slashingSword -> {
 
             slashingSword.setItemStack(new ItemStack(Material.DIAMOND_SWORD));
             slashingSword.setGlowing(false);
@@ -125,14 +126,13 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
         });
 
         // If slashAnimationDuration is 0.3s then this is 300ms
-        final long animationDurationInMillis = (long) (slashAnimationDuration * 1000L);
-        final @NotNull Location casterLocation = player.getLocation().clone();
+        final long animationDurationInMillis = (long) (slashAnimationDuration * 1000L + 400L);
 
         data.put(player, new RisingUppercutData(
                 System.currentTimeMillis(),  // start time of the skill
                 animationDurationInMillis,
                 itemDisplay,
-                casterLocation
+                swordSpawnLocation
         ));
 
         // do to enemies in radius
@@ -140,7 +140,7 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
 
         // do to caster
         doUppercutMovement(player, player);
-        risingUppercutSwingSFX.play(casterLocation);
+        risingUppercutSwingSFX.play(swordSpawnLocation);
 
         final long noFallDurationInTicks = (long) (noFallDurationInSeconds * 1000L);
         championsManager.getEffects().addEffect(player, EffectTypes.NO_FALL, noFallDurationInTicks);
@@ -180,6 +180,7 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
             // check if enemy out of fov
             final @NotNull Vector from = UtilVelocity.getTrajectory(player, enemy).normalize();
             if (player.getLocation().getDirection().subtract(from).length() > fovThreshold) continue;
+            if (!player.hasLineOfSight(enemy)) return;
 
             doUppercutMovement(enemy, player);
 
@@ -227,14 +228,12 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
             }
 
             final @NotNull ItemDisplay itemDisplay = abilityData.getItemDisplay();
-            final boolean hasLingeringAnimationStarted = abilityData.getLingeringAnimationStartTimeInMillis() > 0L;
 
-            // ending lingering animation
-            if (hasLingeringAnimationStarted &&
-                    UtilTime.elapsed(abilityData.getLingeringAnimationStartTimeInMillis(), abilityData.getLingeringAnimationDurationInMillis())) {
+            // ending upward animation
+            if (UtilTime.elapsed(abilityData.getStartTime(), abilityData.getAnimationDuration())) {
+                abilityData.getItemDisplay().remove();
 
                 final @NotNull Location locationForRemoval = abilityData.getItemDisplay().getLocation();
-                abilityData.getItemDisplay().remove();
                 Particle.SMOKE.builder()
                         .count(40)
                         .offset(0.5, 0.5, 0.5)
@@ -247,25 +246,17 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
                 continue;
             }
 
-            // movement for lingering animation
-            if (hasLingeringAnimationStarted) {
-                itemDisplay.teleport(itemDisplay.getLocation().clone().add(0,0.5,0));
-                continue;
-            }
-
-            // ending primary/upward animation
-            if (UtilTime.elapsed(abilityData.getRisingAnimationStartTimeInMillis(), abilityData.getRisingAnimationDurationInMillis())) {
-                abilityData.setLingeringAnimationStartTimeInMillis(System.currentTimeMillis());
-                continue;
-            }
-
-            // movement for primary animation
+            // movement for upward animation
             final Transformation transformation = itemDisplay.getTransformation();
             final float angleInRadians = (float) Math.toRadians(-5);
 
             transformation.getLeftRotation().rotateLocalX(transformation.getLeftRotation().x() + angleInRadians);
             itemDisplay.setTransformation(transformation);
-            itemDisplay.teleport(itemDisplay.getLocation().clone().add(0,1.25,0));
+
+            final @NotNull Location newLocation = itemDisplay.getLocation().clone()
+                    .add(0, 0.5, 0);
+            itemDisplay.teleport(newLocation);
+
         }
     }
 
