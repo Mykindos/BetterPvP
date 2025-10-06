@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -76,11 +75,6 @@ public class GameCommand extends Command {
         public GameStartCommand(ServerController serverController, TransitionHandler transitionHandler) {
             this.serverController = serverController;
             this.transitionHandler = transitionHandler;
-        }
-
-        @Override
-        public Rank getRequiredRank() {
-            return Rank.MODERATOR;
         }
 
         @Override
