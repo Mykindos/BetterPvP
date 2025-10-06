@@ -101,7 +101,7 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
             data.remove(player);
         }
 
-        // Spawns the sword at waist-height (of the player) with the center of the sword being 2.5 blocks away
+        // Spawns the sword at waist-height (of the player) with the center of the sword being 3 blocks away
         final @NotNull Location swordSpawnLocation = player.getLocation().clone()
                 .add(player.getLocation().getDirection().normalize().multiply(3))
                 .add(0,1,0);
@@ -114,7 +114,7 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
             slashingSword.setPersistent(false);
 
             // This transformation amounts to a big sword that's angled slightly downwards.
-            Transformation transformation = slashingSword.getTransformation();
+            final @NotNull Transformation transformation = slashingSword.getTransformation();
             transformation.getScale().set(3);
             transformation.getLeftRotation().rotateLocalX((float) Math.toRadians(-80));
             transformation.getLeftRotation().rotateLocalY((float) Math.toRadians(90));
@@ -126,7 +126,7 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
         });
 
         // If slashAnimationDuration is 0.3s then this is 300ms
-        final long animationDurationInMillis = (long) (slashAnimationDuration * 1000L + 400L);
+        final long animationDurationInMillis = (long) (slashAnimationDuration * 1000L);
 
         data.put(player, new RisingUppercutData(
                 System.currentTimeMillis(),  // start time of the skill
@@ -141,9 +141,16 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
         // do to caster
         doUppercutMovement(player, player);
         risingUppercutSwingSFX.play(swordSpawnLocation);
+        Particle.BLOCK.builder()
+                .count(50)
+                .location(player.getLocation())
+                .receivers(60)
+                .data(Material.IRON_BLOCK.createBlockData())
+                .offset(0.5, 0.1, 0.5)
+                .spawn();
 
-        final long noFallDurationInTicks = (long) (noFallDurationInSeconds * 1000L);
-        championsManager.getEffects().addEffect(player, EffectTypes.NO_FALL, noFallDurationInTicks);
+        final long noFallDurationInMillis = (long) (noFallDurationInSeconds * 1000L);
+        championsManager.getEffects().addEffect(player, EffectTypes.NO_FALL, noFallDurationInMillis);
     }
 
     /**
@@ -221,24 +228,18 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
             final Player player = entry.getKey();
             final RisingUppercutData abilityData = entry.getValue();
 
-            if (!player.isOnline() || getLevel(player) <= 0 || player.isDead()) {
-                abilityData.getItemDisplay().remove();
-                iterator.remove();
-                continue;
-            }
+            final boolean playerNoLongerHasSkill = !hasSkill(player);
+            final boolean animationIsComplete = UtilTime.elapsed(abilityData.getStartTime(), abilityData.getAnimationDuration());
 
-            final @NotNull ItemDisplay itemDisplay = abilityData.getItemDisplay();
-
-            // ending upward animation
-            if (UtilTime.elapsed(abilityData.getStartTime(), abilityData.getAnimationDuration())) {
+            // end animation & remove player from `data`
+            if (!player.isOnline() || player.isDead() || playerNoLongerHasSkill || animationIsComplete) {
                 abilityData.getItemDisplay().remove();
 
-                final @NotNull Location locationForRemoval = abilityData.getItemDisplay().getLocation();
                 Particle.SMOKE.builder()
                         .count(40)
                         .offset(0.5, 0.5, 0.5)
                         .extra(0)
-                        .location(locationForRemoval)
+                        .location(abilityData.getItemDisplay().getLocation())
                         .receivers(60)
                         .spawn();
 
@@ -247,7 +248,8 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
             }
 
             // movement for upward animation
-            final Transformation transformation = itemDisplay.getTransformation();
+            final @NotNull ItemDisplay itemDisplay = abilityData.getItemDisplay();
+            final @NotNull Transformation transformation = itemDisplay.getTransformation();
             final float angleInRadians = (float) Math.toRadians(-5);
 
             transformation.getLeftRotation().rotateLocalX(transformation.getLeftRotation().x() + angleInRadians);
@@ -284,7 +286,7 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
     public void loadSkillConfig() {
         radius = getConfig("radius", 5.0, Double.class);
         damage = getConfig("damage", 4.0, Double.class);
-        slashAnimationDuration = getConfig("slashAnimationDuration", 0.3, Double.class);
+        slashAnimationDuration = getConfig("slashAnimationDuration", 0.7, Double.class);
         noFallDurationInSeconds = getConfig("noFallDurationInSeconds ", 3.0, Double.class);
         fovThreshold = getConfig("fovThreshold", 0.7, Double.class);
         maxEnemiesCanBeHit = getConfig("maxEnemiesCanBeHit", 5, Integer.class);

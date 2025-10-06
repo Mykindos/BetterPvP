@@ -290,7 +290,7 @@ skills:
       maxlevel: 3
       radius: 5.0
       damage: 4.0
-      slashAnimationDuration: 0.3
+      slashAnimationDuration: 0.7
       noFallDurationInSeconds: 3.0
       fovThreshold: 0.7
       maxEnemiesCanBeHit: 5
