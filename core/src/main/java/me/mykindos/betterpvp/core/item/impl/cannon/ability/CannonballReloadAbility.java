@@ -1,19 +1,19 @@
-package me.mykindos.betterpvp.clans.item.cannon.ability;
+package me.mykindos.betterpvp.core.item.impl.cannon.ability;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonReloadEvent;
-import me.mykindos.betterpvp.clans.item.cannon.model.Cannon;
-import me.mykindos.betterpvp.clans.item.cannon.model.CannonManager;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonReloadEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -34,8 +34,8 @@ public class CannonballReloadAbility extends ItemAbility {
     private final CannonManager cannonManager;
 
     @Inject
-    public CannonballReloadAbility(Clans clans, CannonManager cannonManager) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Clans.class), "cannonball_reload"), "Cannonball Reload",
+    public CannonballReloadAbility(Core core, CannonManager cannonManager) {
+        super(new NamespacedKey(JavaPlugin.getPlugin(Core.class), "cannonball_reload"), "Cannonball Reload",
                 "Load a cannon with this cannonball", TriggerTypes.RIGHT_CLICK);
         this.cannonManager = cannonManager;
     }
