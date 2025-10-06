@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.item.cannon.event;
+package me.mykindos.betterpvp.core.item.impl.cannon.event;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;

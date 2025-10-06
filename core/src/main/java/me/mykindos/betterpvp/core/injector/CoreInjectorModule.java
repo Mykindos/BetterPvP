@@ -9,9 +9,12 @@ import me.mykindos.betterpvp.core.chat.filter.impl.MineplexFilterService;
 import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
 import me.mykindos.betterpvp.core.chat.ignore.impl.MineplexIgnoreService;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import org.bukkit.Bukkit;
 
 @CustomLog
@@ -39,6 +42,9 @@ public class CoreInjectorModule extends AbstractModule {
             log.info("Using default integrations").submit();
         }
 
+        bind(ClientManager.class).asEagerSingleton();
+        bind(CooldownManager.class).asEagerSingleton();
+        bind(EnergyHandler.class).asEagerSingleton();
         install(new CoreItemsModule());
     }
 

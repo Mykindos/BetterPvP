@@ -3,24 +3,16 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemGroup;
-import me.mykindos.betterpvp.core.metal.Steel;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
@@ -43,6 +35,7 @@ public class ItemInfoCommand extends Command {
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemInMainHand.getItemMeta();
 
+        UtilMessage.simpleMessage(player, "Info", "<yellow>Type: <gray>%s", itemInMainHand.getType().name());
         if (itemMeta == null) {
             UtilMessage.simpleMessage(player, "Info", "<red>Item has no meta data");
             return;

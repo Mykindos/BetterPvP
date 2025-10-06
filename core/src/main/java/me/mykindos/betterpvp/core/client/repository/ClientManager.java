@@ -59,32 +59,29 @@ public class ClientManager extends PlayerManager<Client> {
     @Getter
     private final ClientSQLLayer sqlLayer;
 
-    private final ClientRedisLayer redisLayer;
     private final Redis redis;
+    private ClientRedisLayer redisLayer;
+
+    public ClientRedisLayer getRedisLayer() {
+        if (redisLayer == null && redis.isEnabled()) {
+            this.redisLayer = plugin.getInjector().getInstance(ClientRedisLayer.class);
+            this.redisLayer.getObserver().register(this::receiveUpdate);
+        }
+        return redisLayer;
+    }
 
     /**
      *
      */
     @Inject
-    public ClientManager(Core plugin, Redis redis) {
+    public ClientManager(Core plugin, Redis redis, ClientSQLLayer sqlLayer) {
         super(plugin);
-        this.sqlLayer = plugin.getInjector().getInstance(ClientSQLLayer.class);
+        this.sqlLayer = sqlLayer;
         this.redis = redis;
-        if (redis.isEnabled()) {
-            this.redisLayer = plugin.getInjector().getInstance(ClientRedisLayer.class);
-            this.redisLayer.getObserver().register(this::receiveUpdate);
-        } else {
-            this.redisLayer = null;
-        }
-
         this.store = Caffeine.newBuilder()
                 .scheduler(Scheduler.systemScheduler())
                 .expireAfter(new ClientExpiry<>())
                 .removalListener((final UUID uuid, final Client client, final RemovalCause cause) -> {
-                    if (uuid == null || client == null) {
-                        return;
-                    }
-
                     Bukkit.getScheduler().runTask(plugin, () -> UtilServer.callEvent(new ClientUnloadEvent(client)));
 
                     // Only announce the client was unloaded if it expired or was removed forcefully, not replaced.
@@ -108,7 +105,7 @@ public class ClientManager extends PlayerManager<Client> {
      */
     public void shutdown() {
         if (this.redis.isEnabled()) {
-            this.redisLayer.getObserver().shutdown();
+            this.getRedisLayer().getObserver().shutdown();
         }
     }
 
@@ -156,7 +153,7 @@ public class ClientManager extends PlayerManager<Client> {
             UtilServer.callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
             load(client);
             if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
+                this.getRedisLayer().save(client);
             }
 
             // Executing our success callback
@@ -191,7 +188,7 @@ public class ClientManager extends PlayerManager<Client> {
     @Override
     protected void unload(final Client client) {
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
         this.store.invalidate(client.getUniqueId());
     }
@@ -206,7 +203,7 @@ public class ClientManager extends PlayerManager<Client> {
 
         Optional<Client> loaded;
         if (this.redis.isEnabled()) {
-            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
+            loaded = this.getRedisLayer().getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
         } else {
             loaded = this.sqlLayer.getAndUpdate(uuid);
         }
@@ -259,7 +256,7 @@ public class ClientManager extends PlayerManager<Client> {
     protected Optional<Client> loadOffline(@Nullable String name) {
         if (this.redis.isEnabled()) {
             return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
-                    () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name))
+                    () -> this.getRedisLayer().getClient(name).or(() -> this.sqlLayer.getClient(name))
             );
         } else {
             return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
@@ -279,7 +276,7 @@ public class ClientManager extends PlayerManager<Client> {
     protected Optional<Client> loadOffline(@Nullable UUID uuid) {
         if (this.redis.isEnabled()) {
             return this.loadOffline(() -> getStoredExact(uuid),
-                    () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid))
+                    () -> this.getRedisLayer().getClient(uuid).or(() -> this.sqlLayer.getClient(uuid))
             );
         } else {
             return this.loadOffline(() -> getStoredExact(uuid),
@@ -378,7 +375,7 @@ public class ClientManager extends PlayerManager<Client> {
     public void save(Client client) {
 
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
         this.sqlLayer.save(client);
 
@@ -396,7 +393,7 @@ public class ClientManager extends PlayerManager<Client> {
         client.getIgnores().add(target.getUniqueId());
 
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
         this.sqlLayer.saveIgnore(client, target);
 
@@ -414,7 +411,7 @@ public class ClientManager extends PlayerManager<Client> {
         client.getIgnores().remove(target.getUniqueId());
 
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
 
         this.sqlLayer.removeIgnore(client, target);
@@ -475,7 +472,7 @@ public class ClientManager extends PlayerManager<Client> {
 
         // Otherwise, update
         final Client stored = client.get();
-        this.redisLayer.getClient(uuid).ifPresent(stored::copy);
+        this.getRedisLayer().getClient(uuid).ifPresent(stored::copy);
     }
 
 }

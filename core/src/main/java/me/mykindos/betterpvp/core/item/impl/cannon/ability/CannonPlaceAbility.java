@@ -1,20 +1,20 @@
-package me.mykindos.betterpvp.clans.item.cannon.ability;
+package me.mykindos.betterpvp.core.item.impl.cannon.ability;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.item.cannon.event.PreCannonPlaceEvent;
-import me.mykindos.betterpvp.clans.item.cannon.model.Cannon;
-import me.mykindos.betterpvp.clans.item.cannon.model.CannonManager;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.PreCannonPlaceEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -44,8 +44,8 @@ public class CannonPlaceAbility extends ItemAbility {
     private final CooldownManager cooldownManager;
 
     @Inject
-    private CannonPlaceAbility(Clans clans, CannonManager cannonManager, CooldownManager cooldownManager) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Clans.class), "cannon_place"), "Cannon Placement",
+    private CannonPlaceAbility(Core core, CannonManager cannonManager, CooldownManager cooldownManager) {
+        super(new NamespacedKey(JavaPlugin.getPlugin(Core.class), "cannon_place"), "Cannon Placement",
                 "Place a cannon that can be loaded with cannonballs", TriggerTypes.RIGHT_CLICK);
         this.cannonManager = cannonManager;
         this.cooldown = cannonManager.getSpawnCooldown();

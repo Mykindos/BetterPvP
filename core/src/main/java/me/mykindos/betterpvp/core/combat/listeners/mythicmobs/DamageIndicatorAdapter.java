@@ -32,7 +32,11 @@ import org.bukkit.util.Vector;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @PluginAdapter("ModelEngine")
 @PluginAdapter("MythicMobs")
@@ -64,6 +68,10 @@ public class DamageIndicatorAdapter implements Listener {
             return;
         }
 
+        if (event.getDamage() <= 0) {
+            return;
+        }
+
         final Optional<ActiveMob> mobOpt = MythicBukkit.inst().getMobManager().getActiveMob(event.getDamagee().getUniqueId());
         if (mobOpt.isEmpty()) {
             return; // Only add damage indicators for mythic mobs
@@ -71,6 +79,7 @@ public class DamageIndicatorAdapter implements Listener {
 
         DamageIndicatorEvent damageIndicatorEvent = UtilServer.callEvent(new DamageIndicatorEvent(player, event.getDamagee(), event.getDamage()));
         if(damageIndicatorEvent.isCancelled()) return;
+
 
         final Vector direction = player.getEyeLocation().getDirection();
         final Location spawnPoint;

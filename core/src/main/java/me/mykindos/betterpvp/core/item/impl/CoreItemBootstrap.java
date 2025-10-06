@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingR
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
+import me.mykindos.betterpvp.core.item.impl.cannon.CannonItem;
+import me.mykindos.betterpvp.core.item.impl.cannon.CannonballItem;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapter;
@@ -64,6 +66,8 @@ public class CoreItemBootstrap implements ItemBootstrap {
     @Inject private VoidglassCore voidglassCore;
     @Inject private CoalItem coalItem;
     @Inject private CharcoalItem charcoalItem;
+    @Inject private CannonItem cannonItem;
+    @Inject private CannonballItem cannonballItem;
 
     private NamespacedKey key(String name) {
         return new NamespacedKey(core, name);
@@ -83,6 +87,8 @@ public class CoreItemBootstrap implements ItemBootstrap {
 
         // Misc items
         itemRegistry.registerItem(key("blueprint"), blueprintItem);
+        itemRegistry.registerItem(key("cannon"), cannonItem);
+        itemRegistry.registerItem(key("cannonball"), cannonballItem);
 
         // Common
         itemRegistry.registerItem(key("cloth"), new BaseItem("Cloth", Item.model("cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON));
