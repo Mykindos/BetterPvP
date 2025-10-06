@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.item.cannon.listener;
+package me.mykindos.betterpvp.core.item.impl.cannon.listener;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.inject.Inject;
@@ -11,25 +11,26 @@ import com.ticxo.modelengine.api.events.ModelRegistrationEvent;
 import com.ticxo.modelengine.api.events.RemoveModelEvent;
 import com.ticxo.modelengine.api.generator.ModelGenerator;
 import com.ticxo.modelengine.api.model.ActiveModel;
-import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.item.cannon.CannonballItem;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonAimEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonFuseEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonPlaceEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonReloadEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonShootEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.PreCannonShootEvent;
-import me.mykindos.betterpvp.clans.item.cannon.model.Cannon;
-import me.mykindos.betterpvp.clans.item.cannon.model.CannonManager;
+import io.papermc.paper.event.entity.EntityMoveEvent;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.impl.cannon.CannonballItem;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonAimEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonFuseEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonPlaceEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonReloadEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonShootEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonballExplodeEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.PreCannonShootEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
@@ -52,9 +53,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
@@ -71,7 +75,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static me.mykindos.betterpvp.clans.item.cannon.model.Cannon.COOLDOWN_LERP_OUT;
+import static me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon.COOLDOWN_LERP_OUT;
 
 @BPvPListener
 @Singleton
@@ -83,7 +87,7 @@ public class CannonListener implements Listener {
     private final Map<TNTPrimed, Location> cannonballs = new HashMap<>();
 
     @Inject
-    private Clans clans;
+    private Core core;
 
     @Inject
     private ClientManager clientManager;
@@ -97,55 +101,24 @@ public class CannonListener implements Listener {
     @Inject
     private ItemFactory itemFactory;
 
-    @Inject
-    @Config(path = "cannon.entity-collision-explode", defaultValue = "true", configName = "items/weapon")
-    private boolean entityCollisionExplode;
-
-    @Inject
-    @Config(path = "cannon.block-collision-explode", defaultValue = "true", configName = "items/weapon")
-    private boolean blockCollisionExplode;
-
-    @Inject
-    @Config(path = "cannon.cannonball-alive-seconds", defaultValue = "2.0", configName = "items/weapon")
-    private double cannonballAliveSeconds;
-
-    @Inject
-    @Config(path = "cannon.cannonball-velocity-strengh", defaultValue = "1.3", configName = "items/weapon")
-    private double cannonballVelocityStrength;
-
-    @Inject
-    @Config(path = "cannon.cannonball-damage", defaultValue = "15.0", configName = "items/weapon")
-    private double cannonballDamage;
-
-    @Inject
-    @Config(path = "cannon.cannonball-min-damage", defaultValue = "4.0", configName = "items/weapon")
-    private double cannonballMinDamage;
-
-    @Inject
-    @Config(path = "cannon.cannonball-damage-max-radius", defaultValue = "4.0", configName = "items/weapon")
-    private double cannonballDamageMaxRadius;
-
-    @Inject
-    @Config(path = "cannon.cannonball-damage-min-radius", defaultValue = "1.0", configName = "items/weapon")
-    private double cannonballDamageMinRadius;
-
     private TNTPrimed spawnCannonball(final @NotNull Cannon cannon, final @NotNull UUID caster) {
         final Location cannonLocation = cannon.getActiveModel().getBone("tnt_start").orElseThrow().getLocation().clone();
         final TNTPrimed cannonball = cannon.getLocation().getWorld().spawn(cannonLocation, TNTPrimed.class);
         cannonball.setSource(Bukkit.getPlayer(caster));
         final Vector direction = cannon.getBackingEntity().getLocation().getDirection();
-        direction.multiply(cannonballVelocityStrength);
+        direction.multiply(cannon.getProperties().getPower());
         cannonball.setVelocity(direction);
-        cannonball.setFuseTicks((int) (cannonballAliveSeconds * 20L));
+        cannonball.setFuseTicks((int) (cannon.getProperties().getCannonballAliveSeconds() * 20L));
         cannonballs.put(cannonball, cannonball.getLocation());
         cannonball.getPersistentDataContainer().set(CoreNamespaceKeys.ENTITY_TYPE, PersistentDataType.STRING, "cannonball");
         cannonball.getPersistentDataContainer().set(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID, caster);
+        cannonball.setMetadata("cannon", new FixedMetadataValue(core, cannon));
         return cannonball;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSpawn(CannonPlaceEvent event) {
-        UtilServer.runTaskLater(clans, event.getCannon()::updateTag, 4L);
+        UtilServer.runTaskLater(core, event.getCannon()::updateTag, 25L);
     }
 
     // Make cannonballs give credit to the player who shot them
@@ -160,13 +133,16 @@ public class CannonListener implements Listener {
 
             final UUID originalOwner = Objects.requireNonNull(tnt.getPersistentDataContainer().get(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID));
             final Player player = Bukkit.getPlayer(originalOwner);
-            if (player != null) {
-                event.setDamager(player);
-                double distance = tnt.getLocation().distance(event.getDamagee().getLocation());
-                double damage = getDamage(distance);
-                event.setDamage(damage);
-                event.setKnockback(false);
-                event.addReason("Cannonball");
+            if (player != null && tnt.hasMetadata("cannon")) {
+                final Cannon cannon = (Cannon) tnt.getMetadata("cannon").getFirst().value();
+                if (cannon != null) {
+                    event.setDamager(player);
+                    double distance = tnt.getLocation().distance(event.getDamagee().getLocation());
+                    double damage = getDamage(cannon, distance);
+                    event.setDamage(damage);
+                    event.setKnockback(false);
+                    event.addReason("Cannonball");
+                }
             }
         }
 
@@ -174,7 +150,12 @@ public class CannonListener implements Listener {
         this.cannonManager.of(event.getDamagee()).ifPresent(event::setSoundProvider);
     }
 
-    private double getDamage(double distance) {
+    private double getDamage(Cannon cannon, double distance) {
+        final double cannonballDamageMaxRadius = cannon.getProperties().getCannonballDamageMaxRadius();
+        final double cannonballDamageMinRadius = cannon.getProperties().getCannonballDamageMinRadius();
+        final double cannonballDamage = cannon.getProperties().getCannonballDamage();
+        final double cannonballMinDamage = cannon.getProperties().getCannonballMinDamage();
+
         double deltaRadius = cannonballDamageMaxRadius - cannonballDamageMinRadius;
         double damage;
         if (distance <= cannonballDamageMinRadius) {
@@ -209,8 +190,13 @@ public class CannonListener implements Listener {
         fuseMap.put(event.getCannon(), event.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPreCantShoot(final PreCannonShootEvent event) {
+        fuseMap.remove(event.getCannon());
+        if (event.isCancelled()) {
+            return;
+        }
+
         final TNTPrimed cannonball = spawnCannonball(event.getCannon(), event.getPlayerId());
         new CannonShootEvent(event.getCannon(), cannonball, event.getPlayer()).callEvent();
     }
@@ -231,7 +217,7 @@ public class CannonListener implements Listener {
         Objects.requireNonNull(animationHandler.getAnimation("load")).setForceLoopMode(BlueprintAnimation.LoopMode.ONCE);
 
         // Play unload sound right after
-        UtilServer.runTaskLater(clans, () -> {
+        UtilServer.runTaskLater(core, () -> {
             new SoundEffect("littleroom_cannon", "littleroom.cannon.openhatch").play(location);
         }, 2L);
 
@@ -267,11 +253,22 @@ public class CannonListener implements Listener {
                 continue;
             }
 
+            // Get cannon from metadata to access properties
+            if (!cannonball.hasMetadata("cannon")) {
+                iterator.remove();
+                continue;
+            }
+            final Cannon cannon = (Cannon) cannonball.getMetadata("cannon").getFirst().value();
+            if (cannon == null) {
+                iterator.remove();
+                continue;
+            }
+
             final Location lastLocation = next.getValue();
             final Location location = cannonball.getLocation().clone();
 
             // Collisions
-            if (entityCollisionExplode && cannonball.getTicksLived() > 1) {
+            if (cannon.getProperties().isEntityCollisionExplode() && cannonball.getTicksLived() > 1) {
                 final Optional<RayTraceResult> trace = UtilEntity.interpolateCollision(lastLocation,
                         location,
                         0.8f,
@@ -284,7 +281,7 @@ public class CannonListener implements Listener {
                 }
             }
 
-            if (blockCollisionExplode && cannonball.getTicksLived() > 1) {
+            if (cannon.getProperties().isBlockCollisionExplode() && cannonball.getTicksLived() > 1) {
                 final BoundingBox box = cannonball.getBoundingBox().clone().expand(0.1);
                 if (UtilLocation.getBoundingBoxCorners(cannonball.getWorld(), box).stream()
                         .anyMatch(loc -> !loc.getBlock().isPassable())) {
@@ -358,10 +355,19 @@ public class CannonListener implements Listener {
 
     @EventHandler
     public void onInteract(final PlayerInteractAtEntityEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
+
         // Don't aim if they are clicking with a cannonball
         final Player player = event.getPlayer();
 
         this.cannonManager.of(event.getRightClicked()).ifPresent(cannon -> {
+            // Check if cannon is enabled
+            if (!cannon.getProperties().isEnabled()) {
+                return;
+            }
+
             final boolean loaded = cannon.isLoaded();
             if (!loaded) {
                 final Optional<ItemInstance> mainHand = itemFactory.fromItemStack(player.getInventory().getItemInMainHand());
@@ -372,7 +378,7 @@ public class CannonListener implements Listener {
                 }
             }
 
-            if (!UtilTime.elapsed(cannon.getLastFuseTime(), (long) (this.cannonManager.getFuseSeconds() * 1000L))) {
+            if (cannon.getProperties().isAllowFuse() && !UtilTime.elapsed(cannon.getLastFuseTime(), (long) (this.cannonManager.getFuseSeconds() * 1000L))) {
                 return; // Don't aim if the cannon is fused
             }
 
@@ -390,6 +396,13 @@ public class CannonListener implements Listener {
                     return;
                 }
 
+                // If fuse is disabled, shoot instantly (unless it requires group fuse)
+                if (!cannon.getProperties().isAllowFuse()) {
+                    new PreCannonShootEvent(cannon, player, player.getUniqueId()).callEvent();
+                    event.setCancelled(true);
+                    return;
+                }
+
                 final CannonFuseEvent fuseEvent = new CannonFuseEvent(cannon, player);
                 fuseEvent.callEvent();
                 if (!fuseEvent.isCancelled()) {
@@ -397,6 +410,11 @@ public class CannonListener implements Listener {
                 }
 
                 return; // Attempt to shoot if they are sneaking
+            }
+
+            // Skip rotation if not allowed
+            if (!cannon.getProperties().isAllowRotation()) {
+                return;
             }
 
             final Vector current = cannon.getBackingEntity().getLocation().getDirection();
@@ -413,6 +431,14 @@ public class CannonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(final EntityDeathEvent event) {
         this.cannonManager.of(event.getEntity()).ifPresent(cannon -> {
+            // Prevent death if cannon is invincible
+            if (cannon.getProperties().isInvincible()) {
+                event.setCancelled(true);
+                event.setDroppedExp(0);
+                event.getDrops().clear();
+                return;
+            }
+
             event.setDroppedExp(0);
             event.getDrops().clear();
             this.cannonManager.remove(cannon);
@@ -498,10 +524,21 @@ public class CannonListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onCannonDamage(final DamageEvent event) {
-        if (event.getBukkitCause() != EntityDamageEvent.DamageCause.SUFFOCATION || !this.cannonManager.isCannonPart(event.getDamagee())) {
+        if (!this.cannonManager.isCannonPart(event.getDamagee())) {
             return;
         }
-        event.setCancelled(true);
+
+        // Check if cannon is invincible
+        this.cannonManager.of(event.getDamagee()).ifPresent(cannon -> {
+            if (cannon.getProperties().isInvincible()) {
+                event.setCancelled(true);
+            }
+        });
+
+        // Cancel suffocation damage for all cannons
+        if (event.getBukkitCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -520,8 +557,44 @@ public class CannonListener implements Listener {
         if (event.getPhase() != ModelGenerator.Phase.FINISHED) {
             return;
         }
-        UtilServer.runTask(clans, () -> this.cannonManager.load());
+        UtilServer.runTask(core, () -> this.cannonManager.load());
     }
 
+    @EventHandler
+    public void onExplodeBlocks(EntityExplodeEvent event) {
+        if (!event.getEntity().hasMetadata("cannon")) {
+            // get the assigned cannon from metadata
+            return; // if it doesnt have the metadata, it's not a cannon'
+        }
+
+        final Cannon cannon = (Cannon) event.getEntity().getMetadata("cannon").getFirst().value();
+        if (cannon == null) {
+            return; // if the cannon is null, it's not a cannon'
+        }
+
+        // Fire CannonballExplodeEvent
+        if (event.getEntity() instanceof TNTPrimed tnt) {
+            final UUID ownerUuid = tnt.getPersistentDataContainer().get(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID);
+            final Player player = ownerUuid != null ? Bukkit.getPlayer(ownerUuid) : null;
+            final CannonballExplodeEvent explodeEvent = new CannonballExplodeEvent(cannon, tnt, tnt.getLocation(), player);
+            explodeEvent.callEvent();
+            if (explodeEvent.isCancelled()) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (!cannon.getProperties().isBreaksBlocks()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMove(EntityMoveEvent event) {
+        if (cannonManager.isCannonPart(event.getEntity())
+                && !cannonManager.of(event.getEntity()).orElseThrow().getProperties().isMovable()) {
+            event.setCancelled(true);
+        }
+    }
 
 }

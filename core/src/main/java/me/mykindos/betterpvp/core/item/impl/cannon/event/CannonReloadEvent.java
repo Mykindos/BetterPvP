@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.clans.item.cannon.event;
+package me.mykindos.betterpvp.core.item.impl.cannon.event;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.clans.item.cannon.CannonballItem;
-import me.mykindos.betterpvp.clans.item.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.CannonballItem;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 

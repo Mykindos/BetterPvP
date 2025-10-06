@@ -1,17 +1,17 @@
-package me.mykindos.betterpvp.clans.item.cannon.listener;
+package me.mykindos.betterpvp.clans.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonAimEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonFuseEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonPlaceEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.CannonReloadEvent;
-import me.mykindos.betterpvp.clans.item.cannon.event.PreCannonPlaceEvent;
-import me.mykindos.betterpvp.clans.item.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonAimEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonFuseEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonPlaceEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonReloadEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.PreCannonPlaceEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
