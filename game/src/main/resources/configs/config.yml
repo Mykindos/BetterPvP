@@ -12,7 +12,7 @@ command:
     requiredRank: PLAYER
   game:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: MODERATOR
     start:
       enabled: true
       requiredRank: MODERATOR
