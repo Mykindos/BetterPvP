@@ -10,6 +10,22 @@ command:
   spectatorchat:
     enabled: true
     requiredRank: PLAYER
+  game:
+    enabled: true
+    requiredRank: MODERATOR
+    start:
+      enabled: true
+      requiredRank: MODERATOR
+    end:
+      enabled: true
+      requiredRank: MODERATOR
+    set:
+      enabled: true
+      requiredRank: MODERATOR
+    attribute:
+      enabled: true
+      requiredRank: MODERATOR
+  
 # Web Config settings
 # If enabled, the plugin will load from local files first,
 # then override any values found in the web configuration.
