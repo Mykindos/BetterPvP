@@ -102,6 +102,7 @@ dependencyResolutionManagement {
 
             // Libraries - Utilities
             library("persistent-data-types", "com.jeff-media", "MorePersistentDataTypes").version("2.4.0")
+            library("glowapi", "fr.skytasul", "glowingentities").version("1.4.8")
             library("commons-text", "org.apache.commons", "commons-text").version("1.10.0")
             library("commons-lang3", "org.apache.commons", "commons-lang3").version("3.12.0")
             library("commons-math3", "org.apache.commons", "commons-math3").version("3.6.1")
@@ -152,6 +153,7 @@ dependencyResolutionManagement {
             bundle("utils",
                 listOf("commons-text",
                     "persistent-data-types",
+                    "glowapi",
                     "commons-lang3",
                     "commons-math3",
                     "annotations",
