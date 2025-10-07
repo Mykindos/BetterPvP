@@ -103,7 +103,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     public boolean wallKick(Player player) {
-        if (championsManager.getEnergy().getEnergy(player) < wallkickEnergyCost / 100) {
+        if (championsManager.getEnergy().getEnergy(player.getUniqueId()) < wallkickEnergyCost / 100) {
             return false;
         }
 
