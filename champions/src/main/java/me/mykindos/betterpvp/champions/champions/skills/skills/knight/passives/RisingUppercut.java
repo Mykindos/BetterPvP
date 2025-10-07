@@ -89,6 +89,9 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
                 "both them and yourself into",
                 "the air.",
                 "",
+                "Sneak while activating to only",
+                "throw your enemies airborne.",
+                "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
@@ -138,9 +141,11 @@ public class RisingUppercut extends Skill implements Listener, CooldownToggleSki
         // do to enemies in radius
         doDamageToEnemies(player, data.get(player));
 
+        risingUppercutSwingSFX.play(swordSpawnLocation);
+        if (player.isSneaking()) return;
+
         // do to caster
         doUppercutMovement(player, player);
-        risingUppercutSwingSFX.play(swordSpawnLocation);
         Particle.BLOCK.builder()
                 .count(50)
                 .location(player.getLocation())
