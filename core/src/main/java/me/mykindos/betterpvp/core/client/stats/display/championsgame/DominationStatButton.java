@@ -1,8 +1,9 @@
 package me.mykindos.betterpvp.core.client.stats.display.championsgame;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.display.AbstractStatMenu;
+import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
+import me.mykindos.betterpvp.core.client.stats.display.championsgame.domination.DominationStatMenu;
 import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -21,7 +22,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-public class DominationStatButton extends ControlItem<AbstractStatMenu> {
+public class DominationStatButton extends ControlItem<IAbstractStatMenu> {
     /**
      * Gets the {@link ItemProvider}.
      * This method gets called every time a {@link Window} is notified ({@link #notifyWindows()}).
@@ -29,35 +30,99 @@ public class DominationStatButton extends ControlItem<AbstractStatMenu> {
      * @return The {@link ItemProvider}
      */
     @Override
-    public ItemProvider getItemProvider(AbstractStatMenu gui) {
+    public ItemProvider getItemProvider(IAbstractStatMenu gui) {
         final StatContainer statContainer = gui.getClient().getStatContainer();
         final String period = gui.getPeriodKey();
 
-        final GameMapStat winStat = GameMapStat.builder().gameName("Domination").action(GameMapStat.Action.WIN).build();
-        final GameMapStat lossStat = GameMapStat.builder().gameName("Domination").action(GameMapStat.Action.LOSS).build();
-        final GameMapStat matchesPlayedStat = GameMapStat.builder().gameName("Domination").action(GameMapStat.Action.MATCHES_PLAYED).build();
-        final GameMapStat timePlayedStat = GameMapStat.builder().gameName("Domination").action(GameMapStat.Action.TIME_PLAYED).build();
+        return ItemView.builder()
+                .material(Material.BEACON)
+                .displayName(Component.text("Domination Stats"))
+                .lore(getStatsDescription(statContainer, period, "", ""))
+                .frameLore(true)
+                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .build();
+    }
 
-        final DOMGameStat killPointsStat = DOMGameStat.builder().action(DOMGameStat.Action.POINTS_KILLS).build();
-        final DOMGameStat gemPointsStat = DOMGameStat.builder().action(DOMGameStat.Action.POINTS_GEMS).build();
-        final DOMGameStat gemPickupStat = DOMGameStat.builder().action(DOMGameStat.Action.GEMS_PICKED_UP).build();
-        final DOMGameStat pointsCapturedStat = DOMGameStat.builder().action(DOMGameStat.Action.CONTROL_POINT_CAPTURED).build();
-        final DOMGameStat captureTimeStat = DOMGameStat.builder().action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING).build();
-        final DOMGameStat contestTimeStat = DOMGameStat.builder().action(DOMGameStat.Action.CONTROL_POINT_TIME_CONTESTED).build();
+    /**
+     *
+     * @param statContainer
+     * @param periodKey
+     * @param teamName {@code ""} if empty
+     * @param mapName {@code ""} if empty
+     * @return
+     */
+    protected static List<Component> getStatsDescription(final StatContainer statContainer, final String periodKey, final String teamName, final String mapName) {
+        final String gameName = "Domination";
 
-        final int wins = winStat.getStat(statContainer, period).intValue();
-        final int losses = lossStat.getStat(statContainer, period).intValue();
-        final int matchesPlayed = matchesPlayedStat.getStat(statContainer, period).intValue();
-        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, period).longValue(), ChronoUnit.MILLIS);
+        final GameMapStat winStat = GameMapStat.builder()
+                .gameName(gameName)
+                .action(GameMapStat.Action.WIN)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final GameMapStat lossStat = GameMapStat.builder()
+                .gameName(gameName)
+                .action(GameMapStat.Action.LOSS)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final GameMapStat matchesPlayedStat = GameMapStat.builder()
+                .gameName(gameName)
+                .action(GameMapStat.Action.MATCHES_PLAYED)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final GameMapStat timePlayedStat = GameMapStat.builder()
+                .gameName(gameName)
+                .action(GameMapStat.Action.TIME_PLAYED)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
 
-        final int killPoints = killPointsStat.getStat(statContainer, period).intValue();
-        final int gemPoints = gemPointsStat.getStat(statContainer, period).intValue();
-        final int gemPickup = gemPickupStat.getStat(statContainer, period).intValue();
-        final int pointsCaptured = pointsCapturedStat.getStat(statContainer, period).intValue();
-        final Duration captureTime = Duration.of(captureTimeStat.getStat(statContainer, period).longValue(), ChronoUnit.MILLIS);
-        final Duration contestTime = Duration.of(contestTimeStat.getStat(statContainer, period).longValue(), ChronoUnit.MILLIS);
+        final DOMGameStat killPointsStat = DOMGameStat.builder()
+                .action(DOMGameStat.Action.POINTS_KILLS)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final DOMGameStat gemPointsStat = DOMGameStat.builder()
+                .action(DOMGameStat.Action.POINTS_GEMS)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final DOMGameStat gemPickupStat = DOMGameStat.builder()
+                .action(DOMGameStat.Action.GEMS_PICKED_UP)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final DOMGameStat pointsCapturedStat = DOMGameStat.builder()
+                .action(DOMGameStat.Action.CONTROL_POINT_CAPTURED)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final DOMGameStat captureTimeStat = DOMGameStat.builder()
+                .action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
+        final DOMGameStat contestTimeStat = DOMGameStat.builder()
+                .action(DOMGameStat.Action.CONTROL_POINT_TIME_CONTESTED)
+                .teamName(teamName)
+                .mapName(mapName)
+                .build();
 
-        final List<Component> description = List.of(
+        final int wins = winStat.getStat(statContainer, periodKey).intValue();
+        final int losses = lossStat.getStat(statContainer, periodKey).intValue();
+        final int matchesPlayed = matchesPlayedStat.getStat(statContainer, periodKey).intValue();
+        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+
+        final int killPoints = killPointsStat.getStat(statContainer, periodKey).intValue();
+        final int gemPoints = gemPointsStat.getStat(statContainer, periodKey).intValue();
+        final int gemPickup = gemPickupStat.getStat(statContainer, periodKey).intValue();
+        final int pointsCaptured = pointsCapturedStat.getStat(statContainer, periodKey).intValue();
+        final Duration captureTime = Duration.of(captureTimeStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+        final Duration contestTime = Duration.of(contestTimeStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+
+        return List.of(
                 StatFormatterUtility.formatStat("Wins", wins),
                 StatFormatterUtility.formatStat("Losses", losses),
                 StatFormatterUtility.formatStat("Matches Played", matchesPlayed),
@@ -70,14 +135,6 @@ public class DominationStatButton extends ControlItem<AbstractStatMenu> {
                 StatFormatterUtility.formatStat("Time Capturing", UtilTime.humanReadableFormat(captureTime)),
                 StatFormatterUtility.formatStat("Time Contesting", UtilTime.humanReadableFormat(contestTime))
         );
-
-        return ItemView.builder()
-                .material(Material.BEACON)
-                .displayName(Component.text("Domination Stats"))
-                .lore(description)
-                .frameLore(true)
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .build();
     }
 
     /**
@@ -90,6 +147,7 @@ public class DominationStatButton extends ControlItem<AbstractStatMenu> {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        //todo
+        final IAbstractStatMenu gui = getGui();
+        new DominationStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
     }
 }

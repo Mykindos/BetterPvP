@@ -11,14 +11,24 @@ import java.util.function.BiFunction;
 
 public class StringBuilderParser<T> {
 
-    public static final String INTRA_SEQUENCE_DELIMITER = "=";
-    public static final String SEQUENCE_DELIMITER = "==";
+    public static final String DEFAULT_INTRA_SEQUENCE_DELIMITER = "=";
+    public static final String DEFAULT_SEQUENCE_DELIMITER = "==";
 
-    List<List<BiFunction<T, String, T>>> sequenceParsers;
+    private final String intraSequenceDelimiter;
+    private final String sequenceDelimiter;
+
+    final List<List<BiFunction<T, String, T>>> sequenceParsers;
 
     @SafeVarargs
     public StringBuilderParser(List<BiFunction<T, String, T>>... sequenceParsers) {
-       this.sequenceParsers = Arrays.stream(sequenceParsers).toList();
+        this(DEFAULT_INTRA_SEQUENCE_DELIMITER, DEFAULT_SEQUENCE_DELIMITER, sequenceParsers);
+    }
+
+    @SafeVarargs
+    public StringBuilderParser(String intraSequenceDelimiter, String sequenceDelimiter, List<BiFunction<T, String, T>>... sequenceParsers) {
+        this.intraSequenceDelimiter = intraSequenceDelimiter;
+        this.sequenceDelimiter = sequenceDelimiter;
+        this.sequenceParsers = Arrays.stream(sequenceParsers).toList();
     }
 
     /**
@@ -26,13 +36,14 @@ public class StringBuilderParser<T> {
      * @param builder
      * @param string
      * @return
+     * @throws IllegalArgumentException if the given string is not buildable by the builder
      */
     public T parse(@NotNull T builder, @NotNull String string) {
-        final String[] sequenceStrings = string.split(SEQUENCE_DELIMITER);
+        final String[] sequenceStrings = string.split(sequenceDelimiter);
         for (int i = 0; i < sequenceStrings.length; i++) {
             final String sequenceString = sequenceStrings[i];
             final List<BiFunction<T, String, T>> parsers = sequenceParsers.get(i);
-            final String[] elementStrings = sequenceString.split(INTRA_SEQUENCE_DELIMITER);
+            final String[] elementStrings = sequenceString.split(intraSequenceDelimiter);
             for (int j = 0; j < elementStrings.length; j++) {
                 final String elementString = elementStrings[j];
                 final BiFunction<T, String, T> parser = parsers.get(j);
@@ -59,12 +70,12 @@ public class StringBuilderParser<T> {
             for (int j = 1; j < sequence.size(); j++) {
                 final String element = sequence.get(j);
                 if (Strings.isNullOrEmpty(element)) break;
-                builder.append(INTRA_SEQUENCE_DELIMITER);
+                builder.append(intraSequenceDelimiter);
                 builder.append(element);
             }
 
             if (i + 1 < sequences.length) {
-                builder.append(SEQUENCE_DELIMITER);
+                builder.append(sequenceDelimiter);
             }
         }
         return builder.toString();

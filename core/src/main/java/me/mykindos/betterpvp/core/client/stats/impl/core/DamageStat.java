@@ -68,19 +68,19 @@ public class DamageStat implements IBuildableStat {
      * Get the stat represented by this object from the statContainer
      *
      * @param statContainer
-     * @param period
+     * @param periodKey
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
+    public Double getStat(StatContainer statContainer, String periodKey) {
         if (damageCause == null) {
-            return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
+            return statContainer.getStats().getStatsOfPeriod(periodKey).entrySet().stream()
                     .filter(entry ->
                     entry.getKey().startsWith(getStatName())
             ).mapToDouble(Map.Entry::getValue)
                     .sum();
         }
-        return statContainer.getProperty(getStatName(), period);
+        return statContainer.getProperty(getStatName(), periodKey);
     }
 
     @Override
