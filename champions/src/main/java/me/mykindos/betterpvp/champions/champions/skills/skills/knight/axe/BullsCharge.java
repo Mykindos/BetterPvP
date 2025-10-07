@@ -136,9 +136,12 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     @EventHandler
     public void onKnockback(CustomEntityVelocityEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        if (running.containsKey(player.getUniqueId())) {
-            event.setCancelled(true);
+        if (!running.containsKey(player.getUniqueId())) return;
+        if (event.getSource() instanceof Player source) {
+            if (source.equals(player)) return;  // player caused the velocity so allow it
         }
+
+        event.setCancelled(true);
     }
 
     @UpdateEvent(delay = 100)
