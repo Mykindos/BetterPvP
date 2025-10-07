@@ -75,7 +75,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     protected Double getValue(StatContainer container, IStat stat, @Nullable String period) {
-        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD) : stat.getStat(container, period);
+        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD_KEY) : stat.getStat(container, period);
     }
 
     /**
@@ -85,7 +85,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
      * @return
      */
     protected Double getValue(StatContainer container, IStat stat) {
-        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD) : stat.getStat(container, StatContainer.PERIOD);
+        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD_KEY) : stat.getStat(container, StatContainer.PERIOD_KEY);
     }
 
 
@@ -182,7 +182,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     protected String getPeriod() {
-        return getAchievementType() == AchievementType.GLOBAL ? StatContainer.GLOBAL_PERIOD : StatContainer.PERIOD;
+        return getAchievementType() == AchievementType.GLOBAL ? StatContainer.GLOBAL_PERIOD_KEY : StatContainer.PERIOD_KEY;
     }
 
     @Override
@@ -234,12 +234,12 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
      * Get the stat represented by this object from the statContainer
      *
      * @param statContainer
-     * @param period
+     * @param periodKey
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
-        return (double) getPercentComplete(statContainer, period);
+    public Double getStat(StatContainer statContainer, String periodKey) {
+        return (double) getPercentComplete(statContainer, periodKey);
     }
 
     @Override

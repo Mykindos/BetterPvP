@@ -26,9 +26,9 @@ public class StatContainer implements Unique, IMapListener {
     /**
      * The current period of stat collecting
      */
-    public static final String PERIOD = JavaPlugin.getPlugin(Core.class).getConfig().getOrSaveString("stats.period", "test");
+    public static final String PERIOD_KEY = JavaPlugin.getPlugin(Core.class).getConfig().getOrSaveString("stats.period", "test");
 
-    public static final String GLOBAL_PERIOD = "";
+    public static final String GLOBAL_PERIOD_KEY = "Global";
 
     private static final ClientManager clientManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientManager.class);
 
@@ -55,7 +55,7 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     public Double getCurrentProperty(String key) {
-        return getProperty(PERIOD, key);
+        return getProperty(PERIOD_KEY, key);
     }
 
     @NotNull
@@ -75,7 +75,7 @@ public class StatContainer implements Unique, IMapListener {
     private void incrementStat(String statName, double amount) {
         synchronized (this) {
             changedStats.add(statName);
-            this.getStats().increase(StatContainer.PERIOD, statName, amount);
+            this.getStats().increase(StatContainer.PERIOD_KEY, statName, amount);
         }
     }
 

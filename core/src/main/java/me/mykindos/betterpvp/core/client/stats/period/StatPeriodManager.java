@@ -23,7 +23,7 @@ public class StatPeriodManager extends Manager<StatPeriod> {
         this.repository = repository;
         repository.saveCurrentPeriod();
         loadFromList(repository.getAll());
-        addObject(StatContainer.GLOBAL_PERIOD, GLOBAL_PERIOD);
+        addObject(StatContainer.GLOBAL_PERIOD_KEY, GLOBAL_PERIOD);
     }
 
     @Override

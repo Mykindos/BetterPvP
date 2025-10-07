@@ -35,7 +35,7 @@ public class RawStatsCommand extends Command implements IStringName {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final String period = args.length > 0 ? args[0] : StatContainer.GLOBAL_PERIOD;
+        final String period = args.length > 0 ? args[0] : StatContainer.GLOBAL_PERIOD_KEY;
         //TODO move this logic to a menu
         final StatContainer container = client.getStatContainer();
 

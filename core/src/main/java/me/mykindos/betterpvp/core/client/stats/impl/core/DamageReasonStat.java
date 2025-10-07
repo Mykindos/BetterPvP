@@ -75,12 +75,12 @@ public class DamageReasonStat implements IBuildableStat {
      * Get the stat represented by this object from the statContainer
      *
      * @param statContainer
-     * @param period
+     * @param periodKey
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
-        return statContainer.getProperty(getStatName(), period);
+    public Double getStat(StatContainer statContainer, String periodKey) {
+        return statContainer.getProperty(getStatName(), periodKey);
     }
 
     @Override

@@ -85,7 +85,7 @@ public class AchievementPeriodFilterButton extends AbstractItem {
             period = decrease();
         }
         if (period != null) {
-            final String strPeriod = period.equals(StatPeriodManager.GLOBAL_PERIOD) ? StatContainer.GLOBAL_PERIOD : period.getPeriod();
+            final String strPeriod = period.equals(StatPeriodManager.GLOBAL_PERIOD) ? StatContainer.GLOBAL_PERIOD_KEY : period.getPeriod();
             new AchievementMenu(client, achievementCategory, strPeriod, achievementManager, statPeriodManager, current).show(player);
         }
     }

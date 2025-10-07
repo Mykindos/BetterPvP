@@ -42,7 +42,7 @@ public class StatPeriodRepository {
     }
 
     public void saveCurrentPeriod() {
-        final String period = StatContainer.PERIOD;
+        final String period = StatContainer.PERIOD_KEY;
         final String insert = "INSERT INTO period_meta (Period) SELECT ? as Period WHERE NOT EXISTS (Select * FROM period_meta WHERE Period = ?)";
         final Statement statement = new Statement(insert,
                 new StringStatementValue(period),

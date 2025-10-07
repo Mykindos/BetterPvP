@@ -133,16 +133,16 @@ public class MinecraftStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
+    public Double getStat(StatContainer statContainer, String periodKey) {
         //material composite
         if (isMaterialStatistic(statistic) && material == null) {
-            return statContainer.getCompositeMinecraftStat(this, period);
+            return statContainer.getCompositeMinecraftStat(this, periodKey);
         }
         //entity composite
         if (isEntityStatistic(statistic) && entityType == null) {
-            return statContainer.getCompositeMinecraftStat(this, period);
+            return statContainer.getCompositeMinecraftStat(this, periodKey);
         }
-        return statContainer.getProperty(period, getFullStat());
+        return statContainer.getProperty(periodKey, getFullStat());
     }
 
     @Override

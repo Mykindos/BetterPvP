@@ -26,13 +26,13 @@ public class CompositeStat implements IStat {
      * Get the stat represented by this object from the statContainer
      *
      * @param statContainer
-     * @param period
+     * @param periodKey
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
+    public Double getStat(StatContainer statContainer, String periodKey) {
        return stats.stream()
-               .mapToDouble(stat -> stat.getStat(statContainer, period))
+               .mapToDouble(stat -> stat.getStat(statContainer, periodKey))
                .sum();
     }
 

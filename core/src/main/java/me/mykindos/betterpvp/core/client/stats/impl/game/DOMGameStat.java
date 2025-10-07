@@ -60,27 +60,41 @@ public class DOMGameStat extends TeamMapStat implements IBuildableStat{
         return builder.teamName(input);
     }
 
-    private Double getActionStat(StatContainer statContainer, String period) {
-        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
-                .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action)
-                ).mapToDouble(Map.Entry::getValue)
-                .sum();
+    private boolean filterActionOnlyStat(Map.Entry<String, Double> entry) {
+        DOMGameStat stat = fromString(entry.getKey());
+        return action == stat.action;
+    }
+
+    private boolean filterMapOnlyStat(Map.Entry<String, Double> entry) {
+        DOMGameStat stat = fromString(entry.getKey());
+        return action == stat.action && mapName.equals(stat.mapName);
+    }
+
+    private boolean filterTeamOnlyStat(Map.Entry<String, Double> entry) {
+        DOMGameStat stat = fromString(entry.getKey());
+        return action == stat.action && teamName.equals(stat.teamName);
     }
 
     /**
      * Get the stat represented by this object from the statContainer
      *
      * @param statContainer
-     * @param period
+     * @param periodKey
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
-        if (Strings.isNullOrEmpty(mapName)) {
-            return getActionStat(statContainer, period);
+    public Double getStat(StatContainer statContainer, String periodKey) {
+        if (Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
+            return getFilteredStat(statContainer, periodKey, this::filterActionOnlyStat);
         }
-        return statContainer.getProperty(period, getStatName());
+        if (Strings.isNullOrEmpty(teamName)) {
+            return getFilteredStat(statContainer, periodKey, this::filterMapOnlyStat);
+        }
+
+        if (Strings.isNullOrEmpty(mapName)) {
+            return getFilteredStat(statContainer, periodKey, this::filterTeamOnlyStat);
+        }
+        return statContainer.getProperty(periodKey, getStatName());
     }
 
     @Override
