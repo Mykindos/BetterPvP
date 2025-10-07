@@ -60,6 +60,6 @@ public class StatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(ClientQuitEvent event) {
         log.error("process stats on quit").submit();
-        clientManager.getSqlLayer().processStatUpdates(Set.of(event.getClient()), StatContainer.PERIOD);
+        clientManager.getSqlLayer().processStatUpdates(Set.of(event.getClient()), StatContainer.PERIOD_KEY);
     }
 }
