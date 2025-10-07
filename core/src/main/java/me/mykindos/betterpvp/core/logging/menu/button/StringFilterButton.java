@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.logging.menu.button;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -16,9 +17,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -28,8 +31,8 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
     @Getter
     private final List<String> contexts;
     @Setter
+    @Nullable
     private Supplier<CompletableFuture<Boolean>> refresh;
-    @Setter
     @Getter
     private String selectedFilter;
     private int selected;
@@ -78,14 +81,30 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
         contexts.sort(String::compareToIgnoreCase);
     }
 
+    public void setSelectedFilter(String filter) {
+        int newSelected = contexts.indexOf(filter);
+        if (newSelected < 0) throw new NoSuchElementException();
+        setSelected(newSelected);
+    }
+
     private void setSelected(int selected) {
         this.selected = selected;
         this.selectedFilter = contexts.get(selected);
-        refresh.get().whenCompleteAsync(((aBoolean, throwable) -> {
-            if (aBoolean.equals(Boolean.TRUE)) {
-                this.notifyWindows();
-            }
-        }));
+        if (refresh != null) {
+            refresh.get().whenCompleteAsync(((aBoolean, throwable) -> {
+                if (aBoolean.equals(Boolean.TRUE)) {
+                    this.notifyWindows();
+                    if (getGui() instanceof AbstractGui abstractGui) {
+                        abstractGui.updateControlItems();
+                    }
+                }
+            }));
+            return;
+        }
+        this.notifyWindows();
+        if (getGui() instanceof AbstractGui abstractGui) {
+            abstractGui.updateControlItems();
+        }
     }
 
     private void increase() {

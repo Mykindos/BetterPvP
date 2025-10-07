@@ -121,11 +121,11 @@ public enum ClientStat implements IClientStat {
 
 
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
+    public Double getStat(StatContainer statContainer, String periodKey) {
         if (compositeStat == null) {
-            return statContainer.getProperty(period,this.name());
+            return statContainer.getProperty(periodKey,this.name());
         }
-        return compositeStat.getStat(statContainer, period);
+        return compositeStat.getStat(statContainer, periodKey);
     }
 
     @Override
