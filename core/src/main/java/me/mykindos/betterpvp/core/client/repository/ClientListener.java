@@ -327,7 +327,7 @@ public class ClientListener implements Listener {
         } finally {
             try {
                 this.clientManager.processPropertyUpdates(true);
-                this.clientManager.processStatUpdates(StatContainer.PERIOD);
+                this.clientManager.processStatUpdates(StatContainer.PERIOD_KEY);
             } catch (Exception ex) {
                 log.error("Error processing stat updates", ex).submit();
                 if (ex.getCause() != null) {
