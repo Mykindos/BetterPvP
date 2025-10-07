@@ -31,7 +31,7 @@ public class StatsCommand extends Command implements IStringName {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final String period = args.length > 0 ? args[0] : StatContainer.GLOBAL_PERIOD;
+        final String period = args.length > 0 ? args[0] : StatContainer.GLOBAL_PERIOD_KEY;
         new StatMenu(client, null, period, statFormatterManager, null).show(player);
     }
 

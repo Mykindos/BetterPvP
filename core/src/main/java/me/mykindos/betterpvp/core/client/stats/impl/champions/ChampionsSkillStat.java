@@ -71,24 +71,24 @@ public class ChampionsSkillStat implements IBuildableStat {
      * Get the stat represented by this object from the statContainer
      *
      * @param statContainer
-     * @param period
+     * @param periodKey
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
+    public Double getStat(StatContainer statContainer, String periodKey) {
         if (skillName == null) {
-            return getActionComposite(statContainer, period);
+            return getActionComposite(statContainer, periodKey);
         }
         if (level == -1) {
-            return getSkillComposite(statContainer, period);
+            return getSkillComposite(statContainer, periodKey);
         }
-        return statContainer.getProperty(period, getStatName());
+        return statContainer.getProperty(periodKey, getStatName());
     }
 
     private Double getActionComposite(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action.name())
+                        entry.getKey().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name())
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }
@@ -96,7 +96,7 @@ public class ChampionsSkillStat implements IBuildableStat {
     private Double getSkillComposite(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + skillName)
+                        entry.getKey().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + skillName)
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }
