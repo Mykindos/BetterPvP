@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.weapons.impl.runes;
 
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.core.combat.weapon.types.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
