@@ -42,7 +42,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
 
 
     public AchievementMenu(Client client, AchievementManager achievementManager, StatPeriodManager statPeriodManager) {
-        this(client, null, StatContainer.GLOBAL_PERIOD, achievementManager, statPeriodManager, null);
+        this(client, null, StatContainer.GLOBAL_PERIOD_KEY, achievementManager, statPeriodManager, null);
     }
 
     public AchievementMenu(Client client, @Nullable IAchievementCategory achievementCategory, String period, AchievementManager achievementManager, StatPeriodManager statPeriodManager, @Nullable Windowed previous) {
@@ -101,7 +101,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
                 .stream()
                 .filter(achievement -> Objects.equals(achievement.getAchievementCategory(), category))
                 .filter(achievement -> {
-                               if (Objects.equals(period, StatContainer.GLOBAL_PERIOD)) {
+                               if (Objects.equals(period, StatContainer.GLOBAL_PERIOD_KEY)) {
                                    return achievement.getAchievementType() == AchievementType.GLOBAL;
                                }
                                return achievement.getAchievementType() == AchievementType.PERIOD;

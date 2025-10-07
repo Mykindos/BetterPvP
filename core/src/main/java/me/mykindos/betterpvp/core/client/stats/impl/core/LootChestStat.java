@@ -78,12 +78,12 @@ public class LootChestStat implements IBuildableStat {
      * Get the stat represented by this object from the statContainer
      *
      * @param statContainer
-     * @param period
+     * @param periodKey
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String period) {
-        return statContainer.getProperty(period, getStatName());
+    public Double getStat(StatContainer statContainer, String periodKey) {
+        return statContainer.getProperty(periodKey, getStatName());
     }
 
     @Override
