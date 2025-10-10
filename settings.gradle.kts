@@ -74,7 +74,7 @@ dependencyResolutionManagement {
             plugin("paperweight-userdev", "io.papermc.paperweight.userdev").versionRef("paperweight")
 
             // Library - Kyori Adventure (does not come with Paper)
-            library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:3.0.1")
+            library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:3.1.0")
 
             // Library - Jackson
             library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
@@ -82,7 +82,7 @@ dependencyResolutionManagement {
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
 
             // Libraries - Data Management
-            library("jedis", "redis.clients:jedis:6.2.0")
+            library("jedis", "redis.clients:jedis:7.0.0")
             library("flyway-core", "org.flywaydb", "flyway-core").version("11.13.0")
             library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.13.0")
             library("hikari-cp", "com.zaxxer", "HikariCP").version("5.1.0")
