@@ -33,10 +33,13 @@ import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.OrientedVector;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -82,6 +85,7 @@ public class Core extends BPvPPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        ConfigurationSerialization.registerClass(OrientedVector.class);
 
         if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
             String serverName = getCommonNameViaReflection();

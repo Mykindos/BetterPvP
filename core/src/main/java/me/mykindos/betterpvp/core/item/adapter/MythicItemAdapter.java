@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.item.adapter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.bukkit.events.MythicMobItemGenerateEvent;
 import io.lumine.mythic.core.utils.jnbt.Tag;
 import lombok.CustomLog;
@@ -36,7 +37,7 @@ public class MythicItemAdapter implements Listener {
         }
 
         final Tag itemTag = itemNBT.get("bpvpid");
-        final String itemKey = (String) itemTag.getValue();
+        final String itemKey = ((PlaceholderString) itemTag.getValue()).get();
         final BaseItem item = itemFactory.getItemRegistry().getItem(itemKey);
         if (item == null) {
             log.error("Could not find item {} to convert through MythicItemAdapter", itemKey).submit();
