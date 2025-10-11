@@ -11,17 +11,16 @@ import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.core.skills.SkillMetadataImpl;
 import io.lumine.mythic.core.skills.SkillTriggers;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
-import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.listeners.DamageEventProcessor;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.List;
+import java.util.Objects;
 
 @PluginAdapter("MythicMobs")
 @Singleton
@@ -112,13 +111,13 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
         damagerMythicMob.getType().executeSkills(damagedMetaData.getCause(), damagedMetaData);
     }
 
-    private void applyDamageImmunityOverride(CustomDamageEvent event) {
+    private void applyDamageImmunityOverride(DamageEvent event) {
         List<MetadataValue> metadata = event.getDamagee().getMetadata("skill-damage");
-        if (!metadata.isEmpty() && metadata.getFirst().value() instanceof DamageMetadata dm) {
+        if (event.isDamageeLiving() && !metadata.isEmpty() && metadata.getFirst().value() instanceof DamageMetadata dm) {
             if (Boolean.TRUE.equals(dm.getPreventsImmunity())) {
                 event.setDamageDelay(0);
                 event.setForceDamageDelay(0);
-                event.getDamagee().setNoDamageTicks(0);
+                Objects.requireNonNull(event.getLivingDamagee()).setNoDamageTicks(0);
             }
         }
     }

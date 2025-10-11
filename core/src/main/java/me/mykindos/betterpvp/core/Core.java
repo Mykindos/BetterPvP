@@ -32,10 +32,13 @@ import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.OrientedVector;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -87,6 +90,7 @@ public class Core extends BPvPPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        ConfigurationSerialization.registerClass(OrientedVector.class);
 
 
         // Add this appender first to ensure we still capture all logs before database is initialized
