@@ -105,6 +105,7 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
             if (Boolean.TRUE.equals(dm.getPreventsImmunity())) {
                 event.setDamageDelay(0);
                 event.setForceDamageDelay(0);
+                event.getDamagee().setNoDamageTicks(0);
             }
         }
     }
