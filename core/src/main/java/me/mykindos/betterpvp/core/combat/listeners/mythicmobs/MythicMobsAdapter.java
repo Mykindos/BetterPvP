@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.listeners.mythicmobs;
 
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ModeledEntity;
+import io.lumine.mythic.api.skills.damage.DamageMetadata;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.adapters.BukkitEntity;
 import io.lumine.mythic.core.mobs.ActiveMob;
@@ -12,6 +13,9 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.metadata.MetadataValue;
+
+import java.util.List;
 
 public class MythicMobsAdapter implements CustomDamageAdapter {
 
@@ -45,6 +49,8 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
             }
 
         }
+
+        applyDamageImmunityOverride(event);
 
         return true;
     }
@@ -80,6 +86,7 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
             // Allow to return false so damage sounds can play
         }
 
+        applyDamageImmunityOverride(event);
 
         return false;
     }
@@ -90,6 +97,16 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
         damagedMetaData.getVariables().putObject("damage-metadata", damagedMetaData);
         damagedMetaData.getVariables().putString("real-damage-cause", event.getCause().toString());
         damagerMythicMob.getType().executeSkills(damagedMetaData.getCause(), damagedMetaData);
+    }
+
+    private void applyDamageImmunityOverride(CustomDamageEvent event) {
+        List<MetadataValue> metadata = event.getDamagee().getMetadata("skill-damage");
+        if (metadata.getFirst().value() instanceof DamageMetadata dm) {
+            if (Boolean.TRUE.equals(dm.getPreventsImmunity())) {
+                event.setDamageDelay(0);
+                event.setForceDamageDelay(0);
+            }
+        }
     }
 
 }
