@@ -1817,6 +1817,106 @@ nodes:
     displayName: sapling_growth_attribute_30
   # endregion
   
+  # region Instant Tree Growth Chance Attributes
+  instant_tree_growth_chance_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 1.0
+      per_level: 1.0
+    displayName: instant_tree_growth_chance_attribute_1
+  instant_tree_growth_chance_attribute_2:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+      - instant_tree_growth_chance_attribute_1
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 1.0
+      per_level: 1.0
+    displayName: instant_tree_growth_chance_attribute_2
+  instant_tree_growth_chance_attribute_3:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+      - instant_tree_growth_chance_attribute_2
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 1.0
+      per_level: 1.0
+    displayName: instant_tree_growth_chance_attribute_3
+  instant_tree_growth_chance_attribute_4:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+      - instant_tree_growth_chance_attribute_3
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 1.0
+      per_level: 1.0
+    displayName: instant_tree_growth_chance_attribute_4
+  instant_tree_growth_chance_attribute_5:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+      - instant_tree_growth_chance_attribute_4
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 1.0
+      per_level: 1.0
+    displayName: instant_tree_growth_chance_attribute_5
+  instant_tree_growth_chance_attribute_6:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+      - instant_tree_growth_chance_attribute_5
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 1.0
+      per_level: 1.0
+    displayName: instant_tree_growth_chance_attribute_6
+  instant_tree_growth_chance_attribute_7:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+      - instant_tree_growth_chance_attribute_6
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 1.0
+      per_level: 1.0
+    displayName: instant_tree_growth_chance_attribute_7
+  # endregion
+  
   # region Increased Experience Attributes
   increased_experience_attribute_1:
     enabled: true
@@ -3585,4 +3685,124 @@ nodes:
       base: 5.0
       per_level: 5.0
     displayName: treefeller_cooldown_reduction_attribute_20
+  # endregion
+  
+  # region Combination Attributes
+  chop_speed_bark_chance_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: CHOP_SPEED
+      base: 2.0
+      per_level: 2.0
+    - attribute: BARK_CHANCE
+      base: 1.5
+      per_level: 1.5
+    displayName: chop_speed_bark_chance_attribute_1
+  sapling_growth_instant_tree_growth_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: SAPLING_GROWTH_SPEED
+      base: 2.0
+      per_level: 2.0
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 0.75
+      per_level: 0.75
+    displayName: sapling_growth_instant_tree_growth_attribute_1
+  treasure_chance_double_treasure_chance_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: WOODCUTTING_TREASURE_CHANCE
+      base: 0.75
+      per_level: 0.75
+    - attribute: WOODCUTTING_DOUBLE_TREASURE_CHANCE
+      base: 0.5
+      per_level: 0.5
+    displayName: treasure_chance_double_treasure_chance_attribute_1
+  treasure_chance_double_treasure_chance_attribute_2:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: WOODCUTTING_TREASURE_CHANCE
+      base: 0.75
+      per_level: 0.75
+    - attribute: WOODCUTTING_DOUBLE_TREASURE_CHANCE
+      base: 0.5
+      per_level: 0.5
+    displayName: treasure_chance_double_treasure_chance_attribute_2
+  treasure_chance_double_treasure_chance_attribute_3:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: WOODCUTTING_TREASURE_CHANCE
+      base: 0.75
+      per_level: 0.75
+    - attribute: WOODCUTTING_DOUBLE_TREASURE_CHANCE
+      base: 0.5
+      per_level: 0.5
+    displayName: treasure_chance_double_treasure_chance_attribute_3
+  # endregion
+  
+  # region Mega Attribute
+  mega_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+    - attribute: BARK_CHANCE
+      base: 1.0
+      per_level: 1.0
+    - attribute: CHOP_SPEED
+      base: 1.0
+      per_level: 1.0
+    - attribute: WOODCUTTING_TREASURE_CHANCE
+      base: 0.5
+      per_level: 0.5
+    - attribute: WOODCUTTING_DOUBLE_TREASURE_CHANCE
+      base: 0.5
+      per_level: 0.5
+    - attribute: SAPLING_GROWTH_SPEED
+      base: 1.0
+      per_level: 1.0
+    - attribute: INSTANT_TREE_GROWTH_CHANCE
+      base: 0.5
+      per_level: 0.5
+    - attribute: LOG_INCREASED_STACK_SIZE
+      base: 1.0
+      per_level: 1.0
+    - attribute: WOODCUTTING_DURABILITY_REDUCTION
+      base: 0.5
+      per_level: 0.5
+    displayName: mega_attribute_1
   # endregion
