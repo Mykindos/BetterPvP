@@ -101,7 +101,7 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
 
     private void applyDamageImmunityOverride(CustomDamageEvent event) {
         List<MetadataValue> metadata = event.getDamagee().getMetadata("skill-damage");
-        if (metadata.getFirst().value() instanceof DamageMetadata dm) {
+        if (!metadata.isEmpty() && metadata.getFirst().value() instanceof DamageMetadata dm) {
             if (Boolean.TRUE.equals(dm.getPreventsImmunity())) {
                 event.setDamageDelay(0);
                 event.setForceDamageDelay(0);
