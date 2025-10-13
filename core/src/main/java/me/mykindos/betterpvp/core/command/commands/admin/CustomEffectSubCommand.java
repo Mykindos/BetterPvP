@@ -26,7 +26,7 @@ abstract class CustomEffectSubCommand extends Command {
 
         String lowercaseArg = args[args.length - 1].toLowerCase();
         if (getArgumentType(args.length).equals("EFFECT")) {
-            tabCompletions.addAll(EffectTypes.getEffectTypes().stream().map(type -> type.getName().replace(" ", "_"))
+            tabCompletions.addAll(EffectTypes.getEffectTypes().stream().map(type -> type.getName().replace("'", "").replace(" ", "_"))
                     .filter(name -> name.toLowerCase().startsWith(lowercaseArg)).toList());
         }
         
