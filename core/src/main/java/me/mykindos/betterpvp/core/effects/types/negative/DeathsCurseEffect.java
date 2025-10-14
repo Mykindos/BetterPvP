@@ -50,6 +50,21 @@ public class DeathsCurseEffect extends VanillaEffectType {
         if (currentTick % 30 == 0) {
             new SoundEffect(Sound.ENTITY_VEX_AMBIENT, (float) Math.random(), (float) Math.random() + 0.3F).play(livingEntity.getLocation());
         }
+
+        // Heartbeat
+        int remaining = effect.getRemainingVanillaDuration();
+
+        // Clamp to a sensible range: faster when less time remains
+        int minInterval = 5;
+        int maxInterval = 40;
+        int heartbeatInterval = (int) Math.max(
+                minInterval,
+                (remaining / 20.0) * (maxInterval - minInterval) / (effect.getVanillaDuration() / 20.0) + minInterval
+        );
+
+        if (currentTick % heartbeatInterval == 0) {
+            new SoundEffect(Sound.ENTITY_WARDEN_HEARTBEAT, 1, 1).play(livingEntity);
+        }
     }
 
     @Override
