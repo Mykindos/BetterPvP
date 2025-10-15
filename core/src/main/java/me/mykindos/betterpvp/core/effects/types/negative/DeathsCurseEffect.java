@@ -61,7 +61,7 @@ public class DeathsCurseEffect extends VanillaEffectType {
         );
 
         if (currentTick % heartbeatInterval == 0) {
-            new SoundEffect(Sound.ENTITY_WARDEN_HEARTBEAT, 1, 1).play(livingEntity);
+            new SoundEffect("littleroom_wendigo", "littleroom.wendigo.heart_beat", 1.4f, 1).play(livingEntity);
         }
     }
 
