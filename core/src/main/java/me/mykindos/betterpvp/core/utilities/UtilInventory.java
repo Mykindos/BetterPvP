@@ -3,7 +3,11 @@ package me.mykindos.betterpvp.core.utilities;
 import com.mojang.authlib.GameProfile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
@@ -26,6 +30,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 import java.util.UUID;
@@ -95,6 +100,31 @@ public class UtilInventory {
         }
 
         return count >= required || player.getGameMode() == GameMode.CREATIVE;
+    }
+
+    public static void remove(Player player, BaseItem baseItem, int amount) {
+        if (player.getGameMode() == GameMode.CREATIVE) return;
+
+        ItemFactory itemFactory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
+        int amountToRemove = amount;
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType().isAir()) continue;
+
+            final ItemInstance content = itemFactory.fromItemStack(item).orElseThrow();
+            if (content.getBaseItem().equals(baseItem)) {
+                if (item.getAmount() > amountToRemove) {
+                    item.setAmount(item.getAmount() - amountToRemove);
+                    return;
+                } else {
+                    amountToRemove -= item.getAmount();
+                    item.setAmount(0);
+                }
+            }
+
+            if (amountToRemove <= 0) {
+                return;
+            }
+        }
     }
 
     public static void remove(Player player, String namespacedKey, int amount) {
