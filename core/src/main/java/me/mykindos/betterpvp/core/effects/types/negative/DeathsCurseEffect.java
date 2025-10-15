@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -37,12 +36,11 @@ public class DeathsCurseEffect extends VanillaEffectType {
     @Override
     public void onTick(LivingEntity livingEntity, Effect effect) {
         final Location location = livingEntity.getLocation();
-        Particle.DUST_PILLAR.builder()
-                .data(Material.BLACK_TERRACOTTA.createBlockData())
-                .location(location)
-                .count(10)
+        Particle.SOUL.builder()
+                .location(livingEntity.getLocation().add(0, livingEntity.getHeight() / 2, 0))
+                .count(1)
                 .extra(0.01)
-                .offset(livingEntity.getWidth() / 2, 0, livingEntity.getWidth() / 2)
+                .offset(0.5, 0.5, 0.5)
                 .allPlayers()
                 .spawn();
 
