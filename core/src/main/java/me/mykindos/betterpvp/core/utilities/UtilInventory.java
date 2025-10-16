@@ -277,11 +277,19 @@ public class UtilInventory {
         //Use the new ValueOutput API to save inventory
         TagValueOutput output = TagValueOutput.createWrappingGlobal(ProblemReporter.DISCARDING, compound);
         ValueOutput.TypedOutputList<ItemStackWithSlot> invOutput = output.list("Inventory", ItemStackWithSlot.CODEC);
+        ValueOutput.TypedOutputList<ItemStackWithSlot> equipmentOutput = output.list("equipment", ItemStackWithSlot.CODEC);
 
         for (int i = 0; i < inventory.getInventory().getContainerSize(); i++) {
             net.minecraft.world.item.ItemStack itemStack = inventory.getInventory().getItem(i);
             if (!itemStack.isEmpty()) {
                 invOutput.add(new ItemStackWithSlot(i, itemStack));
+            }
+        }
+
+        for (int i = 0; i < inventory.getArmorContents().length; i++) {
+            net.minecraft.world.item.ItemStack itemStack = inventory.getInventory().getArmorContents().get(i);
+            if (!itemStack.isEmpty()) {
+                equipmentOutput.add(new ItemStackWithSlot(i, itemStack));
             }
         }
 
