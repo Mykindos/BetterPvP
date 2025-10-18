@@ -4,8 +4,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.domination.DominationStatMenu;
-import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
-import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -54,58 +53,58 @@ public class DominationStatButton extends ControlItem<IAbstractStatMenu> {
     protected static List<Component> getStatsDescription(final StatContainer statContainer, final String periodKey, final String teamName, final String mapName) {
         final String gameName = "Domination";
 
-        final GameMapStat winStat = GameMapStat.builder()
+        final GameTeamMapNativeStat winStat = GameTeamMapNativeStat.builder()
                 .gameName(gameName)
-                .action(GameMapStat.Action.WIN)
+                .action(GameTeamMapNativeStat.Action.WIN)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final GameMapStat lossStat = GameMapStat.builder()
+        final GameTeamMapNativeStat lossStat = GameTeamMapNativeStat.builder()
                 .gameName(gameName)
-                .action(GameMapStat.Action.LOSS)
+                .action(GameTeamMapNativeStat.Action.LOSS)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final GameMapStat matchesPlayedStat = GameMapStat.builder()
+        final GameTeamMapNativeStat matchesPlayedStat = GameTeamMapNativeStat.builder()
                 .gameName(gameName)
-                .action(GameMapStat.Action.MATCHES_PLAYED)
+                .action(GameTeamMapNativeStat.Action.MATCHES_PLAYED)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final GameMapStat timePlayedStat = GameMapStat.builder()
+        final GameTeamMapNativeStat timePlayedStat = GameTeamMapNativeStat.builder()
                 .gameName(gameName)
-                .action(GameMapStat.Action.TIME_PLAYED)
+                .action(GameTeamMapNativeStat.Action.GAME_TIME_PLAYED)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
 
-        final DOMGameStat killPointsStat = DOMGameStat.builder()
-                .action(DOMGameStat.Action.POINTS_KILLS)
+        final GameTeamMapNativeStat killPointsStat = GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.POINTS_KILLS)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final DOMGameStat gemPointsStat = DOMGameStat.builder()
-                .action(DOMGameStat.Action.POINTS_GEMS)
+        final GameTeamMapNativeStat gemPointsStat = GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.POINTS_GEMS)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final DOMGameStat gemPickupStat = DOMGameStat.builder()
-                .action(DOMGameStat.Action.GEMS_PICKED_UP)
+        final GameTeamMapNativeStat gemPickupStat = GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.GEMS_PICKED_UP)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final DOMGameStat pointsCapturedStat = DOMGameStat.builder()
-                .action(DOMGameStat.Action.CONTROL_POINT_CAPTURED)
+        final GameTeamMapNativeStat pointsCapturedStat = GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.CONTROL_POINT_CAPTURED)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final DOMGameStat captureTimeStat = DOMGameStat.builder()
-                .action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING)
+        final GameTeamMapNativeStat captureTimeStat = GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.CONTROL_POINT_TIME_CAPTURING)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
-        final DOMGameStat contestTimeStat = DOMGameStat.builder()
-                .action(DOMGameStat.Action.CONTROL_POINT_TIME_CONTESTED)
+        final GameTeamMapNativeStat contestTimeStat = GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.CONTROL_POINT_TIME_CONTESTED)
                 .teamName(teamName)
                 .mapName(mapName)
                 .build();
