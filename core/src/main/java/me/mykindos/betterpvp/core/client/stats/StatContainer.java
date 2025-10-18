@@ -5,10 +5,10 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.events.IStatMapListener;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.client.stats.events.WrapStatEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
-import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,13 +16,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 @CustomLog
-public class StatContainer implements Unique, IMapListener {
+public class StatContainer implements Unique, IStatMapListener {
     /**
      * The current period of stat collecting
      */
@@ -37,7 +36,7 @@ public class StatContainer implements Unique, IMapListener {
     @Getter
     private final StatConcurrentHashMap stats = new StatConcurrentHashMap();
     @Getter
-    private final Set<String> changedStats = new HashSet<>();
+    private final Set<IStat> changedStats = new HashSet<>();
 
     public StatContainer(UUID id) {
         this.id = id;
@@ -50,17 +49,17 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     //todo enum verions
-    public Double getAllProperty(String key) {
-        return stats.getAll(key);
+    public Double getAllProperty(IStat stat) {
+        return stats.getAll(stat);
     }
 
-    public Double getCurrentProperty(String key) {
-        return getProperty(PERIOD_KEY, key);
+    public Double getCurrentProperty(IStat stat) {
+        return getProperty(PERIOD_KEY, stat);
     }
 
     @NotNull
-    public Double getProperty(String period, String key) {
-        return Optional.ofNullable(stats.get(period, key)).orElse(0d);
+    public Double getProperty(String period, IStat stat) {
+        return Optional.ofNullable(stats.get(period, stat)).orElse(0d);
     }
 
     public void incrementStat(@Nullable IStat stat, double amount) {
@@ -69,31 +68,23 @@ public class StatContainer implements Unique, IMapListener {
             return;
         }
         Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");
-        incrementStat(stat.getStatName(), amount);
-    }
-
-    private void incrementStat(String statName, double amount) {
         synchronized (this) {
-            changedStats.add(statName);
-            this.getStats().increase(StatContainer.PERIOD_KEY, statName, amount);
+
+            final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(id, stat));
+            final IStat wrappedStat = wrapStatEvent.getStat();
+            changedStats.add(wrappedStat);
+            this.getStats().increase(StatContainer.PERIOD_KEY, wrappedStat, amount);
         }
     }
 
-    //todo move this to MinecraftStat
-    public Double getCompositeMinecraftStat(MinecraftStat minecraftStat, String period) {
-        return stats.getStatsOfPeriod(period).entrySet().stream()
-                .filter(entry ->
-                    entry.getKey().startsWith(minecraftStat.getBaseStat())
-                ).mapToDouble(Map.Entry::getValue)
-                .sum();
-    }
-
     @Override
-    public void onMapValueChanged(String key, Object newValue, @Nullable Object oldValue) {
+    public void onMapValueChanged(IStat stat, Double newValue, @Nullable Double oldValue) {
         try {
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), new StatPropertyUpdateEvent(this, key, (Double) newValue, (Double) oldValue)::callEvent);
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                new StatPropertyUpdateEvent(this, stat, newValue, oldValue).callEvent();
+            });
         } catch (Exception e) {
-            log.error("Exception on map value change {}", key, e).submit();
+            log.error("Exception on map value change {}", stat, e).submit();
         }
     }
 }

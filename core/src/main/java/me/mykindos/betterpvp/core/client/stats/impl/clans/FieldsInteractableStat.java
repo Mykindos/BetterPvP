@@ -54,7 +54,7 @@ public class FieldsInteractableStat implements IBuildableStat {
      */
     @Override
     public Double getStat(StatContainer statContainer, String periodKey) {
-        return statContainer.getProperty(periodKey, getStatName());
+        return statContainer.getProperty(periodKey, this);
     }
 
     @Override
