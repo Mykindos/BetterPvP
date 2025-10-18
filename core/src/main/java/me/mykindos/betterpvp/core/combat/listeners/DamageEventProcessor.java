@@ -5,16 +5,15 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
-import me.mykindos.betterpvp.core.combat.data.FireData;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseRegistry;
+import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
+import me.mykindos.betterpvp.core.combat.data.FireData;
 import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.GameMode;
@@ -98,6 +97,8 @@ public class DamageEventProcessor implements Listener {
 
     public boolean processDamageEvent(DamageEvent damageEvent) {
         if (damageEvent.getDamagee().isInvulnerable()
+                || !damageEvent.getDamagee().isValid()
+                || (damageEvent.isDamageeLiving() && damageEvent.getLivingDamagee().isDead())
                 || (damageEvent.getDamagee() instanceof HumanEntity human && human.getGameMode().isInvulnerable())) {
             return false; // Entity is invulnerable
         }
