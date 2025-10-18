@@ -173,15 +173,16 @@ public class DamageEventFinalizer implements Listener {
      * Applies the final damage to the entity
      */
     private void applyFinalDamage(DamageEvent event) {
-        if (!event.getDamagee().isValid() || !event.isDamageeLiving() || event.getLivingDamagee().getHealth() <= 0) {
+        if (!event.getDamagee().isValid() || !event.isDamageeLiving()
+                || event.getLivingDamagee().getHealth() <= 0 || event.getLivingDamagee().isDead()
+                || delayKillSet.contains(event.getDamagee().getUniqueId())) {
             return;
         }
         
         LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
         double finalHealth = damagee.getHealth() - event.getModifiedDamage();
-        
 
-        if (finalHealth < 1.0) {
+        if (finalHealth <= 0.0) {
             // Handle entity death with delay to fix Paper issue
             // Temporary measure to fix https://github.com/PaperMC/Paper/issues/12148
             if (!delayKillSet.contains(damagee.getUniqueId())) {
@@ -190,7 +191,7 @@ public class DamageEventFinalizer implements Listener {
                     if (event.getDamager() instanceof Player killer) damagee.setKiller(killer);
                     damagee.setHealth(0);
                     delayKillSet.remove(damagee.getUniqueId());
-                }, 2L);
+                }, 1L);
             }
         } else {
             damagee.setHealth(finalHealth);
