@@ -79,7 +79,7 @@ public class BossStat implements IBuildableStat {
     private Double getActionStat(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action)
+                        entry.getKey().getStatName().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action)
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }
@@ -96,7 +96,7 @@ public class BossStat implements IBuildableStat {
         if (Strings.isNullOrEmpty(bossName)) {
             return getActionStat(statContainer, periodKey);
         }
-        return statContainer.getProperty(periodKey, getStatName());
+        return statContainer.getProperty(periodKey, this);
     }
 
     @Override

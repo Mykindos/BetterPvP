@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.client.stats.listeners.TimedStatListener;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.game.GamePlugin;
@@ -109,11 +109,11 @@ public class GameStatListener extends TimedStatListener {
     public void onGameEnd() {
         if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
             playerTeams.forEach((id, team) -> {
-                statManager.incrementGameStat(id, GameMapStat.builder().action(GameMapStat.Action.MATCHES_PLAYED), 1);
+                statManager.incrementGameMapStat(id, GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.MATCHES_PLAYED), 1);
                 if (teamGame.getWinners().contains(team)) {
-                    statManager.incrementGameStat(id, GameMapStat.builder().action(GameMapStat.Action.WIN), 1);
+                    statManager.incrementGameMapStat(id, GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.WIN), 1);
                 } else {
-                    statManager.incrementGameStat(id, GameMapStat.builder().action(GameMapStat.Action.LOSS), 1);
+                    statManager.incrementGameMapStat(id, GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.LOSS), 1);
                 }
             });
         } //todo other games
@@ -136,10 +136,11 @@ public class GameStatListener extends TimedStatListener {
 
     private void updateParticipantTime(Participant participant, long deltaTime, boolean force) {
         final Client client = participant.getClient();
+        //todo lobby?
         if (!participant.isSpectating() || force) {
-            statManager.incrementGameStat(client.getUniqueId(), GameMapStat.builder().action(GameMapStat.Action.TIME_PLAYED), deltaTime);
+            statManager.incrementGameMapStat(client.getUniqueId(), GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.GAME_TIME_PLAYED), deltaTime);
         } else {
-            statManager.incrementGameStat(client.getUniqueId(), GameMapStat.builder().action(GameMapStat.Action.SPECTATE_TIME), deltaTime);
+            statManager.incrementGameMapStat(client.getUniqueId(), GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.SPECTATE_TIME), deltaTime);
         }
     }
 

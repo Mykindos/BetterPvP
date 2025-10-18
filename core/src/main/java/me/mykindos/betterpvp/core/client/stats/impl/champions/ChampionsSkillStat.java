@@ -82,13 +82,13 @@ public class ChampionsSkillStat implements IBuildableStat {
         if (level == -1) {
             return getSkillComposite(statContainer, periodKey);
         }
-        return statContainer.getProperty(periodKey, getStatName());
+        return statContainer.getProperty(periodKey, this);
     }
 
     private Double getActionComposite(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name())
+                        entry.getKey().getStatName().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name())
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }
@@ -96,7 +96,7 @@ public class ChampionsSkillStat implements IBuildableStat {
     private Double getSkillComposite(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + skillName)
+                        entry.getKey().getStatName().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + skillName)
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }

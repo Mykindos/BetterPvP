@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.game.impl.domination.listener;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -96,8 +96,8 @@ public class DominationListener implements Listener {
         // Award points for kill
         final Team team = Objects.requireNonNull(game.getPlayerTeam(killer));
         gameController.addPoints(team, killScoreAttribute.getValue());
-        final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
-                .action(DOMGameStat.Action.POINTS_KILLS);
-        statManager.incrementMapStat(killed.getUniqueId(), builder, killScoreAttribute.getValue());
+        final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.POINTS_KILLS);
+        statManager.incrementGameMapStat(killed.getUniqueId(), builder, killScoreAttribute.getValue());
     }
 }

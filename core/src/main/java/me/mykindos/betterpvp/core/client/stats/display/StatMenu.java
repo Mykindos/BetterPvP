@@ -2,11 +2,8 @@ package me.mykindos.betterpvp.core.client.stats.display;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.events.GetDefaultTrackedStatsEvent;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.IStatCategory;
 import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatterManager;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -17,17 +14,12 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
-import me.mykindos.betterpvp.core.utilities.UtilCollection;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @CustomLog
 public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
@@ -58,6 +50,8 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
     }
 
     private List<Item> getItems() {
+        return List.of();
+        /* TODO remove
         final StatContainer container = client.getStatContainer();
         Collection<IStatCategory> childCategories;
         //reset the achievement category if it is no longer valid
@@ -105,7 +99,7 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
                 .toList()
         );
 
-        return items;
+        return items;*/
     }
 
     /**

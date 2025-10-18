@@ -76,11 +76,11 @@ public class DamageStat implements IBuildableStat {
         if (damageCause == null) {
             return statContainer.getStats().getStatsOfPeriod(periodKey).entrySet().stream()
                     .filter(entry ->
-                    entry.getKey().startsWith(getStatName())
+                    entry.getKey().getStatName().startsWith(getStatName())
             ).mapToDouble(Map.Entry::getValue)
                     .sum();
         }
-        return statContainer.getProperty(getStatName(), periodKey);
+        return statContainer.getProperty(getStatName(), this);
     }
 
     @Override

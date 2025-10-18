@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.game.impl.ctf.listener;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.game.framework.listener.player.event.ParticipantPreRespawnEvent;
 import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
@@ -34,15 +34,15 @@ public class SuddenDeathListener implements Listener {
     public void onCustomDeath(CustomDeathEvent event) {
         if (!gameController.isSuddenDeath()) return;
         if (event.getKiller() instanceof Player killer) {
-            final CTFGameStat.CTFGameStatBuilder<?, ?> killerBuilder =  CTFGameStat.builder()
-                    .action(CTFGameStat.Action.SUDDEN_DEATH_KILLS);
-            statManager.incrementMapStat(killer.getUniqueId(), killerBuilder, 1);
+            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> killerBuilder =  GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.SUDDEN_DEATH_KILLS);
+            statManager.incrementGameMapStat(killer.getUniqueId(), killerBuilder, 1);
         }
 
         if (event.getKilled() instanceof Player killed) {
-            final CTFGameStat.CTFGameStatBuilder<?, ?> killedBuilder =  CTFGameStat.builder()
-                    .action(CTFGameStat.Action.SUDDEN_DEATH_DEATHS);
-            statManager.incrementMapStat(killed.getUniqueId(), killedBuilder, 1);
+            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> killedBuilder =  GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.SUDDEN_DEATH_DEATHS);
+            statManager.incrementGameMapStat(killed.getUniqueId(), killedBuilder, 1);
         }
     }
 }

@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.game.impl.domination.model;
 import dev.brauw.mapper.region.CuboidRegion;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
 import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
@@ -89,13 +89,13 @@ public class CapturePoint implements Lifecycled {
         // If multiple teams are present, freeze progress.
         if (distinctTeamCount > 1) {
             state = State.CAPTURING; // Freeze progress changes.
-            final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
-                    .action(DOMGameStat.Action.CONTROL_POINT_TIME_CONTESTED);
+            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.CONTROL_POINT_TIME_CONTESTED);
 
             playersOnPoint.keySet().stream()
                     .map(Player::getUniqueId)
                     .forEach(id -> {
-                        statManager.incrementMapStat(id, builder, 50);
+                        statManager.incrementGameMapStat(id, builder, 50);
                     });
         } else if (distinctTeamCount == 1) {
             // Consider one active team if exactly one team is present.
@@ -140,24 +140,24 @@ public class CapturePoint implements Lifecycled {
                 capturingTeam = null;
                 blocks.capture(owningTeam);
                 fx.capture(owningTeam);
-                final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
-                        .action(DOMGameStat.Action.CONTROL_POINT_CAPTURED);
+                final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                        .action(GameTeamMapNativeStat.Action.CONTROL_POINT_CAPTURED);
 
                 playersOnPoint.keySet().stream()
                         .map(Player::getUniqueId)
                         .forEach(id -> {
-                            statManager.incrementMapStat(id, builder, 1);
+                            statManager.incrementGameMapStat(id, builder, 1);
                         });
                 return;
             }
             state = State.CAPTURING;
-            final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
-                    .action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING);
+            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.CONTROL_POINT_TIME_CAPTURING);
 
             playersOnPoint.keySet().stream()
                     .map(Player::getUniqueId)
                     .forEach(id -> {
-                        statManager.incrementMapStat(id, builder, 50);
+                        statManager.incrementGameMapStat(id, builder, 50);
                     });
         } else {
             // Contested capture: point is already captured.
@@ -176,13 +176,13 @@ public class CapturePoint implements Lifecycled {
                     blocks.uncapture();
                 }
                 state = State.CAPTURING;
-                final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
-                        .action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING);
+                final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                        .action(GameTeamMapNativeStat.Action.CONTROL_POINT_TIME_CAPTURING);
 
                 playersOnPoint.keySet().stream()
                         .map(Player::getUniqueId)
                         .forEach(id -> {
-                            statManager.incrementMapStat(id, builder, 50);
+                            statManager.incrementGameMapStat(id, builder, 50);
                         });
             }
 

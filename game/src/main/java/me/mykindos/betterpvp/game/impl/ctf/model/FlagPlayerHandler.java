@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.game.impl.ctf.model;
 
-import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.hat.HatProvider;
@@ -55,18 +55,18 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         // Effect
         effectManager.removeEffect(holder, EffectTypes.SPEED);
         effectManager.removeEffect(holder, EffectTypes.VANISH, "Smoke Bomb");
-        CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
-                .action(CTFGameStat.Action.FLAG_PICKUP);
-        statManager.incrementMapStat(holder.getUniqueId(), builder, 1);
+        GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.FLAG_PICKUP);
+        statManager.incrementGameMapStat(holder.getUniqueId(), builder, 1);
     }
 
     public void tick(Player holder) {
         effectManager.addEffect(holder, holder, EffectTypes.GLOWING, "FlagGlowing", 1, 100, true);
         effectManager.addEffect(holder, holder,EffectTypes.SLOWNESS, "FlagSlowness", 2, 100, true);
         effectManager.addEffect(holder, holder,EffectTypes.SILENCE, "FlagSilence", 1, 100, true);
-        CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
-                .action(CTFGameStat.Action.FLAG_CARRIER_TIME);
-        statManager.incrementMapStat(holder.getUniqueId(), builder, 50);
+        GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.FLAG_CARRIER_TIME);
+        statManager.incrementGameMapStat(holder.getUniqueId(), builder, 50);
     }
     
     public void drop(Player holder) {
@@ -81,9 +81,9 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         effectManager.removeEffect(holder, EffectTypes.SILENCE, "FlagSilence");
         effectManager.removeEffect(holder, EffectTypes.GLOWING, "FlagGlowing");
 
-        final CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
-                .action(CTFGameStat.Action.FLAG_DROP);
-        statManager.incrementMapStat(holder.getUniqueId(), builder, 1);
+        final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.FLAG_DROP);
+        statManager.incrementGameMapStat(holder.getUniqueId(), builder, 1);
     }
 
     @Override

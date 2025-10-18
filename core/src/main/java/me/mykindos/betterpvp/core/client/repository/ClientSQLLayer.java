@@ -12,8 +12,10 @@ import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesReposito
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
+import me.mykindos.betterpvp.core.client.stats.StatBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatConcurrentHashMap;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
@@ -61,6 +63,7 @@ public class ClientSQLLayer {
 
     private final Database database;
     private final PropertyMapper propertyMapper;
+    private final StatBuilder statBuilder;
     @Getter
     private final PunishmentRepository punishmentRepository;
 
@@ -73,9 +76,10 @@ public class ClientSQLLayer {
     private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
-    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository, OfflineMessagesRepository offlineMessagesRepository) {
+    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, StatBuilder statBuilder, PunishmentRepository punishmentRepository, OfflineMessagesRepository offlineMessagesRepository) {
         this.database = database;
         this.propertyMapper = propertyMapper;
+        this.statBuilder = statBuilder;
         this.punishmentRepository = punishmentRepository;
         this.offlineMessagesRepository = offlineMessagesRepository;
         this.queuedPropertyUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
@@ -280,8 +284,9 @@ public class ClientSQLLayer {
                 while (results.next()) {
                     final String period = results.getString("Period");
                     final String statName = results.getString("Statname");
-                    final double stat = results.getDouble("Stat");
-                    tempMap.put(period, statName, stat, true);
+                    final IStat stat = statBuilder.getStatForStatName(statName);
+                    final double value = results.getDouble("Stat");
+                    tempMap.put(period, stat, value, true);
                 }
 
             } catch (SQLException e) {
@@ -423,9 +428,9 @@ public class ClientSQLLayer {
         return new Statement(saveStatUpdate,
                 new UuidStatementValue(statContainer.getUniqueId()),
                 new StringStatementValue(period),
-                new StringStatementValue(statName),
-                new DoubleStatementValue(stat),
-                new DoubleStatementValue(stat)
+                new StringStatementValue(stat.getStatName()),
+                new DoubleStatementValue(value),
+                new DoubleStatementValue(value)
         );
 
         queuedStatUpdates.updateAndGet(map -> {
@@ -505,6 +510,19 @@ public class ClientSQLLayer {
 
     }
 
+    public CompletableFuture<Void> processStatUpdates(Set<Client> clients, String period) {
+        List<Statement> statementsToRun = clients.stream().flatMap(client -> getStatUpdates(client, period).stream()).toList();
+        return database.executeBatch(statementsToRun, TargetDatabase.GLOBAL);
+    }
+
+    private List<Statement> getStatUpdates(Client client, String period) {
+        synchronized (client.getStatContainer()) {
+            log.info(client.getStatContainer().getChangedStats().toString()).submit();
+            List<Statement> statementStream = client.getStatContainer().getChangedStats().stream().map(statName -> {
+                        return getSaveStatProperty(client.getStatContainer(), period, statName, client.getStatContainer().getProperty(period, statName));
+            }).toList();
+            client.getStatContainer().getChangedStats().clear();
+            return statementStream;
     /**
      * Executes a list of jOOQ queries as a single transaction.
      *

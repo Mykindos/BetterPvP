@@ -94,7 +94,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     public void onPropertyChangeListener(final StatPropertyUpdateEvent event) {
         if (!enabled) return;
         try {
-            final String changedProperty = event.getStatName();
+            final IStat stat = event.getStat();
             final Double newValue = event.getNewValue();
             @Nullable
             final Double oldValue = event.getOldValue();
@@ -102,7 +102,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
             //validate and retrieve
             final List<IStat> statsTemp = watchedStats.stream()
-                    .filter(stat -> stat.containsStat(changedProperty))
+                    .filter(iStat -> iStat.containsStat(stat))
                     .toList();
             if (statsTemp.isEmpty()) return;
             if (statsTemp.size() > 1) {
@@ -114,8 +114,8 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
             Map<IStat, Double> otherProperties = new HashMap<>();
             watchedStats.stream()
-                    .filter(stat -> !stat.containsStat(changedProperty))
-                    .forEach(stat -> {
+                    .filter(iStat -> !stat.containsStat(stat))
+                    .forEach(iStat -> {
                         otherProperties.put(stat, getValue(container, stat));
                     });
 
@@ -134,7 +134,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
         log.info("achievement change {}", getName()).submit();
-        new StatPropertyUpdateEvent(container, getStatName(), (double) newPercent, (double) oldPercent).callEvent();
+        new StatPropertyUpdateEvent(container, this, (double) newPercent, (double) oldPercent).callEvent();
     }
 
     @Override

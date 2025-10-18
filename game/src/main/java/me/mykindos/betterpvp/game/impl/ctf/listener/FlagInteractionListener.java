@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.game.impl.ctf.listener;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
@@ -85,13 +85,13 @@ public class FlagInteractionListener implements Listener {
         Flag flag = flagOpt.get();
         flag.capture();
         gameController.scoreCapture(team, flag);
-        final CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
-                .action(CTFGameStat.Action.FLAG_CAPTURES);
-        statManager.incrementMapStat(player.getUniqueId(), builder, 1);
+        final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.FLAG_CAPTURES);
+        statManager.incrementGameMapStat(player.getUniqueId(), builder, 1);
         if (gameController.isSuddenDeath()) {
-            final CTFGameStat.CTFGameStatBuilder<?, ?> suddenDeathBuilder =  CTFGameStat.builder()
-                    .action(CTFGameStat.Action.SUDDEN_DEATH_FLAG_CAPTURES);
-            statManager.incrementMapStat(player.getUniqueId(), suddenDeathBuilder, 1);
+            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> suddenDeathBuilder =  GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.SUDDEN_DEATH_FLAG_CAPTURES);
+            statManager.incrementGameMapStat(player.getUniqueId(), suddenDeathBuilder, 1);
         }
 
         // Restock player on flag capture

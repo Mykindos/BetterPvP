@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.formatter.StatFormatter;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -42,8 +43,8 @@ public class MinecraftStatFormatter extends StatFormatter {
 
 
     @Override
-    public Description getDescription(String statName, StatContainer statContainer, String period) {
-        final MinecraftStat minecraftStat = getStat() == null ? MinecraftStat.fromString(statName) : (MinecraftStat) getStat();
+    public Description getDescription(IStat stat, StatContainer statContainer, String period) {
+        final MinecraftStat minecraftStat = getStat() == null ? (MinecraftStat) stat: (MinecraftStat) getStat();
 
         final List<Component> lore = new ArrayList<>();
         lore.add(UtilMessage.deserialize("An %s Minecraft Statistic", minecraftStat.getStatistic().getType().toString()));

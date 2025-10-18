@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -30,8 +30,8 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
                 AchievementCategories.GAME_CHAMPIONS_WINS,
                 AchievementType.GLOBAL,
                 (double) goal,
-                GameMapStat.builder()
-                        .action(GameMapStat.Action.WIN)
+                GameTeamMapNativeStat.builder()
+                        .action(GameTeamMapNativeStat.Action.WIN)
                         .build()
         );
     }

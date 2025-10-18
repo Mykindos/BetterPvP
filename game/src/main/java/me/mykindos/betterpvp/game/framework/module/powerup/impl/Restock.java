@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -181,9 +181,9 @@ public class Restock implements Powerup {
             // Put the restock point on cooldown
             startCooldown();
 
-            final GameMapStat.GameMapStatBuilder<?, ?> builder = GameMapStat.builder()
-                    .action(GameMapStat.Action.RESTOCK);
-            statManager.incrementGameStat(player.getUniqueId(), builder, 1);
+            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder = GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.RESTOCK);
+            statManager.incrementGameMapStat(player.getUniqueId(), builder, 1);
 
         } catch (Exception e) {
             log.error("Failed to restock player " + player.getName(), e).submit();

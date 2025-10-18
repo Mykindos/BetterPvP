@@ -123,7 +123,7 @@ public enum ClientStat implements IClientStat {
     @Override
     public Double getStat(StatContainer statContainer, String periodKey) {
         if (compositeStat == null) {
-            return statContainer.getProperty(periodKey,this.name());
+            return statContainer.getProperty(periodKey,this);
         }
         return compositeStat.getStat(statContainer, periodKey);
     }
@@ -149,5 +149,13 @@ public enum ClientStat implements IClientStat {
             return getStatName().equals(statName);
         }
         return compositeStat.containsStat(statName);
+    }
+
+    @Override
+    public boolean containsStat(IStat otherStat) {
+        if (compositeStat == null) {
+            return this.equals(otherStat);
+        }
+        return compositeStat.containsStat(otherStat);
     }
 }

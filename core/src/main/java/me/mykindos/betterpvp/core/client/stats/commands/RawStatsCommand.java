@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatterManager;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
@@ -41,8 +42,8 @@ public class RawStatsCommand extends Command implements IStringName {
 
         final List<Item> statItems = container.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .map(entry -> {
-                    final String statName = entry.getKey();
-                    return statFormatterManager.getStatFormatter(statName).getValue().getDescription(statName, container, period);
+                    final IStat stat = entry.getKey();
+                    return statFormatterManager.getStatFormatter(stat.getStatName()).getValue().getDescription(stat, container, period);
                 })
                 .map(Description::toSimpleItem)
                 .map(Item.class::cast)

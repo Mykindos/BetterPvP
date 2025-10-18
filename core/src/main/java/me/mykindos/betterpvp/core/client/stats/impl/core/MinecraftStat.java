@@ -9,12 +9,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 @Builder
 @Getter
@@ -136,13 +139,21 @@ public class MinecraftStat implements IBuildableStat {
     public Double getStat(StatContainer statContainer, String periodKey) {
         //material composite
         if (isMaterialStatistic(statistic) && material == null) {
-            return statContainer.getCompositeMinecraftStat(this, periodKey);
+            return getCompositeMinecraftStat(statContainer, periodKey);
         }
         //entity composite
         if (isEntityStatistic(statistic) && entityType == null) {
-            return statContainer.getCompositeMinecraftStat(this, periodKey);
+            return getCompositeMinecraftStat(statContainer, periodKey);
         }
-        return statContainer.getProperty(periodKey, getFullStat());
+        return statContainer.getProperty(periodKey, this);
+    }
+
+    public Double getCompositeMinecraftStat(StatContainer statContainer, String period) {
+        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
+                .filter(entry ->
+                        entry.getKey().getStatName().startsWith(this.getBaseStat())
+                ).mapToDouble(Map.Entry::getValue)
+                .sum();
     }
 
     @Override
@@ -189,6 +200,23 @@ public class MinecraftStat implements IBuildableStat {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    @Override
+    public boolean containsStat(IStat stat) {
+        if (!(stat instanceof MinecraftStat other)) return false;
+        //this is a qualified material statistic, check to make sure it is exact
+        if (isMaterialStatistic(statistic) && material != null) {
+            return statistic.equals(other.getStatistic()) && material.equals(other.getMaterial());
+        }
+
+        //this is a qualified entityType statistic, check to make sure it is exact
+        if (isEntityStatistic(statistic) && entityType != null) {
+            return statistic.equals(other.getStatistic()) && entityType.equals(other.getEntityType());
+        }
+
+        //this is a generic or a non-qualified statistic, therefore check if the base statistic is equal
+        return statistic.equals(other.getStatistic());
     }
 
     private static boolean isMaterialStatistic(Statistic statistic) {

@@ -4,7 +4,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.AbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.ChampionsGameStatMenu;
-import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -27,10 +27,10 @@ public class ChampionsStatButton extends ControlItem<AbstractStatMenu> {
         final StatContainer statContainer = gui.getClient().getStatContainer();
         final String period = gui.getPeriodKey();
 
-        final GameMapStat winStat = GameMapStat.builder().action(GameMapStat.Action.WIN).build();
-        final GameMapStat lossStat = GameMapStat.builder().action(GameMapStat.Action.LOSS).build();
-        final GameMapStat matchesPlayedStat = GameMapStat.builder().action(GameMapStat.Action.MATCHES_PLAYED).build();
-        final GameMapStat timePlayedStat = GameMapStat.builder().action(GameMapStat.Action.TIME_PLAYED).build();
+        final GameTeamMapNativeStat winStat = GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.WIN).build();
+        final GameTeamMapNativeStat lossStat = GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.LOSS).build();
+        final GameTeamMapNativeStat matchesPlayedStat = GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.MATCHES_PLAYED).build();
+        final GameTeamMapNativeStat timePlayedStat = GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.GAME_TIME_PLAYED).build();
 
         final int wins = winStat.getStat(statContainer, period).intValue();
         final int losses = lossStat.getStat(statContainer, period).intValue();
