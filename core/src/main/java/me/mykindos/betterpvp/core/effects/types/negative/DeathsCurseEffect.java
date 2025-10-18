@@ -90,6 +90,8 @@ public class DeathsCurseEffect extends VanillaEffectType {
                     Double.MAX_VALUE,
                     "Death's Curse"
             ));
+
+            livingEntity.setHealth(0);
         } else {
             if (notify) {
                 UtilMessage.message(livingEntity, "Death's Curse", "You are no longer cursed to death.");
