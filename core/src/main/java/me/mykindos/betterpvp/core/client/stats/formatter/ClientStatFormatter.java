@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.stats.formatter;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -19,7 +20,7 @@ public abstract class ClientStatFormatter extends StatFormatter {
     }
 
     @Override
-    public Description getDescription(String statName, StatContainer container, String period) {
+    public Description getDescription(IStat stat, StatContainer container, String period) {
         IClientStat clientStat = (IClientStat) Objects.requireNonNull(getStat());
         final List<Component> lore = new ArrayList<>(Arrays.stream(clientStat.getDescription()).map(UtilMessage::deserialize).toList());
         lore.add(Component.empty());

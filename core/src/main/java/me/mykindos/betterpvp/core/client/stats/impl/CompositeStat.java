@@ -48,6 +48,6 @@ public class CompositeStat implements IStat {
 
     @Override
     public boolean containsStat(String statName) {
-        return stats.stream().anyMatch(stat -> stat.containsStat(statName));
+        return stats.stream().anyMatch(stat -> stat.containsStat(this));
     }
 }
