@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.game.impl.domination.model;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -162,9 +162,9 @@ public class Gem implements Powerup {
         final Team team = Objects.requireNonNull(game.getPlayerTeam(player));
         int score = game.getConfiguration().getGemScoreAttribute().getValue();
         controller.addPoints(team, score);
-        final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
-                .action(DOMGameStat.Action.POINTS_GEMS);
-        statManager.incrementMapStat(player.getUniqueId(), builder, score);
+        final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.POINTS_GEMS);
+        statManager.incrementGameMapStat(player.getUniqueId(), builder, score);
 
         // Put the gem on cooldown
         startCooldown();

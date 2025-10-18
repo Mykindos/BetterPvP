@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ import java.util.List;
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class RoleStat implements IStat {
+public class RoleStat implements IBuildableStat {
     public static final String PREFIX = "CHAMPIONS_ROLE";
 
     private static StringBuilderParser<RoleStatBuilder> parser = new StringBuilderParser<>(
@@ -62,7 +62,7 @@ public class RoleStat implements IStat {
      */
     @Override
     public Double getStat(StatContainer statContainer, String periodKey) {
-        return statContainer.getProperty(periodKey, getStatName());
+        return statContainer.getProperty(periodKey, this);
     }
 
     @Override
@@ -93,6 +93,26 @@ public class RoleStat implements IStat {
     @Override
     public boolean containsStat(String statName) {
         return statName.equals(getStatName());
+    }
+
+    /**
+     * Copies the stat represented by this statName into this object
+     *
+     * @param statName the statname
+     * @return this stat
+     * @throws IllegalArgumentException if this statName does not represent this stat
+     */
+    @Override
+    public IBuildableStat copyFromStatname(@NotNull String statName) {
+        final RoleStat other = fromString(statName);
+        this.action = other.action;
+        this.role = other.role;
+        return this;
+    }
+
+    @Override
+    public String getPrefix() {
+        return PREFIX;
     }
 
     public enum Action {
