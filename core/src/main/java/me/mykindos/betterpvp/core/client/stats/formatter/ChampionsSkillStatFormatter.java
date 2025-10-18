@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.formatter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -39,8 +40,8 @@ public class ChampionsSkillStatFormatter extends StatFormatter {
 
 
     @Override
-    public Description getDescription(String statName, StatContainer statContainer, String period) {
-        final ChampionsSkillStat championsSkillStat = getStat() == null ? ChampionsSkillStat.fromString(statName) : (ChampionsSkillStat) getStat();
+    public Description getDescription(IStat stat, StatContainer statContainer, String period) {
+        final ChampionsSkillStat championsSkillStat = getStat() == null ? (ChampionsSkillStat) stat : (ChampionsSkillStat) getStat();
 
         final List<Component> lore = new ArrayList<>();
         lore.add(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", championsSkillStat.getStat(statContainer, period)));
