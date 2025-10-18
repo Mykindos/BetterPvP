@@ -36,6 +36,9 @@ public class HealthListener implements Listener {
 
         final AttributeInstance attribute = Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH));
         final double previousPercentage = entity.getHealth() / attribute.getValue();
+        if (previousPercentage == 0) {
+            return; // We don't want to update health if the entity is already dead
+        }
 
         // Update max health
         final double defaultValue = attribute.getDefaultValue();
@@ -54,6 +57,6 @@ public class HealthListener implements Listener {
         }
 
         // Update relative health. We don't want people equipping sets and staying half health
-        entity.setHealth(Math.max(0.0, previousPercentage * attribute.getValue()));
+        entity.setHealth(Math.max(0.1, previousPercentage * attribute.getValue()));
     }
 }
