@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.game.impl.ctf.listener;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelectorUseEvent;
-import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -64,14 +64,14 @@ public class FlagHolderListener implements Listener {
             return;
         }
         dropFlag(player);
-        CTFGameStat.CTFGameStatBuilder<?, ?> victimBuilder =  CTFGameStat.builder()
-                .action(CTFGameStat.Action.FLAG_CARRIER_DEATHS);
-        statManager.incrementMapStat(player.getUniqueId(), victimBuilder, 1);
+        GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> victimBuilder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.FLAG_CARRIER_DEATHS);
+        statManager.incrementGameMapStat(player.getUniqueId(), victimBuilder, 1);
         if (!(event.getKiller() instanceof Player killer)) return;
 
-        CTFGameStat.CTFGameStatBuilder<?, ?> killerBuilder =  CTFGameStat.builder()
-                .action(CTFGameStat.Action.FLAG_CARRIER_KILLS);
-        statManager.incrementMapStat(killer.getUniqueId(), killerBuilder, 1);
+        GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> killerBuilder =  GameTeamMapNativeStat.builder()
+                .action(GameTeamMapNativeStat.Action.FLAG_CARRIER_KILLS);
+        statManager.incrementGameMapStat(killer.getUniqueId(), killerBuilder, 1);
     }
 
     @EventHandler

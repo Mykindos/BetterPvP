@@ -27,21 +27,32 @@ public interface IStat {
      * @param statName
      * @return
      */
+    @Deprecated
     boolean containsStat(String statName);
+    /**
+     * Whether this stat contains this otherSTat
+     * @param otherStat
+     * @return
+     */
+    default boolean containsStat(IStat otherStat) {
+        return containsStat(otherStat.getStatName());
+    }
 
     /**
-     * Gets the sum of all stats that meet the filter. A predicate that throws an {@link IllegalArgumentException} will default to {@code false}
+     * Gets the sum of all stats that meet the filter. A predicate that throws an {@link IllegalArgumentException} or {@link ClassCastException} will default to {@code false}
      * @param statContainer the statContainer to check
      * @param periodKey the periodKey of the stats
-     * @param filter the predicate to check each stat against. If it throws an {@link IllegalArgumentException}, that test is treated as false
+     * @param filter the predicate to check each stat against. If it throws an {@link IllegalArgumentException} or {@link ClassCastException}, that test is treated as false
      * @return the total value of the stats that meet the filter
      */
-    default Double getFilteredStat(StatContainer statContainer, String periodKey, Predicate<Map.Entry<String, Double>> filter) {
+    default Double getFilteredStat(StatContainer statContainer, String periodKey, Predicate<Map.Entry<IStat, Double>> filter) {
         return statContainer.getStats().getStatsOfPeriod(periodKey).entrySet().stream()
                 .filter((entry) -> {
                     try {
                         return filter.test(entry);
                     } catch (IllegalArgumentException ignored) {
+                        return false;
+                    } catch (ClassCastException ignored) {
                         return false;
                     }
                 })

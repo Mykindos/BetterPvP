@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -30,8 +30,8 @@ public class PointsCapturedAchievement extends SingleSimpleAchievement {
                 AchievementCategories.GAME_POINTS_CAPTURED,
                 AchievementType.GLOBAL,
                 (double) goal,
-                DOMGameStat.builder()
-                        .action(DOMGameStat.Action.CONTROL_POINT_CAPTURED)
+                GameTeamMapNativeStat.builder()
+                        .action(GameTeamMapNativeStat.Action.CONTROL_POINT_CAPTURED)
                         .build()
         );
     }
