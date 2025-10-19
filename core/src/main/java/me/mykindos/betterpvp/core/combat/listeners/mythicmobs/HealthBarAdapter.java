@@ -25,13 +25,9 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -155,15 +151,7 @@ public class HealthBarAdapter implements Listener {
             }
 
             final ModelBone bone = opt.get();
-            final Location location = bone.getLocation();
-            final TextDisplay display = location.getWorld().spawn(location, TextDisplay.class, ent -> {
-                ent.setPersistent(false);
-                ent.setBillboard(Display.Billboard.CENTER);
-                ent.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-            });
-
-            UtilEntity.setViewRangeBlocks(display, 10);
-            final HealthBar healthBar = new HealthBar(display, living, model, bone);
+            final HealthBar healthBar = new HealthBar(living, model, bone);
             healthBar.update();
             healthBars.put(entity, healthBar);
         }, 1L);
