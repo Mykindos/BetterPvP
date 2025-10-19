@@ -71,7 +71,7 @@ public class ReverseKnockbackAbility extends ItemAbility implements Listener {
 
             // Apply custom knockback settings
             event.setCanBypassMinimum(bypassMinimum);
-            event.setMultiplier(knockbackMultiplier);
+            event.setMultiplier(event.getMultiplier() * knockbackMultiplier);
         });
     }
 } 
