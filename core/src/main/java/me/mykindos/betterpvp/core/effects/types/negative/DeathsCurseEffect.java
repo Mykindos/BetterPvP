@@ -39,8 +39,8 @@ public class DeathsCurseEffect extends VanillaEffectType {
 
     @Override
     public void onTick(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(PotionEffectType.DARKNESS,
-                20,
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(PotionEffectType.SLOW_FALLING,
+                30,
                 0,
                 false,
                 false));
