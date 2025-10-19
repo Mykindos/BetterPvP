@@ -11,24 +11,46 @@ import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.core.skills.SkillMetadataImpl;
 import io.lumine.mythic.core.skills.SkillTriggers;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
+import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.listeners.DamageEventProcessor;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @PluginAdapter("MythicMobs")
+@BPvPListener
 @Singleton
-public class MythicMobsAdapter implements CustomDamageAdapter {
+public class MythicMobsAdapter implements CustomDamageAdapter, Listener {
 
     @Inject
     private MythicMobsAdapter(DamageEventProcessor damageEventProcessor) {
         damageEventProcessor.registerCustomDamageAdapter(this);
+    }
+
+    @EventHandler
+    void onDamageKnockback(CustomKnockbackEvent event) {
+        var mobManager = MythicBukkit.inst().getMobManager();
+
+        final Optional<ActiveMob> mobOptional = mobManager.getActiveMob(event.getDamagee().getUniqueId());
+        if (mobOptional.isEmpty()) {
+            return;
+        }
+
+        // Clamp the resistance between 0 and 1
+        final ActiveMob mob = mobOptional.get();
+        final double knockbackResistance = Math.max(0, Math.min(1, mob.getType().getKnockbackResistance(mob)));
+        final double multiplier = 1 - knockbackResistance;
+        event.setMultiplier(multiplier);
     }
 
     @Override

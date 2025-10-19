@@ -115,10 +115,10 @@ public class DamageEventFinalizer implements Listener {
             trajectory.multiply(0.37 * knockback / trajectory.length());
             trajectory.setY(0.06);
         }
-        
-        double strength = 0.2D + trajectory.length() * 0.9D;
+
         trajectory.multiply(event.getMultiplier());
-        
+        double strength = 0.2D + trajectory.length() * 0.9D;
+
         VelocityData velocityData = new VelocityData(trajectory, strength, false, 0.0D, 
                 Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
         UtilVelocity.velocity(event.getDamagee(), event.getDamager(), velocityData, VelocityType.KNOCKBACK);

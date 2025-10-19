@@ -12,7 +12,9 @@ import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
@@ -156,8 +158,11 @@ public class DeathListener implements Listener {
         message = Component.text("").applyFallbackStyle(NamedTextColor.GRAY).append(message).append(Component.text("."));
         Component hoverComponent = Component.text("Damage Breakdown", NamedTextColor.GOLD).appendNewline();
         for (var breakdown : damageLogManager.getDamageBreakdown(event.getKilled())) {
+            final String round = breakdown.getValue() == Double.POSITIVE_INFINITY
+                    ? "∞"
+                    : String.format("%.1f", breakdown.getValue());
             hoverComponent = hoverComponent.append(Component.text(breakdown.getKey() + ": ", NamedTextColor.YELLOW)
-                    .append(Component.text(UtilMath.round(breakdown.getValue(), 1), NamedTextColor.GREEN))).appendNewline();
+                    .append(Component.text(round, NamedTextColor.GREEN))).appendNewline();
         }
 
         UtilMessage.simpleMessage(event.getReceiver(), "Death", message, hoverComponent);

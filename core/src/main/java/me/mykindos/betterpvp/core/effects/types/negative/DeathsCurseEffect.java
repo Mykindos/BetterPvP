@@ -1,19 +1,23 @@
 package me.mykindos.betterpvp.core.effects.types.negative;
 
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.cause.EnvironmentalDamageCause;
-import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class DeathsCurseEffect extends VanillaEffectType {
@@ -35,7 +39,11 @@ public class DeathsCurseEffect extends VanillaEffectType {
 
     @Override
     public void onTick(LivingEntity livingEntity, Effect effect) {
-        final Location location = livingEntity.getLocation();
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(PotionEffectType.DARKNESS,
+                20,
+                0,
+                false,
+                false));
         Particle.SOUL.builder()
                 .location(livingEntity.getLocation().add(0, livingEntity.getHeight() / 2, 0))
                 .count(1)
@@ -61,7 +69,7 @@ public class DeathsCurseEffect extends VanillaEffectType {
         );
 
         if (currentTick % heartbeatInterval == 0) {
-            new SoundEffect("littleroom_wendigo", "littleroom.wendigo.heart_beat", 1.4f, 1).play(livingEntity);
+            new SoundEffect(Sound.ENTITY_WARDEN_HEARTBEAT, 1.4f, 1).play(livingEntity);
         }
     }
 
@@ -74,6 +82,7 @@ public class DeathsCurseEffect extends VanillaEffectType {
             final LivingEntity entity = effect.getApplier().get();
             livingEntity.setKiller(entity instanceof Player player ? player : null);
 
+
             // Damage them
             final EnvironmentalDamageCause cause = new EnvironmentalDamageCause("deaths_curse",
                     "Death's Curse",
@@ -82,16 +91,15 @@ public class DeathsCurseEffect extends VanillaEffectType {
                     0L,
                     false);
 
-            UtilDamage.doDamage(new DamageEvent(
-                    livingEntity,
-                    entity,
-                    null,
-                    cause,
-                    Double.MAX_VALUE,
-                    "Death's Curse"
+            final Core plugin = JavaPlugin.getPlugin(Core.class);
+            final DamageLogManager logManager = plugin.getInjector().getInstance(DamageLogManager.class);
+            logManager.add(livingEntity, new DamageLog(
+                    entity, cause, Double.POSITIVE_INFINITY, new String[] { "Death's Curse" }
             ));
 
-            livingEntity.setHealth(0);
+            UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+                livingEntity.setHealth(0);
+            }, 1L);
         } else {
             if (notify) {
                 UtilMessage.message(livingEntity, "Death's Curse", "You are no longer cursed to death.");
