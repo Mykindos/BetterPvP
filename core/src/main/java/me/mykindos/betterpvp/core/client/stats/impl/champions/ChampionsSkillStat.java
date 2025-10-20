@@ -145,7 +145,7 @@ public class ChampionsSkillStat implements IBuildableStat {
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         ChampionsSkillStat other = fromString(statName);
         this.action = other.action;
         this.skillName = other.skillName;

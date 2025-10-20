@@ -32,7 +32,8 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
      * @param value
      * @param silent
      */
-    public void put(String period, IStat stat, Double value, boolean silent) {
+    public void put(String period, @NotNull IStat stat, Double value, boolean silent) {
+        log.info("Stat {} Value {}", stat, value).submit();
         AtomicReference<Double> oldValue = new AtomicReference<>();
         myMap.compute(period, (k, v) -> {
             if (v == null) {
