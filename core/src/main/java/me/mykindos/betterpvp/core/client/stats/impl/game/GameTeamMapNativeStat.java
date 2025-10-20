@@ -164,7 +164,7 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
     }
 
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         GameTeamMapNativeStat other = fromString(statName);
         this.action = other.action;
         this.gameName = other.gameName;

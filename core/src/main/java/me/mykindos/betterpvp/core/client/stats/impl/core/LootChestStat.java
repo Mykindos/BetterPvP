@@ -62,7 +62,7 @@ public class LootChestStat implements IBuildableStat {
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         LootChestStat other = fromString(statName);
         this.source = other.source;
         this.item = other.item;

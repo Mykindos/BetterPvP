@@ -96,7 +96,7 @@ public class FieldsInteractableStat implements IBuildableStat {
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         FieldsInteractableStat other = fromString(statName);
         this.name = other.name;
         return this;
