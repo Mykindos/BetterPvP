@@ -1,60 +1,60 @@
-package me.mykindos.betterpvp.core.client.stats.impl.events;
+package me.mykindos.betterpvp.core.client.stats.impl.dungeons;
 
 import com.google.common.base.Preconditions;
 import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-
-@Builder
+@SuperBuilder
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class BossStat implements IBuildableStat {
-    public static final String PREFIX = "EVENT_BOSS";
+public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
+    public static final String PREFIX = "DUNGEON_NATIVE";
 
-    private static StringBuilderParser<BossStatBuilder> parser = new StringBuilderParser<>(
+    private static StringBuilderParser<DungeonNativeStatBuilder<?, ?>> parser = new StringBuilderParser<>(
+            "#",
+            "##",
             List.of(
-                    BossStat::parsePrefix,
-                    BossStat::parseAction,
-                    BossStat::parseName
+                    DungeonNativeStat::parsePrefix,
+                    DungeonNativeStat::parseName
+            ),
+            List.of(
+                    DungeonNativeStat::parseAction
             )
     );
 
-    public static BossStat fromString(String string) {
-        return parser.parse(BossStat.builder(), string).build();
+    public static DungeonNativeStat fromString(String string) {
+        return parser.parse(DungeonNativeStat.builder(), string).build();
     }
 
-    private static BossStatBuilder parsePrefix(BossStatBuilder builder, String input) {
+    private static DungeonNativeStatBuilder<?, ?> parsePrefix(DungeonNativeStatBuilder<?, ?> builder, String input) {
         Preconditions.checkArgument(input.equals(PREFIX));
         return builder;
     }
 
-    private static BossStatBuilder parseAction(BossStatBuilder builder, String input) {
-        return builder.action(Action.valueOf(input));
+    private static DungeonNativeStatBuilder<?, ?> parseName(DungeonNativeStatBuilder<?, ?> builder, String input) {
+        return builder.dungeonName(input);
     }
 
-    private static BossStatBuilder parseName(BossStatBuilder builder, String input) {
-        return builder.bossName(input);
+    private static DungeonNativeStatBuilder<?, ?> parseAction(DungeonNativeStatBuilder<?, ?> builder, String input) {
+        return builder.action(Action.valueOf(input));
     }
 
     @NotNull
     private Action action;
-
-    @Nullable
-    private String bossName;
 
     /**
      * Copies the stat represented by this statName into this object
@@ -65,9 +65,9 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        BossStat other = fromString(statName);
+        DungeonNativeStat other = fromString(statName);
         this.action = other.action;
-        this.bossName = other.bossName;
+        this.dungeonName = other.dungeonName;
         return this;
     }
 
@@ -76,12 +76,9 @@ public class BossStat implements IBuildableStat {
         return PREFIX;
     }
 
-    private Double getActionStat(StatContainer statContainer, String period) {
-        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
-                .filter(entry ->
-                        entry.getKey().getStatName().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action)
-                ).mapToDouble(Map.Entry::getValue)
-                .sum();
+    private boolean filterActionStat(Map.Entry<IStat, Double> entry) {
+        final DungeonNativeStat stat = (DungeonNativeStat) entry.getKey();
+        return action.equals(stat.action);
     }
 
     /**
@@ -93,8 +90,8 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public Double getStat(StatContainer statContainer, String periodKey) {
-        if (Strings.isNullOrEmpty(bossName)) {
-            return getActionStat(statContainer, periodKey);
+        if (Strings.isNullOrEmpty(dungeonName)) {
+            return this.getFilteredStat(statContainer, periodKey, this::filterActionStat);
         }
         return statContainer.getProperty(periodKey, this);
     }
@@ -104,8 +101,10 @@ public class BossStat implements IBuildableStat {
         return parser.asString(
                 List.of(
                         PREFIX,
-                        action.name(),
-                        bossName
+                        dungeonName
+                ),
+                List.of(
+                        action.name()
                 )
         );
     }
@@ -117,7 +116,7 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public boolean isSavable() {
-        return !Strings.isNullOrEmpty(bossName);
+        return !Strings.isNullOrEmpty(dungeonName);
     }
 
     /**
@@ -132,6 +131,9 @@ public class BossStat implements IBuildableStat {
     }
 
     public enum Action {
-        KILL,
+        ENTER,
+        WIN,
+        LOSS,
+        BOSS_KILL,
     }
 }

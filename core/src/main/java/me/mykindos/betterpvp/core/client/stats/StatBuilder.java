@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
@@ -33,7 +34,7 @@ public class StatBuilder {
                 .collect(Collectors.toSet());
     }
 
-    public IStat getStatForStatName(String statName) {
+    public IStat getStatForStatName(@NotNull String statName) {
         for (Class<? extends IBuildableStat> buildableStat : builderStats) {
             try {
                 return buildableStat.getConstructor().newInstance().copyFromStatname(statName);
