@@ -69,7 +69,6 @@ public class StatContainer implements Unique, IStatMapListener {
         }
         Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");
         synchronized (this) {
-
             final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(id, stat));
             final IStat wrappedStat = wrapStatEvent.getStat();
             changedStats.add(wrappedStat);
