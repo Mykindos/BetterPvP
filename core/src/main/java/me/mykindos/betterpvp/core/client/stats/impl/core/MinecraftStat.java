@@ -228,7 +228,7 @@ public class MinecraftStat implements IBuildableStat {
     }
 
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         MinecraftStat other = fromString(statName);
         this.statistic = other.getStatistic();
         this.material = other.getMaterial();

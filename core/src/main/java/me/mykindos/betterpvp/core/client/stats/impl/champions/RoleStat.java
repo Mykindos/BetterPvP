@@ -103,7 +103,7 @@ public class RoleStat implements IBuildableStat {
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         final RoleStat other = fromString(statName);
         this.action = other.action;
         this.role = other.role;
