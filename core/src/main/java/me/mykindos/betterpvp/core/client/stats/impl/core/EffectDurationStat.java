@@ -107,7 +107,7 @@ public class EffectDurationStat implements IBuildableStat {
     } //todo how should composites work for this type?
 
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         EffectDurationStat other = fromString(statName);
         relation = other.getRelation();
         effectType = other.getEffectType();

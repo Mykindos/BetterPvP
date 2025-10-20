@@ -286,7 +286,12 @@ public class ClientSQLLayer {
                     final String statName = results.getString("Statname");
                     final IStat stat = statBuilder.getStatForStatName(statName);
                     final double value = results.getDouble("Stat");
-                    tempMap.put(period, stat, value, true);
+                    try {
+                        tempMap.put(period, stat, value, true);
+                    } catch (Exception e) {
+                        log.error("Error saving stat {} ({}), period {}, value {}", stat, statName, period, value, e).submit();
+                    }
+
                 }
 
             } catch (SQLException e) {
