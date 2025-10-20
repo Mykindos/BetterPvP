@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonStat;
+import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -23,8 +23,8 @@ public class BraewoodCavernsAchievement extends SingleSimpleAchievement {
                 AchievementCategories.DUNGEONS,
                 AchievementType.GLOBAL,
                 1d,
-                DungeonStat.builder()
-                        .action(DungeonStat.Action.WIN)
+                DungeonNativeStat.builder()
+                        .action(DungeonNativeStat.Action.WIN)
                         .dungeonName("Braewood Caverns")
                         .build()
         );
