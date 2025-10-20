@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.listeners.mythicmobs;
 
+import com.ticxo.modelengine.api.entity.BukkitEntity;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.bone.ModelBone;
 import lombok.Getter;
@@ -22,23 +23,21 @@ import java.util.Objects;
 public class HealthBar {
 
     private final TextDisplay display;
-    private final LivingEntity entity;
     private final ActiveModel model;
     private final ModelBone bone;
     private final Vector delta;
 
     private float lastPercentage = 100;
 
-    public HealthBar(LivingEntity entity, ActiveModel model, ModelBone bone) {
-        this.entity = entity;
+    public HealthBar(ActiveModel model, ModelBone bone) {
         this.model = model;
         this.bone = bone;
 
-        final Location entityLocation = entity.getLocation();
+        final Location entityLocation = getEntity().getLocation();
         final Location boneLocation = bone.getLocation();
         this.delta = boneLocation.toVector().subtract(entityLocation.toVector());
 
-        this.display = entity.getWorld().spawn(boneLocation, TextDisplay.class, ent -> {
+        this.display = getEntity().getWorld().spawn(boneLocation, TextDisplay.class, ent -> {
             ent.setPersistent(false);
             ent.setBillboard(Display.Billboard.CENTER);
             ent.setTeleportDuration(1);
@@ -48,8 +47,17 @@ public class HealthBar {
         UtilEntity.setViewRangeBlocks(display, 10);
     }
 
+    private LivingEntity getEntity() {
+        return (LivingEntity) ((BukkitEntity) this.model.getModeledEntity().getBase()).getOriginal();
+    }
+
     public void update() {
-        if (bone.getActiveModel().isRemoved() || !entity.getChunk().isEntitiesLoaded()) {
+        final LivingEntity entity = this.getEntity();
+        if (entity == null || !entity.getWorld().isPositionLoaded(entity.getLocation())) {
+            return;
+        }
+
+        if (bone.getActiveModel().isRemoved()) {
             return; // Stop if model is removed or chunk is not loaded
         }
 
@@ -71,6 +79,7 @@ public class HealthBar {
     }
 
     public boolean isValid() {
+        final LivingEntity entity = this.getEntity();
         return display != null && display.isValid() && entity != null && entity.isValid();
     }
 

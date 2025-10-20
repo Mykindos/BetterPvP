@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
-import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -17,7 +16,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class DeathsCurseEffect extends VanillaEffectType {
@@ -39,11 +37,6 @@ public class DeathsCurseEffect extends VanillaEffectType {
 
     @Override
     public void onTick(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(PotionEffectType.SLOW_FALLING,
-                30,
-                0,
-                false,
-                false));
         Particle.SOUL.builder()
                 .location(livingEntity.getLocation().add(0, livingEntity.getHeight() / 2, 0))
                 .count(1)

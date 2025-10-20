@@ -151,7 +151,7 @@ public class HealthBarAdapter implements Listener {
             }
 
             final ModelBone bone = opt.get();
-            final HealthBar healthBar = new HealthBar(living, model, bone);
+            final HealthBar healthBar = new HealthBar(model, bone);
             healthBar.update();
             healthBars.put(entity, healthBar);
         }, 1L);
