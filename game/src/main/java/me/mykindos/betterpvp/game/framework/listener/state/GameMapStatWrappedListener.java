@@ -24,8 +24,8 @@ public class GameMapStatWrappedListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onStatUpdate(WrapStatEvent event) {
-        log.info("Wrap stat start {}", event.getStat()).submit();
         if (event.getStat() instanceof GameTeamMapStat) return;
+        if (!event.getStat().wrappingAllowed()) return;
         //already wrap time played and split it into spectate time
         //todo check this
         if (ClientStat.TIME_PLAYED.equals(event.getStat())) return;
@@ -33,6 +33,5 @@ public class GameMapStatWrappedListener implements Listener {
                 .wrappedStat(event.getStat());
         final GameTeamMapWrapperStat wrappedStat = (GameTeamMapWrapperStat) statManager.addGameMapStatElements(event.getId(), builder).build();
         event.setStat(wrappedStat);
-        log.info("Wrap stat end {}", event.getStat()).submit();
     }
 }

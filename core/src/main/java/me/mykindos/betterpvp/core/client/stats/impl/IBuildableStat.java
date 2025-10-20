@@ -11,6 +11,7 @@ public interface IBuildableStat extends IStat {
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
+    @NotNull
     @Contract(value = "_ -> this", mutates = "this")
     IBuildableStat copyFromStatname(@NotNull String statName);
     String getPrefix();
