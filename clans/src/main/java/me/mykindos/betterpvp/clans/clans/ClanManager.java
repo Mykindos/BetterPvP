@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.clans.ClansStat;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -1033,6 +1034,18 @@ public class ClanManager extends Manager<Long, Clan> {
     public ClanLeaderboard getLeaderboard() {
         Optional<Leaderboard<?, ?>> clans = leaderboardManager.getObject("Clans");
         return (ClanLeaderboard) clans.orElse(null);
+    }
+
+    public ClansStat.ClansStatBuilder<?, ?> addClanInfo(UUID id, ClansStat.ClansStatBuilder<?, ?> builder) {
+        this.getClanByPlayer(id).ifPresentOrElse((clan) -> {
+            builder.clanName(clan.getName());
+            builder.clanId(clan.getId());
+        },
+                () -> {
+            builder.clanName(ClansStat.NO_CLAN_NAME);
+            builder.clanId(null);
+                });
+        return builder;
     }
 
 }

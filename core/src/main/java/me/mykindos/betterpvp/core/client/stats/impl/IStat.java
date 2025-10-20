@@ -8,12 +8,16 @@ import java.util.function.Predicate;
 public interface IStat {
     /**
      * Get the stat represented by this object from the statContainer
-     * @param statContainer
-     * @param periodKey
-     * @return
+     * @param statContainer the statContainer to source the value from
+     * @param periodKey the period to fetch from
+     * @return the stat value represented by this stat
      */
     Double getStat(StatContainer statContainer, String periodKey);
 
+    /**
+     * Get the name that is stored in the DB
+     * @return
+     */
     String getStatName();
 
     /**
@@ -50,14 +54,20 @@ public interface IStat {
                 .filter((entry) -> {
                     try {
                         return filter.test(entry);
-                    } catch (IllegalArgumentException ignored) {
-                        return false;
-                    } catch (ClassCastException ignored) {
+                    } catch (IllegalArgumentException | ClassCastException ignored) {
                         return false;
                     }
                 })
                 .mapToDouble(Map.Entry::getValue)
                 .sum();
+    }
+
+    /**
+     * Whether this stat can be wrapped by an {@link IWrapperStat}
+     * @return {@code true} if it can be wrapped, else {@code false}
+     */
+    default boolean wrappingAllowed() {
+        return true;
     }
 
 

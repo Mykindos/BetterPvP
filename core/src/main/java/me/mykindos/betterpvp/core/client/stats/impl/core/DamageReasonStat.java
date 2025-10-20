@@ -114,7 +114,7 @@ public class DamageReasonStat implements IBuildableStat {
     }
 
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         DamageReasonStat other = fromString(statName);
         this.relation = other.relation;
         this.damageCause = other.damageCause;

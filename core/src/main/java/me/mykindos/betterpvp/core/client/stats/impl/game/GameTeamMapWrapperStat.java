@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +13,7 @@ import me.mykindos.betterpvp.core.client.stats.StatBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -30,20 +30,22 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class GameTeamMapWrapperStat extends GameTeamMapStat {
+public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperStat {
 
     public static final String PREFIX = "GAME_WRAPPER";
 
-    private static StatBuilder statBuilder = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(StatBuilder.class);
+    private static final StatBuilder statBuilder = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(StatBuilder.class);
 
-    private static StringBuilderParser<GameTeamMapWrapperStatBuilder<?, ?>> parser = new StringBuilderParser<>(
+    private static final StringBuilderParser<GameTeamMapWrapperStatBuilder<?, ?>> parser = new StringBuilderParser<>(
             "#",
             "##",
             List.of(
                     GameTeamMapWrapperStat::parsePrefix,
                     GameTeamMapWrapperStat::parseGameName,
                     GameTeamMapWrapperStat::parseTeamName,
-                    GameTeamMapWrapperStat::parseMapName,
+                    GameTeamMapWrapperStat::parseMapName
+            ),
+            List.of(
                     GameTeamMapWrapperStat::parseWrappedStat
             )
     );
@@ -59,10 +61,6 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat {
     }
 
     @NotNull
-    @Builder.Default
-    private String gameName = "";
-
-    @NotNull
     private IStat wrappedStat;
 
     private static GameTeamMapWrapperStatBuilder<?, ?> parsePrefix(GameTeamMapWrapperStatBuilder<?, ?> builder, String input) {
@@ -71,7 +69,7 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat {
     }
     private static GameTeamMapWrapperStatBuilder<?, ?> parseWrappedStat(GameTeamMapWrapperStatBuilder<?, ?> builder, String input) {
         final IStat wrappedStat = statBuilder.getStatForStatName(input);
-        if (wrappedStat instanceof GameTeamMapStat) throw new IllegalArgumentException("Wrapped stat cannot also be a TeamMapStat");
+        if (wrappedStat instanceof GameTeamMapStat) throw new IllegalArgumentException("Wrapped stat cannot also be a GameTeamMapStat");
         return builder.wrappedStat(wrappedStat);
     }
 
@@ -107,9 +105,14 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat {
         return teamName.equals(stat.teamName) && wrappedStat.containsStat(stat);
     }
 
-    private boolean filterActionOnlyStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterWrapperOnlyStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
         return wrappedStat.containsStat(stat);
+    }
+
+    private boolean filterAllStat(Map.Entry<IStat, Double> entry) {
+        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
+        return gameName.equals(stat.gameName) && mapName.equals(stat.mapName) && teamName.equals(stat.teamName) && wrappedStat.containsStat(stat);
     }
 
     public boolean wrappedStatContainsOther(IStat other) {
@@ -152,10 +155,11 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat {
 
         if (Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
             //have action
-            return getFilteredStat(statContainer, periodKey, this::filterActionOnlyStat);
+            return getFilteredStat(statContainer, periodKey, this::filterWrapperOnlyStat);
         }
         //all fields are filled, action, game, team, map
-        return statContainer.getProperty(periodKey, this);
+        //we still need to filter, because the sub stats could be generic
+        return getFilteredStat(statContainer, periodKey, this::filterAllStat);
     }
 
     @Override
@@ -163,10 +167,12 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat {
         return parser.asString(
                 List.of(
                         PREFIX,
-                        wrappedStat.getStatName(),
                         gameName,
                         teamName,
                         mapName
+                ),
+                List.of(
+                        wrappedStat.getStatName()
                 )
         );
     }
@@ -178,7 +184,10 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat {
      */
     @Override
     public boolean isSavable() {
-        return true;
+        return !Strings.isNullOrEmpty(gameName) &&
+                !Strings.isNullOrEmpty(teamName) &&
+                !Strings.isNullOrEmpty(mapName) &&
+                wrappedStat.isSavable();
     }
 
     /**
@@ -215,7 +224,7 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat {
     }
 
     @Override
-    public IBuildableStat copyFromStatname(@NotNull String statName) {
+    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
         final GameTeamMapWrapperStat other = fromString(statName);
         this.gameName = other.gameName;
         this.teamName = other.teamName;
