@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.client.stats.display.championsgame.domination;
 
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.DominationStatButton;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.domination.team.DominationTeamMapStatMenu;
@@ -14,8 +13,12 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class DominationRedTeamStatButton extends DominationStatButton {
+public class DominationTeamStatButton extends DominationStatButton {
+    private final String teamName;
 
+    public DominationTeamStatButton(String teamName) {
+        this.teamName = teamName;
+    }
 
     /**
      * Gets the {@link ItemProvider}.
@@ -26,13 +29,16 @@ public class DominationRedTeamStatButton extends DominationStatButton {
      */
     @Override
     public ItemProvider getItemProvider(IAbstractStatMenu gui) {
-        final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String period = gui.getPeriodKey();
+        Material material = switch (teamName) {
+            case "Red" -> Material.RED_WOOL;
+            case "Blue" -> Material.BLUE_WOOL;
+            case null, default -> Material.WHITE_WOOL;
+        };
 
         return ItemView.builder()
-                .material(Material.RED_WOOL)
-                .displayName(Component.text("Red Team Stats"))
-                .lore(getStatsDescription(statContainer, period, "Red", ""))
+                .material(material)
+                .displayName(Component.text(teamName + " Team Stats"))
+                .lore(getDominationStatsDescription(teamName, ""))
                 .frameLore(true)
                 .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .build();
@@ -49,6 +55,6 @@ public class DominationRedTeamStatButton extends DominationStatButton {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final IAbstractStatMenu gui = getGui();
-        new DominationTeamMapStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager(), "Red").show(player);
+        new DominationTeamMapStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager(), teamName).show(player);
     }
 }

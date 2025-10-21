@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.client.stats.display.championsgame.domination.map;
 
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.DominationStatButton;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -28,13 +27,11 @@ public class DominationMapInfoStatButton extends DominationStatButton {
      */
     @Override
     public ItemProvider getItemProvider(IAbstractStatMenu gui) {
-        final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String period = gui.getPeriodKey();
 
         return ItemView.builder()
                 .material(Material.FILLED_MAP)
                 .displayName(Component.text(mapName + " Stats"))
-                .lore(getStatsDescription(statContainer, period, "", mapName))
+                .lore(getDominationStatsDescription("", mapName))
                 .frameLore(true)
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .build();
