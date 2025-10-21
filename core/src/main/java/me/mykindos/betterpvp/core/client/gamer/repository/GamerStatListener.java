@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -16,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @BPvPListener
+@Singleton
 public class GamerStatListener implements Listener {
 
     private final ClientManager clientManager;
