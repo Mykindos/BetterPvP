@@ -49,6 +49,7 @@ public enum ClientStat implements IClientStat {
     CLONE_ATTACK("Clone Attacks", "Number of times your Clone successfully attacks"),
 
     //clans
+    //todo refactor achievements to use correct wrapper
     CLANS_SET_CORE("Set Core", "Number of times you set your clan core"),
     CLANS_TELEPORT_CORE("Teleport to Core", "Number of times you teleported to your clan core"),
 
@@ -87,7 +88,7 @@ public enum ClientStat implements IClientStat {
     EVENT_UNDEAD_CITY_OPEN_CHEST("Open Chest", "Amount of chests you opened");
 
     //dungeons
-    //todo dungeons entered, dungeons won, dungeons lost, dungeon deaths, dungeon mob kills
+    //todo dungeon mob kills
     private final String name;
     private final String[] description;
     @Nullable
