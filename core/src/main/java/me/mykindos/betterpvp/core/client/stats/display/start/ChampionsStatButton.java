@@ -85,6 +85,9 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
                                 .entityType(EntityType.PLAYER)
                                 .build()
                 )
+                .gameName(gameName)
+                .teamName(teamName)
+                .mapName(mapName)
                 .build();
 
         final GameTeamMapWrapperStat deathsStat = GameTeamMapWrapperStat.builder()
@@ -93,6 +96,9 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
                                 .statistic(Statistic.DEATHS)
                                 .build()
                 )
+                .gameName(gameName)
+                .teamName(teamName)
+                .mapName(mapName)
                 .build();
 
 
