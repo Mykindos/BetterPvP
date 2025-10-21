@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
@@ -12,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @BPvPListener
+@Singleton
 @CustomLog
 public class GamerStatListener implements Listener {
 
