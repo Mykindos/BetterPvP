@@ -26,11 +26,11 @@ public class StatManager {
     }
 
     public GameTeamMapStat.GameTeamMapStatBuilder<?, ?> addGameMapStatElements(UUID id, GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder) {
-        final String gameName = serverController.getCurrentState().isInLobby() ? "Lobby" : serverController.getCurrentGame().getConfiguration().getName();
+        final String gameName = serverController.getCurrentState().isInLobby() ? GameTeamMapStat.LOBBY_GAME_NAME : serverController.getCurrentGame().getConfiguration().getName();
         statBuilder.gameName(gameName);
         if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame && !serverController.getCurrentState().isInLobby()) {
             final Team team = teamGame.getPlayerTeam(id);
-            final String teamName = team == null ? "SPECTATOR" : team.getProperties().name();
+            final String teamName = team == null ? GameTeamMapStat.SPECTATOR_TEAM_NAME : team.getProperties().name();
             statBuilder.teamName(teamName);
         } else {
             statBuilder.teamName(GameTeamMapStat.NONE_TEAM_NAME);
