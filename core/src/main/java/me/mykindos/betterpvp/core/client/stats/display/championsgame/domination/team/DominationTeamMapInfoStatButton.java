@@ -36,7 +36,7 @@ public class DominationTeamMapInfoStatButton extends DominationStatButton {
         return ItemView.builder()
                 .material(teamName.equals("Blue") ? Material.BLUE_CARPET : Material.RED_CARPET)
                 .displayName(Component.text(mapName + " Stats"))
-                .lore(getStatsDescription(statContainer, period, teamName, mapName))
+                .lore(getDominationStatsDescription(teamName, mapName))
                 .frameLore(true)
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .build();

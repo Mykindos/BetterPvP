@@ -69,19 +69,29 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         return builder.teamName(input);
     }
 
-    private boolean filterActionOnlyStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterGameFullStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
-        return action == stat.action;
+        return gameName.equals(stat.gameName) && action.equals(stat.action);
     }
 
-    private boolean filterMapOnlyStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterGameTeamStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
-        return action == stat.action && mapName.equals(stat.mapName);
+        return action.equals(stat.action) && gameName.equals(stat.gameName) && teamName.equals(stat.teamName);
+    }
+
+    private boolean filterGameMapStat(Map.Entry<IStat, Double> entry) {
+        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        return action.equals(stat.action) && gameName.equals(stat.gameName) && mapName.equals(stat.mapName);
     }
 
     private boolean filterTeamOnlyStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
-        return action == stat.action && teamName.equals(stat.teamName);
+        return teamName.equals(stat.teamName) && action.equals(stat.action);
+    }
+
+    private boolean filterActionOnlyStat(Map.Entry<IStat, Double> entry) {
+        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        return action.equals(stat.action);
     }
 
     /**
@@ -93,16 +103,39 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
      */
     @Override
     public Double getStat(StatContainer statContainer, String periodKey) {
-        if (Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
-            return getFilteredStat(statContainer, periodKey, this::filterActionOnlyStat);
-        }
-        if (Strings.isNullOrEmpty(teamName)) {
-            return getFilteredStat(statContainer, periodKey, this::filterMapOnlyStat);
+        if (!Strings.isNullOrEmpty(gameName)) {
+            //have a game name
+            if (Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
+                log.info("only game name").submit();
+                //only game name
+                return getFilteredStat(statContainer, periodKey, this::filterGameFullStat);
+            }
+            if (Strings.isNullOrEmpty(mapName)) {
+                log.info("no map name").submit();
+                //no map name
+                return getFilteredStat(statContainer, periodKey, this::filterGameTeamStat);
+            }
+            if (Strings.isNullOrEmpty(teamName)) {
+                log.info("no team name").submit();
+                //no team name
+                return getFilteredStat(statContainer, periodKey, this::filterGameMapStat);
+            }
         }
 
-        if (Strings.isNullOrEmpty(mapName)) {
+        if (!Strings.isNullOrEmpty(teamName) && Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName)) {
+            log.info("map or game").submit();
+            //no map or game but team
             return getFilteredStat(statContainer, periodKey, this::filterTeamOnlyStat);
         }
+
+        //no map only stat because maps are tied to games
+
+        if (Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
+            //have action
+            log.info("only action").submit();
+            return getFilteredStat(statContainer, periodKey, this::filterActionOnlyStat);
+        }
+        //all are specified, do stat "normally"
         return statContainer.getProperty(periodKey, this);
     }
 

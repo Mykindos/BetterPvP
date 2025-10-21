@@ -55,7 +55,6 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
      * @throws IllegalArgumentException if this string does not represent this Stat
      */
     public static ClanWrapperStat fromString(String string) {
-        log.info(string).submit();
         return parser.parse(ClanWrapperStat.builder(), string).build();
     }
 
@@ -177,6 +176,6 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
     public boolean containsStat(IStat otherStat) {
         if (!(otherStat instanceof ClanWrapperStat other)) return false;
         if (!Strings.isNullOrEmpty(clanName) && !clanName.equals(other.clanName)) return false;
-        return wrappedStat.containsStat(otherStat);
+        return wrappedStat.containsStat(other.wrappedStat);
     }
 }

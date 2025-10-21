@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public abstract class GameTeamMapStat implements IBuildableStat {
     public static final String NONE_TEAM_NAME = "NONE";
+    public static final String SPECTATOR_TEAM_NAME = "SPECTATOR";
+    public static final String LOBBY_GAME_NAME = "Lobby";
     @NotNull
     @Builder.Default
     protected String gameName = "";

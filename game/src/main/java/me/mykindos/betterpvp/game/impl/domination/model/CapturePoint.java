@@ -133,6 +133,15 @@ public class CapturePoint implements Lifecycled {
         if (owningTeam == null) {
             // Neutral capture: progress increases from 0.0 to 1.0.
             captureProgress += progressPerTick;
+            //this stat must be incremented both if captured or are capturing, otherwise it loses 1 tick of progress
+            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> timeBuilder =  GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.CONTROL_POINT_TIME_CAPTURING);
+            playersOnPoint.keySet().stream()
+                    .map(Player::getUniqueId)
+                    .forEach(id -> {
+                        statManager.incrementGameMapStat(id, timeBuilder, 50);
+                    });
+
             if (captureProgress >= 1.0) {
                 captureProgress = 1.0;
                 state = State.CAPTURED;
@@ -151,14 +160,6 @@ public class CapturePoint implements Lifecycled {
                 return;
             }
             state = State.CAPTURING;
-            final GameTeamMapNativeStat.GameTeamMapNativeStatBuilder<?, ?> builder =  GameTeamMapNativeStat.builder()
-                    .action(GameTeamMapNativeStat.Action.CONTROL_POINT_TIME_CAPTURING);
-
-            playersOnPoint.keySet().stream()
-                    .map(Player::getUniqueId)
-                    .forEach(id -> {
-                        statManager.incrementGameMapStat(id, builder, 50);
-                    });
         } else {
             // Contested capture: point is already captured.
             if (activeTeam.equals(owningTeam)) {

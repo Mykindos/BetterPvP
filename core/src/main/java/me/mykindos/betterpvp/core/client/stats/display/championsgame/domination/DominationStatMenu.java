@@ -16,8 +16,8 @@ public class DominationStatMenu extends AbstractStatMenu {
      */
     public DominationStatMenu(Client client, Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
         super(client, previous, periodKey, statPeriodManager);
-        setItem(2,2, new DominationBlueTeamStatButton());
-        setItem(4, 2, new DominationRedTeamStatButton());
+        setItem(2,2, new DominationTeamStatButton("Blue"));
+        setItem(4, 2, new DominationTeamStatButton("Red"));
         setItem(6,2, new DominationMapStatButton());
     }
 }
