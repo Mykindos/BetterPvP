@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
+@CustomLog
 public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperStat {
 
     public static final String PREFIX = "GAME_WRAPPER";
@@ -87,7 +89,7 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
 
     private boolean filterGameFullStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
-        return gameName.equals(stat.gameName) && wrappedStat.containsStat(stat);
+        return gameName.equals(stat.gameName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterGameTeamStat(Map.Entry<IStat, Double> entry) {
@@ -97,22 +99,22 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
 
     private boolean filterGameMapStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
-        return wrappedStat.containsStat(stat) && gameName.equals(stat.gameName) && mapName.equals(stat.mapName);
+        return wrappedStat.containsStat(stat.wrappedStat) && gameName.equals(stat.gameName) && mapName.equals(stat.mapName);
     }
 
     private boolean filterTeamOnlyStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
-        return teamName.equals(stat.teamName) && wrappedStat.containsStat(stat);
+        return teamName.equals(stat.teamName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterWrapperOnlyStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
-        return wrappedStat.containsStat(stat);
+        return wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterAllStat(Map.Entry<IStat, Double> entry) {
         final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
-        return gameName.equals(stat.gameName) && mapName.equals(stat.mapName) && teamName.equals(stat.teamName) && wrappedStat.containsStat(stat);
+        return gameName.equals(stat.gameName) && mapName.equals(stat.mapName) && teamName.equals(stat.teamName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
     public boolean wrappedStatContainsOther(IStat other) {
@@ -130,23 +132,28 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
      */
     @Override
     public Double getStat(StatContainer statContainer, String periodKey) {
+        log.info("GameWrapper get stat {}", this.toString()).submit();
         if (!Strings.isNullOrEmpty(gameName)) {
             //have a game name
             if (Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
+                log.info("only game name").submit();
                 //only game name
                 return getFilteredStat(statContainer, periodKey, this::filterGameFullStat);
             }
             if (Strings.isNullOrEmpty(mapName)) {
+                log.info("no map name").submit();
                 //no map name
                 return getFilteredStat(statContainer, periodKey, this::filterGameTeamStat);
             }
             if (Strings.isNullOrEmpty(teamName)) {
+                log.info("no team name").submit();
                 //no team name
                 return getFilteredStat(statContainer, periodKey, this::filterGameMapStat);
             }
         }
 
         if (!Strings.isNullOrEmpty(teamName) && Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName)) {
+            log.info("map or game").submit();
             //no map or game but team
             return getFilteredStat(statContainer, periodKey, this::filterTeamOnlyStat);
         }
@@ -155,10 +162,12 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
 
         if (Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
             //have action
+            log.info("only wrapper").submit();
             return getFilteredStat(statContainer, periodKey, this::filterWrapperOnlyStat);
         }
         //all fields are filled, action, game, team, map
         //we still need to filter, because the sub stats could be generic
+        log.info("all filled").submit();
         return getFilteredStat(statContainer, periodKey, this::filterAllStat);
     }
 
