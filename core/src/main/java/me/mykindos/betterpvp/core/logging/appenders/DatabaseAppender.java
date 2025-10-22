@@ -151,7 +151,7 @@ public class DatabaseAppender implements LogAppender {
         }
 
         // Execute as a transaction
-        database.executeTransaction(statements, TargetDatabase.GLOBAL, LOG_EXECUTOR)
+        database.executeTransaction(statements, TargetDatabase.GLOBAL, LOG_EXECUTOR, true)
                 .exceptionally(throwable -> {
                     log.error("Failed to insert batched logs", throwable).submit();
                     return null;

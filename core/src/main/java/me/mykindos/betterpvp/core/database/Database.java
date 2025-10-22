@@ -239,17 +239,19 @@ public class Database {
      *                       This allows for custom thread pool management and execution control.
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
-    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase, Executor executor) {
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase, Executor executor, boolean catchErrors) {
         if (statements == null || statements.isEmpty()) {
             return CompletableFuture.completedFuture(null);
         }
 
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
-                executeTransactionalStatements(connection, statements);
+                executeTransactionalStatements(connection, statements, catchErrors);
             } catch (SQLException e) {
-                log.error("Failed to manage transaction or close connection", e).submit();
-                throw new RuntimeException(e); // Ensure exceptional completion
+                if (catchErrors) {
+                    log.error("Failed to manage transaction or close connection", e).submit();
+                    throw new RuntimeException(e); // Ensure exceptional completion
+                }
             }
         }, executor).exceptionally(ex -> {
             log.error("Unexpected error in executeTransaction", ex).submit();
@@ -278,7 +280,7 @@ public class Database {
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
     public CompletableFuture<Void> executeTransaction(List<Statement> statements, Executor executor) {
-        return executeTransaction(statements, DEFAULT_DATABASE, executor);
+        return executeTransaction(statements, DEFAULT_DATABASE, executor, true);
     }
 
     /**
@@ -292,7 +294,11 @@ public class Database {
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
     public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase) {
-       return executeTransaction(statements, targetDatabase, WRITE_EXECUTOR);
+       return executeTransaction(statements, targetDatabase, WRITE_EXECUTOR, true);
+    }
+
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase, boolean catchErrors) {
+        return executeTransaction(statements, targetDatabase, WRITE_EXECUTOR, catchErrors);
     }
 
     /**
@@ -304,7 +310,7 @@ public class Database {
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
     public CompletableFuture<Void> executeTransaction(List<Statement> statements) {
-        return executeTransaction(statements, DEFAULT_DATABASE, WRITE_EXECUTOR);
+        return executeTransaction(statements, DEFAULT_DATABASE, WRITE_EXECUTOR, true);
     }
 
 
@@ -511,7 +517,7 @@ public class Database {
      * @param statements The statements to execute
      * @throws SQLException If a database access error occurs
      */
-    private void executeTransactionalStatements(Connection connection, List<Statement> statements) throws SQLException {
+    private void executeTransactionalStatements(Connection connection, List<Statement> statements, boolean catchErrors) throws SQLException {
         connection.setAutoCommit(false);
 
         try {
@@ -523,16 +529,20 @@ public class Database {
                     setStatementParameters(preparedStatement, statement);
                     preparedStatement.execute();
                 } catch (SQLException ex) {
-                    log.error("Error executing transaction with query: {}", statement.getQuery(), ex).submit();
-                    connection.rollback();
-                    throw ex; // Rethrow to trigger the outer catch block
+                    if(catchErrors) {
+                        log.error("Error executing transaction with query: {}", statement.getQuery(), ex).submit();
+                        connection.rollback();
+                        throw ex; // Rethrow to trigger the outer catch block
+                    }
                 }
             }
             connection.commit();
         } catch (SQLException ex) {
-            log.error("Error executing transaction", ex).submit();
-            connection.rollback();
-            throw ex; // Rethrow to ensure proper error handling in calling method
+            if(catchErrors) {
+                log.error("Error executing transaction", ex).submit();
+                connection.rollback();
+                throw ex; // Rethrow to ensure proper error handling in calling method
+            }
         } finally {
             connection.setAutoCommit(true);
         }

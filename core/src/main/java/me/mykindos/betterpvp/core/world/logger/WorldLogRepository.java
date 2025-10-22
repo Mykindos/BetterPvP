@@ -14,8 +14,7 @@ import me.mykindos.betterpvp.core.database.query.values.BlobStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -26,7 +25,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Repository responsible for managing and persisting world block change logs.
@@ -39,14 +37,48 @@ public class WorldLogRepository {
 
     private final Database database;
     private static final Gson GSON = new Gson();
+    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
     public WorldLogRepository(Database database) {
         this.database = database;
 
+        createPartitions();
+
         UtilServer.runTaskTimer(JavaPlugin.getPlugin(Core.class), () -> {
             purgeLogs(7);
         }, 100L, 20 * 60 * 60L);
+    }
+
+    public void createPartitions() {
+        String currentServer = Core.getCurrentServer();
+        String currentSeason = Core.getCurrentSeason();
+        String partitionName = ("p_" + currentServer + "_" + currentSeason).replace(' ', '_')
+                .replace('-', '_').toLowerCase();
+
+        List<Statement> statements = new ArrayList<>();
+
+        // Create partition for world_logs table
+        String createLogsPartition = String.format(
+                "ALTER TABLE world_logs ADD PARTITION (PARTITION %s VALUES IN (('%s', '%s')))",
+                partitionName, currentServer, currentSeason
+        );
+        statements.add(new Statement(createLogsPartition));
+
+        // Create partition for world_logs_metadata table
+        String createMetadataPartition = String.format(
+                "ALTER TABLE world_logs_metadata ADD PARTITION (PARTITION %s VALUES IN (('%s', '%s')))",
+                partitionName, currentServer, currentSeason
+        );
+        statements.add(new Statement(createMetadataPartition));
+
+        database.executeTransaction(statements, TargetDatabase.GLOBAL, false).thenAccept(a -> {
+            log.info("Successfully created partition {} for server {} and season {}", partitionName, currentServer, currentSeason).submit();
+        }).exceptionally(ex -> {
+            // Silently ignore errors - partition likely already exists
+            log.info("Partition {} may already exist (error ignored)", partitionName).submit();
+            return null;
+        });
     }
 
     /**
@@ -61,12 +93,13 @@ public class WorldLogRepository {
         List<List<StatementValue<?>>> metadataRows = new ArrayList<>();
 
         for (WorldLog log : logs) {
-            UUID uuid = UUID.randomUUID();
+            long id = ID_GENERATOR.nextId();
 
             // Add main log row
             logRows.add(List.of(
-                    new UuidStatementValue(uuid),
+                    new LongStatementValue(id),
                     new StringStatementValue(Core.getCurrentServer()),
+                    new StringStatementValue(Core.getCurrentSeason()),
                     new StringStatementValue(log.getWorld()),
                     new IntegerStatementValue(log.getBlockX()),
                     new IntegerStatementValue(log.getBlockY()),
@@ -75,14 +108,16 @@ public class WorldLogRepository {
                     new StringStatementValue(log.getMaterial()),
                     new StringStatementValue(log.getBlockData() == null ? null : log.getBlockData().getAsString()),
                     new BlobStatementValue(log.getItemStack() != null && !log.getItemStack().getType().isAir() ? log.getItemStack().serializeAsBytes() : null),
-                    new TimestampStatementValue(log.getTime())
+                    new LongStatementValue(log.getTime().toEpochMilli())
             ));
 
             // Add metadata rows
             if (log.getMetadata() != null && !log.getMetadata().isEmpty()) {
                 log.getMetadata().forEach((key, value) -> {
                     metadataRows.add(List.of(
-                            new UuidStatementValue(uuid),
+                            new LongStatementValue(id),
+                            new StringStatementValue(Core.getCurrentServer()),
+                            new StringStatementValue(Core.getCurrentSeason()),
                             new StringStatementValue(key),
                             new StringStatementValue(value)
                     ));
@@ -95,7 +130,7 @@ public class WorldLogRepository {
         // Create bulk insert for logs
         if (!logRows.isEmpty()) {
             statements.add(Statement.builder()
-                    .insertInto("world_logs", "id", "Server", "World", "BlockX", "BlockY", "BlockZ", "Action", "Material", "BlockData", "ItemStack", "Time")
+                    .insertInto("world_logs", "id", "Server", "Season", "World", "BlockX", "BlockY", "BlockZ", "Action", "Material", "BlockData", "ItemStack", "Time")
                     .valuesBulk(logRows)
                     .build());
         }
@@ -103,7 +138,7 @@ public class WorldLogRepository {
 
         if (!metadataRows.isEmpty()) {
             statements.add(Statement.builder()
-                    .insertInto("world_logs_metadata", "LogId", "MetaKey", "MetaValue")
+                    .insertInto("world_logs_metadata", "LogId", "Server", "Season", "MetaKey", "MetaValue")
                     .valuesBulk(metadataRows)
                     .build());
         }
@@ -132,18 +167,18 @@ public class WorldLogRepository {
 
         try (ResultSet results = database.executeQuery(session.getStatement(), TargetDatabase.GLOBAL).join()) {
             while (results.next()) {
-                UUID id = UUID.fromString(results.getString(1));
-                String world = results.getString(3);
-                int x = results.getInt(4);
-                int y = results.getInt(5);
-                int z = results.getInt(6);
-                String action = results.getString(7);
-                String material = results.getString(8);
-                String blockData = results.getString(9);
-                byte[] itemStack = results.getBytes(10);
-                Instant time = results.getTimestamp(11).toInstant();
-                String metadataJson = results.getString(12);
-                int count = results.getInt(13);
+                long id = results.getLong("id");
+                String world = results.getString("World");
+                int x = results.getInt("BlockX");
+                int y = results.getInt("BlockY");
+                int z = results.getInt("BlockZ");
+                String action = results.getString("Action");
+                String material = results.getString("Material");
+                String blockData = results.getString("BlockData");
+                byte[] itemStack = results.getBytes("ItemStack");
+                Instant time = Instant.ofEpochMilli(results.getLong("Time"));
+                String metadataJson = results.getString("metadata");
+                int count = results.getInt("total");
 
                 session.setPages((int) Math.ceil(count / 10.0) - 1);
 
@@ -190,7 +225,9 @@ public class WorldLogRepository {
      * @return Statement object ready for execution
      */
     public Statement getStatementForBlock(Block block) {
-        return Statement.builder().queryBase(getBasicQueryBase()).where("Server", "=", StringStatementValue.of(Core.getCurrentServer()))
+        return Statement.builder().queryBase(getBasicQueryBase())
+                .where("Server", "=", StringStatementValue.of(Core.getCurrentServer()))
+                .where("Season", "=", StringStatementValue.of(Core.getCurrentSeason()))
                 .where("World", "=", StringStatementValue.of(block.getWorld().getName()))
                 .where("BlockX", "=", IntegerStatementValue.of(block.getX()))
                 .where("BlockY", "=", IntegerStatementValue.of(block.getY()))
@@ -203,17 +240,29 @@ public class WorldLogRepository {
 
     public void purgeLogs(int days) {
         Instant cutoff = Instant.now().minusSeconds(days * 24L * 60L * 60L);
-        Statement statement = new Statement("DELETE LOW_PRIORITY FROM world_logs WHERE Server = ? AND Time <= ? LIMIT ?",
+
+        Statement deleteMetadata = new Statement("DELETE FROM world_logs_metadata WHERE Server = ? AND Season = ? AND LogId IN " +
+                "(SELECT id FROM (SELECT id FROM world_logs WHERE Server = ? AND Season = ? AND Time <= ? LIMIT ?) as temp)",
                 StringStatementValue.of(Core.getCurrentServer()),
-                new TimestampStatementValue(cutoff),
+                StringStatementValue.of(Core.getCurrentSeason()),
+                StringStatementValue.of(Core.getCurrentServer()),
+                StringStatementValue.of(Core.getCurrentSeason()),
+                new LongStatementValue(cutoff.toEpochMilli()),
                 new LongStatementValue(50000L));
 
-        database.executeUpdateNoTimeout(statement, TargetDatabase.GLOBAL).thenAccept(a -> {
+        Statement deleteLogs = new Statement("DELETE FROM world_logs WHERE Server = ? AND Season = ? AND Time <= ? LIMIT ?",
+                StringStatementValue.of(Core.getCurrentServer()),
+                StringStatementValue.of(Core.getCurrentSeason()),
+                new LongStatementValue(cutoff.toEpochMilli()),
+                new LongStatementValue(50000L));
+
+        database.executeTransaction(List.of(deleteMetadata, deleteLogs), TargetDatabase.GLOBAL).thenAccept(a -> {
             log.info("Finished purging world_logs").submit();
         }).exceptionally(ex -> {
-            log.error("Failed to purge world_logs", ex);
+            log.error("Failed to purge world_logs", ex).submit();
             return null;
         });
+
     }
 
     /**
@@ -235,7 +284,7 @@ public class WorldLogRepository {
                                        )
                                )
                         FROM world_logs_metadata wlm
-                        WHERE wlm.LogId = world_logs.id
+                        WHERE wlm.LogId = world_logs.id AND wlm.Server = world_logs.Server AND wlm.Season = world_logs.Season
                     ) AS metadata,
                     COUNT(*) OVER() AS total
                 FROM world_logs
