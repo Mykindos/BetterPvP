@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -22,7 +23,6 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
@@ -217,7 +217,8 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
                     CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName());
                     UtilDamage.doCustomDamage(dmg);
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
-                    UtilPlayer.health(player, getHealthPerEnemyHit(level));
+                    double actualHeal = UtilEntity.health(player, getHealthPerEnemyHit(level));
+                    championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_WREATH, actualHeal);
                 }
                 targets.addAll(hit);
 
@@ -258,10 +259,10 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         WreathData wreathData = charges.get(player);
         if (wreathData == null) {
-            return;
+            return false;
         }
 
         final int curCharges = wreathData.getCharges();
@@ -274,6 +275,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
 
         final int newCharges = curCharges - 1;
         wreathData.setCharges(newCharges);
+        return true;
     }
 
     @Override

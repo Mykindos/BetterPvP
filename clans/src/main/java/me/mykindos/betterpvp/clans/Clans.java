@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementLoader;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
@@ -100,6 +101,9 @@ public class Clans extends BPvPPlugin {
 
             var leaderboardLoader = injector.getInstance(ClansLeaderboardLoader.class);
             leaderboardLoader.registerLeaderboards(PACKAGE);
+
+            var clansAchievementLoader = injector.getInstance(ClansAchievementLoader.class);
+            clansAchievementLoader.loadAll(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 

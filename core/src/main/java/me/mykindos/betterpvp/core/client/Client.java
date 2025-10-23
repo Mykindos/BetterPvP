@@ -1,5 +1,12 @@
 package me.mykindos.betterpvp.core.client;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +17,7 @@ import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.redis.CacheObject;
@@ -21,20 +29,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
 @Setter
 @Getter
 @EqualsAndHashCode(callSuper = false, of = {"uuid"})
 public class Client extends PropertyContainer implements IMapListener, CacheObject, Unique {
 
     private final transient @NotNull Gamer gamer;
+    private final StatContainer statContainer;
     private final @NotNull String uuid;
     private @NotNull String name;
     private @NotNull Rank rank;
@@ -48,6 +49,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
 
     public Client(@NotNull Gamer gamer, @NotNull String uuid, @NotNull String name, @NotNull Rank rank) {
         this.gamer = gamer;
+        this.statContainer = new StatContainer(UUID.fromString(uuid));
         this.uuid = uuid;
         this.name = name;
         this.rank = rank;
@@ -82,8 +84,8 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     }
 
     @Override
-    public void onMapValueChanged(String key, Object value) {
-        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClientPropertyUpdateEvent(this, key, value)));
+    public void onMapValueChanged(String key, Object newValue, Object oldValue) {
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClientPropertyUpdateEvent(this, key, newValue, oldValue)));
     }
 
     public boolean hasPunishment(String punishmentType) {
@@ -127,6 +129,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.newClient = other.newClient;
         this.properties.getMap().clear();
         this.properties.getMap().putAll(other.properties.getMap());
+        this.statContainer.getStats().copyFrom(other.getStatContainer().getStats());
         this.punishments.clear();
         this.punishments.addAll(other.punishments);
         this.ignores.clear();

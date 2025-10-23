@@ -69,10 +69,12 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         if (!wallKick(player)) {
             doLeap(player, false);
+            return true;
         }
+        return false;
     }
 
     public void doLeap(Player player, boolean wallkick) {
