@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.StateSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -27,30 +28,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill {
+public class HoldPosition extends StateSkill implements Listener, BuffSkill {
 
     public double baseDuration;
-
     public double durationIncreasePerLevel;
-
     public int resistanceStrength;
-
     public int slownessStrength;
-
 
     @Inject
     public HoldPosition(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-    }
-
-    @Override
-    public String getName() {
-        return "Hold Position";
     }
 
     @Override
@@ -59,7 +52,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Hold your position, gaining",
+                "Fortify yourself, gaining",
                 "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
                 "knockback for <val>" + getDuration(level) + "</val> seconds",
                 "",
@@ -73,35 +66,20 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
-    @Override
-    public Role getClassType() {
-        return Role.KNIGHT;
-    }
-
-    @Override
-    public SkillType getType() {
-        return SkillType.AXE;
-    }
-
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
+        if (!activeState.containsKey(player.getUniqueId())) return;  // only disable if they are in the state
 
-        if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
-            event.setKnockback(false);
-        }
+        event.setKnockback(false);
     }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
 
     @Override
     public void activate(Player player, int level) {
+        super.activate(player, level);
+
         long duration = (long) (getDuration(level) * 1000);
         championsManager.getEffects().addEffect(player, player, EffectTypes.RESISTANCE, resistanceStrength, duration);
         championsManager.getEffects().addEffect(player, player, EffectTypes.SLOWNESS, slownessStrength, duration);
@@ -109,26 +87,10 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         championsManager.getEffects().addEffect(player, player, EffectTypes.NO_SPRINT, duration);
         player.setSprinting(false);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
-        
-        long durationTicks = (long) (getDuration(level) * 20);
-        new BukkitRunnable() {
-            long ticksRun = 0;
-
-            @Override
-            public void run() {
-                if (ticksRun > durationTicks || getLevel(player) <= 0) {
-                    UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
-                    this.cancel();
-                    return;
-                }
-
-                spawnMobSpellParticles(player);
-                ticksRun++;
-            }
-        }.runTaskTimer(champions, 0, 1);
     }
 
-    private void spawnMobSpellParticles(Player player) {
+    @Override
+    protected void doOnSuccessfulUpdate(@NotNull Player player) {
         Location loc = player.getLocation();
         Random random = UtilMath.RANDOM;
         for (int i = 0; i < 5; i++) {
@@ -137,6 +99,31 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
             double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.9;
             player.getWorld().spawnParticle(Particle.ENTITY_EFFECT, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0, org.bukkit.Color.BLACK);
         }
+    }
+
+    @Override
+    protected @NotNull String getActionBarLabel() {
+        return "Fortified";
+    }
+
+    @Override
+    protected double getStateDuration(int level) {
+        return getDuration(level);
+    }
+
+    @Override
+    public String getName() {
+        return "Hold Position";
+    }
+
+    @Override
+    public Role getClassType() {
+        return Role.KNIGHT;
+    }
+
+    @Override
+    public SkillType getType() {
+        return SkillType.AXE;
     }
 
     @Override
