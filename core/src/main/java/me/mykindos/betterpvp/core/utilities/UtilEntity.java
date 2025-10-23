@@ -49,7 +49,7 @@ public class UtilEntity {
      */
     public static EntityRemovalReason getRemovalReason(@NotNull Entity entity) {
         final net.minecraft.world.entity.Entity handle = ((CraftEntity) entity).getHandle();
-        Preconditions.checkArgument(handle.isRemoved(), "Entity must be removed");
+        Preconditions.checkArgument(isRemoved(entity), "Entity must be removed");
         return switch(Objects.requireNonNull(handle.getRemovalReason())) {
             case KILLED -> EntityRemovalReason.KILLED;
             case DISCARDED -> EntityRemovalReason.DISCARDED;
@@ -331,8 +331,7 @@ public class UtilEntity {
      * @return true if the entity is removed or marked as pluginRemoved, otherwise false
      */
     public static boolean isRemoved(@NotNull Entity ent) {
-        net.minecraft.world.entity.Entity craftEntity = ((CraftEntity) ent).getHandle();
-        return craftEntity.isRemoved() || craftEntity.pluginRemoved;
+        return ((CraftEntity) ent).getHandle().isRemoved();
     }
 
     public static void health(LivingEntity ent, double mod) {

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -22,9 +23,9 @@ import java.util.Objects;
 @Getter
 public class HealthBar {
 
-    private final TextDisplay display;
-    private final ActiveModel model;
-    private final ModelBone bone;
+    private TextDisplay display;
+    private ActiveModel model;
+    private ModelBone bone;
     private final Vector delta;
 
     private float lastPercentage = 100;
@@ -84,10 +85,16 @@ public class HealthBar {
     }
 
     public void despawn() {
-        if (display == null || !display.isValid()) {
+        if (display != null && !UtilEntity.isRemoved(display)) {
+            display.remove();
+            Bukkit.broadcastMessage("removed");
             return;
+        } else {
+            Bukkit.broadcastMessage("didnt remove");
         }
-        display.remove();
+        display = null;
+        model = null;
+        bone = null;
     }
 
 }
