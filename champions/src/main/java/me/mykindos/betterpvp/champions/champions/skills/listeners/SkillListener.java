@@ -2,6 +2,13 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
@@ -11,6 +18,7 @@ import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoad
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
@@ -44,7 +52,7 @@ import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -69,14 +77,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 @Singleton
 @BPvPListener
 @CustomLog
@@ -85,7 +85,7 @@ public class SkillListener implements Listener {
     private final BuildManager buildManager;
     private final RoleManager roleManager;
     private final CooldownManager cooldownManager;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final EffectManager effectManager;
     private final ClientManager clientManager;
     private final ChampionsSkillManager skillManager;
@@ -95,11 +95,11 @@ public class SkillListener implements Listener {
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
-                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, ChampionsSkillManager skillManager, WeaponManager weaponManager) {
+                         EnergyService energyService, EffectManager effectManager, ClientManager clientManager, ChampionsSkillManager skillManager, WeaponManager weaponManager) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.effectManager = effectManager;
         this.clientManager = clientManager;
         this.skillManager = skillManager;
@@ -131,7 +131,7 @@ public class SkillListener implements Listener {
                         return;
                     }
                 }
-                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
+                if (!energyService.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -514,6 +514,12 @@ public class SkillListener implements Listener {
                 build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.trackPlayer(player, gamer));
             }
         }
+    }
+
+    @EventHandler
+    public void onSkillUpdate(SkillUpdateEvent event) {
+        final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
+        event.getSkill().updatePlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler

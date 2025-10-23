@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -12,6 +13,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -19,8 +21,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-
-import java.util.HashMap;
 
 @Singleton
 @BPvPListener
@@ -131,7 +131,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
 
         double energyReduced = event.getDamage() * getEnergyReduction(level);
         event.setDamage(event.getDamage() - getDamageReduction(level));
-        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced / 100);
+        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced, EnergyEvent.CAUSE.USE);
 
         event.setKnockback(false);
     }
