@@ -79,8 +79,8 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "SELECT * FROM clans WHERE Server = ? AND Season = ?;";
 
         try (CachedRowSet result = database.executeQuery(new Statement(query,
-                new StringStatementValue(Core.getCurrentServer()),
-                new StringStatementValue(Core.getCurrentSeason())
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason())
         ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 UUID clanId = UUID.fromString(result.getString("id"));
@@ -168,9 +168,9 @@ public class ClanRepository implements IRepository<Clan> {
 
         String saveClanQuery = "INSERT INTO clans (id, Server, Season, Name, Admin) VALUES (?, ?, ?, ?, ?);";
         database.executeUpdate(new Statement(saveClanQuery,
-                new StringStatementValue(Core.getCurrentServer()),
-                new StringStatementValue(Core.getCurrentSeason()),
                 new UuidStatementValue(clan.getId()),
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(clan.getName()),
                 new BooleanStatementValue(clan.isAdmin())
         ), TargetDatabase.GLOBAL);

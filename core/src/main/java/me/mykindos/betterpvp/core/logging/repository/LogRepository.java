@@ -45,17 +45,19 @@ public class LogRepository {
         Statement statement1;
 
         if (actionFilter != null) {
-            statement1 = new Statement("CALL GetLogMessagesByContextAndAction(?, ?, ?, ?)",
+            statement1 = new Statement("CALL GetLogMessagesByContextAndAction(?, ?, ?, ?, ?)",
                     new StringStatementValue(key),
                     new StringStatementValue(value),
                     new StringStatementValue(actionFilter),
-                    new StringStatementValue(Core.getCurrentServer())
+                    new IntegerStatementValue(Core.getCurrentServer()),
+                    new IntegerStatementValue(Core.getCurrentSeason())
             );
         } else {
-            statement1 = new Statement("CALL GetLogMessagesByContextAndValue(?, ?, ?)",
+            statement1 = new Statement("CALL GetLogMessagesByContextAndValue(?, ?, ?, ?)",
                     new StringStatementValue(key),
                     new StringStatementValue(value),
-                    new StringStatementValue(Core.getCurrentServer())
+                    new IntegerStatementValue(Core.getCurrentServer()),
+                    new IntegerStatementValue(Core.getCurrentSeason())
             );
         }
 
@@ -99,10 +101,10 @@ public class LogRepository {
 
             for (int attempt = 0; attempt < maxRetries; attempt++) {
                 try {
-                    // Use LOW_PRIORITY to let other operations go first
                     Statement statement = new Statement(
-                            "DELETE LOW_PRIORITY FROM logs WHERE Server = ? AND Action = ? AND Time <= ? LIMIT ?",
-                            StringStatementValue.of(Core.getCurrentServer()),
+                            "DELETE FROM logs WHERE Server = ? AND Season = ? AND Action = ? AND Time <= ? LIMIT ?",
+                            IntegerStatementValue.of(Core.getCurrentServer()),
+                            IntegerStatementValue.of(Core.getCurrentSeason()),
                             StringStatementValue.of(""),
                             new LongStatementValue(System.currentTimeMillis() - daysToMillis),
                             IntegerStatementValue.of(batchSize)

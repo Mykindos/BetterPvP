@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.FloatStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,8 +43,8 @@ public class GlobalCombatData extends CombatData {
             final Contribution killerContribution = contributions.stream().filter(contribution -> contribution.getContributor().equals(kill.getKiller())).findFirst().orElseThrow();
             Statement killStatement = new Statement(killStmt,
                     new UuidStatementValue(killId),
-                    new StringStatementValue(Core.getCurrentServer()),
-                    new StringStatementValue(Core.getCurrentSeason()),
+                    new IntegerStatementValue(Core.getCurrentServer()),
+                    new IntegerStatementValue(Core.getCurrentSeason()),
                     new UuidStatementValue(kill.getKiller()),
                     new UuidStatementValue(kill.getVictim()),
                     new FloatStatementValue(killerContribution.getPercentage()),
@@ -74,8 +73,8 @@ public class GlobalCombatData extends CombatData {
         String ratingStmt = "INSERT INTO combat_stats (Client, Server, Season, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak)";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
-                new StringStatementValue(Core.getCurrentServer()),
-                new StringStatementValue(Core.getCurrentSeason()),
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason()),
                 new IntegerStatementValue(getRating()),
                 new IntegerStatementValue(getKillStreak()),
                 new IntegerStatementValue(getHighestKillStreak()));

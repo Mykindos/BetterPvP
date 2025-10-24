@@ -6,7 +6,9 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 
@@ -41,7 +43,10 @@ public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCom
         return CompletableFuture.supplyAsync(() -> {
             final GlobalCombatData data = new GlobalCombatData(player);
             final UuidStatementValue uuid = new UuidStatementValue(player);
-            Statement statement = new Statement("CALL GetCombatData(?)", uuid);
+            Statement statement = new Statement("CALL GetCombatData(?, ?, ?)",
+                    uuid,
+                    IntegerStatementValue.of(Core.getCurrentServer()),
+                    IntegerStatementValue.of(Core.getCurrentSeason()));
             database.executeProcedure(statement, -1, result -> {
                 try {
                     if (result.next()) {
@@ -67,7 +72,7 @@ public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCom
                 } catch (SQLException e) {
                     log.error("Failed to load combat data for " + player, e);
                 }
-            }).join();
+            }, TargetDatabase.GLOBAL).join();
             return data;
         }).exceptionally(throwable -> {
             log.error("Failed to load combat data for " + player, throwable);

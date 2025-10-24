@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
@@ -34,9 +35,13 @@ public class UUIDRepository implements IRepository<UUIDItem> {
 
     public List<UUIDItem> getUUIDItemsForModule(String namespace) {
         List<UUIDItem> items = new ArrayList<>();
-        String query = "SELECT * FROM uuiditems WHERE Namespace = ? AND Server = ?;";
+        String query = "SELECT * FROM uuiditems WHERE Namespace = ? AND Server = ? AND Season = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace), new StringStatementValue(Core.getCurrentServer())), TargetDatabase.GLOBAL).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query,
+                        new StringStatementValue(namespace),
+                        new IntegerStatementValue(Core.getCurrentServer()),
+                        new IntegerStatementValue(Core.getCurrentSeason())),
+                TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 UUID uuid = UUID.fromString(result.getString(1));
                 String key = result.getString(4);
@@ -50,10 +55,11 @@ public class UUIDRepository implements IRepository<UUIDItem> {
 
     @Override
     public void save(UUIDItem object) {
-        String query = "INSERT INTO uuiditems (UUID, Server, Namespace, Keyname) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO uuiditems (UUID, Server, Season, Namespace, Keyname) VALUES (?, ?, ?, ?, ?);";
         database.executeUpdate(new Statement(query,
                         new UuidStatementValue(object.getUuid()),
-                        new StringStatementValue(Core.getCurrentServer()),
+                        new IntegerStatementValue(Core.getCurrentServer()),
+                        new IntegerStatementValue(Core.getCurrentSeason()),
                         new StringStatementValue(object.getNamespace()),
                         new StringStatementValue(object.getKey())
                 )

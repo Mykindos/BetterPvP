@@ -1,13 +1,13 @@
 package me.mykindos.betterpvp.core.logging;
 
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ReusableMessageFactory;
-
-import java.util.UUID;
 
 public class CustomLogger {
 
     private final String name;
+    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     public CustomLogger(String name) {
         this.name = name;
@@ -22,7 +22,7 @@ public class CustomLogger {
      */
     public PendingLog log(String level, String message, Object... args) {
         Message test = ReusableMessageFactory.INSTANCE.newMessage(message, args);
-        return new PendingLog(UUID.randomUUID(), name, level, test.getFormattedMessage(), System.currentTimeMillis(), args);
+        return new PendingLog(ID_GENERATOR.nextId(), name, level, test.getFormattedMessage(), System.currentTimeMillis(), args);
     }
 
     /**

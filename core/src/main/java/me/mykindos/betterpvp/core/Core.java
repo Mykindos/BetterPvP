@@ -54,9 +54,7 @@ public class Core extends BPvPPlugin {
     @Setter
     private Injector injector;
 
-    @Inject
     private Database database;
-
 
     @Inject
     private Redis redis;
@@ -75,29 +73,20 @@ public class Core extends BPvPPlugin {
 
     @Getter
     @Setter
-    private static String currentServer;
+    private static int currentServer;
 
     @Getter
     @Setter
-    private static String currentSeason;
+    private static String currentServerName;
+
+    @Getter
+    @Setter
+    private static int currentSeason;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
-        if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-            String serverName = getCommonNameViaReflection();
-            if (serverName == null) return;
-            if (serverName.toLowerCase().startsWith("champions")) {
-                serverName = "Champions";
-            }
-
-            Core.setCurrentServer(serverName);
-        } else {
-            setCurrentServer(getConfig().getOrSaveString("core.info.server", "unknown"));
-        }
-
-        setCurrentSeason(getConfig().getOrSaveString("core.info.season", "unknown"));
 
         // Add this appender first to ensure we still capture all logs before database is initialized
         LoggerFactory.getInstance().addAppender(new LegacyAppender());
@@ -106,12 +95,17 @@ public class Core extends BPvPPlugin {
         Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
         injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
+
+        this.database = injector.getInstance(Database.class);
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local", TargetDatabase.LOCAL);
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);
+
+        setupServerAndSeason();
+
         injector.injectMembers(this);
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
 
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local", TargetDatabase.LOCAL);
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);
         redis.credentials(this.getConfig());
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
@@ -164,6 +158,27 @@ public class Core extends BPvPPlugin {
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
+    }
+
+    private void setupServerAndSeason() {
+        if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
+            String serverName = getCommonNameViaReflection();
+            if (serverName == null) {
+                serverName = "unknown";
+            }
+
+            if (serverName.toLowerCase().startsWith("champions")) {
+                serverName = "Champions";
+            }
+
+            setCurrentServer(database.getServerId(serverName));
+        } else {
+            String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
+            setCurrentServerName(serverName);
+            setCurrentServer(database.getServerId(serverName));
+        }
+
+        setCurrentSeason(getConfig().getOrSaveInt("core.info.season", 0));
     }
 
     @Override

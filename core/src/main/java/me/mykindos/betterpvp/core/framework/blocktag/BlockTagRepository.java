@@ -43,8 +43,8 @@ public class BlockTagRepository {
         Map<Integer, Map<String, BlockTag>> blockTags = new HashMap<>();
         String query = "SELECT * FROM chunk_block_tagging WHERE Server = ? AND Season = ? AND Chunk = ?";
         Statement statement = new Statement(query,
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
                 StringStatementValue.of(UtilWorld.chunkToFile(chunk))
         );
 
@@ -65,8 +65,8 @@ public class BlockTagRepository {
     public void addBlockTag(Block block, BlockTag blockTag) {
         String query = "INSERT INTO chunk_block_tagging (Server, Season, Chunk, BlockKey, Tag, Value) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Value = ?, LastUpdated = ?;";
         Statement statement = new Statement(query,
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
                 StringStatementValue.of(UtilWorld.chunkToFile(block.getChunk())),
                 new IntegerStatementValue(UtilBlock.getBlockKey(block)),
                 StringStatementValue.of(blockTag.getTag()),
@@ -83,8 +83,8 @@ public class BlockTagRepository {
     public void removeBlockTag(Block block, String tag) {
         String query = "DELETE FROM chunk_block_tagging WHERE Server = ? AND Season = ? AND Chunk = ? AND BlockKey = ? AND Tag = ?;";
         Statement statement = new Statement(query,
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
                 StringStatementValue.of(UtilWorld.chunkToFile(block.getChunk())),
                 new IntegerStatementValue(UtilBlock.getBlockKey(block)),
                 StringStatementValue.of(tag)
@@ -99,8 +99,8 @@ public class BlockTagRepository {
     public void purgeOldBlockTags() {
         String query = "DELETE FROM chunk_block_tagging WHERE Server = ? AND Season = ? AND LastUpdated < ? AND Tag = ?";
         Statement statement = new Statement(query,
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
                 new TimestampStatementValue(Instant.now().minusSeconds(60 * 60 * 24 * 3)),
                 StringStatementValue.of("PlayerManipulated")
         );

@@ -6,12 +6,14 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 
@@ -40,7 +42,10 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
             final Map<ChampionsFilter, ChampionsCombatData> combatDataMap = new EnumMap<>(ChampionsFilter.class);
             final RoleStatistics roleStatistics = new RoleStatistics(combatDataMap, roleManager, player);
             final UuidStatementValue uuid = new UuidStatementValue(player);
-            Statement statement = new Statement("CALL GetChampionsData(?)", uuid);
+            Statement statement = new Statement("CALL GetChampionsData(?, ?, ?)",
+                    uuid,
+                    IntegerStatementValue.of(Core.getCurrentServer()),
+                    IntegerStatementValue.of(Core.getCurrentSeason()));
             database.executeProcedure(statement, -1, result -> {
                 try {
                     while (result.next()) {

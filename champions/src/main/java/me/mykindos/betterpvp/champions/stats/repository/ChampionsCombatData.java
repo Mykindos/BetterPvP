@@ -88,8 +88,8 @@ public class ChampionsCombatData extends CombatData {
         String ratingStmt = "INSERT INTO champions_combat_stats (Gamer, Server, Season, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";
         Statement victimRating = new Statement(ratingStmt,
                 new UuidStatementValue(getHolder()),
-                new StringStatementValue(Core.getCurrentServer()),
-                new StringStatementValue(Core.getCurrentSeason()),
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(role == null ? "" : role.toString()),
                 new IntegerStatementValue(getRating()),
                 new IntegerStatementValue(getKillStreak()),

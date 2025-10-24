@@ -51,23 +51,23 @@ public class WorldLogRepository {
     }
 
     public void createPartitions() {
-        String currentServer = Core.getCurrentServer();
-        String currentSeason = Core.getCurrentSeason();
-        String partitionName = ("p_" + currentServer + "_" + currentSeason).replace(' ', '_')
+        int currentServer = Core.getCurrentServer();
+        int currentSeason = Core.getCurrentSeason();
+        String partitionName = ("p_" + Core.getCurrentServerName() + "_season_" + currentSeason).replace(' ', '_')
                 .replace('-', '_').toLowerCase();
 
         List<Statement> statements = new ArrayList<>();
 
         // Create partition for world_logs table
         String createLogsPartition = String.format(
-                "ALTER TABLE world_logs ADD PARTITION (PARTITION %s VALUES IN (('%s', '%s')))",
+                "ALTER TABLE world_logs ADD PARTITION (PARTITION %s VALUES IN ((%d, %d)))",
                 partitionName, currentServer, currentSeason
         );
         statements.add(new Statement(createLogsPartition));
 
         // Create partition for world_logs_metadata table
         String createMetadataPartition = String.format(
-                "ALTER TABLE world_logs_metadata ADD PARTITION (PARTITION %s VALUES IN (('%s', '%s')))",
+                "ALTER TABLE world_logs_metadata ADD PARTITION (PARTITION %s VALUES IN ((%d, %d)))",
                 partitionName, currentServer, currentSeason
         );
         statements.add(new Statement(createMetadataPartition));
@@ -98,8 +98,8 @@ public class WorldLogRepository {
             // Add main log row
             logRows.add(List.of(
                     new LongStatementValue(id),
-                    new StringStatementValue(Core.getCurrentServer()),
-                    new StringStatementValue(Core.getCurrentSeason()),
+                    new IntegerStatementValue(Core.getCurrentServer()),
+                    new IntegerStatementValue(Core.getCurrentSeason()),
                     new StringStatementValue(log.getWorld()),
                     new IntegerStatementValue(log.getBlockX()),
                     new IntegerStatementValue(log.getBlockY()),
@@ -116,8 +116,8 @@ public class WorldLogRepository {
                 log.getMetadata().forEach((key, value) -> {
                     metadataRows.add(List.of(
                             new LongStatementValue(id),
-                            new StringStatementValue(Core.getCurrentServer()),
-                            new StringStatementValue(Core.getCurrentSeason()),
+                            new IntegerStatementValue(Core.getCurrentServer()),
+                            new IntegerStatementValue(Core.getCurrentSeason()),
                             new StringStatementValue(key),
                             new StringStatementValue(value)
                     ));
@@ -226,8 +226,8 @@ public class WorldLogRepository {
      */
     public Statement getStatementForBlock(Block block) {
         return Statement.builder().queryBase(getBasicQueryBase())
-                .where("Server", "=", StringStatementValue.of(Core.getCurrentServer()))
-                .where("Season", "=", StringStatementValue.of(Core.getCurrentSeason()))
+                .where("Server", "=", IntegerStatementValue.of(Core.getCurrentServer()))
+                .where("Season", "=", IntegerStatementValue.of(Core.getCurrentSeason()))
                 .where("World", "=", StringStatementValue.of(block.getWorld().getName()))
                 .where("BlockX", "=", IntegerStatementValue.of(block.getX()))
                 .where("BlockY", "=", IntegerStatementValue.of(block.getY()))
@@ -243,16 +243,16 @@ public class WorldLogRepository {
 
         Statement deleteMetadata = new Statement("DELETE FROM world_logs_metadata WHERE Server = ? AND Season = ? AND LogId IN " +
                 "(SELECT id FROM (SELECT id FROM world_logs WHERE Server = ? AND Season = ? AND Time <= ? LIMIT ?) as temp)",
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
                 new LongStatementValue(cutoff.toEpochMilli()),
                 new LongStatementValue(50000L));
 
         Statement deleteLogs = new Statement("DELETE FROM world_logs WHERE Server = ? AND Season = ? AND Time <= ? LIMIT ?",
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
                 new LongStatementValue(cutoff.toEpochMilli()),
                 new LongStatementValue(50000L));
 

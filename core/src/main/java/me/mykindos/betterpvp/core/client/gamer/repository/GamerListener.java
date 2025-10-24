@@ -51,12 +51,12 @@ public class GamerListener implements Listener {
     private final ClientManager manager;
 
     @Inject
-    public GamerListener(ClientManager manager) {
+    public GamerListener(Core core, ClientManager manager) {
         this.manager = manager;
 
         this.header = new PermanentComponent(gamer -> Component.text("Mineplex ", NamedTextColor.GOLD)
                 .append(Component.text("Network ", NamedTextColor.WHITE))
-                .append(Component.text(Objects.requireNonNull(Core.getCurrentServer(), ""), NamedTextColor.GREEN)));
+                .append(Component.text(core.getConfig().getOrSaveString("core.info.server", "unknown"), NamedTextColor.GREEN)));
 
         this.footer = new PermanentComponent(gamer -> Component.text("Type ", NamedTextColor.WHITE)
                 .append(Component.text(Objects.requireNonNull(shop, ""), NamedTextColor.YELLOW))

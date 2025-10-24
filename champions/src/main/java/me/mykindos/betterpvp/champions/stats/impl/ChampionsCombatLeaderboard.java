@@ -171,8 +171,8 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
     }
 
     private static @NotNull Statement getStatement(String className, CombatSort sortType) {
-        final StringStatementValue server = new StringStatementValue(Core.getCurrentServer());
-        final StringStatementValue season = new StringStatementValue(Core.getCurrentSeason());
+        final IntegerStatementValue server = new IntegerStatementValue(Core.getCurrentServer());
+        final IntegerStatementValue season = new IntegerStatementValue(Core.getCurrentSeason());
         final IntegerStatementValue top = new IntegerStatementValue(10);
         final StringStatementValue classNameStmt = new StringStatementValue(className);
         return switch (sortType) {

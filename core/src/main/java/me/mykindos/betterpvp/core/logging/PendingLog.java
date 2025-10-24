@@ -11,12 +11,11 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 @Data
 public class PendingLog {
 
-    private final UUID id;
+    private final long id;
     private final String className;
     private final String level;
     private final String message;

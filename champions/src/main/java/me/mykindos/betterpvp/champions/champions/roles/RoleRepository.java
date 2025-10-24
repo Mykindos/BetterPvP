@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -33,6 +34,6 @@ public class RoleRepository {
         List<Statement> statements = new ArrayList<>();
         statements.add(new Statement(query, new StringStatementValue(killKey), new StringStatementValue("Kills"), new IntegerStatementValue(1)));
         statements.add(new Statement(query, new StringStatementValue(deathKey), new StringStatementValue("Deaths"), new IntegerStatementValue(1)));
-        database.executeBatch(statements);
+        database.executeBatch(statements, TargetDatabase.GLOBAL);
     }
 }

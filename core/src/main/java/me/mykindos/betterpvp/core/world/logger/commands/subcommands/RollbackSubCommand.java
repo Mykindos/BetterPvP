@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -124,7 +123,8 @@ public class RollbackSubCommand extends Command {
                     .where("wlm1.MetaValue", "=", StringStatementValue.of(finalTargetPlayer));
         }
 
-        builder = builder.where("Server", "=", StringStatementValue.of(Core.getCurrentServer()))
+        builder = builder.where("Server", "=", IntegerStatementValue.of(Core.getCurrentServer()))
+                .where("Season", "=", IntegerStatementValue.of(Core.getCurrentSeason()))
                 .where("World", "=", StringStatementValue.of(playerLocation.getWorld().getName()))
                 .where("BlockX", ">=", IntegerStatementValue.of(playerLocation.getBlockX() - finalRadius))
                 .where("BlockX", "<=", IntegerStatementValue.of(playerLocation.getBlockX() + finalRadius))

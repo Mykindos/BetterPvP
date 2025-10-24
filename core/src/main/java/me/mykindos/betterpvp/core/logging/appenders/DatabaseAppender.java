@@ -7,9 +7,9 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.logging.LogAppender;
 import me.mykindos.betterpvp.core.logging.PendingLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -30,7 +30,6 @@ public class DatabaseAppender implements LogAppender {
     private final Database database;
     private static final Executor LOG_EXECUTOR = Executors.newSingleThreadExecutor();
     private final List<PendingLogEntry> pendingLogs = Collections.synchronizedList(new ArrayList<>());
-
 
     public DatabaseAppender(@NotNull Database database, Core core) {
         this.database = database;
@@ -102,15 +101,15 @@ public class DatabaseAppender implements LogAppender {
         // Prepare all rows
         for (PendingLogEntry entry : logEntries) {
             final PendingLog pl = entry.pendingLog;
-            final String server = Core.getCurrentServer() != null ? Core.getCurrentServer() : "unknown";
             final String level = pl.getLevel() != null ? pl.getLevel() : "INFO";
             final String action = pl.getAction() != null ? pl.getAction() : "";
             final String message = entry.finalMessage != null ? entry.finalMessage : "";
 
             // Main log row
             logRows.add(List.of(
-                    new UuidStatementValue(pl.getId()),
-                    new StringStatementValue(server),
+                    new LongStatementValue(pl.getId()),
+                    new IntegerStatementValue(Core.getCurrentServer()),
+                    new IntegerStatementValue(Core.getCurrentSeason()),
                     new StringStatementValue(level),
                     new StringStatementValue(action),
                     new StringStatementValue(message),
@@ -122,7 +121,9 @@ public class DatabaseAppender implements LogAppender {
             if (ctx != null && !ctx.isEmpty()) {
                 ctx.forEach((key, value) -> {
                     contextRows.add(List.of(
-                            new UuidStatementValue(pl.getId()),
+                            new LongStatementValue(pl.getId()),
+                            new IntegerStatementValue(Core.getCurrentServer()),
+                            new IntegerStatementValue(Core.getCurrentSeason()),
                             new StringStatementValue(key != null ? key : ""),
                             new StringStatementValue(value != null ? value : "")
                     ));
@@ -135,8 +136,7 @@ public class DatabaseAppender implements LogAppender {
         // Create bulk insert for logs
         if (!logRows.isEmpty()) {
             statements.add(Statement.builder()
-                    .lowPriority()
-                    .insertInto("logs", "id", "Server", "Level", "Action", "Message", "Time")
+                    .insertInto("logs", "id", "Server", "Season", "Level", "Action", "Message", "Time")
                     .valuesBulk(logRows)
                     .build());
         }
@@ -144,8 +144,7 @@ public class DatabaseAppender implements LogAppender {
         // Create bulk insert for context
         if (!contextRows.isEmpty()) {
             statements.add(Statement.builder()
-                    .lowPriority()
-                    .insertInto("logs_context", "LogID", "Context", "Value")
+                    .insertInto("logs_context", "LogID", "Server", "Season", "Context", "Value")
                     .valuesBulk(contextRows)
                     .build());
         }

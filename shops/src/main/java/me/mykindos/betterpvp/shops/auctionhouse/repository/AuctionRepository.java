@@ -44,8 +44,8 @@ public class AuctionRepository implements IRepository<Auction> {
         String query = "SELECT * FROM auctions LEFT JOIN auction_transaction_history on auctions.id = auction_transaction_history.AuctionID WHERE Server = ? AND Season = ?";
 
         Statement statement = new Statement(query,
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()));
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()));
         try (ResultSet result = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 boolean delivered = result.getBoolean(10);
@@ -86,8 +86,8 @@ public class AuctionRepository implements IRepository<Auction> {
         ItemStack itemStack = auction.getItemStack().clone();
         Statement statement = new Statement(query,
                 new UuidStatementValue(auction.getAuctionID()),
-                StringStatementValue.of(Core.getCurrentServer()),
-                StringStatementValue.of(Core.getCurrentSeason()),
+                IntegerStatementValue.of(Core.getCurrentServer()),
+                IntegerStatementValue.of(Core.getCurrentSeason()),
                 new UuidStatementValue(auction.getSeller()),
                 new StringStatementValue(Base64.getEncoder().encodeToString(itemStack.serializeAsBytes())),
                 new IntegerStatementValue(auction.getSellPrice()),

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import me.mykindos.betterpvp.core.Core;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -44,8 +45,8 @@ public class SnowflakeIdGenerator {
     private final AtomicLong sequence = new AtomicLong(0L);
 
     public SnowflakeIdGenerator() {
-        this.serverId = generateServerId(Core.getCurrentServer());
-        this.seasonId = generateSeasonId(Core.getCurrentSeason());
+        this.serverId = generateServerId(Core.getCurrentServer() + "");
+        this.seasonId = generateSeasonId(Core.getCurrentSeason() + "");
     }
 
     /**
@@ -128,7 +129,7 @@ public class SnowflakeIdGenerator {
         if (serverName == null || serverName.equals("unknown")) {
             return 0;
         }
-        return Math.abs((long) serverName.hashCode()) & MAX_SERVER_ID;
+        return serverName.hashCode() & MAX_SERVER_ID;
     }
 
     /**
@@ -138,43 +139,16 @@ public class SnowflakeIdGenerator {
         if (seasonName == null || seasonName.equals("unknown")) {
             return 0;
         }
-        return Math.abs((long) seasonName.hashCode()) & MAX_SEASON_ID;
+        return seasonName.hashCode() & MAX_SEASON_ID;
     }
 
     /**
      * Information extracted from a Snowflake ID.
      */
-    public static class SnowflakeInfo {
-        private final long timestamp;
-        private final long serverId;
-        private final long seasonId;
-        private final long sequence;
-
-        public SnowflakeInfo(long timestamp, long serverId, long seasonId, long sequence) {
-            this.timestamp = timestamp;
-            this.serverId = serverId;
-            this.seasonId = seasonId;
-            this.sequence = sequence;
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
-
-        public long getServerId() {
-            return serverId;
-        }
-
-        public long getSeasonId() {
-            return seasonId;
-        }
-
-        public long getSequence() {
-            return sequence;
-        }
+    public record SnowflakeInfo(long timestamp, long serverId, long seasonId, long sequence) {
 
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             return String.format("SnowflakeInfo{timestamp=%d, serverId=%d, seasonId=%d, sequence=%d}",
                     timestamp, serverId, seasonId, sequence);
         }

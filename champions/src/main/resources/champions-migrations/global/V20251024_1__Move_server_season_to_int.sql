@@ -1,5 +1,50 @@
+DROP TABLE IF EXISTS champions_killdeath_data;
+DROP TABLE IF EXISTS champions_kills;
+DROP TABLE IF EXISTS champions_kill_contributions;
+DROP TABLE IF EXISTS champions_combat_stats;
+
+create table if not exists champions_killdeath_data
+(
+    Matchup varchar(255)  not null,
+    Metric  varchar(255)  not null,
+    Value   int default 0 null,
+    constraint champions_killdeath_data_uk
+        unique (Matchup, Metric)
+);
+
+create table if not exists champions_kills
+(
+    KillId      varchar(36) not null primary key,
+    KillerClass varchar(20) default '',
+    VictimClass varchar(20) default ''
+);
+
+create table if not exists champions_kill_contributions
+(
+    ContributionId   varchar(36) not null primary key,
+    ContributorClass varchar(20) default ''
+);
+
+create table if not exists champions_combat_stats
+(
+    Gamer             varchar(36)         not null,
+    Server            tinyint unsigned    not null,
+    Season            tinyint unsigned    not null,
+    Class             varchar(20)         default '',
+    Rating            int                 not null,
+    Killstreak        int                 not null default 0,
+    HighestKillstreak int                 not null default 0,
+    Valid             tinyint             not null default 1
+);
+
+alter table champions_combat_stats
+    add constraint champions_combat_stats_pk
+        primary key (Gamer, Server, Season, Class);
+
+
+
 DROP PROCEDURE IF EXISTS GetTopRatingByClass;
-CREATE PROCEDURE GetTopRatingByClass(serverVar varchar(64), seasonVar varchar(64), top int, class varchar(20))
+CREATE PROCEDURE GetTopRatingByClass(serverVar tinyint unsigned, seasonVar tinyint unsigned, top int, class varchar(20))
 BEGIN
     SELECT r.Gamer, r.Rating
     FROM champions_combat_stats as r
@@ -12,7 +57,7 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKillsByClass;
-CREATE PROCEDURE GetTopKillsByClass(serverVar varchar(64), seasonVar varchar(64), top int, class varchar(20))
+CREATE PROCEDURE GetTopKillsByClass(serverVar tinyint unsigned, seasonVar tinyint unsigned, top int, class varchar(20))
 BEGIN
     SELECT Killer as Gamer, COUNT(*) AS Kills
     FROM kills
@@ -27,7 +72,7 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS GetTopDeathsByClass;
-CREATE PROCEDURE GetTopDeathsByClass(serverVar varchar(64), seasonVar varchar(64), top int, class varchar(20))
+CREATE PROCEDURE GetTopDeathsByClass(serverVar tinyint unsigned, seasonVar tinyint unsigned, top int, class varchar(20))
 BEGIN
     SELECT Victim as Gamer, COUNT(*) AS Deaths
     FROM kills
@@ -42,7 +87,7 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKDRByClass;
-CREATE PROCEDURE GetTopKDRByClass(serverVar varchar(64), seasonVar varchar(64), top INT, class VARCHAR(20))
+CREATE PROCEDURE GetTopKDRByClass(serverVar tinyint unsigned, seasonVar tinyint unsigned, top INT, class VARCHAR(20))
 BEGIN
     WITH KillCount AS (SELECT Killer AS Gamer, COUNT(*) AS Kills
                        FROM kills
@@ -69,20 +114,20 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKillstreakByClass;
-CREATE PROCEDURE GetTopKillstreakByClass(serverVar varchar(64), seasonVar varchar(64), top int, class varchar(20))
+CREATE PROCEDURE GetTopKillstreakByClass(serverVar tinyint unsigned, seasonVar tinyint unsigned, top int, class varchar(20))
 BEGIN
     SELECT Gamer, Killstreak
     FROM champions_combat_stats AS k
     WHERE k.Server = serverVar
-        AND k.Season = seasonVar
-        AND k.Class = class
+      AND k.Season = seasonVar
+      AND k.Class = class
       AND k.Valid = 1
     ORDER BY Killstreak DESC
     LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopHighestKillstreakByClass;
-CREATE PROCEDURE GetTopHighestKillstreakByClass(serverVar varchar(64), seasonVar varchar(64), top INT,
+CREATE PROCEDURE GetTopHighestKillstreakByClass(serverVar tinyint unsigned, seasonVar tinyint unsigned, top INT,
                                                 class VARCHAR(20))
 BEGIN
     SELECT Gamer, HighestKillstreak AS HighestKillstreak
@@ -96,7 +141,7 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS GetChampionsData;
-CREATE PROCEDURE GetChampionsData(serverVar varchar(64), seasonVar varchar(64), player varchar(36))
+CREATE PROCEDURE GetChampionsData(serverVar tinyint unsigned, seasonVar tinyint unsigned, player varchar(36))
 BEGIN
     SELECT cs.Class                      AS Class,
            IFNULL(SUM(kills_count), 0)   AS Kills,

@@ -59,8 +59,8 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
         String query = "SELECT * FROM clans_fields_ores WHERE Server = ? AND Season = ?;";
 
         try (ResultSet result = database.executeQuery(new Statement(query,
-                new StringStatementValue(Core.getCurrentServer()),
-                new StringStatementValue(Core.getCurrentSeason())
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason())
         ), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 final String world = result.getString("World");
@@ -86,8 +86,8 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     public void delete(String world, int x, int y, int z) {
         String stmt = "DELETE FROM clans_fields_ores WHERE Server = ? AND Season = ? AND World = ? AND X = ? AND Y = ? AND Z = ?;";
         database.executeUpdate(new Statement(stmt,
-                new StringStatementValue(Core.getCurrentServer()),
-                new StringStatementValue(Core.getCurrentSeason()),
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(world),
                 new IntegerStatementValue(x),
                 new IntegerStatementValue(y),
@@ -103,8 +103,8 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
         String stmt = "INSERT INTO clans_fields_ores (Server, Season, World, X, Y, Z, Type, Data) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         database.executeUpdate(new Statement(stmt,
-                new StringStatementValue(Core.getCurrentServer()),
-                new StringStatementValue(Core.getCurrentSeason()),
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(ore.getWorld()),
                 new IntegerStatementValue(ore.getX()),
                 new IntegerStatementValue(ore.getY()),
@@ -124,8 +124,8 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             }
 
             Statement statement = new Statement(stmt,
-                    new StringStatementValue(Core.getCurrentServer()),
-                    new StringStatementValue(Core.getCurrentSeason()),
+                    new IntegerStatementValue(Core.getCurrentServer()),
+                    new IntegerStatementValue(Core.getCurrentSeason()),
                     new StringStatementValue(ore.getWorld()),
                     new IntegerStatementValue(ore.getX()),
                     new IntegerStatementValue(ore.getY()),

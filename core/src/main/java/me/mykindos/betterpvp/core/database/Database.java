@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
@@ -60,6 +61,28 @@ public class Database {
     public Database(Core core, IDatabaseConnection connection) {
         this.core = core;
         this.connection = connection;
+    }
+
+    public int getServerId(String serverName) {
+        int serverId = 0;
+
+        Statement createNewServerId = new Statement("INSERT IGNORE INTO servers (id, Name) VALUES ((SELECT MAX(id) + 1 FROM servers), ?)",
+                new StringStatementValue(serverName));
+
+        executeUpdate(createNewServerId, TargetDatabase.GLOBAL).join();
+
+        Statement getServerId = new Statement("SELECT id FROM servers WHERE Name = ?",
+                new StringStatementValue(serverName));
+
+        try (CachedRowSet results = executeQuery(getServerId, TargetDatabase.GLOBAL).join()) {
+            if (results.next()) {
+                serverId = results.getInt("id");
+            }
+        } catch (SQLException e) {
+            log.error("Failed to fetch server id for {}", serverName).submit();
+        }
+
+        return serverId;
     }
 
     /**
@@ -294,7 +317,7 @@ public class Database {
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
     public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase) {
-       return executeTransaction(statements, targetDatabase, WRITE_EXECUTOR, true);
+        return executeTransaction(statements, targetDatabase, WRITE_EXECUTOR, true);
     }
 
     public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase, boolean catchErrors) {
@@ -312,7 +335,6 @@ public class Database {
     public CompletableFuture<Void> executeTransaction(List<Statement> statements) {
         return executeTransaction(statements, DEFAULT_DATABASE, WRITE_EXECUTOR, true);
     }
-
 
 
     /**
@@ -529,7 +551,7 @@ public class Database {
                     setStatementParameters(preparedStatement, statement);
                     preparedStatement.execute();
                 } catch (SQLException ex) {
-                    if(catchErrors) {
+                    if (catchErrors) {
                         log.error("Error executing transaction with query: {}", statement.getQuery(), ex).submit();
                         connection.rollback();
                         throw ex; // Rethrow to trigger the outer catch block
@@ -538,7 +560,7 @@ public class Database {
             }
             connection.commit();
         } catch (SQLException ex) {
-            if(catchErrors) {
+            if (catchErrors) {
                 log.error("Error executing transaction", ex).submit();
                 connection.rollback();
                 throw ex; // Rethrow to ensure proper error handling in calling method

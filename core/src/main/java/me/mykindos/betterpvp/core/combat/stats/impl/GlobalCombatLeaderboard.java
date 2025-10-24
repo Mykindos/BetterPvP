@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
@@ -140,8 +139,8 @@ public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData>
     }
 
     private static @NotNull Statement getStatement(CombatSort sortType) {
-        final StringStatementValue server = new StringStatementValue(Core.getCurrentServer());
-        final StringStatementValue season = new StringStatementValue(Core.getCurrentSeason());
+        final IntegerStatementValue server = new IntegerStatementValue(Core.getCurrentServer());
+        final IntegerStatementValue season = new IntegerStatementValue(Core.getCurrentSeason());
         final IntegerStatementValue top = new IntegerStatementValue(10);
         return switch (sortType) {
             case RATING -> new Statement("CALL GetTopRating(?, ?, ?);", server, season, top);

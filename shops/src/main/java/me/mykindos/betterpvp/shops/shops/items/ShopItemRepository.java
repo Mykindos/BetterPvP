@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.shops.shops.items.data.PolynomialData;
 import org.bukkit.Material;
 
@@ -57,8 +56,8 @@ public class ShopItemRepository {
                 String dynamicPricingQuery = "SELECT * FROM shopitems_dynamic_pricing WHERE shopItemId = ? AND Server = ? AND Season = ?";
                 Statement statement = new Statement(dynamicPricingQuery,
                         new IntegerStatementValue(id),
-                        StringStatementValue.of(Core.getCurrentServer()),
-                        StringStatementValue.of(Core.getCurrentSeason()));
+                        new IntegerStatementValue(Core.getCurrentServer()),
+                        new IntegerStatementValue(Core.getCurrentSeason()));
                 try (CachedRowSet dynamicPricingResult = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
                     if (dynamicPricingResult.next()) {
                         int minSellPrice = dynamicPricingResult.getInt(4);
@@ -110,9 +109,9 @@ public class ShopItemRepository {
                 SELECT shopItemId, ?, ?, MinSellPrice, BaseSellPrice, MaxSellPrice,
                        MinBuyPrice, BaseBuyPrice, MaxBuyPrice, BaseStock, MaxStock, CurrentStock
                 FROM shopitems_dynamic_pricing
-                WHERE Server = "TEMPLATE" AND Season = "TEMPLATE"
+                WHERE Server = 0 AND Season = 0
                 """;
-        database.executeUpdate(new Statement(query, StringStatementValue.of(Core.getCurrentServer()), StringStatementValue.of(Core.getCurrentSeason())), TargetDatabase.GLOBAL).join();
+        database.executeUpdate(new Statement(query, IntegerStatementValue.of(Core.getCurrentServer()), IntegerStatementValue.of(Core.getCurrentSeason())), TargetDatabase.GLOBAL).join();
     }
 
     public void updateStock(List<DynamicShopItem> dynamicShopItems) {
@@ -122,8 +121,8 @@ public class ShopItemRepository {
             updateQueries.add(new Statement(query,
                     new IntegerStatementValue(dynamicShopItem.getCurrentStock()),
                     new IntegerStatementValue(dynamicShopItem.getId()),
-                    StringStatementValue.of(Core.getCurrentServer()),
-                    StringStatementValue.of(Core.getCurrentSeason())));
+                    new IntegerStatementValue(Core.getCurrentServer()),
+                    new IntegerStatementValue(Core.getCurrentSeason())));
         });
 
         database.executeBatch(updateQueries, TargetDatabase.GLOBAL);
