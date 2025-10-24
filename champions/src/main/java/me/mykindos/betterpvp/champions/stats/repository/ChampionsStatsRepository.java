@@ -43,9 +43,9 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
             final RoleStatistics roleStatistics = new RoleStatistics(combatDataMap, roleManager, player);
             final UuidStatementValue uuid = new UuidStatementValue(player);
             Statement statement = new Statement("CALL GetChampionsData(?, ?, ?)",
-                    uuid,
                     IntegerStatementValue.of(Core.getCurrentServer()),
-                    IntegerStatementValue.of(Core.getCurrentSeason()));
+                    IntegerStatementValue.of(Core.getCurrentSeason()),
+                    uuid);
             database.executeProcedure(statement, -1, result -> {
                 try {
                     while (result.next()) {
