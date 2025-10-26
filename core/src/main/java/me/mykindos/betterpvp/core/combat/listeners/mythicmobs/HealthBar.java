@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -37,15 +36,6 @@ public class HealthBar {
         final Location entityLocation = getEntity().getLocation();
         final Location boneLocation = bone.getLocation();
         this.delta = boneLocation.toVector().subtract(entityLocation.toVector());
-
-        this.display = getEntity().getWorld().spawn(boneLocation, TextDisplay.class, ent -> {
-            ent.setPersistent(false);
-            ent.setBillboard(Display.Billboard.CENTER);
-            ent.setTeleportDuration(1);
-            ent.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-        });
-
-        UtilEntity.setViewRangeBlocks(display, 10);
     }
 
     private LivingEntity getEntity() {
@@ -54,7 +44,7 @@ public class HealthBar {
 
     public void update() {
         final LivingEntity entity = this.getEntity();
-        if (entity == null || !entity.getWorld().isPositionLoaded(entity.getLocation())) {
+        if (entity == null) {
             return;
         }
 
@@ -62,21 +52,31 @@ public class HealthBar {
             return; // Stop if model is removed or chunk is not loaded
         }
 
+        if (display == null) {
+            final Location boneLocation = entity.getLocation().add(delta);
+            this.display = getEntity().getWorld().spawn(boneLocation, TextDisplay.class, ent -> {
+                ent.setPersistent(false);
+                ent.setBillboard(Display.Billboard.CENTER);
+                ent.setTeleportDuration(1);
+                ent.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+            });
+
+            UtilEntity.setViewRangeBlocks(display, 10);
+        }
+
         // Update health if alive
         if (isValid()) {
             double maxHealth = Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
             float percentage = (float) (entity.getHealth() / maxHealth);
-            if(percentage != lastPercentage) {
+            if (percentage != lastPercentage) {
                 final TextComponent health = Component.text((int) entity.getHealth(), ProgressColor.of(percentage).getTextColor());
                 final TextComponent bar = ProgressBar.withLength(percentage, 7).build();
                 display.text(health.appendSpace().append(bar));
                 lastPercentage = percentage;
             }
-        }
 
-        // Teleport to entity
-        final Location location = entity.getLocation().add(delta);
-        display.teleport(location);
+            display.teleport(entity.getLocation().add(delta));
+        }
     }
 
     public boolean isValid() {
@@ -87,10 +87,7 @@ public class HealthBar {
     public void despawn() {
         if (display != null && !UtilEntity.isRemoved(display)) {
             display.remove();
-            Bukkit.broadcastMessage("removed");
             return;
-        } else {
-            Bukkit.broadcastMessage("didnt remove");
         }
         display = null;
         model = null;

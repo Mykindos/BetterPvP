@@ -24,6 +24,18 @@ public enum ClientProperty {
     MEDIA_CHANNEL,
     SHOW_TAG,
     /**
+     * Whether music tracks are enabled for this client
+     */
+    MUSIC_ENABLED,
+    /**
+     * Whether ambient sounds are enabled for this client
+     */
+    AMBIENT_ENABLED,
+    /**
+     * Whether UI sounds are enabled for this client
+     */
+    UI_SOUNDS_ENABLED,
+    /**
      * The last time in unix time this client was connected
      * Updates on client quit
      */
