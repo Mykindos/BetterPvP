@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -194,21 +196,16 @@ public class ClientSQLLayer {
     }
 
     /**
-     * Loads properties for a given entity from the specified table concurrently.
+     * Asynchronously loads properties from a database result and maps them to the provided property container.
      *
-     * @param tableName         The database table to query
-     * @param idColumnName      The name of the ID column in the table
-     * @param idValue           The ID value to look up
-     * @param propertyContainer The container to load properties into
-     * @param targetDatabase    The database to query (LOCAL or GLOBAL)
-     * @return A CompletableFuture that completes when the properties are loaded
+     * @param statement The SQL statement used to query the properties from the database.
+     * @param propertyContainer The container where the parsed properties will be stored.
+     * @return A CompletableFuture that completes when the properties have been successfully loaded and mapped.
      */
-    private CompletableFuture<Void> loadPropertiesAsync(String tableName, String idColumnName, String idValue,
-                                                        PropertyContainer propertyContainer, TargetDatabase targetDatabase) {
-        String query = String.format("SELECT Property, Value FROM %s WHERE %s = ?",
-                tableName, idColumnName);
+    private CompletableFuture<Void> loadPropertiesAsync(Statement statement,
+                                                        PropertyContainer propertyContainer) {
 
-        return database.executeQuery(new Statement(query, new StringStatementValue(idValue)), targetDatabase)
+        return database.executeQuery(statement, TargetDatabase.GLOBAL)
                 .thenAccept(result -> {
                     try {
                         if (result != null) {
@@ -216,8 +213,7 @@ public class ClientSQLLayer {
                             result.close();
                         }
                     } catch (SQLException | ClassNotFoundException ex) {
-                        log.error("Failed to load {} properties for {}",
-                                tableName.split("_")[0], idValue, ex).submit();
+                        log.error("Failed to load properties with query {}", statement.getQuery(), ex).submit();
                     }
                 });
     }
@@ -229,7 +225,9 @@ public class ClientSQLLayer {
      * @return A CompletableFuture that completes when properties are loaded
      */
     public CompletableFuture<Void> loadClientPropertiesAsync(Client client) {
-        return loadPropertiesAsync("client_properties", "Client", client.getUuid(), client, TargetDatabase.GLOBAL);
+        Statement statement = new Statement("SELECT * FROM gamer_properties WHERE Gamer = ?",
+                new StringStatementValue(client.getUuid()));
+        return loadPropertiesAsync(statement, client);
     }
 
     /**
@@ -240,7 +238,11 @@ public class ClientSQLLayer {
      */
     public CompletableFuture<Void> loadGamerPropertiesAsync(Client client) {
         Gamer gamer = client.getGamer();
-        return loadPropertiesAsync("gamer_properties", "Gamer", gamer.getUuid(), gamer, TargetDatabase.LOCAL);
+        Statement statement = new Statement("SELECT * FROM gamer_properties WHERE Gamer = ? AND Server = ? AND Season = ?",
+                new StringStatementValue(gamer.getUuid()),
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason()));
+        return loadPropertiesAsync(statement, gamer);
     }
 
     /**
@@ -304,11 +306,13 @@ public class ClientSQLLayer {
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
         // Gamer
-        String savePropertyQuery = "INSERT INTO gamer_properties (Gamer, Property, Value) VALUES (?, ?, ?)"
+        String savePropertyQuery = "INSERT INTO gamer_properties (Gamer, Server, Season, Property, Value) VALUES (?, ?, ?, ?, ?)"
                 + " ON DUPLICATE KEY UPDATE Value = ?";
 
         Statement statement = new Statement(savePropertyQuery,
                 new StringStatementValue(gamer.getUuid()),
+                new IntegerStatementValue(Core.getCurrentServer()),
+                new IntegerStatementValue(Core.getCurrentSeason()),
                 new StringStatementValue(property),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
@@ -330,7 +334,7 @@ public class ClientSQLLayer {
         synchronized (queuedStatUpdates) {
             if (queuedStatUpdates.containsKey(uuid.toString())) {
                 List<Statement> statements = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
-                database.executeBatch(statements);
+                database.executeBatch(statements, TargetDatabase.GLOBAL);
             }
         }
 
@@ -351,7 +355,7 @@ public class ClientSQLLayer {
             queuedStatUpdates.clear();
         }
 
-        database.executeBatch(statementsToRun, TargetDatabase.LOCAL);
+        database.executeBatch(statementsToRun, TargetDatabase.GLOBAL);
         log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
 
 

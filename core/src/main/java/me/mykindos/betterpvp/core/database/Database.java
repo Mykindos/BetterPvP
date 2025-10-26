@@ -18,6 +18,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -66,10 +67,12 @@ public class Database {
     public int getServerId(String serverName) {
         int serverId = 0;
 
-        Statement createNewServerId = new Statement("INSERT IGNORE INTO servers (id, Name) VALUES ((SELECT MAX(id) + 1 FROM servers), ?)",
-                new StringStatementValue(serverName));
+        List<Statement> statements = new ArrayList<>();
+        statements.add(new Statement("SET @max_id = (SELECT COALESCE(MAX(id), 0) + 1 FROM servers);"));
+        statements.add(new Statement("INSERT IGNORE INTO servers (id, Name) VALUES (@max_id, ?);",
+                new StringStatementValue(serverName)));
 
-        executeUpdate(createNewServerId, TargetDatabase.GLOBAL).join();
+        executeTransaction(statements, TargetDatabase.GLOBAL).join();
 
         Statement getServerId = new Statement("SELECT id FROM servers WHERE Name = ?",
                 new StringStatementValue(serverName));

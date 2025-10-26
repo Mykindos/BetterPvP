@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
@@ -47,7 +48,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
     public void loadBuilds(GamerBuilds builds) {
         String query = "SELECT * FROM champions_builds WHERE Gamer = ?";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(builds.getUuid()))).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(builds.getUuid())), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 String uuid = result.getString(1);
                 String role = result.getString(2);
@@ -134,7 +135,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 new IntegerStatementValue(build.getId()),
                 swordStatement, axeStatement, bowStatement,
                 passiveAStatement, passiveBStatement, globalStatement,
-                new BooleanStatementValue(build.isActive())));
+                new BooleanStatementValue(build.isActive())), TargetDatabase.GLOBAL);
     }
 
     public void update(RoleBuild build) {
@@ -155,7 +156,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 new BooleanStatementValue(build.isActive()),
                 swordStatement, axeStatement, bowStatement,
                 passiveAStatement, passiveBStatement, globalStatement,
-                new BooleanStatementValue(build.isActive())));
+                new BooleanStatementValue(build.isActive())), TargetDatabase.GLOBAL);
     }
 
     public void loadDefaultBuilds(GamerBuilds gamerBuilds) {
