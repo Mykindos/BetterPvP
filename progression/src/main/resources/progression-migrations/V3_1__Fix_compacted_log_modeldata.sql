@@ -1,1 +1,0 @@
-UPDATE items SET ModelData = 1 WHERE keyname = 'compacted_log' AND Namespace = 'progression';

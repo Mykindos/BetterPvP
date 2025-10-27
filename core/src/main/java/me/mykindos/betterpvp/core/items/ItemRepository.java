@@ -21,7 +21,7 @@ import java.util.List;
 @CustomLog
 public class ItemRepository implements IRepository<BPvPItem> {
 
-    private Database database;
+    private final Database database;
 
     @Inject
     public ItemRepository(Database database) {

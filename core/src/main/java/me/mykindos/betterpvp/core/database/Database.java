@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 public class Database {
     private final Core core;
     private final IDatabaseConnection connection;
-    private static final TargetDatabase DEFAULT_DATABASE = TargetDatabase.LOCAL;
+    private static final TargetDatabase DEFAULT_DATABASE = TargetDatabase.GLOBAL;
 
     // Default timeout values
     private static final long DEFAULT_QUERY_TIMEOUT_SECONDS = 30;
@@ -329,7 +329,7 @@ public class Database {
 
     /**
      * Executes a series of database statements within a single transaction.
-     * By default, the target database is set to {@code TargetDatabase.LOCAL}.
+     * By default, the target database is set to {@code TargetDatabase.GLOBAL}.
      *
      * @param statements A list of {@link Statement} objects representing the SQL queries
      *                   and their associated parameters to be executed as part of the transaction.

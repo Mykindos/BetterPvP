@@ -1,1 +1,0 @@
-INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('FISHING_ROD', 'progression', 'sharkbait', '<orange>Sharkbait', 1, 0, 1);

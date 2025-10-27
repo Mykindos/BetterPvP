@@ -23,7 +23,6 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
     @Inject
     public MariaDBDatabaseConnection(Core core) {
         this.core = core;
-        configureHikari(TargetDatabase.LOCAL, "core.database.local");
         configureHikari(TargetDatabase.GLOBAL, "core.database.global");
     }
 

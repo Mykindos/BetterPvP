@@ -60,7 +60,7 @@ public class Progression extends BPvPPlugin {
             injector = core.getInjector().createChildInjector(new ProgressionInjectorModule(this), new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations", "progression", TargetDatabase.LOCAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations/global", "progression", TargetDatabase.GLOBAL);
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 

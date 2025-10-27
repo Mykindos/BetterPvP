@@ -1,0 +1,1 @@
+INSERT IGNORE INTO property_map VALUES ("MINEPLEX_LEVEL", "int");

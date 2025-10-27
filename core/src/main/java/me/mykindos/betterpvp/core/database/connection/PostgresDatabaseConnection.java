@@ -23,7 +23,6 @@ public class PostgresDatabaseConnection implements IDatabaseConnection {
     @Inject
     public PostgresDatabaseConnection(Core core) {
         this.core = core;
-        configureHikari(TargetDatabase.LOCAL, "core.database.local");
         configureHikari(TargetDatabase.GLOBAL, "core.database.global");
     }
 
@@ -91,7 +90,7 @@ public class PostgresDatabaseConnection implements IDatabaseConnection {
             flyway.repair();
             flyway.migrate();
         } catch (Exception ex) {
-            log.error("Please correctly configure the Postgresql database connection in the core plugin config.", ex).submit();
+            log.error("Please correctly configure the Postgres database connection in the core plugin config.", ex).submit();
         }
 
     }
