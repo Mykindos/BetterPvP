@@ -24,7 +24,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -36,7 +35,6 @@ import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -82,7 +80,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 final int chargeAsPercentage = (int) (abilityData.getCharge() * 100);
 
                 // ex: Charge: 5%
-                return createComponentMessage("Charge", String.valueOf(chargeAsPercentage), "%");
+                return getActionBarComponent("Charge", String.valueOf(chargeAsPercentage), "%");
             }
     );
 
@@ -111,7 +109,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 final String timeLeft = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1, true);
 
                 // ex: Strength For: 4.2s
-                return createComponentMessage("Strength For", timeLeft, "s");
+                return getActionBarComponentForDuration("Strength", timeLeft);
             }
     );
 
@@ -167,22 +165,6 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         if (abilityData == null || !phase.equals(abilityData.getPhase())) return null;
 
         return abilityData;
-    }
-
-    /**
-     * A helper method used to construct an adventure component given a few strings. This method is only used in
-     * the action bars above.
-     * <p>
-     * The returned component will be in this format:
-     * <code>`label`: `numberValue``symbol`</code>
-     * <p>
-     * Example:
-     * <code>Charge: 5%</code>
-     */
-    private @NotNull Component createComponentMessage(String label, String numberValue, String symbol) {
-        return Component.text(label + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                .append(Component.text(numberValue).color(NamedTextColor.GREEN).decoration(TextDecoration.BOLD, false))
-                .append(Component.text(symbol).color(NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false));
     }
 
     /**

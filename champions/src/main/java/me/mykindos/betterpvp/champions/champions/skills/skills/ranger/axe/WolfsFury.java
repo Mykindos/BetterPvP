@@ -6,20 +6,17 @@ import com.google.inject.Singleton;
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.StateSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -29,16 +26,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.EquipmentSlot;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, BuffSkill {
-    private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
+public class WolfsFury extends StateSkill implements Listener, OffensiveSkill, BuffSkill {
     private final WeakHashMap<Player, Integer> missedSwings = new WeakHashMap<>();
+
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int strengthLevel;
@@ -49,11 +47,6 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     @Inject
     public WolfsFury(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-    }
-
-    @Override
-    public String getName() {
-        return "Wolfs Fury";
     }
 
     @Override
@@ -88,25 +81,18 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public Role getClassType() {
-        return Role.RANGER;
+    public void activate(Player player, int level) {
+        super.activate(player, level);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
+        championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), getStrengthLevel(level), (long) (getDuration(level) * 1000L));
     }
 
-    @Override
-    public SkillType getType() {
-        return SkillType.AXE;
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
 
     @EventHandler
     public void onDamage(CustomDamageEvent e) {
         if (e.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(e.getDamager() instanceof Player damager)) return;
-        if (!active.containsKey(damager)) return;
+        if (!activeState.containsKey(damager.getUniqueId())) return;
 
         int level = getLevel(damager);
         if (level > 0) {
@@ -116,25 +102,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         missedSwings.put(damager, 0);
     }
 
-    @UpdateEvent
-    public void onUpdate() {
-        Iterator<Map.Entry<Player, Long>> iterator = active.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Player, Long> entry = iterator.next();
-            Player player = entry.getKey();
-            if (player == null) {
-                iterator.remove();
-            } else {
-                spawnSkillParticles(player);
-                if (entry.getValue() - System.currentTimeMillis() <= 0) {
-                    expire(player, true);
-                    iterator.remove();
-                }
-            }
-        }
-    }
-
-    private void spawnSkillParticles(Player player) {
+    @Override
+    protected void doOnSuccessfulUpdate(@NotNull Player player) {
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 0.75F);
         new ParticleBuilder(Particle.DUST)
                 .location(player.getLocation().add(0, 1, 0))
@@ -146,51 +115,59 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 .spawn();
     }
 
-    private boolean expire(Player player, boolean force) {
-        if (player == null) {
-            return true;
-        }
-
-        if ((active.get(player) - System.currentTimeMillis() <= 0) || force || player.isDead()) {
-            missedSwings.remove(player);
-            deactivate(player);
-            return true;
-        }
-
-        return false;
-    }
-
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onMiss(PlayerArmSwingEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
 
-        Player player = event.getPlayer();
-
+        final @NotNull Player player = event.getPlayer();
         int level = getLevel(player);
+        if (level <= 0) return;
 
-        if (level > 0) {
-            if (active.containsKey(player)) {
-                missedSwings.put(player, missedSwings.getOrDefault(player, 0) + 1);
-                if (missedSwings.get(player) >= getMaxMissedSwings(level)) {
-                    expire(player, true);
-                    active.remove(player);
-                }
-            }
+        final @NotNull UUID uuid = player.getUniqueId();
+        if (!activeState.containsKey(uuid)) return;
+
+        missedSwings.put(player, missedSwings.getOrDefault(player, 0) + 1);
+        if (missedSwings.get(player) >= getMaxMissedSwings(level)) {
+            doWhenStateEnds(uuid);
         }
     }
 
     @Override
-    public void activate(Player player, int level) {
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
-        active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
-        championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), getStrengthLevel(level), (long) (getDuration(level) * 1000L));
-    }
+    protected void doWhenStateEnds(@NotNull UUID uuid) {
+        super.doWhenStateEnds(uuid);
 
-    public void deactivate(Player player) {
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        final @Nullable Player player = Bukkit.getPlayer(uuid);
+        missedSwings.remove(player);  // if possible, try to remove
+        if (player == null) return;
+
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
 
+    }
+
+    @Override
+    protected @NotNull String getActionBarLabel() {
+        return "Strength";
+    }
+
+    @Override
+    protected double getStateDuration(int level) {
+        return getDuration(level);
+    }
+
+    @Override
+    public Role getClassType() {
+        return Role.RANGER;
+    }
+
+    @Override
+    public SkillType getType() {
+        return SkillType.AXE;
+    }
+
+    @Override
+    public String getName() {
+        return "Wolfs Fury";
     }
 
     @Override
