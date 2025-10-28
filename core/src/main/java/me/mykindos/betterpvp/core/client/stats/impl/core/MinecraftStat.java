@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.EntityType;
@@ -161,6 +162,28 @@ public class MinecraftStat implements IBuildableStat {
         return getFullStat();
     }
 
+    /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        final StringBuilder stringBuilder = new StringBuilder(UtilFormat.cleanString(statistic.name()));
+        if (material != null) {
+            stringBuilder.append(" ")
+                    .append(UtilFormat.cleanString(material.name()));
+        }
+        if (entityType != null) {
+            stringBuilder.append(" ")
+                    .append(UtilFormat.cleanString(entityType.name()));
+        }
+        return stringBuilder.toString();
+    }
+
+
     @Override
     public boolean isSavable() {
         if (!statistic.isSubstatistic()) {
@@ -217,6 +240,17 @@ public class MinecraftStat implements IBuildableStat {
 
         //this is a generic or a non-qualified statistic, therefore check if the base statistic is equal
         return statistic.equals(other.getStatistic());
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return MinecraftStat.builder().statistic(statistic).build();
     }
 
     private static boolean isMaterialStatistic(Statistic statistic) {
