@@ -4,6 +4,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -135,6 +136,31 @@ public enum ClientStat implements IClientStat {
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return getName();
+    }
+
+    /**
+     * Get the qualified name of the stat, if one exists.
+     * Should usually end with the {@link IStat#getSimpleName()}
+     * <p>
+     * i.e. Domination Time Played, Capture the Flag CTF_Oakvale Flags Captured
+     *
+     * @return the qualified name
+     */
+    @Override
+    public String getQualifiedName() {
+        return getSimpleName();
+    }
+
+    /**
      * Whether or not this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -158,5 +184,17 @@ public enum ClientStat implements IClientStat {
             return this.equals(otherStat);
         }
         return compositeStat.containsStat(otherStat);
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        //todo add a way to get set composite parents
+        return this;
     }
 }
