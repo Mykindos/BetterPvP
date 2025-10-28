@@ -34,7 +34,7 @@ public abstract class AbstractStatPagedMenu extends AbstractPagedGui<Item> imple
     private final StringFilterButton<IAbstractStatMenu> periodFilterButton;
 
     private String periodKey;
-    public AbstractStatPagedMenu(@NotNull Client client, @Nullable Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
+    protected AbstractStatPagedMenu(@NotNull Client client, @Nullable Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
         super(9, 6, false, new Structure(
                             "# # # # # # # # P",
                             "# x x x x x x x #",

@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class TimedStatListener implements Listener {
-    public final static long UPDATE_TIME = 60_000;
+    public static final long UPDATE_TIME = 60_000;
     protected final Map<UUID, Long> lastUpdateMap = new ConcurrentHashMap<>();
     protected final ClientManager clientManager;
 
@@ -25,7 +25,7 @@ public abstract class TimedStatListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    abstract public void onUpdate(final Client client, final long deltaTime);
+    public abstract void onUpdate(final Client client, final long deltaTime);
 
     @UpdateEvent(delay = UPDATE_TIME)
     public void doUpdateEvent() {

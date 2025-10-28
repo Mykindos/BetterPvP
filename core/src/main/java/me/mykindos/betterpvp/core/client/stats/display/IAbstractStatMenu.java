@@ -39,7 +39,7 @@ public interface IAbstractStatMenu extends Gui, Windowed {
                 .filter(stat -> {
                     try {
                         if (!(stat instanceof GameTeamMapStat gameTeamMapStat)) return false;
-                        return gameTeamMapStat.getGameName().equals("Domination");
+                        return gameTeamMapStat.getGameName().equals(gameMode);
                     } catch (IllegalArgumentException ignored) {
                         return false;
                     }

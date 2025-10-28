@@ -39,7 +39,6 @@ public class StatBuilder {
             try {
                 return buildableStat.getConstructor().newInstance().copyFromStatname(statName);
             } catch (IllegalArgumentException ignored) {
-                continue;
             } catch (Exception e) {
                 log.error("Error getting stat for name {} ", statName, e).submit();
             }
@@ -47,7 +46,6 @@ public class StatBuilder {
         try {
             return ClientStat.valueOf(statName);
         } catch (IllegalArgumentException ignored) {
-
         }
 
         log.warn("No stat found for {}", statName).submit();
