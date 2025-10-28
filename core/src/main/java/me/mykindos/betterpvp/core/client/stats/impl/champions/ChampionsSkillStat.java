@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.impl.champions;
 
 import com.google.common.base.Preconditions;
+import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.skill.ISkill;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,6 +116,41 @@ public class ChampionsSkillStat implements IBuildableStat {
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        final StringBuilder stringBuilder = new StringBuilder(UtilFormat.cleanString(action.name()));
+        if (!Strings.isNullOrEmpty(skillName)) {
+            stringBuilder.append(" ")
+                    .append(skillName);
+        }
+        if (level != -1) {
+            stringBuilder.append(" ")
+                    .append(level);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Get the qualified name of the stat, if one exists.
+     * Should usually end with the {@link IStat#getSimpleName()}
+     * <p>
+     * i.e. Domination Time Played, Capture the Flag CTF_Oakvale Flags Captured
+     *
+     * @return the qualified name
+     */
+    @Override
+    public String getQualifiedName() {
+        return IBuildableStat.super.getQualifiedName();
+    }
+
+    /**
      * Whether this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -135,6 +173,35 @@ public class ChampionsSkillStat implements IBuildableStat {
     @Override
     public boolean containsStat(String statName) {
         return statName.startsWith(getStatName());
+    }
+
+    /**
+     * Whether this stat contains this otherSTat
+     *
+     * @param otherStat
+     * @return
+     */
+    @Override
+    public boolean containsStat(IStat otherStat) {
+        if (!(otherStat instanceof ChampionsSkillStat other)) return false;
+        if (action != other.action) return false;
+        if (!Strings.isNullOrEmpty(skillName) && !skillName.equals(other.skillName)) return false;
+        if (level != -1 && level != other.level) return false;
+        return true;
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return ChampionsSkillStat.builder()
+                .action(action)
+                .skillName(skillName)
+                .build();
     }
 
     /**
