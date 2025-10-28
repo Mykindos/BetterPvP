@@ -496,9 +496,6 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         // Strength effect sound
         soundEffectToPlay.play(player.getLocation());
 
-        // previously here we removed and re-applied cooldown after calculatedCharge seconds.
-        // cooldown handling now deferred to SkillListener's delayed-cooldown processing.
-        // leave data in place so isUsingSkill(...) can determine when to clean it up.
         abilityData.setAlreadyAppliedStrengthEffectOrActionBar(true);
     }
 
@@ -529,13 +526,11 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         return SkillType.SWORD;
     }
 
-    // NEW: mark this skill as using a delayed cooldown
     @Override
     public boolean isDelayedSkill() {
         return true;
     }
 
-    // NEW: report whether the player is still using this skill; also clean up internal data when the strength phase finishes.
     @Override
     public boolean isUsingSkill(Player player) {
         final @Nullable VanguardsMightData abilityData = data.get(player);
