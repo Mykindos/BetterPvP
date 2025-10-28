@@ -419,7 +419,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
                     // this update event is called every 50ms or every 0.05 seconds
                     final double delayInSeconds = ACTION_BAR_UPDATE_DELAY / 1000d;  // if delay=50 -> delayInSeconds=0.05
-                    abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - delayInSeconds);
+                    final double newTime = abilityData.getStrengthEffectTimeLeft() - delayInSeconds;
+                    abilityData.setStrengthEffectTimeLeft(Math.max(newTime, 0d));
                     continue;
                 }
 
@@ -495,19 +496,10 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         // Strength effect sound
         soundEffectToPlay.play(player.getLocation());
 
-        // Start cooldown when strength effect phase ends
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getCooldowns().removeCooldown(player, getName(), true);
-            championsManager.getCooldowns().use(player,
-                    getName(),
-                    getCooldown(level),
-                    showCooldownFinished(),
-                    true,
-                    isCancellable(),
-                    this::shouldDisplayActionBar);
-
-            data.remove(player);  // ability over
-        }, (long) calculatedCharge * 20L);
+        // previously here we removed and re-applied cooldown after calculatedCharge seconds.
+        // cooldown handling now deferred to SkillListener's delayed-cooldown processing.
+        // leave data in place so isUsingSkill(...) can determine when to clean it up.
+        abilityData.setAlreadyAppliedStrengthEffectOrActionBar(true);
     }
 
     // Defensive Stance showed shield so we should too
@@ -537,6 +529,37 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         return SkillType.SWORD;
     }
 
+    // NEW: mark this skill as using a delayed cooldown
+    @Override
+    public boolean isDelayedSkill() {
+        return true;
+    }
+
+    // NEW: report whether the player is still using this skill; also clean up internal data when the strength phase finishes.
+    @Override
+    public boolean isUsingSkill(Player player) {
+        final @Nullable VanguardsMightData abilityData = data.get(player);
+        if (abilityData == null) return false;
+
+        final @NotNull VanguardsMightAbilityPhase phase = abilityData.getPhase();
+        if (phase == VanguardsMightAbilityPhase.CHANNELING || phase == VanguardsMightAbilityPhase.TRANSFERENCE) {
+            return true; // still using
+        }
+
+        // Player has reached strength effect phase
+        if (!abilityData.isAlreadyAppliedStrengthEffectOrActionBar()) {
+            return true;
+        }
+
+        // if strength timer still > 0, still using
+        if (abilityData.getStrengthEffectTimeLeft() > 0d) {
+            return true;
+        }
+
+        data.remove(player);
+        return false;
+    }
+
     @Override
     public void loadSkillConfig() {
         passiveChargePerSecond = getConfig("passiveChargePerSecond ", 0.5, Double.class);
@@ -548,4 +571,5 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 2.5, Double.class);
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
     }
+
 }

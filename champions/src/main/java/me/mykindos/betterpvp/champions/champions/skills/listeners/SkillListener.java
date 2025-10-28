@@ -68,14 +68,19 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 @BPvPListener
@@ -92,6 +97,7 @@ public class SkillListener implements Listener {
     private final WeaponManager weaponManager;
 
     private final HashSet<UUID> inventoryDrop = new HashSet<>();
+    private final Map<UUID, DelayedEntry> delayedCooldowns = new HashMap<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
@@ -111,9 +117,9 @@ public class SkillListener implements Listener {
     public void onUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
-        Player player = event.getPlayer();
-        IChampionsSkill skill = event.getSkill();
-        int level = event.getLevel();
+        final @NotNull Player player = event.getPlayer();
+        final IChampionsSkill skill = event.getSkill();
+        final int level = event.getLevel();
 
         if (!skill.canUse(player)) {
             event.setCancelled(true);
@@ -140,9 +146,32 @@ public class SkillListener implements Listener {
         }
 
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
-            if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
-                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
-                event.setCancelled(true);
+            if (cooldownSkill.isDelayedSkill()) {
+
+                // if they already have a cooldown, prevent as usual
+                if (cooldownManager.hasCooldown(player, skill.getName())) {
+                    if (cooldownSkill.showCooldownFinished()) {
+                        cooldownManager.informCooldown(player, skill.getName());
+                    }
+                    event.setCancelled(true);
+                    return;
+                }
+
+                // prevent spamming by cancelling if player is already tracked as using a delayed skill
+                final @NotNull UUID id = player.getUniqueId();
+                if (delayedCooldowns.containsKey(id)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                // allow use but track for delayed cooldown processing
+                delayedCooldowns.put(id, new DelayedEntry(cooldownSkill, level));
+                // do not start cooldown now
+            } else {
+                if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
+                        cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
+                    event.setCancelled(true);
+                }
             }
         } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
@@ -557,6 +586,61 @@ public class SkillListener implements Listener {
         });
     }
 
+    /**
+     * Process delayed cooldown skills, starting their cooldowns if the player is no longer using them.
+     * <p>
+     * Cleans up entries for offline or dead players, or if the player no longer can use the skill.
+     */
+    @UpdateEvent
+    public void processDelayedCooldowns() {
+        final Iterator<Map.Entry<UUID, DelayedEntry>> iterator = delayedCooldowns.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<UUID, DelayedEntry> entry = iterator.next();
+            final @NotNull UUID uuid = entry.getKey();
+            final @Nullable DelayedEntry delayed = entry.getValue();
+
+            if (delayed == null) {
+                iterator.remove();
+                continue;
+            }
+
+            final @Nullable Player player = Bukkit.getPlayer(uuid);
+            if (player == null || !player.isOnline() || player.isDead()) {
+                iterator.remove();
+                continue;
+            }
+
+            // if skill no longer usable by player, remove entry without starting cooldown
+            if (!delayed.skill.canUse(player)) {
+                iterator.remove();
+                continue;
+            }
+
+            // if still using skill, skip; otherwise, start cooldown and remove entry
+            if (!delayed.skill.isUsingSkill(player)) {
+                cooldownManager.use(player,
+                        delayed.skill.getName(),
+                        delayed.skill.getCooldown(delayed.level),
+                        delayed.skill.showCooldownFinished(),
+                        true,
+                        delayed.skill.isCancellable(),
+                        delayed.skill::shouldDisplayActionBar,
+                        delayed.skill.getPriority());
+
+                iterator.remove();
+            }
+        }
+    }
+
+    // Simple holder for delayed cooldown entries
+    private static final class DelayedEntry {
+        final CooldownSkill skill;
+        final int level;
+        DelayedEntry(CooldownSkill skill, int level) {
+            this.skill = skill;
+            this.level = level;
+        }
+    }
 
     private int getLevel(Player player, BuildSkill buildSkill) {
         int level = buildSkill.getLevel();

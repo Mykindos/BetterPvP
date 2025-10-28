@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.types;
 
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
+import org.bukkit.entity.Player;
 
 public interface CooldownSkill extends IChampionsSkill {
 
@@ -21,6 +22,14 @@ public interface CooldownSkill extends IChampionsSkill {
 
     default int getPriority() {
         return 1000;
+    }
+
+    default boolean isDelayedSkill() {
+        return false;
+    }
+
+    default boolean isUsingSkill(Player player) {
+        return false;
     }
 
 }
