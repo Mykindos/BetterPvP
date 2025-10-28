@@ -148,6 +148,18 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return wrappedStat.getSimpleName();
+    }
+
+    /**
      * Whether this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -177,5 +189,16 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
         if (!(otherStat instanceof ClanWrapperStat other)) return false;
         if (!Strings.isNullOrEmpty(clanName) && !clanName.equals(other.clanName)) return false;
         return wrappedStat.containsStat(other.wrappedStat);
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return ClanWrapperStat.builder().wrappedStat(wrappedStat.getGenericStat()).build();
     }
 }
