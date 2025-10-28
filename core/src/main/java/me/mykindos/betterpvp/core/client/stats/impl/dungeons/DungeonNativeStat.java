@@ -12,13 +12,14 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 @SuperBuilder
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
@@ -110,6 +111,18 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return UtilFormat.cleanString(action.name());
+    }
+
+    /**
      * Whether this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -128,6 +141,30 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
     @Override
     public boolean containsStat(String statName) {
         return statName.startsWith(getStatName());
+    }
+
+    /**
+     * Whether this stat contains this otherSTat
+     *
+     * @param otherStat
+     * @return
+     */
+    @Override
+    public boolean containsStat(IStat otherStat) {
+        if (!(otherStat instanceof DungeonNativeStat other)) return false;
+        if (!Strings.isNullOrEmpty(dungeonName) && !dungeonName.equals(other.dungeonName)) return false;
+        return action.equals(other.action);
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return DungeonNativeStat.builder().action(action).build();
     }
 
     public enum Action {

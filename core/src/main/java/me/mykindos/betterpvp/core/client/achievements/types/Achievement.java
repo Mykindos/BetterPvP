@@ -248,6 +248,18 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return getName();
+    }
+
+    /**
      * Whether this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -266,5 +278,16 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     @Override
     public boolean containsStat(String statName) {
         return getStatName().equals(statName);
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return this;
     }
 }

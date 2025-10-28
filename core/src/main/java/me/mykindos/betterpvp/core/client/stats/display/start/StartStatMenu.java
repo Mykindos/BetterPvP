@@ -17,6 +17,7 @@ public class StartStatMenu extends AbstractStatMenu {
     public StartStatMenu(Client client, Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
         super(client, previous, periodKey, statPeriodManager);
         setItem(2,2, new ChampionsStatButton());
+        setItem(4, 2, new GenericStatButton());
         setItem(6,2, new ClansStatButton());
     }
 }

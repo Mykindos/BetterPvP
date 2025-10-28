@@ -10,7 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,6 +113,36 @@ public class BossStat implements IBuildableStat {
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return UtilFormat.cleanString(action.name());
+    }
+
+    /**
+     * Get the qualified name of the stat, if one exists.
+     * Should usually end with the {@link IStat#getSimpleName()}
+     * <p>
+     * i.e. Domination Time Played, Capture the Flag CTF_Oakvale Flags Captured
+     *
+     * @return the qualified name
+     */
+    @Override
+    public String getQualifiedName() {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (!com.google.common.base.Strings.isNullOrEmpty(bossName)) {
+            stringBuilder.append(bossName);
+            stringBuilder.append(" ");
+        }
+        return stringBuilder.append(getSimpleName()).toString();
+    }
+
+    /**
      * Whether this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -129,6 +161,25 @@ public class BossStat implements IBuildableStat {
     @Override
     public boolean containsStat(String statName) {
         return statName.startsWith(getStatName());
+    }
+
+    @Override
+    public boolean containsStat(IStat otherStat) {
+        if (!(otherStat instanceof BossStat other)) return false;
+        if (!action.equals(other.action)) return false;
+        if (!Strings.isNullOrEmpty(bossName) && !bossName.equals(other.bossName)) return false;
+        return true;
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return BossStat.builder().action(action).build();
     }
 
     public enum Action {

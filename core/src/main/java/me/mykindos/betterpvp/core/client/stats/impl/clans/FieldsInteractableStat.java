@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -68,6 +70,18 @@ public class FieldsInteractableStat implements IBuildableStat {
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return UtilFormat.cleanString(name);
+    }
+
+    /**
      * Whether this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -86,6 +100,28 @@ public class FieldsInteractableStat implements IBuildableStat {
     @Override
     public boolean containsStat(String statName) {
         return getStatName().equals(statName);
+    }
+
+    /**
+     * Whether this stat contains this otherSTat
+     *
+     * @param otherStat
+     * @return
+     */
+    @Override
+    public boolean containsStat(IStat otherStat) {
+        return this.equals(otherStat);
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return this;
     }
 
     /**

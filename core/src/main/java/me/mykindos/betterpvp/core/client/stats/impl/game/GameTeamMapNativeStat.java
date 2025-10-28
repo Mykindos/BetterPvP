@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -153,6 +154,18 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
     }
 
     /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return UtilFormat.cleanString(action.name());
+    }
+
+    /**
      * Whether this stat is directly savable to the database
      *
      * @return {@code true} if it is, {@code false} otherwise
@@ -194,6 +207,17 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         if (!Strings.isNullOrEmpty(teamName) && !teamName.equals(other.teamName)) return false;
         if (!Strings.isNullOrEmpty(mapName) && !mapName.equals(other.mapName)) return false;
         return true;
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return GameTeamMapNativeStat.builder().action(action).build();
     }
 
     @Override
