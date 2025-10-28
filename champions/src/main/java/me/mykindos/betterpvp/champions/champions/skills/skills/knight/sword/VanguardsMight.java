@@ -419,7 +419,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
                     // this update event is called every 50ms or every 0.05 seconds
                     final double delayInSeconds = ACTION_BAR_UPDATE_DELAY / 1000d;  // if delay=50 -> delayInSeconds=0.05
-                    abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - delayInSeconds);
+                    final double newTime = abilityData.getStrengthEffectTimeLeft() - delayInSeconds;
+                    abilityData.setStrengthEffectTimeLeft(Math.max(newTime, 0d));
                     continue;
                 }
 
@@ -495,19 +496,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         // Strength effect sound
         soundEffectToPlay.play(player.getLocation());
 
-        // Start cooldown when strength effect phase ends
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getCooldowns().removeCooldown(player, getName(), true);
-            championsManager.getCooldowns().use(player,
-                    getName(),
-                    getCooldown(level),
-                    showCooldownFinished(),
-                    true,
-                    isCancellable(),
-                    this::shouldDisplayActionBar);
-
-            data.remove(player);  // ability over
-        }, (long) calculatedCharge * 20L);
+        abilityData.setAlreadyAppliedStrengthEffectOrActionBar(true);
     }
 
     // Defensive Stance showed shield so we should too
@@ -538,6 +527,35 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     }
 
     @Override
+    public boolean isDelayedSkill() {
+        return true;
+    }
+
+    @Override
+    public boolean isUsingSkill(Player player) {
+        final @Nullable VanguardsMightData abilityData = data.get(player);
+        if (abilityData == null) return false;
+
+        final @NotNull VanguardsMightAbilityPhase phase = abilityData.getPhase();
+        if (phase == VanguardsMightAbilityPhase.CHANNELING || phase == VanguardsMightAbilityPhase.TRANSFERENCE) {
+            return true; // still using
+        }
+
+        // Player has reached strength effect phase
+        if (!abilityData.isAlreadyAppliedStrengthEffectOrActionBar()) {
+            return true;
+        }
+
+        // if strength timer still > 0, still using
+        if (abilityData.getStrengthEffectTimeLeft() > 0d) {
+            return true;
+        }
+
+        data.remove(player);
+        return false;
+    }
+
+    @Override
     public void loadSkillConfig() {
         passiveChargePerSecond = getConfig("passiveChargePerSecond ", 0.5, Double.class);
         chargePerDamageTaken = getConfig("chargePerDamageTaken", 2.0, Double.class);
@@ -548,4 +566,5 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 2.5, Double.class);
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
     }
+
 }
