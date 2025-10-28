@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Type;
@@ -23,6 +24,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DamageReasonStat implements IBuildableStat {
+    //todo actually implement
     public static final String PREFIX = "DAMAGE_REASON";
 
     private static StringBuilderParser<DamageReasonStatBuilder> parser = new StringBuilderParser<>(
@@ -111,6 +113,18 @@ public class DamageReasonStat implements IBuildableStat {
     @Override
     public boolean containsStat(String statName) {
         return statName.startsWith(getStatName());
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        //todo
+        return this;
     }
 
     @Override

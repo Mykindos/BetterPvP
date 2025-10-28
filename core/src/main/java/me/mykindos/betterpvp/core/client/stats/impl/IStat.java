@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.impl;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Predicate;
@@ -19,6 +20,28 @@ public interface IStat {
      * @return
      */
     String getStatName();
+
+    //todo implement the following 2 functions for generic
+    /**
+     * Get the simple name of this stat, without qualifications (if present)
+     *
+     * i.e. Time Played, Flags Captured
+     * @return the simple name
+     */
+    default String getSimpleName() {
+        return getStatName();
+    }
+
+    /**
+     * Get the qualified name of the stat, if one exists.
+     * Should usually end with the {@link IStat#getSimpleName()}
+     * <p>
+     * i.e. Domination Time Played, Capture the Flag CTF_Oakvale Flags Captured
+     * @return the qualified name
+     */
+    default String getQualifiedName() {
+        return getSimpleName();
+    }
 
     /**
      * Whether this stat is directly savable to the database
@@ -70,5 +93,11 @@ public interface IStat {
         return true;
     }
 
-
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     * @return the generic stat
+     */
+    @NotNull
+    IStat getGenericStat();
 }

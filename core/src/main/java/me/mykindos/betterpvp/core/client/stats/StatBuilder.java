@@ -74,6 +74,17 @@ public class StatBuilder {
             public boolean containsStat(IStat otherStat) {
                 return containsStat(otherStat.getStatName());
             }
+
+            /**
+             * <p>Get the generic stat that includes this stat.</p>
+             * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+             *
+             * @return the generic stat
+             */
+            @Override
+            public @NotNull IStat getGenericStat() {
+                return this;
+            }
         };
 
     }
