@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
@@ -79,8 +80,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -97,7 +98,7 @@ public class SkillListener implements Listener {
     private final WeaponManager weaponManager;
 
     private final HashSet<UUID> inventoryDrop = new HashSet<>();
-    private final Map<UUID, DelayedEntry> delayedCooldowns = new HashMap<>();
+    private final Map<UUID, DelayedEntry> delayedCooldowns = new WeakHashMap<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
@@ -635,22 +636,18 @@ public class SkillListener implements Listener {
     /**
      * Helper class to store delayed cooldown skill entries.
      */
+    @Data
     private static final class DelayedEntry {
 
         /**
          * The delayed cooldown skill.
          */
-        final CooldownSkill skill;
+        final @NotNull CooldownSkill skill;
 
         /**
          * The level of the skill used.
          */
         final int level;
-
-        DelayedEntry(CooldownSkill skill, int level) {
-            this.skill = skill;
-            this.level = level;
-        }
     }
 
     private int getLevel(Player player, BuildSkill buildSkill) {
