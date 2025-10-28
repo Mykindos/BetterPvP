@@ -632,10 +632,21 @@ public class SkillListener implements Listener {
         }
     }
 
-    // Simple holder for delayed cooldown entries
+    /**
+     * Helper class to store delayed cooldown skill entries.
+     */
     private static final class DelayedEntry {
+
+        /**
+         * The delayed cooldown skill.
+         */
         final CooldownSkill skill;
+
+        /**
+         * The level of the skill used.
+         */
         final int level;
+
         DelayedEntry(CooldownSkill skill, int level) {
             this.skill = skill;
             this.level = level;
