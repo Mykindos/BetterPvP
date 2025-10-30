@@ -12,10 +12,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCreativeInventoryAction;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCollectItem;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerHeldItemChange;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetCursorItem;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPlayerInventory;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
@@ -24,7 +21,6 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import io.papermc.paper.persistence.PersistentDataContainerView;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -32,11 +28,9 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
+import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -176,6 +170,18 @@ public class ItemPacketRemapper implements PacketListener {
 
     private void onSetSlot(PacketSendEvent event) {
         final WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(event);
+
+        // We have to do this for creative players because when they receive a SetSlot packet they take it as a true
+        // source of truth. This means that the player does not send any feedback packets but the item that is seen
+        // is what is converted back to the original item. To avoid this, we send them the true item THEN update it,
+        // because the other packets don't cause this
+        if (event.getPlayer() instanceof Player player
+                && player.getGameMode().equals(GameMode.CREATIVE)
+                && packet.getSlot() != 45) { // #updateInventory calls SetSlot packet so this would make it an infinitely recursive call
+            player.updateInventory();
+            return;
+        }
+
         packet.setItem(mapTo(packet.getItem()));
     }
 
