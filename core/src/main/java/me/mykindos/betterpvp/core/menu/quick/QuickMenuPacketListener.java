@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.item.HashedStack;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -23,15 +22,12 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @PluginAdapter("packetevents")
 @Singleton
@@ -91,7 +87,7 @@ public class QuickMenuPacketListener implements PacketListener {
     private void onSetPlayerInventory(PacketSendEvent event) {
         final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(event);
         final int slot = packet.getSlot();
-        packet.setStack(mapTo(packet.getStack(), slot));
+        // packet.setStack(mapTo(packet.getStack(), slot));
     }
 
     private void onWindowItems(PacketSendEvent event) {

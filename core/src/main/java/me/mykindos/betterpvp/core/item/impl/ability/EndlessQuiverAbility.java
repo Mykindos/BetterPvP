@@ -138,7 +138,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
     }
 
     private void showArrows(Player player) {
-        for (int i = 0; i < player.getInventory().getContents().length; i++) {
+         for (int i = 0; i < player.getInventory().getContents().length; i++) {
             ItemStack content = player.getInventory().getContents()[i];
             if (content == null || !isAmmo(content)) continue;
 
@@ -153,12 +153,13 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             if (content == null || !isAmmo(content)) continue;
 
             ItemStack mock = new ItemStack(Material.PAPER);
-//            if (content.hasData(DataComponentTypes.ITEM_MODEL)) {
-//                mock.setData(DataComponentTypes.ITEM_MODEL, content.getData(DataComponentTypes.ITEM_MODEL));
-//            }
-//            if (content.hasData(DataComponentTypes.CUSTOM_MODEL_DATA)) {
-//                mock.setData(DataComponentTypes.CUSTOM_MODEL_DATA, content.getData(DataComponentTypes.CUSTOM_MODEL_DATA));
-//            }
+            if (content.hasData(DataComponentTypes.ITEM_MODEL)) {
+                mock.setData(DataComponentTypes.ITEM_MODEL, content.getData(DataComponentTypes.ITEM_MODEL));
+            }
+            if (content.hasData(DataComponentTypes.CUSTOM_MODEL_DATA)) {
+                mock.setData(DataComponentTypes.CUSTOM_MODEL_DATA, content.getData(DataComponentTypes.CUSTOM_MODEL_DATA));
+            }
+            mock.setAmount(content.getAmount());
             final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(i, SpigotConversionUtil.fromBukkitItemStack(mock));
             PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
         }
@@ -185,20 +186,70 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
 
     @EventHandler(priority = EventPriority.MONITOR)
     void onItemSwap(PlayerInventorySlotChangeEvent event) {
-        if (event.getRawSlot() == event.getPlayer().getInventory().getHeldItemSlot()) {
+        if (event.getRawSlot() != event.getPlayer().getInventory().getHeldItemSlot()) {
+            return; // Not modifying the held item slot
+        }
+
+        // If it has endless quiver and the old one doesn't, take their arrows
+        // If it doesn't have endless quiver and the new one does, refund arrows
+        final ItemInstance oldItem = itemFactory.fromItemStack(event.getOldItemStack()).orElseThrow();
+        final ItemInstance newItem = itemFactory.fromItemStack(event.getNewItemStack()).orElseThrow();
+
+        final Optional<AbilityContainerComponent> oldContainerOpt = oldItem.getComponent(AbilityContainerComponent.class);
+        boolean oldHasEndlessQuiver = oldContainerOpt.isPresent() && oldContainerOpt.get().getAbilities().contains(this);
+
+        final Optional<AbilityContainerComponent> newContainerOpt = newItem.getComponent(AbilityContainerComponent.class);
+        boolean newHasEndlessQuiver = newContainerOpt.isPresent() && newContainerOpt.get().getAbilities().contains(this);
+
+        if (!oldHasEndlessQuiver && newHasEndlessQuiver) {
             takePacketArrow(event.getPlayer());
-            showArrows(event.getPlayer());
+            hideArrows(event.getPlayer());
             activeTicks.remove(event.getPlayer());
             event.getPlayer().clearActiveItem();
+            return;
+        }
+
+        if (oldHasEndlessQuiver && !newHasEndlessQuiver) {
+            showArrows(event.getPlayer());
+            takePacketArrow(event.getPlayer());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     void onHeldItem(PlayerItemHeldEvent event) {
-        takePacketArrow(event.getPlayer());
-        showArrows(event.getPlayer());
-        activeTicks.remove(event.getPlayer());
-        event.getPlayer().clearActiveItem();
+        // The new item has endless quiver
+        // Take their arrows
+        final ItemStack newItem = event.getPlayer().getInventory().getItem(event.getNewSlot());
+        if (newItem != null) {
+            final ItemInstance itemInstance = itemFactory.fromItemStack(newItem).orElseThrow();
+            final Optional<AbilityContainerComponent> containerOpt = itemInstance.getComponent(AbilityContainerComponent.class);
+            if (containerOpt.isPresent()) {
+                final AbilityContainerComponent container = containerOpt.get();
+                if (container.getAbilities().contains(this)) {
+                    takePacketArrow(event.getPlayer());
+                    hideArrows(event.getPlayer());
+                    activeTicks.remove(event.getPlayer());
+                    event.getPlayer().clearActiveItem();
+                    event.getPlayer().completeUsingActiveItem();
+                    return;
+                }
+            }
+        }
+
+        // The new item doesn't have endless quiver
+        // If the old one does, refund arrows
+        final ItemStack oldItem = event.getPlayer().getInventory().getItem(event.getPreviousSlot());
+        if (oldItem != null) {
+            final ItemInstance itemInstance = itemFactory.fromItemStack(oldItem).orElseThrow();
+            final Optional<AbilityContainerComponent> containerOpt = itemInstance.getComponent(AbilityContainerComponent.class);
+            if (containerOpt.isPresent()) {
+                final AbilityContainerComponent container = containerOpt.get();
+                if (container.getAbilities().contains(this)) {
+                    showArrows(event.getPlayer());
+                    takePacketArrow(event.getPlayer());
+                }
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -219,7 +270,6 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
     void onClickEnd(RightClickEndEvent event) {
         if (activeTicks.containsKey(event.getPlayer())) {
             takePacketArrow(event.getPlayer());
-            showArrows(event.getPlayer());
             activeTicks.remove(event.getPlayer());
             event.getPlayer().clearActiveItem();
         }
@@ -283,17 +333,31 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             // Can't use
             activeTicks.remove(player);
             event.setCancelled(true);
-            takePacketArrow(player);
             player.clearActiveItem();
-            showArrows(player);
+            hideArrows(player);
+            takePacketArrow(player);
         } else {
             // Start using
             if (activeItem.hasData(DataComponentTypes.CHARGED_PROJECTILES)) {
                 final io.papermc.paper.datacomponent.item.@Nullable ChargedProjectiles charged = activeItem.getData(DataComponentTypes.CHARGED_PROJECTILES);
-                if (!charged.projectiles().isEmpty()) return;
+                if (!charged.projectiles().isEmpty()) {
+                    activeTicks.remove(player);
+                    event.setCancelled(true);
+                    player.clearActiveItem();
+                    hideArrows(player);
+                    takePacketArrow(player);
+                    return;
+                }
             }
 
-            if (useCheck != null && !useCheck.test(player)) return;
+            if (useCheck != null && !useCheck.test(player)) {
+                activeTicks.remove(player);
+                event.setCancelled(true);
+                player.clearActiveItem();
+                hideArrows(player);
+                takePacketArrow(player);
+                return;
+            }
 
             activeTicks.put(player, activeItem.getMaxItemUseDuration(player));
             player.startUsingItem(activeHand);
@@ -340,12 +404,19 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             return; // doesnt have endless quiver
         }
 
+        if (useCheck != null && !useCheck.test(player)) {
+            activeTicks.remove(player);
+            takePacketArrow(player);
+            hideArrows(player);
+            player.clearActiveItem();
+            return;
+        }
+
         int usedTime = player.getActiveItemUsedTime();
         // this fixes a rollover caused by a single tap to the bow
         if (activeTicks.containsKey(player)) {
             activeTicks.remove(player);
             takePacketArrow(player);
-            showArrows(player);
             player.clearActiveItem();
         }
 
