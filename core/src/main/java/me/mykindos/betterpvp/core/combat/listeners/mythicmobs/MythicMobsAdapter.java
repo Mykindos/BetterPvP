@@ -141,6 +141,12 @@ public class MythicMobsAdapter implements CustomDamageAdapter, Listener {
                 event.setForceDamageDelay(0);
                 Objects.requireNonNull(event.getLivingDamagee()).setNoDamageTicks(0);
             }
+            if (Boolean.TRUE.equals(dm.getPreventsKnockback())) {
+                event.setKnockback(false);
+            }
+            if (Boolean.TRUE.equals(dm.getIgnoresArmor())) {
+                event.excludeArmorReduction();
+            }
         }
     }
 
