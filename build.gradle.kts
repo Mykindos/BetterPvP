@@ -9,8 +9,9 @@ plugins {
     id("com.gradleup.shadow") version "9.2.2" apply false // Building fat jar
     id("org.inferred.processors") version "3.7.0" apply false  // Annotation processing
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
-    id("org.flywaydb.flyway") version "11.14.0" apply false // Flyway
+    id("org.flywaydb.flyway") version "11.15.0" apply false // Flyway
     id("org.sonarqube") version "6.3.1.5724" apply true
+    id("nu.studer.jooq") version "9.0" apply false
 }
 
 java {
@@ -99,6 +100,7 @@ subprojects {
 
 
 }
+
 
 sonar {
     properties {

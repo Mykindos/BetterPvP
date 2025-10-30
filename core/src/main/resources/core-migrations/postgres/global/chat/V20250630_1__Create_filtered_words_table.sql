@@ -1,8 +1,6 @@
 CREATE TABLE IF NOT EXISTS filtered_words (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     word VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(36) NULL
+    created_by int null references clients(id)
 );
-
-ALTER TABLE filtered_words ADD INDEX (word);

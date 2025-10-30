@@ -1,14 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -35,6 +27,15 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * Utility class providing various methods for working with blocks, entities, and materials
@@ -755,10 +756,10 @@ public class UtilBlock {
      * @param block the block for which the unique key is to be computed, must not be null
      * @return an integer representing the unique key for the specified block
      */
-    public static int getBlockKey(Block block) {
-        final int x = block.getX() % 16;
-        final int y = block.getY();
-        final int z = block.getZ() % 16;
+    public static long getBlockKey(Block block) {
+        final long x = block.getX() % 16;
+        final long y = block.getY();
+        final long z = block.getZ() % 16;
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
     }
 

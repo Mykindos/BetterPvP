@@ -27,7 +27,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
         this.leaderboard = leaderboard;
     }
 
-    protected abstract StatsRepository<?> getAssignedRepository(Player player);
+    protected abstract StatsRepository<?> getAssignedRepository();
 
     protected abstract CompletableFuture<T> getCombatData(Player player);
 
@@ -50,7 +50,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
                     killerData = otherData;
                 }
                 contributorData.put(otherData, contribution.getValue());
-                final StatsRepository<?> assignedRepository = getAssignedRepository(contributor);
+                final StatsRepository<?> assignedRepository = getAssignedRepository();
                 statsRepositories.put(contributor, assignedRepository);
             }
 
@@ -63,7 +63,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
             victimData.killed(event.getKillId(), killerData, contributorData);
 
             // Save everybody's stats
-            getAssignedRepository(victim).saveAsync(victim);
+            getAssignedRepository().saveAsync(victim);
             statsRepositories.forEach((player, repository) -> repository.saveAsync(player));
 
             // Update leaderboard

@@ -1,75 +1,93 @@
-create table if not exists logs
+-- Tables
+CREATE TABLE IF NOT EXISTS logs
 (
-    id        varchar(36)                           primary key,
-    Server    varchar(50)                           not null,
-    Level     varchar(255)                          not null,
-    Action    varchar(255)                          null,
-    Message   text                                  not null,
-    Time      bigint                                not null
+    id          BIGINT       PRIMARY KEY,
+    realm       SMALLINT     NOT NULL,
+    level       VARCHAR(255) NOT NULL,
+    action      VARCHAR(255) NULL,
+    message     TEXT         NOT NULL,
+    log_time    BIGINT       NOT NULL
 );
 
-ALTER TABLE logs ADD INDEX (Level);
-ALTER TABLE logs ADD INDEX (Server, Action);
+CREATE INDEX IF NOT EXISTS idx_logs_level ON logs (level);
+CREATE INDEX IF NOT EXISTS idx_logs_server_action ON logs (realm, action);
 
-create table if not exists logs_context
+CREATE TABLE IF NOT EXISTS logs_context
 (
-    id      int auto_increment primary key,
-    LogId   varchar(36)  not null,
-    Context varchar(255) not null,
-    Value   varchar(255) not null,
-    constraint fk_logs_context_logid foreign key (LogId) references logs (id) on delete cascade
+    log_id  BIGINT       NOT NULL REFERENCES logs (id) ON DELETE CASCADE,
+    realm   SMALLINT     NOT NULL,
+    context VARCHAR(255) NOT NULL,
+    value   VARCHAR(255) NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_logs_context_log_id ON logs_context (log_id);
+CREATE INDEX IF NOT EXISTS idx_logs_context_context_value ON logs_context (context, value);
+
+CREATE TABLE IF NOT EXISTS uuiditems
+(
+    uuid      VARCHAR(36) PRIMARY KEY,
+    realm     SMALLINT     NOT NULL,
+    namespace VARCHAR(255) NOT NULL,
+    keyname   VARCHAR(255) NOT NULL
 );
 
-ALTER TABLE logs_context ADD INDEX (Context, Value);
-
-create table if not exists uuiditems
-(
-    UUID        varchar(36)     PRIMARY KEY,
-    Server      varchar(50)     NOT NULL,
-    Namespace   varchar(255)    NOT NULL,
-    Keyname     varchar(255)    NOT NULL
-);
-
-DROP PROCEDURE IF EXISTS GetLogMessagesByContextAndValue;
-CREATE PROCEDURE GetLogMessagesByContextAndValue(IN context_param VARCHAR(255), IN value_param VARCHAR(255), IN server_param VARCHAR(50))
+-- Function: GetLogMessagesByContextAndValue
+CREATE OR REPLACE FUNCTION get_log_messages_by_context_and_value(
+    context_param VARCHAR(255),
+    value_param VARCHAR(255),
+    realm_param INTEGER
+)
+    RETURNS TABLE
+            (
+                message            TEXT,
+                action             VARCHAR(255),
+                log_time           BIGINT,
+                context_values     TEXT
+            )
+AS
+$$
 BEGIN
-    SELECT
-        l.Message,
-        l.action,
-        l.time,
-        GROUP_CONCAT(CONCAT(lc.context, '::', lc.value) SEPARATOR '|') as context_values
-    FROM
-        logs_context lc
-            INNER JOIN
-        logs l ON lc.LogId = l.id
-    WHERE
-        lc.LogId IN (
-            SELECT LogId FROM logs_context WHERE Context = context_param AND Value = value_param
-        ) AND l.Server = server_param
-    GROUP BY
-        lc.LogId, l.time
-    ORDER BY
-        l.time DESC;
+    RETURN QUERY
+        SELECT l.message,
+               l.action,
+               l.log_time,
+               STRING_AGG(CONCAT(lc.context, '::', lc.value), '|') as context_values
+        FROM logs_context lc
+                 INNER JOIN logs l ON lc.log_id = l.id
+        WHERE lc.log_id IN (SELECT log_id FROM logs_context WHERE context = context_param AND value = value_param)
+          AND l.realm = realm_param
+        GROUP BY lc.log_id, l.message, l.action, l.log_time
+        ORDER BY l.log_time DESC;
 END;
+$$ LANGUAGE plpgsql;
 
-DROP PROCEDURE IF EXISTS GetLogMessagesByContextAndAction;
-CREATE PROCEDURE GetLogMessagesByContextAndAction(IN context_param VARCHAR(255), IN value_param VARCHAR(255), IN action_param VARCHAR(255), IN server_param VARCHAR(50))
+-- Function: GetLogMessagesByContextAndAction
+CREATE OR REPLACE FUNCTION get_log_messages_by_context_and_action(
+    context_param VARCHAR(255),
+    value_param VARCHAR(255),
+    action_param VARCHAR(255),
+    realm_param INTEGER
+)
+    RETURNS TABLE
+            (
+                message        TEXT,
+                action         VARCHAR(255),
+                log_time           BIGINT,
+                context_values TEXT
+            )
+AS
+$$
 BEGIN
-    SELECT
-        l.Message,
-        l.action,
-        l.time,
-        GROUP_CONCAT(CONCAT(lc.context, '::', lc.value) SEPARATOR '|') as context_values
-    FROM
-        logs_context lc
-            INNER JOIN
-        logs l ON lc.LogId = l.id
-    WHERE
-        lc.LogId IN (
-            SELECT LogId FROM logs_context WHERE Context = context_param AND Value = value_param
-        ) AND l.Server = server_param AND l.Action LIKE CONCAT(action_param, '%')
-    GROUP BY
-        lc.LogId, l.time
-    ORDER BY
-        l.time DESC;
-END
+    RETURN QUERY
+        SELECT l.message,
+               l.action,
+               l.log_time,
+               STRING_AGG(CONCAT(lc.context, '::', lc.value), '|') as context_values
+        FROM logs_context lc
+                 INNER JOIN logs l ON lc.log_id = l.id
+        WHERE lc.log_id IN (SELECT log_id FROM logs_context WHERE context = context_param AND value = value_param)
+          AND l.realm = realm_param
+          AND l.action LIKE CONCAT(action_param, '%')
+        GROUP BY lc.log_id, l.message, l.action, l.log_time
+        ORDER BY l.log_time DESC;
+END;
+$$ LANGUAGE plpgsql;

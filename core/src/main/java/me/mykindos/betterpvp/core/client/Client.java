@@ -34,6 +34,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = false, of = {"uuid"})
 public class Client extends PropertyContainer implements IMapListener, CacheObject, Unique {
 
+    private final long id;
     private final transient @NotNull Gamer gamer;
     private final @NotNull String uuid;
     private @NotNull String name;
@@ -46,7 +47,8 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     boolean online;
     boolean newClient;
 
-    public Client(@NotNull Gamer gamer, @NotNull String uuid, @NotNull String name, @NotNull Rank rank) {
+    public Client(long id, @NotNull Gamer gamer, @NotNull String uuid, @NotNull String name, @NotNull Rank rank) {
+        this.id = id;
         this.gamer = gamer;
         this.uuid = uuid;
         this.name = name;

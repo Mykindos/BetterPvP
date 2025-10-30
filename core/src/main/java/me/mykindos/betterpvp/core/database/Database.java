@@ -9,7 +9,9 @@ import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
@@ -18,13 +20,15 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.REALMS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.SERVERS;
 
 /**
  * The Database class provides methods to execute database operations such as queries, updates,
@@ -38,9 +42,13 @@ import java.util.function.Consumer;
 @CustomLog
 @Singleton
 public class Database {
+
     private final Core core;
     private final IDatabaseConnection connection;
     private static final TargetDatabase DEFAULT_DATABASE = TargetDatabase.GLOBAL;
+
+    @Getter
+    private final DSLContext dslContext;
 
     // Default timeout values
     private static final long DEFAULT_QUERY_TIMEOUT_SECONDS = 30;
@@ -62,30 +70,70 @@ public class Database {
     public Database(Core core, IDatabaseConnection connection) {
         this.core = core;
         this.connection = connection;
+        this.dslContext = DSL.using(
+                connection.getDatabaseConnection(DEFAULT_DATABASE),
+                SQLDialect.POSTGRES
+        );
     }
 
     public int getServerId(String serverName) {
-        int serverId = 0;
+        DSLContext dsl = getDslContext();
 
-        List<Statement> statements = new ArrayList<>();
-        statements.add(new Statement("SET @max_id = (SELECT COALESCE(MAX(id), 0) + 1 FROM servers);"));
-        statements.add(new Statement("INSERT IGNORE INTO servers (id, Name) VALUES (@max_id, ?);",
-                new StringStatementValue(serverName)));
+        return dsl.transactionResult(config -> {
+            DSLContext ctx = DSL.using(config);
 
-        executeTransaction(statements, TargetDatabase.GLOBAL).join();
+            // Get max ID + 1 for new server
+            Integer maxId = ctx.select(DSL.coalesce(DSL.max(SERVERS.ID), 0).add(1))
+                    .from(SERVERS)
+                    .fetchOne(0, Integer.class);
 
-        Statement getServerId = new Statement("SELECT id FROM servers WHERE Name = ?",
-                new StringStatementValue(serverName));
+            // Insert new server if it doesn't exist, return ID using RETURNING
+            Integer serverId = ctx.insertInto(SERVERS)
+                    .set(SERVERS.ID, maxId)
+                    .set(SERVERS.NAME, serverName)
+                    .onConflict(SERVERS.NAME)
+                    .doNothing()
+                    .returningResult(SERVERS.ID)
+                    .fetchOne(SERVERS.ID);
 
-        try (CachedRowSet results = executeQuery(getServerId, TargetDatabase.GLOBAL).join()) {
-            if (results.next()) {
-                serverId = results.getInt("id");
+            // If insert was skipped due to conflict, fetch existing ID
+            if (serverId == null) {
+                serverId = ctx.select(SERVERS.ID)
+                        .from(SERVERS)
+                        .where(SERVERS.NAME.eq(serverName))
+                        .fetchOne(SERVERS.ID);
             }
-        } catch (SQLException e) {
-            log.error("Failed to fetch server id for {}", serverName).submit();
-        }
 
-        return serverId;
+            return serverId != null ? serverId : 0;
+        });
+    }
+
+    public int getRealmId(int server, int season) {
+        DSLContext dsl = getDslContext();
+
+        return dsl.transactionResult(config -> {
+            DSLContext ctx = DSL.using(config);
+
+
+            Integer realmId = ctx.insertInto(REALMS)
+                    .set(REALMS.SERVER, server)
+                    .set(REALMS.SEASON, season)
+                    .onConflict(REALMS.SERVER, REALMS.SEASON)
+                    .doNothing()
+                    .returningResult(REALMS.ID)
+                    .fetchOne(REALMS.ID);
+
+            // If insert was skipped due to conflict, fetch existing ID
+            if (realmId == null) {
+                realmId = ctx.select(REALMS.ID)
+                        .from(REALMS)
+                        .where(REALMS.SERVER.eq(server))
+                        .and(REALMS.SEASON.eq(season))
+                        .fetchOne(REALMS.ID);
+            }
+
+            return realmId != null ? realmId : 0;
+        });
     }
 
     /**

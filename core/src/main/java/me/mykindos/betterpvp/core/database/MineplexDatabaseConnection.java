@@ -78,5 +78,10 @@ public final class MineplexDatabaseConnection implements IDatabaseConnection {
 
     }
 
+    @Override
+    public DataSource getDataSource(TargetDatabase targetDatabase) {
+        return dataSources.get(targetDatabase);
+    }
+
 
 }

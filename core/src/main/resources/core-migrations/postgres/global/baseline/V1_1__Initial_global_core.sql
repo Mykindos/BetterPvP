@@ -1,112 +1,170 @@
-create table if not exists clients
+CREATE TABLE IF NOT EXISTS clients
 (
-    id   SERIAL PRIMARY KEY,
-    uuid varchar(36) not null UNIQUE,
-    name varchar(16) not null,
-    `rank` varchar(64) not null default 'PLAYER'
+    id   BIGINT      PRIMARY KEY,
+    uuid VARCHAR(36) NOT NULL UNIQUE,
+    name VARCHAR(16) NOT NULL,
+    rank VARCHAR(64) NOT NULL default 'PLAYER'
 );
 
-create unique index clients_UUID_uindex
-    on clients (UUID);
+CREATE INDEX IF NOT EXISTS clients_name_index ON clients (name);
 
-INSERT IGNORE INTO clients (uuid, name, `rank`) VALUES ('e1f5d06b-685b-46a0-b22c-176d6aefffff', 'Mykindos', 'DEVELOPER');
+INSERT INTO clients (id, uuid, name, rank) VALUES (1, 'e1f5d06b-685b-46a0-b22c-176d6aefffff', 'Mykindos', 'DEVELOPER')
+ON CONFLICT DO NOTHING;
 
-create table if not exists armour
+CREATE TABLE IF NOT EXISTS client_properties
 (
-    Item      varchar(255) not null primary key,
-    Reduction double       null,
-    constraint armour_pk
-        primary key (Item)
+    client   BIGINT       NOT NULL REFERENCES clients (id) ON DELETE CASCADE,
+    property VARCHAR(255) NOT NULL,
+    value    VARCHAR(255) null,
+    PRIMARY KEY (client, property)
 );
 
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_BOOTS', 7);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_CHESTPLATE', 18);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_HELMET', 9);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('CHAINMAIL_LEGGINGS', 13);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_BOOTS', 11);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_CHESTPLATE', 20);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_HELMET', 13);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('DIAMOND_LEGGINGS', 16);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_BOOTS', 7);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_CHESTPLATE', 18);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_HELMET', 9);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('GOLDEN_LEGGINGS', 16);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_BOOTS', 11);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_CHESTPLATE', 20);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_HELMET', 13);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('IRON_LEGGINGS', 16);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_BOOTS', 6);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_CHESTPLATE', 13);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_HELMET', 7);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('LEATHER_LEGGINGS', 10);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_BOOTS', 7);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_CHESTPLATE', 18);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_HELMET', 9);
-INSERT IGNORE INTO armour (Item, Reduction) VALUES ('NETHERITE_LEGGINGS', 16);
+CREATE INDEX idx_client_properties_property ON client_properties (property);
 
-create table if not exists client_properties
+CREATE TABLE IF NOT EXISTS client_rewards
 (
-    Client   varchar(255) not null,
-    Property varchar(255) not null,
-    Value    varchar(255) null,
-    primary key (Client, Property)
+    client  BIGINT  NOT NULL REFERENCES clients (id) ON DELETE CASCADE,
+    season  INT     NOT NULL,
+    rewards TEXT   NOT NULL,
+    PRIMARY KEY (client, season)
 );
 
-CREATE INDEX idx_client_properties_property ON client_properties (Property);
-
-create table if not exists property_map
+CREATE TABLE IF NOT EXISTS ignores
 (
-    Property varchar(255) not null,
-    Type     varchar(255) not null,
-    constraint property_map_pk
-        primary key (Property, Type)
+    client  BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+    ignored BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+    PRIMARY KEY (client, ignored)
 );
 
-INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("COINS", "int");
-INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "int");
-INSERT IGNORE INTO property_map VALUES ("TIPS_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("DROP_PROTECTION_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "boolean");
-INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "int");
-INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
-INSERT IGNORE INTO property_map VALUES ("DAMAGE_DEALT", "double");
-INSERT IGNORE INTO property_map VALUES ("DAMAGE_TAKEN", "double");
-INSERT IGNORE INTO property_map VALUES ("COOLDOWN_DISPLAY", "boolean");
-INSERT IGNORE INTO property_map VALUES ("BALANCE", "int");
-INSERT IGNORE INTO property_map VALUES ("LAST_LOGIN", "long");
-INSERT IGNORE INTO property_map VALUES ("TIME_CREATED", "long");
-INSERT IGNORE INTO property_map VALUES ("EXPERIENCE", "double");
-INSERT IGNORE INTO property_map VALUES ("LUNAR", "boolean");
-INSERT IGNORE INTO property_map VALUES ("TIME_PLAYED", "long");
-INSERT IGNORE INTO property_map VALUES ("COOLDOWN_SOUNDS_ENABLED", "boolean");
+CREATE TABLE IF NOT EXISTS client_name_history
+(
+    client    BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+    name      VARCHAR(255)                        NOT NULL,
+    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY (client, name)
+);
+
+
+CREATE TABLE IF NOT EXISTS property_map
+(
+    property VARCHAR(255) NOT NULL,
+    type     VARCHAR(255) NOT NULL,
+    PRIMARY KEY (property, type)
+);
+
+INSERT INTO property_map VALUES ('CHAT_ENABLED', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('COINS', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('FRAGMENTS', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('TIPS_ENABLED', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('DROP_PROTECTION_ENABLED', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('STAFF_CHAT', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('BLOCKS_PLACED', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('BLOCKS_BROKEN', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('DAMAGE_DEALT', 'double') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('DAMAGE_TAKEN', 'double') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('COOLDOWN_DISPLAY', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('BALANCE', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('LAST_LOGIN', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('TIME_CREATED', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('EXPERIENCE', 'double') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('LUNAR', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('TIME_PLAYED', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('COOLDOWN_SOUNDS_ENABLED', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('REMAINING_PVP_PROTECTION', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('MEDIA_CHANNEL', 'string') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('SHOW_TAG', 'string') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('MINEPLEX_LEVEL', 'int') ON CONFLICT DO NOTHING;
 
 -- Profession properties
-INSERT IGNORE INTO property_map VALUES ("TOTAL_LOGS_CHOPPED", "long");
-INSERT IGNORE INTO property_map VALUES ("TOTAL_ORES_MINED", "long");
-INSERT IGNORE INTO property_map VALUES ("TOTAL_FISH_CAUGHT", "long");
-INSERT IGNORE INTO property_map VALUES ("TOTAL_WEIGHT_CAUGHT", "long");
-INSERT IGNORE INTO property_map VALUES ("BIGGEST_FISH_CAUGHT", "long");
+INSERT INTO property_map VALUES ('TOTAL_LOGS_CHOPPED', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('TOTAL_ORES_MINED', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('TOTAL_FISH_CAUGHT', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('TOTAL_WEIGHT_CAUGHT', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('BIGGEST_FISH_CAUGHT', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('DISABLE_TREEFELLER', 'boolean') ON CONFLICT DO NOTHING;
 
 -- Clans Properties
-INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "boolean");
-INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
-INSERT IGNORE INTO property_map VALUES ("NO_DOMINANCE_COOLDOWN", "long");
-INSERT IGNORE INTO property_map VALUES ("MAP_POINTS_OF_INTEREST", "boolean");
-INSERT IGNORE INTO property_map VALUES ("MAP_PLAYER_NAMES", "boolean");
-INSERT IGNORE INTO property_map VALUES ("SIDEBAR_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("TERRITORY_POPUPS_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("CLAN_MENU_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("ENERGY", "int");
-INSERT IGNORE INTO property_map VALUES ("LEVEL", "int");
-INSERT IGNORE INTO property_map VALUES ("POINTS", "int");
+INSERT INTO property_map VALUES ('ALLY_CHAT', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('CLAN_CHAT', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('NO_DOMINANCE_COOLDOWN', 'long') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('MAP_POINTS_OF_INTEREST', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('MAP_PLAYER_NAMES', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('SIDEBAR_ENABLED', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('TERRITORY_POPUPS_ENABLED', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('CLAN_MENU_ENABLED', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('ENERGY', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('LEVEL', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('POINTS', 'int') ON CONFLICT DO NOTHING;
 
 -- Champions Properties
-INSERT IGNORE INTO property_map VALUES ("ASSASSIN_EQUIPPED", "int");
-INSERT IGNORE INTO property_map VALUES ("KNIGHT_EQUIPPED", "int");
-INSERT IGNORE INTO property_map VALUES ("RANGER_EQUIPPED", "int");
-INSERT IGNORE INTO property_map VALUES ("WARLOCK_EQUIPPED", "int");
-INSERT IGNORE INTO property_map VALUES ("MAGE_EQUIPPED", "int");
-INSERT IGNORE INTO property_map VALUES ("BRUTE_EQUIPPED", "int");
-INSERT IGNORE INTO property_map VALUES ("SKILL_CHAT_PREVIEW", "boolean");
-INSERT IGNORE INTO property_map VALUES ("SKILL_WEAPON_TOOLTIP", "boolean");
+INSERT INTO property_map VALUES ('ASSASSIN_EQUIPPED', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('KNIGHT_EQUIPPED', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('RANGER_EQUIPPED', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('WARLOCK_EQUIPPED', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('MAGE_EQUIPPED', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('BRUTE_EQUIPPED', 'int') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('SKILL_CHAT_PREVIEW', 'boolean') ON CONFLICT DO NOTHING;
+INSERT INTO property_map VALUES ('SKILL_WEAPON_TOOLTIP', 'boolean') ON CONFLICT DO NOTHING;
+
+-- Dungeon Properties
+INSERT INTO property_map VALUES ('DUNGEON_INCLUDE_ALLIES', 'boolean') ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS armour
+(
+    item      VARCHAR(255) NOT NULL,
+    reduction double precision null,
+    constraint armour_pk
+        primary key (item)
+);
+
+INSERT INTO armour (item, reduction) VALUES ('CHAINMAIL_BOOTS', 7) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('CHAINMAIL_CHESTPLATE', 18) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('CHAINMAIL_HELMET', 9) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('CHAINMAIL_LEGGINGS', 13) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('DIAMOND_BOOTS', 11) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('DIAMOND_CHESTPLATE', 20) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('DIAMOND_HELMET', 13) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('DIAMOND_LEGGINGS', 16) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('GOLDEN_BOOTS', 7) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('GOLDEN_CHESTPLATE', 18) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('GOLDEN_HELMET', 9) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('GOLDEN_LEGGINGS', 16) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('IRON_BOOTS', 11) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('IRON_CHESTPLATE', 20) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('IRON_HELMET', 13) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('IRON_LEGGINGS', 16) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('LEATHER_BOOTS', 6) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('LEATHER_CHESTPLATE', 14) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('LEATHER_HELMET', 7) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('LEATHER_LEGGINGS', 10) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('NETHERITE_BOOTS', 7) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('NETHERITE_CHESTPLATE', 18) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('NETHERITE_HELMET', 9) ON CONFLICT DO NOTHING;
+INSERT INTO armour (item, reduction) VALUES ('NETHERITE_LEGGINGS', 16) ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS servers
+(
+    id   SMALLINT     NOT NULL,
+    name VARCHAR(255) NOT NULL PRIMARY KEY,
+    CONSTRAINT servers_id_unique UNIQUE (id)
+);
+
+INSERT INTO servers (id, name) VALUES (0, 'Champions') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (1, 'Clans-1') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (2, 'Clans-2') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (3, 'Clans-3') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (4, 'Clans-4') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (5, 'Clans-5') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (6, 'Clans-6') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (7, 'Clans-7') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (8, 'Clans-8') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (9, 'Clans-9') ON CONFLICT DO NOTHING;
+INSERT INTO servers (id, name) VALUES (10, 'Clans-10') ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS realms
+(
+    id     SERIAL PRIMARY KEY,
+    server SMALLINT NOT NULL REFERENCES servers (id),
+    season SMALLINT NOT NULL,
+    CONSTRAINT realms_server_season_name_unique UNIQUE (server, season)
+);

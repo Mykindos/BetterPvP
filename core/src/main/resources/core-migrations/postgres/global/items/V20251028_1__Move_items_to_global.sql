@@ -1,45 +1,44 @@
-create table if not exists items
+CREATE TABLE IF NOT EXISTS items
 (
-    id       int auto_increment
-        primary key,
-    Material   varchar(255) not null,
-    Namespace  varchar(255) not null,
-    Keyname    varchar(255) not null,
-    Name       varchar(255) not null,
-    ModelData  int          not null default 0,
-    Glow       tinyint      not null,
-    hasUUID    tinyint      not null default 0,
-    constraint items_uk
-        unique (Material, Namespace, ModelData)
+    id         SERIAL PRIMARY KEY,
+    material   VARCHAR(255) NOT NULL,
+    namespace  VARCHAR(255) NOT NULL,
+    keyname    VARCHAR(255) NOT NULL,
+    name       VARCHAR(255) NOT NULL,
+    model_data INTEGER      NOT NULL DEFAULT 0,
+    glow       SMALLINT     NOT NULL,
+    has_uuid   SMALLINT     NOT NULL DEFAULT 0,
+    CONSTRAINT items_uk
+        UNIQUE (material, namespace, model_data)
 );
 
-create table if not exists itemdurability
+CREATE TABLE IF NOT EXISTS itemdurability
 (
-    Item       int           not null,
-    Durability int           not null,
-    constraint itemdurability_item_uk
-        unique (Item),
-    constraint itemdurability___fk
-        foreign key (Item) references items (id)
+    item       INTEGER NOT NULL PRIMARY KEY REFERENCES items (id) ON DELETE CASCADE,
+    durability INTEGER NOT NULL
 );
 
-create table if not exists itemlore
+CREATE TABLE IF NOT EXISTS itemlore
 (
-    Item     int           not null,
-    Priority int default 0 not null,
-    Text     varchar(255)  not null,
-    constraint itemlore_item_priority_uk
-        unique (Item, Priority),
-    constraint itemlore___fk
-        foreign key (Item) references items (id)
+    item     INTEGER      NOT NULL REFERENCES items (id),
+    priority INTEGER      NOT NULL DEFAULT 0,
+    text     VARCHAR(255) NOT NULL,
+    CONSTRAINT itemlore_item_priority_uk
+        UNIQUE (item, priority)
 );
 
-INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('STONECUTTER', 'core', 'salvager', '<yellow>Salvager', 0, 0, 0);
-INSERT IGNORE INTO itemlore
-VALUES ((SELECT id FROM items WHERE Keyname = 'salvager'), 0, '<gray>Can be used to salvage weapons, tools, and armor.');
+INSERT INTO items (material, namespace, keyname, name, model_data, glow, has_uuid) VALUES
+    ('STONECUTTER', 'core', 'salvager', '<yellow>Salvager', 0, 0, 0)
+ON CONFLICT (material, namespace, model_data) DO NOTHING;
 
-INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('GRINDSTONE', 'core', 'resourceconverter', '<yellow>Resource Converter', 0, 0, 0);
-INSERT IGNORE INTO itemlore
-VALUES ((SELECT id FROM items WHERE Keyname = 'resourceconverter'), 0, '<gray>Can be used to exchange resources for other resources.');
+INSERT INTO itemlore (item, priority, text)
+VALUES ((SELECT id FROM items WHERE keyname = 'salvager'), 0, '<gray>Can be used to salvage weapons, tools, and armor.')
+ON CONFLICT (item, priority) DO NOTHING;
+
+INSERT INTO items (material, namespace, keyname, name, model_data, glow, has_uuid) VALUES
+    ('GRINDSTONE', 'core', 'resourceconverter', '<yellow>Resource Converter', 0, 0, 0)
+ON CONFLICT (material, namespace, model_data) DO NOTHING;
+
+INSERT INTO itemlore (item, priority, text)
+VALUES ((SELECT id FROM items WHERE keyname = 'resourceconverter'), 0, '<gray>Can be used to exchange resources for other resources.')
+ON CONFLICT (item, priority) DO NOTHING;

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.ConnectionData;
 import org.flywaydb.core.Flyway;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.HashMap;
 
@@ -93,6 +94,11 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
             log.error("Please correctly configure the MariaDB database connection in the core plugin config.", ex).submit();
         }
 
+    }
+
+    @Override
+    public DataSource getDataSource(TargetDatabase targetDatabase) {
+        return dataSources.get(targetDatabase).getDataSource();
     }
 
 

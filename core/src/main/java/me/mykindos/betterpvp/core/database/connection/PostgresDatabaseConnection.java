@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.ConnectionData;
 import org.flywaydb.core.Flyway;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.HashMap;
 
@@ -40,6 +41,7 @@ public class PostgresDatabaseConnection implements IDatabaseConnection {
         var sqlDatabaseName = core.getConfig().getString(configPath + ".databaseName");
         var maxPoolSize = core.getConfig().getInt(configPath + ".maxPoolSize");
 
+        hikariConfig.setDriverClassName("org.postgresql.Driver");
         hikariConfig.setJdbcUrl("jdbc:postgresql://" + sqlServer + "/" + sqlDatabaseName);
         hikariConfig.setUsername(sqlUsername);
         hikariConfig.setPassword(sqlPassword);
@@ -95,5 +97,9 @@ public class PostgresDatabaseConnection implements IDatabaseConnection {
 
     }
 
+    @Override
+    public DataSource getDataSource(TargetDatabase targetDatabase) {
+        return dataSources.get(targetDatabase).getDataSource();
+    }
 
 }

@@ -4,14 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.ARMOUR;
 
 @Singleton
 @CustomLog
@@ -28,15 +26,17 @@ public class ArmourRepository implements IRepository<Armour> {
     @Override
     public List<Armour> getAll() {
         List<Armour> armour = new ArrayList<>();
-        String query = "SELECT * FROM armour";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
-            while (result.next()) {
-                String type = result.getString(1);
-                double reduction = result.getDouble(2);
-                armour.add(new Armour(type, reduction));
-            }
-        } catch (SQLException ex) {
+        try {
+            database.getDslContext()
+                    .selectFrom(ARMOUR)
+                    .fetch()
+                    .forEach(armourRecord -> {
+                        String type = armourRecord.get(ARMOUR.ITEM);
+                        double reduction = armourRecord.get(ARMOUR.REDUCTION);
+                        armour.add(new Armour(type, reduction));
+                    });
+        } catch (Exception ex) {
             log.error("Failed to load armour", ex);
         }
         return armour;

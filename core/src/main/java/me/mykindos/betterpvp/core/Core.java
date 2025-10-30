@@ -83,6 +83,10 @@ public class Core extends BPvPPlugin {
     @Setter
     private static int currentSeason;
 
+    @Getter
+    @Setter
+    private static int currentRealm;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -97,7 +101,7 @@ public class Core extends BPvPPlugin {
         injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
 
         this.database = injector.getInstance(Database.class);
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/mysql/global", "global", TargetDatabase.GLOBAL);
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/postgres/global", "global", TargetDatabase.GLOBAL);
 
         setupServerAndSeason();
 
@@ -178,6 +182,7 @@ public class Core extends BPvPPlugin {
         }
 
         setCurrentSeason(getConfig().getOrSaveInt("core.info.season", 0));
+        setCurrentRealm(database.getRealmId(getCurrentServer(), getCurrentSeason()));
     }
 
     @Override

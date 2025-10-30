@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.database.connection;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 
 public interface IDatabaseConnection {
@@ -10,6 +11,6 @@ public interface IDatabaseConnection {
 
     void runDatabaseMigrations(ClassLoader classLoader, String location, String name, TargetDatabase targetDatabase);
 
-
+    DataSource getDataSource(TargetDatabase targetDatabase);
 
 }

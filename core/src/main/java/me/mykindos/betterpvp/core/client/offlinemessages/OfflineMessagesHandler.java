@@ -60,29 +60,31 @@ public class OfflineMessagesHandler {
 
     }
 
-    /**
-     * Shows the relevant OfflineMessagesMenu to the player
-     *
-     * @param player the player this menu is being shown to
-     * @param name   the name of the player this menu is about
-     * @param id     the id of the player this menu is about
-     * @param time   how far back to see messages
-     */
-    public void showMenuForMessagesForClientAfterTime(Player player, String name, UUID id, long time) {
 
-        offlineMessagesRepository.getOfflineMessagesForClient(id, time).whenComplete((messages, throwable) -> {
+    /**
+     * Displays a menu of offline messages for a specific client that were sent after a specified time.
+     * Retrieves messages asynchronously and shows them to the given player. If no messages are found
+     * or an error occurs during retrieval, appropriate user messages are displayed instead.
+     *
+     * @param player the player to whom the messages menu should be displayed
+     * @param client the client whose offline messages are to be retrieved
+     * @param time   the timestamp after which messages are to be retrieved
+     */
+    public void showMenuForMessagesForClientAfterTime(Player player, Client client, long time) {
+
+        offlineMessagesRepository.getOfflineMessagesForClient(client.getId(), time).whenComplete((messages, throwable) -> {
             if (throwable != null) {
                 UtilMessage.message(player, "Offline", "An error occurred while retrieving messages");
                 return;
             }
 
             if (messages.isEmpty()) {
-                UtilMessage.message(player, "Offline", "No messages found for <green>%s</green> in the last <green>%s</green>", name, time);
+                UtilMessage.message(player, "Offline", "No messages found for <green>%s</green> in the last <green>%s</green>", client.getName(), time);
                 return;
             }
 
             UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                getOfflineMessagesMenu(name, messages).show(player);
+                getOfflineMessagesMenu(client.getName(), messages).show(player);
             });
         });
 

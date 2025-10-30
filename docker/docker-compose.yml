@@ -14,6 +14,21 @@ services:
     ports:
       - "5000:3306"
 
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: BetterPvP123!
+      POSTGRES_DB: betterpvp
+    ports:
+      - "5002:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d betterpvp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis
     container_name: redis

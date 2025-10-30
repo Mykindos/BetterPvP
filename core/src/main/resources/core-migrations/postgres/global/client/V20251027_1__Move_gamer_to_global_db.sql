@@ -1,10 +1,8 @@
-
-create table if not exists gamer_properties
+CREATE TABLE IF NOT EXISTS gamer_properties
 (
-    Gamer    varchar(36)      not null,
-    Server   tinyint unsigned not null,
-    Season   tinyint unsigned not null,
-    Property varchar(255)     not null,
-    Value    varchar(255)     null,
-    primary key (Gamer, Server, Season, Property)
+    client   BIGINT       NOT NULL REFERENCES clients (id) ON DELETE CASCADE,
+    realm    SMALLINT     NOT NULL,
+    property VARCHAR(255) NOT NULL,
+    value    VARCHAR(255) NULL,
+    PRIMARY KEY (client, realm, property)
 );

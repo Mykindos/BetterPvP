@@ -20,14 +20,15 @@ public class ClientDeserializer implements JsonDeserializer<Client> {
     @Override
     public Client deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject object = json.getAsJsonObject();
+        final Long id = object.get("id").getAsLong();
         final String uuid = object.get("uuid").getAsString();
         final String name = object.get("name").getAsString();
         final Rank rank = Objects.requireNonNull(Rank.getRank(object.get("rank").getAsInt()));
         final boolean administrating = object.get("administrating").getAsBoolean();
         final JsonArray properties = object.get("properties").getAsJsonArray();
 
-        final Gamer gamer = new Gamer(uuid);
-        final Client client = new Client(gamer, uuid, name, rank);
+        final Gamer gamer = new Gamer(id, uuid);
+        final Client client = new Client(id, gamer, uuid, name, rank);
         client.setAdministrating(administrating);
         setProperties(client, properties);
 

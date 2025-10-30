@@ -8,11 +8,11 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jooq.DSLContext;
 
 import javax.annotation.Nullable;
 import java.sql.SQLException;
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.LOGS;
 
 @Singleton
 @CustomLog
@@ -101,17 +103,16 @@ public class LogRepository {
 
             for (int attempt = 0; attempt < maxRetries; attempt++) {
                 try {
-                    Statement statement = new Statement(
-                            "DELETE FROM logs WHERE Server = ? AND Season = ? AND Action = ? AND Time <= ? LIMIT ?",
-                            IntegerStatementValue.of(Core.getCurrentServer()),
-                            IntegerStatementValue.of(Core.getCurrentSeason()),
-                            StringStatementValue.of(""),
-                            new LongStatementValue(System.currentTimeMillis() - daysToMillis),
-                            IntegerStatementValue.of(batchSize)
-                    );
+                    DSLContext ctx = database.getDslContext();
 
-                    database.executeUpdateNoTimeout(statement, TargetDatabase.GLOBAL).join();
-                    log.info("Successfully purged batch of {} logs", batchSize).submit();
+                    int deletedRows = ctx.deleteFrom(LOGS)
+                            .where(LOGS.REALM.eq(Core.getCurrentRealm()))
+                            .and(LOGS.ACTION.eq(""))
+                            .and(LOGS.LOG_TIME.le(System.currentTimeMillis() - daysToMillis))
+                            .limit(batchSize)
+                            .execute();
+
+                    log.info("Successfully purged batch of {} logs", deletedRows).submit();
 
                     // Add delay between batches to reduce lock contention
                     Thread.sleep(5000); // 5 second delay
