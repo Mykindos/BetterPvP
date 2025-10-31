@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
-import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -126,6 +125,10 @@ public abstract class Projectile {
     private Optional<RayTraceResult> checkCollision() {
         if (isExpired()) {
             return Optional.of(new RayTraceResult(location.toVector()));
+        }
+
+        if (velocity == null || velocity.lengthSquared() == 0) {
+            return Optional.empty();
         }
 
         final RayTraceResult rayTrace = location.getWorld().rayTrace(location,
