@@ -4,39 +4,41 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.BlizzardProjectile;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Bukkit;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.UUID;
+import java.util.List;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CrowdControlSkill {
+public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CooldownSkill, CrowdControlSkill {
 
-    private final WeakHashMap<Snowball, Player> snow = new WeakHashMap<>();
+    private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
+    private final WeakHashMap<Player, List<BlizzardProjectile>> projectiles = new WeakHashMap<>();
+    private final WeakHashMap<Player, BlizzardProjectile> preparing = new WeakHashMap<>();
+    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private int slowStrength;
     private double baseSlowDuration;
@@ -45,11 +47,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     private double pushForwardIncreasePerLevel;
     private double pushUpwardStrength;
     private double pushUpwardIncreasePerLevel;
-    private double pushbackVerticalStrength;
-    private double pushVerticalIncreasePerLevel;
-    private double pushbackHorizontalStrength;
-    private double pushHorizontalIncreasePerLevel;
-    private double initialEnergyCost;
+    private double baseSpeed;
+    private double speedIncreasePerLevel;
+    private double projectileAliveTime;
+    private double projectileHitboxSize;
+    private double baseActivationEnergy;
+    private double activationEnergyDecreasePerLevel;
 
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
@@ -64,14 +67,16 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
-                "Hold right click with a Sword to channel.",
+                "Hold right click with a Sword to channel",
                 "",
-                "Release a blizzard that freezes enemies, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushing them back.",
+                "Charge and release a rolling blizzard projectile",
+                "On impact, freezes enemies with <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
+                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushes them back.",
+                "Reflects off walls and maintains speed.",
                 "",
-                "Energy: " + getValueString(this::getEnergy, level)
+                "Activation Energy: " + getValueString(this::getActivationEnergy, level),
+                "Channel Energy: " + getValueString(this::getEnergy, level) + " per second"
         };
     }
 
@@ -87,12 +92,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         return pushUpwardStrength + ((level - 1) * pushUpwardIncreasePerLevel);
     }
 
-    public double getPushbackHorizontalStrength(int level) {
-        return pushbackHorizontalStrength + ((level - 1) * pushHorizontalIncreasePerLevel);
+    public double getSpeed(int level) {
+        return baseSpeed + ((level - 1) * speedIncreasePerLevel);
     }
 
-    public double getPushbackVerticalStrength(int level) {
-        return pushbackVerticalStrength + ((level - 1) * pushVerticalIncreasePerLevel);
+    public float getActivationEnergy(int level) {
+        return (float) (baseActivationEnergy - ((level - 1) * activationEnergyDecreasePerLevel));
     }
 
     @Override
@@ -105,101 +110,165 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         return SkillType.SWORD;
     }
 
-
     @Override
     public float getEnergy(int level) {
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
-    @EventHandler
-    public void onHit(DamageEvent event) {
-        if (event.isCancelled()) return;
-        if (!event.isDamageeLiving()) return;
-        if (event.getProjectile() instanceof Snowball snowball) {
-            if (snowball.getShooter() instanceof Player damager) {
-                if (snow.containsKey(snowball)) {
-                    LivingEntity damagee = event.getLivingDamagee();
-
-                    int level = getLevel(damager);
-                    Vector direction = snowball.getVelocity().normalize();
-
-                    final VelocityData data = new VelocityData(direction,
-                            getPushForwardStrength(level),
-                            true,
-                            0,
-                            getPushUpwardStrength(level),
-                            1.0,
-                            false);
-                    UtilVelocity.velocity(damagee, damager, data);
-
-                    championsManager.getEffects().addEffect(damagee,
-                            event.getDamager(),
-                            EffectTypes.SLOWNESS,
-                            slowStrength,
-                            (long) (getSlowDuration(level) * 1000));
-
-                    event.cancel("Snowball");
-                    snow.remove(snowball);
-                }
-            }
-        }
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
     }
 
-    @UpdateEvent
-    public void onUpdate() {
-        final Iterator<UUID> iterator = active.iterator();
-        while (iterator.hasNext()) {
-            Player player = Bukkit.getPlayer(iterator.next());
-            if (player == null) {
-                iterator.remove();
-                continue;
-            }
-
-            if (!player.isHandRaised()) {
-                iterator.remove();
-                continue;
-            }
-
-            int level = getLevel(player);
-            if (!hasSkill(player)) {
-                iterator.remove();
-            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
-                iterator.remove();
-            } else if (!isHolding(player)) {
-                iterator.remove();
-            } else {
-                Snowball s = player.launchProjectile(Snowball.class);
-                s.getLocation().add(0, 1, 0);
-                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1))));
-                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
-                snow.put(s, player);
-
-                Vector vector = player.getLocation().getDirection().multiply(-1).multiply(new Vector(
-                        getPushbackHorizontalStrength(level),
-                        getPushbackVerticalStrength(level),
-                        getPushbackHorizontalStrength(level)
-                ));
-                final VelocityData data = new VelocityData(vector,
-                        getPushbackHorizontalStrength(level),
-                        false,
-                        getPushUpwardStrength(level),
-                        0,
-                        getPushbackVerticalStrength(level),
-                        true);
-                UtilVelocity.velocity(player, player, data);
-            }
-        }
-    }
-
-    @UpdateEvent (delay = 500)
-    public void cleanSnow() {
-        snow.entrySet().removeIf(e ->  (e.getKey() == null || !e.getKey().isValid()) || e.getValue() == null);
+    @Override
+    public double getCooldown(int level) {
+        return cooldown - (level - 1) * cooldownDecreasePerLevel;
     }
 
     @Override
     public void activate(Player player, int level) {
-        if (championsManager.getEnergy().use(player, getName(), initialEnergyCost, true)) {
-            active.add(player.getUniqueId());
+        // Consume flat activation energy
+        if (!championsManager.getEnergy().use(player, getName(), getActivationEnergy(level), true)) {
+            return; // Not enough energy, cancel activation
+        }
+
+        if (preparing.containsKey(player)) {
+            preparing.remove(player).remove();
+        }
+
+        // Charge rate: 0.15 + (level - 1) * 0.3 per tick
+        final ChargeData data = new ChargeData((float) (0.15 + (level - 1) * 0.3)) {
+            @Override
+            public void playChargeSound(Player player, float charge) {
+                player.playSound(player.getEyeLocation(), Sound.BLOCK_SNOW_STEP, 0.5f, 0.5f + charge);
+            }
+        };
+
+        // Start preparing the projectile at player feet
+        final BlizzardProjectile projectile = new BlizzardProjectile(
+                player,
+                player.getLocation(),
+                projectileHitboxSize,
+                projectileHitboxSize * 2,
+                (long) projectileAliveTime,
+                this,
+                championsManager
+        );
+        preparing.put(player, projectile);
+        charging.put(player, data);
+    }
+
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().add(900, actionBarComponent);
+    }
+
+    @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().remove(actionBarComponent);
+    }
+
+    @UpdateEvent
+    public void updateCharging() {
+        final Iterator<Player> iterator = charging.keySet().iterator();
+        while (iterator.hasNext()) {
+            final Player player = iterator.next();
+            final ChargeData data = charging.get(player);
+
+            // Check if they are still holding and right-clicking to charge
+            final BlizzardProjectile projectile = preparing.get(player);
+            if (projectile == null) {
+                continue;
+            }
+
+            if (player == null || !player.isValid() || !player.isOnline()) {
+                iterator.remove();
+                projectile.remove();
+                preparing.remove(player);
+                continue;
+            }
+
+            // Remove if they no longer have the skill
+            final int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
+                projectile.remove();
+                preparing.remove(player);
+                continue;
+            }
+
+            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+            if (isHolding(player) && gamer.isHoldingRightClick()
+                    && (data.getCharge() >= 1.0 || championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true))) {
+                championsManager.getEnergy().degenerateEnergy(player, 0);
+                data.tick();
+                data.tickSound(player);
+
+                // Position at player feet while charging
+                final Location feetLocation = player.getLocation().add(player.getLocation().getDirection().setY(0).normalize().multiply(0.5f));
+                feetLocation.subtract(0, projectileHitboxSize / 2, 0);
+                projectile.getLocation().set(feetLocation.getX(), feetLocation.getY(), feetLocation.getZ());
+                projectile.tick();
+                continue;
+            }
+
+            final Location feetLocation = player.getLocation().add(player.getLocation().getDirection().setY(0).normalize().multiply(0.5f));
+            feetLocation.add(0, projectileHitboxSize, 0);
+            projectile.getLocation().set(feetLocation.getX(), feetLocation.getY(), feetLocation.getZ());
+
+            // Released - fire the projectile
+            shoot(player, projectile, data, level);
+            preparing.remove(player);
+            iterator.remove();
+        }
+    }
+
+    private void shoot(Player player, BlizzardProjectile projectile, ChargeData data, int level) {
+        if (projectile == null) return;
+
+        // Calculate speed based on charge
+        final double speed = getSpeed(level) * Math.max(0.5f, data.getCharge());
+
+        // Fire the projectile from feet
+        projectiles.computeIfAbsent(player, k -> new ArrayList<>()).add(projectile);
+        projectile.redirect(player.getLocation().getDirection().setY(0).normalize().multiply(speed));
+        projectile.markLaunched();
+
+        // Feedback
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+        new SoundEffect(Sound.ENTITY_SNOW_GOLEM_SHOOT, 2F, 0.8F).play(player.getLocation());
+    }
+
+    @UpdateEvent
+    public void updateProjectiles() {
+        final Iterator<Player> iterator = projectiles.keySet().iterator();
+        while (iterator.hasNext()) {
+            final Player player = iterator.next();
+            final List<BlizzardProjectile> projectiles = this.projectiles.get(player);
+
+            if (player == null || !player.isValid() || !player.isOnline() || projectiles == null || projectiles.isEmpty()) {
+                iterator.remove();
+
+                if (projectiles != null) {
+                    projectiles.forEach(BlizzardProjectile::remove);
+                    projectiles.clear();
+                }
+
+                continue;
+            }
+
+            final Iterator<BlizzardProjectile> projectileIterator = projectiles.iterator();
+            while (projectileIterator.hasNext()) {
+                final BlizzardProjectile projectile = projectileIterator.next();
+                if (projectile.isExpired() || projectile.isMarkForRemoval()) {
+                    projectile.remove();
+                    projectileIterator.remove();
+                    continue;
+                }
+
+                // Tick the projectile to update position and visuals
+                projectile.tick();
+            }
         }
     }
 
@@ -210,17 +279,9 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     @Override
     public void loadSkillConfig() {
-        initialEnergyCost = getConfig("initialEnergyCost", 20.0, Double.class);
-        baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
-        slowStrength = getConfig("slowStrength", 3, Integer.class);
-        pushForwardStrength = getConfig("pushForwardStrength", 0.3, Double.class);
-        pushUpwardStrength = getConfig("pushUpwardStrength", 0.15, Double.class);
-        pushForwardIncreasePerLevel = getConfig("pushForwardIncreasePerLevel", 0.0, Double.class);
-        pushUpwardIncreasePerLevel = getConfig("pushUpwardIncreasePerLevel", 0.0, Double.class);
-        pushbackVerticalStrength = getConfig("pushbackVerticalStrength", 0.1, Double.class);
-        pushbackHorizontalStrength = getConfig("pushbackHorizontalStrength", 0.06, Double.class);
-        pushVerticalIncreasePerLevel = getConfig("pushbackVerticalIncreasePerLevel", 0.0, Double.class);
-        pushHorizontalIncreasePerLevel = getConfig("pushbackHorizontalIncreasePerLevel", 0.0, Double.class);
+        baseSpeed = getConfig("baseSpeed", 30.0, Double.class);
+        speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 5.0, Double.class);
+        projectileAliveTime = getConfig("projectileAliveTime", 5000.0, Double.class);
+        projectileHitboxSize = getConfig("projectileHitboxSize", 0.5, Double.class);
     }
 }
