@@ -57,13 +57,13 @@ public class RegenerationShieldAbility extends ItemAbility {
     public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
         Player player = Objects.requireNonNull(client.getGamer().getPlayer());
         
-        // Apply regeneration effect with condition to remove when no longer holding item
-        applyRegeneration(player, itemStack.getType());
-        
         // Check energy
         if (!energyHandler.use(player, getName(), energyPerTick, true)) {
             return false;
         }
+
+        // Apply regeneration effect with condition to remove when no longer holding item
+        applyRegeneration(player, itemStack.getType());
         
         // Play particles and sound
         new SoundEffect(Sound.BLOCK_LAVA_POP, 1f, 2f).play(player.getLocation());
