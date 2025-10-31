@@ -2,13 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
@@ -76,6 +69,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -522,7 +523,7 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onSkillUpdate(SkillUpdateEvent event) {
         final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
-        event.getSkill().updatePlayer(event.getPlayer(), gamer);
+        event.getBuildSkill().getSkill().updatePlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler
