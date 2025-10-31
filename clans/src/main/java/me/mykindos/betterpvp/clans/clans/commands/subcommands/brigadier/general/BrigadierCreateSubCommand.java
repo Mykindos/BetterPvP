@@ -8,7 +8,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -18,7 +17,7 @@ import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
-import me.mykindos.betterpvp.core.chat.IFilterService;
+import me.mykindos.betterpvp.core.chat.filter.IFilterService;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
@@ -28,6 +27,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.UUID;
 
 @Singleton
 @CustomLog
