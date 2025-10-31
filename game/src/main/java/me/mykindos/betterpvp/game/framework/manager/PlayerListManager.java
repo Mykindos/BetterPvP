@@ -3,11 +3,14 @@ package me.mykindos.betterpvp.game.framework.manager;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.TeamGame;
+import me.mykindos.betterpvp.game.framework.model.player.PlayerStatsForGame;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.state.GameState;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -16,6 +19,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scoreboard.Scoreboard;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Manages player name colors in the tab list
@@ -27,6 +34,13 @@ public class PlayerListManager implements Listener {
 
     private final ServerController serverController;
     private final Scoreboard scoreboard;
+
+    @Getter
+    private final Map<Player, PlayerStatsForGame> playerStats = new WeakHashMap<>();
+
+    // kill icon character; actual padding is computed per-player in updatePlayerList
+    private static final String KILL_ICON_CHAR = "⚔";
+    private static final String DEATH_ICON_CHAR = "☠";
 
     @Inject
     public PlayerListManager(ServerController serverController) {
@@ -53,33 +67,37 @@ public class PlayerListManager implements Listener {
     }
 
     /**
-     * Updates the tab color for a player based on their team
-     * 
-     * @param player The player to update
+     * Gets the tab color for a player based on team/game state.
      */
-    public void updatePlayerTabColor(Player player) {
-        // Default color is yellow
+    private TextColor getTabColorForPlayer(final @NotNull Player player) {
         TextColor color = NamedTextColor.WHITE;
-        
-        // If in a team game, use team color
-        if (serverController.getCurrentGame() instanceof TeamGame<?>teamGame) {
-            Team playerTeam = teamGame.getPlayerTeam(player);
+        if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
+            final Team playerTeam = teamGame.getPlayerTeam(player);
             if (playerTeam != null) {
                 color = playerTeam.getProperties().color();
             }
         }
-        
-        setPlayerTabColor(player, color);
+        return color;
+    }
+
+    /**
+     * Updates the tab color for a player based on their team
+     * 
+     * @param player The player to update
+     */
+    public void updatePlayerTabColor(final @NotNull Player player) {
+        // Forward to unified update so color and playerlist entry stay in sync
+        updatePlayerList(player);
     }
     
     /**
-     * Sets a player's tab list color
+     * Sets a player's tab list color (scoreboard team)
      * 
      * @param player The player
      * @param color The color to set
      */
-    private void setPlayerTabColor(Player player, TextColor color) {
-        String teamName = getTeamNameForColor(color);
+    private void setPlayerTabColor(final @NotNull Player player, final @NotNull TextColor color) {
+        final String teamName = getTeamNameForColor(color);
         
         // Remove player from all existing teams first
         removePlayerFromTeams(player);
@@ -123,7 +141,47 @@ public class PlayerListManager implements Listener {
      */
     public void updateAllPlayerTabColors() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            updatePlayerTabColor(player);
+            updatePlayerList(player);
         }
+    }
+
+    public void addKill(@NotNull Player player) {
+        final @NotNull PlayerStatsForGame stats = playerStats.get(player);
+        stats.setKills(stats.getKills() + 1);
+        updatePlayerList(player);
+    }
+
+    public void addDeath(@NotNull Player player) {
+        final @NotNull PlayerStatsForGame stats = playerStats.get(player);
+        stats.setDeaths(stats.getDeaths() + 1);
+        updatePlayerList(player);
+    }
+
+    /**
+     * Updates a player's tab list entry and ensures their team color is kept in sync.
+     */
+    public void updatePlayerList(final @NotNull Player player) {
+        if (!playerStats.containsKey(player)) {
+            playerStats.put(player, new PlayerStatsForGame());
+        }
+
+        final @NotNull PlayerStatsForGame stats = playerStats.get(player);
+
+        // determine and apply team/tab color
+        final TextColor color = getTabColorForPlayer(player);
+        setPlayerTabColor(player, color);
+
+        // compute right-aligned kill icon column for names up to 16 chars (min 1 space)
+        final @NotNull String baseName = player.getName(); // use plain username for alignment
+        final int spaceCount = Math.max(1, 16 - baseName.length()); // at least 1 space for 16-char names
+        final @NotNull String killIcon = " ".repeat(spaceCount) + KILL_ICON_CHAR;
+
+        // build the player list name component using the plain, padded username to ensure alignment
+        final Component nameComponent = Component.text(baseName, NamedTextColor.nearestTo(color));
+
+        // combined stats component (kills and deaths) in gray text
+        final Component statsComponent = Component.text(killIcon + " " + stats.getKills() + " " + DEATH_ICON_CHAR + " " + stats.getDeaths(), NamedTextColor.GRAY);
+
+        player.playerListName(nameComponent.append(statsComponent));
     }
 }
