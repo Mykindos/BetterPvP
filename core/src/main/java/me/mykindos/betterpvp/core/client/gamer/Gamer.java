@@ -106,10 +106,10 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
                 return timeSinceLastBlock() <= 250;
             }
 
-
+            return player.isBlocking() || player.isHandRaised() || lastBlock != -1;
         }
 
-        return player.isBlocking() || player.isHandRaised() || lastBlock != -1;
+        return timeSinceLastBlock() <= 250;
     }
 
     public @Nullable Player getPlayer() {
