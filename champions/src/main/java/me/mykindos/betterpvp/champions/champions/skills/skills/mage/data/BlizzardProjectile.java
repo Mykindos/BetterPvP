@@ -226,6 +226,6 @@ public class BlizzardProjectile extends Projectile {
 
     @Override
     protected boolean canCollideWith(Entity entity) {
-        return entity instanceof LivingEntity living && !UtilEntity.isEntityFriendly(caster, living);
+        return super.canCollideWith(entity) && entity instanceof LivingEntity living && !UtilEntity.isEntityFriendly(caster, living);
     }
 }

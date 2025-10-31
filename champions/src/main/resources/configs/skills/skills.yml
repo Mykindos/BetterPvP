@@ -380,13 +380,23 @@ skills:
       enabled: true
       maxlevel: 3
       energy: 60
-      baseFireDuration: 2.5
-      fireDurationIncreasePerLevel: 0.0
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.0
-      immuneTime: 0.45
-      fireTicks: 50
       energyDecreasePerLevel: 15.0
+      baseImpactDamage: 6.0
+      impactDamageIncreasePerLevel: 0.5
+      baseSpreadDamage: 3.0
+      spreadDamageIncreasePerLevel: 0.25
+      baseFireTicks: 50.0
+      fireTicksIncreasePerLevel: 10.0
+      baseMaxRadius: 6.0
+      maxRadiusIncreasePerLevel: 0.5
+      baseExpansionRate: 0.35
+      expansionRateIncreasePerLevel: 0.05
+      baseSpeed: 15.0
+      speedIncreasePerLevel: 2.5
+      projectileAliveTime: 5000.0
+      projectileHitboxSize: 0.5
+      baseActivationEnergy: 10.0
+      activationEnergyDecreasePerLevel: 2.0
     fireblast:
       enabled: true
       maxlevel: 5
@@ -416,8 +426,8 @@ skills:
       maxlevel: 5
       cooldown: 12.0
       cooldownDecreasePerLevel: 1.0
-      baseRadius: 3.5
-      radiusIncreasePerLevel: 0.5
+      baseRadius: 5.5
+      radiusIncreasePerLevel: 1.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
       shockDurationIncreasePerLevel: 0.0
@@ -426,6 +436,13 @@ skills:
       slowDuration: 4.0
       baseShockDuration: 2.0
       velocityStrength: 3.0
+      radiusDistance: 3.5
+      delay: 3.0
+      delayDecreasePerLevel: 0.0
+      speed: 25.0
+      projectileHitboxSize: 0.5
+      energyGain: 0.1
+      energyGainPerLevel: 0.05
     swarm:
       enabled: false
       maxlevel: 5
@@ -475,14 +492,12 @@ skills:
       slowStrength: 1
       slowDuration: 2.0
       energyDecreasePerLevel: 5.0
-      pushForwardStrength: 0.5
-      pushForwardIncreasePerLevel: 0.0
-      pushUpwardStrength: 0.35
-      pushUpwardIncreasePerLevel: 0.0
-      pushbackVerticalStrength: 0.3
-      pushbackVerticalIncreasePerLevel: 0.0
-      pushbackHorizontalStrength: 0.2
-      pushbackHorizontalIncreasePerLevel: 0.0
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      baseSpeed: 20.0
+      speedIncreasePerLevel: 5.0
+      projectileAliveTime: 1000.0
+      projectileHitboxSize: 0.8
     glacialblade:
       enabled: true
       maxlevel: 3
