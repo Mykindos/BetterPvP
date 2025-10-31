@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.client.achievements.display;
 
 import lombok.CustomLog;
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
@@ -8,6 +10,9 @@ import me.mykindos.betterpvp.core.client.achievements.display.button.Achievement
 import me.mykindos.betterpvp.core.client.achievements.display.button.AchievementPeriodFilterButton;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
+import me.mykindos.betterpvp.core.client.stats.display.PeriodFilterButton;
+import me.mykindos.betterpvp.core.client.stats.display.StatBackButton;
 import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -16,9 +21,9 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
 import net.kyori.adventure.text.Component;
@@ -33,41 +38,55 @@ import java.util.List;
 import java.util.Objects;
 
 @CustomLog
-public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed {
+@Getter
+@Setter
+public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstractStatMenu {
     private final AchievementManager achievementManager;
     private final StatPeriodManager statPeriodManager;
     private final IAchievementCategory achievementCategory;
+    private final Windowed previous;
     private final Client client;
-    private final String period;
 
+    private final StringFilterButton<IAbstractStatMenu> periodFilterButton;
+
+    private String periodKey;
 
     public AchievementMenu(Client client, AchievementManager achievementManager, StatPeriodManager statPeriodManager) {
         this(client, null, StatContainer.GLOBAL_PERIOD_KEY, achievementManager, statPeriodManager, null);
     }
 
-    public AchievementMenu(Client client, @Nullable IAchievementCategory achievementCategory, String period, AchievementManager achievementManager, StatPeriodManager statPeriodManager, @Nullable Windowed previous) {
+    public AchievementMenu(Client client, @Nullable IAchievementCategory achievementCategory, String periodKey, AchievementManager achievementManager, StatPeriodManager statPeriodManager, @Nullable Windowed previous) {
         super(9, 5, false,
-                new Structure("# # # # # # # P #",
+                new Structure("# # # # # # # # P",
                         "# x x x x x x x #",
                         "# x x x x x x x #",
                         "# x x x x x x x #",
                         "# # # < - > # # #")
                         .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                         .addIngredient('#', Menu.BACKGROUND_ITEM)
-                        .addIngredient('P', new AchievementPeriodFilterButton(achievementCategory, client, period, achievementManager, statPeriodManager))
+                        .addIngredient('P', new PeriodFilterButton(periodKey, statPeriodManager))
                         .addIngredient('<', new PreviousButton())
-                        .addIngredient('-', new BackButton(previous))
+                        .addIngredient('-', new StatBackButton(previous))
                         .addIngredient('>', new ForwardButton())
         );
         this.statPeriodManager = statPeriodManager;
         if (getItem(7, 0) instanceof AchievementPeriodFilterButton filterButton) {
             filterButton.setCurrent(this);
         }
-        //todo add period button
+        if (!(getItem(8, 0) instanceof PeriodFilterButton periodButton)) throw new IllegalStateException("Item in this slot must be a StringFilterButton");
+        this.periodFilterButton = periodButton;
+        this.periodFilterButton.setRefresh(() ->
+            periodButton.onChangePeriod().thenApply(status -> {
+                if (status.equals(Boolean.FALSE)) return Boolean.FALSE;
+                setContent(getItems());
+                return Boolean.TRUE;
+            })
+        );
         this.client = client;
         this.achievementManager = achievementManager;
         this.achievementCategory = achievementCategory;
-        this.period = period;
+        this.previous = previous;
+        this.periodKey = periodKey;
         setContent(getItems());
     }
 
@@ -78,20 +97,15 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
         if (achievementCategory != null) {
             childCategories = achievementCategory.getChildren();
         } else {
-            log.info(achievementManager.getAchievementCategoryManager().toString()).submit();
             childCategories = achievementManager.getAchievementCategoryManager().getObjects().values().stream()
                     .filter(category -> category.getParent() == null)
                     .toList();
         }
 
-
-        log.info("Num Child Categories {}", childCategories.size()).submit();
-
         //add the categories
         final List<Item> items = new ArrayList<>(childCategories.stream()
-                .map(child -> (Item) new AchievementCategoryButton(child, period, client, achievementManager, statPeriodManager, this))
+                .map(child -> (Item) new AchievementCategoryButton(child, periodKey, client, achievementManager, statPeriodManager, this))
                 .toList());
-        log.info("Num Child Buttons {}", items.size()).submit();
 
         @Nullable
         final NamespacedKey category = achievementCategory == null ? null : achievementCategory.getNamespacedKey();
@@ -101,15 +115,15 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
                 .stream()
                 .filter(achievement -> Objects.equals(achievement.getAchievementCategory(), category))
                 .filter(achievement -> {
-                               if (Objects.equals(period, StatContainer.GLOBAL_PERIOD_KEY)) {
+                               if (Objects.equals(periodKey, StatContainer.GLOBAL_PERIOD_KEY)) {
                                    return achievement.getAchievementType() == AchievementType.GLOBAL;
                                }
                                return achievement.getAchievementType() == AchievementType.PERIOD;
                 })
-                .sorted(Comparator.comparingInt(achievement -> achievement.getPriority(client.getStatContainer(), period)))
+                .sorted(Comparator.comparingInt(achievement -> achievement.getPriority(client.getStatContainer(), periodKey)))
                 .map(achievement -> {
                     try {
-                        return (Item) achievement.getDescription(client.getStatContainer(), period).toSimpleItem();
+                        return (Item) achievement.getDescription(client.getStatContainer(), periodKey).toSimpleItem();
                     } catch (Exception e) {
                         log.error("Error getting description for Achievement {} ({}) ", achievement.getName(), achievement.getNamespacedKey().asString(), e).submit();
                     }
