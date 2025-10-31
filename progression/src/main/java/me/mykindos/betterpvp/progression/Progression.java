@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.progression.commands.loader.BrigadierProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoader;
@@ -72,6 +73,9 @@ public class Progression extends BPvPPlugin {
 
             var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
             listenerLoader.registerListeners(PACKAGE);
+
+            var brigadierCommandLoader = injector.getInstance(BrigadierProgressionCommandLoader.class);
+            brigadierCommandLoader.loadCommands(PACKAGE);
 
             var commandLoader = injector.getInstance(ProgressionCommandLoader.class);
             commandLoader.loadCommands(PACKAGE);
