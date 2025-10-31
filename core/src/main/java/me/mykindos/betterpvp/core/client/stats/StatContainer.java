@@ -85,9 +85,11 @@ public class StatContainer implements Unique, IStatMapListener {
     public Double getFullStat(final IStat stat, final String periodKey) {
         Double currentVal = 0d;
         for (IStat iStat : getStats().getStatsOfPeriod(periodKey).keySet()) {
+            IStat topStat = iStat;
             while (true) {
                 if (iStat.containsStat(stat)) {
-                    currentVal += iStat.getStat(this, periodKey);
+                    currentVal += topStat.getStat(this, periodKey);
+                    break;
                 }
                 if (iStat instanceof final IWrapperStat wrapperStat) {
                     iStat = wrapperStat.getWrappedStat();
