@@ -19,7 +19,7 @@ public class PeriodFilterButton extends StringFilterButton<IAbstractStatMenu> {
 
     }
 
-    private CompletableFuture<Boolean> onChangePeriod() {
+    public CompletableFuture<Boolean> onChangePeriod() {
         this.getGui().setPeriodKey(this.getSelectedFilter());
         return CompletableFuture.completedFuture(Boolean.TRUE);
     }

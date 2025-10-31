@@ -516,7 +516,7 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onSkillUpdate(SkillUpdateEvent event) {
         final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
-        event.getSkill().updatePlayer(event.getPlayer(), gamer);
+        event.getBuildSkill().getSkill().updatePlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler
