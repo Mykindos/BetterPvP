@@ -1,8 +1,16 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -32,6 +40,8 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.experience.data.ExperienceLevelData;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -60,13 +70,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
@@ -104,6 +107,8 @@ public class CombatListener implements Listener {
     private final WeakHashMap<LivingEntity, FireData> fireDamageSource;
     private final Set<UUID> delayKillSet = new HashSet<>();
 
+    private final GamerDisplayObject<ExperienceLevelData> gamerDisplayObject;
+
     @Inject
     public CombatListener(Core core, ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, EffectManager effectManager) {
         this.core = core;
@@ -114,6 +119,9 @@ public class CombatListener implements Listener {
         damageDataList = new ArrayList<>();
         customDamageAdapters = new ArrayList<>();
         fireDamageSource = new WeakHashMap<>();
+
+        this.gamerDisplayObject = new GamerDisplayObject<>((gamer) -> new ExperienceLevelData((int) gamer.getLastDealtDamageValue()));
+
 
         initializeAdapters();
     }
@@ -199,7 +207,7 @@ public class CombatListener implements Listener {
                 }
             }
 
-            playDamageEffect(cde, reductionEvent);
+            playDamageEffect(cde);
         }
 
         finalizeDamage(event, reductionEvent);
@@ -364,6 +372,7 @@ public class CombatListener implements Listener {
                     gamer.setLastDamaged(System.currentTimeMillis());
                     gamer.saveProperty(GamerProperty.DAMAGE_DEALT,
                             (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
+                    gamer.setLastDealtDamageValue(event.getDamage());
                 }
             });
         }
@@ -577,7 +586,7 @@ public class CombatListener implements Listener {
         });
     }
 
-    private void playDamageEffect(CustomDamageEvent event, CustomDamageReductionEvent damageReductionEvent) {
+    private void playDamageEffect(CustomDamageEvent event) {
         final LivingEntity damagee = event.getDamagee();
         if (event.isHurtAnimation()) {
             damagee.playHurtAnimation(270);
@@ -591,10 +600,6 @@ public class CombatListener implements Listener {
             } else {
                 damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(), sound.volume(), sound.pitch());
             }
-        }
-
-        if (event.getDamager() instanceof Player player) {
-            player.setLevel((int) damageReductionEvent.getInitialDamage());
         }
     }
 
@@ -632,5 +637,10 @@ public class CombatListener implements Listener {
                 new FireData(combusterEntity,
                         (long) (event.getDuration() * 20L * 1000L))
         );
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onClientLogin(ClientJoinEvent event) {
+        event.getClient().getGamer().getExperienceLevel().add(500, gamerDisplayObject);
     }
 }

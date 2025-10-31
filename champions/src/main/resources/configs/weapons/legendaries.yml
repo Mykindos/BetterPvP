@@ -22,7 +22,7 @@ wind_blade:
   slashHitboxSize: 0.6
   slashEnergyCost: 0
   slashDamage: 5.0
-  slashEnergyRefundPercent: 0.2
+  slashEnergyRefund: 20.0
   slashVelocity: 0.5
   slashAliveTicks: 20
   slashSpeed: 30.0

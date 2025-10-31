@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,7 +54,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
      * <p>
      * Calculates the remaining time left based on the current time and the expiration time stored in {@link #active}.
      */
-    private final DisplayComponent durationActionBar = new PermanentComponent(
+    private final PermanentComponent durationActionBar = new PermanentComponent(
             gamer -> {
                 final @Nullable Player player = gamer.getPlayer();
                 if (player == null) return null;
