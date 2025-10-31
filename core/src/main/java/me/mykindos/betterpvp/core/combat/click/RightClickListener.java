@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.combat.click;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
@@ -90,7 +89,8 @@ public class RightClickListener implements Listener {
 
             // If the click took longer than 250ms, remove it from the cache
             // Unless they're blocking with a shield, meaning they are still holding right click
-            if (!(gamer.canBlock() && (player.isBlocking() || player.hasActiveItem())) && System.currentTimeMillis() - context.getTime() > 249) {
+            final boolean canBlock = gamer.canBlock();
+            if ((!canBlock && System.currentTimeMillis() - context.getTime() > 249) || (canBlock && !(player.isHandRaised() || player.isBlocking() || player.hasActiveItem()))) {
                 iterator.remove();
                 gamer.setLastBlock(-1);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
