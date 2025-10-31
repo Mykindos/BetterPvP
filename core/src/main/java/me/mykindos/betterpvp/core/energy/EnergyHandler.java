@@ -85,7 +85,7 @@ public class EnergyHandler {
 
     public void degenerateEnergy(Player player, double energy) {
         double eg = getEnergy(player);
-        if (eg <= 0F || energy <= 0) return;
+        if (eg <= 0F) return;
         try {
             player.setExp(Math.max(0.001f, (float) eg - (float) energy));
             lastUsedEnergy.put(player, System.currentTimeMillis() + (long) (consumptionRegenDelay * 1000));
@@ -106,7 +106,7 @@ public class EnergyHandler {
             return;
         }
 
-        double energy = BASE_ENERGY_REGEN;
+        double energy = 0.009;
 
         if (nerfEnergyRegen) {
             if (cur.isSprinting() || UtilBlock.isInLiquid(cur) || cur.isGliding()) {
