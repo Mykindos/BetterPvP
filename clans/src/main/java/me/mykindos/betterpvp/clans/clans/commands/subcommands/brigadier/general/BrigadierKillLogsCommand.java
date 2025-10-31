@@ -58,7 +58,7 @@ public class BrigadierKillLogsCommand extends ClanBrigadierCommand {
                     final Player executor = getPlayerFromExecutor(context);
                     final Clan executorClan = getClanByExecutor(context);
 
-                    new ClanKillLogMenu(executorClan, clanManager, clientManager).show(executor);
+                    new ClanKillLogMenu(executorClan, clanManager).show(executor);
 
                     return Command.SINGLE_SUCCESS;
                 })
@@ -68,7 +68,7 @@ public class BrigadierKillLogsCommand extends ClanBrigadierCommand {
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan", Clan.class);
                             final Player executor = getPlayerFromExecutor(context);
-                            new ClanKillLogMenu(target, clanManager, clientManager).show(executor);
+                            new ClanKillLogMenu(target, clanManager).show(executor);
                             return Command.SINGLE_SUCCESS;
                         })
                 );
