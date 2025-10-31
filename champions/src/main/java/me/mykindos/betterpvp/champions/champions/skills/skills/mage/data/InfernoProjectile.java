@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -282,7 +283,7 @@ public class InfernoProjectile extends Projectile {
                     target,
                     caster,
                     null,
-                    new SkillDamageCause(skill).withBukkitCause(EntityDamageEvent.DamageCause.FIRE),
+                    new SkillDamageCause(skill).withBukkitCause(EntityDamageEvent.DamageCause.FIRE).withCategory(DamageCauseCategory.RANGED),
                     spreadDamage.get(),
                     "Inferno"
             ));
@@ -295,7 +296,7 @@ public class InfernoProjectile extends Projectile {
 
     @Override
     protected boolean canCollideWith(Entity entity) {
-        return entity instanceof LivingEntity living && !UtilEntity.isEntityFriendly(caster, living);
+        return super.canCollideWith(entity) && entity instanceof LivingEntity living && !UtilEntity.isEntityFriendly(caster, living);
     }
 
     @Override
