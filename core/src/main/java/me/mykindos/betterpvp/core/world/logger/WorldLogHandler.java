@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 @Getter
 @CustomLog
-public class WorldLogHandler extends Manager<WorldLogSession> {
+public class WorldLogHandler extends Manager<String, WorldLogSession> {
 
     private static final PrettyTime PRETTY_TIME = new PrettyTime();
 

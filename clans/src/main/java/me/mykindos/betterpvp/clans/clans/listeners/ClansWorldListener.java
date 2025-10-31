@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -37,7 +33,6 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.core.world.events.PlayerUseStonecutterEvent;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -92,6 +87,12 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
 @BPvPListener
@@ -744,7 +745,7 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChunkClaim(final ChunkClaimEvent event) {
         event.getChunk().getPersistentDataContainer().set(ClansNamespacedKeys.CLAN,
-                CustomDataType.UUID,
+                PersistentDataType.LONG,
                 event.getClan().getId());
     }
 
@@ -988,7 +989,7 @@ public class ClansWorldListener extends ClanListener {
 
         clan.getTerritory().forEach(clanTerritory -> {
             Chunk chunk = clanTerritory.getWorldChunk();
-            chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
+            chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, PersistentDataType.LONG, clan.getId());
         });
     }
 

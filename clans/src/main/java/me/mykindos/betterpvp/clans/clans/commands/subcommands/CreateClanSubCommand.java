@@ -13,13 +13,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -35,6 +35,8 @@ public class CreateClanSubCommand extends ClanSubCommand {
 
     private final Clans clans;
     private final IFilterService filterService;
+
+    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
     public CreateClanSubCommand(ClanManager clanManager, ClientManager clientManager, Clans clans, IFilterService filterService) {
@@ -93,7 +95,7 @@ public class CreateClanSubCommand extends ClanSubCommand {
             } else {
                 Optional<Clan> clanOptional = clanManager.getClanByName(clanName.toLowerCase());
                 if (clanOptional.isEmpty()) {
-                    Clan clan = new Clan(UUID.randomUUID());
+                    Clan clan = new Clan(ID_GENERATOR.nextId());
                     clan.setName(clanName);
                     clan.setOnline(true);
                     clan.setAdmin(client.isAdministrating());

@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
-import java.util.function.IntToDoubleFunction;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -45,6 +43,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
+import java.util.function.IntToDoubleFunction;
 
 @Singleton
 @CustomLog
@@ -328,7 +329,7 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     public boolean hasSkill(Player player) {
-        Optional<GamerBuilds> gamerBuildsOptional = championsManager.getBuilds().getObject(player.getUniqueId());
+        Optional<GamerBuilds> gamerBuildsOptional = championsManager.getBuilds().getObject(player.getUniqueId().toString());
         return gamerBuildsOptional.filter(this::hasSkill).isPresent();
     }
 
@@ -343,7 +344,7 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     protected Optional<BuildSkill> getSkill(Player player) {
-        Optional<GamerBuilds> gamerBuildOptional = championsManager.getBuilds().getObject(player.getUniqueId());
+        Optional<GamerBuilds> gamerBuildOptional = championsManager.getBuilds().getObject(player.getUniqueId().toString());
         if (gamerBuildOptional.isPresent()) {
             return getSkill(gamerBuildOptional.get());
         }
@@ -351,7 +352,7 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     protected Optional<BuildSkill> getSkill(GamerBuilds gamerBuilds) {
-        Optional<Role> roleOptional = championsManager.getRoles().getObject(gamerBuilds.getUuid());
+        Optional<Role> roleOptional = championsManager.getRoles().getObject(gamerBuilds.getClient().getUuid());
         if (roleOptional.isPresent()) {
             Role role = roleOptional.get();
             if (role == getClassType() || getClassType() == null) {

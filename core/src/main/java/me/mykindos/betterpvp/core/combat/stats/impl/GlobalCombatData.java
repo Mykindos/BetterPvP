@@ -7,18 +7,19 @@ import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.FloatStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.DSLContext;
+import org.jooq.Query;
+import org.jooq.impl.DSL;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.COMBAT_STATS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.KILLS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.KILL_CONTRIBUTIONS;
 
 @CustomLog
 public class GlobalCombatData extends CombatData {
@@ -29,39 +30,43 @@ public class GlobalCombatData extends CombatData {
 
     @Override
     protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
-        List<Statement> killStatements = new ArrayList<>();
-        List<Statement> contributionStatements = new ArrayList<>();
-        final String killStmt = "INSERT INTO kills (Id, Server, Season, Killer, Victim, Contribution, Damage, RatingDelta, Time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        final String assistStmt = "INSERT INTO kill_contributions (KillId, Id, Contributor, Contribution, Damage) VALUES (?, ?, ?, ?, ?);";
+        List<Query> killQueries = new ArrayList<>();
+        List<Query> contributionQueries = new ArrayList<>();
 
-        // Add kills - This is done first because it if it breaks it will stop the rating update
-        // Kills are only saved by the victim
+        // Process kills
         for (final Kill kill : pendingKills) {
-            final UUID killId = kill.getId();
+            final Long killId = kill.getId();
             final List<Contribution> contributions = kill.getContributions();
 
-            final Contribution killerContribution = contributions.stream().filter(contribution -> contribution.getContributor().equals(kill.getKiller())).findFirst().orElseThrow();
-            Statement killStatement = new Statement(killStmt,
-                    new UuidStatementValue(killId),
-                    new IntegerStatementValue(Core.getCurrentServer()),
-                    new IntegerStatementValue(Core.getCurrentSeason()),
-                    new UuidStatementValue(kill.getKiller()),
-                    new UuidStatementValue(kill.getVictim()),
-                    new FloatStatementValue(killerContribution.getPercentage()),
-                    new FloatStatementValue(killerContribution.getDamage()),
-                    new IntegerStatementValue(kill.getRatingDelta()),
-                    new LongStatementValue(kill.getTime()));
-            killStatements.add(killStatement);
+            final Contribution killerContribution = contributions.stream()
+                    .filter(contribution -> contribution.getContributor().equals(kill.getKiller()))
+                    .findFirst()
+                    .orElseThrow();
+
+            killQueries.add(
+                    database.getDslContext()
+                            .insertInto(KILLS)
+                            .set(KILLS.ID, killId)
+                            .set(KILLS.REALM, Core.getCurrentRealm())
+                            .set(KILLS.KILLER, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(kill.getKiller().toString())))
+                            .set(KILLS.VICTIM, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(kill.getVictim().toString())))
+                            .set(KILLS.CONTRIBUTION, killerContribution.getPercentage())
+                            .set(KILLS.DAMAGE, killerContribution.getDamage())
+                            .set(KILLS.RATING_DELTA, kill.getRatingDelta())
+                            .set(KILLS.TIME, kill.getTime())
+            );
 
             contributions.remove(killerContribution);
             for (final Contribution contribution : contributions) {
-                Statement assistStatement = new Statement(assistStmt,
-                        new UuidStatementValue(killId),
-                        new UuidStatementValue(contribution.getId()),
-                        new UuidStatementValue(contribution.getContributor()),
-                        new FloatStatementValue(contribution.getPercentage()),
-                        new FloatStatementValue(contribution.getDamage()));
-                contributionStatements.add(assistStatement);
+                contributionQueries.add(
+                        database.getDslContext()
+                                .insertInto(KILL_CONTRIBUTIONS)
+                                .set(KILL_CONTRIBUTIONS.ID, contribution.getId())
+                                .set(KILL_CONTRIBUTIONS.KILL_ID, killId)
+                                .set(KILL_CONTRIBUTIONS.CONTRIBUTOR, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(contribution.getContributor().toString())))
+                                .set(KILL_CONTRIBUTIONS.CONTRIBUTION, contribution.getPercentage())
+                                .set(KILL_CONTRIBUTIONS.DAMAGE, contribution.getDamage())
+                );
             }
         }
 
@@ -69,27 +74,45 @@ public class GlobalCombatData extends CombatData {
         for (ICombatDataAttachment attachment : attachments) {
             attachment.prepareUpdates(this, database);
         }
-        // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO combat_stats (Client, Server, Season, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak)";
-        Statement victimRating = new Statement(ratingStmt,
-                new UuidStatementValue(getHolder()),
-                new IntegerStatementValue(Core.getCurrentServer()),
-                new IntegerStatementValue(Core.getCurrentSeason()),
-                new IntegerStatementValue(getRating()),
-                new IntegerStatementValue(getKillStreak()),
-                new IntegerStatementValue(getHighestKillStreak()));
 
-        CompletableFuture<Void> killsFuture = database.executeBatch(killStatements, TargetDatabase.GLOBAL);
+// Prepare combat stats query with ON DUPLICATE KEY UPDATE (MySQL) or ON CONFLICT (PostgreSQL)
+        Query combatStatsQuery = database.getDslContext()
+                .insertInto(COMBAT_STATS)
+                .set(COMBAT_STATS.CLIENT, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
+                .set(COMBAT_STATS.REALM, Core.getCurrentRealm())
+                .set(COMBAT_STATS.RATING, getRating())
+                .set(COMBAT_STATS.KILLSTREAK, getKillStreak())
+                .set(COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
+                .onDuplicateKeyUpdate()
+                .set(COMBAT_STATS.RATING, getRating())
+                .set(COMBAT_STATS.KILLSTREAK, getKillStreak())
+                .set(COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak());
 
-        killsFuture.thenRun(() -> {
-                    database.executeBatch(contributionStatements, TargetDatabase.GLOBAL);
-                }).thenRun(() -> {
-                    database.executeUpdate(victimRating, TargetDatabase.GLOBAL);
-                }).thenRun(pendingKills::clear)
-                .exceptionally(ex -> {
-                    log.error("Failed to save combat data", ex).submit();
-                    return null;
-                });
+        // Execute batches sequentially
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
 
+            ctx.transaction(configuration -> {
+                DSLContext ctxl = DSL.using(configuration);
+
+                // Execute kills batch
+                if (!killQueries.isEmpty()) {
+                    ctxl.batch(killQueries).execute();
+                }
+
+                // Execute contributions batch
+                if (!contributionQueries.isEmpty()) {
+                    ctxl.batch(contributionQueries).execute();
+                }
+
+                // Execute combat stats upsert
+                ctxl.execute(combatStatsQuery);
+
+                pendingKills.clear();
+            });
+
+        }).exceptionally(ex -> {
+            log.error("Failed to save combat data", ex).submit();
+            return null;
+        });
     }
 }

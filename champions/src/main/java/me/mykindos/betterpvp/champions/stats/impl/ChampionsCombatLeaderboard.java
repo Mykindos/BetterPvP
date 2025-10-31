@@ -10,10 +10,6 @@ import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatSort;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
@@ -28,8 +24,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.Result;
+import org.jooq.Table;
+import org.jooq.exception.DataAccessException;
 
-import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +36,13 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_DEATHS_BY_CLASS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_HIGHEST_KILLSTREAK_BY_CLASS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_KDR_BY_CLASS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_KILLSTREAK_BY_CLASS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_KILLS_BY_CLASS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_RATING_BY_CLASS;
 
 @Singleton
 @CustomLog
@@ -153,35 +158,34 @@ public final class ChampionsCombatLeaderboard extends PlayerLeaderboard<CombatDa
         }
 
         final String className = Optional.ofNullable(filter.getRole()).map(Role::getName).orElse("");
-        Statement stmt = getStatement(className, sortType);
+        Table<?> proc = getStatement(className, sortType);
 
-        database.executeProcedure(stmt, -1, result -> {
-            try {
-                while (result.next()) {
-                    final UUID gamer = UUID.fromString(result.getString(1));
-                    // We can join this because fetchAll is run on a separate thread
-                    final CombatData data = repository.fetchDataAsync(gamer).join().getCombatData(filter);
-                    map.put(gamer, data);
-                }
-            } catch (SQLException e) {
-                log.error("Failed to load combat rating leaderboard for type " + sortType, e).submit();
-            }
-        }, TargetDatabase.GLOBAL).join();
+        try {
+            Result<?> fetch = database.getDslContext().selectFrom(proc).fetch();
+            fetch.forEach(combatRecord -> {
+                final UUID gamer = UUID.fromString(combatRecord.get(0, String.class));
+                // We can join this because fetchAll is run on a separate thread
+                final CombatData data = repository.fetchDataAsync(gamer).join().getCombatData(filter);
+                map.put(gamer, data);
+            });
+        } catch (DataAccessException e) {
+            log.error("Failed to load combat rating leaderboard for type " + sortType, e).submit();
+        }
         return map;
     }
 
-    private static @NotNull Statement getStatement(String className, CombatSort sortType) {
-        final IntegerStatementValue server = new IntegerStatementValue(Core.getCurrentServer());
-        final IntegerStatementValue season = new IntegerStatementValue(Core.getCurrentSeason());
-        final IntegerStatementValue top = new IntegerStatementValue(10);
-        final StringStatementValue classNameStmt = new StringStatementValue(className);
-        return switch (sortType) {
-            case RATING -> new Statement("CALL GetTopRatingByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
-            case KILLS -> new Statement("CALL GetTopKillsByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
-            case KDR -> new Statement("CALL GetTopKDRByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
-            case KILLSTREAK -> new Statement("CALL GetTopKillstreakByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
-            case HIGHEST_KILLSTREAK -> new Statement("CALL GetTopHighestKillstreakByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
-            case DEATHS -> new Statement("CALL GetTopDeathsByClass(?, ?, ?, ?);", server, season, top, classNameStmt);
-        };
-    }
+
+private @NotNull Table<?> getStatement(String className, CombatSort sortType) {
+    final int currentRealm = Core.getCurrentRealm();
+    final int topResults = 10;
+
+    return switch (sortType) {
+        case RATING -> GET_TOP_RATING_BY_CLASS(currentRealm, topResults, className);
+        case KILLS -> GET_TOP_KILLS_BY_CLASS(currentRealm, topResults, className);
+        case KDR -> GET_TOP_KDR_BY_CLASS(currentRealm, topResults, className);
+        case KILLSTREAK -> GET_TOP_KILLSTREAK_BY_CLASS(currentRealm, topResults, className);
+        case HIGHEST_KILLSTREAK -> GET_TOP_HIGHEST_KILLSTREAK_BY_CLASS(currentRealm, topResults, className);
+        case DEATHS -> GET_TOP_DEATHS_BY_CLASS(currentRealm, topResults, className);
+    };
+}
 }

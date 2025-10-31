@@ -3,10 +3,10 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -23,18 +23,15 @@ public class ClansChampionsHook implements Listener {
     private final RoleManager roleManager;
     private final DamageLogManager damageLogManager;
 
-    @Inject
-    @Config(path = "clans.energy.energy-per-kill-min", defaultValue = "40")
     private int energyMinPerKill;
-
-    @Inject
-    @Config(path = "clans.energy.energy-per-kill-max", defaultValue = "80")
     private int energyMaxPerKill;
 
     @Inject
-    private ClansChampionsHook(RoleManager roleManager, DamageLogManager damageLogManager) {
+    private ClansChampionsHook(Clans clans, RoleManager roleManager, DamageLogManager damageLogManager) {
         this.roleManager = roleManager;
         this.damageLogManager = damageLogManager;
+        energyMinPerKill = clans.getConfig().getInt("clans.energy.energy-per-kill-min", 40);
+        energyMaxPerKill = clans.getConfig().getInt("clans.energy.energy-per-kill-max", 80);
     }
 
     @EventHandler

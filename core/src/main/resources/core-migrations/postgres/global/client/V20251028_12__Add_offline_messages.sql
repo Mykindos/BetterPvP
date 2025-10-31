@@ -24,10 +24,12 @@ CREATE OR REPLACE FUNCTION get_offline_messages_by_time(
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT offline_messages.time_sent,
+    SELECT
+           clients.uuid,
+           offline_messages.time_sent,
            offline_messages.action,
-           offline_messages.message,
-           clients.uuid
+           offline_messages.message
+
     FROM offline_messages
     INNER JOIN clients ON offline_messages.client = clients.id
     WHERE offline_messages.client = client_param

@@ -8,17 +8,22 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
+import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
+import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
@@ -78,6 +83,26 @@ public class ClansFishingListener implements Listener {
                     log.info("{} ({}) would have caught a legendary while fishing, but they were not at fields!", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
                 }
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCatchFish(PlayerCaughtFishEvent event) {
+        if (!(event.getLoot() instanceof Fish fish)) return;
+        if (!clanManager.getClanByLocation(event.getHook().getLocation().getBlock().getLocation())
+                .map(c -> c.getName().equalsIgnoreCase("Fields"))
+                .orElse(false)) {
+
+            if (event.isBaseFishingUnlocked()) {
+                return;
+            }
+
+            fish.setWeight((int) (fish.getWeight() * 0.50));
+            if (UtilMath.randomInt(20) < 2) {
+                UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
+            }
+        } else {
+            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
         }
     }
 }

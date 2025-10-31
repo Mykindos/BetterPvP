@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 public class Kill {
 
-    private final UUID id;
+    private final Long id;
     private final UUID killer;
     private final UUID victim;
     private final int ratingDelta;

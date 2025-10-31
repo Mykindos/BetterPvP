@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS kills
 (
-    id            SERIAL PRIMARY KEY,
+    id            BIGINT         PRIMARY KEY,
     realm         SMALLINT       NOT NULL,
-    killer        BIGINT        NOT NULL,
-    victim        BIGINT        NOT NULL,
+    killer        BIGINT         NOT NULL,
+    victim        BIGINT         NOT NULL,
     contribution  REAL           NOT NULL,
     damage        REAL           NOT NULL,
     rating_delta  INTEGER        NOT NULL,
@@ -17,9 +17,9 @@ CREATE INDEX IF NOT EXISTS idx_kills_killer_victim ON kills (realm, killer, vict
 
 CREATE TABLE IF NOT EXISTS kill_contributions
 (
-    id           SERIAL NOT NULL PRIMARY KEY,
-    kill_id      INTEGER NOT NULL REFERENCES kills (id),
-    contributor  BIGINT  NOT NULL REFERENCES clients (id) ON DELETE CASCADE,
+    id           BIGINT NOT NULL PRIMARY KEY,
+    kill_id      BIGINT NOT NULL REFERENCES kills (id) ON DELETE CASCADE,
+    contributor  BIGINT NOT NULL REFERENCES clients (id) ON DELETE CASCADE,
     contribution REAL NOT NULL,
     damage       REAL NOT NULL,
     UNIQUE (kill_id, contributor)
@@ -71,13 +71,14 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION get_top_rating(realm_param INTEGER, top INTEGER)
-    RETURNS TABLE(client BIGINT, rating INTEGER)
+    RETURNS TABLE(client VARCHAR(36), rating INTEGER)
     LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
-        SELECT cs.client, cs.rating
+        SELECT c.uuid as client, cs.rating
         FROM combat_stats cs
+        JOIN clients c ON cs.client = c.id
         WHERE cs.realm = realm_param
           AND cs.valid = TRUE
         ORDER BY cs.rating DESC
@@ -86,70 +87,75 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION get_top_kills(realm_param INTEGER, top INTEGER)
-    RETURNS TABLE(gamer BIGINT, kills BIGINT)
+    RETURNS TABLE(client VARCHAR(36), kills BIGINT)
     LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
-        SELECT k.killer AS gamer, COUNT(*) AS kills
+        SELECT c.uuid as client, COUNT(*) AS kills
         FROM kills k
+        JOIN clients c ON k.killer = c.id
         WHERE k.realm = realm_param
           AND k.valid = TRUE
-        GROUP BY gamer
+        GROUP BY c.id
         ORDER BY kills DESC
         LIMIT top;
 END;
 $$;
 
 CREATE OR REPLACE FUNCTION get_top_deaths(realm_param INTEGER, top INTEGER)
-    RETURNS TABLE(gamer BIGINT, deaths BIGINT)
+    RETURNS TABLE(client VARCHAR(36), deaths BIGINT)
     LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
-        SELECT k.victim AS gamer, COUNT(*) AS deaths
+        SELECT c.uuid as client, COUNT(*) AS deaths
         FROM kills k
+        JOIN clients c ON k.victim = c.id
         WHERE k.realm = realm_param
           AND k.valid = TRUE
-        GROUP BY gamer
+        GROUP BY c.id
         ORDER BY deaths DESC
         LIMIT top;
 END;
 $$;
 
 CREATE OR REPLACE FUNCTION get_top_kdr(realm_param INTEGER, top INTEGER)
-    RETURNS TABLE(gamer BIGINT, kdr NUMERIC)
+    RETURNS TABLE(client VARCHAR(36), kdr NUMERIC)
     LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
-        WITH kill_count AS (SELECT killer AS gamer, COUNT(*) AS kills
+        WITH kill_count AS (SELECT clients.uuid AS client, COUNT(*) AS kills
                             FROM kills
+                            JOIN clients ON killer = clients.id
                             WHERE realm = realm_param
                               AND valid = TRUE
-                            GROUP BY killer),
-             deaths AS (SELECT victim AS gamer, COUNT(*) AS deaths
+                            GROUP BY clients.id),
+             deaths AS (SELECT clients.uuid AS client, COUNT(*) AS deaths
                         FROM kills
+                        JOIN clients ON victim = clients.id
                         WHERE realm = realm_param
                           AND valid = TRUE
-                        GROUP BY victim)
+                        GROUP BY clients.id)
 
-        SELECT kill_count.gamer AS gamer, COALESCE(kill_count.kills::NUMERIC / deaths.deaths, kill_count.kills::NUMERIC) AS kdr
+        SELECT kill_count.client AS client, COALESCE(kill_count.kills::NUMERIC / deaths.deaths, kill_count.kills::NUMERIC) AS kdr
         FROM kill_count
-                 LEFT JOIN deaths ON kill_count.gamer = deaths.gamer
+                 LEFT JOIN deaths ON kill_count.client = deaths.client
         ORDER BY kdr DESC
         LIMIT top;
 END;
 $$;
 
 CREATE OR REPLACE FUNCTION get_top_killstreak(realm_param INTEGER, top INTEGER)
-    RETURNS TABLE(client BIGINT, killstreak INTEGER)
+    RETURNS TABLE(client VARCHAR(36), killstreak INTEGER)
     LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
-        SELECT cs.client, cs.killstreak
+        SELECT c.uuid AS client, cs.killstreak
         FROM combat_stats cs
+        JOIN clients c ON cs.client = c.id
         WHERE cs.realm = realm_param
           AND cs.valid = TRUE
         ORDER BY cs.killstreak DESC
@@ -158,13 +164,14 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION get_top_highest_killstreak(realm_param INTEGER, top INTEGER)
-    RETURNS TABLE(client BIGINT, highest_killstreak INTEGER)
+    RETURNS TABLE(client VARCHAR(36), highest_killstreak INTEGER)
     LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
-        SELECT cs.client, cs.highest_killstreak
+        SELECT c.uuid AS client, cs.highest_killstreak
         FROM combat_stats cs
+        JOIN clients c ON cs.client = c.id
         WHERE cs.realm = realm_param
           AND cs.valid = TRUE
         ORDER BY cs.highest_killstreak DESC

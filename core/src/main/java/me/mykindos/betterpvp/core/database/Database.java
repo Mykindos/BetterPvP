@@ -57,7 +57,7 @@ public class Database {
     private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 60;
     private static final Executor WRITE_EXECUTOR = Executors.newFixedThreadPool(4);
     private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(5);
-
+    private static final Executor DB_EXECUTOR = Executors.newFixedThreadPool(10);
     /**
      * Constructs a new Database instance.
      *
@@ -71,10 +71,21 @@ public class Database {
         this.core = core;
         this.connection = connection;
         this.dslContext = DSL.using(
-                connection.getDatabaseConnection(DEFAULT_DATABASE),
+                connection.getDataSource(DEFAULT_DATABASE),
                 SQLDialect.POSTGRES
         );
     }
+
+    /**
+     * Returns a DSLContext wrapper that executes queries asynchronously on a background thread.
+     * Eliminates the need for CompletableFuture boilerplate in repository code.
+     *
+     * @return A functional interface that wraps queries with automatic async execution
+     */
+    public AsyncDSLContext getAsyncDslContext() {
+        return new AsyncDSLContext(this.connection, DB_EXECUTOR);
+    }
+
 
     public int getServerId(String serverName) {
         DSLContext dsl = getDslContext();

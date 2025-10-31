@@ -136,7 +136,7 @@ public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData>
         try {
             Result<?> fetch = database.getDslContext().selectFrom(proc).fetch();
             fetch.forEach(combatRecord -> {
-                final UUID gamer = UUID.fromString(combatRecord.get(1, String.class));
+                final UUID gamer = UUID.fromString(combatRecord.get(0, String.class));
                 // We can join this because fetchAll is run on a separate thread
                 final CombatData data = repository.getDataAsync(gamer).join();
                 map.put(gamer, data);

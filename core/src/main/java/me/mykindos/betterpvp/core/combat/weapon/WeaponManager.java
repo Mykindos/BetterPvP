@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Singleton
 @CustomLog
-public class WeaponManager extends Manager<IWeapon> {
+public class WeaponManager extends Manager<String, IWeapon> {
 
     private final Core core;
     private final ItemHandler itemHandler;

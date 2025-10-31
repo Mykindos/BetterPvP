@@ -10,18 +10,21 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GetChampionsDataRecord;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
+import org.jooq.DSLContext;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
 
-import java.sql.SQLException;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.COMBAT_STATS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_CHAMPIONS_DATA;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.KILLS;
 
 @Singleton
 @CustomLog
@@ -38,42 +41,30 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
 
     @Override
     public CompletableFuture<RoleStatistics> fetchDataAsync(UUID player) {
-        return CompletableFuture.supplyAsync(() -> {
-            final Map<ChampionsFilter, ChampionsCombatData> combatDataMap = new EnumMap<>(ChampionsFilter.class);
-            final RoleStatistics roleStatistics = new RoleStatistics(combatDataMap, roleManager, player);
-            final UuidStatementValue uuid = new UuidStatementValue(player);
-            Statement statement = new Statement("CALL GetChampionsData(?, ?, ?)",
-                    IntegerStatementValue.of(Core.getCurrentServer()),
-                    IntegerStatementValue.of(Core.getCurrentSeason()),
-                    uuid);
-            database.executeProcedure(statement, -1, result -> {
-                try {
-                    while (result.next()) {
-                        final String className = result.getString(1);
-                        final Role role = className.isEmpty() ? null : Role.valueOf(className);
-                        ChampionsFilter filter = ChampionsFilter.fromRole(role);
-                        final ChampionsCombatData data = new ChampionsCombatData(player, roleManager, role);
-                        data.setKills(result.getInt(2));
-                        data.setDeaths(result.getInt(3));
-                        data.setAssists(result.getInt(4));
-                        data.setKillStreak(result.getInt(6));
-                        data.setHighestKillStreak(result.getInt(7));
+        final Map<ChampionsFilter, ChampionsCombatData> combatDataMap = new EnumMap<>(ChampionsFilter.class);
+        final RoleStatistics roleStatistics = new RoleStatistics(combatDataMap, roleManager, player);
+        return database.getAsyncDslContext().executeAsync(ctx -> {
 
-                        // We care if the rating is null because that means they have not played a game yet,
-                        // so it falls back to the default value of rating in CombatData
-                        // Contrary to the other stats, which are initialized to 0
-                        int rating = result.getInt(5);
-                        if (!result.wasNull()) {
-                            data.setRating(rating);
-                        }
+            Result<GetChampionsDataRecord> dataRecords = GET_CHAMPIONS_DATA(ctx.configuration(), player.toString(), Core.getCurrentRealm());
+            dataRecords.forEach(result -> {
+                String className = result.getClass_();
+                Role role = className.isEmpty() ? null : Role.valueOf(className);
+                ChampionsFilter filter = ChampionsFilter.fromRole(role);
+                ChampionsCombatData data = new ChampionsCombatData(player, roleManager, role);
+                data.setKills(result.getKills());
+                data.setDeaths(result.getDeaths());
+                data.setAssists(result.getAssists());
+                data.setKillStreak(data.getKillStreak());
+                data.setHighestKillStreak(data.getHighestKillStreak());
 
-                        combatDataMap.put(filter, data);
-                    }
+                int rating = result.getRating();
+                data.setRating(rating);
 
-                } catch (SQLException e) {
-                    log.error("Failed to load combat data for " + player, e).submit();
-                }
-            }, TargetDatabase.GLOBAL).join();
+                combatDataMap.put(filter, data);
+
+            });
+
+
             return roleStatistics;
         }).exceptionally(throwable -> {
             log.error("Failed to load combat data for " + player, throwable).submit();
@@ -82,22 +73,14 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
     }
 
     public void validate(Client client, boolean isValid) {
-        String updateKills = "UPDATE kills SET Valid = ? WHERE Killer = ?";
-        Statement updateKillsStatement = new Statement(updateKills,
-                new BooleanStatementValue(isValid),
-                new UuidStatementValue(client.getUniqueId()));
-        database.executeUpdate(updateKillsStatement, TargetDatabase.GLOBAL);
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.transaction(configuration -> {
+                DSLContext ctxl = DSL.using(configuration);
 
-        String updateStats = "UPDATE combat_stats SET Valid = ? WHERE Gamer = ?";
-        Statement updateStatsStatement = new Statement(updateStats,
-                new BooleanStatementValue(isValid),
-                new UuidStatementValue(client.getUniqueId()));
-        database.executeUpdate(updateStatsStatement, TargetDatabase.GLOBAL);
-
-        String updateCombatData = "UPDATE champions_combat_stats SET Valid = ? WHERE Gamer = ?";
-        Statement updateCombatDataStatement = new Statement(updateCombatData,
-                new BooleanStatementValue(isValid),
-                new UuidStatementValue(client.getUniqueId()));
-        database.executeUpdate(updateCombatDataStatement, TargetDatabase.GLOBAL);
+                ctxl.update(KILLS).set(KILLS.VALID, isValid).where(KILLS.KILLER.eq(client.getId())).execute();
+                ctxl.update(COMBAT_STATS).set(COMBAT_STATS.VALID, isValid).where(COMBAT_STATS.CLIENT.eq(client.getId())).execute();
+                ctxl.update(CHAMPIONS_COMBAT_STATS).set(CHAMPIONS_COMBAT_STATS.VALID, isValid).where(CHAMPIONS_COMBAT_STATS.CLIENT.eq(client.getId())).execute();
+            });
+        });
     }
 }

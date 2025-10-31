@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,11 +29,11 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -73,7 +72,7 @@ public class ClanCoreCrystalListener implements Listener {
             return;
         }
 
-        final UUID clanId = Objects.requireNonNull(pdc.get(ClansNamespacedKeys.CLAN, CustomDataType.UUID));
+        final Long clanId = Objects.requireNonNull(pdc.get(ClansNamespacedKeys.CLAN, PersistentDataType.LONG));
         final Clan clan = this.clanManager.getClanById(clanId).orElseThrow();
         final ClanCore core = clan.getCore();
         final LivingEntity damagerEnt = event.getDamager();
@@ -132,7 +131,7 @@ public class ClanCoreCrystalListener implements Listener {
         }
 
         event.setCancelled(true);
-        final UUID clanId = Objects.requireNonNull(pdc.get(ClansNamespacedKeys.CLAN, CustomDataType.UUID));
+        final Long clanId = Objects.requireNonNull(pdc.get(ClansNamespacedKeys.CLAN, PersistentDataType.LONG));
         final Clan clan = this.clanManager.getClanById(clanId).orElseThrow();
         if (this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null) != clan) {
             UtilMessage.message(event.getPlayer(), "Clans", "You cannot use this clan core.");

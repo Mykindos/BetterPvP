@@ -4,13 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 
-import java.util.ArrayList;
-import java.util.List;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_KILLDEATH_DATA;
 
 @Singleton
 public class RoleRepository {
@@ -30,10 +25,24 @@ public class RoleRepository {
         String killKey = killerRoleName + "_VS_" + killedRoleName;
         String deathKey = killedRoleName + "_VS_" + killerRoleName;
 
-        String query = "INSERT INTO champions_killdeath_data (Matchup, Metric, Value) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE Value = Value + 1";
-        List<Statement> statements = new ArrayList<>();
-        statements.add(new Statement(query, new StringStatementValue(killKey), new StringStatementValue("Kills"), new IntegerStatementValue(1)));
-        statements.add(new Statement(query, new StringStatementValue(deathKey), new StringStatementValue("Deaths"), new IntegerStatementValue(1)));
-        database.executeBatch(statements, TargetDatabase.GLOBAL);
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            // Insert/update kill data
+            ctx.insertInto(CHAMPIONS_KILLDEATH_DATA)
+                    .set(CHAMPIONS_KILLDEATH_DATA.MATCHUP, killKey)
+                    .set(CHAMPIONS_KILLDEATH_DATA.METRIC, "Kills")
+                    .set(CHAMPIONS_KILLDEATH_DATA.VALUE, 1)
+                    .onDuplicateKeyUpdate()
+                    .set(CHAMPIONS_KILLDEATH_DATA.VALUE, CHAMPIONS_KILLDEATH_DATA.VALUE.plus(1))
+                    .execute();
+
+            // Insert/update death data
+            ctx.insertInto(CHAMPIONS_KILLDEATH_DATA)
+                    .set(CHAMPIONS_KILLDEATH_DATA.MATCHUP, deathKey)
+                    .set(CHAMPIONS_KILLDEATH_DATA.METRIC, "Deaths")
+                    .set(CHAMPIONS_KILLDEATH_DATA.VALUE, 1)
+                    .onDuplicateKeyUpdate()
+                    .set(CHAMPIONS_KILLDEATH_DATA.VALUE, CHAMPIONS_KILLDEATH_DATA.VALUE.plus(1))
+                    .execute();
+        });
     }
 }

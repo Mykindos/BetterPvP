@@ -36,7 +36,7 @@ public class ProgressionTipListener implements Listener {
         Player player = event.getPlayer();
         WeighedList<Tip> tipList = event.getTipList();
 
-        Optional<ProfessionProfile> professionProfileOptional  = professionProfileManager.getObject(player.getUniqueId());
+        Optional<ProfessionProfile> professionProfileOptional  = professionProfileManager.getObject(player.getUniqueId().toString());
         final ProfessionProfile professionProfile = professionProfileOptional.orElse(null);
 
         tipManager.getTips().forEach(tip -> {

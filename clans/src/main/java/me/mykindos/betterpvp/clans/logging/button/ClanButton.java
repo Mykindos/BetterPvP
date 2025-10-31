@@ -4,8 +4,10 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.menu.PlayersOfClanMenu;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -18,16 +20,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class ClanButton extends AbstractItem {
     private final String name;
-    private final UUID id;
+    private final long id;
     private final ClanManager clanManager;
     private final ClientManager clientManager;
     private final Windowed previous;
 
-    public ClanButton(String name, UUID id, ClanManager clanManager, ClientManager clientManager, Windowed previous) {
+    public ClanButton(String name, long id, ClanManager clanManager, ClientManager clientManager, Windowed previous) {
         this.name = name;
         this.id = id;
         this.clanManager = clanManager;
@@ -50,7 +51,7 @@ public class ClanButton extends AbstractItem {
         }
         return ItemView.builder()
                 .displayName(Component.text(name, NamedTextColor.AQUA))
-                .lore(Component.text(id.toString()))
+                .lore(Component.text(id))
                 .with(banner)
                 .build();
     }

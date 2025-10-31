@@ -85,7 +85,7 @@ public class SearchCommand extends Command {
                 return;
             }
 
-            Optional<UUIDItem> uuidItemOptional = uuidManager.getObject(uuid);
+            Optional<UUIDItem> uuidItemOptional = uuidManager.getObject(uuid.toString());
 
             if (uuidItemOptional.isEmpty()) {
                 UtilMessage.message(player, "Search", UtilMessage.deserialize("There is no item with the UUID <light_purple>%s</light_purple>", uuid.toString()));

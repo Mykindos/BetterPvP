@@ -30,8 +30,8 @@ dependencies {
     runtimeOnly(libs.sidebar.impl)
     runtimeOnly(libs.sidebar.packetevents)
 
-    implementation(libs.jooq)
-    implementation(libs.jooq.meta)
+    api(libs.jooq)
+    api(libs.jooq.meta)
     jooqGenerator(libs.jooq.meta.extensions)
     jooqGenerator("org.postgresql:postgresql:42.7.4")
     implementation("org.postgresql:postgresql:42.7.4")

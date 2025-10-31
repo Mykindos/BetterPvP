@@ -13,10 +13,8 @@ import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
-import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -28,8 +26,6 @@ import org.jooq.Result;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -207,17 +203,7 @@ public class ClientSQLLayer {
     }
 
     public int getTotalClients() {
-        String query = "SELECT COUNT(*) FROM clients;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
-            if (result.next()) {
-                return result.getInt(1);
-            }
-        } catch (SQLException ex) {
-            log.error("Error fetching total clients", ex).submit();
-        }
-
-        return 0;
+        return database.getDslContext().fetchCount(CLIENTS);
     }
 
     /**
@@ -403,9 +389,11 @@ public class ClientSQLLayer {
         }
 
         try {
-            database.getDslContext().transaction(config -> {
-                DSLContext ctx = DSL.using(config);
-                ctx.batch(queries).execute();
+            database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+                ctx.transaction(config -> {
+                    DSLContext ctxl = DSL.using(config);
+                    ctxl.batch(queries).execute();
+                });
             });
         } catch (Exception ex) {
             log.error("Error executing queries as transaction with {} queries", queries.size(), ex).submit();
@@ -472,8 +460,9 @@ public class ClientSQLLayer {
             try {
                 database.getDslContext().insertInto(CLIENT_REWARDS)
                         .set(CLIENT_REWARDS.CLIENT, client.getId())
+                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentSeason())
                         .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
-                        .onConflict(CLIENT_REWARDS.CLIENT)
+                        .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
                         .doUpdate()
                         .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
                         .execute();

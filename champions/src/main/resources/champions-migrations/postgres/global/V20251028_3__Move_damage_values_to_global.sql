@@ -1,12 +1,13 @@
-create table if not exists champions_damagevalues
+
+CREATE TABLE IF NOT EXISTS champions_damagevalues
 (
-    Material varchar(255) not null,
-    Damage   double       null,
-    constraint champions_damagevalues_pk
-        primary key (Material)
+    material VARCHAR(255) NOT NULL,
+    damage   DOUBLE PRECISION NULL,
+    CONSTRAINT champions_damagevalues_pk
+        PRIMARY KEY (material)
 );
 
-INSERT IGNORE INTO champions_damagevalues (Material, Damage)
+INSERT INTO champions_damagevalues (material, damage)
 VALUES ('NETHERITE_SWORD', 6),
        ('NETHERITE_AXE', 6),
        ('DIAMOND_SWORD', 6),
@@ -21,4 +22,5 @@ VALUES ('NETHERITE_SWORD', 6),
        ('WOODEN_AXE', 3),
        ('TRIDENT', 2),
        ('DIAMOND_SHOVEL', 2),
-       ('IRON_SHOVEL', 1);
+       ('IRON_SHOVEL', 1)
+ON CONFLICT (material) DO NOTHING;

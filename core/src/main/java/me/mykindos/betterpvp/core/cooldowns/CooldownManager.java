@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 
 @CustomLog
 @Singleton
-public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>> {
+public class CooldownManager extends Manager<String, ConcurrentHashMap<String, Cooldown>> {
 
     @Inject
     private ClientManager clientManager;
@@ -168,7 +168,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 }
 
                 final TextComponent cooldownName = Component.text(ability).decorate(TextDecoration.BOLD).color(NamedTextColor.WHITE);
-                final Optional<ConcurrentHashMap<String, Cooldown>> cooldowns = getObject(player.getUniqueId());
+                final Optional<ConcurrentHashMap<String, Cooldown>> cooldowns = getObject(player.getUniqueId().toString());
                 if (cooldowns.isEmpty()) {
                     return null; // Skip
                 }

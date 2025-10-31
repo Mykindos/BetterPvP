@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Singleton
-public class ClanPerkManager extends Manager<ClanPerk> {
+public class ClanPerkManager extends Manager<String, ClanPerk> {
 
     private static ClanPerkManager instance;
 

@@ -8,14 +8,14 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 @Singleton
-public class CombatLogManager extends Manager<CombatLog> {
+public class CombatLogManager extends Manager<String, CombatLog> {
 
     public void createCombatLog(Player player, long expiry){
         if(player.isDead()) {
             return;
         }
 
-        addObject(player.getUniqueId(), new CombatLog(player, expiry));
+        addObject(player.getUniqueId().toString(), new CombatLog(player, expiry));
     }
 
     public Optional<CombatLog> getCombatLogBySheep(LivingEntity target) {

@@ -31,7 +31,6 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
-import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -61,7 +60,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
 @Singleton
-public class ClanManager extends Manager<Clan> {
+public class ClanManager extends Manager<Long, Clan> {
 
     private final Clans clans;
 
@@ -148,11 +147,11 @@ public class ClanManager extends Manager<Clan> {
      * @param id the unique identifier of the clan, or null if no ID is specified
      * @return an {@code Optional} containing the clan if found, or an empty {@code Optional} if no clan exists for the given ID or if the ID is null
      */
-    public Optional<Clan> getClanById(@Nullable UUID id) {
+    public Optional<Clan> getClanById(@Nullable Long id) {
         if (id == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(objects.get(id.toString()));
+        return Optional.ofNullable(objects.get(id));
     }
 
     /**
@@ -189,9 +188,14 @@ public class ClanManager extends Manager<Clan> {
         if (player != null && player.hasMetadata("clan")) {
             List<MetadataValue> clan = player.getMetadata("clan");
             if (!clan.isEmpty()) {
-                return Optional.ofNullable(clan.get(0).value())
-                        .map(UUID.class::cast)
-                        .flatMap(this::getClanById);
+                try {
+                    Optional<Long> clanId = Optional.ofNullable(clan.getFirst())
+                            .map(metaRecord -> (Long) metaRecord.value());
+                    return clanId.flatMap(this::getClanById);
+                } catch (ClassCastException ex) {
+                    log.error("Invalid clan ID type", ex).submit();
+                    return Optional.empty();
+                }
             }
         }
 
@@ -247,12 +251,20 @@ public class ClanManager extends Manager<Clan> {
      *         if the chunk is not owned by any clan
      */
     public Optional<Clan> getClanByChunk(Chunk chunk) {
-        final UUID uuid = chunk.getPersistentDataContainer().get(ClansNamespacedKeys.CLAN, CustomDataType.UUID);
-        if (uuid == null) {
+        PersistentDataContainer pdc = chunk.getPersistentDataContainer();
+        Long clanid = null;
+
+        try {
+            // Try to get as LONG first
+            clanid = pdc.get(ClansNamespacedKeys.CLAN, PersistentDataType.LONG);
+        } catch (IllegalArgumentException e) {
+            // TODO we can remove this after a new map, just stopping error spam for now due to legacy data
+        }
+        if (clanid == null) {
             return Optional.empty();
         }
 
-        return getClanById(uuid);
+        return getClanById(clanid);
     }
 
     /**
@@ -925,8 +937,11 @@ public class ClanManager extends Manager<Clan> {
         List<Insurance> insuranceList = clan.getInsurance();
         insuranceList.sort(Collections.reverseOrder());
         getInsuranceQueue().addAll(insuranceList);
-        getRepository().deleteInsuranceForClan(clan);
         clan.getInsurance().clear();
+    }
+
+    public void deleteInsuranceForClan(Clan clan) {
+        repository.deleteInsuranceForClan(clan);
     }
 
     /**
@@ -936,10 +951,9 @@ public class ClanManager extends Manager<Clan> {
      *
      * @param objects a list of Clan objects to be loaded and initialized
      */
-    @Override
     public void loadFromList(List<Clan> objects) {
         // Load the base clan objects first so they can be referenced in the loop below
-        objects.forEach(clan -> addObject(clan.getId().toString(), clan));
+        objects.forEach(clan -> addObject(clan.getId(), clan));
 
         objects.forEach(clan -> {
             clan.setTerritory(repository.getTerritory(clan));

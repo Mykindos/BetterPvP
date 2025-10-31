@@ -62,7 +62,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
     }
 
     public void populate() {
-        boolean ownClan = viewerClan != null && viewerClan.getId().equals(clan.getId());
+        boolean ownClan = viewerClan != null && viewerClan.getId() == clan.getId();
         boolean admin = ownClan && viewerClan.getMemberByUUID(viewer.getUniqueId()).map(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN)).orElse(false);
         boolean leader = ownClan && viewerClan.getMemberByUUID(viewer.getUniqueId()).map(member -> member.getRank().hasRank(ClanMember.MemberRank.LEADER)).orElse(false);
 

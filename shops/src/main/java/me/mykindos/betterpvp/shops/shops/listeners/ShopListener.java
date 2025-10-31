@@ -85,7 +85,7 @@ public class ShopListener implements Listener {
         if (!(event.getRightClicked() instanceof LivingEntity target)) return;
 
 
-        Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId());
+        Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId().toString());
         shopkeeperOptional.ifPresent(shopkeeper -> {
             shopManager.showShopMenu(event.getPlayer(), shopkeeper.getShopkeeperName(), itemHandler, clientManager);
         });
@@ -290,14 +290,14 @@ public class ShopListener implements Listener {
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if (shopkeeperManager.getObject(event.getDamagee().getUniqueId()).isPresent()) {
+        if (shopkeeperManager.getObject(event.getDamagee().getUniqueId().toString()).isPresent()) {
             event.cancel("Cannot damage shopkeepers");
         }
     }
 
     @EventHandler
     public void onCollide(ThrowableHitEntityEvent event) {
-        if (shopkeeperManager.getObject(event.getCollision().getUniqueId()).isPresent()) {
+        if (shopkeeperManager.getObject(event.getCollision().getUniqueId().toString()).isPresent()) {
             event.setCancelled(true);
         }
     }
@@ -306,7 +306,7 @@ public class ShopListener implements Listener {
     public void onCatch(PlayerFishEvent event) {
         if (event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
             if (event.getCaught() == null) return;
-            if (shopkeeperManager.getObject(event.getCaught().getUniqueId()).isPresent()) {
+            if (shopkeeperManager.getObject(event.getCaught().getUniqueId().toString()).isPresent()) {
                 event.setCancelled(true);
             }
         }
@@ -314,7 +314,7 @@ public class ShopListener implements Listener {
 
     @EventHandler
     public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
-        event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId()).isPresent());
+        event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId().toString()).isPresent());
     }
 
     private static final Material[] MUSIC_DISC_MATERIALS = {

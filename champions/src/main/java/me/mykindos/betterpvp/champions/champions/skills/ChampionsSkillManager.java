@@ -15,7 +15,7 @@ import java.util.Set;
 
 @CustomLog
 @Singleton
-public class ChampionsSkillManager extends Manager<Skill> {
+public class ChampionsSkillManager extends Manager<String, Skill> {
 
     private final Champions champions;
 

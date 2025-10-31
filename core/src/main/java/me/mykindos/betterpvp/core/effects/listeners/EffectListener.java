@@ -170,7 +170,7 @@ public class EffectListener implements Listener {
         for (PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
             event.getPlayer().removePotionEffect(potionEffect.getType());
         }
-        Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = effectManager.getObject(event.getPlayer().getUniqueId());
+        Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = effectManager.getObject(event.getPlayer().getUniqueId().toString());
 
         effectsOptional.ifPresent(effects -> {
             effects.values().forEach(effectList -> effectList.forEach(effect -> effect.getEffectType().onReceive(event.getPlayer(), effect)));

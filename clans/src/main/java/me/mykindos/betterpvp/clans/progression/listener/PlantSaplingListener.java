@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.progression.ProgressionAdapter;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
@@ -27,6 +28,7 @@ import java.util.Optional;
  */
 @BPvPListener
 @Singleton
+@PluginAdapter("Progression")
 public class PlantSaplingListener implements Listener, ConfigAccessor {
     private final ClanManager clanManager;
     private final ForestFlourisher forestFlourisherSkill;

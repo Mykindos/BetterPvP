@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import java.util.List;
 
 @Singleton
-public class ItemDamageManager extends Manager<ItemDamageValue> {
+public class ItemDamageManager extends Manager<String, ItemDamageValue> {
 
     private final ItemDamageRepository repository;
 
@@ -17,7 +17,6 @@ public class ItemDamageManager extends Manager<ItemDamageValue> {
         loadFromList(repository.getAll());
     }
 
-    @Override
     public void loadFromList(List<ItemDamageValue> values) {
         values.forEach(value -> objects.put(value.getMaterial().name(), value));
     }

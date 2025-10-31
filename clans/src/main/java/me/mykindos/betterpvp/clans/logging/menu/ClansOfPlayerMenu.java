@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
@@ -69,7 +68,7 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
     private CompletableFuture<Boolean> refresh() {
         CompletableFuture<List<Item>> future = new CompletableFuture<>();
         future.completeAsync(() -> {
-            Map<UUID, String> clans = clanManager.getRepository().getClansByPlayer(client.getUniqueId());
+            Map<Long, String> clans = clanManager.getRepository().getClansByPlayer(client.getUniqueId());
             return clans.keySet().stream()
                     .map(clanID -> new ClanButton(clans.get(clanID), clanID,
                             clanManager, clientManager, this))
