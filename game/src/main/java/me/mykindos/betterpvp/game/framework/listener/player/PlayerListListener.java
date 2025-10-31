@@ -12,12 +12,12 @@ import me.mykindos.betterpvp.game.framework.manager.PlayerListManager;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerStatsForGame;
 import me.mykindos.betterpvp.game.framework.state.GameState;
+import me.mykindos.betterpvp.game.impl.event.PlayerContributePointsEvent;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,5 +64,12 @@ public class PlayerListListener implements Listener {
         if (!(killer instanceof Player killerPlayer)) return;
 
         playerListManager.addKill(killerPlayer);
+    }
+
+    @EventHandler
+    public void onPlayerCapture(PlayerContributePointsEvent event) {
+        if (!serverController.getCurrentState().equals(GameState.IN_GAME)) return;
+        final Player player = event.getPlayer();
+        playerListManager.addPoints(player, event.getPointsContributed());
     }
 }

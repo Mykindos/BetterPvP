@@ -38,9 +38,9 @@ public class PlayerListManager implements Listener {
     @Getter
     private final Map<Player, PlayerStatsForGame> playerStats = new WeakHashMap<>();
 
-    // kill icon character; actual padding is computed per-player in updatePlayerList
     private static final String KILL_ICON_CHAR = "⚔";
     private static final String DEATH_ICON_CHAR = "☠";
+    private static final String POINTS_ICON_CHAR = "✦";
 
     @Inject
     public PlayerListManager(ServerController serverController) {
@@ -157,6 +157,12 @@ public class PlayerListManager implements Listener {
         updatePlayerList(player);
     }
 
+    public void addPoints(@NotNull Player player, int points) {
+        final @NotNull PlayerStatsForGame stats = playerStats.get(player);
+        stats.setPoints(stats.getPoints() + points);
+        updatePlayerList(player);
+    }
+
     /**
      * Updates a player's tab list entry and ensures their team color is kept in sync.
      */
@@ -176,11 +182,10 @@ public class PlayerListManager implements Listener {
         final int spaceCount = Math.max(1, 16 - baseName.length()); // at least 1 space for 16-char names
         final @NotNull String killIcon = " ".repeat(spaceCount) + KILL_ICON_CHAR;
 
-        // build the player list name component using the plain, padded username to ensure alignment
         final Component nameComponent = Component.text(baseName, NamedTextColor.nearestTo(color));
-
-        // combined stats component (kills and deaths) in gray text
-        final Component statsComponent = Component.text(killIcon + " " + stats.getKills() + " " + DEATH_ICON_CHAR + " " + stats.getDeaths(), NamedTextColor.GRAY);
+        final Component statsComponent = Component.text(killIcon + " " + stats.getKills() + " "
+                + DEATH_ICON_CHAR + " " + stats.getDeaths() + POINTS_ICON_CHAR + " " + stats.getPoints(),
+                NamedTextColor.GRAY);
 
         player.playerListName(nameComponent.append(statsComponent));
     }

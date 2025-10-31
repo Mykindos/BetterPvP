@@ -6,4 +6,5 @@ import lombok.Data;
 public class PlayerStatsForGame {
     private int kills = 0;
     private int deaths = 0;
+    private int points = 0;
 }
