@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Getter
 @Setter
@@ -34,6 +33,7 @@ public abstract class AbstractStatPagedMenu extends AbstractPagedGui<Item> imple
     private final StringFilterButton<IAbstractStatMenu> periodFilterButton;
 
     private String periodKey;
+    @SuppressWarnings("unchecked")
     protected AbstractStatPagedMenu(@NotNull Client client, @Nullable Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
         super(9, 6, false, new Structure(
                             "# # # # # # # # P",
@@ -49,7 +49,7 @@ public abstract class AbstractStatPagedMenu extends AbstractPagedGui<Item> imple
                     .addIngredient('>', new ForwardButton())
                     .addIngredient('P', new PeriodFilterButton(periodKey, statPeriodManager))
         );
-        if (!(getItem(8, 0) instanceof StringFilterButton<?> periodButton)) throw new IllegalStateException();
+        if (!(getItem(8, 0) instanceof StringFilterButton<?> periodButton)) throw new IllegalStateException("Item in this slot must be a StringFilterButton");
         this.periodFilterButton = (StringFilterButton<IAbstractStatMenu>) periodButton;
 
         //todo set back button runnable to update current period
@@ -59,11 +59,6 @@ public abstract class AbstractStatPagedMenu extends AbstractPagedGui<Item> imple
         this.statPeriodManager = statPeriodManager;
 
         this.periodKey = periodKey;
-    }
-
-    public CompletableFuture<Boolean> onChangePeriod() {
-        this.setPeriodKey(this.periodFilterButton.getSelectedFilter());
-        return CompletableFuture.completedFuture(Boolean.TRUE);
     }
 
     /**
