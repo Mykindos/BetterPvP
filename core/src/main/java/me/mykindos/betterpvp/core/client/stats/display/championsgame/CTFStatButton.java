@@ -3,9 +3,11 @@ package me.mykindos.betterpvp.core.client.stats.display.championsgame;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
+import me.mykindos.betterpvp.core.client.stats.display.championsgame.ctf.CTFStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.start.ChampionsStatButton;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -31,6 +33,7 @@ public class CTFStatButton extends ChampionsStatButton {
                 .material(Material.WHITE_BANNER)
                 .lore(getCTFStatsDescription("", ""))
                 .displayName(Component.text("Capture The Flag Stats"))
+                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .build();
     }
 
@@ -115,6 +118,7 @@ public class CTFStatButton extends ChampionsStatButton {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        //todo show ctf specific menu
+        final IAbstractStatMenu gui = getGui();
+        new CTFStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
     }
 }
