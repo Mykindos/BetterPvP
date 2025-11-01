@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.client.stats.events.IStatMapListener;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.events.WrapStatEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IWrapperStat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -75,30 +74,6 @@ public class StatContainer implements Unique, IStatMapListener {
             changedStats.add(wrappedStat);
             this.getStats().increase(StatContainer.PERIOD_KEY, wrappedStat, amount);
         }
-    }
-
-    /**
-     * Get the full stat across all wrappers
-     * @param stat
-     * @return
-     */
-    public Double getFullStat(final IStat stat, final String periodKey) {
-        Double currentVal = 0d;
-        for (IStat iStat : getStats().getStatsOfPeriod(periodKey).keySet()) {
-            IStat topStat = iStat;
-            while (true) {
-                if (iStat.containsStat(stat)) {
-                    currentVal += topStat.getStat(this, periodKey);
-                    break;
-                }
-                if (iStat instanceof final IWrapperStat wrapperStat) {
-                    iStat = wrapperStat.getWrappedStat();
-                } else {
-                    break;
-                }
-            }
-        }
-        return currentVal;
     }
 
     @Override
