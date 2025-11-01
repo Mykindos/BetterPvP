@@ -22,7 +22,9 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -32,7 +34,7 @@ public class LightningOrbProjectile extends Projectile {
     private final List<ItemDisplay> displays = new ArrayList<>();
     private final long impactDelay;
     private long lastAttack;
-    private final List<LivingEntity> entitiesHit = new ArrayList<>();
+    private final Map<LivingEntity, Long> entitiesHit = new HashMap<>();
     private final Consumer<LivingEntity> onAttach;
 
     public LightningOrbProjectile(Player caster, double hitboxSize, Location location, long aliveTime, double attachRadius, Consumer<LivingEntity> onAttach) {
@@ -101,14 +103,16 @@ public class LightningOrbProjectile extends Projectile {
     }
 
     private Location getValidOrigin() {
-        for (int i = entitiesHit.size() - 1; i >= 0; i--) {
-            LivingEntity e = entitiesHit.get(i);
-            if (e != null && e.isValid() && !e.isDead()) {
-                return e.getEyeLocation();
-            }
-        }
-        return location.clone();
+        return entitiesHit.entrySet().stream()
+                .filter(e -> {
+                    LivingEntity entity = e.getKey();
+                    return entity != null && entity.isValid() && !entity.isDead();
+                })
+                .max(Comparator.comparingLong(Map.Entry::getValue))
+                .map(e -> e.getKey().getEyeLocation())
+                .orElse(location.clone());
     }
+
 
     private void spawnElectricity(Location origin) {
         List<VectorLine> branches = getBranchedLines(origin, 2, attachRadius / 3, 0.2);
@@ -167,18 +171,18 @@ public class LightningOrbProjectile extends Projectile {
             if (UtilTime.elapsed(lastAttack, 100L)) {
                 Optional<LivingEntity> nearest = UtilEntity.getNearbyEnemies(caster, origin, attachRadius)
                         .stream()
-                        .filter(entity -> !entitiesHit.contains(entity))
+                        .filter(entity -> !entitiesHit.containsKey(entity))
                         .filter(this::canCollideWith)
                         .min(Comparator.comparingDouble(a -> a.getLocation().distanceSquared(origin)))
                         .or(() -> UtilEntity.getNearbyEnemies(caster, location, attachRadius)
                                 .stream()
-                                .filter(entity -> !entitiesHit.contains(entity))
+                                .filter(entity -> UtilTime.elapsed(entitiesHit.getOrDefault(entity, 0L), 1000L))
                                 .filter(this::canCollideWith)
                                 .min(Comparator.comparingDouble(a -> a.getLocation().distanceSquared(origin))));
 
                 if (nearest.isPresent()) {
                     LivingEntity target = nearest.get();
-                    entitiesHit.add(target);
+                    entitiesHit.put(target, System.currentTimeMillis());
                     onAttach.accept(target);
                     new SoundEffect(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 0.6f, 2.3f).play(origin);
                     new SoundEffect(Sound.ENTITY_BEE_HURT, 0f, 1.3f).play(origin);
