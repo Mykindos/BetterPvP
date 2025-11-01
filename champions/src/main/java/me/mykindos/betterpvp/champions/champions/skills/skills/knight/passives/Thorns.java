@@ -20,7 +20,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.WeakHashMap;
 
@@ -71,7 +70,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @EventHandler
