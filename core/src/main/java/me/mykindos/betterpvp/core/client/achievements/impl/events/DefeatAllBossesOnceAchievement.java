@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.NSingleGoalSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -30,14 +31,18 @@ public class DefeatAllBossesOnceAchievement extends NSingleGoalSimpleAchievement
                 AchievementCategories.EVENT,
                 AchievementType.GLOBAL,
                 1d,
-                BossStat.builder()
+                new GenericStat(
+                        BossStat.builder()
                         .action(BossStat.Action.KILL)
                         .bossName("Skeleton King")
-                        .build(),
-                BossStat.builder()
+                        .build()
+                ),
+                new GenericStat(
+                        BossStat.builder()
                         .action(BossStat.Action.KILL)
                         .bossName("Dreadbeard")
                         .build()
+                )
         );
     }
 
