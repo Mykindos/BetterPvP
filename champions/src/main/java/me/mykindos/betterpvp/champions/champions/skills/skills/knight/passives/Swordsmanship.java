@@ -84,7 +84,7 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
