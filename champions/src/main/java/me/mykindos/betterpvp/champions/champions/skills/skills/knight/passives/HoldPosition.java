@@ -104,7 +104,9 @@ public class HoldPosition extends Skill implements CooldownToggleSkill, Listener
         championsManager.getEffects().addEffect(player, player, EffectTypes.NO_JUMP, duration);
         championsManager.getEffects().addEffect(player, player, EffectTypes.NO_SPRINT, duration);
         player.setSprinting(false);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 1.7F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 0.6F, 0.3F);
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1F, 0.3F);
 
         long durationTicks = (long) (getDuration(level) * 20);
         new BukkitRunnable() {
@@ -116,6 +118,11 @@ public class HoldPosition extends Skill implements CooldownToggleSkill, Listener
                     UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
                     this.cancel();
                     return;
+                }
+
+                if (Math.random() < 0.3) {
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 0.6F, 0.3F);
+                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CAVE_VINES_PICK_BERRIES, 0.6F, 0.3F);
                 }
 
                 spawnMobSpellParticles(player);
