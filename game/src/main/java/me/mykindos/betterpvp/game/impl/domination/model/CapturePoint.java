@@ -107,7 +107,9 @@ public class CapturePoint implements Lifecycled {
 
             // 2 because it's every 10 ticks out of 20
             final int pointsContributedOverall = (int) Math.ceil(configuration.getCapturePointScoreAttribute().getValue() / 2d);
-            final int pointsContributedPerPlayer = pointsContributedOverall / playersWhoCapturedThisPoint.size();
+
+            // Ensure at least 1 point per player
+            final int pointsContributedPerPlayer = Math.max(1, pointsContributedOverall / playersWhoCapturedThisPoint.size());
 
             controller.addPoints(owningTeam, pointsContributedOverall);
             for (Player player : playersWhoCapturedThisPoint) {

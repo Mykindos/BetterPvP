@@ -38,7 +38,7 @@ public class PlayerListManager implements Listener {
     @Getter
     private final Map<Player, PlayerStatsForGame> playerStats = new WeakHashMap<>();
 
-    private static final String KILL_ICON_CHAR = "⚔";
+    private static final String KILL_ICON_CHAR = "\uD83D\uDDE1";
     private static final String DEATH_ICON_CHAR = "☠";
     private static final String POINTS_ICON_CHAR = "✦";
 
