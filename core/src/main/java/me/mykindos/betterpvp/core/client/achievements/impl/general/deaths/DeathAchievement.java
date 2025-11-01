@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -39,9 +40,12 @@ public class DeathAchievement extends SingleSimpleAchievement {
                 AchievementCategories.DEATH_TYPE,
                 AchievementType.PERIOD,
                 (double) goal,
+                new GenericStat(
                 MinecraftStat.builder()
                         .statistic(Statistic.DEATHS)
-                        .build());
+                        .build()
+                )
+        );
     }
 
     @Override

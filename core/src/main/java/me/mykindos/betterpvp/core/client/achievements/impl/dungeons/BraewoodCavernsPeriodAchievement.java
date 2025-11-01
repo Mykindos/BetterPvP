@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
@@ -30,10 +31,13 @@ public class BraewoodCavernsPeriodAchievement extends SingleSimpleAchievement {
                 AchievementCategories.DUNGEONS_BRAEWOOD_CAVERNS_PERIOD,
                 AchievementType.PERIOD,
                 (double) goal,
-                DungeonNativeStat.builder()
-                        .action(DungeonNativeStat.Action.WIN)
-                        .dungeonName("Braewood Caverns")
-                        .build()
+                //this allows dungeon stats outside of clans, could also just be a ClanWrapperStat
+                new GenericStat(
+                        DungeonNativeStat.builder()
+                                .action(DungeonNativeStat.Action.WIN)
+                                .dungeonName("Braewood Caverns")
+                                .build()
+                )
         );
     }
 

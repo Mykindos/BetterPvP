@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathA
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -30,7 +31,7 @@ public class OpenUndeadChests extends SingleSimpleAchievement {
                 AchievementCategories.EVENT_UNDEAD_CHESTS,
                 AchievementType.GLOBAL,
                 (double) goal,
-                ClientStat.EVENT_UNDEAD_CITY_OPEN_CHEST
+                new GenericStat(ClientStat.EVENT_UNDEAD_CITY_OPEN_CHEST)
         );
     }
 

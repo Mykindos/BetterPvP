@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -27,10 +28,12 @@ public class CastFireball extends SingleSimpleAchievement {
     @Inject
     public CastFireball() {
         super("I Cast Fireball", new NamespacedKey("champions", "cast_fireball_100"), AchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 100d,
-                ChampionsSkillStat.builder()
+                new GenericStat(
+                        ChampionsSkillStat.builder()
                         .action(ChampionsSkillStat.Action.USE)
                         .skillName("Fire Blast")
                         .build()
+                )
         );
     }
 

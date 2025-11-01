@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -23,7 +24,9 @@ public class TeleportHomeAchievement extends SingleSimpleAchievement {
                 AchievementCategories.CLANS,
                 AchievementType.GLOBAL,
                 1d,
-                ClientStat.CLANS_TELEPORT_CORE
+                ClanWrapperStat.builder()
+                        .wrappedStat(ClientStat.CLANS_TELEPORT_CORE)
+                        .build()
         );
     }
 

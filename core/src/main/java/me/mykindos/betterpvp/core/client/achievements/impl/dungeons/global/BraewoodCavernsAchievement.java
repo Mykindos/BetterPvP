@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -23,10 +24,13 @@ public class BraewoodCavernsAchievement extends SingleSimpleAchievement {
                 AchievementCategories.DUNGEONS,
                 AchievementType.GLOBAL,
                 1d,
-                DungeonNativeStat.builder()
+                //this allows dungeon stats outside of clans, could also just be a ClanWrapperStat
+                new GenericStat(
+                        DungeonNativeStat.builder()
                         .action(DungeonNativeStat.Action.WIN)
                         .dungeonName("Braewood Caverns")
                         .build()
+                )
         );
     }
 

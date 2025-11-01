@@ -26,7 +26,7 @@ public class PointsCapturedAchievement extends SingleSimpleAchievement {
     }
 
     public PointsCapturedAchievement(NamespacedKey key, int goal) {
-        super("Flag Captures", key,
+        super("Points Captured", key,
                 AchievementCategories.GAME_POINTS_CAPTURED,
                 AchievementType.GLOBAL,
                 (double) goal,
