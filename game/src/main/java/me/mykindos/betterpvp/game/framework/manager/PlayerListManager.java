@@ -145,18 +145,27 @@ public class PlayerListManager implements Listener {
         }
     }
 
+    /**
+     * Adds a kill to the player's stats and updates their tab list entry.
+     */
     public void addKill(@NotNull Player player) {
         final @NotNull PlayerStatsForGame stats = playerStats.get(player);
         stats.setKills(stats.getKills() + 1);
         updatePlayerList(player);
     }
 
+    /**
+     * Adds a death to the player's stats and updates their tab list entry.
+     */
     public void addDeath(@NotNull Player player) {
         final @NotNull PlayerStatsForGame stats = playerStats.get(player);
         stats.setDeaths(stats.getDeaths() + 1);
         updatePlayerList(player);
     }
 
+    /**
+     * Adds the specified number of points to the player's states and updates their tab list entry.
+     */
     public void addPoints(@NotNull Player player, int points) {
         final @NotNull PlayerStatsForGame stats = playerStats.get(player);
         stats.setPoints(stats.getPoints() + points);
@@ -167,26 +176,31 @@ public class PlayerListManager implements Listener {
      * Updates a player's tab list entry and ensures their team color is kept in sync.
      */
     public void updatePlayerList(final @NotNull Player player) {
+
+        final @NotNull String baseName = player.getName();
+        final TextColor color = getTabColorForPlayer(player);
+        setPlayerTabColor(player, color);
+        final Component nameComponent = Component.text(baseName, NamedTextColor.nearestTo(color));
+
+        if (serverController.getCurrentState().equals(GameState.WAITING)
+                || serverController.getCurrentState().equals(GameState.STARTING)) {
+            player.playerListName(nameComponent);
+            return;
+        }
         if (!playerStats.containsKey(player)) {
             playerStats.put(player, new PlayerStatsForGame());
         }
 
         final @NotNull PlayerStatsForGame stats = playerStats.get(player);
 
-        // determine and apply team/tab color
-        final TextColor color = getTabColorForPlayer(player);
-        setPlayerTabColor(player, color);
+        // compute right-aligned kill icon column for names up to 16 chars (min 1 space for longer names handled elsewhere)
+        final int spaceCount = Math.max(1, 16 - baseName.length());
+        final @NotNull String padding = (" ").repeat(spaceCount);
 
-        // compute right-aligned kill icon column for names up to 16 chars (min 1 space)
-        final @NotNull String baseName = player.getName(); // use plain username for alignment
-        final int spaceCount = Math.max(1, 16 - baseName.length()); // at least 1 space for 16-char names
-        final @NotNull String killIcon = " ".repeat(spaceCount) + KILL_ICON_CHAR;
+        final @NotNull Component killComponent = Component.text(padding + KILL_ICON_CHAR + " " + stats.getKills(), NamedTextColor.GREEN);
+        final @NotNull Component deathComponent = Component.text(" " + DEATH_ICON_CHAR + " " + stats.getDeaths(), NamedTextColor.RED);
+        final @NotNull Component pointsComponent = Component.text(" " + POINTS_ICON_CHAR + " " + stats.getPoints(), NamedTextColor.GOLD);
 
-        final Component nameComponent = Component.text(baseName, NamedTextColor.nearestTo(color));
-        final Component statsComponent = Component.text(killIcon + " " + stats.getKills() + " "
-                + DEATH_ICON_CHAR + " " + stats.getDeaths() + POINTS_ICON_CHAR + " " + stats.getPoints(),
-                NamedTextColor.GRAY);
-
-        player.playerListName(nameComponent.append(statsComponent));
+        player.playerListName(nameComponent.append(killComponent).append(deathComponent).append(pointsComponent));
     }
 }

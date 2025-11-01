@@ -106,10 +106,12 @@ public class CapturePoint implements Lifecycled {
         if (owningTeam != null && Bukkit.getCurrentTick() % 10 == 0) {
 
             // 2 because it's every 10 ticks out of 20
-            int pointsContributed = (int) Math.ceil(configuration.getCapturePointScoreAttribute().getValue() / 2d);
-            controller.addPoints(owningTeam, pointsContributed);
+            final int pointsContributedOverall = (int) Math.ceil(configuration.getCapturePointScoreAttribute().getValue() / 2d);
+            final int pointsContributedPerPlayer = pointsContributedOverall / playersWhoCapturedThisPoint.size();
+
+            controller.addPoints(owningTeam, pointsContributedOverall);
             for (Player player : playersWhoCapturedThisPoint) {
-                new PlayerContributePointsEvent(player, pointsContributed).callEvent();
+                new PlayerContributePointsEvent(player, pointsContributedPerPlayer).callEvent();
             }
         }
     }
