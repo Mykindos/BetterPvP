@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapStat;
@@ -43,30 +44,38 @@ public class GenericStatButton extends ControlItem<IAbstractStatMenu> {
         final StatContainer statContainer = gui.getClient().getStatContainer();
         final String periodKey = gui.getPeriodKey();
 
-        final ClientStat timePlayedStat = ClientStat.TIME_PLAYED;
-        final GameTeamMapNativeStat spectateTimePlayedStat = GameTeamMapNativeStat.builder()
-                .action(GameTeamMapNativeStat.Action.SPECTATE_TIME)
-                .build();
-        final GameTeamMapNativeStat lobbyTimePlayedStat = GameTeamMapNativeStat.builder()
-                .action(GameTeamMapNativeStat.Action.GAME_TIME_PLAYED)
-                .gameName(GameTeamMapStat.LOBBY_GAME_NAME)
-                .build();
+        final GenericStat timePlayedStat = new GenericStat(ClientStat.TIME_PLAYED);
+        final GenericStat spectateTimePlayedStat = new GenericStat(
+                        GameTeamMapNativeStat.builder()
+                                .action(GameTeamMapNativeStat.Action.SPECTATE_TIME)
+                                .build()
+                );
 
-        final MinecraftStat killsStat = MinecraftStat.builder()
+        final GenericStat lobbyTimePlayedStat = new GenericStat(
+                    GameTeamMapNativeStat.builder()
+                    .action(GameTeamMapNativeStat.Action.GAME_TIME_PLAYED)
+                    .gameName(GameTeamMapStat.LOBBY_GAME_NAME)
+                    .build()
+        );
+
+        final GenericStat killsStat = new GenericStat(
+                MinecraftStat.builder()
                 .statistic(Statistic.KILL_ENTITY)
                 .entityType(EntityType.PLAYER)
-                .build();
+                .build()
+        );
 
-        final MinecraftStat deathsStat = MinecraftStat.builder()
+        final GenericStat deathsStat = new GenericStat(MinecraftStat.builder()
                 .statistic(Statistic.DEATHS)
-                .build();
+                .build()
+        );
 
-        final int kills = statContainer.getFullStat(killsStat, periodKey).intValue();
-        final int deaths = statContainer.getFullStat(deathsStat, periodKey).intValue();
+        final int kills = killsStat.getStat(statContainer, periodKey).intValue();
+        final int deaths = deathsStat.getStat(statContainer, periodKey).intValue();
         final float killDeathRatio = (float) kills / (deaths == 0 ? 1 : deaths);
 
 
-        Duration timePlayed = Duration.of(statContainer.getFullStat(timePlayedStat, periodKey).longValue(), ChronoUnit.MILLIS);
+        Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
         //subtract game spectate time from overall time
         timePlayed = timePlayed.minus(spectateTimePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
         //subtract lobby time from overall time
