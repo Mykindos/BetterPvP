@@ -6,7 +6,13 @@ import org.bukkit.event.block.Action;
 
 public interface InteractSkill extends IChampionsSkill {
 
-    void activate(Player player, int level);
+    /**
+     * Returns true if this skill was used, false otherwise
+     * @param player
+     * @param level
+     * @return
+     */
+    boolean activate(Player player, int level);
 
     Action[] getActions();
 

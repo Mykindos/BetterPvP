@@ -6,6 +6,8 @@ import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -18,7 +20,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -58,12 +59,14 @@ public class ScytheListener implements Listener {
     private final DamageLogManager damageLogManager;
     private final Scythe scythe;
     private final EffectManager effectManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public ScytheListener(DamageLogManager damageLogManager, Scythe scythe, EffectManager effectManager) {
+    public ScytheListener(DamageLogManager damageLogManager, Scythe scythe, EffectManager effectManager, ClientManager clientManager) {
         this.damageLogManager = damageLogManager;
         this.scythe = scythe;
         this.effectManager = effectManager;
+        this.clientManager = clientManager;
     }
 
 
@@ -94,7 +97,8 @@ public class ScytheListener implements Listener {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (scythe.isHoldingWeapon(damager) && scythe.tracked.containsKey(damager)) {
             final double soulCount = scythe.tracked.get(damager).getSoulCount();
-            UtilPlayer.health(damager, scythe.baseHeal + scythe.healPerSoul * soulCount);
+            double actualHeal = UtilEntity.health(damager, scythe.baseHeal + scythe.healPerSoul * soulCount);
+            clientManager.search().online(damager).getStatContainer().incrementStat(ClientStat.HEAL_SCYTHE, actualHeal);
         }
     }
 
