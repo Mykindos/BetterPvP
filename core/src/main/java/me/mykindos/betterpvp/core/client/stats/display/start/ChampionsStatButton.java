@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.ChampionsGameStatMenu;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapStat;
@@ -17,7 +18,6 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -80,10 +80,7 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
 
         final GameTeamMapWrapperStat killsStat = GameTeamMapWrapperStat.builder()
                 .wrappedStat(
-                        MinecraftStat.builder()
-                                .statistic(Statistic.KILL_ENTITY)
-                                .entityType(EntityType.PLAYER)
-                                .build()
+                        ClientStat.PLAYER_KILLS
                 )
                 .gameName(gameName)
                 .teamName(teamName)
@@ -116,8 +113,6 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
             //subtract lobby time from overall time
             timePlayed = timePlayed.minus(lobbyTimePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
         }
-
-        log.info(String.valueOf(timePlayed)).submit();
 
         return new ArrayList<>(
                 List.of(

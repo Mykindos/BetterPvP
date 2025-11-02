@@ -171,6 +171,7 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
         ENTER,
         WIN,
         LOSS,
+        //todo implement
         BOSS_KILL,
     }
 }
