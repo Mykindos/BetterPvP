@@ -21,7 +21,7 @@ public class TestStatsCommand extends Command implements IStringName {
 
     @Override
     public String getName() {
-        return "teststatsmenu";
+        return "statsmenu";
     }
 
     @Override
@@ -32,9 +32,6 @@ public class TestStatsCommand extends Command implements IStringName {
     @Override
     public void execute(Player player, Client client, String... args) {
         final String periodKey = args.length > 0 ? args[0] : StatContainer.GLOBAL_PERIOD_KEY;
-        //final StatPeriod statPeriod = statPeriodManager.getObject(period).orElse(StatPeriodManager.GLOBAL_PERIOD);
         new StartStatMenu(client, null, periodKey, statPeriodManager).show(player);
     }
-
-    //todo type hints for period
 }
