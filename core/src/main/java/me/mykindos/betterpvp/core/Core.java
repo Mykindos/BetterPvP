@@ -9,7 +9,6 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatterLoader;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
@@ -146,9 +145,6 @@ public class Core extends BPvPPlugin {
 
         var coreAchievementLoader = injector.getInstance(CoreAchievementLoader.class);
         coreAchievementLoader.loadAll(PACKAGE);
-
-        var coreStatFormatterLoader = injector.getInstance(StatFormatterLoader.class);
-        coreStatFormatterLoader.loadAll();
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
