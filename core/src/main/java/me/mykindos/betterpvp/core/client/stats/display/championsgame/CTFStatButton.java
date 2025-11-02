@@ -28,7 +28,6 @@ public class CTFStatButton extends ChampionsStatButton {
      */
     @Override
     public ItemProvider getItemProvider(IAbstractStatMenu gui) {
-        //todo
         return ItemView.builder()
                 .material(Material.WHITE_BANNER)
                 .lore(getCTFStatsDescription("", ""))

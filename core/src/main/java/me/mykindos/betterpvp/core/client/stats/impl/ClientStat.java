@@ -12,6 +12,10 @@ import java.util.Set;
 @Getter
 @CustomLog
 public enum ClientStat implements IClientStat {
+    PLAYER_KILLS("Players Killed", "The number of players you have killed"),
+    PLAYER_KILL_ASSISTS("Player Assists", "The number of players that you have assisted in their deaths"),
+    PLAYER_DEATHS("Death from Players", "The number of times you have died to another player"),
+
     REGENERATION_EFFECT_TO_OTHERS("Healing others with regeneration", "Healing other players with the regeneration effect", "You gave them"),
     REGENERATION_EFFECT_FROM_OTHERS("Healing received from others by regeneration", "Healing by regeneration from other sources"),
     REGENERATION_EFFECT_SELF("Healing self with regeneration", "Healing yourself with the regeneration effect"),
@@ -70,7 +74,6 @@ public enum ClientStat implements IClientStat {
     CLANS_DESTROY_CORE("Destroy Core", "Number of times you destroyed an opposing Clan's core"),
     CLANS_CORE_DESTROYED("Core Destroyed", "Number of times your Clan was destroyed"),
     CLANS_CORE_DAMAGE("Core Damage", "Amount of damage you dealt to the core"),
-
 
     CLANS_CANNON_SHOT("Cannon Shots", "Number of times you fired a cannon"),
     CLANS_CANNON_BLOCK_DAMAGE("Cannon Block Damage", "Amount of block damage you have dealt with cannons"),
