@@ -21,10 +21,28 @@ import java.util.function.Predicate;
 public enum RuneGroup {
 
     /**
+     * Everything
+     */
+    ALL("Everything", item -> true),
+
+    // <editor-fold desc="Equipment Types">
+
+    /**
      * Any item that has {@link ItemGroup#ARMOR}
      */
     ARMOR("Armor", item -> item.getItemGroup() == ItemGroup.ARMOR),
 
+    HELMET("Helmet", item -> getItemStack(item).getType().name().contains("HELMET")),
+
+    CHESTPLATE("Chestplate", item -> getItemStack(item).getType().name().contains("CHESTPLATE")),
+
+    LEGGINGS("Leggings", item -> getItemStack(item).getType().name().contains("LEGGINGS")),
+
+    BOOTS("Boots", item -> getItemStack(item).getType().name().contains("BOOTS")),
+
+    // </editor-fold>
+
+    // <editor-fold desc="Weapon Types">
     /**
      * Any item that has {@link ItemGroup#WEAPON}, extends {@link WeaponItem} and has group {@link Group#MELEE}
      */
@@ -49,27 +67,27 @@ public enum RuneGroup {
         return baseItem instanceof WeaponItem weaponItem && weaponItem.getGroups().contains(Group.RANGED);
     }),
 
+    // </editor-fold>
+
     /**
      * Any item that has the DataComponentTypes.TOOL data key or has {@link ItemGroup#TOOL}
      */
-    TOOL("Tools", item -> {
-        final ItemStack itemStack;
-        final boolean tool;
-        if (item instanceof ItemInstance itemInstance) {
-            itemStack = itemInstance.createItemStack();
-            tool = itemInstance.getBaseItem().getItemGroup() == ItemGroup.TOOL;
-        } else if (item instanceof BaseItem baseItem) {
-            itemStack = baseItem.getModel();
-            tool = baseItem.getItemGroup() == ItemGroup.TOOL;
-        } else {
-            throw new IllegalArgumentException("Item must be an ItemInstance or BaseItem");
-        }
-
-        return tool || itemStack.hasData(DataComponentTypes.TOOL);
-    });
+    TOOL("Tools", item -> item.getItemGroup() == ItemGroup.TOOL || getItemStack(item).hasData(DataComponentTypes.TOOL));
 
     private final String displayName;
     private final Predicate<Item> itemPredicate;
+
+    private static ItemStack getItemStack(Item item) {
+        final ItemStack itemStack;
+        if (item instanceof ItemInstance itemInstance) {
+            itemStack = itemInstance.createItemStack();
+        } else if (item instanceof BaseItem baseItem) {
+            itemStack = baseItem.getModel();
+        } else {
+            throw new IllegalArgumentException("Item must be an ItemInstance or BaseItem");
+        }
+        return itemStack;
+    }
 
     public String getDisplayName() {
         return displayName;
