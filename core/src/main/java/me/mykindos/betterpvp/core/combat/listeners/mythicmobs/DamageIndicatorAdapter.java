@@ -100,7 +100,7 @@ public class DamageIndicatorAdapter implements Listener {
             return;
         }
 
-        final Component text = formatDamage(event.getDamage());
+        final Component text = formatDamage(event.getModifiedDamage());
         final TextDisplay shadow = spawn(spawnPoint, player);
         final Location shadowLocation = spawnPoint.subtract(direction.multiply(0.01).add(new Vector(0, -0.02, 0)));
         final TextDisplay display = spawn(shadowLocation, player);
