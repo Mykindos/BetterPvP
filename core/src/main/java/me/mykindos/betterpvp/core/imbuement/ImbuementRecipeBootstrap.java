@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.attraction.AttractionRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
@@ -35,6 +36,7 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
     @Inject private ScorchingRuneItem scorchingRune;
     @Inject private UnbreakingRuneItem unbreakingRune;
     @Inject private FlameguardRuneItem flameguardRune;
+    @Inject private AttractionRuneItem attractionRune;
     @Inject private RecoveryRuneItem recoveryRune;
 
     /**
@@ -56,7 +58,11 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
         if (registered) return;
         registered = true;
 
-        final List<RuneItem> runes = List.of(scorchingRune, unbreakingRune, flameguardRune, recoveryRune);
+        final List<RuneItem> runes = List.of(scorchingRune,
+                unbreakingRune,
+                flameguardRune,
+                recoveryRune,
+                attractionRune);
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }

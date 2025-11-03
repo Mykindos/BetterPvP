@@ -47,7 +47,7 @@ public class RecoveryRuneHandler implements Listener {
         for (ItemStack armorContent : equipment.getArmorContents()) {
             final Optional<RuneContainerComponent> container = componentLookupService.getComponent(armorContent, RuneContainerComponent.class);
             if (container.isEmpty()) {
-                return; // No runes present
+                continue; // No runes present
             }
 
             final RuneContainerComponent runeContainer = container.get();
@@ -56,6 +56,9 @@ public class RecoveryRuneHandler implements Listener {
             }
         }
 
+        if (flatIncrement <= 0) {
+            return;
+        }
         event.setAmount(event.getAmount() + flatIncrement);
     }
 }

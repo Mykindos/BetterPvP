@@ -54,7 +54,7 @@ public class FlameguardRuneHandler implements Listener {
         for (ItemStack armorContent : equipment.getArmorContents()) {
             final Optional<RuneContainerComponent> container = componentLookupService.getComponent(armorContent, RuneContainerComponent.class);
             if (container.isEmpty()) {
-                return; // No runes present
+                continue; // No runes present
             }
 
             final RuneContainerComponent runeContainer = container.get();
@@ -63,6 +63,9 @@ public class FlameguardRuneHandler implements Listener {
             }
         }
 
+        if (mitigation <= 0) {
+            return;
+        }
         event.addModifier(new GenericModifier("Flameguard",
                 ModifierType.RUNE,
                 Math.max(0, 1 - mitigation),
