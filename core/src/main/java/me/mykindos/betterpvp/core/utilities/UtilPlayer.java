@@ -23,6 +23,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,14 +173,7 @@ public class UtilPlayer {
         if (player.isDead()) {
             return;
         }
-        double health = player.getHealth() + mod;
-        if (health < 0.0D) {
-            health = 0.0D;
-        }
-        if (health > UtilPlayer.getMaxHealth(player)) {
-            health = UtilPlayer.getMaxHealth(player);
-        }
-        player.setHealth(health);
+        player.heal(mod, EntityRegainHealthEvent.RegainReason.CUSTOM);
     }
 
     /**

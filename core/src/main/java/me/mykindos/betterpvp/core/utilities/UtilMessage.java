@@ -21,11 +21,16 @@ import org.bukkit.entity.Player;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilMessage {
 
-    private static final TagResolver tagResolver = TagResolver.resolver(
+    public static final TagResolver tagResolver = TagResolver.resolver(
             TagResolver.resolver("alt", Tag.styling(NamedTextColor.GREEN)),
             TagResolver.resolver("alt2", Tag.styling(NamedTextColor.YELLOW)),
-            TagResolver.resolver("orange", Tag.styling(TextColor.color(0xFFA500)))
+            TagResolver.resolver("orange", Tag.styling(TextColor.color(0xFFA500))),
+            TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN)),
+            TagResolver.resolver("effect", Tag.styling(NamedTextColor.WHITE)),
+            TagResolver.resolver("stat", Tag.styling(NamedTextColor.YELLOW))
     );
+
+    public static final MiniMessage miniMessage = MiniMessage.builder().tags(tagResolver).build();
 
     public static final TextComponent DIVIDER = Component.text("                                            ")
             .color(NamedTextColor.DARK_GRAY)
@@ -55,7 +60,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      */
     public static void message(Audience sender, String prefix, String message) {
-        message(sender, prefix, MiniMessage.miniMessage().deserialize(message, tagResolver));
+        message(sender, prefix, miniMessage.deserialize(message, tagResolver));
     }
 
     /**
@@ -263,7 +268,7 @@ public class UtilMessage {
             msg = UtilFormat.stripColor(message);
         }
 
-        return normalize(MiniMessage.miniMessage().deserialize(msg, tagResolver));
+        return normalize(miniMessage.deserialize(msg, tagResolver));
     }
 
     public static Component deserialize(String message, Object... args) {
@@ -278,7 +283,7 @@ public class UtilMessage {
         if (prefix.isEmpty()) {
             return Component.empty();
         }
-        return MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ");
+        return miniMessage.deserialize("<blue>" + prefix + "> ");
     }
 
     /**

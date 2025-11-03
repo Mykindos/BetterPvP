@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
@@ -42,12 +41,16 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.function.IntToDoubleFunction;
+
+import java.util.Optional;
+import java.util.function.IntToDoubleFunction;
+
+import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 @Singleton
 @CustomLog
@@ -116,7 +119,7 @@ public abstract class Skill implements IChampionsSkill {
         final String[] description = getDescription(level);
         final Component[] components = new Component[description.length];
         for (int i = 0; i < description.length; i++) {
-            components[i] = MiniMessage.miniMessage().deserialize("<gray>" + description[i], SkillMenu.TAG_RESOLVER)
+            components[i] = miniMessage.deserialize("<gray>" + description[i])
                     .decoration(TextDecoration.ITALIC, false);
         }
         return components;
