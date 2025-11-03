@@ -63,7 +63,7 @@ public class FlameguardRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull String getName() {
-        return "Flameguard";
+        return "Rune of Flameguard";
     }
 
     @Override

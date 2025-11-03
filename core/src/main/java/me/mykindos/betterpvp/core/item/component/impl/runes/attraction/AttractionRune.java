@@ -57,7 +57,7 @@ public class AttractionRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull String getName() {
-        return "Attraction";
+        return "Rune of Attraction";
     }
 
     @Override

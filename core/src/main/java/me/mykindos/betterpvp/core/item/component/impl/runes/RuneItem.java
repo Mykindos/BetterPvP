@@ -22,11 +22,7 @@ public abstract class RuneItem extends BaseItem {
      * @param rarity The rarity of this rune
      */
     protected RuneItem(Rune rune, RuneColor color, ItemRarity rarity) {
-        this("Rune of " + rune.getName(), color, rune, rarity);
-    }
-
-    protected RuneItem(String name, RuneColor color, Rune rune, ItemRarity rarity) {
-        super(name, Item.builder("rune").customModelData(color.getModelData()).build(), ItemGroup.MATERIAL, rarity);
+        super(rune.getName(), Item.builder("rune").customModelData(color.getModelData()).build(), ItemGroup.MATERIAL, rarity);
         this.rune = rune;
         addBaseComponent(new RuneDescriptionComponent(rune));
     }

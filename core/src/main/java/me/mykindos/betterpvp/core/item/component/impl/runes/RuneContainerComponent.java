@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.component.LoreComponent;
 import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -113,9 +114,7 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
                     .append(Component.text("✔", NamedTextColor.GREEN))
                     .append(Component.text("]", NamedTextColor.GRAY))
                     .appendSpace()
-                    .append(Component.text("Rune:", NamedTextColor.DARK_GREEN))
-                    .appendSpace()
-                    .append(Component.text(rune.getName() + " Rune", NamedTextColor.GREEN)));
+                    .append(Component.text(rune.getName(), NamedTextColor.GREEN, TextDecoration.UNDERLINED)));
 
             final Component description = miniMessage.deserialize("<gray>" + rune.getDescription());
             final List<Component> runeDescription = ComponentWrapper.wrapLine(description);

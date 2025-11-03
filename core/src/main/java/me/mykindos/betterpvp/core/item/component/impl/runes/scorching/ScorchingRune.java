@@ -36,7 +36,7 @@ public class ScorchingRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull String getName() {
-        return "Scorching";
+        return "Rune of Scorching";
     }
 
     @Override

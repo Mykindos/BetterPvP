@@ -36,7 +36,7 @@ public class UnbreakingRune implements Rune {
 
     @Override
     public @NotNull String getName() {
-        return "Unbreaking";
+        return "Rune of Unbreaking";
     }
 
     @Override

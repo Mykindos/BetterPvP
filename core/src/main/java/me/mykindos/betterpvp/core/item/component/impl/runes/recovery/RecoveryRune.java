@@ -52,7 +52,7 @@ public class RecoveryRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull String getName() {
-        return "Recovery";
+        return "Rune of Recovery";
     }
 
     @Override
