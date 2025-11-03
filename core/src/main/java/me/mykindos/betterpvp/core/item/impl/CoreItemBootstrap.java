@@ -21,6 +21,8 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingR
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.wanderer.WandererRune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.wanderer.WandererRuneItem;
 import me.mykindos.betterpvp.core.item.impl.cannon.CannonItem;
 import me.mykindos.betterpvp.core.item.impl.cannon.CannonballItem;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
@@ -53,6 +55,8 @@ public class CoreItemBootstrap implements ItemBootstrap {
     @Inject private AttractionRune attractionRune;
     @Inject private RecoveryRuneItem recoveryRuneItem;
     @Inject private RecoveryRune recoveryRune;
+    @Inject private WandererRuneItem wandererRuneItem;
+    @Inject private WandererRune wandererRune;
     @Inject private BlueprintItem blueprintItem;
     @Inject private Hammer hammer;
     @Inject private Rope rope;
@@ -102,6 +106,8 @@ public class CoreItemBootstrap implements ItemBootstrap {
         runeRegistry.registerRune(recoveryRune);
         itemRegistry.registerItem(key("attraction_rune"), attractionRuneItem);
         runeRegistry.registerRune(attractionRune);
+        itemRegistry.registerItem(key("wanderer_rune"), wandererRuneItem);
+        runeRegistry.registerRune(wandererRune);
 
         // Misc items
         itemRegistry.registerItem(key("blueprint"), blueprintItem);

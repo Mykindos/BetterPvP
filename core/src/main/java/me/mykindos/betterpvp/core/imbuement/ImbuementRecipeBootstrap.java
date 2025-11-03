@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.Flameguar
 import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.wanderer.WandererRuneItem;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -38,6 +39,7 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
     @Inject private FlameguardRuneItem flameguardRune;
     @Inject private AttractionRuneItem attractionRune;
     @Inject private RecoveryRuneItem recoveryRune;
+    @Inject private WandererRuneItem wandererRune;
 
     /**
      * Creates a namespaced key for the Core plugin.
@@ -62,7 +64,8 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
                 unbreakingRune,
                 flameguardRune,
                 recoveryRune,
-                attractionRune);
+                attractionRune,
+                wandererRune);
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }
