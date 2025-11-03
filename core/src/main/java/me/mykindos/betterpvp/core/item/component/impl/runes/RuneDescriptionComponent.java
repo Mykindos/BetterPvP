@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
+
 @AllArgsConstructor
 public class RuneDescriptionComponent implements ItemComponent, LoreComponent {
 
@@ -31,7 +33,7 @@ public class RuneDescriptionComponent implements ItemComponent, LoreComponent {
 
     @Override
     public List<Component> getLines(ItemInstance item) {
-        final List<Component> components = ComponentWrapper.wrapLine(Component.text(rune.getDescription(), NamedTextColor.GRAY));
+        final List<Component> components = ComponentWrapper.wrapLine(miniMessage.deserialize("<gray>" + rune.getDescription()));
         components.add(Component.empty());
         components.add(Component.text("Applies to:", NamedTextColor.GRAY, TextDecoration.UNDERLINED));
         for (RuneGroup value : RuneGroup.values()) {

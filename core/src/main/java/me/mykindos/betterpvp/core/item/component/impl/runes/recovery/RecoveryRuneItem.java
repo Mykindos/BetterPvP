@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.component.impl.runes.flameguard;
+package me.mykindos.betterpvp.core.item.component.impl.runes.recovery;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,10 +9,10 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
 
 @Singleton
 @EqualsAndHashCode(callSuper = false)
-public class FlameguardRuneItem extends RuneItem {
+public class RecoveryRuneItem extends RuneItem {
 
     @Inject
-    private FlameguardRuneItem(FlameguardRune rune) {
-        super(rune, RuneColor.ARMOR, ItemRarity.UNCOMMON);
+    private RecoveryRuneItem(RecoveryRune rune) {
+        super(rune, RuneColor.ARMOR, ItemRarity.EPIC);
     }
 }

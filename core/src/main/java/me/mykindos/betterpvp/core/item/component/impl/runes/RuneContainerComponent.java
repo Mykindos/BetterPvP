@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
+
 /**
  * Container component that holds multiple runes for an item.
  * Defines the maximum number of rune sockets an item can have.
@@ -115,8 +117,8 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
                     .appendSpace()
                     .append(Component.text(rune.getName() + " Rune", NamedTextColor.GREEN)));
 
-            final Component description = Component.text(rune.getDescription(), NamedTextColor.GRAY);
-            final List<Component> runeDescription = ComponentWrapper.wrapLine(description, 30);
+            final Component description = miniMessage.deserialize("<gray>" + rune.getDescription());
+            final List<Component> runeDescription = ComponentWrapper.wrapLine(description);
             loreLines.addAll(runeDescription);
 
             if (runes.indexOf(rune) < sockets - 1) {

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import org.bukkit.NamespacedKey;
@@ -34,6 +35,7 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
     @Inject private ScorchingRuneItem scorchingRune;
     @Inject private UnbreakingRuneItem unbreakingRune;
     @Inject private FlameguardRuneItem flameguardRune;
+    @Inject private RecoveryRuneItem recoveryRune;
 
     /**
      * Creates a namespaced key for the Core plugin.
@@ -54,7 +56,7 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
         if (registered) return;
         registered = true;
 
-        final List<RuneItem> runes = List.of(scorchingRune, unbreakingRune, flameguardRune);
+        final List<RuneItem> runes = List.of(scorchingRune, unbreakingRune, flameguardRune, recoveryRune);
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }

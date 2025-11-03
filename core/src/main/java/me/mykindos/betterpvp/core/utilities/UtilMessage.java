@@ -3,6 +3,12 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.HealthTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.ManaTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.ResistanceTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.TimeTag;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -22,12 +28,19 @@ import org.bukkit.entity.Player;
 public class UtilMessage {
 
     public static final TagResolver tagResolver = TagResolver.resolver(
+            TagResolver.standard(),
             TagResolver.resolver("alt", Tag.styling(NamedTextColor.GREEN)),
             TagResolver.resolver("alt2", Tag.styling(NamedTextColor.YELLOW)),
             TagResolver.resolver("orange", Tag.styling(TextColor.color(0xFFA500))),
             TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN)),
             TagResolver.resolver("effect", Tag.styling(NamedTextColor.WHITE)),
-            TagResolver.resolver("stat", Tag.styling(NamedTextColor.YELLOW))
+            TagResolver.resolver("stat", Tag.styling(NamedTextColor.YELLOW)),
+            TagResolver.resolver("coins", new CoinsTag()),
+            TagResolver.resolver("damage", new DamageTag()),
+            TagResolver.resolver("health", new HealthTag()),
+            TagResolver.resolver("mana", new ManaTag()),
+            TagResolver.resolver("resistance", new ResistanceTag()),
+            TagResolver.resolver("time", new TimeTag())
     );
 
     public static final MiniMessage miniMessage = MiniMessage.builder().tags(tagResolver).build();

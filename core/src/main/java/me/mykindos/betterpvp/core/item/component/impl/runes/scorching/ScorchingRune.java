@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,7 +41,9 @@ public class ScorchingRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull String getDescription() {
-        return "Melee attacks have a chance to set enemies on fire for a short duration.";
+        return String.format("Melee attacks have a <val>%s%%</val> chance to set enemies on fire for <time>%ss</time>.",
+                UtilFormat.formatNumber(getChance() * 100),
+                UtilFormat.formatNumber(getDuration()));
     }
 
     @Override

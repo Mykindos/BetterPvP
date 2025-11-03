@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.component.impl.runes.flameguard;
+package me.mykindos.betterpvp.core.item.component.impl.runes.recovery;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -19,36 +19,25 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode
-public class FlameguardRune implements Rune, ReloadHook {
+public class RecoveryRune implements Rune, ReloadHook {
 
-    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "flameguard");
+    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "recovery");
 
-    private final Provider<FlameguardRuneItem> itemProvider;
-    private double mitigation = 0.2;
+    private final Provider<RecoveryRuneItem> itemProvider;
+    private double increment = 0.3;
 
     @Inject
-    private FlameguardRune(Provider<FlameguardRuneItem> itemProvider) {
+    private RecoveryRune(Provider<RecoveryRuneItem> itemProvider) {
         this.itemProvider = itemProvider;
     }
 
-    /**
-     * Gets the mitigation percentage of this rune. Multiple items with
-     * this rune will stack its mitigation percentage, additively.
-     *
-     * <p>
-     *     For example, if the mitigation percentage is 10% (0.1) and a player
-     *     has two items with this rune, the damage mitigated will be 20% (0.2).
-     * </p>
-     *
-     * @return The mitigation percentage.
-     */
-    public double getMitigation() {
-        return mitigation;
+    public double getIncrement() {
+        return increment;
     }
 
     @Override
     public @NotNull String getDescription() {
-        return String.format("Mitigates damage taken from fire sources by <health>%s%%</health>, stacking additively.", UtilFormat.formatNumber(getMitigation() * 100));
+        return String.format("Increases natural health regeneration by <health>%s</health>, stacking additively.", UtilFormat.formatNumber(getIncrement()));
     }
 
     @Override
@@ -63,12 +52,12 @@ public class FlameguardRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull String getName() {
-        return "Flameguard";
+        return "Recovery";
     }
 
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.mitigation = config.getConfig("mitigation", 0.2, Double.class);
+        this.increment = config.getConfig("increment", 0.3, Double.class);
     }
 }
