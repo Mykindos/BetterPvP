@@ -45,7 +45,7 @@ public class LightningOrbProjectile extends Projectile {
         this.dragCoefficient = DEFAULT_DRAG_COEFFICIENT;
         this.impactDelay = 500L;
 
-        for (double i = 0; i < 180; i += 15) {
+        for (double i = 0; i < 180; i += 10) {
             displays.add(createDisplay(location, i, hitboxSize * 2));
         }
     }
@@ -62,7 +62,7 @@ public class LightningOrbProjectile extends Projectile {
         location.setDirection(direction);
 
         return location.getWorld().spawn(location, ItemDisplay.class, spawned -> {
-            spawned.setItemStack(new ItemStack(Material.ALLAY_SPAWN_EGG));
+            spawned.setItemStack(new ItemStack(Material.ENDER_PEARL));
             spawned.setGlowing(false);
             spawned.setPersistent(false);
             spawned.setBrightness(new Display.Brightness(15, 15));
