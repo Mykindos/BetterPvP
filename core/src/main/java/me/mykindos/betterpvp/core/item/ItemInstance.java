@@ -168,6 +168,11 @@ public class ItemInstance implements Item {
         return baseItem.getLoreRenderer();
     }
 
+    @Override
+    public @NotNull ItemGroup getItemGroup() {
+        return baseItem.getItemGroup();
+    }
+
     public @NotNull ItemRarity getRarity() {
         return baseItem.getInstanceRarityProvider().apply(this);
     }

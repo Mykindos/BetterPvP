@@ -21,6 +21,8 @@ import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.NamespacedKey;
 
+import java.util.List;
+
 @Singleton
 @EqualsAndHashCode(callSuper = true)
 public class MagneticMaul extends WeaponItem implements ReloadHook {
@@ -33,7 +35,7 @@ public class MagneticMaul extends WeaponItem implements ReloadHook {
     private MagneticMaul(Champions champions,
                          MagnetismAbility magnetismAbility,
                          ItemFactory itemFactory) {
-        super(champions, "Magnetic Maul", Item.model("magnetic_maul"), ItemRarity.LEGENDARY);
+        super(champions, "Magnetic Maul", Item.model("magnetic_maul"), ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
         this.magnetismAbility = magnetismAbility;
         this.reverseKnockbackAbility = new ReverseKnockbackAbility(champions, itemFactory, this);
         

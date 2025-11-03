@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.VineSnareAbility;
-import me.mykindos.betterpvp.champions.item.bloomrot.NectarOfDecay;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
@@ -16,12 +15,11 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerCo
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.ability.EndlessQuiverAbility;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerInputEvent;
+
+import java.util.List;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
@@ -34,7 +32,7 @@ public class Ivybolt extends WeaponItem implements ReloadHook {
 
     @Inject
     private Ivybolt(Champions champions, EndlessQuiverAbility endlessQuiverAbility, ItemFactory itemFactory, EffectManager effectManager, CooldownManager cooldownManager) {
-        super(champions, "Ivybolt", Item.model(Material.BOW, "ivybolt"), ItemRarity.LEGENDARY);
+        super(champions, "Ivybolt", Item.model(Material.BOW, "ivybolt"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
         this.itemFactory = itemFactory;
         this.vineSnareAbility = new VineSnareAbility(champions, itemFactory, this, effectManager);
         this.endlessQuiverAbility = endlessQuiverAbility;

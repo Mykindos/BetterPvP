@@ -1,18 +1,29 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
 import me.mykindos.betterpvp.core.combat.durability.DurabilityProcessor;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
+import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
+import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,7 +32,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -178,9 +192,69 @@ public class DamageEventFinalizer implements Listener {
                 || delayKillSet.contains(event.getDamagee().getUniqueId())) {
             return;
         }
+
+        final double modifiedDamage = event.getModifiedDamage();
+        if (event.getDamagee() instanceof Player player && player.isOp() && player.getEquipment().getItemInMainHand().getType() == Material.DEBUG_STICK) {
+            final List<String> categories = new ArrayList<>();
+            for (DamageCauseCategory category : event.getCause().getCategories()) {
+                categories.add(category.name());
+            }
+
+            UtilMessage.simpleMessage(player, "");
+            UtilMessage.simpleMessage(player, "Damage", "<u>Details:");
+            UtilMessage.simpleMessage(player, "Damage", "Raw Damage: <alt2>" + event.getRawDamage());
+            UtilMessage.simpleMessage(player, "Damage", "Damage: <alt2>" + event.getDamage());
+            UtilMessage.simpleMessage(player, "Damage", "Final Damage: <alt2>" + modifiedDamage);
+            UtilMessage.simpleMessage(player, "Damage", "Projectile: " + (event.isProjectile() ? "<green>Yes" : "<red>No"));
+            UtilMessage.simpleMessage(player, "Damage", "Knockback: " + (event.isKnockback() ? "<green>Yes" : "<red>No"));
+            UtilMessage.simpleMessage(player, "Damage", "Hurt Animation: " + (event.isHurtAnimation() ? "<green>Yes" : "<red>No"));
+            UtilMessage.simpleMessage(player, "Damage", "Living Damagee: " + (event.isDamageeLiving() ? "<green>Yes" : "<red>No"));
+            UtilMessage.simpleMessage(player, "Damage", "Damage Delay: <alt2>" + event.getDamageDelay() + "ms");
+            UtilMessage.simpleMessage(player, "Damage", "Force Damage Delay: <alt2>" + event.getForceDamageDelay() + "ms");
+            UtilMessage.simpleMessage(player, "Damage", "Reasons: <alt2>" + String.join(", ", event.getReasons()));
+            UtilMessage.simpleMessage(player, "Damage", "");
+            UtilMessage.simpleMessage(player, "Damage", "<u>Cause Breakdown:");
+            UtilMessage.simpleMessage(player, "Damage", "Cause: <alt2>" + event.getCause().getDisplayName());
+            UtilMessage.simpleMessage(player, "Damage", "Bukkit Cause: <alt2>" + event.getCause().getBukkitCause());
+            UtilMessage.simpleMessage(player, "Damage", "Damage Categories: <alt2>" + String.join(", ", categories));
+            UtilMessage.simpleMessage(player, "Damage", "True Damage: <alt2>" + event.getCause().isTrueDamage());
+            UtilMessage.simpleMessage(player, "Damage", "");
+            UtilMessage.simpleMessage(player, "Damage", "<u>Modifiers:");
+
+            final List<DamageModifier> appliedModifiers = event.getAppliedModifiers();
+            final Multimap<ModifierType, DamageModifier> modifiers = event.getModifiers();
+            for (Map.Entry<ModifierType, DamageModifier> entry : modifiers.entries()) {
+                final ModifierType type = entry.getKey();
+                final DamageModifier modifier = entry.getValue();
+
+                boolean applied = appliedModifiers.contains(modifier);
+                final TextComponent.Builder builder = Component.text();
+                if (applied) {
+                    builder.append(Component.text("[")).append(Component.text("✔", NamedTextColor.GREEN)).append(Component.text("]"));
+                } else {
+                    builder.append(Component.text("[")).append(Component.text("✘", NamedTextColor.GREEN)).append(Component.text("]"));
+                }
+
+                builder.appendSpace();
+                builder.append(Component.text("(P: ")).append(Component.text(modifier.getPriority(), NamedTextColor.YELLOW)).append(Component.text(")"));
+                builder.appendSpace();
+                builder.append(Component.text(modifier.getName()).decorate(TextDecoration.ITALIC));
+                builder.appendSpace();
+                builder.append(Component.text("(")).append(Component.text(type.name(), NamedTextColor.YELLOW)).append(Component.text(")"));
+
+                if (applied) {
+                    final ModifierResult result = modifier.apply(event);
+                    builder.append(Component.text(": "));
+                    builder.append(Component.text("×" + result.getDamageMultiplier() + " + " + result.getDamageAddition(), NamedTextColor.YELLOW));
+                }
+
+                UtilMessage.simpleMessage(player, "Damage", builder.build());
+            }
+            UtilMessage.simpleMessage(player, "");
+        }
         
         LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
-        double finalHealth = damagee.getHealth() - event.getModifiedDamage();
+        double finalHealth = damagee.getHealth() - modifiedDamage;
 
         if (finalHealth <= 0.0) {
             // Handle entity death with delay to fix Paper issue

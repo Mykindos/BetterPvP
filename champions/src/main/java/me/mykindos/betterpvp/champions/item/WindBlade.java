@@ -28,6 +28,8 @@ import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 
+import java.util.List;
+
 @Singleton
 @BPvPListener
 @EqualsAndHashCode(callSuper = true)
@@ -42,7 +44,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
     private WindBlade(Champions champions, ChampionsManager championsManager,
                      CooldownManager cooldownManager, EnergyHandler energyHandler, 
                      FeatherFeetAbility featherFeetAbility) {
-        super(champions, "Wind Blade", Item.model("windblade"), ItemRarity.LEGENDARY);
+        super(champions, "Wind Blade", Item.model("windblade"), ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
         this.featherFeetAbility = featherFeetAbility;
         
         // Create abilities

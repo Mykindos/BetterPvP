@@ -23,6 +23,8 @@ import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 
+import java.util.List;
+
 @Singleton
 @BPvPListener
 @EqualsAndHashCode(callSuper = true)
@@ -36,7 +38,7 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
     private MeridianScepter(Champions champions, 
                            BlackHoleAbility blackHoleAbility, 
                            MeridianBeamAbility meridianBeamAbility) {
-        super(champions, "Meridian Scepter", Item.model("meridian_scepter"), ItemRarity.LEGENDARY);
+        super(champions, "Meridian Scepter", Item.model("meridian_scepter"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
         this.blackHoleAbility = blackHoleAbility;
         this.meridianBeamAbility = meridianBeamAbility;
         

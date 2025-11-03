@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.core.item.component.impl.runes;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Base class for all rune items in the system.
@@ -21,8 +21,12 @@ public abstract class RuneItem extends BaseItem {
      * @param model  The item model to use
      * @param rarity The rarity of this rune
      */
-    protected RuneItem(Rune rune, ItemStack model, ItemRarity rarity) {
-        super(rune.getName() + " Rune", model, ItemGroup.MATERIAL, rarity);
+    protected RuneItem(Rune rune, RuneColor color, ItemRarity rarity) {
+        this("Rune of " + rune.getName(), color, rune, rarity);
+    }
+
+    protected RuneItem(String name, RuneColor color, Rune rune, ItemRarity rarity) {
+        super(name, Item.builder("rune").customModelData(color.getModelData()).build(), ItemGroup.MATERIAL, rarity);
         this.rune = rune;
         addBaseComponent(new RuneDescriptionComponent(rune));
     }

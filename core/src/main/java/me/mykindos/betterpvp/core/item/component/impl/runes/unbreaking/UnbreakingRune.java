@@ -4,15 +4,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 @Singleton
 @EqualsAndHashCode
@@ -40,12 +40,12 @@ public class UnbreakingRune implements Rune {
     }
 
     @Override
-    public boolean canApply(@NotNull Item item) {
-        return (item instanceof ItemInstance instance && isDamageable(instance.createItemStack()))
-                || (item instanceof BaseItem base && isDamageable(base.getModel()));
+    public @NotNull Collection<@NotNull RuneGroup> getGroups() {
+        return Arrays.stream(RuneGroup.values()).toList(); // Everything that can hold a rune
     }
 
-    private boolean isDamageable(@NotNull ItemStack itemStack) {
-        return itemStack.hasItemMeta() && itemStack.getItemMeta() instanceof Damageable;
+    @Override
+    public boolean canApply(@NotNull Item item) {
+        return Rune.super.canApply(item) && Rune.isDamageable(item);
     }
 }

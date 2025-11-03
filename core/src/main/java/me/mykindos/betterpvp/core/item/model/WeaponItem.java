@@ -12,16 +12,32 @@ import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
+import java.util.List;
+
 public abstract class WeaponItem extends BaseItem implements ReloadHook {
 
     private final BPvPPlugin plugin;
+    private final List<Group> groups;
 
-    protected WeaponItem(BPvPPlugin plugin, String name, ItemStack model, ItemRarity rarity) {
+    protected WeaponItem(BPvPPlugin plugin, String name, ItemStack model, ItemRarity rarity, List<Group> groups) {
         super(name, model, ItemGroup.WEAPON, rarity);
         this.plugin = plugin;
-        addSerializableComponent(new StatContainerComponent().withBaseStat(new MeleeDamageStat(1f)));
+        this.groups = groups;
         addSerializableComponent(new RuneContainerComponent(3));
         addSerializableComponent(new DurabilityComponent(500));
+
+        if (groups.contains(Group.MELEE)) {
+            addSerializableComponent(new StatContainerComponent().withBaseStat(new MeleeDamageStat(1f)));
+        }
+    }
+
+    protected WeaponItem(BPvPPlugin plugin, String name, ItemStack model, ItemRarity rarity) {
+        this(plugin, name, model, rarity, List.of(Group.MELEE));
+    }
+
+    public List<Group> getGroups() {
+        return Collections.unmodifiableList(groups);
     }
 
     @Override
@@ -38,5 +54,10 @@ public abstract class WeaponItem extends BaseItem implements ReloadHook {
         getComponent(DurabilityComponent.class).ifPresent(durabilityComponent -> {
             durabilityComponent.setMaxDamage(durability);
         });
+    }
+
+    public enum Group {
+        RANGED,
+        MELEE
     }
 }

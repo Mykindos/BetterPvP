@@ -4,27 +4,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.item.ability.GatorStrokeAbility;
-import me.mykindos.betterpvp.champions.item.ability.UnderwaterBreathingAbility;
-import me.mykindos.betterpvp.champions.item.ability.WaterDamageAbility;
-import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.item.impl.AlligatorScale;
-import me.mykindos.betterpvp.core.item.impl.DurakHandle;
-import me.mykindos.betterpvp.core.item.impl.FangOfTheDeep;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
-import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
-import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
+
+import java.util.List;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
@@ -35,7 +24,7 @@ public class Bloomrot extends WeaponItem implements ReloadHook {
 
     @Inject
     private Bloomrot(Champions champions, NectarOfDecay nectarOfDecay, ItemFactory itemFactory) {
-        super(champions, "Bloomroot", Item.model("bloomrot"), ItemRarity.LEGENDARY);
+        super(champions, "Bloomroot", Item.model("bloomrot"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
         this.itemFactory = itemFactory;
 
         this.nectarOfDecayAbility = nectarOfDecay;

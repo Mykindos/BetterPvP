@@ -29,6 +29,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Singleton
 @EqualsAndHashCode(callSuper = true)
 public class Mjolnir extends WeaponItem implements ReloadHook, NexoItem {
@@ -43,7 +45,7 @@ public class Mjolnir extends WeaponItem implements ReloadHook, NexoItem {
 
     @Inject
     private Mjolnir(Champions champions, CooldownManager cooldownManager, ItemFactory itemFactory, EffectManager effectManager, ClientManager clientManager) {
-        super(champions, "Mjolnir", Item.model(Material.TRIDENT, "mjolnir"), ItemRarity.MYTHICAL);
+        super(champions, "Mjolnir", Item.model(Material.TRIDENT, "mjolnir"), ItemRarity.MYTHICAL, List.of(Group.MELEE, Group.RANGED));
         this.champions = champions;
         this.skyforgedAscent = new SkyforgedAscent(effectManager, cooldownManager, this, itemFactory, clientManager);
         this.heavensplitter = new Heavensplitter(this, itemFactory, clientManager);

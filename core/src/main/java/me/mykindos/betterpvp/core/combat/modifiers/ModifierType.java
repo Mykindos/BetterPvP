@@ -30,6 +30,11 @@ public enum ModifierType {
     STAT,
 
     /**
+     * Runes on items
+     */
+    RUNE,
+
+    /**
      * Armor
      */
     ARMOR,
@@ -38,9 +43,4 @@ public enum ModifierType {
      * Potion effect modifiers (strength, resistance, etc.)
      */
     EFFECT,
-    
-    /**
-     * Any other type of modifier
-     */
-    OTHER
 }

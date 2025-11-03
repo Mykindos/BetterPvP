@@ -6,16 +6,16 @@ import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.item.Item;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
 
 @Singleton
 @EqualsAndHashCode
@@ -49,8 +49,8 @@ public class ScorchingRune implements Rune, ReloadHook {
     }
 
     @Override
-    public boolean canApply(@NotNull Item item) {
-        return item instanceof WeaponItem || (item instanceof ItemInstance instance && canApply(instance.getBaseItem()));
+    public @NotNull Collection <@NotNull RuneGroup> getGroups() {
+        return List.of(RuneGroup.MELEE_WEAPON);
     }
 
     @Override

@@ -11,9 +11,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,7 +30,7 @@ public class ModelBuilder {
     private Key itemModel;
     private Integer maxStackSize;
     private Boolean hideTooltip;
-    private Integer customModelData;
+    private CustomModelData customModelData;
     private Component displayName;
     private Boolean consumable;
     private Boolean unbreakable;
@@ -44,7 +42,12 @@ public class ModelBuilder {
      * @return This builder for chaining
      */
     public ModelBuilder customModelData(int customModelData) {
-        this.customModelData = customModelData;
+        this.customModelData = CustomModelData.customModelData().addFloat(customModelData).build();
+        return this;
+    }
+
+    public ModelBuilder customModelData(@NotNull String string) {
+        this.customModelData = CustomModelData.customModelData().addString(string).build();
         return this;
     }
 
@@ -131,11 +134,6 @@ public class ModelBuilder {
         ItemStack result = itemStack.clone();
         ItemMeta meta = result.getItemMeta();
 
-        // Set custom model data if specified
-        if (customModelData != null) {
-            result.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addFloat(customModelData).build());
-        }
-
         // Set display name if specified
         if (displayName != null) {
             meta.displayName(displayName);
@@ -151,6 +149,11 @@ public class ModelBuilder {
         // Set data components
         if (itemModel != null) {
             result.setData(DataComponentTypes.ITEM_MODEL, itemModel);
+        }
+
+        // Set custom model data if specified
+        if (customModelData != null) {
+            result.setData(DataComponentTypes.CUSTOM_MODEL_DATA, customModelData);
         }
 
         if (maxStackSize != null) {

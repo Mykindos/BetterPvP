@@ -11,6 +11,8 @@ import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
@@ -41,6 +43,8 @@ public class CoreItemBootstrap implements ItemBootstrap {
     @Inject private UnbreakingRune unbreakingRune;
     @Inject private ScorchingRuneItem scorchingRuneItem;
     @Inject private ScorchingRune scorchingRune;
+    @Inject private FlameguardRuneItem flameguardRuneItem;
+    @Inject private FlameguardRune flameguardRune;
     @Inject private BlueprintItem blueprintItem;
     @Inject private Hammer hammer;
     @Inject private Rope rope;
@@ -84,6 +88,8 @@ public class CoreItemBootstrap implements ItemBootstrap {
         runeRegistry.registerRune(unbreakingRune);
         itemRegistry.registerItem(key("scorching_rune"), scorchingRuneItem);
         runeRegistry.registerRune(scorchingRune);
+        itemRegistry.registerItem(key("flameguard_rune"), flameguardRuneItem);
+        runeRegistry.registerRune(flameguardRune);
 
         // Misc items
         itemRegistry.registerItem(key("blueprint"), blueprintItem);

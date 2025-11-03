@@ -84,4 +84,9 @@ public interface Item {
      */
     @Nullable ItemLoreRenderer getLoreRenderer();
 
+    /**
+     * Gets the group this item belongs to.
+     */
+    @NotNull ItemGroup getItemGroup();
+
 }

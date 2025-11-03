@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import org.bukkit.NamespacedKey;
@@ -32,6 +33,7 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
     @Inject private ImbuementRecipeRegistry imbuementRecipeRegistry;
     @Inject private ScorchingRuneItem scorchingRune;
     @Inject private UnbreakingRuneItem unbreakingRune;
+    @Inject private FlameguardRuneItem flameguardRune;
 
     /**
      * Creates a namespaced key for the Core plugin.
@@ -52,7 +54,7 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
         if (registered) return;
         registered = true;
 
-        final List<RuneItem> runes = List.of(scorchingRune, unbreakingRune);
+        final List<RuneItem> runes = List.of(scorchingRune, unbreakingRune, flameguardRune);
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }
@@ -66,14 +68,9 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
             return;
         }
 
-        final RuneContainerComponent container = containerOpt.get();
-        if (!container.hasAvailableSockets()) {
-            return;
-        }
-
         final NamespacedKey itemKey = Objects.requireNonNull(itemRegistry.getKey(baseItem));
         for (RuneItem runeItem : runes) {
-            if (!container.hasRune(runeItem.getRune()) && runeItem.getRune().canApply(baseItem)) {
+            if (runeItem.getRune().canApply(baseItem)) {
                 final NamespacedKey runeKey = Objects.requireNonNull(itemRegistry.getKey(runeItem));
                 final String key = itemKey.getKey() + "_" + runeKey.getKey();
                 final NamespacedKey combinationKey = new NamespacedKey(itemKey.getNamespace(), key);
