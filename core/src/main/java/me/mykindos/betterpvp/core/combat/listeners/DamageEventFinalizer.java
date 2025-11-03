@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
@@ -50,12 +51,14 @@ public class DamageEventFinalizer implements Listener {
     private final DurabilityProcessor durabilityProcessor;
     private final DamageDelayManager delayManager;
     private final Set<UUID> delayKillSet = new HashSet<>();
+    private final ClientManager clientManager;
 
     @Inject
-    private DamageEventFinalizer(Core core, DurabilityProcessor durabilityProcessor, DamageDelayManager delayManager) {
+    private DamageEventFinalizer(Core core, DurabilityProcessor durabilityProcessor, DamageDelayManager delayManager, ClientManager clientManager) {
         this.core = core;
         this.durabilityProcessor = durabilityProcessor;
         this.delayManager = delayManager;
+        this.clientManager = clientManager;
     }
     
     protected void finalizeEvent(@NotNull DamageEvent event, @Nullable CustomDamageAdapter adapter) {
@@ -88,8 +91,16 @@ public class DamageEventFinalizer implements Listener {
 
         // Apply final damage
         applyFinalDamage(event);
-        
-        log.debug("Finalized damage: {} dealt {} damage to {}", 
+
+        // Send debug info
+        sendDebugInfo(event);
+
+        // Update last damaged
+        if (event.getDamagee() instanceof Player player && event.getDamager() != null) {
+            clientManager.search().online(player).getGamer().setLastDamaged(System.currentTimeMillis());
+        }
+
+        log.debug("Finalized damage: {} dealt {} damage to {}",
                  event.getDamager() != null ? event.getDamager().getName() : "Environment",
                  event.getDamage(), event.getDamagee().getName()).submit();
     }
@@ -188,13 +199,33 @@ public class DamageEventFinalizer implements Listener {
      */
     private void applyFinalDamage(DamageEvent event) {
         if (!event.getDamagee().isValid() || !event.isDamageeLiving()
-                || event.getLivingDamagee().getHealth() <= 0 || event.getLivingDamagee().isDead()
+                || Objects.requireNonNull(event.getLivingDamagee()).getHealth() <= 0 || event.getLivingDamagee().isDead()
                 || delayKillSet.contains(event.getDamagee().getUniqueId())) {
             return;
         }
 
-        final double modifiedDamage = event.getModifiedDamage();
+        LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
+        double finalHealth = damagee.getHealth() - event.getModifiedDamage();
+
+        if (finalHealth <= 0.0) {
+            // Handle entity death with delay to fix Paper issue
+            // Temporary measure to fix https://github.com/PaperMC/Paper/issues/12148
+            if (!delayKillSet.contains(damagee.getUniqueId())) {
+                delayKillSet.add(damagee.getUniqueId());
+                UtilServer.runTaskLater(core, () -> {
+                    if (event.getDamager() instanceof Player killer) damagee.setKiller(killer);
+                    damagee.setHealth(0);
+                    delayKillSet.remove(damagee.getUniqueId());
+                }, 1L);
+            }
+        } else {
+            damagee.setHealth(finalHealth);
+        }
+    }
+
+    private void sendDebugInfo(DamageEvent event) {
         if (event.getDamagee() instanceof Player player && player.isOp() && player.getEquipment().getItemInMainHand().getType() == Material.DEBUG_STICK) {
+            double modifiedDamage = event.getModifiedDamage();
             final List<String> categories = new ArrayList<>();
             for (DamageCauseCategory category : event.getCause().getCategories()) {
                 categories.add(category.name());
@@ -251,24 +282,6 @@ public class DamageEventFinalizer implements Listener {
                 UtilMessage.simpleMessage(player, "Damage", builder.build());
             }
             UtilMessage.simpleMessage(player, "");
-        }
-        
-        LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
-        double finalHealth = damagee.getHealth() - modifiedDamage;
-
-        if (finalHealth <= 0.0) {
-            // Handle entity death with delay to fix Paper issue
-            // Temporary measure to fix https://github.com/PaperMC/Paper/issues/12148
-            if (!delayKillSet.contains(damagee.getUniqueId())) {
-                delayKillSet.add(damagee.getUniqueId());
-                UtilServer.runTaskLater(core, () -> {
-                    if (event.getDamager() instanceof Player killer) damagee.setKiller(killer);
-                    damagee.setHealth(0);
-                    delayKillSet.remove(damagee.getUniqueId());
-                }, 1L);
-            }
-        } else {
-            damagee.setHealth(finalHealth);
         }
     }
 }

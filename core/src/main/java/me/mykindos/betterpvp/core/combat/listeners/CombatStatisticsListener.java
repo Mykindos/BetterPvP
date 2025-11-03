@@ -66,11 +66,6 @@ public class CombatStatisticsListener implements Listener {
                 // Update damage taken statistic
                 double currentDamageTaken = (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0.0);
                 gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, currentDamageTaken + event.getDamage());
-
-                // Update last damaged time (except for fall damage)
-                if (!isFallDamage(event)) {
-                    gamer.setLastDamaged(System.currentTimeMillis());
-                }
                 
                 log.debug("Updated damage taken for {}: +{} (total: {})", 
                          damagee.getName(), event.getDamage(), currentDamageTaken + event.getDamage()).submit();
