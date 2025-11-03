@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEv
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.offhand.OffhandExecutor;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
@@ -188,7 +189,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     }
 
     public boolean isInCombat() {
-        return !UtilTime.elapsed(lastDamaged, 15000);
+        return !UtilTime.elapsed(lastDamaged, DamageLog.EXPIRY);
     }
 
     public void setChatChannel(@NotNull ChatChannel chatChannel) {

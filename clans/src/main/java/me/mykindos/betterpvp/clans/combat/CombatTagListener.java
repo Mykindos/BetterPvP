@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -87,7 +88,7 @@ public class CombatTagListener implements Listener {
 
                 if (gamer.isInCombat()) {
 
-                    long remainingMillis = 15000 - (System.currentTimeMillis() - gamer.getLastDamaged());
+                    long remainingMillis = DamageLog.EXPIRY - (System.currentTimeMillis() - gamer.getLastDamaged());
                     double remainingSeconds = remainingMillis / 1000.0;
 
                     Component subtitleText = Component.text("Unsafe for: ", NamedTextColor.GRAY).append(Component.text(String.format("%.1f", remainingSeconds) + "s", NamedTextColor.RED));
