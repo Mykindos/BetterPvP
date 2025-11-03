@@ -23,12 +23,12 @@ public enum RuneGroup {
     /**
      * Any item that has {@link ItemGroup#ARMOR}
      */
-    ARMOR(item -> item.getItemGroup() == ItemGroup.ARMOR),
+    ARMOR("Armor", item -> item.getItemGroup() == ItemGroup.ARMOR),
 
     /**
      * Any item that has {@link ItemGroup#WEAPON}, extends {@link WeaponItem} and has group {@link Group#MELEE}
      */
-    MELEE_WEAPON(item -> {
+    MELEE_WEAPON("Melee Weapons", item -> {
         if (item.getItemGroup() != ItemGroup.WEAPON) {
             return false;
         }
@@ -40,7 +40,7 @@ public enum RuneGroup {
     /**
      * Any item that has {@link ItemGroup#WEAPON}, extends {@link WeaponItem} and has group {@link Group#RANGED}
      */
-    RANGED_WEAPON(item -> {
+    RANGED_WEAPON("Ranged Weapons", item -> {
         if (item.getItemGroup() != ItemGroup.WEAPON) {
             return false;
         }
@@ -52,7 +52,7 @@ public enum RuneGroup {
     /**
      * Any item that has the DataComponentTypes.TOOL data key or has {@link ItemGroup#TOOL}
      */
-    TOOL(item -> {
+    TOOL("Tools", item -> {
         final ItemStack itemStack;
         final boolean tool;
         if (item instanceof ItemInstance itemInstance) {
@@ -68,7 +68,12 @@ public enum RuneGroup {
         return tool || itemStack.hasData(DataComponentTypes.TOOL);
     });
 
+    private final String displayName;
     private final Predicate<Item> itemPredicate;
+
+    public String getDisplayName() {
+        return displayName;
+    }
 
     public boolean canApply(Item item) {
         return itemPredicate.test(item);

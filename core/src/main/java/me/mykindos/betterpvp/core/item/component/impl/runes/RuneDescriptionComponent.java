@@ -5,9 +5,9 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
 import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,25 @@ public class RuneDescriptionComponent implements ItemComponent, LoreComponent {
 
     @Override
     public List<Component> getLines(ItemInstance item) {
-        return ComponentWrapper.wrapLine(Component.text(rune.getDescription(), NamedTextColor.GRAY));
+        final List<Component> components = ComponentWrapper.wrapLine(Component.text(rune.getDescription(), NamedTextColor.GRAY));
+        components.add(Component.empty());
+        components.add(Component.text("Applies to:", NamedTextColor.GRAY, TextDecoration.UNDERLINED));
+        for (RuneGroup value : RuneGroup.values()) {
+            final String displayName = value.getDisplayName();
+            final boolean contains = rune.getGroups().contains(value);
+            if (!contains) {
+                components.add(Component.text("[", NamedTextColor.GRAY)
+                        .append(Component.text("✘", NamedTextColor.RED))
+                        .append(Component.text("] ", NamedTextColor.GRAY))
+                        .append(Component.text(displayName, NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH)));
+            } else {
+                components.add(Component.text("[", NamedTextColor.GRAY)
+                        .append(Component.text("✔", NamedTextColor.GREEN))
+                        .append(Component.text("] ", NamedTextColor.GRAY))
+                        .append(Component.text(displayName, NamedTextColor.GREEN)));
+            }
+        }
+        return components;
     }
 
     @Override
