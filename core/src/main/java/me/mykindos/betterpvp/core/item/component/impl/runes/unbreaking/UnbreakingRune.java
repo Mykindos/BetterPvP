@@ -11,8 +11,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 @Singleton
 @EqualsAndHashCode
@@ -41,7 +41,7 @@ public class UnbreakingRune implements Rune {
 
     @Override
     public @NotNull Collection<@NotNull RuneGroup> getGroups() {
-        return Arrays.stream(RuneGroup.values()).toList(); // Everything that can hold a rune
+        return Collections.singleton(RuneGroup.ALL);
     }
 
     @Override
