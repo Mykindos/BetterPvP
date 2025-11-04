@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS client_properties
     PRIMARY KEY (client, property)
 );
 
-CREATE INDEX idx_client_properties_property ON client_properties (property);
+CREATE INDEX IF NOT EXISTS idx_client_properties_property ON client_properties (property);
 
 CREATE TABLE IF NOT EXISTS client_rewards
 (
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS ignores
 CREATE TABLE IF NOT EXISTS client_name_history
 (
     client    BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
-    name      VARCHAR(255)                        NOT NULL,
-    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    name      VARCHAR(255) NOT NULL,
+    last_seen BIGINT       NOT NULL,
     PRIMARY KEY (client, name)
 );
 
@@ -163,7 +163,7 @@ INSERT INTO servers (id, name) VALUES (10, 'Clans-10') ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS realms
 (
-    id     SERIAL PRIMARY KEY,
+    id     INTEGER  PRIMARY KEY,
     server SMALLINT NOT NULL REFERENCES servers (id),
     season SMALLINT NOT NULL,
     CONSTRAINT realms_server_season_name_unique UNIQUE (server, season)

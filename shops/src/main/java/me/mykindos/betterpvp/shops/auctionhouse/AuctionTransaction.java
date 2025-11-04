@@ -7,7 +7,7 @@ import java.util.UUID;
 @Data
 public class AuctionTransaction {
 
-    private final UUID auctionId;
+    private final Long auctionId;
     private final UUID buyer;
 
 }

@@ -88,7 +88,7 @@ public class ClansAuctionListener implements Listener {
         Optional<Clan> sellerClanOptional = clanManager.getClanByPlayer(event.getAuction().getSeller());
         if(sellerClanOptional.isEmpty()) {
             event.cancel("The seller must be in a clan to purchase this auction."); // This should never happen
-            log.warn("Seller of auction " + event.getAuction().getAuctionID().toString() + " is not in a clan.").submit();
+            log.warn("Seller of auction " + event.getAuction().getAuctionID() + " is not in a clan.").submit();
             return;
         }
 

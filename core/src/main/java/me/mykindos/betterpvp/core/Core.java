@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.coretips.CoreTipLoader;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
@@ -101,7 +100,7 @@ public class Core extends BPvPPlugin {
         injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
 
         this.database = injector.getInstance(Database.class);
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/postgres/global", "global", TargetDatabase.GLOBAL);
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/postgres/global", "global");
 
         setupServerAndSeason();
 

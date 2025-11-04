@@ -1,1 +1,0 @@
-UPDATE punishments SET Reason = "N/A" WHERE Reason IS NULL;

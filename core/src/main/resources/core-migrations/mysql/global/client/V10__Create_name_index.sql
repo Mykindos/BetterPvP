@@ -1,1 +1,0 @@
-CREATE INDEX idx_clients_name ON clients (Name);

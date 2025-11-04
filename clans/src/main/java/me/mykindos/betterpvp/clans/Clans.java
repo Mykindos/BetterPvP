@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
@@ -69,7 +68,7 @@ public class Clans extends BPvPPlugin {
                     new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations/postgres/global", "clans", TargetDatabase.GLOBAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations/postgres/global", "clans");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Clans"));
 

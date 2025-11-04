@@ -281,7 +281,6 @@ public class ClanRepository implements IRepository<Clan> {
                 .where(CLANS.REALM.eq(Core.getCurrentRealm()))
                 .fetch();
 
-        System.out.println(records.size());
         database.getAsyncDslContext()
                 .executeAsyncVoid(ctx -> {
                     ctx.update(CLAN_METADATA)

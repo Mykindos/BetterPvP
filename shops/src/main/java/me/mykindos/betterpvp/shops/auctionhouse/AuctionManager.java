@@ -127,7 +127,7 @@ public class AuctionManager {
             getAuctionRepository().setDelivered(auction, true);
             getActiveAuctions().remove(auction);
         } else {
-            log.warn("Failed to deliver cancelled auction {}", auction.getAuctionID().toString()).submit();
+            log.warn("Failed to deliver cancelled auction {}", auction.getAuctionID()).submit();
         }
         itemHandler.getUUIDItem(auction.getItemStack()).ifPresent((uuidItem) -> {
             log.info("{} canceled ({}) on the auction house",

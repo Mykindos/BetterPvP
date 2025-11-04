@@ -98,10 +98,6 @@ jooq {
                             org.jooq.meta.jaxb.ForcedType().apply {
                                 setName("INTEGER")
                                 setIncludeTypes("SMALLINT")
-                            },
-                            org.jooq.meta.jaxb.ForcedType().apply {
-                                setName("INSTANT")
-                                setIncludeTypes("TIMESTAMP|TIMESTAMP WITH TIME ZONE")
                             }
                         )
                     }

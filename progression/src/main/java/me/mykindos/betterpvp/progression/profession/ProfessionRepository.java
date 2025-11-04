@@ -3,15 +3,16 @@ package me.mykindos.betterpvp.progression.profession;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import org.jooq.impl.DSL;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicLong;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.PROGRESSION_EXP;
 
 @CustomLog
 @Singleton
@@ -22,53 +23,72 @@ public class ProfessionRepository {
     @Inject
     public ProfessionRepository(Database database) {
         this.database = database;
+        createPartitions();
     }
 
-    public CompletableFuture<Long> getMostExperiencePerProfessionForGamer(UUID player, String profession) {
-        return CompletableFuture.supplyAsync(() -> {
+    public void createPartitions() {
+        int season = Core.getCurrentSeason();
+        String partitionTableName = "progression_exp_season_" + season;
+        try {
+            database.getDslContext().execute(DSL.sql(String.format(
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF progression_exp FOR VALUES IN (%d)",
+                    partitionTableName, season
+            )));
+            log.info("Created partition {} for season {}", partitionTableName, season).submit();
+        } catch (Exception e) {
+            log.info("Partition {} may already exist", partitionTableName).submit();
+        }
+    }
 
-            AtomicLong exp = new AtomicLong(0);
+    public CompletableFuture<Long> getMostExperiencePerProfessionForClient(UUID player, String profession) {
+        try {
+            return database.getAsyncDslContext().executeAsync(ctx -> {
 
-            Statement statement = new Statement("SELECT * FROM progression_exp WHERE Profession = ? AND Gamer = ? ORDER BY Experience DESC LIMIT 10",
-                    new StringStatementValue(profession),
-                    new StringStatementValue(player.toString()));
+                Long experience = ctx.select(PROGRESSION_EXP.EXPERIENCE)
+                        .from(PROGRESSION_EXP)
+                        .where(PROGRESSION_EXP.PROFESSION.eq(profession))
+                        .and(PROGRESSION_EXP.CLIENT.eq(ctx.select(CLIENTS.ID)
+                                        .from(CLIENTS)
+                                        .where(CLIENTS.UUID.eq(player.toString()))))
+                        .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentSeason()))
+                        .orderBy(PROGRESSION_EXP.EXPERIENCE.desc())
+                        .limit(1)
+                        .fetchOne(PROGRESSION_EXP.EXPERIENCE);
 
-            database.executeProcedure(statement, -1, result -> {
-                try {
-                    if (result.next()) {
-                        long experience = result.getLong(3);
-                        exp.set(experience);
-                    }
-                } catch (SQLException e) {
-                    log.error("Error fetching leaderboard data", e).submit();
-                }
-            }).join();
-
-            return exp.get();
-        });
+                return experience != null ? experience : 0L;
+            });
+        } catch (Exception e) {
+            log.error("Error fetching leaderboard data for player {}", player, e).submit();
+            return CompletableFuture.completedFuture(0L);
+        }
 
     }
 
     public CompletableFuture<HashMap<UUID, Long>> getMostExperiencePerProfession(String profession) {
-        return CompletableFuture.supplyAsync(() -> {
-            HashMap<UUID, Long> leaderboard = new HashMap<>();
-            Statement statement = new Statement("SELECT * FROM progression_exp WHERE Profession = ? ORDER BY Experience DESC LIMIT 10",
-                    new StringStatementValue(profession));
+        HashMap<UUID, Long> leaderboard = new HashMap<>();
+        try {
+            return database.getAsyncDslContext().executeAsync(ctx -> {
+                ctx.select(CLIENTS.UUID, PROGRESSION_EXP.EXPERIENCE)
+                        .from(PROGRESSION_EXP)
+                        .join(CLIENTS).on(PROGRESSION_EXP.CLIENT.eq(CLIENTS.ID))
+                        .where(PROGRESSION_EXP.PROFESSION.eq(profession))
+                        .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentSeason()))
+                        .orderBy(PROGRESSION_EXP.EXPERIENCE.desc())
+                        .limit(10)
+                        .fetch()
+                        .forEach(expRecord -> {
+                            UUID gamer = UUID.fromString(expRecord.get(CLIENTS.UUID));
+                            Long experience = expRecord.get(PROGRESSION_EXP.EXPERIENCE);
+                            leaderboard.put(gamer, experience);
+                        });
 
-            database.executeProcedure(statement, -1, result -> {
-                try {
-                    while (result.next()) {
-                        UUID gamer = UUID.fromString(result.getString(1));
-                        Long experience = result.getLong(3);
-                        leaderboard.put(gamer, experience);
-                    }
-                } catch (SQLException e) {
-                    log.error("Error fetching leaderboard data", e).submit();
-                }
-            }).join();
+                return leaderboard;
+            });
+        } catch (Exception e) {
+            log.error("Error fetching leaderboard data", e).submit();
+        }
 
-            return leaderboard;
-        });
+        return CompletableFuture.completedFuture(leaderboard);
 
 
     }

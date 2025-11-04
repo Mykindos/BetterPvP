@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.jooq.Query;
+import org.jooq.impl.DSL;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,7 +33,22 @@ public class BlockTagRepository {
     @Inject
     public BlockTagRepository(Core core, Database database) {
         this.core = core;
-        this.database = database;;
+        this.database = database;
+        createPartitions();
+    }
+
+    public void createPartitions() {
+        int realm = Core.getCurrentRealm();
+        String partitionTableName = "chunk_block_tags_realm_" + realm;
+        try {
+            database.getDslContext().execute(DSL.sql(String.format(
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF chunk_block_tags FOR VALUES IN (%d)",
+                    partitionTableName, realm
+            )));
+            log.info("Created partition {} for realm {}", partitionTableName, realm).submit();
+        } catch (Exception e) {
+            log.info("Partition {} may already exist", partitionTableName).submit();
+        }
     }
 
     public Map<Long, Map<String, BlockTag>> getBlockTagsForChunk(Chunk chunk) {
@@ -72,11 +88,11 @@ public class BlockTagRepository {
                             .set(CHUNK_BLOCK_TAGGING.BLOCK_KEY, blockKey)
                             .set(CHUNK_BLOCK_TAGGING.TAG, blockTag.getTag())
                             .set(CHUNK_BLOCK_TAGGING.VALUE, blockTag.getValue())
-                            .set(CHUNK_BLOCK_TAGGING.LAST_UPDATED, Instant.now())
+                            .set(CHUNK_BLOCK_TAGGING.LAST_UPDATED, System.currentTimeMillis())
                             .onConflict(CHUNK_BLOCK_TAGGING.REALM, CHUNK_BLOCK_TAGGING.CHUNK, CHUNK_BLOCK_TAGGING.BLOCK_KEY, CHUNK_BLOCK_TAGGING.TAG)
                             .doUpdate()
                             .set(CHUNK_BLOCK_TAGGING.VALUE, blockTag.getValue())
-                            .set(CHUNK_BLOCK_TAGGING.LAST_UPDATED, Instant.now())
+                            .set(CHUNK_BLOCK_TAGGING.LAST_UPDATED, System.currentTimeMillis())
             );
         }
     }
@@ -101,7 +117,7 @@ public class BlockTagRepository {
             int deletedRows = database.getDslContext()
                     .deleteFrom(CHUNK_BLOCK_TAGGING)
                     .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm()))
-                    .and(CHUNK_BLOCK_TAGGING.LAST_UPDATED.lt(cutoff))
+                    .and(CHUNK_BLOCK_TAGGING.LAST_UPDATED.lt(cutoff.toEpochMilli()))
                     .and(CHUNK_BLOCK_TAGGING.TAG.eq("PlayerManipulated"))
                     .execute();
 

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
@@ -57,8 +58,9 @@ public class FishingHandler extends ProfessionHandler {
 
 
     @Inject
-    protected FishingHandler(Progression progression, ProfessionProfileManager professionProfileManager, FishingRepository fishingRepository, LeaderboardManager leaderboardManager) {
-        super(progression, professionProfileManager, "Fishing");
+    protected FishingHandler(Progression progression, ClientManager clientManager,
+                             ProfessionProfileManager professionProfileManager, FishingRepository fishingRepository, LeaderboardManager leaderboardManager) {
+        super(progression, clientManager, professionProfileManager, "Fishing");
         this.fishingRepository = fishingRepository;
         this.leaderboardManager = leaderboardManager;
     }
@@ -77,7 +79,7 @@ public class FishingHandler extends ProfessionHandler {
                 .addClientContext(player).addLocationContext(player.getLocation())
                 .addContext("Experience", xp + "").addContext("Fish Weight", fish.getWeight() + "").submit();
 
-        fishingRepository.saveFish(player.getUniqueId(), fish);
+        fishingRepository.saveFish(clientManager.search().online(player), fish);
 
         long fishCaught = (long) professionData.getProperties().getOrDefault("TOTAL_FISH_CAUGHT", 0L);
         professionData.getProperties().put("TOTAL_FISH_CAUGHT", fishCaught + 1);

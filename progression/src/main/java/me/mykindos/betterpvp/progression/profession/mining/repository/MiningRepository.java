@@ -3,15 +3,15 @@ package me.mykindos.betterpvp.progression.profession.mining.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import org.jooq.impl.DSL;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.PROGRESSION_PROPERTIES;
 
 @CustomLog
 @Singleton
@@ -22,29 +22,39 @@ public class MiningRepository {
     @Inject
     public MiningRepository(Database database) {
         this.database = database;
+        createPartitions();
     }
 
-    public CompletableFuture<Long> getOresMinedForGamer(UUID player) {
-        return CompletableFuture.supplyAsync(() -> {
+    public void createPartitions() {
+        int season = Core.getCurrentSeason();
+        String partitionTableName = "progression_mining_season_" + season;
+        try {
+            database.getDslContext().execute(DSL.sql(String.format(
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF progression_mining FOR VALUES IN (%d)",
+                    partitionTableName, season
+            )));
+            log.info("Created partition {} for season {}", partitionTableName, season).submit();
+        } catch (Exception e) {
+            log.info("Partition {} may already exist", partitionTableName).submit();
+        }
+    }
+    public CompletableFuture<Integer> getOresMinedForGamer(UUID player) {
+        return database.getAsyncDslContext().executeAsync(ctx -> {
+            try {
+                String totalOresMined = ctx.select(PROGRESSION_PROPERTIES.VALUE).from(PROGRESSION_PROPERTIES)
+                        .where(PROGRESSION_PROPERTIES.CLIENT.eq(ctx.select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(player.toString()))))
+                        .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentSeason()))
+                        .and(PROGRESSION_PROPERTIES.PROPERTY.eq("TOTAL_ORES_MINED")).fetchOne(PROGRESSION_PROPERTIES.VALUE);
+                if (totalOresMined == null) return 0;
 
-            /*
-            The reason why you don't have to also specify the "Profession" field here is because no two Professions are
-            going to share the same value for the fields "Property" and "Gamer"
-            */
-            Statement statement = new Statement("SELECT Value FROM progression_properties WHERE Gamer = ? AND Property = ?",
-                    new UuidStatementValue(player), new StringStatementValue("TOTAL_ORES_MINED"));
-            try (CachedRowSet result = database.executeQuery(statement).join()) {
-
-                if (result.next()) {
-                    return result.getLong(1);
-                }
-
-            } catch (SQLException e) {
-                log.error("Failed to load mining data for " + player, e).submit();
+                return Integer.parseInt(totalOresMined);
+            } catch (Exception ex) {
+                log.error("Failed to load mining data for {}", player.toString(), ex).submit();
             }
 
-            return 0L;
+            return 0;
         });
+
     }
 
 }

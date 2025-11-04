@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
@@ -67,7 +66,7 @@ public class Champions extends BPvPPlugin {
                     new SkillInjectorModule(this));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations/postgres/global", "champions", TargetDatabase.GLOBAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations/postgres/global", "champions");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Champions"));
 

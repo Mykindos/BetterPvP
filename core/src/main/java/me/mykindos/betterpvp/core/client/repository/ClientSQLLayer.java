@@ -428,6 +428,7 @@ public class ClientSQLLayer {
         ctx.insertInto(CLIENT_NAME_HISTORY)
                 .set(CLIENT_NAME_HISTORY.CLIENT, client.getId())
                 .set(CLIENT_NAME_HISTORY.NAME, client.getName())
+                .set(CLIENT_NAME_HISTORY.LAST_SEEN, System.currentTimeMillis())
                 .onConflict(CLIENT_NAME_HISTORY.CLIENT, CLIENT_NAME_HISTORY.NAME)
                 .doNothing()
                 .execute();

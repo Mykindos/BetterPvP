@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 @Getter
@@ -32,7 +33,7 @@ public class ShopManager {
     private final ShopItemRepository shopItemRepository;
     private final ShopItemSellService shopItemSellService;
 
-    private HashMap<String, List<IShopItem>> shopItems = new HashMap<>();
+    private Map<String, List<IShopItem>> shopItems = new HashMap<>();
 
     @Inject
     public ShopManager(ShopItemRepository shopItemRepository, ShopItemSellService shopItemSellService) {
