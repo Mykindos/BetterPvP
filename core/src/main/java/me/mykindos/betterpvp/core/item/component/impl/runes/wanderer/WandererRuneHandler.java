@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.item.component.impl.runes.wanderer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -31,13 +32,15 @@ public class WandererRuneHandler implements Listener {
 
     private final Object DUMMY_OBJECT = new Object();
     private final DamageLogManager damageLogManager;
+    private final ClientManager clientManager;
     private final WandererRune wandererRune;
     private final WeakHashMap<LivingEntity, Object> tracked = new WeakHashMap<>();
     private final ComponentLookupService componentLookupService;
 
     @Inject
-    public WandererRuneHandler(DamageLogManager damageLogManager, WandererRune wandererRune, ComponentLookupService lookupService) {
+    public WandererRuneHandler(DamageLogManager damageLogManager, ClientManager clientManager, WandererRune wandererRune, ComponentLookupService lookupService) {
         this.damageLogManager = damageLogManager;
+        this.clientManager = clientManager;
         this.wandererRune = wandererRune;
         this.componentLookupService = lookupService;
     }
@@ -85,7 +88,8 @@ public class WandererRuneHandler implements Listener {
 
             // Check if they're in combat
             final DamageLog lastDamager = damageLogManager.getLastDamager(entity);
-            if (lastDamager == null || lastDamager.getDamager() == null) {
+            final boolean combat = entity instanceof Player player && clientManager.search().online(player).getGamer().isInCombat();
+            if ((lastDamager == null || lastDamager.getDamager() == null) && !combat) {
                 // They haven't taken damage by an enemy
                 // Give them the effect
                 final AttributeModifier modifier = new AttributeModifier(WandererRune.KEY,

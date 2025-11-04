@@ -99,6 +99,9 @@ public class DamageEventFinalizer implements Listener {
         if (event.getDamagee() instanceof Player player && event.getDamager() != null) {
             clientManager.search().online(player).getGamer().setLastDamaged(System.currentTimeMillis());
         }
+        if (event.getDamager() instanceof Player player) {
+            clientManager.search().online(player).getGamer().setLastDamaged(System.currentTimeMillis());
+        }
 
         log.debug("Finalized damage: {} dealt {} damage to {}",
                  event.getDamager() != null ? event.getDamager().getName() : "Environment",
