@@ -100,7 +100,7 @@ public class Core extends BPvPPlugin {
         injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
 
         this.database = injector.getInstance(Database.class);
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/postgres/global", "global");
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/postgres/", "global");
 
         setupServerAndSeason();
 

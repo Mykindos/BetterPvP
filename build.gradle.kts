@@ -11,7 +11,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
     id("org.flywaydb.flyway") version "11.15.0" apply false // Flyway
     id("org.sonarqube") version "6.3.1.5724" apply true
-    id("nu.studer.jooq") version "9.0" apply false
+    //id("nu.studer.jooq") version "9.0" apply false
 }
 
 java {

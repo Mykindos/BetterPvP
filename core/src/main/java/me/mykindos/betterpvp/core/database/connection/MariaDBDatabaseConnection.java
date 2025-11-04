@@ -5,13 +5,11 @@ import com.google.inject.Singleton;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.CustomLog;
-import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.ConnectionData;
 import org.flywaydb.core.Flyway;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 
 @Singleton
 @CustomLog

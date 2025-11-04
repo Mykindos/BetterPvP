@@ -54,7 +54,7 @@ public class Shops extends BPvPPlugin {
                     new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:shops-migrations/postgres/global", "shops");
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:shops-migrations/postgres/", "shops");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Shops"));
 

@@ -2,18 +2,6 @@ version: '3.9'
 name: betterpvp
 
 services:
-  mariadb:
-    image: mariadb
-    container_name: mariadb
-    environment:
-      MYSQL_USER: user
-      MYSQL_PASSWORD: BetterPvP123!
-      MYSQL_ROOT_PASSWORD: BetterPvPAdmin123! # Random
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5000:3306"
-
   postgres:
     image: postgres:latest
     container_name: postgres

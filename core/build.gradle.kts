@@ -33,8 +33,8 @@ dependencies {
     api(libs.jooq)
     api(libs.jooq.meta)
     jooqGenerator(libs.jooq.meta.extensions)
-    jooqGenerator("org.postgresql:postgresql:42.7.4")
-    implementation("org.postgresql:postgresql:42.7.4")
+    jooqGenerator(libs.postgres)
+    implementation(libs.postgres)
 
     api(libs.prettytime)
     api(libs.bundles.data)
@@ -92,7 +92,7 @@ jooq {
                         name = "org.jooq.meta.postgres.PostgresDatabase"
                         inputSchema = "public"
                         includes = ".*"
-                        excludes = ".*_\\d+|.*_\\d+_\\d+"  // Excludes partition tables like table_0, table_1_2, etc.
+                        excludes = ".*_\\d+|.*_\\d+_\\d+|.*schema_history"  // Excludes partition tables like table_0, table_1_2, etc.
                         // Force TINYINT UNSIGNED to be treated as INTEGER
                         withForcedTypes(
                             org.jooq.meta.jaxb.ForcedType().apply {

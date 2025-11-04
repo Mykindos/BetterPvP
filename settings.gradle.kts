@@ -50,6 +50,10 @@ dependencyResolutionManagement {
             version("mockbukkit", "4.45.0")
             version("junit", "5.13.0-M2")
             version("jooq", "3.19.3")
+            version("postgres", "42.7.4")
+
+            // Library - PostgreSQL
+            library("postgres", "org.postgresql", "postgresql").versionRef("postgres")
 
             // Library - jOOQ
             library("jooq", "org.jooq", "jooq").versionRef("jooq")
