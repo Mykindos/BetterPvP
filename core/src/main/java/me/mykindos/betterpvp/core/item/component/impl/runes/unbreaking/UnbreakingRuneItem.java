@@ -13,6 +13,6 @@ public class UnbreakingRuneItem extends RuneItem {
 
     @Inject
     private UnbreakingRuneItem(UnbreakingRune rune) {
-        super(rune, RuneColor.MISC, ItemRarity.LEGENDARY);
+        super(rune, RuneColor.MISC, ItemRarity.MYTHICAL);
     }
 }
