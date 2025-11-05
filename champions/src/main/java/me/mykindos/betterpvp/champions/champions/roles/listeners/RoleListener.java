@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -30,7 +29,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -44,7 +42,6 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -88,17 +85,6 @@ public class RoleListener implements Listener {
             int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
             gamer.saveProperty(roleProperty, timesEquipped);
         }
-
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-
-            if (UtilEffect.isNegativePotionEffect(effect)) {
-                continue;
-            }
-
-            player.removePotionEffect(effect.getType());
-
-        }
-
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
 

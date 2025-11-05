@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerCompone
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.attraction.AttractionRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.moonseer.MoonseerRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
@@ -40,6 +41,7 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
     @Inject private AttractionRuneItem attractionRune;
     @Inject private RecoveryRuneItem recoveryRune;
     @Inject private WandererRuneItem wandererRune;
+    @Inject private MoonseerRuneItem moonseerRune;
 
     /**
      * Creates a namespaced key for the Core plugin.
@@ -65,7 +67,8 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
                 flameguardRune,
                 recoveryRune,
                 attractionRune,
-                wandererRune);
+                wandererRune,
+                moonseerRune);
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }

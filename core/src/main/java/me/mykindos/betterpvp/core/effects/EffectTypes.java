@@ -32,6 +32,7 @@ import me.mykindos.betterpvp.core.effects.types.positive.ImmuneEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.InvisibilityEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.InvulnerableEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.JumpBoostEffect;
+import me.mykindos.betterpvp.core.effects.types.positive.NightVisionEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.NoFallEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.ProtectionEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.RegenerationEffect;
@@ -97,6 +98,7 @@ public class EffectTypes {
     public static final EffectType JUMP_BOOST = createEffectType(new JumpBoostEffect());
     public static final EffectType INVULNERABLE = createEffectType(new InvulnerableEffect());
     public static final EffectType GLOWING = createEffectType(new GlowingEffect());
+    public static final EffectType NIGHT_VISION = createEffectType(new NightVisionEffect());
     // </editor-fold>
 
     public static EffectType createEffectType(EffectType effectType) {
