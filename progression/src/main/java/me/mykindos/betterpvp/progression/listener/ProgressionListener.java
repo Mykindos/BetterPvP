@@ -71,7 +71,9 @@ public class ProgressionListener implements Listener {
 
         // Title levelup
         if (!event.isLevelUp()) {
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
+            if (event.getGainedExp() > 10) {
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
+            }
             return;
         }
 
@@ -88,7 +90,7 @@ public class ProgressionListener implements Listener {
             gamer.getTitleQueue().add(501, titleCmpt);
         }
 
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0f);
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
     }
 
 }
