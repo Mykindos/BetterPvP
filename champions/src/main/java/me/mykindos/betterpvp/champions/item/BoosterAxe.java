@@ -21,7 +21,7 @@ public class BoosterAxe extends WeaponItem {
 
     @Inject
     private BoosterAxe(Champions champions) {
-        super(champions, "Booster Axe", ItemStack.of(Material.GOLDEN_AXE), ItemRarity.COMMON);
+        super(champions, "Booster Axe", ItemStack.of(Material.GOLDEN_AXE), ItemRarity.UNCOMMON);
     }
 
     @Inject
