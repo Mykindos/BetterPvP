@@ -81,7 +81,7 @@ public class Clients extends TableImpl<ClientsRecord> {
     /**
      * The column <code>public.clients.name</code>.
      */
-    public final TableField<ClientsRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(16).nullable(false), this, "");
+    public final TableField<ClientsRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(64).nullable(false), this, "");
 
     /**
      * The column <code>public.clients.rank</code>.

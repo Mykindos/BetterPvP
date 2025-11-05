@@ -275,12 +275,6 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void updateClanVault(Clan clan) {
-
-        var records = database.getDslContext()
-                .selectFrom(CLANS)
-                .where(CLANS.REALM.eq(Core.getCurrentRealm()))
-                .fetch();
-
         database.getAsyncDslContext()
                 .executeAsyncVoid(ctx -> {
                     ctx.update(CLAN_METADATA)

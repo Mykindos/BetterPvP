@@ -30,12 +30,6 @@ dependencies {
     runtimeOnly(libs.sidebar.impl)
     runtimeOnly(libs.sidebar.packetevents)
 
-    api(libs.jooq)
-    api(libs.jooq.meta)
-    jooqGenerator(libs.jooq.meta.extensions)
-    jooqGenerator(libs.postgres)
-    implementation(libs.postgres)
-
     api(libs.prettytime)
     api(libs.bundles.data)
     api(libs.bundles.utils)

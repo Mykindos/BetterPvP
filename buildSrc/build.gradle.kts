@@ -9,5 +9,5 @@ repositories {
 }
 
 dependencies {
-    implementation("nu.studer:gradle-jooq-plugin:9.0")
+    api("nu.studer:gradle-jooq-plugin:9.0")
 }

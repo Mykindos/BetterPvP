@@ -21,11 +21,23 @@ if (extractedTables.isEmpty()) {
         // Get the version catalog
         val libs = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
 
-        add("api", libs.findLibrary("jooq").get())
-        add("api", libs.findLibrary("jooq.meta").get())
+        // Only core should bundle jOOQ, other modules use it from core at runtime
+        val isCoreProject = project.name == "core"
+
+        if (isCoreProject) {
+            // Core bundles jOOQ runtime
+            add("api", libs.findLibrary("jooq").get())
+            add("api", libs.findLibrary("jooq.meta").get())
+            add("implementation", libs.findLibrary("postgres").get())
+        } else {
+            // Non-core projects only need jOOQ at compile time
+            add("compileOnly", libs.findLibrary("jooq").get())
+        }
+
+        // Generator dependencies are always needed for code generation
+        add("jooqGenerator", libs.findLibrary("jooq.meta").get())
         add("jooqGenerator", libs.findLibrary("jooq.meta.extensions").get())
         add("jooqGenerator", "org.postgresql:postgresql:42.7.4")
-        add("implementation", "org.postgresql:postgresql:42.7.4")
     }
 
     jooq {
@@ -104,5 +116,18 @@ if (extractedTables.isEmpty()) {
             finalizedBy(moveJooqGenerated)
         }
 
+        // For non-core projects, exclude jOOQ from runtime configurations
+        if (project.name != "core") {
+            configurations.named("runtimeClasspath") {
+                exclude(group = "org.jooq")
+            }
+            configurations.named("runtimeOnly") {
+                exclude(group = "org.jooq")
+            }
+            // Also exclude from the jar task
+            tasks.named("jar", Jar::class) {
+                exclude("org/jooq/**")
+            }
+        }
     }
 }

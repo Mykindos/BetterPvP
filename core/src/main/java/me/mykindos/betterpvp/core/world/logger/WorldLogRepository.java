@@ -101,10 +101,10 @@ public class WorldLogRepository {
         }
 
 
-            CompletableFuture.runAsync(() -> {
-                try {
-                database.getDslContext().transaction(config -> {
-                    DSLContext ctx = DSL.using(config);
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            try {
+                ctx.transaction(config -> {
+                    DSLContext ctxl = DSL.using(config);
 
                     // Prepare log records
                     List<WorldLogsRecord> logRecords = new ArrayList<>();
@@ -114,7 +114,7 @@ public class WorldLogRepository {
                         long id = ID_GENERATOR.nextId();
 
                         // Create main log record
-                        WorldLogsRecord logRecord = ctx.newRecord(WORLD_LOGS);
+                        WorldLogsRecord logRecord = ctxl.newRecord(WORLD_LOGS);
                         logRecord.setId(id);
                         logRecord.setRealm(Core.getCurrentRealm());
                         logRecord.setWorld(log.getWorld());
@@ -136,7 +136,7 @@ public class WorldLogRepository {
                         // Create metadata records
                         if (log.getMetadata() != null && !log.getMetadata().isEmpty()) {
                             log.getMetadata().forEach((key, value) -> {
-                                WorldLogsMetadataRecord metadataRecord = ctx.newRecord(WORLD_LOGS_METADATA);
+                                WorldLogsMetadataRecord metadataRecord = ctxl.newRecord(WORLD_LOGS_METADATA);
                                 metadataRecord.setLogId(id);
                                 metadataRecord.setRealm(Core.getCurrentRealm());
                                 metadataRecord.setMetaKey(key);
@@ -148,17 +148,17 @@ public class WorldLogRepository {
 
                     // Batch insert logs
                     if (!logRecords.isEmpty()) {
-                        ctx.batchInsert(logRecords).execute();
+                        ctxl.batchInsert(logRecords).execute();
                         log.info("Inserted {} world log records", logRecords.size()).submit();
                     }
 
                     // Batch insert metadata
                     if (!metadataRecords.isEmpty()) {
-                        ctx.batchInsert(metadataRecords).execute();
+                        ctxl.batchInsert(metadataRecords).execute();
                         log.info("Inserted {} metadata records", metadataRecords.size()).submit();
                     }
                 });
-            } catch(Exception ex){
+            } catch (Exception ex) {
                 log.error("Failed to save world logs", ex).submit();
             }
         });

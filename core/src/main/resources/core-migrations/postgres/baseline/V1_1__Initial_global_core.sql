@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS clients
 (
     id   BIGINT      PRIMARY KEY,
     uuid VARCHAR(36) NOT NULL UNIQUE,
-    name VARCHAR(16) NOT NULL,
+    name VARCHAR(64) NOT NULL,
     rank VARCHAR(64) NOT NULL default 'PLAYER'
 );
 

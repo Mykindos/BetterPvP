@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_NAME_HISTORY;
@@ -55,8 +56,8 @@ public class ClientSQLLayer {
 
     private final OfflineMessagesRepository offlineMessagesRepository;
 
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> queuedStatUpdates;
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> queuedSharedStatUpdates;
+    private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedStatUpdates;
+    private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedSharedStatUpdates;
     private static final ThreadLocal<Map<UUID, Client>> LOADING_CLIENTS = ThreadLocal.withInitial(HashMap::new);
     private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
@@ -66,13 +67,13 @@ public class ClientSQLLayer {
         this.propertyMapper = propertyMapper;
         this.punishmentRepository = punishmentRepository;
         this.offlineMessagesRepository = offlineMessagesRepository;
-        this.queuedStatUpdates = new ConcurrentHashMap<>();
-        this.queuedSharedStatUpdates = new ConcurrentHashMap<>();
+        this.queuedStatUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
+        this.queuedSharedStatUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
     }
 
     public Client create(UUID uuid, String name) {
         long id = ID_GENERATOR.nextId();
-        final Gamer gamer = new Gamer(id ,uuid.toString());
+        final Gamer gamer = new Gamer(id, uuid.toString());
         final Client created = new Client(id, gamer, uuid.toString(), name, Rank.PLAYER);
         save(created);
         created.setNewClient(true);
@@ -213,7 +214,7 @@ public class ClientSQLLayer {
      * @return A CompletableFuture that completes when the properties have been successfully loaded and mapped.
      */
     private void loadPropertiesAsync(Result<Record2<String, String>> result,
-                                                        PropertyContainer propertyContainer) {
+                                     PropertyContainer propertyContainer) {
         if (result != null) {
             propertyMapper.parseProperties(result, propertyContainer);
         }
@@ -226,9 +227,8 @@ public class ClientSQLLayer {
      * @return A CompletableFuture that completes when properties are loaded
      */
     public CompletableFuture<Void> loadClientPropertiesAsync(Client client) {
-        return CompletableFuture.runAsync(() -> {
-            Result<Record2<String, String>> result = database.getDslContext()
-                    .select(CLIENT_PROPERTIES.PROPERTY, CLIENT_PROPERTIES.VALUE)
+        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            Result<Record2<String, String>> result = ctx.select(CLIENT_PROPERTIES.PROPERTY, CLIENT_PROPERTIES.VALUE)
                     .from(CLIENT_PROPERTIES)
                     .where(CLIENT_PROPERTIES.CLIENT.eq(client.getId()))
                     .fetch();
@@ -243,16 +243,14 @@ public class ClientSQLLayer {
      * @return A CompletableFuture that completes when properties are loaded
      */
     public CompletableFuture<Void> loadGamerPropertiesAsync(Client client) {
-        return CompletableFuture.runAsync(() -> {
+        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             Gamer gamer = client.getGamer();
-            Result<Record2<String, String>> result = database.getDslContext()
-                    .select(GAMER_PROPERTIES.PROPERTY, GAMER_PROPERTIES.VALUE)
+            Result<Record2<String, String>> result = ctx.select(GAMER_PROPERTIES.PROPERTY, GAMER_PROPERTIES.VALUE)
                     .from(GAMER_PROPERTIES)
                     .where(GAMER_PROPERTIES.CLIENT.eq(client.getId()))
                     .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm()))
                     .fetch();
             loadPropertiesAsync(result, gamer);
-
         });
     }
 
@@ -271,15 +269,29 @@ public class ClientSQLLayer {
 
 
     public void save(Client object) {
-        database.getDslContext().insertInto(CLIENTS)
-                .set(CLIENTS.ID, object.getId())
-                .set(CLIENTS.UUID, object.getUuid())
-                .set(CLIENTS.NAME, object.getName())
-                .onConflict(CLIENTS.UUID)
-                .doUpdate()
-                .set(CLIENTS.NAME, object.getName())
-                .set(CLIENTS.RANK, object.getRank().name())
-                .execute();
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.transaction(config -> {
+                DSLContext ctxl = DSL.using(config);
+
+                ctxl.insertInto(CLIENTS)
+                        .set(CLIENTS.ID, object.getId())
+                        .set(CLIENTS.UUID, object.getUuid())
+                        .set(CLIENTS.NAME, object.getName())
+                        .onConflict(CLIENTS.UUID)
+                        .doUpdate()
+                        .set(CLIENTS.NAME, object.getName())
+                        .set(CLIENTS.RANK, object.getRank().name())
+                        .execute();
+
+                // Prevent possibility of clients with same name
+                // This happens if someone name changes and never joins server again, and then someone else takes their name
+                ctxl.update(CLIENTS)
+                        .set(CLIENTS.NAME, object.getName() + "-" + System.currentTimeMillis())
+                        .where(CLIENTS.UUID.ne(object.getUuid()))
+                        .and(CLIENTS.NAME.eq(object.getName()))
+                        .execute();
+            });
+        });
 
         // Gamer
         final Gamer gamer = object.getGamer();
@@ -287,17 +299,17 @@ public class ClientSQLLayer {
     }
 
     public void saveIgnore(Client client, Client ignored) {
-        database.getDslContext().insertInto(IGNORES)
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.insertInto(IGNORES)
                 .set(IGNORES.CLIENT, client.getId())
                 .set(IGNORES.IGNORED, ignored.getId())
-                .execute();
+                .execute());
     }
 
     public void removeIgnore(Client client, Client ignored) {
-        database.getDslContext().deleteFrom(IGNORES)
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.deleteFrom(IGNORES)
                 .where(IGNORES.CLIENT.eq(client.getId()))
                 .and(IGNORES.IGNORED.eq(ignored.getId()))
-                .execute();
+                .execute());
     }
 
     public void saveProperty(Client client, String property, Object value) {
@@ -309,9 +321,11 @@ public class ClientSQLLayer {
                 .doUpdate()
                 .set(CLIENT_PROPERTIES.VALUE, value.toString());
 
-        ConcurrentHashMap<String, Query> propertyUpdates = queuedSharedStatUpdates.computeIfAbsent(client.getUuid(), k -> new ConcurrentHashMap<>());
-        propertyUpdates.put(property, query);
-        queuedSharedStatUpdates.put(client.getUuid(), propertyUpdates);
+        queuedSharedStatUpdates.updateAndGet(map -> {
+            ConcurrentHashMap<String, Query> propertyUpdates = map.computeIfAbsent(client.getUuid(), k -> new ConcurrentHashMap<>());
+            propertyUpdates.put(property, query);
+            return map;
+        });
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
@@ -324,77 +338,88 @@ public class ClientSQLLayer {
                 .doUpdate()
                 .set(GAMER_PROPERTIES.VALUE, value.toString());
 
-        ConcurrentHashMap<String, Query> propertyUpdates = queuedStatUpdates.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
-        propertyUpdates.put(property, query);
-
-        queuedStatUpdates.put(gamer.getUuid(), propertyUpdates);
+        queuedStatUpdates.updateAndGet(map -> {
+            ConcurrentHashMap<String, Query> propertyUpdates = map.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
+            propertyUpdates.put(property, query);
+            return map;
+        });
     }
 
     public void processStatUpdates(UUID uuid, boolean async) {
-        synchronized (queuedStatUpdates) {
-            if (queuedSharedStatUpdates.containsKey(uuid.toString())) {
-                List<Query> queries = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
-                executeQueriesAsTransaction(queries);
-            }
+        // Process shared stat updates for this UUID
+        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedStatUpdates.updateAndGet(map -> {
+            map.remove(uuid.toString());
+            return map;
+        }).get(uuid.toString());
+
+        if (sharedQueries != null && !sharedQueries.isEmpty()) {
+            List<Query> queries = new ArrayList<>(sharedQueries.values());
+            executeQueriesAsTransaction(queries, async);
         }
 
-        synchronized (queuedStatUpdates) {
-            if (queuedStatUpdates.containsKey(uuid.toString())) {
-                List<Query> queries = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
-                executeQueriesAsTransaction(queries);
-            }
+        // Process stat updates for this UUID
+        ConcurrentHashMap<String, Query> gamerQueries = queuedStatUpdates.updateAndGet(map -> {
+            map.remove(uuid.toString());
+            return map;
+        }).get(uuid.toString());
+
+        if (gamerQueries != null && !gamerQueries.isEmpty()) {
+            List<Query> queries = new ArrayList<>(gamerQueries.values());
+            executeQueriesAsTransaction(queries, async);
         }
 
         log.info("Updated stats for {}", uuid).submit();
     }
 
-    // There is a potential issue here where stat updates are cleared before they are processed due to aync processing
     public void processStatUpdates(boolean async) {
 
         log.info("Beginning to process stat updates").submit();
 
-        // Gamer
-        List<Query> statementsToRun;
-        synchronized (queuedStatUpdates) {
-            var statements = new ConcurrentHashMap<>(queuedStatUpdates);
-            statementsToRun = new ArrayList<>();
-            statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
-            queuedStatUpdates.clear();
-        }
+        // Gamer - atomically swap with empty map
+        ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> gamerStatements =
+                queuedStatUpdates.getAndSet(new ConcurrentHashMap<>());
 
-        executeQueriesAsTransaction(statementsToRun);
+        List<Query> statementsToRun = new ArrayList<>();
+        gamerStatements.forEach((key, value) -> statementsToRun.addAll(value.values()));
+
+        executeQueriesAsTransaction(statementsToRun, async);
         log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
 
-        // Client
-        List<Query> sharedStatementsToRun;
-        synchronized (queuedSharedStatUpdates) {
-            var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
-            sharedStatementsToRun = new ArrayList<>();
-            sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
-            queuedSharedStatUpdates.clear();
-        }
+        // Client - atomically swap with empty map
+        ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> sharedStatements =
+                queuedSharedStatUpdates.getAndSet(new ConcurrentHashMap<>());
 
-        executeQueriesAsTransaction(sharedStatementsToRun);
+        List<Query> sharedStatementsToRun = new ArrayList<>();
+        sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
+
+        executeQueriesAsTransaction(sharedStatementsToRun, async);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
     }
 
     /**
      * Executes a list of jOOQ queries as a single transaction.
      *
-     * @param queries        The list of jOOQ Query objects to execute
+     * @param queries The list of jOOQ Query objects to execute
      */
-    private void executeQueriesAsTransaction(List<Query> queries) {
+    private void executeQueriesAsTransaction(List<Query> queries, boolean async) {
         if (queries == null || queries.isEmpty()) {
             return;
         }
 
         try {
-            database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-                ctx.transaction(config -> {
+            if (async) {
+                database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+                    ctx.transaction(config -> {
+                        DSLContext ctxl = DSL.using(config);
+                        ctxl.batch(queries).execute();
+                    });
+                });
+            } else {
+                database.getDslContext().transaction(config -> {
                     DSLContext ctxl = DSL.using(config);
                     ctxl.batch(queries).execute();
                 });
-            });
+            }
         } catch (Exception ex) {
             log.error("Error executing queries as transaction with {} queries", queries.size(), ex).submit();
         }
@@ -416,22 +441,35 @@ public class ClientSQLLayer {
     }
 
     public void updateClientName(Client client, String name) {
-        DSLContext ctx = database.getDslContext();
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.transaction(config -> {
+                DSLContext ctxl = DSL.using(config);
 
-        // Update client name
-        ctx.update(CLIENTS)
-                .set(CLIENTS.NAME, name)
-                .where(CLIENTS.UUID.eq(client.getUuid()))
-                .execute();
+                // Update client name
+                ctxl.update(CLIENTS)
+                        .set(CLIENTS.NAME, name)
+                        .where(CLIENTS.UUID.eq(client.getUuid()))
+                        .execute();
 
-        // Insert old name into history if not already present
-        ctx.insertInto(CLIENT_NAME_HISTORY)
-                .set(CLIENT_NAME_HISTORY.CLIENT, client.getId())
-                .set(CLIENT_NAME_HISTORY.NAME, client.getName())
-                .set(CLIENT_NAME_HISTORY.LAST_SEEN, System.currentTimeMillis())
-                .onConflict(CLIENT_NAME_HISTORY.CLIENT, CLIENT_NAME_HISTORY.NAME)
-                .doNothing()
-                .execute();
+                // Prevent possibility of clients with same name
+                // This happens if someone name changes and never joins server again, and then someone else takes their name
+                ctxl.update(CLIENTS)
+                        .set(CLIENTS.NAME, name + "-" + System.currentTimeMillis())
+                        .where(CLIENTS.UUID.ne(client.getUuid()))
+                        .and(CLIENTS.NAME.eq(name)).execute();
+
+                // Insert old name into history if not already present
+                ctxl.insertInto(CLIENT_NAME_HISTORY)
+                        .set(CLIENT_NAME_HISTORY.CLIENT, client.getId())
+                        .set(CLIENT_NAME_HISTORY.NAME, client.getName())
+                        .set(CLIENT_NAME_HISTORY.LAST_SEEN, System.currentTimeMillis())
+                        .onConflict(CLIENT_NAME_HISTORY.CLIENT, CLIENT_NAME_HISTORY.NAME)
+                        .doNothing()
+                        .execute();
+            });
+        });
+
+
     }
 
     public RewardBox getRewardBox(Client client) {
@@ -457,9 +495,9 @@ public class ClientSQLLayer {
     }
 
     public CompletableFuture<Void> updateClientRewards(Client client, RewardBox rewardBox) {
-        return CompletableFuture.runAsync(() -> {
+        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             try {
-                database.getDslContext().insertInto(CLIENT_REWARDS)
+                ctx.insertInto(CLIENT_REWARDS)
                         .set(CLIENT_REWARDS.CLIENT, client.getId())
                         .set(CLIENT_REWARDS.SEASON, Core.getCurrentSeason())
                         .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
