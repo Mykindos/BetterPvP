@@ -1,16 +1,18 @@
-package me.mykindos.betterpvp.core.utilities.model.display;
+package me.mykindos.betterpvp.core.utilities.model.display.title;
 
-import java.lang.ref.WeakReference;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
+import me.mykindos.betterpvp.core.utilities.model.display.IDisplayQueue;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.lang.ref.WeakReference;
+import java.util.UUID;
+
 @Slf4j
-public class TitleQueue implements IDisplayQueue<TitleComponent>{
+public class TitleQueue implements IDisplayQueue<TitleComponent> {
 
     static final Component EMPTY = Component.empty();
 

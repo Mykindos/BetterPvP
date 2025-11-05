@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.item.ability.EnergyBoost;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
@@ -25,10 +25,10 @@ public class EnergyApple extends BaseItem implements ReloadHook {
     private final EnergyBoost energyBoost;
 
     @Inject
-    private EnergyApple(EnergyHandler energyHandler, CooldownManager cooldownManager) {
+    private EnergyApple(EnergyService energyService, CooldownManager cooldownManager) {
         super("Energy Apple", ItemStack.of(Material.APPLE), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         final SoundEffect soundEffect = new SoundEffect(Sound.ENTITY_PLAYER_BURP, 1f, 1f);
-        this.energyBoost = new EnergyBoost(energyHandler, cooldownManager, soundEffect);
+        this.energyBoost = new EnergyBoost(energyService, cooldownManager, soundEffect);
         energyBoost.setConsumesItem(true);
         addBaseComponent(AbilityContainerComponent.builder().ability(energyBoost).build());
     }

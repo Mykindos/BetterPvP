@@ -13,7 +13,8 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
@@ -61,12 +62,12 @@ public class VolticBashAbility extends ItemAbility {
     @EqualsAndHashCode.Exclude
     private final EffectManager effectManager;
     @EqualsAndHashCode.Exclude
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     @EqualsAndHashCode.Exclude
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
 
     @Inject
-    private VolticBashAbility(Champions champions, ClientManager clientManager, EffectManager effectManager, EnergyHandler energyHandler) {
+    private VolticBashAbility(Champions champions, ClientManager clientManager, EffectManager effectManager, EnergyService energyService) {
         super(new NamespacedKey(champions, "voltic_bash"),
                 "Voltic Bash",
                 "Charge up and dash forward, dealing damage to entities in your path. Higher charge increases damage and velocity.",
@@ -74,7 +75,7 @@ public class VolticBashAbility extends ItemAbility {
         this.champions = champions;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         
         // Default values, will be overridden by config
         this.velocity = 0.8;
@@ -116,7 +117,7 @@ public class VolticBashAbility extends ItemAbility {
         }
         
         // Check energy
-        if (!energyHandler.use(player, getName(), energyPerTick, true)) {
+        if (!energyService.use(player, getName(), energyPerTick, true)) {
             return;
         }
         
@@ -139,7 +140,7 @@ public class VolticBashAbility extends ItemAbility {
         final int charge = data.getTicksCharged();
         if (!collisions.isEmpty()) {
             final double percentage = getChargePercentage(charge);
-            this.energyHandler.degenerateEnergy(player, this.energyOnCollide / 100);
+            this.energyService.degenerateEnergy(player, this.energyOnCollide / 100, EnergyEvent.Cause.USE);
             for (LivingEntity hit : collisions) {
                 collide(player, hit, percentage, data);
             }

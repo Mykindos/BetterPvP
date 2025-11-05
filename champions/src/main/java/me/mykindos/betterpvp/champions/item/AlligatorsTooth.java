@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.GatorStrokeAbility;
 import me.mykindos.betterpvp.champions.item.ability.UnderwaterBreathingAbility;
 import me.mykindos.betterpvp.champions.item.ability.WaterDamageAbility;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
@@ -38,7 +37,6 @@ public class AlligatorsTooth extends WeaponItem implements ReloadHook {
     private AlligatorsTooth(Champions champions, 
                            GatorStrokeAbility gatorStrokeAbility,
                            UnderwaterBreathingAbility underwaterBreathingAbility,
-                           EnergyHandler energyHandler,
                            ItemFactory itemFactory) {
         super(champions, "Alligator's Tooth", Item.model("alligators_tooth"), ItemRarity.LEGENDARY);
         this.gatorStrokeAbility = gatorStrokeAbility;

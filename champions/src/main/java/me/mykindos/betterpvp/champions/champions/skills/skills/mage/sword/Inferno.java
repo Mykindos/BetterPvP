@@ -17,11 +17,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -39,7 +41,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, List<InfernoProjectile>> projectiles = new WeakHashMap<>();
     private final WeakHashMap<Player, InfernoProjectile> preparing = new WeakHashMap<>();
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double baseImpactDamage;
     private double impactDamageIncreasePerLevel;
@@ -212,7 +214,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (isHolding(player) && gamer.isHoldingRightClick()
                 && (data.getCharge() >= 1.0 || championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true))) {
-                championsManager.getEnergy().degenerateEnergy(player, 0);
+                championsManager.getEnergy().degenerateEnergy(player, 0, EnergyEvent.Cause.USE);
                 data.tick();
                 data.tickSound(player);
 

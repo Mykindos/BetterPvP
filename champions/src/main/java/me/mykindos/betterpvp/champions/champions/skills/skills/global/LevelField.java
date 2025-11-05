@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -24,7 +21,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -35,6 +32,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener

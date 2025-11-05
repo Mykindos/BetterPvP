@@ -2,17 +2,18 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.WeakHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
@@ -21,9 +22,15 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -34,13 +41,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.RayTraceResult;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
-    private final GamerDisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
             charging,
             gamer -> true);
 

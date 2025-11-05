@@ -2,12 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -25,7 +19,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -33,7 +27,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -53,7 +52,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     private final WeakHashMap<Player, BoulderChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, List<BlockTossObject>> boulders = new WeakHashMap<>();
-    private final GamerDisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
             charging,
             gamer -> true);
 

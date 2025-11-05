@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.HyperRushAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -39,7 +38,6 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
     private double attackSpeed;
     private final HyperRushAbility hyperRushAbility;
     private final ItemFactory itemFactory;
-    private final EnergyHandler energyHandler;
 
     static {
         model = Item.model("hyper_axe");
@@ -56,12 +54,10 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
     private HyperAxe(Champions champions, 
                     CooldownManager cooldownManager,
                     EffectManager effectManager,
-                    EnergyHandler energyHandler,
                     ItemFactory itemFactory) {
         super(champions, "Hyper Axe", model, ItemRarity.EPIC);
         this.hyperRushAbility = new HyperRushAbility(champions, cooldownManager, effectManager);
         this.itemFactory = itemFactory;
-        this.energyHandler = energyHandler;
         this.attackSpeed = 1; // 100%+ attack speed by default
 
         // Add attack speed stat

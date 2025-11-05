@@ -6,7 +6,8 @@ import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
@@ -31,14 +32,14 @@ public class EnergyBoost extends ItemAbility {
     private double energy;
     @EqualsAndHashCode.Include
     private double cooldown;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final CooldownManager cooldownManager;
     private final SoundEffect soundEffect;
 
-    public EnergyBoost(EnergyHandler energyHandler, CooldownManager cooldownManager, SoundEffect soundEffect) {
+    public EnergyBoost(EnergyService energyService, CooldownManager cooldownManager, SoundEffect soundEffect) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "energy_boost"), "Energy Boost",
                 "Instantly grants a flat energy boost when used.", TriggerTypes.RIGHT_CLICK);
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.cooldownManager = cooldownManager;
         this.soundEffect = soundEffect;
     }
@@ -50,7 +51,7 @@ public class EnergyBoost extends ItemAbility {
             return false;
         }
 
-        energyHandler.regenerateEnergy(player, energy);
+        energyService.regenerateEnergy(player, energy, EnergyEvent.Cause.USE);
         final TextComponent name = Component.text(getName()).color(NamedTextColor.YELLOW);
         UtilMessage.message(player, "Item", Component.text("You used ", NamedTextColor.GRAY)
                 .append(name)

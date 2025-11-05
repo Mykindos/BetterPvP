@@ -2,14 +2,16 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.List;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
@@ -22,9 +24,13 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Firework;
@@ -36,12 +42,16 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
 public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CooldownSkill, OffensiveSkill, AreaOfEffectSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
-    private final GamerDisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double baseCharge;
     private double chargeIncreasePerLevel;

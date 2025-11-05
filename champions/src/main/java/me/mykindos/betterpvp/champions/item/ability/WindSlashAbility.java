@@ -8,7 +8,8 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
@@ -57,7 +58,7 @@ public class WindSlashAbility extends ItemAbility {
     private double slashSpeed;
 
     @EqualsAndHashCode.Exclude
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     @EqualsAndHashCode.Exclude
     private final CooldownManager cooldownManager;
     @EqualsAndHashCode.Exclude
@@ -67,14 +68,14 @@ public class WindSlashAbility extends ItemAbility {
     @EqualsAndHashCode.Exclude
     private final Set<Slash> slashSet = new HashSet<>();
 
-    public WindSlashAbility(CooldownManager cooldownManager, EnergyHandler energyHandler, BaseItem heldItem) {
+    public WindSlashAbility(CooldownManager cooldownManager, EnergyService energyService, BaseItem heldItem) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "wind_slash"),
                 "Wind Slash",
                 "Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.",
                 TriggerTypes.LEFT_CLICK);
         this.cooldownManager = cooldownManager;
         this.heldItem = heldItem;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class WindSlashAbility extends ItemAbility {
             return false;
         }
 
-        if (!energyHandler.use(player, getName(), slashEnergyCost, true)) {
+        if (!energyService.use(player, getName(), slashEnergyCost, true)) {
             return false;
         }
 
@@ -202,7 +203,7 @@ public class WindSlashAbility extends ItemAbility {
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
 
             // Regen energy
-            energyHandler.regenerateEnergy(caster, slashEnergyRefundPercent);
+            energyService.regenerateEnergy(caster, slashEnergyRefundPercent, EnergyEvent.Cause.USE);
         }
     }
 } 

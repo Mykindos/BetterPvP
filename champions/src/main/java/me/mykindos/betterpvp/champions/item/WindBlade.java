@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.item.ability.FeatherFeetAbility;
 import me.mykindos.betterpvp.champions.item.ability.WindDashAbility;
 import me.mykindos.betterpvp.champions.item.ability.WindSlashAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -42,14 +42,14 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
 
     @Inject
     private WindBlade(Champions champions, ChampionsManager championsManager,
-                     CooldownManager cooldownManager, EnergyHandler energyHandler, 
+                     CooldownManager cooldownManager, EnergyService energyService,
                      FeatherFeetAbility featherFeetAbility) {
         super(champions, "Wind Blade", Item.model("windblade"), ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
         this.featherFeetAbility = featherFeetAbility;
         
         // Create abilities
         this.windDashAbility = new WindDashAbility(championsManager, champions);
-        this.windSlashAbility = new WindSlashAbility(cooldownManager, energyHandler, this);
+        this.windSlashAbility = new WindSlashAbility(cooldownManager, energyService, this);
         
         // Add ability container
         addBaseComponent(AbilityContainerComponent.builder()

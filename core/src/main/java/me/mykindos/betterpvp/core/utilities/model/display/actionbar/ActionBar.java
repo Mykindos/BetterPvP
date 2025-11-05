@@ -1,17 +1,21 @@
-package me.mykindos.betterpvp.core.utilities.model.display;
+package me.mykindos.betterpvp.core.utilities.model.display.actionbar;
 
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityData;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.IDisplayQueue;
+import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 @Slf4j
-public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
+public class ActionBar implements IDisplayQueue<DisplayObject<Component>> {
 
     protected static final Component EMPTY = Component.empty();
 
@@ -21,13 +25,13 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    protected final PriorityDataBlockingQueue<GamerDisplayObject<Component>> components = new PriorityDataBlockingQueue<>(20);
+    protected final PriorityDataBlockingQueue<DisplayObject<Component>> components = new PriorityDataBlockingQueue<>(20);
 
     // Use a lock to synchronize access to the components PriorityQueue
     protected final Object lock = new Object();
 
     @Override
-    public void add(int priority, GamerDisplayObject<Component> component) {
+    public void add(int priority, DisplayObject<Component> component) {
         synchronized (lock) {
             components.put(priority, component);
             if (component instanceof TimedComponent timed && !timed.isWaitToExpire()) {
@@ -37,7 +41,7 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
     }
 
     @Override
-    public void remove(GamerDisplayObject<Component> component) {
+    public void remove(DisplayObject<Component> component) {
         synchronized (lock) {
             components.removeIf(pair -> pair.getRight().equals(component));
         }
@@ -56,8 +60,6 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
             return !components.isEmpty();
         }
     }
-
-
 
     @Override
     public void show(Gamer gamer) {
@@ -86,14 +88,14 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
                 return EMPTY;
             }
 
-            Pair<PriorityData, GamerDisplayObject<Component>> peekPair = components.peek();
-            GamerDisplayObject<Component> display = peekPair.getRight();
+            Pair<PriorityData, DisplayObject<Component>> peekPair = components.peek();
+            DisplayObject<Component> display = peekPair.getRight();
             Component advComponent = display.getProvider().apply(gamer);
 
             //peek component is not valid, try and find a valid one
             if (advComponent == null) {
                 //components iterator/splititerator methods are not guaranteed any order, filter for one
-                Pair<PriorityData, GamerDisplayObject<Component>> pair = components.stream().filter(priorityDataDisplayComponentPair ->
+                Pair<PriorityData, DisplayObject<Component>> pair = components.stream().filter(priorityDataDisplayComponentPair ->
                         priorityDataDisplayComponentPair.getRight().getProvider().apply(gamer) != null).findFirst().orElse(null);
 
                 if (pair == null) {

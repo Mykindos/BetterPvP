@@ -15,12 +15,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -38,15 +39,8 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, List<BlizzardProjectile>> projectiles = new WeakHashMap<>();
     private final WeakHashMap<Player, BlizzardProjectile> preparing = new WeakHashMap<>();
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
-    private int slowStrength;
-    private double baseSlowDuration;
-    private double slowDurationIncreasePerLevel;
-    private double pushForwardStrength;
-    private double pushForwardIncreasePerLevel;
-    private double pushUpwardStrength;
-    private double pushUpwardIncreasePerLevel;
     private double baseSpeed;
     private double speedIncreasePerLevel;
     private double projectileAliveTime;
@@ -71,25 +65,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge and release a rolling blizzard projectile",
-                "On impact, freezes enemies with <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushes them back.",
+                "that pushes back enemies.",
                 "Reflects off walls and maintains speed.",
                 "",
                 "Activation Energy: " + getValueString(this::getActivationEnergy, level),
                 "Channel Energy: " + getValueString(this::getEnergy, level) + " per second"
         };
-    }
-
-    public double getSlowDuration(int level) {
-        return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
-    }
-
-    public double getPushForwardStrength(int level) {
-        return pushForwardStrength + ((level - 1) * pushForwardIncreasePerLevel);
-    }
-
-    public double getPushUpwardStrength(int level) {
-        return pushUpwardStrength + ((level - 1) * pushUpwardIncreasePerLevel);
     }
 
     public double getSpeed(int level) {
@@ -200,7 +181,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (isHolding(player) && gamer.isHoldingRightClick()
                     && (data.getCharge() >= 1.0 || championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true))) {
-                championsManager.getEnergy().degenerateEnergy(player, 0);
+                championsManager.getEnergy().degenerateEnergy(player, 0, EnergyEvent.Cause.USE);
                 data.tick();
                 data.tickSound(player);
 

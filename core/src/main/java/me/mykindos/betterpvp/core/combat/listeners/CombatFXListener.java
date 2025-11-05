@@ -9,17 +9,22 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSo
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.experience.data.ExperienceLevelData;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import java.util.List;
 
 @Singleton
 @PluginAdapter("packetevents")
 @BPvPListener
-public class CombatSoundPacketListener implements PacketListener {
+public class CombatFXListener implements PacketListener, Listener {
 
     private final List<Sound> blockedSounds = List.of(
             Sound.ENTITY_PLAYER_ATTACK_SWEEP,
@@ -30,9 +35,12 @@ public class CombatSoundPacketListener implements PacketListener {
             Sound.ENTITY_PLAYER_ATTACK_CRIT
     );
 
+    private final DisplayObject<ExperienceLevelData> levelDisplay;
+
     @Inject
-    private CombatSoundPacketListener(Core core) {
+    private CombatFXListener(Core core) {
         PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.NORMAL);
+        this.levelDisplay = new DisplayObject<>((gamer) -> new ExperienceLevelData((int) gamer.getLastDealtDamageValue()));
     }
 
     @Override
@@ -46,5 +54,10 @@ public class CombatSoundPacketListener implements PacketListener {
         if (sound != null && blockedSounds.contains(sound)) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onClientLogin(ClientJoinEvent event) {
+        event.getClient().getGamer().getExperienceLevel().add(500, levelDisplay);
     }
 }

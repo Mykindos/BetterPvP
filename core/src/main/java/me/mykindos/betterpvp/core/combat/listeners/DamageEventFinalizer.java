@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
@@ -100,7 +101,9 @@ public class DamageEventFinalizer implements Listener {
             clientManager.search().online(player).getGamer().setLastDamaged(System.currentTimeMillis());
         }
         if (event.getDamager() instanceof Player player) {
-            clientManager.search().online(player).getGamer().setLastDamaged(System.currentTimeMillis());
+            final Gamer gamer = clientManager.search().online(player).getGamer();
+            gamer.setLastDamaged(System.currentTimeMillis());
+            gamer.setLastDealtDamageValue(event.getModifiedDamage());
         }
 
         log.debug("Finalized damage: {} dealt {} damage to {}",
@@ -189,11 +192,6 @@ public class DamageEventFinalizer implements Listener {
                 damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(), 
                         sound.volume(), sound.pitch());
             }
-        }
-        
-        // Set damager level to damage amount (for visual feedback)
-        if (event.getDamager() instanceof Player player) {
-            player.setLevel((int) event.getModifiedDamage());
         }
     }
     

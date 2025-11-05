@@ -29,7 +29,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import net.kyori.adventure.text.Component;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -103,7 +104,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     private ScytheOfTheFallenLord scythe;
 
     @EqualsAndHashCode.Exclude
-    private final DisplayComponent actionBar = ChargeData.getActionBar(
+    private final DisplayObject<Component> actionBar = ChargeData.getActionBar(
             gmr -> gmr.isOnline() && playerData.containsKey(gmr.getPlayer().getUniqueId()) && scythe.isHoldingWeapon(gmr.getPlayer()),
             gmr -> playerData.get(gmr.getPlayer().getUniqueId()).getChargeData()
     );

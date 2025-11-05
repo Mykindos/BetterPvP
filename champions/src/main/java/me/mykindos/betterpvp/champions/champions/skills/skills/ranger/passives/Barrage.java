@@ -19,7 +19,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -38,7 +39,11 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.WeakHashMap;
 
 import static org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED;
 
@@ -47,7 +52,7 @@ import static org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED;
 public class Barrage extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
     private final List<Arrow> arrows = new ArrayList<>();
     private double baseCharge;
     private double chargeIncreasePerLevel;

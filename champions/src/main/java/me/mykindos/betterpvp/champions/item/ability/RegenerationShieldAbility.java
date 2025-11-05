@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
@@ -34,18 +34,18 @@ public class RegenerationShieldAbility extends ItemAbility {
     @EqualsAndHashCode.Exclude
     private final Champions champions;
     @EqualsAndHashCode.Exclude
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     @EqualsAndHashCode.Exclude
     private final EffectManager effectManager;
 
     @Inject
-    public RegenerationShieldAbility(Champions champions, EnergyHandler energyHandler, EffectManager effectManager) {
+    public RegenerationShieldAbility(Champions champions, EnergyService energyService, EffectManager effectManager) {
         super(new NamespacedKey(champions, "regeneration_shield"),
                 "Shield",
                 "Gain an amplified regeneration effect while using this ability.",
                 TriggerTypes.HOLD_RIGHT_CLICK);
         this.champions = champions;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.effectManager = effectManager;
         
         // Default values, will be overridden by config
@@ -58,7 +58,7 @@ public class RegenerationShieldAbility extends ItemAbility {
         Player player = Objects.requireNonNull(client.getGamer().getPlayer());
         
         // Check energy
-        if (!energyHandler.use(player, getName(), energyPerTick, true)) {
+        if (!energyService.use(player, getName(), energyPerTick, true)) {
             return false;
         }
 

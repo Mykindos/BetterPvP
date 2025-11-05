@@ -5,13 +5,12 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.data.ExperienceBarData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,13 +25,13 @@ public class EnergyHandler implements Listener {
     private final EnergyService energyService;
     private final EffectManager effectManager;
 
-    private final GamerDisplayObject<ExperienceBarData> displayObject;
+    private final DisplayObject<ExperienceBarData> displayObject;
 
     @Inject
     public EnergyHandler(EnergyService energyService, EffectManager effectManager) {
         this.energyService = energyService;
         this.effectManager = effectManager;
-        this.displayObject = new GamerDisplayObject<>((gamer) -> {
+        this.displayObject = new DisplayObject<>((gamer) -> {
                 final Energy energy = energyService.getEnergyObject(gamer.getUniqueId());
                 if (energy == null) return null;
                 final float percentage = (float) (energy.getCurrent()/ energy.getMax());
@@ -48,7 +47,7 @@ public class EnergyHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDegen(DegenerateEnergyEvent event) {
         if(event.getPlayer().getGameMode().isInvulnerable()) return;
-        if (event.getCause() != EnergyEvent.CAUSE.USE) return;
+        if (event.getCause() != EnergyEvent.Cause.USE) return;
         effectManager.getEffect(event.getPlayer(), EffectTypes.ENERGY_REDUCTION).ifPresent(effect -> {
             event.setEnergy(event.getEnergy() * (1 - (effect.getAmplifier() / 100d)));
         });
@@ -57,7 +56,7 @@ public class EnergyHandler implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDegenerateFinal(DegenerateEnergyEvent event) {
         if (event.getPlayer().getGameMode().isInvulnerable()) return;
-        if (event.getCause() != EnergyEvent.CAUSE.USE) return;
+        if (event.getCause() != EnergyEvent.Cause.USE) return;
         if (event.getEnergy() <= 0) return;
         energyService.addEnergyCooldown(event.getPlayer());
     }
@@ -65,7 +64,7 @@ public class EnergyHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRegen(RegenerateEnergyEvent event) {
-        if (event.getCause() != EnergyEvent.CAUSE.NATURAL) return;
+        if (event.getCause() != EnergyEvent.Cause.NATURAL) return;
         if (energyService.isOnRegenCooldown(event.getPlayer())) {
             event.setCancelled(true);
         }
@@ -80,7 +79,7 @@ public class EnergyHandler implements Listener {
         event.setAmount(0);
     }
 
-    @UpdateEvent(delay = EnergyService.UPDATE_RATE)
+    @UpdateEvent
     public void update() {
         energyService.tick();
     }

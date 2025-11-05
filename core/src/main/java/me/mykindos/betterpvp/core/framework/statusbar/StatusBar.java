@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.framework.statusbar;
 
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.health.EntityHealthService;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
-import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
+import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -16,11 +16,11 @@ import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 public class StatusBar extends ActionBar {
 
     private final EntityHealthService healthService;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
 
-    public StatusBar(EntityHealthService healthService, EnergyHandler energyHandler) {
+    public StatusBar(EntityHealthService healthService, EnergyService energyService) {
         this.healthService = healthService;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class StatusBar extends ActionBar {
         // The component to show
         Component component;
         synchronized (lock) {
-            component = hasComponentsQueued() ?  nextComponent(gamer) : EMPTY;
+            component = hasElementsQueued() ?  nextComponent(gamer) : EMPTY;
         }
         if (component == null) {
             component = EMPTY;
@@ -62,8 +62,8 @@ public class StatusBar extends ActionBar {
     }
 
     private Component getEnergyComponent(Player player) {
-        final int maxEnergy = (int) Math.ceil(energyHandler.getMax(player));
-        final int energy = (int) Math.ceil(energyHandler.getEnergy(player) * maxEnergy);
+        final int maxEnergy = (int) Math.ceil(energyService.getMax(player.getUniqueId()));
+        final int energy = (int) Math.ceil(energyService.getEnergy(player.getUniqueId()));
         return Component.empty()
                 .append(Component.text(energy + "/" + maxEnergy, TextColor.color(48, 114, 255)))
                 .appendSpace()

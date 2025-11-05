@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
-import java.util.function.Function;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -8,8 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
 @Getter
-public class GamerTimedDisplayObject<T> extends GamerDisplayObject<T> implements ITimedDisplay {
+public class TimedDisplayObject<T> extends DisplayObject<T> implements ITimedDisplay {
 
     private final double seconds;
     private final boolean waitToExpire;
@@ -20,7 +21,7 @@ public class GamerTimedDisplayObject<T> extends GamerDisplayObject<T> implements
      * @param waitToExpire Whether to wait for the component to show first before allowing it to start expiring.
      * @param provider     The component to show. Return null to not display anything and skip this component.
      */
-    public GamerTimedDisplayObject(double seconds, boolean waitToExpire, @NotNull Function<Gamer, T> provider) {
+    public TimedDisplayObject(double seconds, boolean waitToExpire, @NotNull Function<Gamer, T> provider) {
         super(provider);
         this.seconds = seconds;
         this.waitToExpire = waitToExpire;

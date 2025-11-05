@@ -1,19 +1,21 @@
-package me.mykindos.betterpvp.core.utilities.model.display;
+package me.mykindos.betterpvp.core.utilities.model.display.title;
 
 import com.google.common.base.Preconditions;
-import java.time.Duration;
-import java.util.Optional;
-import java.util.function.Function;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.utilities.model.display.TimedDisplayObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
+import java.util.Optional;
+import java.util.function.Function;
+
 @Getter
-public class TitleComponent extends GamerTimedDisplayObject<Component> {
+public class TitleComponent extends TimedDisplayObject<Component> {
 
     protected boolean subtitle = false;
     private final Function<Gamer, Component> subtitleProvider;

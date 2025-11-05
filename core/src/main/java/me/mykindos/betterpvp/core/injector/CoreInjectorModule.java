@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import org.bukkit.Bukkit;
 
 @CustomLog
@@ -44,6 +45,7 @@ public class CoreInjectorModule extends AbstractModule {
 
         bind(ClientManager.class).asEagerSingleton();
         bind(CooldownManager.class).asEagerSingleton();
+        bind(EnergyService.class).asEagerSingleton();
         bind(EnergyHandler.class).asEagerSingleton();
         install(new CoreItemsModule());
     }

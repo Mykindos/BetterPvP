@@ -1,8 +1,5 @@
 package me.mykindos.betterpvp.core.client.gamer;
 
-import io.papermc.paper.datacomponent.DataComponentTypes;
-import java.util.Objects;
-import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,17 +22,20 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
-import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
-import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
-import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
+import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceBar;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceLevel;
+import me.mykindos.betterpvp.core.utilities.model.display.playerlist.PlayerList;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A gamer represents a clients seasonal data.

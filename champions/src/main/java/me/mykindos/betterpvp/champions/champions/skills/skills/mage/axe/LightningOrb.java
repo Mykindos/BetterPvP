@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -128,7 +129,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         championsManager.getEffects().addEffect(target, caster, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
         championsManager.getEffects().addEffect(target, caster, EffectTypes.SHOCK, (long) (getShockDuration(level) * 1000));
         target.getLocation().getWorld().strikeLightningEffect(target.getLocation());
-        championsManager.getEnergy().regenerateEnergy(caster, getEnergyGain(level));
+        championsManager.getEnergy().regenerateEnergy(caster, getEnergyGain(level), EnergyEvent.Cause.USE);
         UtilDamage.doDamage(new DamageEvent(target,
                 caster,
                 null,

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
@@ -35,16 +35,16 @@ public class GatorStrokeAbility extends ItemAbility {
     @EqualsAndHashCode.Exclude
     private final Champions champions;
     @EqualsAndHashCode.Exclude
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
 
     @Inject
-    private GatorStrokeAbility(Champions champions, EnergyHandler energyHandler) {
+    private GatorStrokeAbility(Champions champions, EnergyService energyService) {
         super(new NamespacedKey(champions, "gator_stroke"),
                 "Gator Stroke",
                 "Propels the user at high speed. This ability only works in water.",
                 TriggerTypes.HOLD_RIGHT_CLICK);
         this.champions = champions;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         
         // Default values, will be overridden by config
         this.velocityStrength = 0.7;
@@ -65,7 +65,7 @@ public class GatorStrokeAbility extends ItemAbility {
             energyToUse *= skimmingEnergyMultiplier;
         }
         
-        if (!energyHandler.use(player, getName(), energyToUse, true)) {
+        if (!energyService.use(player, getName(), energyToUse, true)) {
             return false;
         }
         

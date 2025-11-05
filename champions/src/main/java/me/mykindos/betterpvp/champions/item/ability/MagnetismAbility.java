@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
@@ -44,16 +44,16 @@ public class MagnetismAbility extends ItemAbility {
     @EqualsAndHashCode.Exclude
     private final Champions champions;
     @EqualsAndHashCode.Exclude
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
 
     @Inject
-    public MagnetismAbility(Champions champions, EnergyHandler energyHandler) {
+    public MagnetismAbility(Champions champions, EnergyService energyService) {
         super(new NamespacedKey(champions, "magnetism"),
                 "Magnetism",
                 "Spawn a cone of particles in front of you that pulls entities inwards.",
                 TriggerTypes.HOLD_RIGHT_CLICK);
         this.champions = champions;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         
         // Default values, will be overridden by config
         this.pullRange = 10.0;
@@ -65,7 +65,7 @@ public class MagnetismAbility extends ItemAbility {
     public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
         Player player = Objects.requireNonNull(client.getGamer().getPlayer());
         
-        if (!energyHandler.use(player, getName(), energyPerTick, true)) {
+        if (!energyService.use(player, getName(), energyPerTick, true)) {
             return false;
         }
 
