@@ -11,8 +11,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +49,7 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
         recipes.put(key, recipe);
         
         // Log registration differently based on recipe type
-        log.info("Registered custom imbuement recipe: {}", recipe.getClass().getSimpleName()).submit();
+        log.info("Registered custom imbuement recipe: {}", key).submit();
     }
 
     @Override

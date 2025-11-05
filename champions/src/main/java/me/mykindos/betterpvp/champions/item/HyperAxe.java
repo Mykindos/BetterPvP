@@ -40,7 +40,7 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
     private final ItemFactory itemFactory;
 
     static {
-        model = Item.model("hyper_axe");
+        model = Item.model(Material.NETHERITE_AXE, "hyper_axe");
 
         // Register as an axe for block breaking
         model.editMeta(meta -> {

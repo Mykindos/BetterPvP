@@ -8,18 +8,22 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapelessCraftingRecipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Adapter for working with Minecraft's built-in recipes.
@@ -30,20 +34,24 @@ import java.util.Map;
 public class MinecraftCraftingRecipeAdapter {
 
     private final Provider<ItemFactory> itemFactory;
+    private final Provider<CraftingRecipeRegistry> registry;
+    private final Set<Recipe> disabledRecipes = new HashSet<>();
 
     @Inject
-    private MinecraftCraftingRecipeAdapter(Provider<ItemFactory> itemFactory) {
+    private MinecraftCraftingRecipeAdapter(Provider<ItemFactory> itemFactory, Provider<CraftingRecipeRegistry> registry) {
         this.itemFactory = itemFactory;
+        this.registry = registry;
     }
 
     public Map<NamespacedKey, CraftingRecipe> getRecipes() {
         Map<NamespacedKey, CraftingRecipe> recipes = new HashMap<>();
         Bukkit.recipeIterator().forEachRemaining(recipe -> {
-            if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe) {
+            if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe && !disabledRecipes.contains(craftingRecipe)) {
                 CraftingRecipe convertedRecipe = convertToCustomRecipe(craftingRecipe);
                 if (convertedRecipe != null) {
                     recipes.put(craftingRecipe.getKey(), convertedRecipe);
                 }
+
             }
         });
         return recipes;
@@ -64,6 +72,21 @@ public class MinecraftCraftingRecipeAdapter {
         } else {
             return null; // Unsupported recipe type
         }
+    }
+
+    public Map<NamespacedKey, CraftingRecipe> disableRecipesFor(Material material) {
+        final List<Recipe> mcRecipes = Bukkit.getRecipesFor(new ItemStack(material));
+        final Map<NamespacedKey, CraftingRecipe> recipes = new HashMap<>();
+        disabledRecipes.addAll(mcRecipes);
+
+        final CraftingRecipeRegistry recipeRegistry = registry.get();
+        for (Recipe recipe : mcRecipes) {
+            if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe) {
+                recipeRegistry.clearRecipe(craftingRecipe.getKey());
+                recipes.put(craftingRecipe.getKey(), convertToCustomRecipe(craftingRecipe));
+            }
+        }
+        return recipes;
     }
     
     /**

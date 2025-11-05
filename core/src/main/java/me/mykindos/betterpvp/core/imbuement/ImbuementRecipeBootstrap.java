@@ -11,9 +11,12 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerCompone
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.attraction.AttractionRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.forestwright.ForestwrightRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.hookmaster.HookmasterRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.moonseer.MoonseerRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.stonecaller.StonecallerRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.wanderer.WandererRuneItem;
 import org.bukkit.NamespacedKey;
@@ -42,6 +45,9 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
     @Inject private RecoveryRuneItem recoveryRune;
     @Inject private WandererRuneItem wandererRune;
     @Inject private MoonseerRuneItem moonseerRune;
+    @Inject private ForestwrightRuneItem forestwrightRune;
+    @Inject private HookmasterRuneItem hookmasterRune;
+    @Inject private StonecallerRuneItem stonecallerRune;
 
     /**
      * Creates a namespaced key for the Core plugin.
@@ -68,7 +74,10 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
                 recoveryRune,
                 attractionRune,
                 wandererRune,
-                moonseerRune);
+                moonseerRune,
+                forestwrightRune,
+                hookmasterRune,
+                stonecallerRune);
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }

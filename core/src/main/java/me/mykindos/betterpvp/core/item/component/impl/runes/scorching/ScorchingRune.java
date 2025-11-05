@@ -8,6 +8,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroups;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
@@ -53,7 +54,7 @@ public class ScorchingRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull Collection <@NotNull RuneGroup> getGroups() {
-        return List.of(RuneGroup.MELEE_WEAPON);
+        return List.of(RuneGroups.MELEE_WEAPON);
     }
 
     @Override

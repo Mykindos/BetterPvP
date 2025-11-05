@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.ExperienceTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.HealthTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.ManaTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.ResistanceTag;
@@ -38,6 +39,7 @@ public class UtilMessage {
             TagResolver.resolver("coins", new CoinsTag()),
             TagResolver.resolver("damage", new DamageTag()),
             TagResolver.resolver("health", new HealthTag()),
+            TagResolver.resolver("exp", new ExperienceTag()),
             TagResolver.resolver("mana", new ManaTag()),
             TagResolver.resolver("resistance", new ResistanceTag()),
             TagResolver.resolver("time", new TimeTag())

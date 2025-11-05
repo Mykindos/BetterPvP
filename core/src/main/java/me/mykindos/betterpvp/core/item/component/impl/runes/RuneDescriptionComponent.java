@@ -36,15 +36,12 @@ public class RuneDescriptionComponent implements ItemComponent, LoreComponent {
         final List<Component> components = ComponentWrapper.wrapLine(miniMessage.deserialize("<gray>" + rune.getDescription()));
         components.add(Component.empty());
         components.add(Component.text("Applies to:", NamedTextColor.GRAY, TextDecoration.UNDERLINED));
-        for (RuneGroup value : RuneGroup.values()) {
+        for (RuneGroup value : rune.getGroups()) {
             final String displayName = value.getDisplayName();
-            final boolean contains = rune.getGroups().contains(value);
-            if (contains) {
-                components.add(Component.text("[", NamedTextColor.GRAY)
-                        .append(Component.text("✔", NamedTextColor.GREEN))
-                        .append(Component.text("] ", NamedTextColor.GRAY))
-                        .append(Component.text(displayName, NamedTextColor.WHITE)));
-            }
+            components.add(Component.text("[", NamedTextColor.GRAY)
+                    .append(Component.text("✔", NamedTextColor.GREEN))
+                    .append(Component.text("] ", NamedTextColor.GRAY))
+                    .append(Component.text(displayName, NamedTextColor.WHITE)));
         }
         return components;
     }

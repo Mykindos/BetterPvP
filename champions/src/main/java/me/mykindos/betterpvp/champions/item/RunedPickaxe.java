@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.MagicSeal;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
@@ -44,6 +45,7 @@ public class RunedPickaxe extends BaseItem implements ReloadHook {
 
         // Create and add the mining speed ability
         this.ability = new EnhancedMiningAbility();
+        addSerializableComponent(new RuneContainerComponent(3));
         addBaseComponent(AbilityContainerComponent.builder()
                 .ability(ability)
                 .build());

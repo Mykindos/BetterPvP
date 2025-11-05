@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroups;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +42,7 @@ public class UnbreakingRune implements Rune {
 
     @Override
     public @NotNull Collection<@NotNull RuneGroup> getGroups() {
-        return Collections.singleton(RuneGroup.ALL);
+        return Collections.singleton(RuneGroups.ALL);
     }
 
     @Override

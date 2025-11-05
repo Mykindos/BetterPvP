@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
@@ -42,8 +43,12 @@ public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
                 .addIngredient('>', PageForwardButton.defaultTexture().withDisabledInvisible(true))
                 .addIngredient('B', new BackTabButton(previousWindow)));
 
+        // Sort recipes: CraftingRecipe first, ImbuementRecipe last
+        List<Recipe<?, ?>> sortedRecipes = new ArrayList<>(recipes);
+        sortedRecipes.sort(Comparator.comparingInt(this::getRecipePriority));
+
         List<Gui> guis = new ArrayList<>();
-        for (Recipe<?, ?> recipe : recipes) {
+        for (Recipe<?, ?> recipe : sortedRecipes) {
             guis.add(createGui(recipe));
         }
 
@@ -91,6 +96,17 @@ public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
 
         this.pages = pages;
         update();
+    }
+
+    private int getRecipePriority(Recipe<?, ?> recipe) {
+        return switch (recipe) {
+            case CraftingRecipe craftingRecipe -> 0; // CraftingRecipe first
+            case SmeltingRecipe smeltingRecipe -> 2;
+            case CastingMoldRecipe castingMoldRecipe -> 1;
+            case AnvilRecipe anvilRecipe -> 3;
+            case ImbuementRecipe imbuementRecipe -> 4; // ImbuementRecipe last
+            case null, default -> throw new IllegalArgumentException("Unsupported recipe type to sort: " + (recipe == null ? "null" : recipe.getClass().getName()));
+        };
     }
 
     private Component getTitle(Gui gui) {

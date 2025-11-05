@@ -24,7 +24,7 @@ public abstract class WeaponItem extends BaseItem implements ReloadHook {
         super(name, model, ItemGroup.WEAPON, rarity);
         this.plugin = plugin;
         this.groups = groups;
-        addSerializableComponent(new RuneContainerComponent(3));
+        addSerializableComponent(new RuneContainerComponent(2));
         addSerializableComponent(new DurabilityComponent(500));
 
         if (groups.contains(Group.MELEE)) {

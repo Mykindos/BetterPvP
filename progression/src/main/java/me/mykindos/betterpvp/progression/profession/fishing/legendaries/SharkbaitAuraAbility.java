@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
 import org.bukkit.Color;
@@ -32,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+@BPvPListener
 @Singleton
 @Getter
 @Setter
@@ -45,7 +47,7 @@ public class SharkbaitAuraAbility extends ItemAbility implements Listener {
     private double radius;
     
     @Inject
-    public SharkbaitAuraAbility(Progression progression, ItemFactory itemFactory) {
+    private SharkbaitAuraAbility(Progression progression, ItemFactory itemFactory) {
         super(new NamespacedKey(progression, "sharkbait_aura"),
                 "Fishing Aura",
                 "Increases fishing catch speed for all nearby fishermen",

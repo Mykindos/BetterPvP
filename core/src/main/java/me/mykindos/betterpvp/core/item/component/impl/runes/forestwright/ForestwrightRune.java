@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.component.impl.runes.attraction;
+package me.mykindos.betterpvp.core.item.component.impl.runes.forestwright;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -20,35 +20,30 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode
-public class AttractionRune implements Rune, ReloadHook {
+public class ForestwrightRune implements Rune, ReloadHook {
 
-    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "attraction");
+    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "foreswright");
 
-    private final Provider<AttractionRuneItem> itemProvider;
-    private double speed = 4.0;
-    private double range = 5.0;
+    private final Provider<ForestwrightRuneItem> itemProvider;
+    private double percent;
 
     @Inject
-    private AttractionRune(Provider<AttractionRuneItem> itemProvider) {
+    private ForestwrightRune(Provider<ForestwrightRuneItem> itemProvider) {
         this.itemProvider = itemProvider;
     }
 
-    public double getSpeed() {
-        return speed;
-    }
-
-    public double getRange() {
-        return range;
+    public double getPercent() {
+        return percent;
     }
 
     @Override
     public @NotNull String getDescription() {
-        return String.format("Pulls nearby dropped items within <val>%s</val> blocks toward the wearer. Pull speed stacks additively.", UtilFormat.formatNumber(getRange()));
+        return String.format("Increases woodcutting experience gained by <exp>%s%%</exp>.", UtilFormat.formatNumber(getPercent() * 100));
     }
 
     @Override
     public @NotNull Collection<@NotNull RuneGroup> getGroups() {
-        return List.of(RuneGroups.ARMOR);
+        return List.of(RuneGroups.AXE);
     }
 
     @Override
@@ -58,13 +53,12 @@ public class AttractionRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull String getName() {
-        return "Rune of Attraction";
+        return "Rune of Forestwright";
     }
 
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.speed = config.getConfig("speed", 4.0, Double.class);
-        this.range = config.getConfig("range", 5.0, Double.class);
+        this.percent = config.getConfig("percent", 0.15, Double.class);
     }
 }

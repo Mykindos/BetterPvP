@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroups;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
@@ -42,7 +43,7 @@ public class RecoveryRune implements Rune, ReloadHook {
 
     @Override
     public @NotNull Collection<@NotNull RuneGroup> getGroups() {
-        return List.of(RuneGroup.ARMOR);
+        return List.of(RuneGroups.ARMOR);
     }
 
     @Override

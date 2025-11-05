@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.bloomrot.Bloomrot;
 import me.mykindos.betterpvp.champions.item.ivybolt.Ivybolt;
 import me.mykindos.betterpvp.champions.item.scythe.ScytheOfTheFallenLord;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
@@ -15,14 +16,19 @@ import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapte
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class ChampionsItemBoostrap implements ItemBootstrap {
 
     private boolean registered = false;
 
+    @Inject private Core core;
     @Inject private ItemRegistry itemRegistry;
     @Inject private Champions champions;
     @Inject private CraftingRecipeRegistry craftingRecipeRegistry;
@@ -90,15 +96,15 @@ public class ChampionsItemBoostrap implements ItemBootstrap {
         if (registered) return;
         registered = true;
 
-        // Weapons
-        registerFallbackItem(itemRegistry, "ancient_sword", Material.NETHERITE_SWORD, ancientSword, false);
-        registerFallbackItem(itemRegistry, "ancient_axe", Material.NETHERITE_AXE, ancientAxe, false);
-        registerFallbackItem(itemRegistry, "power_sword", Material.DIAMOND_SWORD, powerSword, false);
-        registerFallbackItem(itemRegistry, "power_axe", Material.DIAMOND_AXE, powerAxe, false);
-        registerFallbackItem(itemRegistry, "booster_sword", Material.GOLDEN_SWORD, boosterSword, false);
-        registerFallbackItem(itemRegistry, "booster_axe", Material.GOLDEN_AXE, boosterAxe, false);
-        registerFallbackItem(itemRegistry, "standard_sword", Material.IRON_SWORD, standardSword, true);
-        registerFallbackItem(itemRegistry, "standard_axe", Material.IRON_AXE, standardAxe, true);
+        // Override default weapons so we can have the
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "ancient_sword"), Material.NETHERITE_SWORD, ancientSword, false);
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "ancient_axe"), Material.NETHERITE_AXE, ancientAxe, false);
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "power_sword"), Material.DIAMOND_SWORD, powerSword, false);
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "power_axe"), Material.DIAMOND_AXE, powerAxe, false);
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "booster_sword"), Material.GOLDEN_SWORD, boosterSword, false);
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "booster_axe"), Material.GOLDEN_AXE, boosterAxe, false);
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "standard_sword"), Material.IRON_SWORD, standardSword, true);
+        registerFallbackItem(itemRegistry, new NamespacedKey(core, "standard_axe"), Material.IRON_AXE, standardAxe, true);
         
         // Consumables
         registerFallbackItem(itemRegistry, "energy_apple", Material.APPLE, energyApple, false);
@@ -153,12 +159,21 @@ public class ChampionsItemBoostrap implements ItemBootstrap {
 
     private void registerFallbackItem(ItemRegistry registry, String key, Material material, BaseItem item, boolean keepRecipe) {
         final NamespacedKey namespacedKey = championsKey(key);
+        registerFallbackItem(registry, namespacedKey, material, item, keepRecipe);
+    }
+
+    private void registerFallbackItem(ItemRegistry registry, NamespacedKey namespacedKey, Material material, BaseItem item, boolean keepRecipe) {
         registry.registerFallbackItem(namespacedKey, material, item);
+        final List<Recipe> old = Bukkit.getRecipesFor(ItemStack.of(material));
+        if (old.isEmpty()) {
+            return;
+        }
+
+        final Map<NamespacedKey, CraftingRecipe> disabled = adapter.disableRecipesFor(material);
         if (keepRecipe) {
-            final Recipe old = Bukkit.getRecipe(material.getKey());
-            if (old == null) return;
-            final CraftingRecipe craftingRecipe = adapter.convertToCustomRecipe(old);
-            if (craftingRecipe != null) craftingRecipeRegistry.registerRecipe(namespacedKey, craftingRecipe);
+            for (Map.Entry<NamespacedKey, CraftingRecipe> entry : disabled.entrySet()) {
+                craftingRecipeRegistry.registerRecipe(entry.getKey(), entry.getValue());
+            }
         }
     }
 }

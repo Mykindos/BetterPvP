@@ -17,9 +17,11 @@ import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class ExplosiveResistanceBootstrap implements ItemBootstrap {
@@ -57,11 +59,16 @@ public class ExplosiveResistanceBootstrap implements ItemBootstrap {
     private void registerFallbackItem(ItemRegistry itemRegistry, String key, Material material, BaseItem item, boolean keepRecipe) {
         final NamespacedKey namespacedKey = new NamespacedKey("minecraft", key);
         itemRegistry.registerFallbackItem(namespacedKey, material, item);
+        final List<Recipe> old = Bukkit.getRecipesFor(ItemStack.of(material));
+        if (old.isEmpty()) {
+            return;
+        }
+
+        final Map<NamespacedKey, CraftingRecipe> disabled = adapter.get().disableRecipesFor(material);
         if (keepRecipe) {
-            final Recipe old = Bukkit.getRecipe(material.getKey());
-            if (old == null) return;
-            final CraftingRecipe craftingRecipe = adapter.get().convertToCustomRecipe(old);
-            if (craftingRecipe != null) craftingRegistry.registerRecipe(namespacedKey, craftingRecipe);
+            for (Map.Entry<NamespacedKey, CraftingRecipe> entry : disabled.entrySet()) {
+                craftingRegistry.registerRecipe(entry.getKey(), entry.getValue());
+            }
         }
     }
 
