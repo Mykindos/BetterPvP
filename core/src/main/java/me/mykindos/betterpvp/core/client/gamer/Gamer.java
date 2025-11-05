@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.client.gamer;
 
+import java.util.Objects;
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +26,8 @@ import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
+import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceBar;
+import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceLevel;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -31,9 +35,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A gamer represents a clients seasonal data.
@@ -49,6 +50,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private ActionBar actionBar = new ActionBar();
     private TitleQueue titleQueue = new TitleQueue();
     private PlayerList playerList = new PlayerList();
+    private ExperienceBar experienceBar = new ExperienceBar();
+    private ExperienceLevel experienceLevel = new ExperienceLevel();
     private Sidebar sidebar = null;
     private @NotNull IChatChannel chatChannel = ServerChatChannel.getInstance();
 
@@ -58,6 +61,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private long lastTip = -1;
     private long lastBlock = -1;
     private long lastMovement = -1;
+    private double lastDealtDamageValue = 0;
     private String lastAdminMessenger;
 
     public Gamer(long id, String uuid) {

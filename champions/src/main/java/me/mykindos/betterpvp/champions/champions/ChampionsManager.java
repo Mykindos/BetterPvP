@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableHandler;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 
 /**
  * A wrapper containing frequently used dependencies throughout the champions module
@@ -25,12 +25,12 @@ public class ChampionsManager {
     private final BuildManager builds;
     private final CooldownManager cooldowns;
     private final EffectManager effects;
-    private final EnergyHandler energy;
+    private final EnergyService energy;
     private final ThrowableHandler throwables;
 
     @Inject
     public ChampionsManager(ClientManager clientManager, ChampionsSkillManager skills, RoleManager roles, BuildManager builds,
-                            CooldownManager cooldowns, EffectManager effects, EnergyHandler energy, ThrowableHandler throwables) {
+                            CooldownManager cooldowns, EffectManager effects, EnergyService energy, ThrowableHandler throwables) {
         this.clientManager = clientManager;
         this.skills = skills;
         this.roles = roles;

@@ -3,6 +3,11 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +24,8 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -52,12 +58,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 @Singleton
 @BPvPListener
 public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
@@ -67,7 +67,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
     private final ClientManager clientManager;
     private final EffectManager effectManager;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private int maxChargeTicks;
     private double baseVelocity;
     private double chargeDamage;
@@ -91,11 +91,11 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     });
 
     @Inject
-    public ThunderclapAegis(Champions champions, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler) {
+    public ThunderclapAegis(Champions champions, final ClientManager clientManager, final EffectManager effectManager, EnergyService energyService) {
         super(champions, "thunderclap_aegis");
         this.clientManager = clientManager;
         this.effectManager = effectManager;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
     }
 
     @Override
@@ -210,7 +210,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
                 continue;
             }
 
-            if (!energyHandler.use(player, ABILITY_NAME, energyPerTick, true)) {
+            if (!energyService.use(player, ABILITY_NAME, energyPerTick, true)) {
                 iterator.remove();
                 deactivate(data);
                 activeUsageNotifications.remove(player.getUniqueId());
@@ -243,7 +243,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             final int charge = data.getTicksCharged();
             if (!collisions.isEmpty()) {
                 final double percentage = getChargePercentage(charge);
-                this.energyHandler.degenerateEnergy(player, this.energyOnCollide / 100);
+                this.energyService.degenerateEnergy(player, this.energyOnCollide, EnergyEvent.CAUSE.USE);
                 for (LivingEntity hit : collisions) {
                     collide(player, hit, percentage, data);
                 }

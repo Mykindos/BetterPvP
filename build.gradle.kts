@@ -10,8 +10,8 @@ plugins {
     id("org.inferred.processors") version "3.7.0" apply false  // Annotation processing
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
     id("org.flywaydb.flyway") version "11.15.0" apply false // Flyway
-    id("org.sonarqube") version "6.3.1.5724" apply true
-    //id("nu.studer.jooq") version "9.0" apply false
+    id("org.sonarqube") version "7.0.1.6134" apply true
+
 }
 
 java {
