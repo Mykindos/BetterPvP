@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.GetChampionsDataRecord;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetChampionsDataRecord;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -21,9 +21,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.COMBAT_STATS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_CHAMPIONS_DATA;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_CHAMPIONS_DATA;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.KILLS;
 
 @Singleton

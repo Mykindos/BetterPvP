@@ -9,8 +9,8 @@ import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.ChampionsKillContributionsRecord;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.ChampionsKillsRecord;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_KILLS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_KILL_CONTRIBUTIONS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILL_CONTRIBUTIONS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 public class ChampionsCombatData extends CombatData {

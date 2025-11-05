@@ -6,8 +6,8 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.GetBiggestFishCaughtByClientRecord;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.GetBiggestFishCaughtRecord;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.GetBiggestFishCaughtByClientRecord;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.GetBiggestFishCaughtRecord;
 import me.mykindos.betterpvp.progression.profession.fishing.data.CaughtFish;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
@@ -26,11 +26,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_BIGGEST_FISH_CAUGHT;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_BIGGEST_FISH_CAUGHT_BY_CLIENT;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_FISHING_BY_COUNT;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_FISHING_BY_WEIGHT;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.PROGRESSION_FISHING;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_BIGGEST_FISH_CAUGHT;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_BIGGEST_FISH_CAUGHT_BY_CLIENT;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_TOP_FISHING_BY_COUNT;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_TOP_FISHING_BY_WEIGHT;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_FISHING;
 
 @CustomLog
 @Singleton

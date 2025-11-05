@@ -6,7 +6,7 @@ import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopMiningByOreRecord;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.GetTopMiningByOreRecord;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_MINING_BY_ORE;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_TOP_MINING_BY_ORE;
 
 @CustomLog
 @Singleton

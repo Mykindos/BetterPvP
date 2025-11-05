@@ -37,12 +37,12 @@ import java.util.SortedSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_DEATHS_BY_CLASS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_HIGHEST_KILLSTREAK_BY_CLASS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_KDR_BY_CLASS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_KILLSTREAK_BY_CLASS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_KILLS_BY_CLASS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_TOP_RATING_BY_CLASS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_TOP_DEATHS_BY_CLASS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_TOP_HIGHEST_KILLSTREAK_BY_CLASS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_TOP_KDR_BY_CLASS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_TOP_KILLSTREAK_BY_CLASS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_TOP_KILLS_BY_CLASS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_TOP_RATING_BY_CLASS;
 
 @Singleton
 @CustomLog

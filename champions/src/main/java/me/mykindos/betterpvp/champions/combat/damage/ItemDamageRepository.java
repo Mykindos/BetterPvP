@@ -10,7 +10,7 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_DAMAGEVALUES;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_DAMAGEVALUES;
 
 @Singleton
 @CustomLog

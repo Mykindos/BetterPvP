@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.SHOPITEMS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.SHOPITEMS_DYNAMIC_PRICING;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.SHOPITEMS_FLAGS;
+import static me.mykindos.betterpvp.shops.database.jooq.Tables.SHOPITEMS;
+import static me.mykindos.betterpvp.shops.database.jooq.Tables.SHOPITEMS_DYNAMIC_PRICING;
+import static me.mykindos.betterpvp.shops.database.jooq.Tables.SHOPITEMS_FLAGS;
 
 @Singleton
 @CustomLog

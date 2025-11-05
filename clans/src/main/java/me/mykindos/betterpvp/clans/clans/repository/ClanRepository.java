@@ -16,8 +16,8 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.ClanMetadataRecord;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.GetClanKillLogsRecord;
+import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanMetadataRecord;
+import me.mykindos.betterpvp.clans.database.jooq.tables.records.GetClanKillLogsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.logging.CachedLog;
@@ -52,18 +52,18 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLANS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLANS_DOMINANCE_SCALE;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLANS_KILLS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLAN_ALLIANCES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLAN_ENEMIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLAN_INSURANCE;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLAN_MEMBERS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLAN_METADATA;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLAN_PROPERTIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLAN_TERRITORY;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLANS;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLANS_DOMINANCE_SCALE;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLANS_KILLS;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_ALLIANCES;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_ENEMIES;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_INSURANCE;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_MEMBERS;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_METADATA;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_PROPERTIES;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_TERRITORY;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_CLAN_KILL_LOGS;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.GET_CLAN_KILL_LOGS;
 
 @CustomLog
 @Singleton

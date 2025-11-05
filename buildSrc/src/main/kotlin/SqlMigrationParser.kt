@@ -22,6 +22,12 @@ object SqlMigrationParser {
                 createProcRegex.findAll(content).forEach { match ->
                     tables.add(match.groupValues[1])
                 }
+
+                // Extract CREATE FUNCTION statements
+                val createFuncRegex = """CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+["'`]?(\w+)["'`]?""".toRegex(RegexOption.IGNORE_CASE)
+                createFuncRegex.findAll(content).forEach { match ->
+                    tables.add(match.groupValues[1])
+                }
             }
 
         return tables

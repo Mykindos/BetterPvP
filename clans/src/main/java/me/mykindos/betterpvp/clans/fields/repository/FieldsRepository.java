@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLANS_FIELDS_ORES;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLANS_FIELDS_ORES;
 
 @Singleton
 @CustomLog

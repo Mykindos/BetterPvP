@@ -17,8 +17,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.AUCTIONS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.AUCTION_TRANSACTION_HISTORY;
+import static me.mykindos.betterpvp.shops.database.jooq.Tables.AUCTIONS;
+import static me.mykindos.betterpvp.shops.database.jooq.Tables.AUCTION_TRANSACTION_HISTORY;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 @Singleton

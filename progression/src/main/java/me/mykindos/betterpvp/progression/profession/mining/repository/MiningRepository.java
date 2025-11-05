@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.PROGRESSION_PROPERTIES;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_PROPERTIES;
 
 @CustomLog
 @Singleton

@@ -1,3 +1,4 @@
+
 plugins {
     id("nu.studer.jooq")
 }
@@ -7,60 +8,101 @@ val jooqVersion = "3.19.15"
 // Extract tables from migrations
 val migrationsDir = file("src/main/resources/${project.name}-migrations/postgres")
 val extractedTables = SqlMigrationParser.extractTableNames(migrationsDir)
-val dynamicIncludes = SqlMigrationParser.generateIncludes(extractedTables)
 
-println("jOOQ: Extracted tables for ${project.name}: $extractedTables")
+// Exit early if no tables found
+if (extractedTables.isEmpty()) {
+    println("jOOQ: No tables found for ${project.name}, skipping jOOQ configuration")
+} else {
+    val dynamicIncludes = SqlMigrationParser.generateIncludes(extractedTables)
 
-dependencies {
-    // Get the version catalog
-    val libs = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
+    println("jOOQ: Extracted tables for ${project.name}: $extractedTables")
 
-    add("api", libs.findLibrary("jooq").get())
-    add("api", libs.findLibrary("jooq.meta").get())
-    add("jooqGenerator", libs.findLibrary("jooq.meta.extensions").get())
-    add("jooqGenerator", "org.postgresql:postgresql:42.7.4")
-    add("implementation", "org.postgresql:postgresql:42.7.4")
-}
+    dependencies {
+        // Get the version catalog
+        val libs = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
 
-jooq {
-    version.set(jooqVersion)
+        add("api", libs.findLibrary("jooq").get())
+        add("api", libs.findLibrary("jooq.meta").get())
+        add("jooqGenerator", libs.findLibrary("jooq.meta.extensions").get())
+        add("jooqGenerator", "org.postgresql:postgresql:42.7.4")
+        add("implementation", "org.postgresql:postgresql:42.7.4")
+    }
 
-    configurations {
-        create("main") {
-            generateSchemaSourceOnCompilation.set(false)
-            jooqConfiguration.apply {
-                jdbc.apply {
-                    driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://localhost:5002/betterpvp"
-                    user = "user"
-                    password = "BetterPvP123!"
-                }
-                generator.apply {
-                    name = "org.jooq.codegen.DefaultGenerator"
-                    database.apply {
-                        name = "org.jooq.meta.postgres.PostgresDatabase"
-                        inputSchema = "public"
-                        includes = dynamicIncludes
-                        excludes = ".*_\\d+|.*_\\d+_\\d+"
-                        withForcedTypes(
-                            org.jooq.meta.jaxb.ForcedType().apply {
-                                setName("INTEGER")
-                                setIncludeTypes("SMALLINT")
-                            }
-                        )
+    jooq {
+        version.set(jooqVersion)
+
+        configurations {
+            create("main") {
+                generateSchemaSourceOnCompilation.set(false)
+                jooqConfiguration.apply {
+                    jdbc.apply {
+                        driver = "org.postgresql.Driver"
+                        url = "jdbc:postgresql://localhost:5002/betterpvp"
+                        user = "user"
+                        password = "BetterPvP123!"
                     }
-                    generate.apply {
-                        isDeprecated = false
-                        isRecords = true
-                        isImmutablePojos = false
-                        isFluentSetters = true
-                    }
-                    target.apply {
-                        packageName = "me.mykindos.betterpvp.${project.name}.database.jooq"
-                        directory = "src/main/java"
+                    generator.apply {
+                        name = "org.jooq.codegen.DefaultGenerator"
+                        database.apply {
+                            name = "org.jooq.meta.postgres.PostgresDatabase"
+                            inputSchema = "public"
+                            includes = dynamicIncludes
+                            excludes = ".*_\\d+|.*_\\d+_\\d+"
+                            withForcedTypes(
+                                org.jooq.meta.jaxb.ForcedType().apply {
+                                    setName("INTEGER")
+                                    setIncludeTypes("SMALLINT")
+                                }
+                            )
+                        }
+                        generate.apply {
+                            isDeprecated = false
+                            isRecords = true
+                            isImmutablePojos = false
+                            isFluentSetters = true
+                        }
+                        target.apply {
+                            packageName = "me.mykindos.betterpvp.${project.name}.database.jooq"
+                            directory = "build/generated-jooq/"
+                        }
                     }
                 }
             }
         }
+    }
+
+    // Task to move generated jOOQ files to src/main/java
+    val moveJooqGenerated by tasks.registering {
+        group = "jooq"
+        description = "Moves jOOQ generated files to src/main/java for ${project.name}"
+
+        doLast {
+            val sourceDir = file("build/generated-jooq/me/mykindos/betterpvp/${project.name}/database/jooq")
+            val targetDir = file("src/main/java/me/mykindos/betterpvp/${project.name}/database/jooq")
+
+            // Clean the target directory before moving
+            if (targetDir.exists()) {
+                println("Cleaning jOOQ directory: ${targetDir.absolutePath}")
+                targetDir.deleteRecursively()
+            }
+
+            // Move files from build to src
+            if (sourceDir.exists()) {
+                println("Moving jOOQ files from ${sourceDir.absolutePath} to ${targetDir.absolutePath}")
+                sourceDir.copyRecursively(targetDir, overwrite = true)
+                sourceDir.deleteRecursively()
+                println("jOOQ files moved successfully")
+            } else {
+                println("Source directory does not exist: ${sourceDir.absolutePath}")
+            }
+        }
+    }
+
+    // Make the move task run after jOOQ generation
+    afterEvaluate {
+        tasks.named("generateJooq") {
+            finalizedBy(moveJooqGenerated)
+        }
+
     }
 }

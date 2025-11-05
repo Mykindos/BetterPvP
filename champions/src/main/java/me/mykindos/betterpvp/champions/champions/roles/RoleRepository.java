@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_KILLDEATH_DATA;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLDEATH_DATA;
 
 @Singleton
 public class RoleRepository {

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CHAMPIONS_BUILDS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_BUILDS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 @Singleton

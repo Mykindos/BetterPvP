@@ -7,8 +7,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.ProgressionBuildsRecord;
-import me.mykindos.betterpvp.core.database.jooq.tables.records.ProgressionExpRecord;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionBuildsRecord;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionExpRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
@@ -28,9 +28,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.PROGRESSION_BUILDS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.PROGRESSION_EXP;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.PROGRESSION_PROPERTIES;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_BUILDS;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_EXP;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_PROPERTIES;
 
 @Singleton
 @CustomLog
