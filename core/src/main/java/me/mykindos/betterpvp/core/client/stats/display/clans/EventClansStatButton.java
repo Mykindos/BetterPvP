@@ -24,10 +24,10 @@ public class EventClansStatButton extends ControlItem<IAbstractClansStatMenu> {
     @Override
     public ItemProvider getItemProvider(IAbstractClansStatMenu gui) {
         return ItemView.builder()
-                .material(Material.TNT)
+                .material(Material.BEACON)
                 .lore(getEventStats())
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .displayName(Component.text("Clans Stats"))
+                .displayName(Component.text("Events Stats"))
                 .build();
     }
 

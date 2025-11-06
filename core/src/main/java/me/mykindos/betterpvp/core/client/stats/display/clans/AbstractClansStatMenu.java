@@ -33,7 +33,9 @@ public abstract class AbstractClansStatMenu extends AbstractStatMenu implements 
      */
     protected AbstractClansStatMenu(@NotNull Client client, @Nullable Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
         super(client, previous, periodKey, statPeriodManager);
-        this.clanFilterButton = new ClanFilterButton("Clan", IAbstractClansStatMenu.getClanContexts(client), 9, Material.IRON_DOOR, 0);
+        //todo pass clan context better
+        this.clanContext = ClanContext.ALL;
+        this.clanFilterButton = new ClanFilterButton("Clan", ClanContext.ALL, IAbstractClansStatMenu.getClanContexts(client), 9, Material.IRON_DOOR, 0);
         setItem(7, 0, (Item) this.clanFilterButton);
     }
 }

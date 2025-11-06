@@ -24,10 +24,10 @@ public class PillageClansStatButton extends ControlItem<IAbstractClansStatMenu> 
     @Override
     public ItemProvider getItemProvider(IAbstractClansStatMenu gui) {
         return ItemView.builder()
-                .material(Material.TNT)
+                .material(Material.END_CRYSTAL)
                 .lore(getPillageStats())
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .displayName(Component.text("Clans Stats"))
+                .displayName(Component.text("Pillage Stats"))
                 .build();
     }
 
@@ -81,7 +81,7 @@ public class PillageClansStatButton extends ControlItem<IAbstractClansStatMenu> 
         return new ArrayList<>(
                 List.of(
                         StatFormatterUtility.formatStat("Offensive Pillages", pillagesAttacked),
-                        StatFormatterUtility.formatStat("Enemy Core Destroyed", coreDestroyedStat),
+                        StatFormatterUtility.formatStat("Enemy Core Destroyed", coresDestroy),
                         StatFormatterUtility.formatStat("Pillage Win Rate", winRate),
                         StatFormatterUtility.formatStat("Enemy Core Damage", coreDamage),
                         StatFormatterUtility.formatStat("Cannon Shots", cannonShots),
