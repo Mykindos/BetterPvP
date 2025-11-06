@@ -18,8 +18,11 @@ public class ClanFilterButton extends FilterButton<ClansStatMenu, ClanContext> {
      * @param displayMaterial the material of the item
      * @param customModelData the custom model data of the item
      */
-    public ClanFilterButton(String title, List<ClanContext> contexts, int numToShow, Material displayMaterial, int customModelData) {
+    public ClanFilterButton(String title, ClanContext currentContext, List<ClanContext> contexts, int numToShow, Material displayMaterial, int customModelData) {
+        //todo do creation better (title material etc)
         super(title, contexts, numToShow, displayMaterial, customModelData);
+        this.setSelectedFilter(currentContext);
+        setRefresh(this::onChangeClan);
     }
 
     public CompletableFuture<Boolean> onChangeClan() {

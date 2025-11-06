@@ -32,7 +32,7 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                 .material(Material.MOSSY_COBBLESTONE)
                 .lore(getDungeonStats())
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .displayName(Component.text("Clans Stats"))
+                .displayName(Component.text("Dungeons Stats"))
                 .build();
     }
 
