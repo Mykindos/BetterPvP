@@ -32,7 +32,7 @@ public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu>
                 .material(Material.IRON_SWORD)
                 .lore(getPersonalStats())
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .displayName(Component.text("Clans Stats"))
+                .displayName(Component.text("Personal Stats"))
                 .build();
     }
 
