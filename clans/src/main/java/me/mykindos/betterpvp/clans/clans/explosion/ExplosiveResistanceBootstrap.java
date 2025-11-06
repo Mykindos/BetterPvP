@@ -51,13 +51,13 @@ public class ExplosiveResistanceBootstrap implements ItemBootstrap {
                 final Material material = tiers.get(i);
                 final VanillaItem item = new VanillaItem(name, material, ItemRarity.COMMON);
                 item.addBaseComponent(new ExplosiveResistanceComponent(explosiveResistance));
-                registerFallbackItem(itemRegistry, material.translationKey(), material, item, true);
+                registerFallbackItem(itemRegistry, material.getKey().toString(), material, item, true);
             }
         }
     }
 
     private void registerFallbackItem(ItemRegistry itemRegistry, String key, Material material, BaseItem item, boolean keepRecipe) {
-        final NamespacedKey namespacedKey = new NamespacedKey("minecraft", key);
+        final NamespacedKey namespacedKey = NamespacedKey.fromString(key);
         itemRegistry.registerFallbackItem(namespacedKey, material, item);
         final List<Recipe> old = Bukkit.getRecipesFor(ItemStack.of(material));
         if (old.isEmpty()) {

@@ -105,6 +105,11 @@ public class CoreItemBootstrap implements ItemBootstrap {
     @Inject private CharcoalItem charcoalItem;
     @Inject private CannonItem cannonItem;
     @Inject private CannonballItem cannonballItem;
+    @Inject private CutStone cutStone;
+    @Inject private ShadowQuill shadowQuill;
+    @Inject private EternalFlame eternalFlame;
+    @Inject private RunicPlate runicPlate;
+    @Inject private Cloth cloth;
 
     private NamespacedKey key(String name) {
         return new NamespacedKey(core, name);
@@ -144,8 +149,8 @@ public class CoreItemBootstrap implements ItemBootstrap {
         itemRegistry.registerItem(key("cannonball"), cannonballItem);
 
         // Common
-        itemRegistry.registerItem(key("cloth"), new BaseItem("Cloth", Item.model("cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON));
-        itemRegistry.registerItem(key("cut_stone"), new BaseItem("Cut Stone", Item.model("cut_stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON));
+        itemRegistry.registerItem(key("cloth"), cloth);
+        itemRegistry.registerItem(key("cut_stone"), cutStone);
         itemRegistry.registerItem(key("torn_cloth"), new BaseItem("Torn Cloth", Item.model("torn_cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON));
         itemRegistry.registerItem(key("stone"), new BaseItem("Stone", Item.model("stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON));
         itemRegistry.registerItem(key("hammer"), hammer);
@@ -154,11 +159,13 @@ public class CoreItemBootstrap implements ItemBootstrap {
 
         // Uncommon
         itemRegistry.registerItem(key("toxic_gem"), new BaseItem("Toxic Gem", Item.model("toxic_gem", 16), ItemGroup.MATERIAL, ItemRarity.UNCOMMON));
+        itemRegistry.registerItem(key("runic_plate"), runicPlate);
 
         // Rare
         itemRegistry.registerItem(key("magic_seal"), magicSeal);
         itemRegistry.registerItem(key("blackroot"), blackroot);
         itemRegistry.registerItem(key("razor_edge"), razorEdge);
+        itemRegistry.registerItem(key("shadow_quill"), shadowQuill);
 
         // Epic
         itemRegistry.registerItem(key("divine_amulet"), new BaseItem("Divine Amulet", Item.model("divine_amulet", 16), ItemGroup.MATERIAL, ItemRarity.EPIC));
@@ -173,6 +180,7 @@ public class CoreItemBootstrap implements ItemBootstrap {
         itemRegistry.registerItem(key("fang_of_the_deep"), fangOfTheDeep);
         itemRegistry.registerItem(key("voltic_shield"), volticShield);
         itemRegistry.registerItem(key("stormsteel_plate"), stormsteelPlate);
+        itemRegistry.registerItem(key("eternal_flame"), eternalFlame);
 
         // Legendary
         itemRegistry.registerItem(key("phoenix_egg"), new BaseItem("Phoenix Egg", Item.model("phoenix_egg", 16), ItemGroup.MATERIAL, ItemRarity.LEGENDARY));

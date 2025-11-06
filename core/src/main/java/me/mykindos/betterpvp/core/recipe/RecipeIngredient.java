@@ -17,6 +17,7 @@ public class RecipeIngredient {
     
     private final BaseItem baseItem;
     private final int amount;
+    private boolean consumeOnCraft = true;
     
     /**
      * Creates a new recipe ingredient.
@@ -27,7 +28,20 @@ public class RecipeIngredient {
         this.baseItem = baseItem;
         this.amount = amount;
     }
-    
+
+    /**
+     * Creates a new recipe ingredient.
+     * @param baseItem The base item required
+     * @param amount The amount required
+     * @param consumeOnCraft Whether the ingredient should be consumed on crafting
+     */
+    public RecipeIngredient(@NotNull BaseItem baseItem, int amount, boolean consumeOnCraft) {
+        this.baseItem = baseItem;
+        this.amount = amount;
+        this.consumeOnCraft = consumeOnCraft;
+    }
+
+
     /**
      * Checks if the provided ItemStack matches this ingredient.
      * @param stack The ItemStack to check

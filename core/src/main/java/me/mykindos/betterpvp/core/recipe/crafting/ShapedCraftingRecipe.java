@@ -175,28 +175,31 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
         for (Map.Entry<Integer, RecipeIngredient> entry : this.ingredients.entrySet()) {
             int recipeSlot = entry.getKey();
             RecipeIngredient ingredient = entry.getValue();
-            
+
             // Calculate the corresponding grid slot
             int recipeRow = recipeSlot / 3;
             int recipeCol = recipeSlot % 3;
             int gridRow = recipeRow + startRow;
             int gridCol = recipeCol + startCol;
             int gridSlot = gridRow * 3 + gridCol;
-            
+
             ItemInstance instance = ingredients.get(gridSlot);
             if (instance != null && ingredient.matches(instance.createItemStack(), itemFactory)) {
-                ItemStack stack = instance.createItemStack();
-                int newAmount = stack.getAmount() - ingredient.getAmount();
-                
-                if (newAmount <= 0) {
-                    ingredients.remove(gridSlot);
-                } else {
-                    stack.setAmount(newAmount);
-                    final ItemInstance newInstance = itemFactory.fromItemStack(stack).orElseThrow();
-                    ingredients.put(gridSlot, newInstance);
+                // Only consume if the ingredient should be consumed on craft
+                if (ingredient.isConsumeOnCraft()) {
+                    ItemStack stack = instance.createItemStack();
+                    int newAmount = stack.getAmount() - ingredient.getAmount();
+
+                    if (newAmount <= 0) {
+                        ingredients.remove(gridSlot);
+                    } else {
+                        stack.setAmount(newAmount);
+                        final ItemInstance newInstance = itemFactory.fromItemStack(stack).orElseThrow();
+                        ingredients.put(gridSlot, newInstance);
+                    }
+
+                    consumedSlots.add(gridSlot);
                 }
-                
-                consumedSlots.add(gridSlot);
             }
         }
         

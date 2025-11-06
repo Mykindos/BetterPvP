@@ -4,14 +4,12 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.AbstractItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.Collections;
 import java.util.List;
-
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
 public class ExplosiveResistanceComponent extends AbstractItemComponent implements LoreComponent {
 
@@ -39,7 +37,7 @@ public class ExplosiveResistanceComponent extends AbstractItemComponent implemen
         return List.of(
                 Component.text("Explosive Resistance", TextColor.color(212, 212, 212), TextDecoration.BOLD),
                 Component.empty()
-                        .append(Component.text("<glyph:shield_icon>").font(NEXO))
+                        .append(MiniMessage.miniMessage().deserialize("<font:nexo:default><white>꒒"))
                         .appendSpace()
                         .append(Component.text(resistance, TextColor.color(255, 153, 0)))
         );

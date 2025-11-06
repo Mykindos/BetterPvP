@@ -117,10 +117,12 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
     public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         List<Integer> consumedSlots = new ArrayList<>();
 
-        // Create a map of BaseItem to required amounts
+        // Create a map of BaseItem to required amounts (only for items that should be consumed)
         Map<BaseItem, Integer> requiredIngredients = new HashMap<>();
         for (RecipeIngredient ingredient : getIngredients().values()) {
-            requiredIngredients.merge(ingredient.getBaseItem(), ingredient.getAmount(), Integer::sum);
+            if (ingredient.isConsumeOnCraft()) {
+                requiredIngredients.merge(ingredient.getBaseItem(), ingredient.getAmount(), Integer::sum);
+            }
         }
 
         // Consume items from the matrix

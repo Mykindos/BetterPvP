@@ -48,7 +48,7 @@ public class ItemInstanceView implements ItemProvider {
         // Set name and attributes
         itemStack.setData(DataComponentTypes.ITEM_NAME, getName());
 
-        // Tooltip
+//        // Tooltip
         TooltipDisplay.Builder tooltipBuilder = TooltipDisplay.tooltipDisplay();
         if (itemStack.hasData(DataComponentTypes.TOOLTIP_DISPLAY)) {
             final TooltipDisplay existing = Objects.requireNonNull(itemStack.getData(DataComponentTypes.TOOLTIP_DISPLAY));

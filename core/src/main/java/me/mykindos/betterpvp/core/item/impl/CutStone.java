@@ -16,31 +16,32 @@ import org.bukkit.NamespacedKey;
 import java.util.Map;
 
 @Singleton
-public class Rope extends BaseItem {
+public class CutStone extends BaseItem {
 
     private transient boolean registered;
 
     @Inject
-    private Rope() {
-        super("Rope", Item.model("rope", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+    private CutStone() {
+        super("Cut Stone", Item.model("cut_stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
         if (registered) return;
         registered = true;
-        final BaseItem string = itemFactory.getFallbackItem(Material.STRING);
-        final RecipeIngredient stringIngredient = new RecipeIngredient(string, 1);
+        final BaseItem stone = itemFactory.getFallbackItem(Material.STONE);
+        final BaseItem shears = itemFactory.getFallbackItem(Material.SHEARS);
+        final RecipeIngredient shearsIngredient = new RecipeIngredient(shears, 1, false);
+        final RecipeIngredient stoneIngredient = new RecipeIngredient(stone, 1);
         final Map<Integer, RecipeIngredient> ingredients = Map.of(
-                0, stringIngredient,
-                1, stringIngredient);
+                0, stoneIngredient,
+                1, shearsIngredient);
         final ShapelessCraftingRecipe recipe = new ShapelessCraftingRecipe(
                 this,
                 ingredients,
                 itemFactory,
                 false
         );
-        registry.registerRecipe(new NamespacedKey("core", "rope"), recipe);
+        registry.registerRecipe(new NamespacedKey("core", "cut_stone"), recipe);
     }
-
 }
