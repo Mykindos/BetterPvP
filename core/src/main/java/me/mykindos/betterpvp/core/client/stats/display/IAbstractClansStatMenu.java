@@ -1,11 +1,46 @@
 package me.mykindos.betterpvp.core.client.stats.display;
 
-import org.jetbrains.annotations.Nullable;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.display.filter.ClanContext;
+import me.mykindos.betterpvp.core.client.stats.impl.clans.ClansStat;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.filter.IContextFilterButton;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public interface IAbstractClansStatMenu extends IAbstractStatMenu {
-    String getClanName();
-    @Nullable
-    UUID getClanID();
+    IContextFilterButton<ClanContext> getClanFilterButton();
+    ClanContext getClanContext();
+    void setClanContext(ClanContext newContext);
+
+    default void updateCurrentClanContext(Windowed previousMenu) {
+        if (previousMenu instanceof IAbstractClansStatMenu clansAbstractStatMenu) {
+            clansAbstractStatMenu.setClanContext(this.getClanContext());
+            clansAbstractStatMenu.getClanFilterButton().setSelectedFilter(this.getClanContext());
+        }
+        //if previousMenu is instance of IAbstractStatMenu it should always be an AbstractGUI
+        if (previousMenu instanceof AbstractGui abstractGui) {
+            abstractGui.updateControlItems();
+        }
+    }
+
+    static List<ClanContext> getClanContexts(Client client) {
+        List<ClanContext> contexts = new ArrayList<>(List.of(
+                ClanContext.ALL,
+                ClanContext.NO_CLAN
+        ));
+        contexts.addAll(
+                client.getStatContainer().getStats().getStatsOfPeriod(StatContainer.GLOBAL_PERIOD_KEY)
+                        .keySet().stream()
+                        .filter(ClansStat.class::isInstance)
+                        .map(ClansStat.class::cast)
+                        .map(ClanContext::from)
+                        .collect(Collectors.toSet())
+        );
+        return contexts;
+    }
 }
