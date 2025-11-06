@@ -1,5 +1,6 @@
-package me.mykindos.betterpvp.core.client.stats.display;
+package me.mykindos.betterpvp.core.client.stats.display.filter;
 
+import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.period.StatPeriod;
 import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;

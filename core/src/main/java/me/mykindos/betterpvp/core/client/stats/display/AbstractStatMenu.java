@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.display;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.stats.display.filter.PeriodFilterButton;
 import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;

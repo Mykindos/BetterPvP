@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.stats.display.filter;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.stats.impl.clans.ClansStat;
 import me.mykindos.betterpvp.core.menu.button.filter.IFilterContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,14 +13,28 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Getter
 public class ClanContext implements IFilterContext<ClanContext> {
+    public static final ClanContext ALL = new ClanContext(ContextType.ALL);
+    public static final ClanContext NO_CLAN = new ClanContext(ContextType.NO_CLAN);
+
     private final String clanName;
     @Nullable
     private final UUID clanId;
     private final ContextType contextType;
 
-    public ClanContext(String clanName, @Nullable UUID clanId, ContextType contextType) {
+    public static ClanContext from(ClansStat clansStat) {
+        if (clansStat.getClanId() == null) return NO_CLAN;
+        return new ClanContext(clansStat.getClanName(), clansStat.getClanId());
+    }
+
+    public ClanContext(String clanName, @Nullable UUID clanId) {
         this.clanName = clanName;
         this.clanId = clanId;
+        this.contextType = ContextType.CLAN;
+    }
+
+    private ClanContext(ContextType contextType) {
+        this.clanName = contextType == ContextType.NO_CLAN ? ClansStat.NO_CLAN_NAME : "";
+        this.clanId = null;
         this.contextType = contextType;
     }
 
