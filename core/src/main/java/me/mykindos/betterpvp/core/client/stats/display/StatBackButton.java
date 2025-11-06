@@ -13,6 +13,8 @@ public class StatBackButton extends BackButton {
                 return;
             }
             current.updateCurrentPeriod(previousMenu);
+            if (!(getGui() instanceof IAbstractClansStatMenu clanMenu)) return;
+            clanMenu.updateCurrentClanContext(previousMenu);
         });
     }
 }

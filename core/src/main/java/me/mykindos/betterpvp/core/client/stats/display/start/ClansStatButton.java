@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.core.client.stats.display.start;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
+import me.mykindos.betterpvp.core.client.stats.display.clans.ClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
@@ -30,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ClansStatButton extends ControlItem<IAbstractStatMenu> {
+public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T> {
     /**
      * Gets the {@link ItemProvider}.
      * This method gets called every time a {@link Window} is notified ({@link #notifyWindows()}).
@@ -39,9 +41,15 @@ public class ClansStatButton extends ControlItem<IAbstractStatMenu> {
      */
     @Override
     public ItemProvider getItemProvider(IAbstractStatMenu gui) {
+        String clanName = "";
+        UUID clanId = null;
+        if (gui instanceof IAbstractClansStatMenu clanGui) {
+            clanName = clanGui.getClanContext().getClanName();
+            clanId = clanGui.getClanContext().getClanId();
+        }
         return ItemView.builder()
                 .material(Material.TNT)
-                .lore(getClanStats("", null))
+                .lore(getClanStats(clanName, clanId))
                 .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .displayName(Component.text("Clans Stats"))
                 .build();
@@ -55,7 +63,7 @@ public class ClansStatButton extends ControlItem<IAbstractStatMenu> {
         final ClanWrapperStat.ClanWrapperStatBuilder<?, ?> clanStatBuilder = ClanWrapperStat.builder()
                         .clanName(clanName)
                         .clanId(clanId);
-        //todo get kills another way?
+
         final ClanWrapperStat killsStat = clanStatBuilder
                 .wrappedStat(ClientStat.PLAYER_KILLS)
                 .build();
@@ -162,6 +170,7 @@ public class ClansStatButton extends ControlItem<IAbstractStatMenu> {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        //todo
+        IAbstractStatMenu gui = getGui();
+        new ClansStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
     }
 }
