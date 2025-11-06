@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @SuperBuilder
@@ -188,6 +189,7 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
     public boolean containsStat(IStat otherStat) {
         if (!(otherStat instanceof ClanWrapperStat other)) return false;
         if (!Strings.isNullOrEmpty(clanName) && !clanName.equals(other.clanName)) return false;
+        if (!Objects.equals(clanId, other.clanId)) return false;
         return wrappedStat.containsStat(other.wrappedStat);
     }
 

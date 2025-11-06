@@ -11,8 +11,8 @@ import me.mykindos.betterpvp.core.client.achievements.display.button.Achievement
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
-import me.mykindos.betterpvp.core.client.stats.display.PeriodFilterButton;
 import me.mykindos.betterpvp.core.client.stats.display.StatBackButton;
+import me.mykindos.betterpvp.core.client.stats.display.filter.PeriodFilterButton;
 import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
