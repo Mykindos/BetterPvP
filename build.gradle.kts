@@ -11,7 +11,6 @@ plugins {
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
     id("org.flywaydb.flyway") version "11.15.0" apply false // Flyway
     id("org.sonarqube") version "7.0.1.6134" apply true
-
 }
 
 java {
@@ -100,7 +99,6 @@ subprojects {
 
 
 }
-
 
 sonar {
     properties {

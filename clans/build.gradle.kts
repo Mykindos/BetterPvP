@@ -11,8 +11,6 @@ version = "1.0.0"
 group = "me.mykindos.betterpvp.clans"
 description = "Clans plugin for BetterPvP"
 
-
-
 dependencies {
     compileOnly(libs.bundles.paper)
     paperweight.paperDevBundle(libs.versions.paper)

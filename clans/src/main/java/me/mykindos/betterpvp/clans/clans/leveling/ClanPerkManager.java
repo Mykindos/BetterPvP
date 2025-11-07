@@ -77,7 +77,7 @@ public class ClanPerkManager extends Manager<String, ClanPerk> {
 
     private void registerFarmingLevels(int levels, int minReq) {
         final ClanFarmingLevels perk = new ClanFarmingLevels(levels, minReq);
-        addObject(perk.getPerkUUID(), perk);
+        addObject(perk.getPerkUUID().toString(), perk);
     }
 
     public int getTotalFarmingLevels(Clan clan) {
