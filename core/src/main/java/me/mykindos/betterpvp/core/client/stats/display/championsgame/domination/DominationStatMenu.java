@@ -12,7 +12,7 @@ public class DominationStatMenu extends AbstractStatMenu {
      *
      * @param client
      * @param previous
-     * @param period
+     * @param periodKey
      */
     public DominationStatMenu(Client client, Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
         super(client, previous, periodKey, statPeriodManager);
