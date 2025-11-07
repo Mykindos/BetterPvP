@@ -24,7 +24,6 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DamageReasonStat implements IBuildableStat {
-    //todo actually implement
     public static final String PREFIX = "DAMAGE_REASON";
 
     private static StringBuilderParser<DamageReasonStatBuilder> parser = new StringBuilderParser<>(
@@ -90,6 +89,7 @@ public class DamageReasonStat implements IBuildableStat {
         return parser.asString(List.of(
                 PREFIX,
                 relation.name(),
+                type.name(),
                 damageCause == null ? "" : damageCause.name())
         );
     }
@@ -129,8 +129,9 @@ public class DamageReasonStat implements IBuildableStat {
 
     @Override
     public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        DamageReasonStat other = fromString(statName);
+        final DamageReasonStat other = fromString(statName);
         this.relation = other.relation;
+        this.type = other.type;
         this.damageCause = other.damageCause;
         this.reason = other.reason;
         return this;

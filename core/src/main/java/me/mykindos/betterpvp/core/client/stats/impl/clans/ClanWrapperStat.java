@@ -86,8 +86,9 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
 
     private boolean filterClanStat(Map.Entry<IStat, Double> entry) {
         final ClanWrapperStat stat = (ClanWrapperStat) entry.getKey();
-        if (clanId == null && stat.clanId != null) return false;
-        return (clanId == null || clanId.equals(stat.clanId) && wrappedStat.containsStat(stat.wrappedStat));
+        return clanName.equals(stat.clanName) &&
+                Objects.equals(clanId, stat.clanId) &&
+                wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterWrappedStat (Map.Entry<IStat, Double> entry) {

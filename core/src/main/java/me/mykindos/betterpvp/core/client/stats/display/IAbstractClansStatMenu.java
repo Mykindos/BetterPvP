@@ -30,8 +30,7 @@ public interface IAbstractClansStatMenu extends IAbstractStatMenu {
 
     static List<ClanContext> getClanContexts(Client client) {
         List<ClanContext> contexts = new ArrayList<>(List.of(
-                ClanContext.ALL,
-                ClanContext.NO_CLAN
+                ClanContext.ALL
         ));
         contexts.addAll(
                 client.getStatContainer().getStats().getStatsOfPeriod(StatContainer.GLOBAL_PERIOD_KEY)
@@ -41,6 +40,7 @@ public interface IAbstractClansStatMenu extends IAbstractStatMenu {
                         .map(ClanContext::from)
                         .collect(Collectors.toSet())
         );
+        contexts.sort(null);
         return contexts;
     }
 }

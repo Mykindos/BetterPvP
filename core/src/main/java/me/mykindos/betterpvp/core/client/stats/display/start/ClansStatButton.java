@@ -43,14 +43,17 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
     public ItemProvider getItemProvider(IAbstractStatMenu gui) {
         String clanName = "";
         UUID clanId = null;
+
+        ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder();
         if (gui instanceof IAbstractClansStatMenu clanGui) {
             clanName = clanGui.getClanContext().getClanName();
             clanId = clanGui.getClanContext().getClanId();
+        } else {
+            itemViewBuilder.action(ClickActions.ALL, Component.text("Show Detailed Stats"));
         }
-        return ItemView.builder()
+        return itemViewBuilder
                 .material(Material.TNT)
                 .lore(getClanStats(clanName, clanId))
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .displayName(Component.text("Clans Stats"))
                 .build();
     }
@@ -171,6 +174,7 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         IAbstractStatMenu gui = getGui();
+        if (gui instanceof IAbstractClansStatMenu) return;
         new ClansStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
     }
 }
