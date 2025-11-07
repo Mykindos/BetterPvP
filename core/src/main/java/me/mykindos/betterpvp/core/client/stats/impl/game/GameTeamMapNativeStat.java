@@ -121,7 +121,6 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         }
 
         if (!Strings.isNullOrEmpty(teamName) && Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName)) {
-            log.info("map or game").submit();
             //no map or game but team
             return getFilteredStat(statContainer, periodKey, this::filterTeamOnlyStat);
         }
@@ -130,7 +129,6 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
 
         if (Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
             //have action
-            log.info("only action").submit();
             return getFilteredStat(statContainer, periodKey, this::filterActionOnlyStat);
         }
         //all are specified, do stat "normally"
