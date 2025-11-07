@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.filter.IContextFilterButton;
-import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,11 +30,11 @@ public abstract class AbstractClansStatMenu extends AbstractStatMenu implements 
      * @param periodKey
      * @param statPeriodManager
      */
-    protected AbstractClansStatMenu(@NotNull Client client, @Nullable Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
+    protected AbstractClansStatMenu(@NotNull Client client, @Nullable Windowed previous, String periodKey, ClanContext clanContext, StatPeriodManager statPeriodManager) {
         super(client, previous, periodKey, statPeriodManager);
         //todo pass clan context better
         this.clanContext = ClanContext.ALL;
-        this.clanFilterButton = new ClanFilterButton("Clan", ClanContext.ALL, IAbstractClansStatMenu.getClanContexts(client), 9, Material.IRON_DOOR, 0);
+        this.clanFilterButton = new ClanFilterButton(clanContext, IAbstractClansStatMenu.getClanContexts(client));
         setItem(7, 0, (Item) this.clanFilterButton);
     }
 }
