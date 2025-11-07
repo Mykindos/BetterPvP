@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
@@ -60,7 +59,7 @@ public class Progression extends BPvPPlugin {
             injector = core.getInjector().createChildInjector(new ProgressionInjectorModule(this), new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations/global", "progression", TargetDatabase.GLOBAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations/postgres/", "progression");
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 

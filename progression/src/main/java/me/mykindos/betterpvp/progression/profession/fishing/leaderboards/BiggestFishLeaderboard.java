@@ -117,7 +117,7 @@ public class BiggestFishLeaderboard extends Leaderboard<UUID, CaughtFish> implem
         }
 
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getValue().getGamer());
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getValue().getClient());
         if(player.getName() != null) {
             final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
             meta.setPlayerProfile(PlayerProfiles.computeIfAbsent(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));

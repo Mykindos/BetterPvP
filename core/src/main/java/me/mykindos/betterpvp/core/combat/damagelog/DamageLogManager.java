@@ -23,7 +23,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Singleton
-public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> {
+public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<DamageLog>> {
 
     private static final Collector<DamageLog, ?, Map<String, List<DamageLog>>> SUMMARY_COLLECTOR =
             Collectors.groupingBy(log -> log.getDamager() != null

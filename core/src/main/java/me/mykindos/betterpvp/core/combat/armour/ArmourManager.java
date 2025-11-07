@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class ArmourManager extends Manager<Armour> {
+public class ArmourManager extends Manager<String, Armour> {
 
     private final ArmourRepository armourRepository;
 
@@ -20,7 +20,6 @@ public class ArmourManager extends Manager<Armour> {
         loadFromList(armourRepository.getAll());
     }
 
-    @Override
     public void loadFromList(List<Armour> armourList) {
         objects.clear();
         armourList.forEach(armour -> objects.put(armour.getItemType().toUpperCase(), armour));

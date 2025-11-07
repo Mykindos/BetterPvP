@@ -11,22 +11,21 @@ import me.mykindos.betterpvp.clans.fields.block.SimpleOre;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLANS_FIELDS_ORES;
 
 @Singleton
 @CustomLog
@@ -56,19 +55,20 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     @Override
     public List<FieldsBlockEntry> getAll() {
         List<FieldsBlockEntry> ores = new ArrayList<>();
-        String query = "SELECT * FROM clans_fields_ores WHERE Server = ? AND Season = ?;";
+        try {
+            var records = database.getDslContext()
+                    .selectFrom(CLANS_FIELDS_ORES)
+                    .where(CLANS_FIELDS_ORES.REALM.eq(Core.getCurrentRealm()))
+                    .fetch();
 
-        try (ResultSet result = database.executeQuery(new Statement(query,
-                new IntegerStatementValue(Core.getCurrentServer()),
-                new IntegerStatementValue(Core.getCurrentSeason())
-        ), TargetDatabase.GLOBAL).join()) {
-            while (result.next()) {
-                final String world = result.getString("World");
-                final int x = result.getInt("X");
-                final int y = result.getInt("Y");
-                final int z = result.getInt("Z");
-                final String typeName = result.getString("Type");
-                final String blockData = result.getString("Data");
+            for (var fieldsRecord : records) {
+                final String world = fieldsRecord.get(CLANS_FIELDS_ORES.WORLD);
+                final int x = fieldsRecord.get(CLANS_FIELDS_ORES.X);
+                final int y = fieldsRecord.get(CLANS_FIELDS_ORES.Y);
+                final int z = fieldsRecord.get(CLANS_FIELDS_ORES.Z);
+                final String typeName = fieldsRecord.get(CLANS_FIELDS_ORES.TYPE);
+                final String blockData = fieldsRecord.get(CLANS_FIELDS_ORES.DATA);
+
                 FieldsInteractable type = types.stream()
                         .filter(t -> t.getName().equalsIgnoreCase(typeName))
                         .findFirst()
@@ -76,7 +76,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
                 ores.add(new FieldsBlockEntry(type, world, x, y, z, blockData == null ? "" : blockData));
             }
-        } catch (SQLException | IllegalStateException ex) {
+        } catch (Exception ex) {
             log.error("Failed to load fields ores", ex).submit();
         }
 
@@ -84,14 +84,15 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     }
 
     public void delete(String world, int x, int y, int z) {
-        String stmt = "DELETE FROM clans_fields_ores WHERE Server = ? AND Season = ? AND World = ? AND X = ? AND Y = ? AND Z = ?;";
-        database.executeUpdate(new Statement(stmt,
-                new IntegerStatementValue(Core.getCurrentServer()),
-                new IntegerStatementValue(Core.getCurrentSeason()),
-                new StringStatementValue(world),
-                new IntegerStatementValue(x),
-                new IntegerStatementValue(y),
-                new IntegerStatementValue(z)), TargetDatabase.GLOBAL);
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.deleteFrom(CLANS_FIELDS_ORES)
+                    .where(CLANS_FIELDS_ORES.REALM.eq(Core.getCurrentRealm()))
+                    .and(CLANS_FIELDS_ORES.WORLD.eq(world))
+                    .and(CLANS_FIELDS_ORES.X.eq(x))
+                    .and(CLANS_FIELDS_ORES.Y.eq(y))
+                    .and(CLANS_FIELDS_ORES.Z.eq(z))
+                    .execute();
+        });
     }
 
     @Override
@@ -101,39 +102,45 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             return;
         }
 
-        String stmt = "INSERT INTO clans_fields_ores (Server, Season, World, X, Y, Z, Type, Data) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-        database.executeUpdate(new Statement(stmt,
-                new IntegerStatementValue(Core.getCurrentServer()),
-                new IntegerStatementValue(Core.getCurrentSeason()),
-                new StringStatementValue(ore.getWorld()),
-                new IntegerStatementValue(ore.getX()),
-                new IntegerStatementValue(ore.getY()),
-                new IntegerStatementValue(ore.getZ()),
-                new StringStatementValue(ore.getType().getName()),
-                new StringStatementValue(ore.getData())), TargetDatabase.GLOBAL);
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            getQueryForBlockEntry(ctx, ore).execute();
+        });
     }
 
     @SneakyThrows
     public void saveBatch(@NotNull Collection<@NotNull FieldsBlockEntry> ores) {
-        String stmt = "INSERT INTO clans_fields_ores (Server, Season, World, X, Y, Z, Type, Data) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE type = VALUES(type), data = VALUES(data);";
-        List<Statement> statements = new ArrayList<>();
-        for (FieldsBlockEntry ore : ores) {
-            if (ore.getType() == null) {
-                delete(ore.getWorld(), ore.getX(), ore.getY(), ore.getZ());
-                continue;
+        List<Query> statements = new ArrayList<>();
+
+        try {
+            DSLContext ctx = database.getDslContext();
+            for (FieldsBlockEntry ore : ores) {
+                if (ore.getType() == null) {
+                    delete(ore.getWorld(), ore.getX(), ore.getY(), ore.getZ());
+                    continue;
+                }
+
+                statements.add(getQueryForBlockEntry(ctx, ore));
             }
 
-            Statement statement = new Statement(stmt,
-                    new IntegerStatementValue(Core.getCurrentServer()),
-                    new IntegerStatementValue(Core.getCurrentSeason()),
-                    new StringStatementValue(ore.getWorld()),
-                    new IntegerStatementValue(ore.getX()),
-                    new IntegerStatementValue(ore.getY()),
-                    new IntegerStatementValue(ore.getZ()),
-                    new StringStatementValue(ore.getType().getName()),
-                    new StringStatementValue(ore.getData()));
-            statements.add(statement);
+            database.getAsyncDslContext().executeAsyncVoid(actx -> {
+                actx.batch(statements).execute();
+            });
+        } catch (Exception ex) {
+            log.error("Failed saving fields batch", ex).submit();
         }
-        database.executeBatch(statements, TargetDatabase.GLOBAL);
+    }
+
+    private Query getQueryForBlockEntry(DSLContext ctx, FieldsBlockEntry entry) {
+        return ctx.insertInto(CLANS_FIELDS_ORES)
+                .set(CLANS_FIELDS_ORES.REALM, Core.getCurrentRealm())
+                .set(CLANS_FIELDS_ORES.WORLD, entry.getWorld())
+                .set(CLANS_FIELDS_ORES.X, entry.getX())
+                .set(CLANS_FIELDS_ORES.Y, entry.getY())
+                .set(CLANS_FIELDS_ORES.Z, entry.getZ())
+                .set(CLANS_FIELDS_ORES.TYPE, Objects.requireNonNull(entry.getType()).getName())
+                .set(CLANS_FIELDS_ORES.DATA, entry.getData())
+                .onDuplicateKeyUpdate()
+                .set(CLANS_FIELDS_ORES.TYPE, entry.getType().getName())
+                .set(CLANS_FIELDS_ORES.DATA, entry.getData());
     }
 }

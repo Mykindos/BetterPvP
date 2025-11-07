@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Singleton
 @Getter
-public class RoleManager extends Manager<Role> {
+public class RoleManager extends Manager<String, Role> {
 
     private final RoleRepository repository;
     public static final Map<Role, ArrayList<RoleEffect>> rolePassiveDescs = new EnumMap<>(Role.class);

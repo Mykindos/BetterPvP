@@ -200,7 +200,7 @@ public class ItemHandler {
             if (itemMeta != null) {
                 PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
                 if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
-                    return uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))));
+                    return uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))).toString());
                 }
             }
         }

@@ -4,14 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import org.bukkit.Material;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_DAMAGEVALUES;
 
 @Singleton
 @CustomLog
@@ -27,15 +26,16 @@ public class ItemDamageRepository implements IRepository<ItemDamageValue> {
     @Override
     public List<ItemDamageValue> getAll() {
         List<ItemDamageValue> itemDamageValues = new ArrayList<>();
-        String query = "SELECT * FROM champions_damagevalues;";
-
-        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
-            while (result.next()) {
-                Material item = Material.valueOf(result.getString(1));
-                double damage = result.getDouble(2);
-                itemDamageValues.add(new ItemDamageValue(item, damage));
-            }
-        } catch (SQLException ex) {
+        try {
+            database.getDslContext()
+                    .selectFrom(CHAMPIONS_DAMAGEVALUES)
+                    .fetch()
+                    .forEach(dmgValueRecord -> {
+                        Material item = Material.valueOf(dmgValueRecord.get(CHAMPIONS_DAMAGEVALUES.MATERIAL));
+                        double damage = dmgValueRecord.get(CHAMPIONS_DAMAGEVALUES.DAMAGE);
+                        itemDamageValues.add(new ItemDamageValue(item, damage));
+                    });
+        } catch (Exception ex) {
             log.error("Failed to load damage values", ex).submit();
         }
 

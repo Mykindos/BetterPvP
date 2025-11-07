@@ -52,7 +52,7 @@ public class DamageLogListener implements Listener {
         }
 
         final long deathTime = System.currentTimeMillis();
-        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId())
+        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId().toString())
                 .orElse(new ConcurrentLinkedDeque<>()));
         final WeakReference<Player> killerRef = new WeakReference<>(event.getKiller());
         final ClickEvent clickEvent = ClickEvent.callback(
@@ -79,7 +79,7 @@ public class DamageLogListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
         final long deathTime = System.currentTimeMillis();
-        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getPlayer().getUniqueId())
+        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getPlayer().getUniqueId().toString())
                 .orElse(new ConcurrentLinkedDeque<>()));
         final WeakReference<Player> playerRef = new WeakReference<>(event.getPlayer());
         final ClickEvent clickEvent = ClickEvent.callback(

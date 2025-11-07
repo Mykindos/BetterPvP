@@ -3,18 +3,12 @@ core:
     server: Clans-1
     season: Season 1
   database:
-    local:
+    global:
       databaseName: betterpvp
       username: user
       password: BetterPvP123!
-      ip: 127.0.0.1:5000
-      maxPoolSize: 7
-    global:
-      databaseName: betterpvp_global
-      username: user
-      password: BetterPvP123!
-      ip: 127.0.0.1:5000
-      maxPoolSize: 2
+      ip: 127.0.0.1:5002
+      maxPoolSize: 10
     mineplex:
       localDatabaseName:
       globalDatabaseName:

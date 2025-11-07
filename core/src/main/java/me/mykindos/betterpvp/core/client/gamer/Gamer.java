@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
@@ -44,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 @EqualsAndHashCode(callSuper = false, of = {"uuid"})
 public class Gamer extends PropertyContainer implements Invitable, Unique, IMapListener {
 
+    private final long id;
     private final String uuid;
     private ActionBar actionBar = new ActionBar();
     private TitleQueue titleQueue = new TitleQueue();
@@ -62,7 +64,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private double lastDealtDamageValue = 0;
     private String lastAdminMessenger;
 
-    public Gamer(String uuid) {
+    public Gamer(long id, String uuid) {
+        this.id = id;
         this.uuid = uuid;
         this.properties.registerListener(this);
     }

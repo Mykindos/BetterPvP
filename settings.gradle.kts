@@ -49,6 +49,17 @@ dependencyResolutionManagement {
             version("sidebar", "2.2.2")
             version("mockbukkit", "4.45.0")
             version("junit", "5.13.0-M2")
+            version("jooq", "3.19.3")
+            version("postgres", "42.7.4")
+
+            // Library - PostgreSQL
+            library("postgres", "org.postgresql", "postgresql").versionRef("postgres")
+
+            // Library - jOOQ
+            library("jooq", "org.jooq", "jooq").versionRef("jooq")
+            library("jooq-codegen", "org.jooq", "jooq-codegen").versionRef("jooq")
+            library("jooq-meta", "org.jooq", "jooq-meta").versionRef("jooq")
+            library("jooq-meta-extensions", "org.jooq", "jooq-meta-extensions").versionRef("jooq")
 
             // Library - Mineplex SDK
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
@@ -85,6 +96,7 @@ dependencyResolutionManagement {
             library("jedis", "redis.clients:jedis:7.0.0")
             library("flyway-core", "org.flywaydb", "flyway-core").version("11.13.0")
             library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.13.0")
+            library("flyway-postgres", "org.flywaydb", "flyway-database-postgresql").version("11.15.0")
             library("hikari-cp", "com.zaxxer", "HikariCP").version("5.1.0")
 
             // Libraries - Utilities
@@ -146,7 +158,7 @@ dependencyResolutionManagement {
                     "reflections",
                     "okhttp",
                     "zip4j"))
-            bundle("data", listOf("jedis", "flyway-core", "flyway-mysql"))
+            bundle("data", listOf("jedis", "flyway-core", "flyway-mysql", "flyway-postgres"))
             bundle("mixins", listOf("ignite", "mixin"))
         }
     }

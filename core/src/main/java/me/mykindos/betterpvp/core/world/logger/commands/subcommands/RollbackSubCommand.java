@@ -7,11 +7,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.logger.WorldLog;
@@ -23,13 +18,15 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.WORLD_LOGS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.WORLD_LOGS_METADATA;
 
 @CustomLog
 @SubCommand(WorldLoggerCommand.class)
@@ -112,70 +109,66 @@ public class RollbackSubCommand extends Command {
 
         UtilMessage.message(player, "World Logger", "Starting rollback process...");
 
-        Statement.StatementBuilder builder = Statement.builder()
-                .queryBase("SELECT wl.* FROM world_logs wl")
-                .forceIndex("world_logs_location_index");
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            var query = ctx.selectQuery();
 
-        // Add player filter if specified
-        if (finalTargetPlayer != null) {
-            builder = builder.join("world_logs_metadata", Statement.JoinType.INNER, "wlm1", "wl.id", "wlm1.LogId")
-                    .where("wlm1.MetaKey", "=", StringStatementValue.of("PlayerName"))
-                    .where("wlm1.MetaValue", "=", StringStatementValue.of(finalTargetPlayer));
-        }
+            query.addFrom(WORLD_LOGS);
+            if (finalTargetPlayer != null) {
+                query.addJoin(WORLD_LOGS_METADATA, WORLD_LOGS.ID.eq(WORLD_LOGS_METADATA.LOG_ID));
+                query.addConditions(WORLD_LOGS_METADATA.META_KEY.eq("PlayerName")
+                        .and(WORLD_LOGS_METADATA.META_VALUE.eq(finalTargetPlayer)));
+            }
 
-        builder = builder.where("Server", "=", IntegerStatementValue.of(Core.getCurrentServer()))
-                .where("Season", "=", IntegerStatementValue.of(Core.getCurrentSeason()))
-                .where("World", "=", StringStatementValue.of(playerLocation.getWorld().getName()))
-                .where("BlockX", ">=", IntegerStatementValue.of(playerLocation.getBlockX() - finalRadius))
-                .where("BlockX", "<=", IntegerStatementValue.of(playerLocation.getBlockX() + finalRadius))
-                .where("BlockY", ">=", IntegerStatementValue.of(playerLocation.getBlockY() - finalRadius))
-                .where("BlockY", "<=", IntegerStatementValue.of(playerLocation.getBlockY() + finalRadius))
-                .where("BlockZ", ">=", IntegerStatementValue.of(playerLocation.getBlockZ() - finalRadius))
-                .where("BlockZ", "<=", IntegerStatementValue.of(playerLocation.getBlockZ() + finalRadius))
-                .whereOrSameColumn("Action", "=", List.of(StringStatementValue.of(WorldLogAction.BLOCK_PLACE.name()),
-                        StringStatementValue.of(WorldLogAction.BLOCK_BREAK.name())))
-                .where("Time", ">=", new TimestampStatementValue(timeThreshold))
-                .orderBy("Time", Statement.SortOrder.DESCENDING);
+            query.addConditions(WORLD_LOGS.REALM.eq(Core.getCurrentRealm()));
+            query.addConditions(WORLD_LOGS.WORLD.eq(playerLocation.getWorld().getName()));
+            query.addConditions(WORLD_LOGS.BLOCK_X.ge(playerLocation.getBlockX() - finalRadius));
+            query.addConditions(WORLD_LOGS.BLOCK_X.le(playerLocation.getBlockX() + finalRadius));
+            query.addConditions(WORLD_LOGS.BLOCK_Y.ge(playerLocation.getBlockY() - finalRadius));
+            query.addConditions(WORLD_LOGS.BLOCK_Y.le(playerLocation.getBlockY() + finalRadius));
+            query.addConditions(WORLD_LOGS.BLOCK_Z.ge(playerLocation.getBlockZ() - finalRadius));
+            query.addConditions(WORLD_LOGS.BLOCK_Z.le(playerLocation.getBlockZ() + finalRadius));
+            query.addConditions(WORLD_LOGS.ACTION.in(
+                    WorldLogAction.BLOCK_PLACE.name(),
+                    WorldLogAction.BLOCK_BREAK.name()
+            ));
+            query.addConditions(WORLD_LOGS.TIME.ge(timeThreshold.getEpochSecond()));
 
+            try {
+                List<WorldLog> worldLogs = new ArrayList<>();
+                query.fetch().forEach(worldLogRecord -> {
+                    String world = worldLogRecord.get(WORLD_LOGS.WORLD);
+                    int x = worldLogRecord.get(WORLD_LOGS.BLOCK_X);
+                    int y = worldLogRecord.get(WORLD_LOGS.BLOCK_Y);
+                    int z = worldLogRecord.get(WORLD_LOGS.BLOCK_Z);
+                    String action = worldLogRecord.get(WORLD_LOGS.ACTION);
+                    String material = worldLogRecord.get(WORLD_LOGS.MATERIAL);
 
-        Statement statement = builder.build();
+                    WorldLog log = WorldLog.builder()
+                            .world(world)
+                            .blockX(x)
+                            .blockY(y)
+                            .blockZ(z)
+                            .action(WorldLogAction.valueOf(action))
+                            .material(material)
+                            .build();
+                    worldLogs.add(log);
+                });
 
-        database.executeQuery(statement, TargetDatabase.GLOBAL).thenAccept(resultSet -> {
-           try {
-               List<WorldLog> worldLogs = new ArrayList<>();
-               while(resultSet.next()) {
-                   String world = resultSet.getString(3);
-                   int x = resultSet.getInt(4);
-                   int y = resultSet.getInt(5);
-                   int z = resultSet.getInt(6);
-                   String action = resultSet.getString(7);
-                   String material = resultSet.getString(8);
+                if (worldLogs.isEmpty()) {
+                    UtilMessage.message(player, "World Logger", "No blocks found to roll back.");
+                    return;
+                }
 
-                   WorldLog log = WorldLog.builder().world(world).blockX(x).blockY(y).blockZ(z).action(WorldLogAction.valueOf(action)).material(material).build();
-                   worldLogs.add(log);
-               }
+                // Process the rollback
+                processRollback(worldLogs);
 
-               resultSet.close();
+                UtilMessage.message(player, "World Logger", "Rollback completed.");
 
-               if (worldLogs.isEmpty()) {
-                   UtilMessage.message(player, "World Logger", "No blocks found to roll back.");
-                   return;
-               }
-
-               // Process the rollback
-               processRollback(worldLogs);
-
-               UtilMessage.message(player, "World Logger", "Rollback completed.");
-
-           } catch (SQLException e) {
-               throw new RuntimeException(e);
-           }
-        }).exceptionally(ex -> {
-            UtilMessage.simpleMessage(player, "World Logger", "Failed to rollback blocks");
-            log.error("Failed to rollback blocks", ex).submit();
-            return null;
+            } catch (Exception ex) {
+                UtilMessage.simpleMessage(player, "World Logger", "Failed to rollback blocks");
+                log.error("Failed to rollback blocks", ex).submit();
+            }
         });
-
 
     }
 

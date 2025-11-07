@@ -37,7 +37,7 @@ import java.util.UUID;
 @Getter
 @Singleton
 @PluginAdapter(value = "ModelEngine", loadMethodName = "ignored")
-public class CannonManager extends Manager<Cannon> {
+public class CannonManager extends Manager<String, Cannon> {
 
     @Inject
     @Config(path = "cannon.fuse-seconds", defaultValue = "2.5", configName = "weapons/cannon")

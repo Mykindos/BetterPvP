@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Singleton
-public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect>>> {
+public class EffectManager extends Manager<String, ConcurrentHashMap<String, List<Effect>>> {
 
     // Thread-safe cache for effect type names
     private static final ConcurrentHashMap<Class<? extends EffectType>, String> EFFECT_TYPE_NAMES = new ConcurrentHashMap<>();
@@ -166,7 +166,7 @@ public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect
                 }
             }
 
-            Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = getObject(target.getUniqueId()).or(() -> {
+            Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString()).or(() -> {
                 ConcurrentHashMap<String, List<Effect>> effects = new ConcurrentHashMap<>();
                 addObject(target.getUniqueId().toString(), effects);
                 return Optional.of(effects);
@@ -363,7 +363,7 @@ public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect
 
     public long getDuration(LivingEntity target, EffectType type) {
 
-        Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = getObject(target.getUniqueId());
+        Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get().get(type.getName());
             if (effects != null) {

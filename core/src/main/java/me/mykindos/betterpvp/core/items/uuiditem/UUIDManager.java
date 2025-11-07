@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import java.util.List;
 
 @Singleton
-public class UUIDManager extends Manager<UUIDItem> {
+public class UUIDManager extends Manager<String, UUIDItem> {
     @Getter
     private final UUIDRepository uuidRepository;
 
@@ -21,16 +21,15 @@ public class UUIDManager extends Manager<UUIDItem> {
         loadFromList(uuidRepository.getUUIDItemsForModule(namespace));
     }
 
-    @Override
     public void loadFromList(List<UUIDItem> objects) {
-        objects.forEach(uuidItem -> addObject(uuidItem.getUuid(), uuidItem));
+        objects.forEach(uuidItem -> addObject(uuidItem.getUuid().toString(), uuidItem));
     }
 
     public void addUuid(UUIDItem object) {
-        if (getObject(object.getUuid()).isPresent()){
+        if (getObject(object.getUuid().toString()).isPresent()){
             return;
         }
-        addObject(object.getUuid(), object);
+        addObject(object.getUuid().toString(), object);
         uuidRepository.save(object);
     }
 }

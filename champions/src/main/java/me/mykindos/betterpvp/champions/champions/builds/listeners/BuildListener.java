@@ -57,7 +57,7 @@ public class BuildListener implements Listener {
             Block block = event.getClickedBlock();
             if (block == null) return;
             if (block.getType() == Material.ENCHANTING_TABLE) {
-                Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
+                Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId().toString());
                 gamerBuildsOptional.ifPresent(builds -> {
                     new ClassSelectionMenu(buildManager, skillManager, armourManager, null, false).show(event.getPlayer());
                     event.setCancelled(true);
@@ -68,7 +68,7 @@ public class BuildListener implements Listener {
 
     @EventHandler
     public void onDeleteBuild(DeleteBuildEvent event) {
-        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             buildManager.getBuildRepository().update(event.getRoleBuild());
         }
@@ -76,7 +76,7 @@ public class BuildListener implements Listener {
 
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {
-        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             buildManager.getBuildRepository().update(event.getNewBuild());
             buildManager.getBuildRepository().update(event.getOldBuild());

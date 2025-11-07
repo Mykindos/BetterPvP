@@ -8,7 +8,7 @@ import java.util.UUID;
 @Value
 public class Contribution {
 
-    UUID id = UUID.randomUUID();
+    long id;
     UUID contributor;
     @Range(from = 0, to = Integer.MAX_VALUE) float damage;
     @Range(from = 0, to = 1) float percentage;

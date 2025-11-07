@@ -3,119 +3,164 @@ package me.mykindos.betterpvp.progression.profile.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionBuildsRecord;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionExpRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
+import org.jooq.DSLContext;
+import org.jooq.Query;
+import org.jooq.Record2;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
 
-import javax.sql.rowset.CachedRowSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_BUILDS;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_EXP;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_PROPERTIES;
 
 @Singleton
 @CustomLog
 public class ProfessionProfileRepository {
 
     private final Database database;
+    private final ClientManager clientManager;
     private final ProgressionSkillManager skillManager;
     private final PropertyMapper propertyMapper;
-    private final ConcurrentHashMap<String, Statement> queuedStatUpdates;
-    private final ConcurrentHashMap<String, Statement> queuedExpUpdates;
+    private final AtomicReference<ConcurrentHashMap<String, Query>> queuedStatUpdates =
+            new AtomicReference<>(new ConcurrentHashMap<>());
+    private final AtomicReference<ConcurrentHashMap<String, Query>> queuedExpUpdates =
+            new AtomicReference<>(new ConcurrentHashMap<>());
 
     @Inject
-    public ProfessionProfileRepository(Database database, ProgressionSkillManager skillManager, PropertyMapper propertyMapper) {
+    public ProfessionProfileRepository(Database database, ClientManager clientManager,
+                                       ProgressionSkillManager skillManager, PropertyMapper propertyMapper) {
         this.database = database;
+        this.clientManager = clientManager;
         this.skillManager = skillManager;
         this.propertyMapper = propertyMapper;
-        this.queuedStatUpdates = new ConcurrentHashMap<>();
-        this.queuedExpUpdates = new ConcurrentHashMap<>();
+
+        createPartitions();
+    }
+
+    public void createPartitions() {
+        int season = Core.getCurrentSeason();
+        String partitionTableName = "progression_builds_season_" + season;
+        try {
+            database.getDslContext().execute(DSL.sql(String.format(
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF progression_builds FOR VALUES IN (%d)",
+                    partitionTableName, season
+            )));
+            log.info("Created partition {} for season {}", partitionTableName, season).submit();
+        } catch (Exception e) {
+            log.info("Partition {} may already exist", partitionTableName).submit();
+        }
     }
 
     public ProfessionProfile loadProfileForGamer(UUID uuid) {
         ProfessionProfile profile = new ProfessionProfile(uuid);
 
-        loadExperience(profile);
-        loadBuilds(profile);
+        Client client = clientManager.search().online(uuid).orElseThrow();
+        loadExperience(client, profile);
+        loadBuilds(client, profile);
 
         return profile;
     }
 
     public void saveExperience(UUID gamer, String profession, double experience) {
-        String saveExperienceQuery = "INSERT INTO progression_exp (Gamer, Profession, Experience) VALUES (?, ?, ?)"
-                + " ON DUPLICATE KEY UPDATE Experience = ?";
-        Statement statement = new Statement(saveExperienceQuery,
-                new UuidStatementValue(gamer),
-                new StringStatementValue(profession),
-                new DoubleStatementValue(experience),
-                new DoubleStatementValue(experience));
-        queuedExpUpdates.put(gamer + profession, statement);
+        CompletableFuture.runAsync(() -> {
+            Client client = clientManager.search().offline(gamer).join().orElse(null);
+            if (client == null) return;
+
+            DSLContext ctx = database.getDslContext();
+
+            org.jooq.Query query = ctx.insertInto(PROGRESSION_EXP)
+                    .set(PROGRESSION_EXP.CLIENT, client.getId())
+                    .set(PROGRESSION_EXP.SEASON, Core.getCurrentSeason())
+                    .set(PROGRESSION_EXP.PROFESSION, profession)
+                    .set(PROGRESSION_EXP.EXPERIENCE, (long) experience)
+                    .onConflict()
+                    .doUpdate()
+                    .set(PROGRESSION_EXP.EXPERIENCE, (long) experience);
+
+            queuedExpUpdates.get().put(gamer + profession, query);
+        });
+
+
     }
 
-    private void loadExperience(ProfessionProfile profile) {
-        String experienceQuery = "SELECT * FROM progression_exp WHERE Gamer = ?";
-        Statement experienceStatement = new Statement(experienceQuery, new UuidStatementValue(profile.getGamerUUID()));
+    private void loadExperience(Client client, ProfessionProfile profile) {
 
-        try (CachedRowSet result = database.executeQuery(experienceStatement).join()) {
-            while (result.next()) {
-                String profession = result.getString(2);
-                double experience = result.getDouble(3);
+        try {
+            DSLContext ctx = database.getDslContext();
+            Result<ProgressionExpRecord> results = ctx.selectFrom(PROGRESSION_EXP)
+                    .where(PROGRESSION_EXP.CLIENT.eq(client.getId()))
+                    .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentSeason())).fetch();
+            results.forEach(result -> {
+                String profession = result.getProfession();
+                double experience = result.getExperience();
 
                 ProfessionData professionData = profile.getProfessionDataMap().computeIfAbsent(profession, key -> new ProfessionData(profile.getGamerUUID(), profession));
                 professionData.setExperience(experience);
 
-                loadProperties(profile, professionData);
+                loadProperties(client, profile, professionData);
 
-            }
+            });
         } catch (Exception ex) {
             log.error("Failed to load progression experience for {}", profile.getGamerUUID(), ex).submit();
         }
     }
 
-    private void loadProperties(ProfessionProfile profile, ProfessionData data) {
-        String query = "SELECT * FROM progression_properties WHERE Gamer = ? AND Profession = ?";
-        Statement statement = new Statement(query, new UuidStatementValue(profile.getGamerUUID()), new StringStatementValue(data.getProfession()));
+    private void loadProperties(Client client, ProfessionProfile profile, ProfessionData data) {
 
-        try (CachedRowSet result = database.executeQuery(statement).join()) {
-            while (result.next()) {
-                String property = result.getString(3);
-                String value = result.getString(4);
+        try {
+            Result<Record2<String, String>> result = database.getDslContext()
+                    .select(PROGRESSION_PROPERTIES.PROPERTY, PROGRESSION_PROPERTIES.VALUE)
+                    .from(PROGRESSION_PROPERTIES)
+                    .where(PROGRESSION_PROPERTIES.CLIENT.eq(client.getId()))
+                    .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentSeason()))
+                    .and(PROGRESSION_PROPERTIES.PROFESSION.eq(data.getProfession()))
+                    .fetch();
 
-                propertyMapper.parseProperty(property, value, data);
-            }
+            propertyMapper.parseProperties(result, data);
         } catch (Exception ex) {
             log.error("Failed to load progression properties for {}", profile.getGamerUUID()).submit();
         }
     }
 
 
-    private void loadBuilds(ProfessionProfile profile) {
-
-        String query = "SELECT * FROM progression_builds WHERE Gamer = ?";
-        Statement statement = new Statement(query, new UuidStatementValue(profile.getGamerUUID()));
-
+    private void loadBuilds(Client client, ProfessionProfile profile) {
         Map<String, ProfessionData> professionDataMap = profile.getProfessionDataMap();
 
-        try (CachedRowSet result = database.executeQuery(statement).join()) {
-            while (result.next()) {
-                String profession = result.getString(2);
-                String skillName = result.getString(3);
-                int level = result.getInt(4);
+        try {
+            DSLContext ctx = database.getDslContext();
+            Result<ProgressionBuildsRecord> results = ctx.selectFrom(PROGRESSION_BUILDS)
+                    .where(PROGRESSION_BUILDS.CLIENT.eq(client.getId()))
+                    .and(PROGRESSION_BUILDS.SEASON.eq(Core.getCurrentSeason())).fetch();
+
+            results.forEach(buildRecord -> {
+                String profession = buildRecord.getProfession();
+                String skillName = buildRecord.getSkill();
+                int level = buildRecord.getLevel();
 
                 ProfessionData professionData = professionDataMap.computeIfAbsent(profession, k -> new ProfessionData(profile.getGamerUUID(), profession));
                 ProgressionBuild build = professionData.getBuild();
 
                 skillManager.getSkill(skillName).ifPresent(skill -> build.getSkills().put(skill, level));
-            }
+            });
         } catch (Exception ex) {
             log.error("Failed to load progression builds for {}", profile.getGamerUUID()).submit();
         }
@@ -123,43 +168,73 @@ public class ProfessionProfileRepository {
     }
 
     public void updateBuildForGamer(UUID uuid, ProgressionBuild build) {
-        String query = "INSERT INTO progression_builds (Gamer, Profession, Skill, Level) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE Level = ?";
-        List<Statement> batch = new ArrayList<>();
-        build.getSkills().forEach((skill, level) -> {
-            batch.add(new Statement(query, new UuidStatementValue(uuid),
-                    new StringStatementValue(build.getProfession()),
-                    new StringStatementValue(skill.getName()),
-                    new IntegerStatementValue(level),
-                    new IntegerStatementValue(level)));
-        });
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            Client client = clientManager.search().offline(uuid).join().orElse(null);
+            if (client == null) return;
 
-        database.executeBatch(batch);
+            List<Query> queries = new ArrayList<>();
+
+            build.getSkills().forEach((skill, level) -> {
+                Query query = ctx.insertInto(PROGRESSION_BUILDS)
+                        .set(PROGRESSION_BUILDS.CLIENT, client.getId())
+                        .set(PROGRESSION_BUILDS.SEASON, Core.getCurrentSeason())
+                        .set(PROGRESSION_BUILDS.PROFESSION, build.getProfession())
+                        .set(PROGRESSION_BUILDS.SKILL, skill.getName())
+                        .set(PROGRESSION_BUILDS.LEVEL, level)
+                        .onConflict()
+                        .doUpdate()
+                        .set(PROGRESSION_BUILDS.LEVEL, level);
+                queries.add(query);
+            });
+
+            if (!queries.isEmpty()) {
+                ctx.batch(queries).execute();
+            }
+        });
 
     }
 
     public void saveProperty(UUID gamer, String profession, String property, Object value) {
-        String savePropertyQuery = "INSERT INTO progression_properties (Gamer, Profession, Property, Value) VALUES (?, ?, ?, ?)"
-                + " ON DUPLICATE KEY UPDATE Value = ?";
+        CompletableFuture.runAsync(() -> {
+            Client client = clientManager.search().offline(gamer).join().orElse(null);
+            if (client == null) return;
 
-        Statement statement = new Statement(savePropertyQuery,
-                new UuidStatementValue(gamer),
-                new StringStatementValue(profession),
-                new StringStatementValue(property),
-                new StringStatementValue(value.toString()),
-                new StringStatementValue(value.toString()));
-        queuedStatUpdates.put(gamer + property, statement);
+            DSLContext ctx = database.getDslContext();
+
+            Query query = ctx.insertInto(PROGRESSION_PROPERTIES)
+                    .set(PROGRESSION_PROPERTIES.CLIENT, client.getId())
+                    .set(PROGRESSION_PROPERTIES.SEASON, Core.getCurrentSeason())
+                    .set(PROGRESSION_PROPERTIES.PROFESSION, profession)
+                    .set(PROGRESSION_PROPERTIES.PROPERTY, property)
+                    .set(PROGRESSION_PROPERTIES.VALUE, value.toString())
+                    .onConflict()
+                    .doUpdate()
+                    .set(PROGRESSION_PROPERTIES.VALUE, value.toString());
+
+            queuedStatUpdates.get().put(gamer + property, query);
+        });
     }
 
     public void processStatUpdates(boolean async) {
-        ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedStatUpdates);
-        queuedStatUpdates.clear();
-        database.executeBatch(statements.values().stream().toList());
-        log.info("Updated gamer profession stats with {} queries", statements.size()).submit();
-
-        statements = new ConcurrentHashMap<>(queuedExpUpdates);
-        queuedExpUpdates.clear();
-        database.executeBatch(statements.values().stream().toList());
-        log.info("Updated gamer profession experience with {} queries", statements.size()).submit();
-
+        if (async) {
+            database.getAsyncDslContext().executeAsyncVoid(this::performStatUpdates);
+        } else {
+            performStatUpdates(database.getDslContext());
+        }
     }
+
+    private void performStatUpdates(DSLContext ctx) {
+        ConcurrentHashMap<String, Query> statUpdates = queuedStatUpdates.getAndSet(new ConcurrentHashMap<>());
+        ConcurrentHashMap<String, Query> expUpdates = queuedExpUpdates.getAndSet(new ConcurrentHashMap<>());
+
+        if (!statUpdates.isEmpty()) {
+            ctx.batch(statUpdates.values().stream().toList()).execute();
+            log.info("Updated stats with {} queries", statUpdates.size()).submit();
+        }
+        if (!expUpdates.isEmpty()) {
+            ctx.batch(expUpdates.values().stream().toList()).execute();
+            log.info("Updated experience with {} queries", expUpdates.size()).submit();
+        }
+    }
+
 }

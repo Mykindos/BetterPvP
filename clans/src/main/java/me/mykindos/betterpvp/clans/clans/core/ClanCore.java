@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -187,7 +186,7 @@ public final class ClanCore {
             entity.setVisualFire(false);
             entity.setPersistent(false);
             entity.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN_CORE, PersistentDataType.BOOLEAN, true);
-            entity.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, this.clan.getId());
+            entity.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, PersistentDataType.LONG, this.clan.getId());
         });
 
         if (healthbar) {

@@ -5,24 +5,21 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
+import org.jooq.Query;
+import org.jooq.impl.DSL;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CHUNK_BLOCK_TAGGING;
 
 @Singleton
 @CustomLog
@@ -31,90 +28,112 @@ public class BlockTagRepository {
     private final Core core;
     private final Database database;
 
-    private final List<Statement> pendingBlockTagUpdates = Collections.synchronizedList(new ArrayList<>());
+    private final List<Query> pendingBlockTagUpdates = Collections.synchronizedList(new ArrayList<>());
 
     @Inject
     public BlockTagRepository(Core core, Database database) {
         this.core = core;
-        this.database = database;;
+        this.database = database;
+        createPartitions();
     }
 
-    public Map<Integer, Map<String, BlockTag>> getBlockTagsForChunk(Chunk chunk) {
-        Map<Integer, Map<String, BlockTag>> blockTags = new HashMap<>();
-        String query = "SELECT * FROM chunk_block_tagging WHERE Server = ? AND Season = ? AND Chunk = ?";
-        Statement statement = new Statement(query,
-                IntegerStatementValue.of(Core.getCurrentServer()),
-                IntegerStatementValue.of(Core.getCurrentSeason()),
-                StringStatementValue.of(UtilWorld.chunkToFile(chunk))
-        );
+    public void createPartitions() {
+        int realm = Core.getCurrentRealm();
+        String partitionTableName = "chunk_block_tags_realm_" + realm;
+        try {
+            database.getDslContext().execute(DSL.sql(String.format(
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF chunk_block_tags FOR VALUES IN (%d)",
+                    partitionTableName, realm
+            )));
+            log.info("Created partition {} for realm {}", partitionTableName, realm).submit();
+        } catch (Exception e) {
+            log.info("Partition {} may already exist", partitionTableName).submit();
+        }
+    }
 
-        try (CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
-            while(result.next()) {
-                int blockKey = result.getInt(4);
-                String tag = result.getString(5);
-                String value = result.getString(6);
-                blockTags.computeIfAbsent(blockKey, key -> new HashMap<>()).put(tag, new BlockTag(tag, value));
-            }
-        } catch (SQLException e) {
-            log.error("Failed to get block tags for chunk {}: {}", UtilWorld.chunkToFile(chunk), e).submit();
+    public Map<Long, Map<String, BlockTag>> getBlockTagsForChunk(Chunk chunk) {
+        Map<Long, Map<String, BlockTag>> blockTags = new HashMap<>();
+        String chunkString = UtilWorld.chunkToFile(chunk);
+
+        try {
+            database.getDslContext()
+                    .selectFrom(CHUNK_BLOCK_TAGGING)
+                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm()))
+                    .and(CHUNK_BLOCK_TAGGING.CHUNK.eq(chunkString))
+                    .fetch()
+                    .forEach(record -> {
+                        long blockKey = record.get(CHUNK_BLOCK_TAGGING.BLOCK_KEY);
+                        String tag = record.get(CHUNK_BLOCK_TAGGING.TAG);
+                        String value = record.get(CHUNK_BLOCK_TAGGING.VALUE);
+
+                        blockTags.computeIfAbsent(blockKey, key -> new HashMap<>())
+                                .put(tag, new BlockTag(tag, value));
+                    });
+        } catch (Exception e) {
+            log.error("Failed to get block tags for chunk {}: {}", chunkString, e).submit();
         }
 
         return blockTags;
     }
 
     public void addBlockTag(Block block, BlockTag blockTag) {
-        String query = "INSERT INTO chunk_block_tagging (Server, Season, Chunk, BlockKey, Tag, Value) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Value = ?, LastUpdated = ?;";
-        Statement statement = new Statement(query,
-                IntegerStatementValue.of(Core.getCurrentServer()),
-                IntegerStatementValue.of(Core.getCurrentSeason()),
-                StringStatementValue.of(UtilWorld.chunkToFile(block.getChunk())),
-                new IntegerStatementValue(UtilBlock.getBlockKey(block)),
-                StringStatementValue.of(blockTag.getTag()),
-                StringStatementValue.of(blockTag.getValue()),
-                StringStatementValue.of(blockTag.getValue()),
-                new TimestampStatementValue(Instant.now())
-        );
+        long blockKey = UtilBlock.getBlockKey(block);
 
         synchronized (pendingBlockTagUpdates) {
-            pendingBlockTagUpdates.add(statement);
+            pendingBlockTagUpdates.add(
+                    database.getDslContext()
+                            .insertInto(CHUNK_BLOCK_TAGGING)
+                            .set(CHUNK_BLOCK_TAGGING.REALM, Core.getCurrentRealm())
+                            .set(CHUNK_BLOCK_TAGGING.CHUNK, UtilWorld.chunkToFile(block.getChunk()))
+                            .set(CHUNK_BLOCK_TAGGING.BLOCK_KEY, blockKey)
+                            .set(CHUNK_BLOCK_TAGGING.TAG, blockTag.getTag())
+                            .set(CHUNK_BLOCK_TAGGING.VALUE, blockTag.getValue())
+                            .set(CHUNK_BLOCK_TAGGING.LAST_UPDATED, System.currentTimeMillis())
+                            .onConflict(CHUNK_BLOCK_TAGGING.REALM, CHUNK_BLOCK_TAGGING.CHUNK, CHUNK_BLOCK_TAGGING.BLOCK_KEY, CHUNK_BLOCK_TAGGING.TAG)
+                            .doUpdate()
+                            .set(CHUNK_BLOCK_TAGGING.VALUE, blockTag.getValue())
+                            .set(CHUNK_BLOCK_TAGGING.LAST_UPDATED, System.currentTimeMillis())
+            );
         }
     }
 
     public void removeBlockTag(Block block, String tag) {
-        String query = "DELETE FROM chunk_block_tagging WHERE Server = ? AND Season = ? AND Chunk = ? AND BlockKey = ? AND Tag = ?;";
-        Statement statement = new Statement(query,
-                IntegerStatementValue.of(Core.getCurrentServer()),
-                IntegerStatementValue.of(Core.getCurrentSeason()),
-                StringStatementValue.of(UtilWorld.chunkToFile(block.getChunk())),
-                new IntegerStatementValue(UtilBlock.getBlockKey(block)),
-                StringStatementValue.of(tag)
-        );
-
         synchronized (pendingBlockTagUpdates) {
-            pendingBlockTagUpdates.add(statement);
+            pendingBlockTagUpdates.add(
+                    database.getDslContext()
+                            .deleteFrom(CHUNK_BLOCK_TAGGING)
+                            .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm()))
+                            .and(CHUNK_BLOCK_TAGGING.CHUNK.eq(UtilWorld.chunkToFile(block.getChunk())))
+                            .and(CHUNK_BLOCK_TAGGING.BLOCK_KEY.eq(UtilBlock.getBlockKey(block)))
+                            .and(CHUNK_BLOCK_TAGGING.TAG.eq(tag))
+            );
         }
     }
 
     // Purge player manipulated block tags older than 3 days
     public void purgeOldBlockTags() {
-        String query = "DELETE FROM chunk_block_tagging WHERE Server = ? AND Season = ? AND LastUpdated < ? AND Tag = ?";
-        Statement statement = new Statement(query,
-                IntegerStatementValue.of(Core.getCurrentServer()),
-                IntegerStatementValue.of(Core.getCurrentSeason()),
-                new TimestampStatementValue(Instant.now().minusSeconds(60 * 60 * 24 * 3)),
-                StringStatementValue.of("PlayerManipulated")
-        );
+        Instant cutoff = Instant.now().minusSeconds(60 * 60 * 24 * 3);
+        try {
+            int deletedRows = database.getDslContext()
+                    .deleteFrom(CHUNK_BLOCK_TAGGING)
+                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm()))
+                    .and(CHUNK_BLOCK_TAGGING.LAST_UPDATED.lt(cutoff.toEpochMilli()))
+                    .and(CHUNK_BLOCK_TAGGING.TAG.eq("PlayerManipulated"))
+                    .execute();
 
-        database.executeUpdate(statement, TargetDatabase.GLOBAL);
+            log.info("Purged {} old block tags", deletedRows).submit();
+        } catch (Exception ex) {
+            log.error("Failed to purge old block tags", ex).submit();
+        }
     }
 
     public void processBlockTagUpdates() {
         synchronized (pendingBlockTagUpdates) {
             if(!pendingBlockTagUpdates.isEmpty()) {
 
-                List<Statement> temp = new ArrayList<>(pendingBlockTagUpdates);
+                List<Query> temp = new ArrayList<>(pendingBlockTagUpdates);
                 pendingBlockTagUpdates.clear();
-                database.executeBatch(temp, TargetDatabase.GLOBAL);
+                database.getDslContext().batch(temp).execute();
             }
         }
     }

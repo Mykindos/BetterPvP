@@ -2,6 +2,7 @@ plugins {
     id("org.flywaydb.flyway")
     id("io.papermc.paperweight.userdev")
     `maven-publish`
+    id("jooqdynamic")
 }
 
 version = "1.0.0"

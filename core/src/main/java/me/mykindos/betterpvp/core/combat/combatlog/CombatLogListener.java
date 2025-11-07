@@ -136,7 +136,7 @@ public class CombatLogListener implements Listener {
             return;
         }
 
-        combatLogManager.getObject(event.getPlayer().getUniqueId()).ifPresent(combatLog -> {
+        combatLogManager.getObject(event.getPlayer().getUniqueId().toString()).ifPresent(combatLog -> {
             combatLog.getCombatLogSheep().remove();
         });
 

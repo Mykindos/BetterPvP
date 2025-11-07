@@ -9,11 +9,8 @@ import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILL_CONTRIBUTIONS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 public class ChampionsCombatData extends CombatData {
 
@@ -39,7 +41,7 @@ public class ChampionsCombatData extends CombatData {
     }
 
     @Override
-    protected ChampionsKill generateKill(UUID killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
+    protected ChampionsKill generateKill(long killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
         final Role killerRole = roleManager.getObject(killer).orElse(null);
         final Role victimRole = roleManager.getObject(victim).orElse(null);
         final Map<Contribution, Role> contributorRoles = new HashMap<>();
@@ -52,30 +54,29 @@ public class ChampionsCombatData extends CombatData {
 
     @Override
     protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
-        List<Statement> killStatements = new ArrayList<>();
-        List<Statement> contributionStatements = new ArrayList<>();
-        final String killStmt = "INSERT INTO champions_kills (KillId, KillerClass, VictimClass) VALUES (?, ?, ?);";
-        final String assistStmt = "INSERT INTO champions_kill_contributions (ContributionId, ContributorClass) VALUES (?, ?);";
+        List<ChampionsKillsRecord> killRecords = new ArrayList<>();
+        List<ChampionsKillContributionsRecord> contributionRecords = new ArrayList<>();
 
-        // Add kills - This is done first because it if it breaks it will stop the rating update
+        // Add kills - This is done first because if it breaks it will stop the rating update
         // Kills are only saved by the victim
-        for (final Kill kill: pendingKills) {
+        for (final Kill kill : pendingKills) {
             final ChampionsKill championsKill = (ChampionsKill) kill;
-            final UUID killId = kill.getId();
+            final Long killId = kill.getId();
             final Map<Contribution, Role> contributions = championsKill.getContributionRoles();
 
-            Statement killStatement = new Statement(killStmt,
-                    new UuidStatementValue(killId),
-                    new StringStatementValue(championsKill.getKillerRole() == null ? "" : championsKill.getKillerRole().toString()),
-                    new StringStatementValue(championsKill.getVictimRole() == null ? "" : championsKill.getVictimRole().toString()));
-            killStatements.add(killStatement);
+            // Create kill record
+            ChampionsKillsRecord killRecord = database.getDslContext().newRecord(CHAMPIONS_KILLS);
+            killRecord.setKillId(killId);
+            killRecord.setKillerClass(championsKill.getKillerRole() == null ? "" : championsKill.getKillerRole().toString());
+            killRecord.setVictimClass(championsKill.getVictimRole() == null ? "" : championsKill.getVictimRole().toString());
+            killRecords.add(killRecord);
 
             contributions.entrySet().removeIf(entry -> entry.getKey().getContributor() == kill.getKiller());
             contributions.forEach((contribution, cRole) -> {
-                Statement assistStatement = new Statement(assistStmt,
-                        new UuidStatementValue(contribution.getId()),
-                        new StringStatementValue(cRole == null ? "" : cRole.toString()));
-                contributionStatements.add(assistStatement);
+                ChampionsKillContributionsRecord contributionRecord = database.getDslContext().newRecord(CHAMPIONS_KILL_CONTRIBUTIONS);
+                contributionRecord.setContributionId(contribution.getId());
+                contributionRecord.setContributorClass(cRole == null ? "" : cRole.toString());
+                contributionRecords.add(contributionRecord);
             });
         }
 
@@ -85,19 +86,32 @@ public class ChampionsCombatData extends CombatData {
         }
 
         // Save self-rating (this saves independently for each player)
-        String ratingStmt = "INSERT INTO champions_combat_stats (Gamer, Server, Season, Class, Rating, Killstreak, HighestKillstreak) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Rating = VALUES(Rating), Killstreak = VALUES(Killstreak), HighestKillstreak = VALUES(HighestKillstreak);";
-        Statement victimRating = new Statement(ratingStmt,
-                new UuidStatementValue(getHolder()),
-                new IntegerStatementValue(Core.getCurrentServer()),
-                new IntegerStatementValue(Core.getCurrentSeason()),
-                new StringStatementValue(role == null ? "" : role.toString()),
-                new IntegerStatementValue(getRating()),
-                new IntegerStatementValue(getKillStreak()),
-                new IntegerStatementValue(getHighestKillStreak()));
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            // Batch insert kills
+            if (!killRecords.isEmpty()) {
+                ctx.batchInsert(killRecords).execute();
+            }
 
-        database.executeBatch(killStatements, TargetDatabase.GLOBAL);
-        database.executeBatch(contributionStatements, TargetDatabase.GLOBAL);
-        database.executeUpdate(victimRating, TargetDatabase.GLOBAL);
+            // Batch insert contributions
+            if (!contributionRecords.isEmpty()) {
+                ctx.batchInsert(contributionRecords).execute();
+            }
+
+            // Insert/update victim rating using INSERT ... ON DUPLICATE KEY UPDATE
+            ctx.insertInto(CHAMPIONS_COMBAT_STATS)
+                    .set(CHAMPIONS_COMBAT_STATS.CLIENT, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
+                    .set(CHAMPIONS_COMBAT_STATS.REALM, Core.getCurrentRealm())
+                    .set(CHAMPIONS_COMBAT_STATS.CLASS, role == null ? "" : role.toString())
+                    .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
+                    .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
+                    .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
+                    .onDuplicateKeyUpdate()
+                    .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
+                    .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
+                    .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
+                    .execute();
+        });
+
         pendingKills.clear();
     }
 

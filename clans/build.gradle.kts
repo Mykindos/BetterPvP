@@ -1,6 +1,10 @@
+project.ext["jooqPackageName"] = "me.mykindos.betterpvp.clans.database.jooq"
+project.ext["jooqOutputDir"] = "src/main/java"
+
 plugins {
     id("org.flywaydb.flyway")
     id("io.papermc.paperweight.userdev")
+    id("jooqdynamic")
 }
 
 version = "1.0.0"

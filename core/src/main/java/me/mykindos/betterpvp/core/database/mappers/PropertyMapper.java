@@ -4,14 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import org.jooq.Record2;
+import org.jooq.Result;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.PROPERTY_MAP;
 
 @CustomLog
 @Singleton
@@ -27,16 +27,10 @@ public class PropertyMapper {
     }
 
     public Map<String, String> getPropertyMap() {
-        String query = "SELECT * FROM property_map;";
-
         Map<String, String> map = new ConcurrentHashMap<>();
-        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
-            while (result.next()) {
-                map.put(result.getString(1), result.getString(2));
-            }
-        } catch (SQLException ex) {
-            log.error("Error loading property map", ex);
-        }
+        database.getDslContext().selectFrom(PROPERTY_MAP).fetch().forEach(propertyRecord -> {
+            map.put(propertyRecord.get(PROPERTY_MAP.PROPERTY), propertyRecord.get(PROPERTY_MAP.TYPE));
+        });
 
         return map;
     }
@@ -45,31 +39,37 @@ public class PropertyMapper {
      *
      * @param result A CachedRowSet with 2 columns, Property and Value
      * @param container The property container that the properties will be added to
-     * @throws SQLException If the result set is invalid
-     * @throws ClassNotFoundException If the property type is not found
      */
-    public void parseProperties(CachedRowSet result, PropertyContainer container) throws SQLException, ClassNotFoundException {
+    public void parseProperties(Result<Record2<String, String>> result, PropertyContainer container) {
 
-        while (result.next()) {
-            String property = result.getString("Property");
+        result.forEach(propertyRecord -> {
+            String property = propertyRecord.component1();
             String type = propertyMap.get(property);
 
             if(type == null){
                 log.error("Property type not found for property: " + property).submit();
-                continue;
+                return;
             }
 
             Object value = switch (type.toLowerCase()) {
-                case "int" -> result.getInt("Value");
-                case "boolean" -> Boolean.parseBoolean(result.getString("Value"));
-                case "double" -> Double.parseDouble(result.getString("Value"));
-                case "long" -> Long.parseLong(result.getString("Value"));
-                case "string" -> result.getString("Value");
-                default -> Class.forName(type).cast(result.getObject("Value"));
+                case "int" -> Integer.parseInt(propertyRecord.component2());
+                case "boolean" -> Boolean.parseBoolean(propertyRecord.component2());
+                case "double" -> Double.parseDouble(propertyRecord.component2());
+                case "long" -> Long.parseLong(propertyRecord.component2());
+                case "string" -> propertyRecord.component2();
+                default -> {
+                    try {
+                        yield Class.forName(type).cast(propertyRecord.component2());
+                    } catch (ClassNotFoundException e) {
+                        log.error("Failed to parse property {} to class {}", propertyRecord.component2(), type, e).submit();
+                        yield null;
+                    }
+                }
             };
 
             container.putProperty(property, value, true);
-        }
+        });
+
 
     }
 

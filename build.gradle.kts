@@ -104,6 +104,7 @@ sonar {
     properties {
         property("sonar.projectKey", "Mykindos_BetterPvP")
         property("sonar.organization", "mykindos")
+        property("sonar.exclusions", "*.sql")
     }
 }
 

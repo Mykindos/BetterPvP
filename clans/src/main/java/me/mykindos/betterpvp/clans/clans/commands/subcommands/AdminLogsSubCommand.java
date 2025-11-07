@@ -56,7 +56,7 @@ public class AdminLogsSubCommand extends ClanSubCommand {
 
         if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
-            new CachedLogMenu(clan.getName(), LogContext.CLAN, clan.getId().toString(), null, CachedLogMenu.CLANS, JavaPlugin.getPlugin(Clans.class), logRepository, null).show(player);
+            new CachedLogMenu(clan.getName(), LogContext.CLAN, clan.getId() + "", null, CachedLogMenu.CLANS, JavaPlugin.getPlugin(Clans.class), logRepository, null).show(player);
             return;
         }
         UUID clanId;

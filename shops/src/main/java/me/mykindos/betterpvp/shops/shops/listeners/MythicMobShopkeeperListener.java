@@ -58,7 +58,7 @@ public class MythicMobShopkeeperListener implements Listener {
         ActiveMob activeMob = MythicBukkit.inst().getMobManager().spawnMob(mythicMob, event.getLocation());
         if (activeMob != null) {
             activeMob.getEntity().getBukkitEntity().getPersistentDataContainer().set(ShopsNamespacedKeys.SHOPKEEPER, PersistentDataType.BOOLEAN, true);
-            shopkeeperManager.addObject(activeMob.getEntity().getUniqueId(), new IShopkeeper() {
+            shopkeeperManager.addObject(activeMob.getEntity().getUniqueId().toString(), new IShopkeeper() {
                 @Override
                 public Entity getEntity() {
                     return activeMob.getEntity().getBukkitEntity();

@@ -34,7 +34,7 @@ public class PlayerControllerListener implements Listener {
 
     @EventHandler
     public void onBuildLoad(ChampionsBuildLoadedEvent event) {
-        layoutManager.load(event.getPlayer());
+        layoutManager.load(clientManager.search().online(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

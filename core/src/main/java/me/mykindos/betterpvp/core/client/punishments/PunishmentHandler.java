@@ -60,7 +60,7 @@ public class PunishmentHandler {
         String formattedTime = UtilTime.getTime(time, 1);
 
         Punishment punishment = new Punishment(
-                UUID.randomUUID(),
+                target.getId(),
                 target.getUniqueId(),
                 type,
                 rule,

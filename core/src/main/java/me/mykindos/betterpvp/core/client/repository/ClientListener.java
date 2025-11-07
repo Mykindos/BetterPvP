@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientFetchExternalDataEvent;
@@ -31,6 +32,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -63,13 +65,15 @@ public class ClientListener implements Listener {
     @Config(path = "core.salt", defaultValue = "")
     private String salt;
 
+    private final Core core;
     private final ClientManager clientManager;
 
     private boolean serverLoaded;
     private final Set<UUID> usersLoading = Collections.synchronizedSet(new HashSet<>());
 
     @Inject
-    public ClientListener(ClientManager clientManager) {
+    public ClientListener(Core core, ClientManager clientManager) {
+        this.core = core;
         this.clientManager = clientManager;
     }
 
@@ -154,6 +158,7 @@ public class ClientListener implements Listener {
 
         final Client client = clientManager.search().online(event.getPlayer());
         if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
+            event.getPlayer().setMetadata("clientId", new FixedMetadataValue(core, client.getId()));
 
             if (client.hasRank(Rank.TRIAL_MOD)) {
                 event.allow();

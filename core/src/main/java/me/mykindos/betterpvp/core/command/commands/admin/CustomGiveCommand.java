@@ -26,7 +26,6 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @WithReflection
 @CustomLog
@@ -100,7 +99,7 @@ public class CustomGiveCommand extends Command {
         if (itemMeta != null) {
             PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
             if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
-                uuidItem = uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)))).orElse(null);
+                uuidItem = uuidManager.getObject(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))).orElse(null);
             }
         }
         if (uuidItem != null) {

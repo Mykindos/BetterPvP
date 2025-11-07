@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession;
 
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
@@ -14,14 +15,16 @@ import java.util.UUID;
 public abstract class ProfessionHandler implements IProfession {
 
     protected final Progression progression;
+    protected final ClientManager clientManager;
     protected final ProfessionProfileManager professionProfileManager;
     protected final String profession;
 
     @Getter
     public boolean enabled;
 
-    protected ProfessionHandler(Progression progression, ProfessionProfileManager professionProfileManager, String profession) {
+    protected ProfessionHandler(Progression progression, ClientManager clientManager, ProfessionProfileManager professionProfileManager, String profession) {
         this.progression = progression;
+        this.clientManager = clientManager;
         this.professionProfileManager = professionProfileManager;
         this.profession = profession;
     }

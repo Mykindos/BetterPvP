@@ -46,7 +46,7 @@ public class ProgressionListener implements Listener {
         final double amount = event.getGainedExp();
 
         // Grant exp
-        professionProfileManager.getObject(player.getUniqueId()).ifPresent(profile -> {
+        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             var data = profile.getProfessionDataMap().computeIfAbsent(event.getProfession(), k -> new ProfessionData(player.getUniqueId(), event.getProfession()));
             data.setExperience(data.getExperience() + amount);
             professionProfileManager.getRepository().saveExperience(player.getUniqueId(), event.getProfession(), data.getExperience());

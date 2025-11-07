@@ -27,7 +27,7 @@ import java.util.UUID;
 
 @Singleton
 @CustomLog
-public class ShopkeeperManager extends Manager<IShopkeeper> {
+public class ShopkeeperManager extends Manager<String, IShopkeeper> {
 
     private final Shops shops;
 
@@ -75,19 +75,19 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             switch (type.toUpperCase()) {
                 case "ZOMBIE" -> {
                     var zombieKeeper = new ZombieShopkeeper(new Location(world, x, y, z), name);
-                    addObject(zombieKeeper.getUUID(), zombieKeeper);
+                    addObject(zombieKeeper.getUUID().toString(), zombieKeeper);
                 }
                 case "SKELETON" -> {
                     var skeletonKeeper = new SkeletonShopkeeper(new Location(world, x, y, z), name);
-                    addObject(skeletonKeeper.getUUID(), skeletonKeeper);
+                    addObject(skeletonKeeper.getUUID().toString(), skeletonKeeper);
                 }
                 case "PARROT" -> {
                     var parrotKeeper = new ParrotShopkeeper(new Location(world, x, y, z), name);
-                    addObject(parrotKeeper.getUUID(), parrotKeeper);
+                    addObject(parrotKeeper.getUUID().toString(), parrotKeeper);
                 }
                 default -> {
                     var villagerKeeper = new VillagerShopkeeper(new Location(world, x, y, z), name);
-                    addObject(villagerKeeper.getUUID(), villagerKeeper);
+                    addObject(villagerKeeper.getUUID().toString(), villagerKeeper);
                 }
             }
         });

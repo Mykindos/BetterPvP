@@ -33,12 +33,12 @@ import java.util.concurrent.CompletableFuture;
 public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowed {
 
     private final String name;
-    private final UUID id;
+    private final long id;
     private final ClanManager clanManager;
     private final ClientManager clientManager;
     private final Windowed previous;
 
-    public PlayersOfClanMenu(String name, UUID id, ClanManager clanManager, ClientManager clientManager, Windowed previous) {
+    public PlayersOfClanMenu(String name, long id, ClanManager clanManager, ClientManager clientManager, Windowed previous) {
         super(9, 4, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",

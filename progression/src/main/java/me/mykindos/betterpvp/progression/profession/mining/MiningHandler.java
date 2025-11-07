@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.progression.Progression;
@@ -37,8 +38,9 @@ public class MiningHandler extends ProfessionHandler {
     private Set<Material> leaderboardBlocks = new HashSet<>();
 
     @Inject
-    public MiningHandler(Progression progression, ProfessionProfileManager professionProfileManager, MiningRepository miningRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager) {
-        super(progression, professionProfileManager, "Mining");
+    public MiningHandler(Progression progression, ClientManager clientManager,
+                         ProfessionProfileManager professionProfileManager, MiningRepository miningRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager) {
+        super(progression, clientManager, professionProfileManager, "Mining");
         this.miningRepository = miningRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;
@@ -48,11 +50,10 @@ public class MiningHandler extends ProfessionHandler {
         return Collections.unmodifiableSet(leaderboardBlocks);
     }
 
-    public String getDbMaterialsList() {
+    public String[] getDbMaterialsArray() {
         return getLeaderboardBlocks().stream()
-                .map(mat -> "'" + mat.name() + "'")
-                .reduce((a, b) -> a + "," + b)
-                .orElse("''");
+                .map(Material::name)
+                .toArray(String[]::new);
     }
 
     public long getExperienceFor(Material material) {
@@ -99,7 +100,7 @@ public class MiningHandler extends ProfessionHandler {
 
         leaderboardManager.getObject("Total Ores Mined").ifPresent(leaderboard -> {
             MiningOresMinedLeaderboard oresMinedLeaderboard = (MiningOresMinedLeaderboard) leaderboard;
-            oresMinedLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable2) -> {
+            oresMinedLeaderboard.add(player.getUniqueId(), 1).whenComplete((result, throwable2) -> {
                 if (throwable2 != null) {
                     log.error("Failed to add ore count to leaderboard for player " + player.getName(), throwable2).submit();
                     return;

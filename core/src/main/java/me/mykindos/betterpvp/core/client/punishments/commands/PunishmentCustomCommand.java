@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Singleton
 @CustomLog
@@ -146,7 +145,7 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
 
         String formattedTime = new PrettyTime().format(new Date(time)).replace(" from now", "");
 
-        Punishment punishment = new Punishment(UUID.randomUUID(), target.getUniqueId(), type, ruleManager.getObject("CUSTOM").orElseThrow(), System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
+        Punishment punishment = new Punishment(target.getId(), target.getUniqueId(), type, ruleManager.getObject("CUSTOM").orElseThrow(), System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
         target.getPunishments().add(punishment);
         punishmentRepository.save(punishment);
 

@@ -68,10 +68,10 @@ public class PendingLog {
 
     public PendingLog addClanContext(IClan clan, boolean target) {
         if (!target) {
-            context.put(LogContext.CLAN, clan.getId().toString());
+            context.put(LogContext.CLAN, clan.getId() + "");
             context.put(LogContext.CLAN_NAME, clan.getName());
         } else {
-            context.put(LogContext.TARGET_CLAN, clan.getId().toString());
+            context.put(LogContext.TARGET_CLAN, clan.getId() + "");
             context.put(LogContext.TARGET_CLAN_NAME, clan.getName());
         }
         return this;

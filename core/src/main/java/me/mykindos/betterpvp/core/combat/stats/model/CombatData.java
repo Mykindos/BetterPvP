@@ -42,9 +42,9 @@ public abstract class CombatData extends PlayerData {
 
     protected final UUID holder;
     protected @IntRange(from = 0) int rating = 1_500; // Default is 1500 rating
-    protected @IntRange(from = 0) int kills;
-    protected @IntRange(from = 0) int assists;
-    protected @IntRange(from = 0) int deaths;
+    protected @IntRange(from = 0) long kills;
+    protected @IntRange(from = 0) long assists;
+    protected @IntRange(from = 0) long deaths;
     protected @IntRange(from = 0) int killStreak;
     protected @IntRange(from = 0) int highestKillStreak;
 
@@ -56,7 +56,7 @@ public abstract class CombatData extends PlayerData {
         attachments.add(attachment);
     }
 
-    public final Kill killed(UUID killId, @NotNull CombatData killer, @NotNull Map<CombatData, Contribution> contributions) {
+    public final Kill killed(long killId, @NotNull CombatData killer, @NotNull Map<CombatData, Contribution> contributions) {
         Preconditions.checkArgument(contributions.containsKey(killer), "Must have at least one contributor");
         final int ratingDelta = getRatingDelta(killer, this);
 
@@ -94,7 +94,7 @@ public abstract class CombatData extends PlayerData {
         return kill;
     }
 
-    protected Kill generateKill(UUID killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
+    protected Kill generateKill(long killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
         return new Kill(killId, killer, victim, ratingDelta, contributions);
     }
 

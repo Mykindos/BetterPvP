@@ -1,15 +1,11 @@
 package me.mykindos.betterpvp.core.database.connection;
 
-import java.sql.Connection;
+import javax.sql.DataSource;
 
 public interface IDatabaseConnection {
 
-    Connection getDatabaseConnection(TargetDatabase targetDatabase);
+    void runDatabaseMigrations(ClassLoader classLoader, String location, String name);
 
-    Connection getDatabaseConnection();
-
-    void runDatabaseMigrations(ClassLoader classLoader, String location, String name, TargetDatabase targetDatabase);
-
-
+    DataSource getDataSource();
 
 }

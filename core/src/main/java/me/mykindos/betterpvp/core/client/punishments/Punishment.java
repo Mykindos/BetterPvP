@@ -34,11 +34,13 @@ public class Punishment {
     /**
      * The id of this punishment
      */
-    private final UUID id;
+    private int id;
     /**
      * The UUID of the punished player
      */
-    private final UUID client;
+    private final long clientId;
+
+    private final UUID clientUUID;
     /**
      * The type of punishment
      */
@@ -122,7 +124,7 @@ public class Punishment {
         this.setRevokeType(revokeType);
         this.setRevokeTime(System.currentTimeMillis());
         this.setRevokeReason(reason);
-        this.getType().onExpire(client, this);
+        this.getType().onExpire(clientUUID, this);
         return this;
     }
 

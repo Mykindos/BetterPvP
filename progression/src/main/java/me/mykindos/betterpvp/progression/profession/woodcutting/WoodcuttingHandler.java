@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Data;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
@@ -61,10 +62,10 @@ public class WoodcuttingHandler extends ProfessionHandler {
     private DropTable lootTypes;
 
     @Inject
-    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager,
+    public WoodcuttingHandler(Progression progression, ClientManager clientManager, ProfessionProfileManager professionProfileManager,
                               WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager,
                               BlockTagManager blockTagManager, EffectManager effectManager, ItemHandler itemHandler) {
-        super(progression, professionProfileManager, "Woodcutting");
+        super(progression, clientManager, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;

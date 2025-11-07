@@ -36,7 +36,7 @@ public class OfflineMessagesCommand extends Command {
             UtilMessage.message(player, "OfflineMessages", "Usage: <yellow>/offlinemessages <green><number> <unit></green></yellow>");
             return;
         }
-        offlineMessagesHandler.showMenuForMessagesForClientAfterTime(player, player.getName(), player.getUniqueId(), UtilTime.parseTimeString(args));
+        offlineMessagesHandler.showMenuForMessagesForClientAfterTime(player, client, UtilTime.parseTimeString(args));
 
     }
 }
