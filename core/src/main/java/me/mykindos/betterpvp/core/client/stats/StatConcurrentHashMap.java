@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.client.stats;
 
-import joptsimple.internal.Strings;
 import lombok.CustomLog;
 import lombok.Data;
 import lombok.Getter;
@@ -28,12 +27,11 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
      * Put the specified stat in this map;
      *
      * @param period
-     * @param key
+     * @param stat
      * @param value
      * @param silent
      */
     public void put(String period, @NotNull IStat stat, Double value, boolean silent) {
-        log.info("Stat {} Value {}", stat, value).submit();
         AtomicReference<Double> oldValue = new AtomicReference<>();
         myMap.compute(period, (k, v) -> {
             if (v == null) {
@@ -58,7 +56,7 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
 
     @Nullable
     public Double get(String period, IStat stat) {
-        if (Strings.isNullOrEmpty(period)) return getAll(stat);
+        if (StatContainer.GLOBAL_PERIOD_KEY.equals(period)) return getAll(stat);
 
         final ConcurrentHashMap<IStat, Double> periodMap = myMap.get(period);
         if (periodMap == null) return null;

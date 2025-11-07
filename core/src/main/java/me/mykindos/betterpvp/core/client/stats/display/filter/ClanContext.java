@@ -22,7 +22,7 @@ public class ClanContext implements IFilterContext<ClanContext> {
     private final ContextType contextType;
 
     public static ClanContext from(ClansStat clansStat) {
-        if (clansStat.getClanId() == null) return NO_CLAN;
+        if (clansStat.getClanId() == null || clansStat.getClanName().equals(ClansStat.NO_CLAN_NAME)) return NO_CLAN;
         return new ClanContext(clansStat.getClanName(), clansStat.getClanId());
     }
 
