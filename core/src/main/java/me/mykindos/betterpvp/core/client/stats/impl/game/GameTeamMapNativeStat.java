@@ -107,17 +107,14 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         if (!Strings.isNullOrEmpty(gameName)) {
             //have a game name
             if (Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
-                log.info("only game name").submit();
                 //only game name
                 return getFilteredStat(statContainer, periodKey, this::filterGameFullStat);
             }
             if (Strings.isNullOrEmpty(mapName)) {
-                log.info("no map name").submit();
                 //no map name
                 return getFilteredStat(statContainer, periodKey, this::filterGameTeamStat);
             }
             if (Strings.isNullOrEmpty(teamName)) {
-                log.info("no team name").submit();
                 //no team name
                 return getFilteredStat(statContainer, periodKey, this::filterGameMapStat);
             }
