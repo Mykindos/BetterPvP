@@ -39,10 +39,10 @@ public class BlockTagRepository {
 
     public void createPartitions() {
         int realm = Core.getCurrentRealm();
-        String partitionTableName = "chunk_block_tags_realm_" + realm;
+        String partitionTableName = "chunk_block_tagging_realm_" + realm;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
-                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF chunk_block_tags FOR VALUES IN (%d)",
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF chunk_block_tagging FOR VALUES IN (%d)",
                     partitionTableName, realm
             )));
             log.info("Created partition {} for realm {}", partitionTableName, realm).submit();
