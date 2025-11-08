@@ -12,7 +12,7 @@ public class CoinsTag implements Modifying {
         if (depth != 0) return Component.empty();
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(255, 183, 0)))
-                .appendSpace()
+//                .appendSpace()
                 .append(MiniMessage.miniMessage().deserialize("<font:nexo:default><white>ꓯ"))
                 .build();
     }

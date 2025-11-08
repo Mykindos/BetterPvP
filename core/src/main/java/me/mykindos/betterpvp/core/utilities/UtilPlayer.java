@@ -169,7 +169,7 @@ public class UtilPlayer {
      * @param mod the value to modify the player's current health by; can be
      *            positive or negative
      */
-    public static void health(Player player, double mod) {
+    public static void health(LivingEntity player, double mod) {
         if (player.isDead()) {
             return;
         }

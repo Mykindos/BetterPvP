@@ -35,6 +35,15 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
         logs.add(damageLog);
     }
 
+    public DamageLog getLastDamage(LivingEntity damagee) {
+        ConcurrentLinkedDeque<DamageLog> logQueue = objects.get(damagee.getUniqueId().toString());
+        if (logQueue.isEmpty()) {
+            return null;
+        } else {
+            return logQueue.getLast();
+        }
+    }
+
     /**
      * Gets the latest damage logs for the given damagee.
      * If a damage log includes a damager (e.g. a player), the log will be immediately returned.

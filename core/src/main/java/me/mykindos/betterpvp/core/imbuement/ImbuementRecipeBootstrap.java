@@ -10,14 +10,22 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.attraction.AttractionRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.brutality.BrutalityRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.detonation.DetonationRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.essence.EssenceRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.ferocity.FerocityRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.forestwright.ForestwrightRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.hookmaster.HookmasterRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.momentum.MomentumRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.moonseer.MoonseerRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.pickpocket.GreedRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.slayer.SlayerRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.stonecaller.StonecallerRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.vampirism.VampirismRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.wanderer.WandererRuneItem;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -48,6 +56,14 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
     @Inject private ForestwrightRuneItem forestwrightRune;
     @Inject private HookmasterRuneItem hookmasterRune;
     @Inject private StonecallerRuneItem stonecallerRune;
+    @Inject private FerocityRuneItem ferocityRuneItem;
+    @Inject private DetonationRuneItem detonationRuneItem;
+    @Inject private GreedRuneItem greedRuneItem;
+    @Inject private VampirismRuneItem vampirismRuneItem;
+    @Inject private SlayerRuneItem slayerRuneItem;
+    @Inject private BrutalityRuneItem brutalityRuneItem;
+    @Inject private MomentumRuneItem momentumRuneItem;
+    @Inject private EssenceRuneItem essenceRuneItem;
 
     /**
      * Creates a namespaced key for the Core plugin.
@@ -77,7 +93,16 @@ public class ImbuementRecipeBootstrap implements ItemBootstrap {
                 moonseerRune,
                 forestwrightRune,
                 hookmasterRune,
-                stonecallerRune);
+                stonecallerRune,
+                ferocityRuneItem,
+                detonationRuneItem,
+                greedRuneItem,
+                vampirismRuneItem,
+                slayerRuneItem,
+                brutalityRuneItem,
+                momentumRuneItem,
+                essenceRuneItem
+                );
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }

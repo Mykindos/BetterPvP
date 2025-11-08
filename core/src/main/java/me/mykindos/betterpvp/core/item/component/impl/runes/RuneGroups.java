@@ -72,6 +72,8 @@ public final class RuneGroups {
         return baseItem instanceof WeaponItem weaponItem && weaponItem.getGroups().contains(WeaponItem.Group.RANGED);
     });
 
+    public static final RuneGroup BOW = new RuneGroup("Bows", item -> getItemStack(item).getType().name().contains("BOW"));
+
     // </editor-fold>
 
     // <editor-fold desc="Tool Types">

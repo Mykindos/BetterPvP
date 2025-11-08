@@ -59,8 +59,13 @@ public class CoinDeathListener implements Listener {
         Player player = event.getPlayer();
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
-        final int dropAmount = (int) (gamer.getBalance() * percentCoinsDroppedOnDeath);
-        gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - dropAmount);
+        // Fire the CoinDropEvent to allow runes and other modifiers to adjust the drop amount
+        final CoinDropEvent coinDropEvent = new CoinDropEvent(player, gamer.getBalance());
+        coinDropEvent.callEvent();
+
+        // Calculate the final drop amount including all bonuses
+        final int dropAmount = coinDropEvent.getTotalDropAmount(percentCoinsDroppedOnDeath);
+        gamer.saveProperty(GamerProperty.BALANCE, Math.max(0, gamer.getBalance() - dropAmount));
         UtilMessage.simpleMessage(player, "Death", "You lost <yellow>%s coins<gray> for dying.", UtilFormat.formatNumber(dropAmount));
 
         ItemStack coinItem = generateDrops(dropAmount);

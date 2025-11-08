@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.component.impl.runes.scorching;
+package me.mykindos.betterpvp.core.item.component.impl.runes.ferocity;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,25 +20,25 @@ import java.util.Optional;
 
 @BPvPListener
 @Singleton
-public class ScorchingRuneHandler implements Listener {
+public class FerocityRuneHandler implements Listener {
 
-    private final ScorchingRune scorchingRune;
+    private final FerocityRune ferocityRune;
     private final ComponentLookupService componentLookupService;
 
     @Inject
-    public ScorchingRuneHandler(ScorchingRune scorchingRune, ComponentLookupService lookupService) {
-        this.scorchingRune = scorchingRune;
+    public FerocityRuneHandler(FerocityRune ferocityRune, ComponentLookupService lookupService) {
+        this.ferocityRune = ferocityRune;
         this.componentLookupService = lookupService;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPostDamage(DamageEvent event) {
-        if (!(event.getDamager() instanceof LivingEntity damager) || !(event.getDamagee() instanceof LivingEntity livingEntity)) {
-            return; // Only handle player damage events
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDamage(DamageEvent event) {
+        if (!(event.getDamager() instanceof LivingEntity damager)) {
+            return; // Wasn't damaged by an entity
         }
 
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
-            return; // Only handle melee attacks
+            return; // Wasn't a melee hit
         }
 
         final EntityEquipment equipment = damager.getEquipment();
@@ -50,17 +52,17 @@ public class ScorchingRuneHandler implements Listener {
             return; // No runes present
         }
 
-        // Check if the scorching rune is present in the container
-        if (!container.get().hasRune(scorchingRune)) {
-            return; // Scorching rune not present
+        // Check if the rune is present in the container
+        if (!container.get().hasRune(ferocityRune)) {
+            return; // Rune not present
         }
 
-        // Apply scorching effect
-        final double chance = scorchingRune.getChance();
-        if (Math.random() < chance) {
-            final double seconds = scorchingRune.getDuration();
-            final int ticks = (int) (seconds * 20); // Convert seconds to ticks
-            livingEntity.setFireTicks(Math.max(livingEntity.getFireTicks(), ticks)); // Apply fire effect, ensuring it doesn't overwrite existing fire ticks
+        // Check for chances
+        if (Math.random() <= ferocityRune.getChance()) {
+            final double delayReduction = ferocityRune.getDelayReduction();
+            event.setDamageDelay((long) Math.max(0, event.getDamageDelay() * (1 - delayReduction)));
+            new SoundEffect(Sound.ENTITY_RAVAGER_ROAR, 2f, 1f).play(damager.getLocation());
+            new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0f, 1f).play(damager.getLocation());
         }
     }
 }
