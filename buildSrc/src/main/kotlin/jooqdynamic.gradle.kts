@@ -72,6 +72,7 @@ if (extractedTables.isEmpty()) {
                             isRecords = true
                             isImmutablePojos = false
                             isFluentSetters = true
+                            newline = "\\r\\n"
                         }
                         target.apply {
                             packageName = "me.mykindos.betterpvp.${project.name}.database.jooq"

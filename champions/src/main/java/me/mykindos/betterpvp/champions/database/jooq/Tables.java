@@ -7,6 +7,7 @@ package me.mykindos.betterpvp.champions.database.jooq;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsCombatStats;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsDamagevalues;
+import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsHotbarLayouts;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKilldeathData;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKills;
@@ -50,6 +51,11 @@ public class Tables {
      * The table <code>public.champions_damagevalues</code>.
      */
     public static final ChampionsDamagevalues CHAMPIONS_DAMAGEVALUES = ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES;
+
+    /**
+     * The table <code>public.champions_hotbar_layouts</code>.
+     */
+    public static final ChampionsHotbarLayouts CHAMPIONS_HOTBAR_LAYOUTS = ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS;
 
     /**
      * The table <code>public.champions_kill_contributions</code>.
