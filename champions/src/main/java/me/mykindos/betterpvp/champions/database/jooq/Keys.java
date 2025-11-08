@@ -6,13 +6,11 @@ package me.mykindos.betterpvp.champions.database.jooq;
 
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsDamagevalues;
-import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsHotbarLayouts;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKilldeathData;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKills;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsBuildsRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsDamagevaluesRecord;
-import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsHotbarLayoutsRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKilldeathDataRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
@@ -36,7 +34,6 @@ public class Keys {
 
     public static final UniqueKey<ChampionsBuildsRecord> CHAMPIONS_BUILDS_PKEY = Internal.createUniqueKey(ChampionsBuilds.CHAMPIONS_BUILDS, DSL.name("champions_builds_pkey"), new TableField[] { ChampionsBuilds.CHAMPIONS_BUILDS.CLIENT, ChampionsBuilds.CHAMPIONS_BUILDS.ROLE, ChampionsBuilds.CHAMPIONS_BUILDS.ID }, true);
     public static final UniqueKey<ChampionsDamagevaluesRecord> CHAMPIONS_DAMAGEVALUES_PK = Internal.createUniqueKey(ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES, DSL.name("champions_damagevalues_pk"), new TableField[] { ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES.MATERIAL }, true);
-    public static final UniqueKey<ChampionsHotbarLayoutsRecord> CHAMPIONS_HOTBAR_LAYOUTS_PKEY = Internal.createUniqueKey(ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS, DSL.name("champions_hotbar_layouts_pkey"), new TableField[] { ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS.CLIENT, ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS.ROLE, ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS.ID, ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS.SLOT }, true);
     public static final UniqueKey<ChampionsKillContributionsRecord> CHAMPIONS_KILL_CONTRIBUTIONS_PKEY = Internal.createUniqueKey(ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS, DSL.name("champions_kill_contributions_pkey"), new TableField[] { ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS.CONTRIBUTION_ID }, true);
     public static final UniqueKey<ChampionsKilldeathDataRecord> CHAMPIONS_KILLDEATH_DATA_UK = Internal.createUniqueKey(ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA, DSL.name("champions_killdeath_data_uk"), new TableField[] { ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA.MATCHUP, ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA.METRIC }, true);
     public static final UniqueKey<ChampionsKillsRecord> CHAMPIONS_KILLS_PKEY = Internal.createUniqueKey(ChampionsKills.CHAMPIONS_KILLS, DSL.name("champions_kills_pkey"), new TableField[] { ChampionsKills.CHAMPIONS_KILLS.KILL_ID }, true);

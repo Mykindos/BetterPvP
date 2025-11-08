@@ -10,7 +10,6 @@ import java.util.List;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsCombatStats;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsDamagevalues;
-import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsHotbarLayouts;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKilldeathData;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKills;
@@ -64,11 +63,6 @@ public class Public extends SchemaImpl {
      * The table <code>public.champions_damagevalues</code>.
      */
     public final ChampionsDamagevalues CHAMPIONS_DAMAGEVALUES = ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES;
-
-    /**
-     * The table <code>public.champions_hotbar_layouts</code>.
-     */
-    public final ChampionsHotbarLayouts CHAMPIONS_HOTBAR_LAYOUTS = ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS;
 
     /**
      * The table <code>public.champions_kill_contributions</code>.
@@ -455,7 +449,6 @@ public class Public extends SchemaImpl {
             ChampionsBuilds.CHAMPIONS_BUILDS,
             ChampionsCombatStats.CHAMPIONS_COMBAT_STATS,
             ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES,
-            ChampionsHotbarLayouts.CHAMPIONS_HOTBAR_LAYOUTS,
             ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS,
             ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA,
             ChampionsKills.CHAMPIONS_KILLS,

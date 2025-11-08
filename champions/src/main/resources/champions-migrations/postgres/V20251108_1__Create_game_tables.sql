@@ -1,6 +1,6 @@
 
 -- Store hotbar layouts
-CREATE TABLE IF NOT EXISTS champions_hotbar_layouts
+CREATE /*stop jooq*/ TABLE IF NOT EXISTS champions_hotbar_layouts
 (
     client  BIGINT REFERENCES clients (id) ON DELETE CASCADE,
     role    varchar(20) not null,
