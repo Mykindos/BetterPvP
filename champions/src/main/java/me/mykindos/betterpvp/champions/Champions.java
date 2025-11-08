@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
+import me.mykindos.betterpvp.champions.item.ChampionsItemBoostrap;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.champions.tips.ChampionsTipLoader;
 import me.mykindos.betterpvp.core.Core;
@@ -65,6 +66,8 @@ public class Champions extends BPvPPlugin {
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations/postgres/", "champions");
 
+            this.registerItems();
+
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Champions"));
 
             var championsListenerLoader = injector.getInstance(ChampionsListenerLoader.class);
@@ -92,6 +95,10 @@ public class Champions extends BPvPPlugin {
             // We do this to force the static initializer to run, can be removed if we import this class anywhere
             Class.forName("me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes");
         }
+    }
+
+    private void registerItems() {
+        this.injector.getInstance(ChampionsItemBoostrap.class).registerItems();
     }
 
 }

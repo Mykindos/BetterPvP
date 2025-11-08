@@ -25,9 +25,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKillstreak;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopRating;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetWorldLogsForBlock;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores;
-import me.mykindos.betterpvp.core.database.jooq.tables.Itemdurability;
-import me.mykindos.betterpvp.core.database.jooq.tables.Itemlore;
-import me.mykindos.betterpvp.core.database.jooq.tables.Items;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
@@ -37,6 +34,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
 import me.mykindos.betterpvp.core.database.jooq.tables.Servers;
+import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
@@ -51,7 +49,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillsRecord
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
-
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -659,21 +656,6 @@ public class Tables {
     public static final Ignores IGNORES = Ignores.IGNORES;
 
     /**
-     * The table <code>public.itemdurability</code>.
-     */
-    public static final Itemdurability ITEMDURABILITY = Itemdurability.ITEMDURABILITY;
-
-    /**
-     * The table <code>public.itemlore</code>.
-     */
-    public static final Itemlore ITEMLORE = Itemlore.ITEMLORE;
-
-    /**
-     * The table <code>public.items</code>.
-     */
-    public static final Items ITEMS = Items.ITEMS;
-
-    /**
      * The table <code>public.kill_contributions</code>.
      */
     public static final KillContributions KILL_CONTRIBUTIONS = KillContributions.KILL_CONTRIBUTIONS;
@@ -717,6 +699,11 @@ public class Tables {
      * The table <code>public.servers</code>.
      */
     public static final Servers SERVERS = Servers.SERVERS;
+
+    /**
+     * The table <code>public.smart_block_data</code>.
+     */
+    public static final SmartBlockData SMART_BLOCK_DATA = SmartBlockData.SMART_BLOCK_DATA;
 
     /**
      * The table <code>public.uuiditems</code>.

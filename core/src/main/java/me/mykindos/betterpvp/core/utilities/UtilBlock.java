@@ -2,14 +2,6 @@ package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
 import com.jeff_media.morepersistentdatatypes.DataType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -793,11 +785,11 @@ public class UtilBlock {
      * @param chunk the chunk in which the block is located, must not be null
      * @return the block corresponding to the given key, or null if the key is invalid
      */
-    public static Block getBlockByKey(int key, Chunk chunk) {
-        final int y = key & 0xFFFF;
-        final int x = (key >> 16) & 0xFF;
-        final int z = (key >> 24) & 0xFF;
-        return chunk.getBlock(x, y, z);
+    public static Block getBlockByKey(long key, Chunk chunk) {
+        final long y = key & 0xFFFF;
+        final long x = (key >> 16) & 0xFF;
+        final long z = (key >> 24) & 0xFF;
+        return chunk.getBlock((int) x, (int) y, (int) z);
     }
 
     /**
@@ -839,16 +831,16 @@ public class UtilBlock {
         final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
 
         // We have no data for this chunk, just make a new one
-        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
+        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER))) {
             return chunkPdc.getAdapterContext().newPersistentDataContainer();
         }
 
-        final HashMap<Integer, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+        final HashMap<Long, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER));
         if (blockPdcs == null) {
             throw new RuntimeException("Block PDCs are null");
         }
 
-        final int blockKey = getBlockKey(block);
+        final long blockKey = getBlockKey(block);
         PersistentDataContainer blockPdc = blockPdcs.get(blockKey);
         if(blockPdc != null) {
             return blockPdc;
@@ -868,20 +860,20 @@ public class UtilBlock {
         final Chunk chunk = block.getChunk();
         final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
         // We have no data for this chunk, just make a new one
-        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
-            HashMap<Integer, PersistentDataContainer> blockPdcs = new HashMap<>();
+        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER))) {
+            HashMap<Long, PersistentDataContainer> blockPdcs = new HashMap<>();
             blockPdcs.put(getBlockKey(block), container);
-            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockPdcs);
+            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER), blockPdcs);
             return;
         }
 
-        HashMap<Integer, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+        HashMap<Long, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER));
         if (blockPdcs == null) {
             throw new RuntimeException("Block PDCs are null");
         }
 
         blockPdcs.put(getBlockKey(block), container);
-        chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockPdcs);
+        chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER), blockPdcs);
     }
 
 }

@@ -27,15 +27,15 @@ core:
   salt: ''
 pvp:
   enableOldPvP: true
-  mythic-health-bars:
-    enabled: true
-  showKillerHealth: false
+  hitboxExpansion: 0.05
   hitboxCooldown: 0.1
-  hitboxExpansion: 0.1
   mythic-damage-indicators:
     duration: 1.5
     enabled: true
-    scale: 3.0
+    scale: 1.1
+  mythic-health-bars:
+    enabled: true
+  showKillerHealth: true
 gamer:
   default:
     coins: 5000
@@ -317,6 +317,12 @@ tab:
   shop: /store
 energy:
   nerf-energy-regen: false
+  consumption-regen-delay: 1.0
+  max-energy: 150.0
+  energy-per-tick: 10.0
+  energy-per-tick-nerfed: 4.0
+  update-rate: 50
+  energy-per-second: 10.0
 combat:
   crit-arrows: false
 server:

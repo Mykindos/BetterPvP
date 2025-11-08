@@ -49,7 +49,7 @@ public interface SmartBlockDataStorage {
      * @param chunk the chunk to load data for
      * @return map of block keys to their data (empty map if no data found)
      */
-    @NotNull CompletableFuture<Map<Integer, SmartBlockData<?>>> loadChunk(@NotNull Chunk chunk);
+    @NotNull CompletableFuture<Map<Long, SmartBlockData<?>>> loadChunk(@NotNull Chunk chunk);
     
     /**
      * Removes all data for a chunk.

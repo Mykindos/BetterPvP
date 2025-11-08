@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Manages the caching layer for SmartBlock data.
@@ -95,9 +96,9 @@ public class SmartBlockDataCache {
      * @param chunkData the chunk data to process
      * @param validator function to validate block instances
      */
-    public void processLoadedChunkData(Map<Integer, SmartBlockData<?>> chunkData, 
-                                     java.util.function.Function<SmartBlockInstance, Boolean> validator) {
-        for (Map.Entry<Integer, SmartBlockData<?>> entry : chunkData.entrySet()) {
+    public void processLoadedChunkData(Map<Long, SmartBlockData<?>> chunkData,
+                                     Function<SmartBlockInstance, Boolean> validator) {
+        for (Map.Entry<Long, SmartBlockData<?>> entry : chunkData.entrySet()) {
             SmartBlockData<?> data = entry.getValue();
             SmartBlockInstance instance = data.getBlockInstance();
             if (validator.apply(instance)) {

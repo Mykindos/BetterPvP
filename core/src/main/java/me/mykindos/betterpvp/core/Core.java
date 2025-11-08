@@ -6,8 +6,10 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.anvil.AnvilRecipeBootstrap;
 import me.mykindos.betterpvp.core.block.SmartBlockModule;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
+import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
@@ -23,13 +25,19 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeBootstrap;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.inventory.InvUI;
+import me.mykindos.betterpvp.core.item.impl.CoreItemBootstrap;
 import me.mykindos.betterpvp.core.leaderboards.CoreLeaderboardLoader;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.logging.LoggerFactory;
 import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
+import me.mykindos.betterpvp.core.metal.CastingMoldBootstrap;
+import me.mykindos.betterpvp.core.metal.MetalBlockBootstrap;
+import me.mykindos.betterpvp.core.metal.MetalItemBootstrap;
+import me.mykindos.betterpvp.core.metal.MetalRecipeBootstrap;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.sound.SoundManager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -109,6 +117,8 @@ public class Core extends BPvPPlugin {
         setupServerAndSeason();
         injector.injectMembers(this);
 
+        this.registerItems();
+
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
 
         redis.credentials(this.getConfig());
@@ -151,6 +161,17 @@ public class Core extends BPvPPlugin {
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
+    }
+    
+    private void registerItems() {
+        this.injector.getInstance(CoreItemBootstrap.class);
+        this.injector.getInstance(CoreBlockBootstrap.class);
+        this.injector.getInstance(MetalItemBootstrap.class);
+        this.injector.getInstance(MetalBlockBootstrap.class);
+        this.injector.getInstance(MetalRecipeBootstrap.class);
+        this.injector.getInstance(CastingMoldBootstrap.class);
+        this.injector.getInstance(ImbuementRecipeBootstrap.class);
+        this.injector.getInstance(AnvilRecipeBootstrap.class);
     }
 
     private void setupServerAndSeason() {

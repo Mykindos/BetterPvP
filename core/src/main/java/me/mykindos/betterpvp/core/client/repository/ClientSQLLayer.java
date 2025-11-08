@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.Query;
@@ -25,17 +24,19 @@ import org.jooq.Result;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_NAME_HISTORY;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_PROPERTIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_REWARDS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GAMER_PROPERTIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.IGNORES;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.*;
 
 @CustomLog
 @Singleton
@@ -462,46 +463,6 @@ public class ClientSQLLayer {
         });
 
 
-    }
-
-    public RewardBox getRewardBox(Client client) {
-        RewardBox rewardBox = new RewardBox();
-
-        try {
-            String rewards = database.getDslContext()
-                    .select(CLIENT_REWARDS.REWARDS)
-                    .from(CLIENT_REWARDS)
-                    .where(CLIENT_REWARDS.CLIENT.eq(client.getId()))
-                    .fetchOne(CLIENT_REWARDS.REWARDS);
-
-            if (rewards == null) {
-                rewards = UtilItem.serializeItemStackList(new ArrayList<>());
-            }
-            rewardBox.read(rewards);
-        } catch (Exception ex) {
-            log.error("Error getting rewards box for " + client.getName(), ex).submit();
-            throw new RuntimeException(ex);
-        }
-
-        return rewardBox;
-    }
-
-    public CompletableFuture<Void> updateClientRewards(Client client, RewardBox rewardBox) {
-        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            try {
-                ctx.insertInto(CLIENT_REWARDS)
-                        .set(CLIENT_REWARDS.CLIENT, client.getId())
-                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentSeason())
-                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
-                        .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
-                        .doUpdate()
-                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
-                        .execute();
-            } catch (Exception ex) {
-                log.error("Error updating rewards for " + client.getName(), ex).submit();
-                throw new RuntimeException(ex);
-            }
-        });
     }
 
 }

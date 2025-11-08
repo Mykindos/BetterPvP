@@ -71,12 +71,12 @@ public class ClanPerkManager extends Manager<String, ClanPerk> {
 
     private void registerLegends(int legends, int minReq) {
         final ClanVaultLegend perk = new ClanVaultLegend(legends, minReq);
-        addObject(UUID.randomUUID(), perk);
+        addObject(UUID.randomUUID().toString(), perk);
     }
 
     private void registerSlots(int slots, int minReq) {
         final ClanVaultSlot perk = new ClanVaultSlot(slots, minReq);
-        addObject(UUID.randomUUID(), perk);
+        addObject(UUID.randomUUID().toString(), perk);
     }
 
     private void registerFarmingLevels(int levels, int minReq) {

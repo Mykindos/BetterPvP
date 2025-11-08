@@ -17,6 +17,8 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
+import me.mykindos.betterpvp.progression.item.ProgressionFishBootstrap;
+import me.mykindos.betterpvp.progression.item.ProgressionItemBootstrap;
 import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
@@ -61,6 +63,8 @@ public class Progression extends BPvPPlugin {
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 
+            this.registerItems();
+
             var skillManager = injector.getInstance(ProgressionSkillManager.class);
             skillManager.loadSkills();
 
@@ -89,6 +93,11 @@ public class Progression extends BPvPPlugin {
     public void onDisable() {
         injector.getInstance(FishingRepository.class).saveAllFish(false);
         injector.getInstance(ProfessionProfileRepository.class).processStatUpdates(false);
+    }
+
+    private void registerItems() {
+        this.injector.getInstance(ProgressionFishBootstrap.class).registerItems();
+        this.injector.getInstance(ProgressionItemBootstrap.class).registerItems();
     }
 
 }

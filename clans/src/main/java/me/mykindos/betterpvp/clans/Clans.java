@@ -6,9 +6,11 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
+import me.mykindos.betterpvp.clans.item.ClansItemBoostrap;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
@@ -114,6 +116,11 @@ public class Clans extends BPvPPlugin {
         recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:mangrove_boat"));
         recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:cherry_boat"));
         recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:pale_oak_boat"));
+    }
+
+    private void registerItems() {
+        this.injector.getInstance(ClansItemBoostrap.class).registerItems();
+        this.injector.getInstance(ExplosiveResistanceBootstrap.class).registerItems();
     }
 
     @Override

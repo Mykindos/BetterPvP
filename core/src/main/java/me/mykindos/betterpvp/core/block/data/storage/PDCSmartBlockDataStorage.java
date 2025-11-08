@@ -137,8 +137,8 @@ public class PDCSmartBlockDataStorage implements SmartBlockDataStorage {
     }
     
     @Override
-    public @NotNull CompletableFuture<Map<Integer, SmartBlockData<?>>> loadChunk(@NotNull Chunk chunk) {
-        Map<Integer, SmartBlockData<?>> chunkData = new HashMap<>();
+    public @NotNull CompletableFuture<Map<Long, SmartBlockData<?>>> loadChunk(@NotNull Chunk chunk) {
+        Map<Long, SmartBlockData<?>> chunkData = new HashMap<>();
         
         // For PDC storage, we need to scan all blocks in the chunk
         // This is less efficient than database storage but maintains compatibility
@@ -166,7 +166,7 @@ public class PDCSmartBlockDataStorage implements SmartBlockDataStorage {
                     SmartBlockData<?> smartBlockData = getSmartBlock(instance.get(), dataHolder, container, block);
                     if (smartBlockData != null) {
                         // Use block's position as the key
-                        int blockKey = UtilBlock.getBlockKey(block);
+                        long blockKey = UtilBlock.getBlockKey(block);
                         chunkData.put(blockKey, smartBlockData);
                         log.info("Loaded SmartBlock data for block at {}: {}", block.getLocation(), smartBlockData).submit();
                     }

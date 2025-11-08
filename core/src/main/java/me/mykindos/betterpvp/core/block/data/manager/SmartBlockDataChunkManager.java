@@ -109,7 +109,7 @@ public class SmartBlockDataChunkManager {
         long chunkKey = chunk.getChunkKey();
         
         try {
-            Map<Integer, SmartBlockData<?>> chunkData = storage.loadChunk(chunk).join();
+            Map<Long, SmartBlockData<?>> chunkData = storage.loadChunk(chunk).join();
             processLoadedChunkData(chunkData);
         } catch (Exception e) {
             log.error("Failed to load chunk data for chunk {},{}", chunk.getX(), chunk.getZ(), e).submit();
@@ -164,7 +164,7 @@ public class SmartBlockDataChunkManager {
      * Processes loaded chunk data.
      * @param chunkData the chunk data to process
      */
-    private void processLoadedChunkData(Map<Integer, SmartBlockData<?>> chunkData) {
+    private void processLoadedChunkData(Map<Long, SmartBlockData<?>> chunkData) {
         cache.processLoadedChunkData(chunkData, this::verifySmartBlock);
         
         // Trigger load handlers for valid blocks

@@ -4,12 +4,9 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.util.Collection;
-
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.SmartBlockDataRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Name;
@@ -26,6 +23,8 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Collection;
 
 
 /**
