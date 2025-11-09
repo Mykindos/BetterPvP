@@ -5,7 +5,10 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.menu.button.*;
+import me.mykindos.betterpvp.core.menu.button.BackTabButton;
+import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import net.kyori.adventure.text.Component;
 
 import java.net.MalformedURLException;

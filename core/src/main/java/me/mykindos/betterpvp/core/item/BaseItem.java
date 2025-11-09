@@ -15,13 +15,15 @@ import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameRarityRenderer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.core.combat.cause;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.With;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.event.entity.EntityDamageEvent;

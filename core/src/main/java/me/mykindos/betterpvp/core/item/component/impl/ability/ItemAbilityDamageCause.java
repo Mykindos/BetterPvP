@@ -1,13 +1,17 @@
 package me.mykindos.betterpvp.core.item.component.impl.ability;
 
-import com.google.common.collect.Lists;
-import lombok.*;
-import lombok.experimental.WithBy;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.With;
 import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**

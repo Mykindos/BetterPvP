@@ -2,31 +2,34 @@
 
  import com.google.common.base.Preconditions;
  import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+ import com.google.common.collect.Multimap;
  import lombok.CustomLog;
  import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
-import me.mykindos.betterpvp.core.combat.cause.DamageCause;
+ import lombok.EqualsAndHashCode;
+ import lombok.Getter;
+ import me.mykindos.betterpvp.core.combat.cause.DamageCause;
  import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
  import me.mykindos.betterpvp.core.combat.data.SoundProvider;
-import me.mykindos.betterpvp.core.combat.durability.DurabilityParameters;
-import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
-import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
-import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
-import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
-import org.bukkit.damage.DamageSource;
+ import me.mykindos.betterpvp.core.combat.durability.DurabilityParameters;
+ import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
+ import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
+ import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
+ import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
+ import org.bukkit.damage.DamageSource;
  import org.bukkit.damage.DamageType;
  import org.bukkit.entity.Entity;
-import org.bukkit.entity.LightningStrike;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
+ import org.bukkit.entity.LightningStrike;
+ import org.bukkit.entity.LivingEntity;
+ import org.bukkit.entity.Projectile;
  import org.bukkit.event.entity.EntityDamageEvent;
  import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+ import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+ import java.util.ArrayList;
+ import java.util.Comparator;
+ import java.util.HashSet;
+ import java.util.List;
+ import java.util.Set;
 
 /**
  * Unified damage event that handles all types of damage with proper entity separation and modifier exclusion

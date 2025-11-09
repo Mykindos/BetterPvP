@@ -7,13 +7,11 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Chunk;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.*;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 @BPvPListener
 @Singleton
