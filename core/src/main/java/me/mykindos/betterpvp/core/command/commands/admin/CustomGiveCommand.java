@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -100,34 +101,35 @@ public class CustomGiveCommand extends Command {
             }
         }
 
-        ItemInstance instance = itemFactory.create(baseItem);
+        int toGive = count;
+        while (toGive > 0) {
+            final ItemInstance instance = itemFactory.create(baseItem);
+            final ItemStack itemStack = instance.createItemStack();
+            final int stackSize = itemStack.getMaxStackSize();
+            int giveAmount = Math.min(toGive, stackSize);
+            itemStack.setAmount(giveAmount);
+            UtilItem.insert(player, itemStack);
 
-        // Give Uncommon+ rarities a UUID
-        if (instance.getRarity().isImportant()) {
-            Optional<UUIDProperty>  component = instance.getComponent(UUIDProperty.class);
-            component.ifPresent(uuidProperty ->
-                    log.info("{} spawned and gave ({}) to {}", player.getName(), uuidProperty.getUniqueId(), target.getName())
-                            .setAction("ITEM_SPAWN")
-                            .addClientContext(player)
-                            .addClientContext(target, true)
-                            .addItemContext(itemRegistry, instance)
-                            .submit());
+            // Give Uncommon+ rarities a UUID
+            if (instance.getRarity().isImportant()) {
+                Optional<UUIDProperty>  component = instance.getComponent(UUIDProperty.class);
+                component.ifPresent(uuidProperty ->
+                        log.info("{} spawned and gave ({}) to {}", player.getName(), uuidProperty.getUniqueId(), target.getName())
+                                .setAction("ITEM_SPAWN")
+                                .addClientContext(player)
+                                .addClientContext(target, true)
+                                .addItemContext(itemRegistry, instance)
+                                .submit());
+            }
+
+            toGive -= giveAmount;
         }
 
-        final ItemStack itemStack = instance.createItemStack();
-        itemStack.setAmount(Math.min(count, itemStack.getMaxStackSize())); // Ensure the amount does not exceed max stack size
-        final int amount = itemStack.getAmount();
-        if (amount < count) {
-            UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>Warning:</yellow> <red>Item stack size is limited to <green>%s</green>, giving only x<green>%s</green>.", itemStack.getMaxStackSize(), amount));
-        }
-
-        target.getInventory().addItem(itemStack);
         clientManager.sendMessageToRank("Core", UtilMessage.deserialize("<yellow>%s</yellow> gave <yellow>%s</yellow> [<green>%s</green>] x<green>%s</green>",
                 player.getName(),
                 target.getName(),
                 namespacedKey,
-                amount), Rank.HELPER);
-        // todo handle items that do not fit in inventory
+                count), Rank.HELPER);
     }
 
     public Component getUsage() {
