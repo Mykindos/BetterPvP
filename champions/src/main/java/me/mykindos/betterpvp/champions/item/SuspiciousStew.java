@@ -11,13 +11,13 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @EqualsAndHashCode(callSuper = false)
-public class SuspiciousStew extends BaseItem implements ReloadHook {
+public class SuspiciousStew extends BaseItem implements Reloadable {
 
     private static final ItemStack model;
     private final EffectRouletteAbility effectRouletteAbility;

@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.fishing.bait.ability.BaitAbility;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
  * Base class for all bait items.
  * Manages configuration and ability integration.
  */
-public abstract class BaitItem extends BaseItem implements ReloadHook {
+public abstract class BaitItem extends BaseItem implements Reloadable {
 
     private final BPvPPlugin plugin;
     private final BaitAbility ability;

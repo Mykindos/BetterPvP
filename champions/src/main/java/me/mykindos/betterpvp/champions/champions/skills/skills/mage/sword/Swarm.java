@@ -32,12 +32,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Map.Entry;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 

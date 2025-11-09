@@ -9,13 +9,13 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerCompone
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeDamageStat;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 import java.util.List;
 
-public abstract class WeaponItem extends BaseItem implements ReloadHook {
+public abstract class WeaponItem extends BaseItem implements Reloadable {
 
     private final BPvPPlugin plugin;
     private final List<Group> groups;

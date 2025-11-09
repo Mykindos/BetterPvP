@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
+import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -78,21 +79,20 @@ import java.util.function.Consumer;
 @SuppressWarnings("ALL")
 @CustomLog
 @EqualsAndHashCode(callSuper = true)
-@PluginAdapter("ProtocolLib")
+@PluginAdapter("PacketEvents")
+@Getter
+@Setter
 @Singleton
 public class EndlessQuiverAbility extends ItemAbility implements Listener, PacketListener {
 
     @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
     @EqualsAndHashCode.Exclude
+    @Getter(AccessLevel.NONE)
     private final Map<Player, Integer> activeTicks = new MapMaker().weakKeys().makeMap();
     @EqualsAndHashCode.Exclude
     private static Core core;
-    @Getter
-    @Setter
     private Consumer<LivingEntity> useFunction;
-    @Getter
-    @Setter
     private Predicate<LivingEntity> useCheck;
 
     @Inject

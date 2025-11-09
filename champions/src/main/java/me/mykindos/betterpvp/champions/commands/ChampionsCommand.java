@@ -13,10 +13,9 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -66,9 +65,6 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         private ChampionsSkillManager skillManager;
 
         @Inject
-        private ItemFactory itemFactory;
-
-        @Inject
         private BuildManager buildManager;
 
         @Inject
@@ -92,7 +88,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             champions.reload();
-            champions.getReloadHooks().forEach(ReloadHook::reload);
+            champions.getReloadables().forEach(Reloadable::reload);
 
             commandLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();

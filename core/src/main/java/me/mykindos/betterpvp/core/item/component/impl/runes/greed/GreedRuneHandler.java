@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.component.impl.runes.pickpocket;
+package me.mykindos.betterpvp.core.item.component.impl.runes.greed;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

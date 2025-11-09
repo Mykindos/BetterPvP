@@ -24,7 +24,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 
@@ -33,7 +33,7 @@ import java.util.List;
 @Singleton
 @BPvPListener
 @EqualsAndHashCode(callSuper = true)
-public class WindBlade extends WeaponItem implements Listener, ReloadHook {
+public class WindBlade extends WeaponItem implements Listener, Reloadable {
 
     private final WindDashAbility windDashAbility;
     private final WindSlashAbility windSlashAbility;

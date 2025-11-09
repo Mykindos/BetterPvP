@@ -17,7 +17,13 @@ public class AnvilRecipeBootstrap implements ItemBootstrap {
 
     private boolean registered = false;
 
-    @Inject private ItemRegistry itemRegistry;    
+    private final ItemRegistry itemRegistry;
+
+    @Inject
+    private AnvilRecipeBootstrap(ItemRegistry itemRegistry) {
+        this.itemRegistry = itemRegistry;
+    }
+
     /**
      * Creates a namespaced key for the Core plugin.
      * @param name The key name

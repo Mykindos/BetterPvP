@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.papermc.paper.datacomponent.DataComponentType;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;

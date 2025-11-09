@@ -49,7 +49,7 @@ public abstract class AbstractSmartBlockDataSerializer<T> implements SmartBlockD
     private byte[] decompressIfNeeded(byte[] bytes) throws IOException {
         // Check for GZIP magic bytes (1F 8B)
         if (bytes.length >= 2 && (bytes[0] & 0xFF) == 0x1F && (bytes[1] & 0xFF) == 0x8B) {
-            log.debug("Detected GZIP compression, decompressing {} bytes", bytes.length);
+            log.debug("Detected GZIP compression, decompressing {} bytes", bytes.length).submit();
             
             try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
                  GZIPInputStream gzis = new GZIPInputStream(bais);
@@ -62,7 +62,7 @@ public abstract class AbstractSmartBlockDataSerializer<T> implements SmartBlockD
                 }
                 
                 byte[] decompressed = baos.toByteArray();
-                log.debug("Decompressed from {} to {} bytes", bytes.length, decompressed.length);
+                log.debug("Decompressed from {} to {} bytes", bytes.length, decompressed.length).submit();
                 return decompressed;
             }
         }

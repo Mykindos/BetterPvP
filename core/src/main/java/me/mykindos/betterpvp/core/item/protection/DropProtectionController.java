@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
-public class DropProtectionController implements ReloadHook {
+public class DropProtectionController implements Reloadable {
 
     /**
      * Cache that stores per-player drop protection status. Keys are player UUIDs.

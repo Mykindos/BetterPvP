@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
@@ -25,7 +26,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 @Getter
 @Setter
@@ -38,7 +38,6 @@ public class EffectRouletteAbility extends ItemAbility {
     private double cooldown;
     private final EffectManager effectManager;
     private final CooldownManager cooldownManager;
-    private static final Random random = new Random();
 
     @Inject
     private EffectRouletteAbility(EffectManager effectManager, CooldownManager cooldownManager) {
@@ -61,8 +60,9 @@ public class EffectRouletteAbility extends ItemAbility {
         List<EffectType> validEffectTypes = effectTypesList.stream()
                 .filter(effect -> !effect.isSpecial())
                 .toList();
-        EffectType randomEffect = validEffectTypes.get(random.nextInt(validEffectTypes.size()));
-        int randomLevel = random.nextInt(4) + 1;
+
+        EffectType randomEffect = validEffectTypes.get(UtilMath.RANDOM.nextInt(validEffectTypes.size()));
+        int randomLevel = UtilMath.RANDOM.nextInt(4) + 1;
         effectManager.addEffect(player, randomEffect, randomLevel, (long) (duration * 1000));
         UtilMessage.message(player, "Item",
                 Component.text("You used ", NamedTextColor.GRAY)

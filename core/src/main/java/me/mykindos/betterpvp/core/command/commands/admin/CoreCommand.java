@@ -10,19 +10,13 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
-import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Set;
 
 @Singleton
 public class CoreCommand extends Command implements IConsoleCommand {
@@ -39,10 +33,6 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final ItemRegistry registry = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemRegistry.class);
-        for (NamespacedKey namespacedKey : registry.getItems().keySet()) {
-            System.out.println(namespacedKey.toString());
-        }
     }
 
     @Override
@@ -94,7 +84,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             core.reload();
-            core.getReloadHooks().forEach(ReloadHook::reload);
+            core.getReloadables().forEach(Reloadable::reload);
 
             commandLoader.reload(core.getClass().getPackageName());
             tipManager.reloadTips(core);

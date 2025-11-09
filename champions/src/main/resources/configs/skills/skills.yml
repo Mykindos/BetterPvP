@@ -53,14 +53,14 @@ skills:
       allowPickupItems: false
     silencingarrow:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 15.0
       baseDuration: 1.0
       cooldownDecreasePerLevel: 0.5
       durationIncreasePerLevel: 0.5
     smokearrow:
       enabled: true
-      maxlevel: 4
+      maxlevel: 3
       cooldown: 20.0
       baseDuration: 3.0
       cooldownDecreasePerLevel: 2.0
@@ -97,7 +97,6 @@ skills:
       damage: 2.0
       damageIncreasePerLevel: 1.5
       distance: 5.0
-      cooldownReductionPerHit: 3.0
       distanceIncreasePerLevel: 0.0
       cooldownReduction: 4.0
       cooldownReductionPerLevel: 0.0

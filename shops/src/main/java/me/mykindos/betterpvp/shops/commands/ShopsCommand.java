@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.listener.ShopsListenerLoader;
@@ -149,7 +149,7 @@ public class ShopsCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             shops.reload();
-            shops.getReloadHooks().forEach(ReloadHook::reload);
+            shops.getReloadables().forEach(Reloadable::reload);
 
             shopManager.loadShopItems();
             commandLoader.reload(shops.getClass().getPackageName());

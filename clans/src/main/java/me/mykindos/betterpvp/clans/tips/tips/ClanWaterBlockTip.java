@@ -9,12 +9,10 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
-import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
@@ -57,7 +55,5 @@ public class ClanWaterBlockTip extends ClanTip {
             });
         }
         return waterBlock != null;
-        // todo: add enabling condition for water block
-//        return waterBlock != null && waterBlock.isEnabled();
     }
 }

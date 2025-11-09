@@ -11,11 +11,11 @@ import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.cannon.ability.CannonPlaceAbility;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 
 @Singleton
 @EqualsAndHashCode(callSuper = false)
-public class CannonItem extends BaseItem implements ReloadHook {
+public class CannonItem extends BaseItem implements Reloadable {
 
     private final CannonPlaceAbility cannonPlaceAbility;
 

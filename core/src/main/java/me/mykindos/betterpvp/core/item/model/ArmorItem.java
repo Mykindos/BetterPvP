@@ -9,10 +9,10 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerCompone
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.HealthStat;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class ArmorItem extends BaseItem implements ReloadHook {
+public abstract class ArmorItem extends BaseItem implements Reloadable {
 
     protected final BPvPPlugin plugin;
 

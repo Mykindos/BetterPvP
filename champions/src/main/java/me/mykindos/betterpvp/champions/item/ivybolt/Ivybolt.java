@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerCo
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.ability.EndlessQuiverAbility;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -23,7 +23,7 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class Ivybolt extends WeaponItem implements ReloadHook {
+public class Ivybolt extends WeaponItem implements Reloadable {
 
     private final ItemFactory itemFactory;
     private final CooldownManager cooldownManager;

@@ -24,7 +24,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -62,9 +61,6 @@ public class GuiCraftingTableAdvanced extends AbstractCraftingGui {
                 .addIngredient('B', new BlueprintHolder(itemFactory, blueprintInventory))
                 .addIngredient('I', InfoTabButton.builder()
                         .description(Component.text("Use this workbench to craft items using blueprints and ingredients in your inventory."))
-                        // todo: wiki entry
-                        .wikiEntry("Test", URI.create("https://wiki.betterpvp.net/").toURL())
-                        .wikiEntry("Test2", URI.create("https://wiki.betterpvp.net/").toURL())
                         .build()));
     }
 

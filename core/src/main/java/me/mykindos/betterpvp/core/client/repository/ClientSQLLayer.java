@@ -11,11 +11,13 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesRepository;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
+import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.Query;
@@ -464,5 +466,46 @@ public class ClientSQLLayer {
 
 
     }
+
+    public RewardBox getRewardBox(Client client) {
+        RewardBox rewardBox = new RewardBox();
+
+        try {
+            String rewards = database.getDslContext()
+                    .select(CLIENT_REWARDS.REWARDS)
+                    .from(CLIENT_REWARDS)
+                    .where(CLIENT_REWARDS.CLIENT.eq(client.getId()))
+                    .fetchOne(CLIENT_REWARDS.REWARDS);
+
+            if (rewards == null) {
+                rewards = UtilItem.serializeItemStackList(new ArrayList<>());
+            }
+            rewardBox.read(rewards);
+        } catch (Exception ex) {
+            log.error("Error getting rewards box for " + client.getName(), ex).submit();
+            throw new RuntimeException(ex);
+        }
+
+        return rewardBox;
+    }
+
+    public CompletableFuture<Void> updateClientRewards(Client client, RewardBox rewardBox) {
+        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            try {
+                ctx.insertInto(CLIENT_REWARDS)
+                        .set(CLIENT_REWARDS.CLIENT, client.getId())
+                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentSeason())
+                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
+                        .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
+                        .doUpdate()
+                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
+                        .execute();
+            } catch (Exception ex) {
+                log.error("Error updating rewards for " + client.getName(), ex).submit();
+                throw new RuntimeException(ex);
+            }
+        });
+    }
+
 
 }

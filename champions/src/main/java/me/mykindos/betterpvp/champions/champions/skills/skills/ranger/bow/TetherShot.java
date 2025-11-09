@@ -6,7 +6,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -17,8 +21,16 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Bat;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,10 +43,14 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener

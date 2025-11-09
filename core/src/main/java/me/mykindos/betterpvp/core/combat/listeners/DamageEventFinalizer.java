@@ -29,7 +29,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +45,7 @@ import java.util.UUID;
  * Handles final damage application, effects, and cleanup
  */
 @CustomLog
-public class DamageEventFinalizer implements Listener {
+public class DamageEventFinalizer {
     
     private final Core core;
     private final DurabilityProcessor durabilityProcessor;

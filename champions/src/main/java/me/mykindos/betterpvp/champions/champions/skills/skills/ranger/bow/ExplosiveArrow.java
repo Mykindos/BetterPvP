@@ -6,7 +6,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
@@ -33,7 +37,11 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 

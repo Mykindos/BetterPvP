@@ -17,7 +17,7 @@ import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
@@ -46,7 +46,7 @@ import java.util.function.DoubleUnaryOperator;
 @Singleton
 @CustomLog
 @Getter
-public class WoodcuttingHandler extends ProfessionHandler implements ReloadHook {
+public class WoodcuttingHandler extends ProfessionHandler implements Reloadable {
 
     private final WoodcuttingRepository woodcuttingRepository;
     private final LeaderboardManager leaderboardManager;

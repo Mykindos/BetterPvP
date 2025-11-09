@@ -16,13 +16,13 @@ import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class ThunderclapAegis extends WeaponItem implements ReloadHook {
+public class ThunderclapAegis extends WeaponItem implements Reloadable {
 
     private transient boolean registered;
     private final VolticBashAbility volticBashAbility;

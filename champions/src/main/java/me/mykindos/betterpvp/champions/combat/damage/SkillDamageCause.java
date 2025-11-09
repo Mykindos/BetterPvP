@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.champions.combat.damage;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.With;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;

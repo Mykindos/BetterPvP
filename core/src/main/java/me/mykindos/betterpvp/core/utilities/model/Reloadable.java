@@ -5,7 +5,7 @@ package me.mykindos.betterpvp.core.utilities.model;
  * owning plugin is reloaded.
  */
 @FunctionalInterface
-public interface ReloadHook {
+public interface Reloadable {
 
     /**
      * Reloads the configuration or state of this class.

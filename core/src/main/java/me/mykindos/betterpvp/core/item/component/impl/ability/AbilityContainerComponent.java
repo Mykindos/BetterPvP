@@ -66,7 +66,6 @@ public class AbilityContainerComponent extends AbstractItemComponent implements 
     public List<Component> getLines(ItemInstance item) {
         final List<Component> lines = new ArrayList<>();
 
-        // todo: add energy and cooldown icons
         for (int i = 0; i < abilities.size(); i++) {
             final ItemAbility ability = abilities.get(i);
             final Component text = Component.text(ability.getDescription(), NamedTextColor.WHITE);

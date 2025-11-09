@@ -22,12 +22,24 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener

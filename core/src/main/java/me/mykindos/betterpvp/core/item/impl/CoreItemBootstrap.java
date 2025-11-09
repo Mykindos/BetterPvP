@@ -25,14 +25,14 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.Flameguar
 import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.forestwright.ForestwrightRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.forestwright.ForestwrightRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.greed.GreedRune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.greed.GreedRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.hookmaster.HookmasterRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.hookmaster.HookmasterRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.momentum.MomentumRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.momentum.MomentumRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.moonseer.MoonseerRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.moonseer.MoonseerRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.pickpocket.GreedRune;
-import me.mykindos.betterpvp.core.item.component.impl.runes.pickpocket.GreedRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRune;

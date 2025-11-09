@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerCo
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
 import org.bukkit.Material;
 
@@ -23,7 +23,7 @@ import org.bukkit.Material;
 @CustomLog
 @EqualsAndHashCode(callSuper = true)
 @Getter
-public class Sharkbait extends BaseItem implements ReloadHook {
+public class Sharkbait extends BaseItem implements Reloadable {
     
     private final SharkbaitAuraAbility auraAbility;
     private final Progression progression;

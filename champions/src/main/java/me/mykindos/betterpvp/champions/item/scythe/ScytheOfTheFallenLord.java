@@ -21,7 +21,7 @@ import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +30,7 @@ import org.bukkit.inventory.ItemStack;
 @CustomLog
 @EqualsAndHashCode(callSuper = true)
 @Getter
-public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
+public class ScytheOfTheFallenLord extends WeaponItem implements Reloadable {
 
     private transient boolean registered;
 

@@ -9,7 +9,6 @@ import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -34,7 +33,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @Singleton
-@PluginAdapter("ProtocolLib")
+@PluginAdapter("PacketEvents")
 public class PacketHatController {
 
     private final Multimap<Integer, HatProvider> providers = ArrayListMultimap.create();
@@ -45,8 +44,8 @@ public class PacketHatController {
     private final ItemFactory itemFactory;
 
     @Inject
-    public PacketHatController(Core core, HatProtocol protocol, ItemFactory itemFactory) {
-        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(core, this, protocol), PacketListenerPriority.HIGH);
+    public PacketHatController(HatProtocol protocol, ItemFactory itemFactory) {
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(this, protocol), PacketListenerPriority.HIGH);
         PacketEvents.getAPI().getEventManager().registerListener(new RemapperOut(this), PacketListenerPriority.HIGH);
         this.itemFactory = itemFactory;
         this.protocol = protocol;

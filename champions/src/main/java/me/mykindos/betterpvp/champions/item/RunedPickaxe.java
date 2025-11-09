@@ -17,7 +17,7 @@ import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.MagicSeal;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.ability.EnhancedMiningAbility;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +27,7 @@ import java.util.Map;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class RunedPickaxe extends BaseItem implements ReloadHook {
+public class RunedPickaxe extends BaseItem implements Reloadable {
 
     private transient boolean registered;
 

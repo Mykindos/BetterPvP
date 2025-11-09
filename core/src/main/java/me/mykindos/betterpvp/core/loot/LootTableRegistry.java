@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.loot.loader.LootTableLoader;
 import me.mykindos.betterpvp.core.loot.loader.SupabaseLootTableLoader;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 
@@ -24,7 +24,7 @@ import static me.mykindos.betterpvp.core.loot.session.LootSessionController.GLOB
 @PluginAdapter("Core")
 @Singleton
 @CustomLog
-public class LootTableRegistry implements ReloadHook {
+public class LootTableRegistry implements Reloadable {
 
     /**
      * The map of registered loot tables.

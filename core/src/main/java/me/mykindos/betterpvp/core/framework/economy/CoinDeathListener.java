@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -60,8 +61,7 @@ public class CoinDeathListener implements Listener {
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
         // Fire the CoinDropEvent to allow runes and other modifiers to adjust the drop amount
-        final CoinDropEvent coinDropEvent = new CoinDropEvent(player, gamer.getBalance());
-        coinDropEvent.callEvent();
+        final CoinDropEvent coinDropEvent = UtilServer.callEvent(new CoinDropEvent(player, gamer.getBalance()));
 
         // Calculate the final drop amount including all bonuses
         final int dropAmount = coinDropEvent.getTotalDropAmount(percentCoinsDroppedOnDeath);

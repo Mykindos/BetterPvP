@@ -19,7 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -37,7 +37,7 @@ import java.util.UUID;
 @Singleton
 @BPvPListener
 @EqualsAndHashCode(callSuper = true)
-public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook {
+public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable {
 
     private transient boolean registered;
     private final RegenerationShieldAbility regenerationShieldAbility;

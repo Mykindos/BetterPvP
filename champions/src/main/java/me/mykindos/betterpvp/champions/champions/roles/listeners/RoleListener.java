@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -41,7 +40,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -49,13 +47,15 @@ import java.util.function.Function;
 @BPvPListener
 public class RoleListener implements Listener {
 
+    private final ItemFactory itemFactory;
     private final RoleManager roleManager;
     private final ClientManager clientManager;
     private final BuildManager buildManager;
     private final RoleSoundProvider soundProvider;
 
     @Inject
-    public RoleListener(RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, RoleSoundProvider soundProvider) {
+    public RoleListener(ItemFactory itemFactory, RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, RoleSoundProvider soundProvider) {
+        this.itemFactory = itemFactory;
         this.roleManager = roleManager;
         this.clientManager = clientManager;
         this.buildManager = buildManager;
@@ -178,7 +178,6 @@ public class RoleListener implements Listener {
         return Component.empty();
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void damageSound(DamageEvent pre) {
         pre.setSoundProvider(soundProvider);
@@ -187,7 +186,6 @@ public class RoleListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onShootBow(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        final ItemFactory itemFactory = JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(ItemFactory.class);
         if (event.getBow() != null && itemFactory.isCustomItem(event.getBow())) {
             return; // custom bow
         }

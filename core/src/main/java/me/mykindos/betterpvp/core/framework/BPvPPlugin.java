@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.config.WebConfigLoader;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
     private final ArrayList<Listener> listeners;
 
     @Getter
-    private final ArrayList<ReloadHook> reloadHooks;
+    private final ArrayList<Reloadable> reloadables;
 
     private final HashMap<String, ExtendedYamlConfiguration> configs;
 
@@ -46,7 +46,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
 
     protected BPvPPlugin() {
         this.listeners = new ArrayList<>();
-        this.reloadHooks = new ArrayList<>();
+        this.reloadables = new ArrayList<>();
         this.configs = new HashMap<>();
 
         File configFile = new File(getDataFolder(), "config.yml");

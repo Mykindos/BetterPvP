@@ -16,7 +16,7 @@ import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.MagicSeal;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -24,7 +24,7 @@ import java.util.Map;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class Rake extends WeaponItem implements ReloadHook {
+public class Rake extends WeaponItem implements Reloadable {
 
     private final TillingTremorAbility ability;
 

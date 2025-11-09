@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -90,7 +90,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             clans.reload();
-            clans.getReloadHooks().forEach(ReloadHook::reload);
+            clans.getReloadables().forEach(Reloadable::reload);
 
             commandLoader.reload(clans.getClass().getPackageName());
             tipManager.reloadTips(clans);

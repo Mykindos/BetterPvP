@@ -40,7 +40,7 @@ import java.util.UUID;
 
 @PluginAdapter("ModelEngine")
 @PluginAdapter("MythicMobs")
-@PluginAdapter("ProtocolLib")
+@PluginAdapter("PacketEvents")
 @BPvPListener
 @Singleton
 public class DamageIndicatorAdapter implements Listener {

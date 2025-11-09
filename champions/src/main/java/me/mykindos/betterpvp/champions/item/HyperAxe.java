@@ -21,7 +21,7 @@ import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
@@ -30,7 +30,7 @@ import org.bukkit.inventory.meta.components.ToolComponent;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class HyperAxe extends WeaponItem implements ReloadHook {
+public class HyperAxe extends WeaponItem implements Reloadable {
 
     private static final ItemStack model;
 

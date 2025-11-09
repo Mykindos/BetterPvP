@@ -24,7 +24,7 @@ import me.mykindos.betterpvp.core.metal.Runesteel;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +33,7 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class Mjolnir extends WeaponItem implements ReloadHook, NexoItem {
+public class Mjolnir extends WeaponItem implements Reloadable, NexoItem {
 
     private transient boolean registered;
     @EqualsAndHashCode.Exclude

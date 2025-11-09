@@ -5,8 +5,8 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,7 +19,12 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class PestilenceProjectile extends Projectile {
 

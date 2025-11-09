@@ -19,12 +19,12 @@ import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class AlligatorsTooth extends WeaponItem implements ReloadHook {
+public class AlligatorsTooth extends WeaponItem implements Reloadable {
 
     private transient boolean registered;
 

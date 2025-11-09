@@ -2,15 +2,16 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
@@ -21,7 +22,14 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
-import me.mykindos.betterpvp.core.utilities.*;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -35,6 +43,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener

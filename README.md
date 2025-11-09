@@ -4,7 +4,6 @@ Repository containing all of BetterPvP's plugins for 1.21.
 - [Java 21](https://www.oracle.com/java/technologies/downloads/#java21)
 - [PaperSpigot](https://papermc.io/downloads)
 - [Docker](https://www.docker.com/) or for Windows and Mac users [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997)
 - [LibsDisguises](https://www.spigotmc.org/resources/libs-disguises.32453)
 - A Postgres server ([Bundled](docker))
 - A Redis server (optional) ([Bundled](docker))

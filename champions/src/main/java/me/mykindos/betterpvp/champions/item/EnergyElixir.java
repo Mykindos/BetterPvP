@@ -11,14 +11,14 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
-public class EnergyElixir extends BaseItem implements ReloadHook {
+public class EnergyElixir extends BaseItem implements Reloadable {
 
     private final EnergyBoost energyBoost;
 

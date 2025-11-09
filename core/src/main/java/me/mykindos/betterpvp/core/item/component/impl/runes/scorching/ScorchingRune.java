@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroups;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode
-public class ScorchingRune implements Rune, ReloadHook {
+public class ScorchingRune implements Rune, Reloadable {
 
     public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "scorching");
     private final Provider<ScorchingRuneItem> itemProvider;
