@@ -11,52 +11,24 @@ import lombok.RequiredArgsConstructor;
 public class ModifierResult {
     
     /**
-     * Multiplier to apply to the damage (1.0 = no change, 1.5 = 50% increase, 0.5 = 50% reduction)
+     * Damage to be applied
      */
-    private final double damageMultiplier;
-    
+    private final double damageOperand;
+
     /**
-     * Flat amount to add to the damage (can be negative for reduction)
+     * Damage operator
      */
-    private final double damageAddition;
-    
-    /**
-     * Whether this modifier should cancel all other modifiers of lower priority
-     * Used for true damage scenarios
-     */
-    private final boolean cancelOtherModifiers;
+    private final DamageOperator damageOperator;
     
     /**
      * Reason for this modification (used in damage logs and debug info)
      */
     private final String reason;
-    
-    /**
-     * Creates a simple multiplier-based result
-     * @param multiplier the damage multiplier
-     * @param reason the reason for the modification
-     */
-    public ModifierResult(double multiplier, String reason) {
-        this(multiplier, 0.0, false, reason);
-    }
-    
-    /**
-     * Creates a result that cancels other modifiers (for true damage)
-     * @param reason the reason for the modification
-     */
-    public static ModifierResult cancelOthers(String reason) {
-        return new ModifierResult(1.0, 0.0, true, reason);
-    }
-    
-    /**
-     * Creates a no-change result
-     * @param reason the reason for no modification
-     */
-    public static ModifierResult noChange(String reason) {
-        return new ModifierResult(1.0, 0.0, false, reason);
-    }
 
     public boolean isReductive() {
-        return damageMultiplier <= 1.0 && damageAddition <= 0.0;
+        return switch (damageOperator) {
+            case FLAT -> damageOperand < 0;
+            case MULTIPLIER -> damageOperand < 1.0;
+        };
     }
 }

@@ -3,9 +3,12 @@ package me.mykindos.betterpvp.core.item.component.impl.runes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
+import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,8 +25,16 @@ public class RuneRegistry {
     private final Map<NamespacedKey, Rune> runes = new HashMap<>();
     
     @Inject
-    public RuneRegistry() {
-        // Empty constructor for Guice
+    public RuneRegistry(Core core) {
+        final Reflections reflections = new Reflections(getClass().getPackageName());
+        for (Class<? extends Rune> runeClazz : reflections.getSubTypesOf(Rune.class)) {
+            if (runeClazz.isInterface() || Modifier.isAbstract(runeClazz.getModifiers())) {
+                continue;
+            }
+
+            final Rune runeInstance = core.getInjector().getInstance(runeClazz);
+            registerRune(runeInstance);
+        }
     }
     
     /**

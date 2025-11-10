@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.item.component.impl.ability;
 
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 
@@ -12,32 +13,32 @@ import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 public class ItemAbilityDamageModifier implements DamageModifier {
     
     protected final ItemAbility ability;
-    protected final double damageMultiplier;
-    protected final double damageIncrease;
+    protected final DamageOperator operator;
+    protected final double operand;
     protected final int priority;
     
     /**
      * Creates an item ability damage modifier
      * @param ability the item ability this modifier is for
-     * @param damageMultiplier the damage multiplier (1.0 = no change, 1.5 = 50% increase)
-     * @param damageIncrease the flat damage increase
+     * @param operator the damage operator
+     * @param operand the damage operand
      * @param priority the priority of this modifier
      */
-    public ItemAbilityDamageModifier(ItemAbility ability, double damageMultiplier, double damageIncrease, int priority) {
+    public ItemAbilityDamageModifier(ItemAbility ability, DamageOperator operator, double operand, int priority) {
         this.ability = ability;
-        this.damageMultiplier = damageMultiplier;
+        this.operator = operator;
         this.priority = priority;
-        this.damageIncrease = damageIncrease;
+        this.operand = operand;
     }
     
     /**
      * Creates a item ability damage modifier with default priority
      * @param ability the item ability this modifier is for
-     * @param damageMultiplier the damage multiplier
-     * @param damageIncrease the flat damage increase
+    * @param operator the damage operator
+    * @param operand the damage operand
      */
-    public ItemAbilityDamageModifier(ItemAbility ability, double damageMultiplier, double damageIncrease) {
-        this(ability, damageMultiplier, damageIncrease, 200);
+    public ItemAbilityDamageModifier(ItemAbility ability, DamageOperator operator, double operand) {
+        this(ability, operator, operand, 300);
     }
     
     @Override
@@ -68,7 +69,7 @@ public class ItemAbilityDamageModifier implements DamageModifier {
     
     @Override
     public ModifierResult apply(DamageEvent event) {
-        return new ModifierResult(damageMultiplier, damageIncrease, false, ability.getName());
+        return new ModifierResult(operand, operator, ability.getName());
     }
     
     @Override
@@ -78,19 +79,19 @@ public class ItemAbilityDamageModifier implements DamageModifier {
 
     public static class Flat extends ItemAbilityDamageModifier {
         public Flat(ItemAbility itemAbility, double damageIncrease, int priority) {
-            super(itemAbility, 1.0, damageIncrease, priority);
+            super(itemAbility, DamageOperator.FLAT, damageIncrease, priority);
         }
         public Flat(ItemAbility itemAbility, double damageIncrease) {
-            super(itemAbility, 1.0, damageIncrease);
+            super(itemAbility, DamageOperator.FLAT, damageIncrease);
         }
     }
 
     public static class Multiplier extends ItemAbilityDamageModifier {
         public Multiplier(ItemAbility itemAbility, double damageMultiplier, int priority) {
-            super(itemAbility, damageMultiplier, 0.0, priority);
+            super(itemAbility, DamageOperator.MULTIPLIER, damageMultiplier, priority);
         }
         public Multiplier(ItemAbility itemAbility, double damageMultiplier) {
-            super(itemAbility, damageMultiplier, 0.0);
+            super(itemAbility, DamageOperator.MULTIPLIER, damageMultiplier);
         }
     }
 

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.combat.damage;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -14,32 +15,32 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 public class SkillDamageModifier implements DamageModifier {
     
     protected final Skill skill;
-    protected final double damageMultiplier;
-    protected final double damageIncrease;
+    protected final DamageOperator operator;
+    protected final double operand;
     protected final int priority;
     
     /**
      * Creates a skill damage modifier
      * @param skill the skill this modifier is for
-     * @param damageMultiplier the damage multiplier (1.0 = no change, 1.5 = 50% increase)
-     * @param damageIncrease the flat damage increase
+     * @param operator the damage operator
+     * @param operand the damage operand
      * @param priority the priority of this modifier
      */
-    public SkillDamageModifier(Skill skill, double damageMultiplier, double damageIncrease, int priority) {
+    public SkillDamageModifier(Skill skill, DamageOperator operator, double operand, int priority) {
         this.skill = skill;
-        this.damageMultiplier = damageMultiplier;
+        this.operator = operator;
         this.priority = priority;
-        this.damageIncrease = damageIncrease;
+        this.operand = operand;
     }
     
     /**
      * Creates a skill damage modifier with default priority
      * @param skill the skill this modifier is for
-     * @param damageMultiplier the damage multiplier
-     * @param damageIncrease the flat damage increase
+     * @param operator the damage operator
+     * @param operand the flat damage increase
      */
-    public SkillDamageModifier(Skill skill, double damageMultiplier, double damageIncrease) {
-        this(skill, damageMultiplier, damageIncrease, 200);
+    public SkillDamageModifier(Skill skill, DamageOperator operator, double operand) {
+        this(skill, operator, operand, 200);
     }
     
     @Override
@@ -70,7 +71,7 @@ public class SkillDamageModifier implements DamageModifier {
     
     @Override
     public ModifierResult apply(DamageEvent event) {
-        return new ModifierResult(damageMultiplier, damageIncrease, false, skill.getName());
+        return new ModifierResult(operand, operator, skill.getName());
     }
     
     @Override
@@ -80,19 +81,19 @@ public class SkillDamageModifier implements DamageModifier {
 
     public static class Flat extends SkillDamageModifier {
         public Flat(Skill skill, double damageIncrease, int priority) {
-            super(skill, 1.0, damageIncrease, priority);
+            super(skill, DamageOperator.FLAT, damageIncrease, priority);
         }
         public Flat(Skill skill, double damageIncrease) {
-            super(skill, 1.0, damageIncrease);
+            super(skill, DamageOperator.FLAT, damageIncrease);
         }
     }
 
     public static class Multiplier extends SkillDamageModifier {
         public Multiplier(Skill skill, double damageMultiplier, int priority) {
-            super(skill, damageMultiplier, 0.0, priority);
+            super(skill, DamageOperator.MULTIPLIER, damageMultiplier, priority);
         }
         public Multiplier(Skill skill, double damageMultiplier) {
-            super(skill, damageMultiplier, 0.0);
+            super(skill, DamageOperator.MULTIPLIER, damageMultiplier);
         }
     }
 

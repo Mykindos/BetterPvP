@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.effects.Effect;
@@ -14,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Optional;
 
@@ -46,6 +46,6 @@ public class StrengthListener implements Listener {
 
         final Effect effect = effectOptional.get();
         final double increment = (1.5 * effect.getAmplifier());
-        event.addModifier(new GenericModifier("Strength", 1.0, increment).withType(ModifierType.EFFECT));
+        event.addModifier(new GenericModifier("Strength", DamageOperator.FLAT, increment).withType(ModifierType.EFFECT));
     }
 }

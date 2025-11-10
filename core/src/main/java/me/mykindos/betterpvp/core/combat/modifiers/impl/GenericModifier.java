@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.With;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 
@@ -17,23 +18,23 @@ public class GenericModifier implements DamageModifier {
     private final String reason;
     @With
     private ModifierType type = ModifierType.GENERIC;
-    private final double multiplier;
-    private final double flat;
+    private final DamageOperator operator;
+    private final double operand;
 
-    public GenericModifier(String reason, double multiplier, double flat) {
+    public GenericModifier(String reason, DamageOperator operator, double operand) {
         this.reason = reason;
-        this.multiplier = multiplier;
-        this.flat = flat;
+        this.operator = operator;
+        this.operand = operand;
     }
 
     @Override
     public String getName() {
         return reason;
     }
-    
+
     @Override
     public int getPriority() {
-        return 150; // Medium priority
+        return 500;
     }
     
     @Override
@@ -43,7 +44,7 @@ public class GenericModifier implements DamageModifier {
     
     @Override
     public ModifierResult apply(DamageEvent event) {
-        return new ModifierResult(multiplier, flat, false, reason);
+        return new ModifierResult(operand, operator, reason);
     }
     
     @Override

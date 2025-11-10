@@ -12,6 +12,7 @@
  import me.mykindos.betterpvp.core.combat.data.SoundProvider;
  import me.mykindos.betterpvp.core.combat.durability.DurabilityParameters;
  import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
+ import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
  import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
  import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
  import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
@@ -29,6 +30,7 @@
  import java.util.Comparator;
  import java.util.HashSet;
  import java.util.List;
+ import java.util.Objects;
  import java.util.Set;
 
 /**
@@ -263,30 +265,16 @@ public class DamageEvent extends CustomCancellableEvent {
      * @return array of reasons
      */
     public String[] getReasons() {
-        final List<String> reasons = new ArrayList<>(this.reasons);
-        final List<String> modifierReasons = new ArrayList<>();
-        final ArrayList<DamageModifier> modifiers = new ArrayList<>(this.modifiers.values());
-        modifiers.sort(Comparator.comparingInt(DamageModifier::getPriority).reversed());
+        List<String> reasons = new ArrayList<>(this.reasons);
 
-        for (DamageModifier modifier : modifiers) {
-            if (isModifierExcluded(modifier) || !modifier.canApply(this)) {
-                continue;
-            }
-
+        List<DamageModifier> ordered = getAppliedModifiers();
+        for (DamageModifier modifier : ordered) {
             ModifierResult result = modifier.apply(this);
-            Preconditions.checkNotNull(result, "Modifier %s returned null result", modifier.getName());
-
-            // Apply the modification
-            if (!result.isReductive()) { // If it reduces damage, don't add it to the reasons because it tried impeding death
-                modifierReasons.add(modifier.getName());
-            }
-
-            // If this modifier cancels others, stop processing
-            if (result.isCancelOtherModifiers()) {
-                break;
+            if (!result.isReductive()) {
+                reasons.add(modifier.getName());
             }
         }
-        reasons.addAll(modifierReasons);
+
         return reasons.toArray(new String[0]);
     }
     
@@ -359,72 +347,59 @@ public class DamageEvent extends CustomCancellableEvent {
     }
 
     public List<DamageModifier> getAppliedModifiers() {
-        final ArrayList<DamageModifier> modifiers = new ArrayList<>(this.modifiers.values());
-        final ArrayList<DamageModifier> resultList = new ArrayList<>();
-        modifiers.sort(Comparator.comparingInt(DamageModifier::getPriority).reversed());
+        List<DamageModifier> applied = new ArrayList<>();
 
-        for (DamageModifier modifier : modifiers) {
-            if (isModifierExcluded(modifier) || !modifier.canApply(this)) {
-                continue;
-            }
+        applied.addAll(getOrderedModifiers(false, DamageOperator.MULTIPLIER));
+        applied.addAll(getOrderedModifiers(false, DamageOperator.FLAT));
+        applied.addAll(getOrderedModifiers(true, DamageOperator.FLAT));
+        applied.addAll(getOrderedModifiers(true, DamageOperator.MULTIPLIER));
 
-            ModifierResult result = modifier.apply(this);
-            Preconditions.checkNotNull(result, "Modifier %s returned null result", modifier.getName());
-
-            // Apply the modification
-            resultList.add(modifier);
-
-            // If this modifier cancels others, stop processing
-            if (result.isCancelOtherModifiers()) {
-                break;
-            }
-        }
-
-        return resultList;
+        return applied;
     }
+
+    private List<DamageModifier> getOrderedModifiers(boolean reductive, DamageOperator operator) {
+        return modifiers.values().stream()
+                .filter(Objects::nonNull)
+                .filter(m -> !isModifierExcluded(m) && m.canApply(this))
+                .filter(m -> {
+                    ModifierResult r = m.apply(this);
+                    return r.isReductive() == reductive && r.getDamageOperator() == operator;
+                })
+                .sorted(Comparator.comparingInt(DamageModifier::getPriority).reversed())
+                .toList();
+    }
+
 
     /**
      * Calculates the final modified damage after applying all modifiers in order of priority
      * @return the final modified damage
      */
     public double getModifiedDamage() {
-        final ArrayList<DamageModifier> modifiers = new ArrayList<>(this.modifiers.values());
-        modifiers.sort(Comparator.comparingInt(DamageModifier::getPriority).reversed());
-
         double damage = getDamage();
-        for (DamageModifier modifier : modifiers) {
-            if (isModifierExcluded(modifier) || !modifier.canApply(this)) {
-                continue;
-            }
 
-            ModifierResult result = modifier.apply(this);
-            Preconditions.checkNotNull(result, "Modifier %s returned null result", modifier.getName());
-
-            // Apply the modification
-            damage = applyModifierResult(damage, result);
-
-            // If this modifier cancels others, stop processing
-            if (result.isCancelOtherModifiers()) {
-                break;
-            }
+        final List<DamageModifier> additiveMultipliers = getOrderedModifiers(false, DamageOperator.MULTIPLIER);
+        double base = damage;
+        for (int i = 0; i < additiveMultipliers.size(); i++) {
+            final ModifierResult result = additiveMultipliers.get(i).apply(this);
+            if (i == 0) damage = damage * result.getDamageOperand();
+            else damage = damage + (base * result.getDamageOperand());
         }
 
-        return damage;
+        for (DamageModifier modifier : getOrderedModifiers(false, DamageOperator.FLAT)) {
+            damage = damage + modifier.apply(this).getDamageOperand();
+        }
+
+        for (DamageModifier modifier : getOrderedModifiers(true, DamageOperator.FLAT)) {
+            damage = damage + modifier.apply(this).getDamageOperand();
+        }
+
+        for (DamageModifier modifier : getOrderedModifiers(true, DamageOperator.MULTIPLIER)) {
+            damage = damage * modifier.apply(this).getDamageOperand();
+        }
+
+        return Math.max(0, damage);
     }
 
-    /**
-     * Applies a single modifier result to a damage value
-     * @param currentDamage the current damage value
-     * @param result the modifier result to apply
-     * @return the new damage value
-     */
-    private double applyModifierResult(double currentDamage, ModifierResult result) {
-        // Apply multiplier first, then addition
-        double newDamage = currentDamage * result.getDamageMultiplier();
-        newDamage += result.getDamageAddition();
-
-        return Math.max(0, newDamage); // Ensure damage is never negative
-    }
 
     public EntityDamageEvent.DamageCause getBukkitCause() {
         if (cause instanceof VanillaDamageCause vanillaCause) {

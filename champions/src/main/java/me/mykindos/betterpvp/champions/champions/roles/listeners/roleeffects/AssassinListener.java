@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -105,7 +106,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
         if (!(event.getProjectile() instanceof AbstractArrow)) return;
         if (event.getProjectile().getShooter() instanceof Player player) {
             if (roleManager.hasRole(player, Role.ASSASSIN)) {
-                event.addModifier(new GenericModifier("Assassin Arrows", 0, 0));
+                event.addModifier(new GenericModifier("Assassin Arrows", DamageOperator.MULTIPLIER, 0));
             }
         }
     }

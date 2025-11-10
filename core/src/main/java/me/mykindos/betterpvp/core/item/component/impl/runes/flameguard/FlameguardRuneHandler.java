@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.item.component.impl.runes.flameguard;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
@@ -68,7 +69,7 @@ public class FlameguardRuneHandler implements Listener {
         }
         event.addModifier(new GenericModifier("Flameguard",
                 ModifierType.RUNE,
-                Math.max(0, 1 - mitigation),
-                0));
+                DamageOperator.MULTIPLIER,
+                Math.max(0, 1 - mitigation)));
     }
 }

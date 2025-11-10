@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
@@ -83,8 +84,8 @@ public class BrutalityRuneHandler implements Listener {
             event.addModifier(new GenericModifier(
                     brutalityRune.getName(),
                     ModifierType.RUNE,
-                    1 + brutalityRune.getScalar(),
-                    0)
+                    DamageOperator.MULTIPLIER,
+                    1 + brutalityRune.getScalar())
             );
 
             final double width = event.getDamagee().getWidth();

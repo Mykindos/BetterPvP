@@ -254,18 +254,31 @@ public class DamageEventFinalizer {
 
             final List<DamageModifier> appliedModifiers = event.getAppliedModifiers();
             final Multimap<ModifierType, DamageModifier> modifiers = event.getModifiers();
+            for (DamageModifier modifier : appliedModifiers) {
+                final ModifierType type = modifier.getType();
+                final TextComponent.Builder builder = Component.text();
+                builder.append(Component.text("[")).append(Component.text("✔", NamedTextColor.GREEN)).append(Component.text("]"));
+                builder.appendSpace();
+                builder.append(Component.text("(P: ")).append(Component.text(modifier.getPriority(), NamedTextColor.YELLOW)).append(Component.text(")"));
+                builder.appendSpace();
+                builder.append(Component.text(modifier.getName()).decorate(TextDecoration.ITALIC));
+                builder.appendSpace();
+                builder.append(Component.text("(")).append(Component.text(type.name(), NamedTextColor.YELLOW)).append(Component.text("):"));
+                builder.appendSpace();
+                final ModifierResult result = modifier.apply(event);
+                builder.append(Component.text(result.getDamageOperator().name(), NamedTextColor.AQUA));
+                builder.appendSpace();
+                builder.append(Component.text(result.getDamageOperand(), NamedTextColor.YELLOW));
+
+                player.sendMessage(builder.build());
+            }
+
             for (Map.Entry<ModifierType, DamageModifier> entry : modifiers.entries()) {
                 final ModifierType type = entry.getKey();
                 final DamageModifier modifier = entry.getValue();
-
-                boolean applied = appliedModifiers.contains(modifier);
+                if (appliedModifiers.contains(modifier)) continue;
                 final TextComponent.Builder builder = Component.text();
-                if (applied) {
-                    builder.append(Component.text("[")).append(Component.text("✔", NamedTextColor.GREEN)).append(Component.text("]"));
-                } else {
-                    builder.append(Component.text("[")).append(Component.text("✘", NamedTextColor.GREEN)).append(Component.text("]"));
-                }
-
+                builder.append(Component.text("[")).append(Component.text("✘", NamedTextColor.GREEN)).append(Component.text("]"));
                 builder.appendSpace();
                 builder.append(Component.text("(P: ")).append(Component.text(modifier.getPriority(), NamedTextColor.YELLOW)).append(Component.text(")"));
                 builder.appendSpace();
@@ -273,13 +286,7 @@ public class DamageEventFinalizer {
                 builder.appendSpace();
                 builder.append(Component.text("(")).append(Component.text(type.name(), NamedTextColor.YELLOW)).append(Component.text(")"));
 
-                if (applied) {
-                    final ModifierResult result = modifier.apply(event);
-                    builder.append(Component.text(": "));
-                    builder.append(Component.text("×" + result.getDamageMultiplier() + " + " + result.getDamageAddition(), NamedTextColor.YELLOW));
-                }
-
-                UtilMessage.simpleMessage(player, "Damage", builder.build());
+                player.sendMessage(builder.build());
             }
             UtilMessage.simpleMessage(player, "");
         }

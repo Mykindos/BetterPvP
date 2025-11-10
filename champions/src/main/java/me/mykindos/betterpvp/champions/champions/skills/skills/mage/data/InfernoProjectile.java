@@ -338,7 +338,7 @@ public class InfernoProjectile extends Projectile {
                     livingEntity,
                     caster,
                     null,
-                    new SkillDamageCause(skill).withBukkitCause(EntityDamageEvent.DamageCause.FIRE),
+                    new SkillDamageCause(skill).withBukkitCause(EntityDamageEvent.DamageCause.FIRE).withCategory(DamageCauseCategory.RANGED),
                     impactDamage.get(),
                     "Inferno"
             ));

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
@@ -65,7 +66,7 @@ public class SlayerRuneHandler implements Listener {
         event.addModifier(new GenericModifier(
                 slayerRune.getName(),
                 ModifierType.RUNE,
-                1.0,
+                DamageOperator.FLAT,
                 Math.max(0, slayerRune.getDamage())
         ));
     }

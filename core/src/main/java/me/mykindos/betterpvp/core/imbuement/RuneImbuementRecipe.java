@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -117,7 +116,7 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
                     return null; // Rune stack must be exactly 1
                 }
                 runeItemInstance = item;
-            } else {
+            } else if (item.getBaseItem() == baseItem) {
                 if (targetItemInstance != null) {
                     return null; // Multiple target items not allowed
                 }

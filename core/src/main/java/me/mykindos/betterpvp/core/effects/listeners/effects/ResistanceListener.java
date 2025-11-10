@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
 import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.effects.Effect;
@@ -40,7 +41,8 @@ public class ResistanceListener implements Listener {
 
         final Effect effect = effectOptional.get();
         event.addModifier(new GenericModifier("Resistance",
-                (1.0 - (double) (effect.getAmplifier() * 20) / 100),
-                0).withType(ModifierType.EFFECT));
+                DamageOperator.MULTIPLIER,
+                (1.0 - (double) (effect.getAmplifier() * 20) / 100)
+        ).withType(ModifierType.EFFECT));
     }
 }

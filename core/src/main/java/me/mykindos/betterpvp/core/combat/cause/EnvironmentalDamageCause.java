@@ -16,9 +16,6 @@ import java.util.Collections;
 @EqualsAndHashCode
 public class EnvironmentalDamageCause implements DamageCause {
 
-    // Common environmental damage causes
-//    public static final EnvironmentalDamageCause TEST = new EnvironmentalDamageCause("test", "Test", true, 2000L, false);
-
     private final String name;
     private final String displayName;
     private final EntityDamageEvent.DamageCause vanillaCause;

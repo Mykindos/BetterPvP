@@ -3,10 +3,10 @@ package me.mykindos.betterpvp.core.item.component.impl.runes.serialization;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneRegistry;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentDeserializer;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentSerializer;
 import org.bukkit.NamespacedKey;
@@ -89,7 +89,7 @@ public class RuneContainerSerializer implements ComponentSerializer<RuneContaine
             if (runeOpt.isPresent()) {
                 runes.add(runeOpt.get());
             } else {
-                log.warn("Rune with key {} not found in registry, skipping.", runeKey);
+                log.warn("Rune with key {} not found in registry, skipping.", runeKey).submit();
             }
         }
         return new RuneContainerComponent(maxSlots, runes);
