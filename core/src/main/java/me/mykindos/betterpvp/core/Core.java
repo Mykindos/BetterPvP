@@ -6,7 +6,6 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.anvil.AnvilRecipeBootstrap;
 import me.mykindos.betterpvp.core.block.SmartBlockModule;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
@@ -28,16 +27,15 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeBootstrap;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.inventory.InvUI;
-import me.mykindos.betterpvp.core.item.impl.CoreItemBootstrap;
+import me.mykindos.betterpvp.core.item.ItemKey;
+import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.leaderboards.CoreLeaderboardLoader;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.logging.LoggerFactory;
 import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
-import me.mykindos.betterpvp.core.metal.CastingMoldBootstrap;
-import me.mykindos.betterpvp.core.metal.MetalBlockBootstrap;
-import me.mykindos.betterpvp.core.metal.MetalItemBootstrap;
 import me.mykindos.betterpvp.core.metal.MetalRecipeBootstrap;
+import me.mykindos.betterpvp.core.metal.casting.CastingMoldBootstrap;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.sound.SoundManager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -56,7 +54,7 @@ import java.util.Set;
 @CustomLog
 public class Core extends BPvPPlugin {
 
-    private final String PACKAGE = getClass().getPackageName();
+    public static final String PACKAGE = Core.class.getPackageName();
 
     @Getter
     @Setter
@@ -104,8 +102,10 @@ public class Core extends BPvPPlugin {
         // Add this appender first to ensure we still capture all logs before database is initialized
         LoggerFactory.getInstance().addAppender(new LegacyAppender());
 
-        Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
-        Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
+        final Adapters adapters = new Adapters(this);
+        Reflections fieldReflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
+        Reflections reflections = new Reflections(PACKAGE);
+        Set<Field> fields = fieldReflections.getFieldsAnnotatedWith(Config.class);
 
         injector = Guice.createInjector(new CoreInjectorModule(this),
                 new ConfigInjectorModule(this, fields),
@@ -117,6 +117,8 @@ public class Core extends BPvPPlugin {
         setupServerAndSeason();
         injector.injectMembers(this);
 
+        final ItemLoader itemLoader = new ItemLoader(this);
+        itemLoader.load(adapters, reflections.getTypesAnnotatedWith(ItemKey.class));
         this.registerItems();
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
@@ -155,23 +157,17 @@ public class Core extends BPvPPlugin {
             log.warn("No packet adapter found, falling back to no-op implementation").submit();
         }
 
-        final Adapters adapters = new Adapters(this);
-        final Reflections reflectionAdapters = new Reflections(PACKAGE);
-        adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
-        adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+        adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapter.class));
+        adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapters.class));
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }
     
     private void registerItems() {
-        this.injector.getInstance(CoreItemBootstrap.class);
-        this.injector.getInstance(CoreBlockBootstrap.class);
-        this.injector.getInstance(MetalItemBootstrap.class);
-        this.injector.getInstance(MetalBlockBootstrap.class);
-        this.injector.getInstance(MetalRecipeBootstrap.class);
-        this.injector.getInstance(CastingMoldBootstrap.class);
-        this.injector.getInstance(ImbuementRecipeBootstrap.class);
-        this.injector.getInstance(AnvilRecipeBootstrap.class);
+        this.injector.getInstance(CoreBlockBootstrap.class).register();
+        this.injector.getInstance(MetalRecipeBootstrap.class).register();
+        this.injector.getInstance(CastingMoldBootstrap.class).register();
+        this.injector.getInstance(ImbuementRecipeBootstrap.class).register();
     }
 
     private void setupServerAndSeason() {

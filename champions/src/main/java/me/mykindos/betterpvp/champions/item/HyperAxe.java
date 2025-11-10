@@ -8,8 +8,10 @@ import me.mykindos.betterpvp.champions.item.ability.HyperRushAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
@@ -30,6 +32,8 @@ import org.bukkit.inventory.meta.components.ToolComponent;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:hyper_axe")
+@FallbackItem(value = Material.NETHERITE_AXE, keepRecipes = true)
 public class HyperAxe extends WeaponItem implements Reloadable {
 
     private static final ItemStack model;

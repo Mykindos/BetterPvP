@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.item.ability.RegenerationShieldAbility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -37,6 +38,7 @@ import java.util.UUID;
 @Singleton
 @BPvPListener
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:giants_broadsword")
 public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable {
 
     private transient boolean registered;

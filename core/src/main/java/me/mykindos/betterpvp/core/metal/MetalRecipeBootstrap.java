@@ -2,9 +2,7 @@ package me.mykindos.betterpvp.core.metal;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.impl.Blackroot;
 import me.mykindos.betterpvp.core.recipe.smelting.AlloyRegistry;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingRecipeBuilder;
@@ -13,11 +11,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 @Singleton
-public class MetalRecipeBootstrap implements ItemBootstrap {
+public class MetalRecipeBootstrap {
 
-    private boolean registered = false;
-
-    @Inject private ItemRegistry itemRegistry;
     @Inject private ItemFactory itemFactory;
     @Inject private SmeltingRecipeRegistry recipeRegistry;
     @Inject private AlloyRegistry alloyRegistry;
@@ -27,12 +22,7 @@ public class MetalRecipeBootstrap implements ItemBootstrap {
     @Inject private FissureQuartz.Item fissureQuartz;
     @Inject private Blackroot blackroot;
 
-    @Inject
-    @Override
-    public void registerItems() {
-        if (registered) return;
-        registered = true;
-
+    public void register() {
         // Steel
         final SmeltingRecipeBuilder steelBuilder = new SmeltingRecipeBuilder();
         steelBuilder.setPrimaryResult(steel, 1000);

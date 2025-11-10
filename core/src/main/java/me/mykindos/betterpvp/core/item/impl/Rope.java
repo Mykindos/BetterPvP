@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -16,6 +17,7 @@ import org.bukkit.NamespacedKey;
 import java.util.Map;
 
 @Singleton
+@ItemKey("core:rope")
 public class Rope extends BaseItem {
 
     private transient boolean registered;

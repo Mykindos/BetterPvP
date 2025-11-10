@@ -5,9 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 
 @Singleton
+@ItemKey("core:duskhide")
 public class Duskhide extends BaseItem {
 
     @Inject

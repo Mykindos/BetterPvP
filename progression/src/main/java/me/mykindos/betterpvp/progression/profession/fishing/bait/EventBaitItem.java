@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.fishing.bait;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.bait.ability.EventBaitAbility;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
  * Event Bait item that provides special effects when fishing.
  */
 @Singleton
+@ItemKey("progression:event_bait")
 public class EventBaitItem extends BaitItem {
 
     /**

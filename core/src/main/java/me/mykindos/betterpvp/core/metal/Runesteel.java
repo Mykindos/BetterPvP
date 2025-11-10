@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.metal;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -56,6 +57,7 @@ public class Runesteel {
     }
 
     @Singleton
+    @ItemKey("core:runesteel_billet")
     public static class Billet extends MetalItem {
 
         private transient boolean registered;
@@ -89,6 +91,7 @@ public class Runesteel {
     }
 
     @Singleton
+    @ItemKey("core:runesteel_block")
     public static class BlockItem extends MetalBlockItem {
 
         private transient boolean registered;

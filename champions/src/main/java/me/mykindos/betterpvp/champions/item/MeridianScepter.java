@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.item.ability.MeridianBeamAbility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -28,6 +29,7 @@ import java.util.List;
 @Singleton
 @BPvPListener
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:meridian_scepter")
 public class MeridianScepter extends WeaponItem implements Listener, Reloadable {
 
     private transient boolean registered;

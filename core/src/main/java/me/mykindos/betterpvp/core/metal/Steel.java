@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.metal;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import org.bukkit.Color;
 
@@ -16,6 +17,7 @@ public class Steel {
     }
 
     @Singleton
+    @ItemKey("core:steel_ingot")
     public static class Ingot extends MetalItem {
         @Inject
         public Ingot() {
@@ -32,6 +34,7 @@ public class Steel {
     }
 
     @Singleton
+    @ItemKey("core:steel_block")
     public static class BlockItem extends MetalBlockItem {
         @Inject
         public BlockItem() {

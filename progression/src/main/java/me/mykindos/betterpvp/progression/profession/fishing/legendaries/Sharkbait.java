@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
@@ -23,6 +24,7 @@ import org.bukkit.Material;
 @CustomLog
 @EqualsAndHashCode(callSuper = true)
 @Getter
+@ItemKey("core:sharkbait")
 public class Sharkbait extends BaseItem implements Reloadable {
     
     private final SharkbaitAuraAbility auraAbility;

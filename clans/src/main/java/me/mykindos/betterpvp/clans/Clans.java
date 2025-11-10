@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
-import me.mykindos.betterpvp.clans.item.ClansItemBoostrap;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
@@ -28,6 +27,8 @@ import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.item.ItemKey;
+import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -102,8 +103,16 @@ public class Clans extends BPvPPlugin {
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
 
+            final ItemLoader itemLoader = new ItemLoader(this);
+            itemLoader.load(adapters, reflectionAdapters.getTypesAnnotatedWith(ItemKey.class));
+            this.registerItems();
+
             clearCraftingRecipes();
         }
+    }
+
+    private void registerItems() {
+        this.injector.getInstance(ExplosiveResistanceBootstrap.class).register();
     }
 
     private void clearCraftingRecipes() {
@@ -116,11 +125,6 @@ public class Clans extends BPvPPlugin {
         recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:mangrove_boat"));
         recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:cherry_boat"));
         recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:pale_oak_boat"));
-    }
-
-    private void registerItems() {
-        this.injector.getInstance(ClansItemBoostrap.class).registerItems();
-        this.injector.getInstance(ExplosiveResistanceBootstrap.class).registerItems();
     }
 
     @Override

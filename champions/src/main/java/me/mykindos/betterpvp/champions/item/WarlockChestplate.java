@@ -4,7 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.model.ArmorItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
@@ -15,6 +17,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
+@ItemKey("champions:warlock_chestplate")
+@FallbackItem(value = Material.NETHERITE_CHESTPLATE, keepRecipes = true)
 public class WarlockChestplate extends ArmorItem {
 
     private transient boolean registered;

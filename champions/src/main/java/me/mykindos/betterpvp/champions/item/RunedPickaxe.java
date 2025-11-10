@@ -7,9 +7,11 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
@@ -27,6 +29,8 @@ import java.util.Map;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:runed_pickaxe")
+@FallbackItem(value = Material.DIAMOND_PICKAXE, keepRecipes = true)
 public class RunedPickaxe extends BaseItem implements Reloadable {
 
     private transient boolean registered;

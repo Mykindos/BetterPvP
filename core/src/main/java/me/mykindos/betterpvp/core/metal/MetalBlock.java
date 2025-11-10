@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a block of metal in the game.
  */
-public class MetalBlock extends SmartBlock implements NexoBlock {
+public abstract class MetalBlock extends SmartBlock implements NexoBlock {
 
     private final String nexoId;
 

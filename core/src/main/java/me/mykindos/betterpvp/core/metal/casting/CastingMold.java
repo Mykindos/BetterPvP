@@ -9,13 +9,13 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.intellij.lang.annotations.Subst;
 
-public class CastingMold extends BaseItem {
+public abstract class CastingMold extends BaseItem {
 
-    public CastingMold(String name, ItemStack model) {
+    protected CastingMold(String name, ItemStack model) {
         super(name, model, ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 
-    public CastingMold(String name, @Subst("base") String model) {
+    protected CastingMold(String name, @Subst("base") String model) {
         this(name, ItemView.builder()
                 .material(Material.PAPER)
                 .maxStackSize(1)

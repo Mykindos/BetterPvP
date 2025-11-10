@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -19,6 +20,7 @@ import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
+@ItemKey("champions:energy_apple")
 @EqualsAndHashCode(callSuper = false)
 public class EnergyApple extends BaseItem implements Reloadable {
 

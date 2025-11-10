@@ -2,12 +2,13 @@ package me.mykindos.betterpvp.core.metal;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import org.bukkit.Color;
 
 public class FissureQuartz {
 
     @Singleton
+    @ItemKey("core:fissure_quartz")
     public static class Item extends MetalItem {
         @Inject
         public Item() {
@@ -24,6 +25,7 @@ public class FissureQuartz {
     }
 
     @Singleton
+    @ItemKey("core:fissure_quartz_stone_ore")
     public static class OreItem extends MetalBlockItem {
         @Inject
         public OreItem() {
@@ -40,6 +42,7 @@ public class FissureQuartz {
     }
 
     @Singleton
+    @ItemKey("core:fissure_quartz_deepslate_ore")
     public static class DeepslateOreItem extends MetalBlockItem {
         @Inject
         public DeepslateOreItem() {

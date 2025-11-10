@@ -7,12 +7,14 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.impl.cannon.ability.CannonballReloadAbility;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
 
 @Singleton
+@ItemKey("core:cannonball")
 @EqualsAndHashCode(callSuper = false)
 public class CannonballItem extends BaseItem {
 

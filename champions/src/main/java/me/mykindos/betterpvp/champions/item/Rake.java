@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:rake")
 public class Rake extends WeaponItem implements Reloadable {
 
     private final TillingTremorAbility ability;

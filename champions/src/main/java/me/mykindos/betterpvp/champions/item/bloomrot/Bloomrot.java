@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:bloomrot")
 public class Bloomrot extends WeaponItem implements Reloadable {
 
     private final ItemFactory itemFactory;

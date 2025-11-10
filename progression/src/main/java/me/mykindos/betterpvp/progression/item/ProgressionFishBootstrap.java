@@ -2,30 +2,28 @@ package me.mykindos.betterpvp.progression.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.progression.Progression;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 @Singleton
-public class ProgressionFishBootstrap implements ItemBootstrap {
+public class ProgressionFishBootstrap {
 
-    private boolean registered = false;
+    private final ItemRegistry itemRegistry;
+    private final Progression progression;
 
-    @Inject private ItemRegistry itemRegistry;
-    @Inject private Progression progression;
+    @Inject
+    public ProgressionFishBootstrap(ItemRegistry itemRegistry, Progression progression) {
+        this.itemRegistry = itemRegistry;
+        this.progression = progression;
+    }
 
     private NamespacedKey key(String name) {
         return new NamespacedKey(progression, name);
     }
 
-    @Inject
-    @Override
-    public void registerItems() {
-        if (registered) return;
-        registered = true;
-
+    public void register() {;
         itemRegistry.registerItem(key("trout"), new FishItem("Trout", "trout"));
         itemRegistry.registerItem(key("salmon"), new FishItem("Salmon", "salmon"));
         itemRegistry.registerItem(key("bluegill"), new FishItem("Bluegill", "bluegill"));
@@ -45,5 +43,4 @@ public class ProgressionFishBootstrap implements ItemBootstrap {
         itemRegistry.registerItem(key("sturgeon"), new FishItem("Sturgeon", "sturgeon"));
         itemRegistry.registerItem(key("sunfish"), new FishItem("Sunfish", "sunfish"));
     }
-
 }

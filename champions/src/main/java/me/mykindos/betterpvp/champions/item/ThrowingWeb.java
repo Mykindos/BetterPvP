@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.item.ability.ThrowingWebAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -18,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
+@ItemKey("champions:throwing_web")
 @EqualsAndHashCode(callSuper = false)
 public class ThrowingWeb extends BaseItem implements Reloadable {
 

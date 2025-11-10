@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
@@ -33,6 +34,7 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:mjolnir")
 public class Mjolnir extends WeaponItem implements Reloadable, NexoItem {
 
     private transient boolean registered;

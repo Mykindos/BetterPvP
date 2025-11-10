@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
+@ItemKey("champions:ivybolt")
 public class Ivybolt extends WeaponItem implements Reloadable {
 
     private final ItemFactory itemFactory;

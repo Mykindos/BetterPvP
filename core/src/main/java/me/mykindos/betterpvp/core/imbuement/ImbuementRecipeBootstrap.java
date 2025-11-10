@@ -4,105 +4,54 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemBootstrap;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.attraction.AttractionRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.brutality.BrutalityRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.detonation.DetonationRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.essence.EssenceRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.ferocity.FerocityRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.flameguard.FlameguardRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.forestwright.ForestwrightRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.greed.GreedRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.hookmaster.HookmasterRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.momentum.MomentumRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.moonseer.MoonseerRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.recovery.RecoveryRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.slayer.SlayerRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.stonecaller.StonecallerRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.vampirism.VampirismRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.wanderer.WandererRuneItem;
 import org.bukkit.NamespacedKey;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+
+import static me.mykindos.betterpvp.core.Core.PACKAGE;
 
 /**
  * Bootstrap class for registering imbuement recipes.
  * This class is responsible for setting up all imbuement crafting recipes in the system.
  */
 @Singleton
-public class ImbuementRecipeBootstrap implements ItemBootstrap {
+public class ImbuementRecipeBootstrap {
 
-    private boolean registered = false;
+    private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
+    private final ImbuementRecipeRegistry imbuementRecipeRegistry;
+    private final Core core;
 
-    @Inject private ItemRegistry itemRegistry;
-    @Inject private ItemFactory itemFactory;
-    @Inject private ImbuementRecipeRegistry imbuementRecipeRegistry;
-    @Inject private ScorchingRuneItem scorchingRune;
-    @Inject private UnbreakingRuneItem unbreakingRune;
-    @Inject private FlameguardRuneItem flameguardRune;
-    @Inject private AttractionRuneItem attractionRune;
-    @Inject private RecoveryRuneItem recoveryRune;
-    @Inject private WandererRuneItem wandererRune;
-    @Inject private MoonseerRuneItem moonseerRune;
-    @Inject private ForestwrightRuneItem forestwrightRune;
-    @Inject private HookmasterRuneItem hookmasterRune;
-    @Inject private StonecallerRuneItem stonecallerRune;
-    @Inject private FerocityRuneItem ferocityRuneItem;
-    @Inject private DetonationRuneItem detonationRuneItem;
-    @Inject private GreedRuneItem greedRuneItem;
-    @Inject private VampirismRuneItem vampirismRuneItem;
-    @Inject private SlayerRuneItem slayerRuneItem;
-    @Inject private BrutalityRuneItem brutalityRuneItem;
-    @Inject private MomentumRuneItem momentumRuneItem;
-    @Inject private EssenceRuneItem essenceRuneItem;
-
-    /**
-     * Creates a namespaced key for the Core plugin.
-     * @param name The key name
-     * @return A namespaced key for the Core plugin
-     */
-    private NamespacedKey key(String name) {
-        return new NamespacedKey(JavaPlugin.getPlugin(Core.class), name);
+    @Inject
+    private ImbuementRecipeBootstrap(ItemRegistry itemRegistry, ItemFactory itemFactory, ImbuementRecipeRegistry imbuementRecipeRegistry, Core core) {
+        this.itemRegistry = itemRegistry;
+        this.itemFactory = itemFactory;
+        this.imbuementRecipeRegistry = imbuementRecipeRegistry;
+        this.core = core;
     }
 
-    /**
-     * Register imbuement recipes including the rune recipe handler.
-     * This method sets up the core imbuement system.
-     */
-    @Inject
-    @Override
-    public void registerItems() {
-        if (registered) return;
-        registered = true;
+    public void register() {
+        final Reflections reflections = new Reflections(PACKAGE);
+        final Set<Class<? extends RuneItem>> subTypes = reflections.getSubTypesOf(RuneItem.class);
+        final List<RuneItem> runes = new ArrayList<>();
+        for (Class<? extends RuneItem> runeClazz : subTypes) {
+            if (runeClazz.isInterface() || Modifier.isAbstract(runeClazz.getModifiers())) {
+                continue;
+            }
 
-        final List<RuneItem> runes = List.of(scorchingRune,
-                unbreakingRune,
-                flameguardRune,
-                recoveryRune,
-                attractionRune,
-                wandererRune,
-                moonseerRune,
-                forestwrightRune,
-                hookmasterRune,
-                stonecallerRune,
-                ferocityRuneItem,
-                detonationRuneItem,
-                greedRuneItem,
-                vampirismRuneItem,
-                slayerRuneItem,
-                brutalityRuneItem,
-                momentumRuneItem,
-                essenceRuneItem
-                );
+            runes.add(core.getInjector().getInstance(runeClazz));
+        }
+
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
             registerRecipe(itemRegistry, alreadyRegistered, runes);
         }

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import org.bukkit.NamespacedKey;
@@ -16,6 +17,7 @@ import org.bukkit.NamespacedKey;
 import java.util.Map;
 
 @Singleton
+@ItemKey("core:durak_handle")
 public class DurakHandle extends BaseItem {
 
     private transient boolean registered;
