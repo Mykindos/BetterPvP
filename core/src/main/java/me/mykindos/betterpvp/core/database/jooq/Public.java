@@ -4,9 +4,6 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
@@ -28,9 +25,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKillstreak;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopRating;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetWorldLogsForBlock;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores;
-import me.mykindos.betterpvp.core.database.jooq.tables.Itemdurability;
-import me.mykindos.betterpvp.core.database.jooq.tables.Itemlore;
-import me.mykindos.betterpvp.core.database.jooq.tables.Items;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
@@ -40,6 +34,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
 import me.mykindos.betterpvp.core.database.jooq.tables.Servers;
+import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
@@ -54,13 +49,15 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillsRecord
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
-
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -672,21 +669,6 @@ public class Public extends SchemaImpl {
     public final Ignores IGNORES = Ignores.IGNORES;
 
     /**
-     * The table <code>public.itemdurability</code>.
-     */
-    public final Itemdurability ITEMDURABILITY = Itemdurability.ITEMDURABILITY;
-
-    /**
-     * The table <code>public.itemlore</code>.
-     */
-    public final Itemlore ITEMLORE = Itemlore.ITEMLORE;
-
-    /**
-     * The table <code>public.items</code>.
-     */
-    public final Items ITEMS = Items.ITEMS;
-
-    /**
      * The table <code>public.kill_contributions</code>.
      */
     public final KillContributions KILL_CONTRIBUTIONS = KillContributions.KILL_CONTRIBUTIONS;
@@ -730,6 +712,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.servers</code>.
      */
     public final Servers SERVERS = Servers.SERVERS;
+
+    /**
+     * The table <code>public.smart_block_data</code>.
+     */
+    public final SmartBlockData SMART_BLOCK_DATA = SmartBlockData.SMART_BLOCK_DATA;
 
     /**
      * The table <code>public.uuiditems</code>.
@@ -783,9 +770,6 @@ public class Public extends SchemaImpl {
             GetTopRating.GET_TOP_RATING,
             GetWorldLogsForBlock.GET_WORLD_LOGS_FOR_BLOCK,
             Ignores.IGNORES,
-            Itemdurability.ITEMDURABILITY,
-            Itemlore.ITEMLORE,
-            Items.ITEMS,
             KillContributions.KILL_CONTRIBUTIONS,
             Kills.KILLS,
             Logs.LOGS,
@@ -795,6 +779,7 @@ public class Public extends SchemaImpl {
             Punishments.PUNISHMENTS,
             Realms.REALMS,
             Servers.SERVERS,
+            SmartBlockData.SMART_BLOCK_DATA,
             Uuiditems.UUIDITEMS,
             WorldLogs.WORLD_LOGS,
             WorldLogsMetadata.WORLD_LOGS_METADATA

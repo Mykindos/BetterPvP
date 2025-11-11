@@ -11,13 +11,15 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -31,7 +33,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -94,20 +95,22 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
+
         if (event.getDamagee() instanceof Player player) {
             if (running.containsKey(player.getUniqueId())) {
                 event.setKnockback(false);
             }
         }
 
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
             return;
         }
 
         if (event.getDamager() instanceof Player damager) {
 
-            final LivingEntity damagee = event.getDamagee();
+            final LivingEntity damagee = event.getLivingDamagee();
 
             if (running.containsKey(damager.getUniqueId())) {
                 if (expire(damager.getUniqueId())) {
@@ -136,6 +139,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     @EventHandler
     public void onKnockback(CustomEntityVelocityEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
+        if (event.getSource() != null && UtilEntity.isEntityFriendly(player, event.getSource())) return;
         if (running.containsKey(player.getUniqueId())) {
             event.setCancelled(true);
         }

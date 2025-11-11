@@ -1,19 +1,14 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.droptables.DropTable;
-import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -21,11 +16,9 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -44,9 +37,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,17 +47,16 @@ public class UtilItem {
 
     public static ItemStack convertType(@NotNull ItemStack itemStackIn, @NotNull Material to, @Nullable Integer toModel) {
         ItemStack itemStack = itemStackIn.clone();
-        final Material from = itemStack.getType();
         if (itemStack.getItemMeta() != null) {
             final ItemMeta metaCopy = itemStack.getItemMeta().clone();
             itemStack.setType(to);
             final ItemMeta meta = itemStack.getItemMeta();
             meta.setCustomModelData(toModel);
+            itemStack.setData(DataComponentTypes.ITEM_NAME, itemStackIn.getData(DataComponentTypes.ITEM_NAME));
 
             if (!metaCopy.hasDisplayName()) {
-                final String key = from.translationKey();
-                final Component name = Component.translatable(key, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
-                meta.displayName(name);
+                final Component name = itemStack.getData(DataComponentTypes.ITEM_NAME);
+                meta.displayName(name.decoration(TextDecoration.ITALIC, false));
             }
 
             // Durability
@@ -89,61 +79,18 @@ public class UtilItem {
         return itemStack;
     }
 
-    public static boolean isCosmeticShield(ItemStack item) {
-        return item.getType() == Material.SHIELD && item.hasItemMeta()
+    public static boolean isUndroppable(ItemStack item) {
+        return item.hasItemMeta()
                 && item.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN)
                 && Boolean.TRUE.equals(item.getItemMeta().getPersistentDataContainer().get(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN));
     }
 
-    public static ItemStack createCosmeticShield(int modelData) {
-        ItemStack shield = new ItemStack(Material.SHIELD);
-        final ItemMeta meta = shield.getItemMeta();
-        meta.setCustomModelData(modelData);
+    public static ItemStack makeUndroppable(ItemStack itemStack) {
+        ItemStack result = itemStack.clone();
+        final ItemMeta meta = result.getItemMeta();
         meta.getPersistentDataContainer().set(CoreNamespaceKeys.UNDROPPABLE_KEY, PersistentDataType.BOOLEAN, true);
-        shield.setItemMeta(meta);
-        return shield;
-    }
-
-    /**
-     * Updates an ItemStack, giving it a custom name and lore
-     *
-     * @param item ItemStack to modify
-     * @param name Name to give the ItemStack
-     * @param lore Lore to give the ItemStack
-     * @return Returns the ItemStack with the newly adjusted name and lore
-     */
-    public static ItemStack setItemNameAndLore(ItemStack item, String name, String[] lore) {
-        if (lore != null) {
-            return setItemNameAndLore(item, name, Arrays.asList(lore));
-        }
-
-        return setItemNameAndLore(item, name, new ArrayList<>());
-
-    }
-
-    /**
-     * Updates an ItemStack, giving it a custom name and lore
-     *
-     * @param item ItemStack to modify
-     * @param name Name to give the ItemStack
-     * @param lore Lore to give the ItemStack
-     * @return Returns the ItemStack with the newly adjusted name and lore
-     */
-    public static ItemStack setItemNameAndLore(ItemStack item, String name, List<String> lore) {
-        ItemMeta im = item.getItemMeta();
-        im.displayName(Component.text(name));
-        if (lore != null) {
-            List<Component> components = new ArrayList<>();
-            for (String loreEntry : lore) {
-                components.add(Component.text(loreEntry));
-            }
-            im.lore(components);
-        }
-
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-
-        item.setItemMeta(im);
-        return item;
+        result.setItemMeta(meta);
+        return result;
     }
 
     /**
@@ -279,25 +226,29 @@ public class UtilItem {
         return (wep.getType() == Material.BOW || wep.getType() == Material.CROSSBOW);
     }
 
-    public static void insert(Player player, ItemStack stack) {
-        if (stack != null && stack.getType() != Material.AIR) {
-            if (player.getInventory().firstEmpty() != -1) {
-                player.getInventory().addItem(stack).forEach((num, item) -> {
-                    player.getWorld().dropItem(player.getLocation(), item);
-                });
-            } else {
-                player.getWorld().dropItem(player.getLocation(), stack);
+    /**
+     * Checks if the player has a partial stack of the given item in their inventory.
+     */
+    public static  boolean fits(Player player, ItemStack item, int count) {
+        if (player.getInventory().firstEmpty() != -1) {
+            return true; // Player has an empty slot
+        }
+        if (count == 0 || item == null || item.getType().isAir()) {
+            return false; // No item or count is zero
+        }
+        for (ItemStack stack : player.getInventory().getStorageContents()) {
+            if (stack != null && stack.isSimilar(item) && (stack.getAmount() + count) <= stack.getMaxStackSize()) {
+                return true;
             }
         }
+        return false;
     }
 
-    public static void insert(Player player, ItemStack stack, ItemHandler itemHandler) {
+    public static void insert(Player player, ItemStack stack) {
         if (stack != null && stack.getType() != Material.AIR) {
-            if (player.getInventory().firstEmpty() != -1) {
-                player.getInventory().addItem(stack);
-            } else {
-                player.getWorld().dropItem(player.getLocation(), stack);
-            }
+            player.getInventory().addItem(stack).forEach((num, item) -> {
+                player.getWorld().dropItem(player.getLocation(), item);
+            });
         }
     }
 
@@ -351,81 +302,6 @@ public class UtilItem {
         return newComponents;
     }
 
-    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String source, String config, String configKey) {
-        return getDropTable(itemHandler, plugin.getConfig(config), source, configKey);
-    }
-
-    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String source, String configKey) {
-        return getDropTable(itemHandler, plugin, source, "config", configKey);
-    }
-
-    public static DropTable getDropTable(ItemHandler itemHandler, ExtendedYamlConfiguration config, String source, String configKey) {
-        DropTable droptable = new DropTable(source, configKey);
-
-        var configSection = config.getConfigurationSection(configKey);
-        if (configSection == null) return droptable;
-
-        parseDropTable(itemHandler, configSection, droptable);
-
-        return droptable;
-    }
-
-    public static Map<String, DropTable> getDropTables(ItemHandler itemHandler, ExtendedYamlConfiguration config, String source, String configKey) {
-        Map<String, DropTable> droptableMap = new HashMap<>();
-
-        var configSection = config.getConfigurationSection(configKey);
-        if (configSection == null) return droptableMap;
-
-        configSection.getKeys(false).forEach(key -> {
-            var droptableSection = configSection.getConfigurationSection(key);
-            if (droptableSection == null) return;
-            DropTable droptable = new DropTable(source, key);
-            parseDropTable(itemHandler, droptableSection, droptable);
-
-            droptableMap.put(key, droptable);
-
-            log.info("Droptable: " + key).submit();
-            droptable.getAbsoluteElementChances().forEach((element, chance) -> {
-                log.info(element + ": " + (chance * 100)).submit();
-            });
-
-        });
-
-        return droptableMap;
-    }
-
-    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, DropTable droptable) {
-        for (String key : droptableSection.getKeys(false)) {
-            DropTableItemStack itemStack = null;
-            int weight = droptableSection.getInt(key + ".weight");
-            int categoryWeight = droptableSection.getInt(key + ".category-weight");
-            int amount = droptableSection.getInt(key + ".amount", 1);
-
-            int minAmount = droptableSection.getInt(key + ".minAmount", amount);
-            int maxAmount = droptableSection.getInt(key + ".maxAmount", amount);
-
-            if (key.contains(":")) {
-                BPvPItem item = itemHandler.getItem(key);
-                if (item != null) {
-                    if (!item.isEnabled()) continue;
-                    itemStack = new DropTableItemStack(item.getItemStack(amount), minAmount, maxAmount);
-                } else {
-                    log.error("Failed to load item {}", key).submit();
-                }
-            } else {
-                Material item = Material.valueOf(key.toUpperCase());
-                int modelId = droptableSection.getInt(key + ".model-id", 0);
-                itemStack = new DropTableItemStack(UtilItem.createItemStack(item, amount, modelId), minAmount, maxAmount);
-            }
-
-            if (itemStack == null) {
-                log.warn(key + " is null").submit();
-            }
-
-            droptable.add(categoryWeight, weight, itemStack);
-        }
-    }
-
     /**
      * Get an item identifier for the supplied ItemStack
      * @param itemStack
@@ -439,6 +315,10 @@ public class UtilItem {
         return itemStack.getType()
                     + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
 
+    }
+
+    public static void damageItem(Player player, ItemInstance itemInstance, int damage) {
+        damageItem(player, itemInstance.getItemStack(), damage);
     }
 
     /**
@@ -462,7 +342,6 @@ public class UtilItem {
      * @param itemStack the item to break
      */
     public static void breakItem(Player player, ItemStack itemStack) {
-        UtilServer.callEvent(new PlayerItemBreakEvent(player, itemStack));
         itemStack.setAmount(0);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
     }
@@ -633,6 +512,5 @@ public class UtilItem {
 
         return itemMap;
     }
-
 
 }

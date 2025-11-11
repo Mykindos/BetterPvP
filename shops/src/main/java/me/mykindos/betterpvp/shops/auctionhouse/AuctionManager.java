@@ -8,7 +8,9 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -28,7 +30,8 @@ import java.util.UUID;
 @CustomLog
 public class AuctionManager {
 
-    private final ItemHandler itemHandler;
+    private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
     private final ClientManager clientManager;
     private final AuctionRepository auctionRepository;
 
@@ -38,8 +41,9 @@ public class AuctionManager {
     private IAuctionDeliveryService deliveryService = new DefaultAuctionDeliveryService();
 
     @Inject
-    public AuctionManager(ItemHandler itemHandler, ClientManager clientManager, AuctionRepository auctionRepository) {
-        this.itemHandler = itemHandler;
+    public AuctionManager(ItemRegistry itemRegistry, ItemFactory itemFactory, ClientManager clientManager, AuctionRepository auctionRepository) {
+        this.itemRegistry = itemRegistry;
+        this.itemFactory = itemFactory;
         this.clientManager = clientManager;
         this.auctionRepository = auctionRepository;
         activeAuctions.addAll(auctionRepository.getAll());
@@ -54,14 +58,17 @@ public class AuctionManager {
         auction.setExpiryTime(System.currentTimeMillis() + auction.getListingDuration().getDuration());
         getAuctionRepository().save(auction);
         getActiveAuctions().add(auction);
-        itemHandler.getUUIDItem(auction.getItemStack()).ifPresent((uuidItem) -> {
-            log.info("{} listed ({}) on the auction house for ${}",
-                            player.getName(), uuidItem.getUuid(), auction.getSellPrice())
-                    .setAction("ITEM_AUCTION_CREATE").addItemContext(uuidItem)
-                    .addContext(LogContext.CURRENCY, String.valueOf(auction.getSellPrice()))
-                    .addClientContext(player).submit();
-        });
 
+        itemFactory.fromItemStack(auction.getItemStack()).ifPresent(itemInstance -> {
+            itemInstance.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+                final UUID uuid = uuidProperty.getUniqueId();
+                log.info("{} listed ({}) on the auction house for ${}", player.getName(), uuid, auction.getSellPrice())
+                        .setAction("ITEM_AUCTION_CREATE")
+                        .addItemContext(itemRegistry, itemInstance)
+                        .addContext(LogContext.CURRENCY, String.valueOf(auction.getSellPrice()))
+                        .addClientContext(player).submit();
+            });
+        });
         UtilMessage.simpleMessage(player, "Auction House", "Listing created successfully.");
         log.info("{} has created a listing for {} for ${}", player.getName(), auction.getItemStack().getType().name(), auction.getSellPrice()).setAction("ITEM_AUCTION_LIST").submit();
     }
@@ -93,12 +100,15 @@ public class AuctionManager {
             getActiveAuctions().remove(auction);
         }
 
-        itemHandler.getUUIDItem(auction.getItemStack()).ifPresent((uuidItem) -> {
-            log.info("{} bought ({}) on the auction house for ${}",
-                            player.getName(), uuidItem.getUuid(), auction.getSellPrice())
-                    .setAction("ITEM_AUCTION_BUY").addItemContext(uuidItem)
-                    .addContext(LogContext.CURRENCY, String.valueOf(auction.getSellPrice()))
-                    .addClientContext(player).submit();
+        itemFactory.fromItemStack(auction.getItemStack()).ifPresent(itemInstance -> {
+            itemInstance.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+                final UUID uuid = uuidProperty.getUniqueId();
+                log.info("{} bought ({}) on the auction house for ${}", player.getName(), uuid, auction.getSellPrice())
+                        .setAction("ITEM_AUCTION_BUY")
+                        .addItemContext(itemRegistry, itemInstance)
+                        .addContext(LogContext.CURRENCY, String.valueOf(auction.getSellPrice()))
+                        .addClientContext(player).submit();
+            });
         });
     }
 
@@ -129,11 +139,15 @@ public class AuctionManager {
         } else {
             log.warn("Failed to deliver cancelled auction {}", auction.getAuctionID()).submit();
         }
-        itemHandler.getUUIDItem(auction.getItemStack()).ifPresent((uuidItem) -> {
-            log.info("{} canceled ({}) on the auction house",
-                            player.getName(), uuidItem.getUuid(), auction.getSellPrice())
-                    .setAction("ITEM_AUCTION_CANCEL").addItemContext(uuidItem)
-                    .addClientContext(player).submit();
+
+        itemFactory.fromItemStack(auction.getItemStack()).ifPresent(itemInstance -> {
+            itemInstance.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+                final UUID uuid = uuidProperty.getUniqueId();
+                log.info("{} canceled ({}) on the auction house", player.getName(), uuid, auction.getSellPrice())
+                        .setAction("ITEM_AUCTION_CANCEL")
+                        .addItemContext(itemRegistry, itemInstance)
+                        .addClientContext(player).submit();
+            });
         });
     }
 
@@ -153,10 +167,15 @@ public class AuctionManager {
                 getAuctionRepository().setDelivered(auction, true);
                 auctionIterator.remove();
             }
-            itemHandler.getUUIDItem(auction.getItemStack()).ifPresent((uuidItem) -> {
-                log.info("({})'s Auction was cancelled",
-                                uuidItem.getUuid())
-                        .setAction("ITEM_AUCTION_CANCEL").addItemContext(uuidItem).submit();
+
+            itemFactory.fromItemStack(auction.getItemStack()).ifPresent(itemInstance -> {
+                itemInstance.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+                    final UUID uuid = uuidProperty.getUniqueId();
+                    log.info("({})'s Auction was cancelled", uuid)
+                            .setAction("ITEM_AUCTION_CANCEL")
+                            .addItemContext(itemRegistry, itemInstance)
+                            .submit();
+                });
             });
         }
     }

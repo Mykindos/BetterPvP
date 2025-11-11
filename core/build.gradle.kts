@@ -36,17 +36,22 @@ dependencies {
 
     api(libs.mini.placeholders)
     api(libs.caffeine)
+    compileOnly(libs.nexo)
 
     compileOnly(libs.mineplex)
     compileOnly(libs.lombok)
     compileOnly(libs.mythic)
     compileOnly(libs.modelengine)
-    compileOnly(libs.protocollib)
+    compileOnly(libs.packetevents)
+    compileOnly(libs.packetevents)
     compileOnly(libs.bundles.paper)
-
+    compileOnly(libs.fawe)
+    compileOnly(libs.fawebukkit)
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)
+    testImplementation("org.mockito:mockito-core:5.12.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

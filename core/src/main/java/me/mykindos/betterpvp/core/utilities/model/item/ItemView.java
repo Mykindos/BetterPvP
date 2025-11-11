@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.item;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.CustomModelData;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@SuppressWarnings("UnstableApiUsage")
 @Builder(toBuilder = true)
 @Value
 @Getter
@@ -42,7 +44,9 @@ public class ItemView implements ItemProvider {
     @Nullable Component displayName;
     @NotNull Material material;
     @Nullable Key itemModel;
+    @Nullable @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) Integer maxStackSize = null;
     @Builder.Default boolean hideTooltip = false;
+    @Builder.Default boolean hideAdditionalTooltip = false;
     @Nullable @Builder.Default @Range(from = 0, to = Integer.MAX_VALUE) Integer customModelData = null;
     @Nullable Material fallbackMaterial;
     @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) int amount = 1;
@@ -92,6 +96,10 @@ public class ItemView implements ItemProvider {
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) {
             meta = Bukkit.getItemFactory().getItemMeta(material);
+
+            if (meta == null) {
+                return new ItemStack(fallbackMaterial != null ? fallbackMaterial : Material.BARRIER, Math.max(1, amount));
+            }
         }
 
         if (durability != null && meta instanceof Damageable damageable) {
@@ -140,11 +148,6 @@ public class ItemView implements ItemProvider {
             }
         }
 
-
-        if (customModelData != null && customModelData != 0) {
-            meta.setCustomModelData(customModelData);
-        }
-
         if (flags != null) {
             meta.addItemFlags(flags.toArray(ItemFlag[]::new));
         }
@@ -160,10 +163,32 @@ public class ItemView implements ItemProvider {
         }
 
         if (hideTooltip) {
-            itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hideTooltip(true).build());
+            final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay().hideTooltip(true);
+            itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, builder.build());
+        } else if (hideAdditionalTooltip) {
+            final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay().
+                    addHiddenComponents(DataComponentTypes.EQUIPPABLE,
+                            DataComponentTypes.ENCHANTMENTS,
+                            DataComponentTypes.BANNER_PATTERNS,
+                            DataComponentTypes.INSTRUMENT,
+                            DataComponentTypes.BASE_COLOR,
+                            DataComponentTypes.UNBREAKABLE,
+                            DataComponentTypes.CAN_BREAK,
+                            DataComponentTypes.CAN_PLACE_ON,
+                            DataComponentTypes.ATTRIBUTE_MODIFIERS
+                    );
+            itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, builder.build());
         }
 
-        return itemStack;
+        if (customModelData != null) {
+            itemStack.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addFloat(customModelData).build());
+        }
+
+        if (maxStackSize != null && maxStackSize > 0) {
+            itemStack.setData(DataComponentTypes.MAX_STACK_SIZE, maxStackSize);
+        }
+
+        return itemStack.clone();
     }
 
     @Override
@@ -196,6 +221,10 @@ public class ItemView implements ItemProvider {
             this.baseMeta(meta);
             this.material(itemStack.getType());
             this.amount(itemStack.getAmount());
+
+            if (meta == null) {
+                return this;
+            }
 
             final Component displayName = meta.displayName();
             if (displayName != null) {

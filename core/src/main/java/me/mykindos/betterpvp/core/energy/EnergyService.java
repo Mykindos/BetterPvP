@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
@@ -32,22 +33,31 @@ public class EnergyService {
     private boolean nerfEnergyRegen;
 
     @Inject
-    @Config(path = "energy.consumption-regen-delay", defaultValue = "1.5")
+    @Config(path = "energy.consumption-regen-delay", defaultValue = "1.0")
     private double consumptionRegenDelay;
 
     @Getter
-    private final Map<UUID, Energy> energyMap = new ConcurrentHashMap<>();
+    @Inject
+    @Config(path = "energy.max-energy", defaultValue = "150.0")
+    public double maxEnergy = 150.0D;
 
-    public static final double BASE_ENERGY = 150.0D;
-    /**
-     * Default energy regenerated per second
-     */
-    public static final double BASE_ENERGY_REGEN = 10D;
-    public static final double NERFED_ENERGY_REGEN = 8D;
-    public static final long UPDATE_RATE = 50L;
+    @Getter
+    @Inject
+    @Config(path = "energy.energy-per-second", defaultValue = "10.0")
+    public double energyPerSecond = 10D;
+
+    @Getter
+    @Inject
+    @Config(path = "energy.energy-per-tick-nerfed", defaultValue = "8.0")
+    public double nerfedEnergyPerSecond = 8D;
+
+    @Getter
+    private final Map<UUID, Energy> energyMap = new ConcurrentHashMap<>();
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public EnergyService() {
+    public EnergyService(CooldownManager cooldownManager) {
+        this.cooldownManager = cooldownManager;
     }
 
     public Energy getEnergyObject(UUID id) {
@@ -92,8 +102,9 @@ public class EnergyService {
             return true;
         }
 
-        if (amount > getEnergy(player.getUniqueId())) {
-            if (inform) {
+        final Energy energy = getEnergyObject(player.getUniqueId());
+        if (amount > energy.getCurrent()) {
+            if (inform && this.cooldownManager.use(player, ability + "_no_energy", 0.5, false)) {
                 UtilMessage.simpleMessage(player, "Energy", "You are too exhausted to use <green>" + ability + "</green>.");
                 player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
             }
@@ -101,19 +112,19 @@ public class EnergyService {
             return false;
         }
 
-        degenerateEnergy(player, amount, EnergyEvent.CAUSE.USE);
+        degenerateEnergy(player, amount, EnergyEvent.Cause.USE);
 
         return true;
     }
 
-    public void regenerateEnergy(Player player, double energy, EnergyEvent.CAUSE cause) {
+    public void regenerateEnergy(Player player, double energy, EnergyEvent.Cause cause) {
         RegenerateEnergyEvent regenerateEnergyEvent = new RegenerateEnergyEvent(player, energy, cause);
         if (!regenerateEnergyEvent.callEvent()) return;
 
         addEnergy(player.getUniqueId(), energy);
     }
 
-    public void degenerateEnergy(Player player, double energy, EnergyEvent.CAUSE cause) {
+    public void degenerateEnergy(Player player, double energy, EnergyEvent.Cause cause) {
         DegenerateEnergyEvent degenerateEnergyEvent = new DegenerateEnergyEvent(player, energy, cause);
         if (!degenerateEnergyEvent.callEvent()) return;
         reduceEnergy(player.getUniqueId(), degenerateEnergyEvent.getEnergy());
@@ -134,36 +145,32 @@ public class EnergyService {
                 continue;
             }
 
-            double regen = BASE_ENERGY_REGEN;
+            double regen = energyPerSecond;
 
             if (nerfEnergyRegen) {
                 if (player.isSprinting() || UtilBlock.isInLiquid(player) || player.isGliding()) {
-                    regen = NERFED_ENERGY_REGEN;
+                    regen = nerfedEnergyPerSecond;
                 }
             }
-            regen = regen / ((double) 1000 / UPDATE_RATE);
-            RegenerateEnergyEvent regenerateEnergyEvent = new RegenerateEnergyEvent(player, regen, EnergyEvent.CAUSE.NATURAL);
+            regen = regen / 20;
+            RegenerateEnergyEvent regenerateEnergyEvent = new RegenerateEnergyEvent(player, regen, EnergyEvent.Cause.NATURAL);
             if (!regenerateEnergyEvent.callEvent()) continue;
             energy.addEnergy(regenerateEnergyEvent.getEnergy());
         }
     }
 
-
     /**
      * Updates the max amount of energy for a player
-     * @param player
-     * @return
+     * @param player the player to update the max energy for
      */
     public void updateMax(Player player) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-            final UpdateMaxEnergyEvent event = new UpdateMaxEnergyEvent(player, BASE_ENERGY);
-            double max = event.callEvent() ? event.getNewMax() : BASE_ENERGY;
+            final UpdateMaxEnergyEvent event = new UpdateMaxEnergyEvent(player, maxEnergy);
+            double max = event.callEvent() ? event.getNewMax() : maxEnergy;
             energyMap.get(player.getUniqueId()).setMax(max);
         });
 
     }
-
-
 
     /**
      * Adds the ID to the map if it is not already
@@ -172,9 +179,9 @@ public class EnergyService {
     private void addToMap(UUID id) {
         energyMap.computeIfAbsent(id, (key) -> {
             final Player player = Bukkit.getPlayer(key);
-            if (player == null) return new Energy(BASE_ENERGY, BASE_ENERGY, 0);
-            final UpdateMaxEnergyEvent event = new UpdateMaxEnergyEvent(player, BASE_ENERGY);
-            double max = event.callEvent() ? event.getNewMax() : BASE_ENERGY;
+            if (player == null) return new Energy(maxEnergy, maxEnergy, 0);
+            final UpdateMaxEnergyEvent event = new UpdateMaxEnergyEvent(player, maxEnergy);
+            double max = event.callEvent() ? event.getNewMax() : maxEnergy;
             return new Energy(max, max, 0);
         });
     }

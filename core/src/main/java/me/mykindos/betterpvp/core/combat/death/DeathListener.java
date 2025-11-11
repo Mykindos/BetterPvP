@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.combat.death;
 
 import com.google.inject.Inject;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -8,15 +9,16 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,15 +33,19 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 @BPvPListener
 public class DeathListener implements Listener {
 
+    private final ItemFactory itemFactory;
     private final DamageLogManager damageLogManager;
     private final ClientManager clientManager;
 
     @Inject
-    public DeathListener(DamageLogManager damageLogManager, ClientManager clientManager) {
+    public DeathListener(ItemFactory itemFactory, DamageLogManager damageLogManager, ClientManager clientManager) {
+        this.itemFactory = itemFactory;
         this.damageLogManager = damageLogManager;
         this.clientManager = clientManager;
     }
@@ -75,13 +81,20 @@ public class DeathListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCustomDeath(CustomDeathMessageEvent event) {
         final String[] reasonRaw = Objects.requireNonNullElse(event.getReason(), new String[]{});
-        final Component[] reasons = Arrays.stream(reasonRaw).map(text -> Component.text(text, NamedTextColor.GREEN)).toArray(Component[]::new);
+        Component[] reasons = Arrays.stream(reasonRaw).map(text -> Component.text(text, NamedTextColor.GREEN)).toArray(Component[]::new);
         Component reason = Component.join(JoinConfiguration.separator(Component.text(", ", NamedTextColor.GRAY)), reasons).applyFallbackStyle(NamedTextColor.GRAY);
         Component message;
         final Component killedName = event.getKilledName().applyFallbackStyle(NamedTextColor.YELLOW);
         if (event.getKiller() == null) {
             if (reasons.length == 0) {
-                message = killedName.append(Component.text(" was killed", NamedTextColor.GRAY));
+                final Optional<ConcurrentLinkedDeque<DamageLog>> damageLog = damageLogManager.getObject(event.getDeathEvent().getKilled().getUniqueId());
+                if (damageLog.isPresent() && !damageLog.get().isEmpty()) {
+                    final DamageLog lastDamage = damageLog.get().getLast();
+                    final TextComponent name = Component.text(lastDamage.getDamageCause().getDisplayName());
+                    message = killedName.append(Component.text(" was killed by ", NamedTextColor.GRAY)).append(name);
+                } else {
+                    message = killedName.append(Component.text(" was killed", NamedTextColor.GRAY));
+                }
             } else {
                 message = killedName.append(Component.text(" was killed by ", NamedTextColor.GRAY)).append(reason);
             }
@@ -90,24 +103,25 @@ public class DeathListener implements Listener {
             LivingEntity killer = event.getKiller();
             boolean with = false;
             if (killer instanceof Player) {
-                ItemStack item = killer.getEquipment().getItemInMainHand();
-                if (reasons.length == 0 && item.getType() != Material.AIR) {
-                    TextColor color = NamedTextColor.GREEN;
+                ItemStack itemStack = killer.getEquipment().getItemInMainHand();
+                if (reasons.length == 0 && itemStack.getType() != Material.AIR) {
 
-                    if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                        Component displayName = item.getItemMeta().displayName();
-                        if (displayName != null && displayName.color() != null) {
-                            color = displayName.color();
-                        }
+                    final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(itemStack);
+                    if (instanceOpt.isPresent()) {
+                        itemStack = instanceOpt.get().getView().get();
                     }
 
-                    if (color == NamedTextColor.YELLOW) {
-                        color = NamedTextColor.GREEN;
+                    final Component name;
+                    if (itemStack.getItemMeta().hasDisplayName()) {
+                        name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+                    } else {
+                        name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                                Component.translatable(itemStack.getType().translationKey()));
                     }
 
-                    String namePlainText = PlainTextComponentSerializer.plainText().serialize(item.displayName()).replaceAll("[\\[\\]]", "");
-                    Component itemCmpt = Component.text(namePlainText, color);
-                    reason = Component.text(UtilFormat.getIndefiniteArticle(namePlainText) + " ", NamedTextColor.GRAY).append(itemCmpt.hoverEvent(item));
+                    String namePlainText = PlainTextComponentSerializer.plainText().serialize(name).replaceAll("[\\[\\]]", "");
+                    final String article = UtilFormat.getIndefiniteArticle(namePlainText);
+                    reason = Component.text(article + " ", NamedTextColor.GRAY).append(name.hoverEvent(itemStack));
                     with = true;
                 }
             }
@@ -144,8 +158,11 @@ public class DeathListener implements Listener {
         message = Component.text("").applyFallbackStyle(NamedTextColor.GRAY).append(message).append(Component.text("."));
         Component hoverComponent = Component.text("Damage Breakdown", NamedTextColor.GOLD).appendNewline();
         for (var breakdown : damageLogManager.getDamageBreakdown(event.getKilled())) {
+            final String round = breakdown.getValue() == Double.POSITIVE_INFINITY
+                    ? "∞"
+                    : String.format("%.1f", breakdown.getValue());
             hoverComponent = hoverComponent.append(Component.text(breakdown.getKey() + ": ", NamedTextColor.YELLOW)
-                    .append(Component.text(UtilMath.round(breakdown.getValue(), 1), NamedTextColor.GREEN))).appendNewline();
+                    .append(Component.text(round, NamedTextColor.GREEN))).appendNewline();
         }
 
         UtilMessage.simpleMessage(event.getReceiver(), "Death", message, hoverComponent);

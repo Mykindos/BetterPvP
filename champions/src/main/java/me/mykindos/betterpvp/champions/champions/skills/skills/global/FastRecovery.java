@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
@@ -42,9 +41,9 @@ public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
                 "",
                 "Energy Information:",
                 "<white>Always Active</white>",
-                "Base Energy: <stat>" + EnergyService.BASE_ENERGY,
+                "Base Energy: <stat>" + this.championsManager.getEnergy().getMaxEnergy(),
                 //Energy is updated every 50ms. Energy is represented in 0-1
-                "Energy Regeneration / Second: <stat>" + (EnergyService.BASE_ENERGY_REGEN),
+                "Energy Regeneration / Second: <stat>" + (this.championsManager.getEnergy().getEnergyPerSecond()),
                 //"regeneration / second while sprinting ",
                 //"or in liquid: <stat>" + (EnergyService.NERFED_ENERGY_REGEN)
 

@@ -1,11 +1,11 @@
 package me.mykindos.betterpvp.core.utilities.model.display.experience;
 
 import me.mykindos.betterpvp.core.utilities.model.display.AbstractDisplayQueue;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.data.ExperienceLevelData;
 import org.bukkit.entity.Player;
 
-public class ExperienceLevel extends AbstractDisplayQueue<ExperienceLevelData, GamerDisplayObject<ExperienceLevelData>> {
+public class ExperienceLevel extends AbstractDisplayQueue<ExperienceLevelData, DisplayObject<ExperienceLevelData>> {
 
     private static final ExperienceLevelData EMPTY = new ExperienceLevelData(0);
 

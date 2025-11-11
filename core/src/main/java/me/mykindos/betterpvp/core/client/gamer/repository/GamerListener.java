@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Objects;
-import java.util.Optional;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
@@ -13,8 +11,8 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
-import me.mykindos.betterpvp.core.utilities.model.display.PlayerListType;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.playerlist.PlayerListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.EventHandler;
@@ -22,6 +20,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @BPvPListener
 @Singleton

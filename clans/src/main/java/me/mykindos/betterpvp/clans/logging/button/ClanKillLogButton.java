@@ -54,7 +54,7 @@ public class ClanKillLogButton extends AbstractItem {
                 .material(Material.TIPPED_ARROW)
                 .baseMeta(itemMeta)
                 .displayName(name)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .lore(lore)
                 .build();
     }

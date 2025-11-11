@@ -7,10 +7,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -29,7 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -114,14 +112,15 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @EventHandler
-    public void onProjectileHit(CustomDamageEvent event) {
+    public void onProjectileHit(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!isValidProjectile(projectile)) return;
         if (!(event.getDamager() instanceof Player player)) return;
 
         int level = getLevel(player);
         if (level > 0) {
-            LivingEntity damagee = event.getDamagee();
+            LivingEntity damagee = event.getLivingDamagee();
             UUID playerUuid = player.getUniqueId();
             long currentTime = System.currentTimeMillis();
             double damage = getDamage(level);
@@ -135,9 +134,10 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @EventHandler
-    public void onHit(CustomDamageEvent event) {
+    public void onHit(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
         if (!(event.getDamager() instanceof Player player)) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         int level = getLevel(player);
 
         if (level > 0) {
@@ -147,21 +147,20 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 return;
             }
 
-            BarbedTargetData barbedData = targetsMap.get(event.getDamagee());
+            final LivingEntity damagee = event.getLivingDamagee();
+            BarbedTargetData barbedData = targetsMap.get(damagee);
             if (barbedData == null) {
                 return;
             }
 
             double extraDamage = barbedData.damage;
-            event.addReason(getName());
-            event.setDamage(event.getDamage() + extraDamage);
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, extraDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
-            championsManager.getEffects().addEffect(event.getDamagee(), EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
+            event.addModifier(new SkillDamageModifier.Flat(this, extraDamage));
+            championsManager.getEffects().addEffect(damagee, EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
             player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
 
-            targetsMap.remove(event.getDamagee());
+            targetsMap.remove(event.getLivingDamagee());
             if (targetsMap.isEmpty()) {
                 playerToTargetsMap.remove(playerUuid);
             }
@@ -170,15 +169,14 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Projectile projectile) {
-            if (event.getHitBlock() != null || event.getHitEntity() == null) {
-                barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
-            }
-
-            UtilServer.runTaskLater(champions, () -> {
-                barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
-            }, 2L);
+        Projectile projectile = event.getEntity();
+        if (event.getHitBlock() != null || event.getHitEntity() == null) {
+            barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
         }
+
+        UtilServer.runTaskLater(champions, () -> {
+            barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
+        }, 2L);
     }
 
     @UpdateEvent

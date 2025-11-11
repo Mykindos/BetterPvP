@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -41,7 +41,7 @@ import java.util.Objects;
 public class ClanCoreCrystalListener implements Listener {
 
     private final ClanManager clanManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
     @Config(path = "clans.core.crystal-enabled", defaultValue = "true")
@@ -56,9 +56,9 @@ public class ClanCoreCrystalListener implements Listener {
     private double crystalHealth;
 
     @Inject
-    public ClanCoreCrystalListener(final ClanManager clanManager, ItemHandler itemHandler) {
+    public ClanCoreCrystalListener(final ClanManager clanManager, ItemFactory itemFactory) {
         this.clanManager = clanManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -138,7 +138,7 @@ public class ClanCoreCrystalListener implements Listener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemFactory).show(event.getPlayer());
     }
 
     @EventHandler

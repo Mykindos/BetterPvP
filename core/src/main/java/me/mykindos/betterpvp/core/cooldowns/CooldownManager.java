@@ -5,16 +5,20 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Synchronized;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
-import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
@@ -24,6 +28,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -87,6 +93,43 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
      */
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable) {
         return use(player, ability, duration, inform, removeOnDeath, cancellable, x -> false);
+    }
+
+    /**
+     * Attempts to initiate the use of a specific ability for a given player with the specified parameters.
+     * This method handles cooldowns, action bar updates, and various conditions surrounding the ability's use.
+     *
+     * @param player The player attempting to use the ability.
+     * @param ability The identifier of the ability to be used.
+     * @param duration The duration for which the ability will be active, in seconds.
+     * @param inform Whether the player should be informed about the cooldown.
+     * @param removeOnDeath Whether the cooldown should be removed upon the player's death.
+     * @param cancellable Indicates if the ability's cooldown or effects can be cancelled by external factors.
+     * @param actionBarHeldItem The {@link BaseItem} a player must be holding to view this cooldown's action bar, null for the currently
+     *                          held item.
+     * @return True if the ability was successfully initiated, false otherwise (e.g., due to an active cooldown or unmet conditions).
+     */
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable BaseItem actionBarHeldItem) {
+        final ItemFactory itemFactory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
+        if (actionBarHeldItem == null) {
+            final ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
+            if (itemInMainHand.getType().isAir()) {
+                throw new IllegalArgumentException("Cannot use ability with no held item");
+            }
+            final Optional<ItemInstance> instance = itemFactory.fromItemStack(itemInMainHand);
+            if (instance.isEmpty()) {
+                throw new IllegalArgumentException("Cannot use ability with no held item");
+            }
+            return use(player, ability, duration, inform, removeOnDeath, cancellable, instance.orElseThrow().getBaseItem());
+        }
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, gmr -> {
+            final ItemStack item = player.getEquipment().getItemInMainHand();
+            final Optional<ItemInstance> instance = itemFactory.fromItemStack(item);
+            if (instance.isEmpty()) {
+                return false;
+            }
+            return instance.orElseThrow().getBaseItem() == actionBarHeldItem;
+        });
     }
 
     /**

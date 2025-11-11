@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -19,6 +18,8 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 @Data
 public class OfflineMessage implements Describable {
@@ -30,7 +31,7 @@ public class OfflineMessage implements Describable {
 
     public Component getContent() {
         return Component.empty().color(NamedTextColor.WHITE)
-                .append(MiniMessage.miniMessage().deserialize(rawContent, TagResolver.standard()));
+                .append(miniMessage.deserialize(rawContent, TagResolver.standard()));
     }
 
     public void send() {

@@ -3,6 +3,14 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.ExperienceTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.HealthTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.ManaTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.ResistanceTag;
+import me.mykindos.betterpvp.core.utilities.model.tag.TimeTag;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
@@ -15,17 +23,29 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilMessage {
 
-    private static final TagResolver tagResolver = TagResolver.resolver(
+    public static final TagResolver tagResolver = TagResolver.resolver(
+            TagResolver.standard(),
             TagResolver.resolver("alt", Tag.styling(NamedTextColor.GREEN)),
             TagResolver.resolver("alt2", Tag.styling(NamedTextColor.YELLOW)),
-            TagResolver.resolver("orange", Tag.styling(TextColor.color(0xFFA500)))
+            TagResolver.resolver("orange", Tag.styling(TextColor.color(0xFFA500))),
+            TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN)),
+            TagResolver.resolver("effect", Tag.styling(NamedTextColor.WHITE)),
+            TagResolver.resolver("stat", Tag.styling(NamedTextColor.YELLOW)),
+            TagResolver.resolver("coins", new CoinsTag()),
+            TagResolver.resolver("damage", new DamageTag()),
+            TagResolver.resolver("health", new HealthTag()),
+            TagResolver.resolver("exp", new ExperienceTag()),
+            TagResolver.resolver("mana", new ManaTag()),
+            TagResolver.resolver("resistance", new ResistanceTag()),
+            TagResolver.resolver("time", new TimeTag())
     );
+
+    public static final MiniMessage miniMessage = MiniMessage.builder().tags(tagResolver).build();
 
     public static final TextComponent DIVIDER = Component.text("                                            ")
             .color(NamedTextColor.DARK_GRAY)
@@ -42,7 +62,7 @@ public class UtilMessage {
      * @param prefix  The message
      * @param message Message to send to a player
      */
-    public static void message(CommandSender sender, String prefix, Component message) {
+    public static void message(Audience sender, String prefix, Component message) {
         sender.sendMessage(getPrefix(prefix).append(normalize(message)));
     }
 
@@ -54,8 +74,8 @@ public class UtilMessage {
      * @param prefix  The message
      * @param message Message to send to the CommandSender
      */
-    public static void message(CommandSender sender, String prefix, String message) {
-        message(sender, prefix, MiniMessage.miniMessage().deserialize(message, tagResolver));
+    public static void message(Audience sender, String prefix, String message) {
+        message(sender, prefix, miniMessage.deserialize(message, tagResolver));
     }
 
     /**
@@ -67,7 +87,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      * @param args    The args to interpolate in the string
      */
-    public static void message(CommandSender sender, String prefix, String message, Object... args) {
+    public static void message(Audience sender, String prefix, String message, Object... args) {
         message(sender, prefix, String.format(message, args));
     }
 
@@ -94,7 +114,7 @@ public class UtilMessage {
      * @param player  The player receiving the message
      * @param message The message to be sent
      */
-    public static void message(Player player, String message) {
+    public static void message(Audience player, String message) {
         player.sendMessage(Component.text(message));
     }
 
@@ -104,7 +124,7 @@ public class UtilMessage {
      * @param player  The player receiving the message
      * @param message The message to be sent
      */
-    public static void message(Player player, Component message) {
+    public static void message(Audience player, Component message) {
         player.sendMessage(message);
     }
 
@@ -117,7 +137,7 @@ public class UtilMessage {
      * @param message The message to be sent
      * @param rank    The rank required to use this command
      */
-    public static void message(Player player, String command, String message, Rank rank) {
+    public static void message(Audience player, String command, String message, Rank rank) {
         final TextComponent prefixCmpt = Component.text(command, rank.getColor());
         final TextComponent messageCmpt = Component.text(message, NamedTextColor.GRAY);
         final Component rankCmpt = rank.getTag(Rank.ShowTag.LONG, false);
@@ -130,7 +150,7 @@ public class UtilMessage {
      * @param player  The player receiving the message
      * @param message The strings to be sent
      */
-    public static void message(Player player, String[] message) {
+    public static void message(Audience player, String[] message) {
         for (String string : message) {
             message(player, string);
         }
@@ -142,7 +162,7 @@ public class UtilMessage {
      * @param player  The player receiving the message
      * @param message The strings to be sent
      */
-    public static void message(Player player, Component[] message) {
+    public static void message(Audience player, Component[] message) {
         for (Component string : message) {
             player.sendMessage(string);
         }
@@ -155,7 +175,7 @@ public class UtilMessage {
      * @param prefix  The message
      * @param message Strings to send to a player
      */
-    public static void message(Player player, String prefix, String[] message) {
+    public static void message(Audience player, String prefix, String[] message) {
         for (String string : message) {
             message(player, prefix, string);
         }
@@ -167,7 +187,7 @@ public class UtilMessage {
      * @param sender  The CommandSender to send the message to
      * @param message The message to send
      */
-    public static void simpleMessage(CommandSender sender, String message) {
+    public static void simpleMessage(Audience sender, String message) {
         sender.sendMessage(deserialize(message));
     }
 
@@ -178,7 +198,7 @@ public class UtilMessage {
      * @param prefix  The prefix
      * @param message Message to send to the CommandSender
      */
-    public static void simpleMessage(CommandSender sender, String prefix, String message) {
+    public static void simpleMessage(Audience sender, String prefix, String message) {
         sender.sendMessage(getPrefix(prefix).append(deserialize(message)));
     }
 
@@ -190,7 +210,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      * @param hover   Hover event to add to the message
      */
-    public static void simpleMessage(CommandSender sender, String prefix, String message, Component hover) {
+    public static void simpleMessage(Audience sender, String prefix, String message, Component hover) {
         simpleMessage(sender, prefix, deserialize(message), hover);
     }
 
@@ -202,7 +222,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      * @param hover   Hover event to add to the message
      */
-    public static void simpleMessage(CommandSender sender, String prefix, Component message, Component hover) {
+    public static void simpleMessage(Audience sender, String prefix, Component message, Component hover) {
         sender.sendMessage(getPrefix(prefix).hoverEvent(HoverEvent.showText(hover)).append(normalize(message)));
     }
 
@@ -214,7 +234,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      * @param args    The args to interpolate in the string
      */
-    public static void simpleMessage(CommandSender sender, String prefix, String message, Object... args) {
+    public static void simpleMessage(Audience sender, String prefix, String message, Object... args) {
         simpleMessage(sender, prefix, String.format(message, args));
     }
 
@@ -225,7 +245,7 @@ public class UtilMessage {
      * @param prefix    The message
      * @param component Message to send to the CommandSender
      */
-    public static void simpleMessage(CommandSender sender, String prefix, Component component) {
+    public static void simpleMessage(Audience sender, String prefix, Component component) {
         sender.sendMessage(getPrefix(prefix).append(normalize(component)));
     }
 
@@ -236,7 +256,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      * @param args    The args to interpolate in the string
      */
-    public static void simpleMessage(CommandSender sender, String message, Object... args) {
+    public static void simpleMessage(Audience sender, String message, Object... args) {
         sender.sendMessage(deserialize(String.format(message, args)));
     }
 
@@ -263,7 +283,7 @@ public class UtilMessage {
             msg = UtilFormat.stripColor(message);
         }
 
-        return normalize(MiniMessage.miniMessage().deserialize(msg, tagResolver));
+        return normalize(miniMessage.deserialize(msg, tagResolver));
     }
 
     public static Component deserialize(String message, Object... args) {
@@ -278,7 +298,7 @@ public class UtilMessage {
         if (prefix.isEmpty()) {
             return Component.empty();
         }
-        return MiniMessage.miniMessage().deserialize("<blue>" + prefix + "> ");
+        return miniMessage.deserialize("<blue>" + prefix + "> ");
     }
 
     /**

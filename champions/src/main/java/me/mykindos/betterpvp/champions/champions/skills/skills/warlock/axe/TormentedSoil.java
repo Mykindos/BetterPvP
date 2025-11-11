@@ -13,10 +13,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -73,7 +71,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 "Sacrifice " + getValueString(this::getHealthReduction, level) + " health to create",
                 "a ring of torment for " + getValueString(this::getDuration, level) + " seconds.",
                 "",
-                "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 1, "%", 0) + " more damage.",
+                "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 100, "%", 0) + " more damage.",
                 "",
                 "Range: " + getValueString(this::getRange, level) + " blocks.",
                 "",
@@ -104,14 +102,15 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         for (Torment torment : tormentList) {
             if (!torment.getLocation().getWorld().equals(event.getDamagee().getLocation().getWorld())) {
                 return;
             }
             for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange(torment.getLevel()))) {
                 if (target.equals(event.getDamagee())) {
-                    event.getDamageModifiers().addModifier(ModifierType.DAMAGE, getDamageIncrease(torment.getLevel()), getName(), ModifierValue.PERCENTAGE, ModifierOperation.INCREASE);
+                    final double damage = 1 + getDamageIncrease(torment.getLevel());
+                    event.addModifier(new SkillDamageModifier.Multiplier(this, damage));
                     return;
                 }
             }
@@ -198,10 +197,10 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         baseRange = getConfig("baseRange", 5.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
-        baseDamageIncrease = getConfig("baseDamageIncrease", 33.0, Double.class);
+        baseDamageIncrease = getConfig("baseDamageIncrease", 0.33, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.5, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 8.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);
     }
 
     @Override

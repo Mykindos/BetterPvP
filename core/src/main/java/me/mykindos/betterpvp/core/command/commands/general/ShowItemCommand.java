@@ -2,11 +2,14 @@ package me.mykindos.betterpvp.core.command.commands.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -16,14 +19,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Singleton
 public class ShowItemCommand extends Command {
+
+    private final ItemFactory itemFactory;
     private final CooldownManager cooldownManager;
     private final Core core;
 
     @Inject
-    public ShowItemCommand(CooldownManager cooldownManager, Core core) {
+    public ShowItemCommand(ItemFactory itemFactory, CooldownManager cooldownManager, Core core) {
+        this.itemFactory = itemFactory;
         this.cooldownManager = cooldownManager;
         this.core = core;
     }
@@ -40,16 +47,29 @@ public class ShowItemCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(!cooldownManager.use(player, getName(), 15d, false, true)){
+        if (!cooldownManager.use(player, getName(), 15d, false, true)){
             UtilMessage.message(player, "Command", "You must wait some time between using this command again");
             return;
         }
         ItemStack itemStack = player.getInventory().getItemInMainHand();
-        if (itemStack.getItemMeta().hasDisplayName()) {
-            Component messageComponent = Component.text("I am currently holding ", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false).append(
-                    Objects.requireNonNull(itemStack.getItemMeta().displayName()).hoverEvent(itemStack.asHoverEvent())
-            );
-            UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player, client.getGamer().getChatChannel(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));
+        final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(itemStack);
+        final Component name;
+        if (instanceOpt.isPresent()) {
+            final ItemInstance instance = instanceOpt.get();
+            name = instance.getBaseItem().getItemNameRenderer().createName(instance);
+            itemStack = instance.getView().get();
+        } else {
+            if (itemStack.getItemMeta().hasDisplayName()) {
+                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+            } else {
+                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                        Component.translatable(itemStack.getType().translationKey()));
+            }
         }
-    }
+
+        Component messageComponent = Component.text("I am currently holding [", NamedTextColor.WHITE)
+                .decoration(TextDecoration.BOLD, false)
+                .append(Objects.requireNonNull(name).hoverEvent(itemStack.asHoverEvent()))
+                .append(Component.text("]", NamedTextColor.WHITE));
+        UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player, client.getGamer().getChatChannel(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));    }
 }

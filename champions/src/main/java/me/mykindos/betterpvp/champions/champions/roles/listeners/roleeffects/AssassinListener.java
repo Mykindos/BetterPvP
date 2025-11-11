@@ -5,7 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
+import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -22,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -77,9 +79,9 @@ public class AssassinListener implements Listener, ConfigAccessor {
      * Surgical Precision Passive & Speedlock Passive
      */
     @EventHandler
-    public void onAssassinKnockback(CustomDamageEvent event) {
+    public void onAssassinKnockback(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
 
         if (event.getDamager() instanceof Player damager) {
             if (meleeDealsNoKnockbackIsEnabled) {
@@ -100,11 +102,11 @@ public class AssassinListener implements Listener, ConfigAccessor {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onAssassinArrowDamage(CustomDamageEvent event) {
+    public void onAssassinArrowDamage(DamageEvent event) {
         if (!(event.getProjectile() instanceof AbstractArrow)) return;
         if (event.getProjectile().getShooter() instanceof Player player) {
             if (roleManager.hasRole(player, Role.ASSASSIN)) {
-                event.setDamage(0);
+                event.addModifier(new GenericModifier("Assassin Arrows", DamageOperator.MULTIPLIER, 0));
             }
         }
     }

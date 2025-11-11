@@ -5,15 +5,17 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
-import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -55,6 +57,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -63,19 +66,19 @@ public class ShopListener implements Listener {
 
     private final ShopkeeperManager shopkeeperManager;
     private final ShopManager shopManager;
-    private final ItemHandler itemHandler;
+    private final ItemRegistry registry;
+    private final ItemFactory itemFactory;
     private final ClientManager clientManager;
-    private final WeaponManager weaponManager;
     private final ShopItemSellService shopItemSellService;
 
     @Inject
-    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, 
-                   ClientManager clientManager, WeaponManager weaponManager, ShopItemSellService shopItemSellService) {
+    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemRegistry registry,
+                        ItemFactory itemFactory, ClientManager clientManager, ShopItemSellService shopItemSellService) {
         this.shopkeeperManager = shopkeeperManager;
         this.shopManager = shopManager;
-        this.itemHandler = itemHandler;
+        this.registry = registry;
+        this.itemFactory = itemFactory;
         this.clientManager = clientManager;
-        this.weaponManager = weaponManager;
         this.shopItemSellService = shopItemSellService;
     }
 
@@ -87,7 +90,7 @@ public class ShopListener implements Listener {
 
         Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId().toString());
         shopkeeperOptional.ifPresent(shopkeeper -> {
-            shopManager.showShopMenu(event.getPlayer(), shopkeeper.getShopkeeperName(), itemHandler, clientManager);
+            shopManager.showShopMenu(event.getPlayer(), shopkeeper.getShopkeeperName(), itemFactory, clientManager);
         });
     }
 
@@ -183,7 +186,9 @@ public class ShopListener implements Listener {
             }
         });
 
-        UtilItem.insert(event.getPlayer(), itemHandler.updateNames(boughtItem));
+        final ItemInstance instanceResult = itemFactory.fromItemStack(boughtItem).orElseThrow();
+        final ItemStack result = instanceResult.createItemStack();
+        UtilItem.insert(event.getPlayer(), result);
         UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
                 amount, event.getShopItem().getItemName(), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
@@ -192,14 +197,19 @@ public class ShopListener implements Listener {
                 .setAction("SHOP_BUY").addClientContext(event.getPlayer())
                 .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
                 .addContext("Price", cost + "").submit();
-        itemHandler.getUUIDItem(boughtItem).ifPresent(uuidItem -> {
+
+        // Log the item purchase with UUID
+        instanceResult.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+            final UUID uuid = uuidProperty.getUniqueId();
             Player player = event.getPlayer();
             Location location = player.getLocation();
-            log.info("{} purchased ({}) at {}", player.getName(), uuidItem.getUuid(),
+            log.info("{} purchased ({}) at {}", player.getName(), uuid,
                             UtilWorld.locationToString((location))).setAction("ITEM_BUY")
-                    .addClientContext(player).addItemContext(uuidItem).addLocationContext(location).submit();
+                    .addClientContext(player)
+                    .addItemContext(registry, instanceResult)
+                    .addLocationContext(location)
+                    .submit();
         });
-
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -230,8 +240,8 @@ public class ShopListener implements Listener {
                 if (item == null) continue;
 
                 if (shopItemSellService.canSellItem(item, shopItem)) {
-                    int amount = shopItem.getAmount() == 1 
-                        ? (isShifting ? item.getAmount() : shopItem.getAmount()) 
+                    int amount = shopItem.getAmount() == 1
+                        ? (isShifting ? item.getAmount() : shopItem.getAmount())
                         : shopItem.getAmount();
 
                     if (item.getAmount() >= amount) {
@@ -242,8 +252,8 @@ public class ShopListener implements Listener {
                             UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
                             UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
                                     result.amountSold, result.itemName, UtilFormat.formatNumber(result.totalEarned), event.getCurrency().name().toLowerCase());
-                            
-                            log.info("{} sold {}x {} for {} {}", 
+
+                            log.info("{} sold {}x {} for {} {}",
                                     event.getPlayer().getName(), result.amountSold, result.itemName, result.totalEarned, event.getCurrency().name().toLowerCase())
                                     .setAction("SHOP_SELL").addClientContext(event.getPlayer())
                                     .addContext("ShopItem", result.itemName).addContext("Amount", result.amountSold + "")
@@ -289,7 +299,7 @@ public class ShopListener implements Listener {
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (shopkeeperManager.getObject(event.getDamagee().getUniqueId().toString()).isPresent()) {
             event.cancel("Cannot damage shopkeepers");
         }
