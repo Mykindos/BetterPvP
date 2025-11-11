@@ -99,7 +99,6 @@ public class ClansExplosionListener extends ClanListener {
         final Location targetTop = targetBottom.clone().add(0, event.getDamagee().getHeight(), 0);
         if (!hasLineOfSight(center, targetBottom) && !hasLineOfSight(center, targetTop)) {
             event.setCancelled(true);
-            event.setCancelled(true);
         }
     }
 
