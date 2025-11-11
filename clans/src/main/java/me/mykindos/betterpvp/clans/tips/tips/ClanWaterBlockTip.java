@@ -4,14 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.item.WaterBlock;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,22 +17,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ClanWaterBlockTip extends ClanTip {
 
     private final ItemFactory itemFactory;
-    private final ItemRegistry itemRegistry;
-    private BaseItem waterBlock = null;
+    private final WaterBlock waterBlock;
 
     @Inject
-    protected ClanWaterBlockTip(Clans clans, ItemFactory itemFactory, ItemRegistry itemRegistry) {
+    protected ClanWaterBlockTip(Clans clans, ItemFactory itemFactory, WaterBlock waterBlock) {
         super(clans, 1, 2);
         this.itemFactory = itemFactory;
-        this.itemRegistry = itemRegistry;
+        this.waterBlock = waterBlock;
     }
 
     @Override
     public Component generateComponent() {
-        waterBlock = itemRegistry.getItem(new NamespacedKey("clans", "water_block"));
-        if (waterBlock == null) {
-            return Component.empty();
-        }
 
         final ItemInstance instance = itemFactory.create(waterBlock);
         return Component.empty().append(Component.text("You can place water in your territory by buying or crafting a "))
