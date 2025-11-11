@@ -21,6 +21,8 @@ import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jooq.Record4;
+import org.jooq.Result;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -232,11 +234,11 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
      */
     private CompletableFuture<Map<Long, SmartBlockData<?>>> processChunkResultSet(
             @NotNull Chunk chunk,
-            org.jooq.Result<org.jooq.Record4<Long, String, String, byte[]>> result) {
+            Result<Record4<Long, String, String, byte[]>> result) {
         try {
             List<CompletableFuture<Map.Entry<Long, SmartBlockData<?>>>> futures = new ArrayList<>();
 
-            for (org.jooq.Record4<Long, String, String, byte[]> record : result) {
+            for (Record4<Long, String, String, byte[]> record : result) {
                 long blockKey = record.get(SMART_BLOCK_DATA.BLOCK_KEY);
                 String blockType = record.get(SMART_BLOCK_DATA.BLOCK_TYPE);
                 String dataTypeClassName = record.get(SMART_BLOCK_DATA.DATA_TYPE_CLASS);
