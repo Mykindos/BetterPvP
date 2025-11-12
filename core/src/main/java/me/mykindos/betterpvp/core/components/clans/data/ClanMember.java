@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ClanMember {
 
-    String uuid;
+    UUID uuid;
     MemberRank rank;
     String clientName;
 
@@ -32,7 +32,7 @@ public class ClanMember {
     }
 
     public @Nullable Player getPlayer() {
-        return Bukkit.getPlayer(UUID.fromString(uuid));
+        return Bukkit.getPlayer(uuid);
     }
 
     public boolean isOnline() {

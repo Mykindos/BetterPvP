@@ -19,11 +19,6 @@ import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -47,20 +42,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_NAME_HISTORY;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_PROPERTIES;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_REWARDS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GAMER_PROPERTIES;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.IGNORES;
+import static me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.CLIENT_STATS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.*;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 @CustomLog
 @Singleton
@@ -278,34 +269,26 @@ public class ClientSQLLayer {
     public CompletableFuture<Void> loadStatsAsync(Client client) {
         final StatContainer statContainer = client.getStatContainer();
 
-        final Statement statement = Statement.builder()
-                .select("client_stats", "Period", "Statname", "Stat")
-                .where("Client", "=", new UuidStatementValue(statContainer.getUniqueId()))
-                .build();
-
-        return database.executeQuery(statement, TargetDatabase.GLOBAL).thenAccept(results -> {
+        return database.getAsyncDslContext().executeAsyncVoid(context -> {
             final StatConcurrentHashMap tempMap = new StatConcurrentHashMap();
-            try {
-                while (results.next()) {
-                    final String period = results.getString("Period");
-                    final String statName = results.getString("Statname");
-                    final IStat stat = statBuilder.getStatForStatName(statName);
-                    final double value = results.getDouble("Stat");
-                    try {
-                        tempMap.put(period, stat, value, true);
-                    } catch (Exception e) {
-                        log.error("Error saving stat {} ({}), period {}, value {}", stat, statName, period, value, e).submit();
-                    }
-
-                }
-
-            } catch (SQLException e) {
-                log.info("Error loading stats for {} ", client.getName(), e).submit();
-            }
+            context.select(CLIENT_STATS.PERIOD, CLIENT_STATS.STATNAME, CLIENT_STATS.STAT)
+                    .from(CLIENT_STATS)
+                    //todo change to id PK
+                    .where(CLIENT_STATS.CLIENT.eq(client.getUuid()))
+                    .fetch()
+                    .forEach(record -> {
+                        final String period = record.get(CLIENT_STATS.PERIOD);
+                        final String statName = record.get(CLIENT_STATS.STATNAME);
+                        final IStat stat = statBuilder.getStatForStatName(statName);
+                        final double value = record.get(CLIENT_STATS.STAT);
+                        try {
+                            tempMap.put(period, stat, value, true);
+                        } catch (Exception e) {
+                            log.error("Error saving stat {} ({}), period {}, value {}", stat, statName, period, value, e).submit();
+                        }
+                    });
             statContainer.getStats().copyFrom(tempMap);
         });
-
-
     }
 
     /**
@@ -404,53 +387,9 @@ public class ClientSQLLayer {
         });
     }
 
-    public void processStatUpdates(UUID uuid, boolean async) {
-        // Process shared stat updates for this UUID
-        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedStatUpdates.getAndUpdate(map -> {
-            final ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
-            updated.remove(uuid.toString());
-            return updated;
-        }).get(uuid.toString());
 
-        if (sharedQueries != null && !sharedQueries.isEmpty()) {
-            List<Query> queries = new ArrayList<>(sharedQueries.values());
-            executeQueriesAsTransaction(queries, async);
-        }
 
-        // Process stat updates for this UUID
-        ConcurrentHashMap<String, Query> gamerQueries = queuedStatUpdates.getAndUpdate(map -> {
-            final ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
-            updated.remove(uuid.toString());
-            return updated;
-        }).get(uuid.toString());
-
-        if (gamerQueries != null && !gamerQueries.isEmpty()) {
-            List<Query> queries = new ArrayList<>(gamerQueries.values());
-            executeQueriesAsTransaction(queries, async);
-        }
-    }
-
-    public void saveStatProperty(StatContainer statContainer, String period, String statName, Double stat) {
-        //TODO change to JOOQ
-        String saveStatUpdate = "INSERT INTO client_stats (Client, Period, Statname, Stat) VALUES (?, ?, ?, ?)" +
-                " ON DUPLICATE KEY UPDATE Stat = ?";
-
-        return new Statement(saveStatUpdate,
-                new UuidStatementValue(statContainer.getUniqueId()),
-                new StringStatementValue(period),
-                new StringStatementValue(stat.getStatName()),
-                new DoubleStatementValue(value),
-                new DoubleStatementValue(value)
-        );
-
-        queuedStatUpdates.updateAndGet(map -> {
-            ConcurrentHashMap<String, Query> statUpdatse = map.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
-            statUpdatse.put(property, query);
-            return map;
-        });
-    }
-
-    public void processStatUpdates(UUID uuid, boolean async) {
+    public void processPropertyUpdates(UUID uuid, boolean async) {
         ConcurrentHashMap<String, Query> sharedQueries = queuedSharedPropertyUpdates.updateAndGet(map -> {
             map.remove(uuid.toString());
             return map;
@@ -485,7 +424,7 @@ public class ClientSQLLayer {
         log.info("Updated stats for {}", uuid).submit();
     }
 
-    public void processStatUpdates(boolean async) {
+    public void processPropertyUpdates(boolean async) {
 
         log.info("Beginning to process stat updates").submit();
 
@@ -509,43 +448,57 @@ public class ClientSQLLayer {
         executeQueriesAsTransaction(sharedStatementsToRun, async);
         log.info("Updated client properties with {} queries", sharedStatementsToRun.size()).submit();
 
-        oncurrentHashMap<String, ConcurrentHashMap<String, Query>> statStatements =
+        ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> statStatements =
                 queuedStatUpdates.getAndSet(new ConcurrentHashMap<>());
 
         List<Query> statStatementsToRun = new ArrayList<>();
         statStatements.forEach((key, value) -> statStatementsToRun.addAll(value.values()));
 
-        executeQueriesAsTransaction(sharedStatementsToRun, async);
+        executeQueriesAsTransaction(statStatementsToRun, async);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
 
     }
 
     public CompletableFuture<Void> processStatUpdates(Set<Client> clients, String period) {
-        List<Statement> statementsToRun = clients.stream().flatMap(client -> getStatUpdates(client, period).stream()).toList();
-        return database.executeBatch(statementsToRun, TargetDatabase.GLOBAL);
+        List<Query> statementsToRun = clients.stream().flatMap(client -> getStatUpdates(client, period).stream()).toList();
+        return executeQueriesAsTransaction(statementsToRun, false);
     }
 
-    private List<Statement> getStatUpdates(Client client, String period) {
+    private List<Query> getStatUpdates(Client client, String period) {
         synchronized (client.getStatContainer()) {
-            log.info(client.getStatContainer().getChangedStats().toString()).submit();
-            List<Statement> statementStream = client.getStatContainer().getChangedStats().stream().map(statName -> {
-                        return getSaveStatProperty(client.getStatContainer(), period, statName, client.getStatContainer().getProperty(period, statName));
+            List<Query> statementStream = client.getStatContainer().getChangedStats().stream().map(statName -> {
+                return getSaveStatProperty(client.getStatContainer(), period, statName, client.getStatContainer().getProperty(period, statName));
             }).toList();
             client.getStatContainer().getChangedStats().clear();
             return statementStream;
+        }
+    }
+
+    private Query getSaveStatProperty(StatContainer statContainer, String period, IStat stat, Double value) {
+        log.info("Saving {}", stat.getStatName()).submit();
+        return database.getDslContext().insertInto(CLIENT_STATS)
+                .set(CLIENT_STATS.CLIENT, statContainer.getUniqueId().toString())
+                .set(CLIENT_STATS.PERIOD, period)
+                .set(CLIENT_STATS.STATNAME, stat.getStatName())
+                .set(CLIENT_STATS.STAT, value)
+                .onDuplicateKeyUpdate()
+                .set(CLIENT_STATS.STAT, value);
+    }
+
+
     /**
      * Executes a list of jOOQ queries as a single transaction.
      *
      * @param queries The list of jOOQ Query objects to execute
      */
-    private void executeQueriesAsTransaction(List<Query> queries, boolean async) {
+    private CompletableFuture<Void> executeQueriesAsTransaction(@Nullable List<Query> queries, boolean async) {
         if (queries == null || queries.isEmpty()) {
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
         try {
             if (async) {
-                database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+                return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
                     ctx.transaction(config -> {
                         DSLContext ctxl = DSL.using(config);
                         ctxl.batch(queries).execute();
@@ -556,9 +509,11 @@ public class ClientSQLLayer {
                     DSLContext ctxl = DSL.using(config);
                     ctxl.batch(queries).execute();
                 });
+                return CompletableFuture.completedFuture(null);
             }
         } catch (Exception ex) {
             log.error("Error executing queries as transaction with {} queries", queries.size(), ex).submit();
+            return CompletableFuture.completedFuture(null);
         }
     }
 
@@ -609,7 +564,7 @@ public class ClientSQLLayer {
 
     }
 
-    public RewardBox getRewardBox(UUID id) {
+    public RewardBox getRewardBox(Client client) {
         RewardBox rewardBox = new RewardBox();
 
         try {

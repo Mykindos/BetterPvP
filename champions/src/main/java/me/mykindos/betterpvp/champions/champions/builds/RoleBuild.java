@@ -12,8 +12,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class RoleBuild {
@@ -186,7 +186,7 @@ public class RoleBuild {
     }
 
     public RoleBuild copy() {
-        RoleBuild other = new RoleBuild(uuid, role, id);
+        RoleBuild other = new RoleBuild(clientId, clientUUID, role, id);
         other.setSwordSkill(getSwordSkill() != null ? getSwordSkill().copy() : null);
         other.setAxeSkill(getAxeSkill() != null ? getAxeSkill().copy() : null);
         other.setBow(getBow() != null ? getBow().copy() : null);

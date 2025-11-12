@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class StatPeriod implements Comparable<StatPeriod> {
@@ -13,9 +13,9 @@ public class StatPeriod implements Comparable<StatPeriod> {
     @NotNull
     private final String period;
     @NotNull
-    private final Date date;
+    private final LocalDate date;
 
-    public StatPeriod(@NotNull String period, @NotNull Date date) {
+    public StatPeriod(@NotNull String period, @NotNull LocalDate date) {
         this.period = period;
         this.date = date;
     }

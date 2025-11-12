@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.clans;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -17,6 +14,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -53,9 +54,9 @@ public class ChampionsClansRewardListener implements Listener {
             clientOptionalFuture.thenAcceptAsync(clientOptional -> {
                 if (clientOptional.isPresent()) {
                     Client client = clientOptional.get();
-                    RewardBox rewardBox = clientManager.getSqlLayer().getRewardBox(client.getUniqueId());
+                    RewardBox rewardBox = clientManager.getSqlLayer().getRewardBox(client);
                     rewardBox.getContents().add(itemStack);
-                    clientManager.getSqlLayer().updateClientRewards(client.getUniqueId(), rewardBox);
+                    clientManager.getSqlLayer().updateClientRewards(client, rewardBox);
                 }
             }).exceptionally(ex -> {
                 log.error("Failed to fetch client for uuid: " + uuid, ex).submit();

@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.bukkit.NamespacedKey;
 
 @Singleton
-public class AchievementCategoryManager extends Manager<IAchievementCategory> {
+public class AchievementCategoryManager extends Manager<String, IAchievementCategory> {
     public void addObject(NamespacedKey identifier, IAchievementCategory object) {
         super.addObject(identifier.asString(), object);
     }

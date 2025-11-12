@@ -1,12 +1,5 @@
 package me.mykindos.betterpvp.core.client;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +21,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -51,7 +52,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     public Client(long id, @NotNull Gamer gamer, @NotNull String uuid, @NotNull String name, @NotNull Rank rank) {
         this.id = id;
         this.gamer = gamer;
-        this.statContainer = new StatContainer(UUID.fromString(uuid));
+        this.statContainer = new StatContainer(this);
         this.uuid = uuid;
         this.name = name;
         this.rank = rank;

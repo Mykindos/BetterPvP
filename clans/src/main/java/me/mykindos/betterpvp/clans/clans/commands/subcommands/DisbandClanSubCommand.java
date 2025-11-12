@@ -48,7 +48,7 @@ public class DisbandClanSubCommand extends ClanSubCommand {
         if (leaderOptional.isPresent()) {
             ClanMember leader = leaderOptional.get();
 
-            if (!leader.getUuid().equalsIgnoreCase(client.getUuid()) && !client.isAdministrating()) {
+            if (!leader.getUuid().equals(client.getUniqueId()) && !client.isAdministrating()) {
                 UtilMessage.message(player, "Command", "You do not have permission to disband this clan");
                 return;
             }

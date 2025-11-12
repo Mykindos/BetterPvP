@@ -1,1 +1,0 @@
-INSERT IGNORE INTO property_map VALUES ("SET_CORE", "int");
