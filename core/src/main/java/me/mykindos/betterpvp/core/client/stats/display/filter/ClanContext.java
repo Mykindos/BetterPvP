@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @EqualsAndHashCode
 @Getter
@@ -18,7 +17,7 @@ public class ClanContext implements IFilterContext<ClanContext> {
 
     private final String clanName;
     @Nullable
-    private final UUID clanId;
+    private final Long clanId;
     private final ContextType contextType;
 
     public static ClanContext from(ClansStat clansStat) {
@@ -26,7 +25,7 @@ public class ClanContext implements IFilterContext<ClanContext> {
         return new ClanContext(clansStat.getClanName(), clansStat.getClanId());
     }
 
-    public ClanContext(String clanName, @Nullable UUID clanId) {
+    public ClanContext(String clanName, @Nullable Long clanId) {
         this.clanName = clanName;
         this.clanId = clanId;
         this.contextType = ContextType.CLAN;

@@ -10,7 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
@@ -27,14 +26,14 @@ public class PillageStatsListener implements Listener {
     public void onPillageStart(PillageStartEvent event) {
         CompletableFuture.supplyAsync(() -> {
             event.getPillage().getPillaged().getMembers().stream()
-                    .map(clanMember -> clientManager.search().offline(UUID.fromString(clanMember.getUuid())))
+                    .map(clanMember -> clientManager.search().offline(clanMember.getUuid()))
                     .forEach(future -> future.thenAccept(
                             clientOptional ->
                                     clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_DEFEND_PILLAGE, 1))
                     ));
 
             event.getPillage().getPillager().getMembers().stream()
-                    .map(clanMember -> clientManager.search().offline(UUID.fromString(clanMember.getUuid())))
+                    .map(clanMember -> clientManager.search().offline(clanMember.getUuid()))
                     .forEach(future -> future.thenAccept(
                             clientOptional ->
                                     clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_ATTACK_PILLAGE, 1))
