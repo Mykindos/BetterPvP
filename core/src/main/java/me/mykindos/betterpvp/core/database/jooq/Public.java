@@ -4,14 +4,13 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
-import java.util.Arrays;
-import java.util.List;
-
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords;
@@ -33,6 +32,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
+import me.mykindos.betterpvp.core.database.jooq.tables.PeriodMeta;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
@@ -75,6 +75,11 @@ public class Public extends SchemaImpl {
     public static final Public PUBLIC = new Public();
 
     /**
+     * The table <code>public.achievement_completions</code>.
+     */
+    public final AchievementCompletions ACHIEVEMENT_COMPLETIONS = AchievementCompletions.ACHIEVEMENT_COMPLETIONS;
+
+    /**
      * The table <code>public.armour</code>.
      */
     public final Armour ARMOUR = Armour.ARMOUR;
@@ -98,6 +103,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.client_rewards</code>.
      */
     public final ClientRewards CLIENT_REWARDS = ClientRewards.CLIENT_REWARDS;
+
+    /**
+     * The table <code>public.client_stats</code>.
+     */
+    public final ClientStats CLIENT_STATS = ClientStats.CLIENT_STATS;
 
     /**
      * The table <code>public.clients</code>.
@@ -695,6 +705,11 @@ public class Public extends SchemaImpl {
     public final OfflineMessages OFFLINE_MESSAGES = OfflineMessages.OFFLINE_MESSAGES;
 
     /**
+     * The table <code>public.period_meta</code>.
+     */
+    public final PeriodMeta PERIOD_META = PeriodMeta.PERIOD_META;
+
+    /**
      * The table <code>public.property_map</code>.
      */
     public final PropertyMap PROPERTY_MAP = PropertyMap.PROPERTY_MAP;
@@ -750,11 +765,13 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            AchievementCompletions.ACHIEVEMENT_COMPLETIONS,
             Armour.ARMOUR,
             ChunkBlockTagging.CHUNK_BLOCK_TAGGING,
             ClientNameHistory.CLIENT_NAME_HISTORY,
             ClientProperties.CLIENT_PROPERTIES,
             ClientRewards.CLIENT_REWARDS,
+            ClientStats.CLIENT_STATS,
             Clients.CLIENTS,
             CombatStats.COMBAT_STATS,
             FilteredWords.FILTERED_WORDS,
@@ -776,6 +793,7 @@ public class Public extends SchemaImpl {
             Logs.LOGS,
             LogsContext.LOGS_CONTEXT,
             OfflineMessages.OFFLINE_MESSAGES,
+            PeriodMeta.PERIOD_META,
             PropertyMap.PROPERTY_MAP,
             Punishments.PUNISHMENTS,
             Realms.REALMS,

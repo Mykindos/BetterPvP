@@ -4,7 +4,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
-import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
@@ -18,7 +17,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Statistic;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,8 +78,9 @@ public class DeathAchievement extends SingleSimpleAchievement {
     @Override
     public void processRewards(StatContainer container) {
         super.processRewards(container);
-        RewardBox rewardBox = clientSQLLayer.getRewardBox(container.getUniqueId());
-        rewardBox.getContents().add(ItemStack.of(Material.SKELETON_SKULL));
-        clientSQLLayer.updateClientRewards(container.getUniqueId(), rewardBox);
+        //todo reimplement
+//        RewardBox rewardBox = clientSQLLayer.getRewardBox(container.getUniqueId());
+//        rewardBox.getContents().add(ItemStack.of(Material.SKELETON_SKULL));
+//        clientSQLLayer.updateClientRewards(container.getUniqueId(), rewardBox);
     }
 }
