@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 @SuperBuilder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -78,7 +77,7 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
 
     private static ClanWrapperStatBuilder<?, ?> parseClanID(ClanWrapperStatBuilder<?, ?> builder, String input) {
         try {
-            return builder.clanId(UUID.fromString(input));
+            return builder.clanId(Long.valueOf(input));
         } catch (IllegalArgumentException ignored) {
             return builder.clanId(null);
         }

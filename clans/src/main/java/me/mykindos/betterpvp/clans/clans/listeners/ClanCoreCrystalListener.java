@@ -118,14 +118,14 @@ public class ClanCoreCrystalListener extends ClanListener implements Listener {
                             .addClanContext(clan, true).submit();
             UtilServer.callEvent(new ClanCoreDestroyedEvent(clan));
             clan.getMembers().stream()
-                    .map(clanMember -> clientManager.search().offline(UUID.fromString(clanMember.getUuid())))
+                    .map(clanMember -> clientManager.search().offline(clanMember.getUuid()))
                     .forEach(future -> future.thenAccept(
                             clientOptional ->
                                     clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_CORE_DESTROYED, 1))
                     ));
 
             Objects.requireNonNull(other).getMembers().stream()
-                    .map(clanMember -> clientManager.search().offline(UUID.fromString(clanMember.getUuid())))
+                    .map(clanMember -> clientManager.search().offline(clanMember.getUuid()))
                     .forEach(future -> future.thenAccept(
                             clientOptional ->
                                     clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_DESTROY_CORE, 1))

@@ -7,13 +7,13 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Singleton
 @CustomLog
-public class StatPeriodManager extends Manager<StatPeriod> {
-    public static final StatPeriod GLOBAL_PERIOD = new StatPeriod("Global", new Date(System.currentTimeMillis()));
+public class StatPeriodManager extends Manager<String, StatPeriod> {
+    public static final StatPeriod GLOBAL_PERIOD = new StatPeriod("Global", LocalDate.now());
 
     @Getter
     private final StatPeriodRepository repository;
@@ -26,7 +26,6 @@ public class StatPeriodManager extends Manager<StatPeriod> {
         addObject(StatContainer.GLOBAL_PERIOD_KEY, GLOBAL_PERIOD);
     }
 
-    @Override
     public void loadFromList(List<StatPeriod> objects) {
         objects.forEach(statPeriod -> addObject(statPeriod.getPeriod(), statPeriod));
     }
