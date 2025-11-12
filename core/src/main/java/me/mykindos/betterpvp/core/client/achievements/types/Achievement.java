@@ -158,7 +158,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         final AchievementCompletion achievementCompletion = achievementCompletionOptional.get();
 
         //todo localize timezones
-        final Component timeComponent = Component.text(UtilTime.getDateTime(achievementCompletion.getTimestamp().getTime()), NamedTextColor.GOLD);
+        final Component timeComponent = Component.text(UtilTime.getDateTime(achievementCompletion.getTimestamp()), NamedTextColor.GOLD);
 
         final Component placementComponent = UtilMessage.deserialize("<gold>#%s of %s", achievementCompletion.getCompletedRank(), achievementCompletion.getTotalCompletions());
 

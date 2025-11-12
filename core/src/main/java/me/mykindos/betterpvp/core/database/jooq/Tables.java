@@ -4,11 +4,13 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords;
@@ -33,6 +35,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
+import me.mykindos.betterpvp.core.database.jooq.tables.PeriodMeta;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
@@ -51,7 +54,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillsRecord
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
-
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -62,6 +64,11 @@ import org.jooq.Result;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
+
+    /**
+     * The table <code>public.achievement_completions</code>.
+     */
+    public static final AchievementCompletions ACHIEVEMENT_COMPLETIONS = AchievementCompletions.ACHIEVEMENT_COMPLETIONS;
 
     /**
      * The table <code>public.armour</code>.
@@ -87,6 +94,11 @@ public class Tables {
      * The table <code>public.client_rewards</code>.
      */
     public static final ClientRewards CLIENT_REWARDS = ClientRewards.CLIENT_REWARDS;
+
+    /**
+     * The table <code>public.client_stats</code>.
+     */
+    public static final ClientStats CLIENT_STATS = ClientStats.CLIENT_STATS;
 
     /**
      * The table <code>public.clients</code>.
@@ -697,6 +709,11 @@ public class Tables {
      * The table <code>public.offline_messages</code>.
      */
     public static final OfflineMessages OFFLINE_MESSAGES = OfflineMessages.OFFLINE_MESSAGES;
+
+    /**
+     * The table <code>public.period_meta</code>.
+     */
+    public static final PeriodMeta PERIOD_META = PeriodMeta.PERIOD_META;
 
     /**
      * The table <code>public.property_map</code>.

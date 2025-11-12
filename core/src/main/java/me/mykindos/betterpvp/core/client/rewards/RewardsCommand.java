@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.client.rewards;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.concurrent.CompletableFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
@@ -14,6 +13,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @CustomLog
@@ -46,11 +47,11 @@ public class RewardsCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if(cooldownManager.use(player, "Rewards", 60 * 5, true, false)) {
             CompletableFuture.runAsync(() -> {
-                RewardBox rewardBox = clientSQLLayer.getRewardBox(client.getUniqueId());
+                RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
 
                 UtilServer.runTask(core, () -> {
                     new GuiRewardBox(rewardBox, itemHandler, null).show(player).addCloseHandler(() -> {
-                        JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class).updateClientRewards(client.getUniqueId(), rewardBox)
+                        JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class).updateClientRewards(client, rewardBox)
                                 .whenComplete((unused, throwable) -> {
                                     if (throwable != null) {
                                         log.error("Failed to update client rewards for {}", throwable, client.getName());

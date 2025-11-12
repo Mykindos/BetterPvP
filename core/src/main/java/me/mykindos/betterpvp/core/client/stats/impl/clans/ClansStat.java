@@ -13,8 +13,6 @@ import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
-
 @SuperBuilder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
@@ -28,7 +26,7 @@ public abstract class ClansStat implements IBuildableStat {
     protected String clanName = "";
 
     @Nullable("When not in a Clan")
-    protected UUID clanId;
+    protected Long clanId;
 
 
     /**

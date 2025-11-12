@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS achievement_completions
 (
     Id          varchar(36)    PRIMARY KEY,
-    User        VARCHAR(36)    NOT NULL,
+    Client      BIGINT    NOT NULL,
     Period      VARCHAR(255)   DEFAULT '' NOT NULL,
     Namespace   VARCHAR(255)   NOT NULL,
     Keyname     VARCHAR(255)   NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS achievement_completions
 );
 
 CREATE INDEX IDX_achievement_completions
-ON achievement_completions(User);
+ON achievement_completions(Client);
 
 CREATE INDEX IDX_achievement_completions_total
 ON achievement_completions(Period, Namespace, Keyname);

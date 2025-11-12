@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.core.client.achievements.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -15,10 +11,15 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.bukkit.NamespacedKey;
 
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Singleton
 @CustomLog
 //todo proper async handling (and in repository)
-public class AchievementManager extends Manager<IAchievement> {
+public class AchievementManager extends Manager<String, IAchievement> {
 
     @Getter
     private final AchievementCategoryManager achievementCategoryManager;

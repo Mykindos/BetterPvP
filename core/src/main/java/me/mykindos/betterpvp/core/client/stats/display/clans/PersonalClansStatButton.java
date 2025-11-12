@@ -23,7 +23,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu> {
     @Override
@@ -41,7 +40,7 @@ public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu>
         final StatContainer statContainer = gui.getClient().getStatContainer();
         final String periodKey = gui.getPeriodKey();
         final String clanName = gui.getClanContext().getClanName();
-        final UUID clanId = gui.getClanContext().getClanId();
+        final Long clanId = gui.getClanContext().getClanId();
 
         final ClanWrapperStat.ClanWrapperStatBuilder<?, ?> clanStatBuilder = ClanWrapperStat.builder()
                 .clanName(clanName)

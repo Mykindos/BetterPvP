@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.stats.events.IStatMapListener;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.events.WrapStatEvent;
@@ -29,23 +29,22 @@ public class StatContainer implements Unique, IStatMapListener {
 
     public static final String GLOBAL_PERIOD_KEY = "Global";
 
-    private static final ClientManager clientManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientManager.class);
-
-    private final UUID id;
+    @Getter
+    private final Client client;
 
     @Getter
     private final StatConcurrentHashMap stats = new StatConcurrentHashMap();
     @Getter
     private final Set<IStat> changedStats = new HashSet<>();
 
-    public StatContainer(UUID id) {
-        this.id = id;
+    public StatContainer(Client client) {
+        this.client = client;
         this.stats.registerListener(this);
     }
 
     @Override
     public UUID getUniqueId() {
-        return id;
+        return client.getUniqueId();
     }
 
     //todo enum verions
@@ -69,7 +68,7 @@ public class StatContainer implements Unique, IStatMapListener {
         }
         Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");
         synchronized (this) {
-            final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(id, stat));
+            final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(getUniqueId(), stat));
             final IStat wrappedStat = wrapStatEvent.getStat();
             changedStats.add(wrappedStat);
             this.getStats().increase(StatContainer.PERIOD_KEY, wrappedStat, amount);
