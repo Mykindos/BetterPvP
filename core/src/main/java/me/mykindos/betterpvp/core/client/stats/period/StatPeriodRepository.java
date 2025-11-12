@@ -5,15 +5,12 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.Date;
-import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static me.mykindos.betterpvp.core.database.jooq.tables.PeriodMeta.PERIOD_META;
 
 @Singleton
 @CustomLog
@@ -26,16 +23,16 @@ public class StatPeriodRepository {
 
     public List<StatPeriod> getAll() {
         List<StatPeriod> statPeriods = new ArrayList<>();
-        final Statement statement = Statement.builder()
-                .select("period_meta", "Period", "Start")
-                .build();
-        try (CachedRowSet rowSet = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
-            while (rowSet.next()) {
-                String period = rowSet.getString("Period");
-                Date date = rowSet.getDate("Start");
-                statPeriods.add(new StatPeriod(period, date));
-            }
-        } catch (SQLException e) {
+        try {
+            database.getDslContext().select(PERIOD_META.PERIOD, PERIOD_META.START)
+                    .from(PERIOD_META)
+                    .fetch()
+                    .forEach(periodRecord -> {
+                        final String period = periodRecord.get(PERIOD_META.PERIOD);
+                        final LocalDate date = periodRecord.get(PERIOD_META.START);
+                        statPeriods.add(new StatPeriod(period, date));
+                    });
+        } catch (Exception e) {
             log.error("Error getting periods ", e).submit();
         }
         return statPeriods;
@@ -44,10 +41,12 @@ public class StatPeriodRepository {
     public void saveCurrentPeriod() {
         final String period = StatContainer.PERIOD_KEY;
         final String insert = "INSERT INTO period_meta (Period) SELECT ? as Period WHERE NOT EXISTS (Select * FROM period_meta WHERE Period = ?)";
-        final Statement statement = new Statement(insert,
-                new StringStatementValue(period),
-                new StringStatementValue(period));
-        database.executeUpdate(statement, TargetDatabase.GLOBAL);
+
+        database.getDslContext().insertInto(PERIOD_META)
+                .set(PERIOD_META.PERIOD, period)
+                .onDuplicateKeyIgnore()
+                .execute();
+
     }
 
 }

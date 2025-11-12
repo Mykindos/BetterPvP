@@ -4,16 +4,13 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory.ClientNameHistoryPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties.ClientPropertiesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards.ClientRewardsPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.ClientStatsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats.CombatStatsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords.FilteredWordsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.GamerProperties.GamerPropertiesPath;
@@ -23,7 +20,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills.KillsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages.OfflineMessagesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments.PunishmentsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -45,6 +41,10 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -233,6 +233,19 @@ public class Clients extends TableImpl<ClientsRecord> {
             _filteredWords = new FilteredWordsPath(this, null, Keys.FILTERED_WORDS__FILTERED_WORDS_CREATED_BY_FKEY.getInverseKey());
 
         return _filteredWords;
+    }
+
+    private transient ClientStatsPath _clientStats;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.client_stats</code> table
+     */
+    public ClientStatsPath clientStats() {
+        if (_clientStats == null)
+            _clientStats = new ClientStatsPath(this, null, Keys.CLIENT_STATS__FK_CLIENT.getInverseKey());
+
+        return _clientStats;
     }
 
     private transient GamerPropertiesPath _gamerProperties;

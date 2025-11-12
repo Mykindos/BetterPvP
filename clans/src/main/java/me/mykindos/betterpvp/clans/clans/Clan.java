@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -211,23 +210,23 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     /**
      * Retrieves a clan member based on their UUID.
      *
-     * @param uuid the UUID of the clan member to be retrieved
+     * @param uuid the UUID of the clan member to be retrieved as a string
      * @return an {@code Optional} containing the {@code ClanMember} if found,
      *         or an empty {@code Optional} if no member with the specified UUID exists
      */
-    public Optional<ClanMember> getMemberByUUID(final UUID uuid) {
-        return this.getMemberByUUID(uuid.toString());
+    public Optional<ClanMember> getMemberByUUID(final String uuid) {
+        return this.getMemberByUUID(UUID.fromString(uuid));
     }
 
     /**
      * Retrieves a clan member by their unique UUID.
      * Searches through the list of members and returns the first match if found.
      *
-     * @param uuid the unique identifier of the clan member as a string
+     * @param uuid the unique identifier of the clan member
      * @return an Optional containing the ClanMember if found, or an empty Optional if not
      */
-    public Optional<ClanMember> getMemberByUUID(final String uuid) {
-        return this.members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
+    public Optional<ClanMember> getMemberByUUID(final UUID uuid) {
+        return this.members.stream().filter(clanMember -> clanMember.getUuid().equals(uuid)).findFirst();
     }
 
     /**
@@ -239,7 +238,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     public List<Player> getAdminsAsPlayers() {
         return this.getMembers().stream()
                 .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN))
-                .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
+                .map(member -> Bukkit.getPlayer(member.getUuid()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -365,11 +364,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     @Override
     public void messageClan(final String message, final UUID ignore, final boolean prefix) {
         this.members.forEach(member -> {
-            if (ignore != null && ignore.toString().equalsIgnoreCase(member.getUuid())) {
+            if (ignore != null && ignore.equals(member.getUuid())) {
                 return;
             }
 
-            final Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            final Player player = Bukkit.getPlayer(member.getUuid());
             if (player != null) {
                 UtilMessage.simpleMessage(player, prefix ? "Clans" : "", message);
             }
@@ -527,10 +526,5 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
             terr.getWorldChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
         });
         getTerritory().clear();
-    }
-
-    @Override
-    public UUID getUniqueId() {
-        return id;
     }
 }
