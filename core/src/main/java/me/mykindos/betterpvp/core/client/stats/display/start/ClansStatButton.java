@@ -30,7 +30,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T> {
     /**
@@ -42,7 +41,7 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
     @Override
     public ItemProvider getItemProvider(IAbstractStatMenu gui) {
         String clanName = "";
-        UUID clanId = null;
+        Long clanId = null;
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder();
         if (gui instanceof IAbstractClansStatMenu clanGui) {
@@ -58,7 +57,7 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
                 .build();
     }
 
-    protected List<Component> getClanStats(String clanName, @Nullable UUID clanId) {
+    protected List<Component> getClanStats(String clanName, @Nullable Long clanId) {
         final IAbstractStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
         final String periodKey = gui.getPeriodKey();
