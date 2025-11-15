@@ -473,11 +473,11 @@ public class ClientManager extends PlayerManager<Client> {
      * @param player the player
      * @param amount the amount to increment by
      */
-    public void incrementStat(Player player, IStat iStat, double amount) {
+    public void incrementStat(Player player, IStat iStat, long amount) {
         search().online(player).getStatContainer().incrementStat(iStat, amount);
     }
 
-    public void incrementStatOffline(UUID id, IStat iStat, double amount) {
+    public void incrementStatOffline(UUID id, IStat iStat, long amount) {
         search().offline(id).thenAccept(clientOptional -> {
             UtilServer.runTask(BPvPPlugin.getPlugin(Core.class), () -> {
                 clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(iStat, amount));

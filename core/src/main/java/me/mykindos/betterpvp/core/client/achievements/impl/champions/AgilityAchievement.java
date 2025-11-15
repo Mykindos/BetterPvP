@@ -23,7 +23,7 @@ public class AgilityAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("champions", "agility_100"),
                 AchievementCategories.CHAMPIONS,
                 AchievementType.GLOBAL,
-                100d,
+                100L,
                 new GenericStat(
                         ChampionsSkillStat.builder()
                         .action(ChampionsSkillStat.Action.USE)

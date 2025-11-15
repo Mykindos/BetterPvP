@@ -11,47 +11,28 @@ import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 @SuperBuilder
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
-    public static final String PREFIX = "DUNGEON_NATIVE";
+    public static final String TYPE = "DUNGEON_NATIVE";
 
-    private static StringBuilderParser<DungeonNativeStatBuilder<?, ?>> parser = new StringBuilderParser<>(
-            "#",
-            "##",
-            List.of(
-                    DungeonNativeStat::parsePrefix,
-                    DungeonNativeStat::parseName
-            ),
-            List.of(
-                    DungeonNativeStat::parseAction
-            )
-    );
-
-    public static DungeonNativeStat fromString(String string) {
-        return parser.parse(DungeonNativeStat.builder(), string).build();
-    }
-
-    private static DungeonNativeStatBuilder<?, ?> parsePrefix(DungeonNativeStatBuilder<?, ?> builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-
-    private static DungeonNativeStatBuilder<?, ?> parseName(DungeonNativeStatBuilder<?, ?> builder, String input) {
-        return builder.dungeonName(input);
-    }
-
-    private static DungeonNativeStatBuilder<?, ?> parseAction(DungeonNativeStatBuilder<?, ?> builder, String input) {
-        return builder.action(Action.valueOf(input));
+    public static DungeonNativeStat fromData(String statType, JSONObject data) {
+        DungeonNativeStat.DungeonNativeStatBuilder<?, ?> builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.action(Action.valueOf(data.getString("action")));
+        builder.dungeonName(data.getString("dungeonName"));
+        return builder.build();
     }
 
     @NotNull
@@ -60,24 +41,20 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
     /**
      * Copies the stat represented by this statName into this object
      *
-     * @param statName the statname
+     * @param statType the statname
+     * @param data
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        DungeonNativeStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        DungeonNativeStat other = fromData(statType, data);
         this.action = other.action;
         this.dungeonName = other.dungeonName;
         return this;
     }
 
-    @Override
-    public String getPrefix() {
-        return PREFIX;
-    }
-
-    private boolean filterActionStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterActionStat(Map.Entry<IStat, Long> entry) {
         final DungeonNativeStat stat = (DungeonNativeStat) entry.getKey();
         return action.equals(stat.action);
     }
@@ -90,7 +67,7 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         if (Strings.isNullOrEmpty(dungeonName)) {
             return this.getFilteredStat(statContainer, periodKey, this::filterActionStat);
         }
@@ -98,16 +75,19 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        dungeonName
-                ),
-                List.of(
-                        action.name()
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return Objects.requireNonNull(super.getJsonData())
+                .putOnce("action", action.name());
     }
 
     /**
@@ -130,17 +110,6 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
     @Override
     public boolean isSavable() {
         return !Strings.isNullOrEmpty(dungeonName);
-    }
-
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        return statName.startsWith(getStatName());
     }
 
     /**

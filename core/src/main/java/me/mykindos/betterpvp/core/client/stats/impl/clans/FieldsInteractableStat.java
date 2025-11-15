@@ -10,11 +10,10 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 @Builder
 @Getter
@@ -22,30 +21,18 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class FieldsInteractableStat implements IBuildableStat {
-    public static final String PREFIX = "CLANS_FIELD_INTERACTABLE";
+    public static final String TYPE = "CLANS_FIELD_INTERACTABLE";
 
-    private static StringBuilderParser<FieldsInteractableStatBuilder> parser = new StringBuilderParser<>(
-            List.of(
-                    FieldsInteractableStat::parsePrefix,
-                    FieldsInteractableStat::parseName
-            )
-    );
+    public static FieldsInteractableStat fromData(String statType, JSONObject data) {
+        FieldsInteractableStat.FieldsInteractableStatBuilder builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.name(data.getString("name"));
 
-    public static FieldsInteractableStat fromString(String string) {
-        return parser.parse(FieldsInteractableStat.builder(), string).build();
+        return builder.build();
     }
 
     @NotNull
     private String name;
-
-    private static FieldsInteractableStatBuilder parsePrefix(FieldsInteractableStatBuilder builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-
-    private static FieldsInteractableStatBuilder parseName(FieldsInteractableStatBuilder builder, String input) {
-        return builder.name(input);
-    }
 
     /**
      * Get the stat represented by this object from the statContainer
@@ -55,18 +42,24 @@ public class FieldsInteractableStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         return statContainer.getProperty(periodKey, this);
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        name
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("name", name);
     }
 
     /**
@@ -89,17 +82,6 @@ public class FieldsInteractableStat implements IBuildableStat {
     @Override
     public boolean isSavable() {
         return true;
-    }
-
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        return getStatName().equals(statName);
     }
 
     /**
@@ -127,19 +109,15 @@ public class FieldsInteractableStat implements IBuildableStat {
     /**
      * Copies the stat represented by this statName into this object
      *
-     * @param statName the statname
+     * @param statType the statname
+     * @param data
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        FieldsInteractableStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        FieldsInteractableStat other = fromData(statType, data);
         this.name = other.name;
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 }

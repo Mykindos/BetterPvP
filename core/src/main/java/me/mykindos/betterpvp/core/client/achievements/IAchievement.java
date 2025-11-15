@@ -51,9 +51,9 @@ public interface IAchievement {
      */
     void onChangeValue(final StatContainer container,
                        final IStat stat,
-                       final Double newValue,
-                       final @Nullable("Null when no previous value") Double oldValue,
-                       final Map<IStat, Double> otherStats);
+                       final Long newValue,
+                       final @Nullable("Null when no previous value") Long oldValue,
+                       final Map<IStat, Long> otherStats);
 
     /**
      * Get the {@link AchievementCategory} of this {@link IAchievement}
@@ -226,7 +226,7 @@ public interface IAchievement {
      * @param propertyMap
      * @return
      */
-    float calculatePercent(final Map<IStat, Double> propertyMap);
+    float calculatePercent(final Map<IStat, Long> propertyMap);
 
     /**
      * Get when this {@link IAchievement} was completed for the {@link PropertyContainer}
@@ -258,9 +258,9 @@ public interface IAchievement {
      */
     void handleNotify(final StatContainer container,
                       final IStat stat,
-                      final Double newValue,
-                      final @Nullable("Null when no previous value") Double oldValue,
-                      final Map<IStat, Double> otherStats);
+                      final Long newValue,
+                      final @Nullable("Null when no previous value") Long oldValue,
+                      final Map<IStat, Long> otherStats);
 
     /**
      * Does the logic for whether to call {@link IAchievement#notifyComplete(PropertyContainer, Audience)} and {@link IAchievement#complete(PropertyContainer)} and executes it

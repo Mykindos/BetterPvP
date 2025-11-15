@@ -30,7 +30,7 @@ public class BraewoodCavernsPeriodAchievement extends SingleSimpleAchievement {
         super("Beat the Braewoods Cavern", key,
                 AchievementCategories.DUNGEONS_BRAEWOOD_CAVERNS_PERIOD,
                 AchievementType.PERIOD,
-                (double) goal,
+                (long) goal,
                 //this allows dungeon stats outside of clans, could also just be a ClanWrapperStat
                 new GenericStat(
                         DungeonNativeStat.builder()
