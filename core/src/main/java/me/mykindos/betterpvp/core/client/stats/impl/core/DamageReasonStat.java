@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.impl.core;
 
 import com.google.common.base.Preconditions;
+import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,13 +11,12 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Type;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 @Builder
 @EqualsAndHashCode
@@ -24,41 +24,16 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DamageReasonStat implements IBuildableStat {
-    public static final String PREFIX = "DAMAGE_REASON";
+    public static final String TYPE = "DAMAGE_REASON";
 
-    private static StringBuilderParser<DamageReasonStatBuilder> parser = new StringBuilderParser<>(
-            List.of(
-                    DamageReasonStat::parsePrefix,
-                    DamageReasonStat::parseRelation,
-                    DamageReasonStat::parseType,
-                    DamageReasonStat::parseDamageCause,
-                    DamageReasonStat::parseReason
-            )
-    );
-
-    public static DamageReasonStat fromString(String statName) {
-        return parser.parse(DamageReasonStat.builder(), statName).build();
-    }
-
-    private static DamageReasonStatBuilder parsePrefix(DamageReasonStatBuilder builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-
-    private static DamageReasonStatBuilder parseRelation(DamageReasonStatBuilder builder, String input) {
-        return builder.relation(Relation.valueOf(input));
-    }
-
-    private static DamageReasonStatBuilder parseType(DamageReasonStatBuilder builder, String input) {
-        return builder.type(Type.valueOf(input));
-    }
-
-    private static DamageReasonStatBuilder parseDamageCause(DamageReasonStatBuilder builder, String input) {
-        return builder.damageCause(EntityDamageEvent.DamageCause.valueOf(input));
-    }
-
-    private static DamageReasonStatBuilder parseReason(DamageReasonStatBuilder builder, String input) {
-        return builder.reason(input);
+    public static DamageReasonStat fromData(String statType, JSONObject data) {
+        DamageReasonStat.DamageReasonStatBuilder builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.relation(Relation.valueOf(data.getString("relation")));
+        builder.type(Type.valueOf(data.getString("type")));
+        builder.damageCause(EntityDamageEvent.DamageCause.valueOf(data.getString("damageCause")));
+        builder.reason(data.optString("reason"));
+        return builder.build();
     }
 
 
@@ -80,18 +55,27 @@ public class DamageReasonStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         return statContainer.getProperty(periodKey, this);
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(List.of(
-                PREFIX,
-                relation.name(),
-                type.name(),
-                damageCause == null ? "" : damageCause.name())
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("relation", relation.name())
+                .putOnce("type", type.name())
+                .putOnce("damageCause", damageCause.name())
+                .putOnce("reason", reason);
     }
 
     /**
@@ -105,14 +89,18 @@ public class DamageReasonStat implements IBuildableStat {
     }
 
     /**
-     * Whether this stat contains this statName
+     * Whether this stat contains this otherSTat
      *
-     * @param statName
+     * @param otherStat
      * @return
      */
     @Override
-    public boolean containsStat(String statName) {
-        return statName.startsWith(getStatName());
+    public boolean containsStat(IStat otherStat) {
+        if (!(otherStat instanceof DamageReasonStat other)) return false;
+        if (relation != other.relation ||
+                type != other.type ||
+                damageCause != other.damageCause) return false;
+        return (Strings.isNullOrEmpty(reason) || reason.equals(other.reason));
     }
 
     /**
@@ -128,18 +116,13 @@ public class DamageReasonStat implements IBuildableStat {
     }
 
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        final DamageReasonStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        final DamageReasonStat other = fromData(statType, data);
         this.relation = other.relation;
         this.type = other.type;
         this.damageCause = other.damageCause;
         this.reason = other.reason;
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 
 }

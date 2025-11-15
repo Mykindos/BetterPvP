@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -107,7 +108,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         if (playerMaxHealth != null) {
             double userHeal = UtilEntity.health(player, 4d * healthBoostStrength);
             final StatContainer playerStatContainer = championsManager.getClientManager().search().online(player).getStatContainer();
-            playerStatContainer.incrementStat(ClientStat.HEAL_SELF_DEFENSIVE_AURA, userHeal);
+            playerStatContainer.incrementStat(ClientStat.HEAL_SELF_DEFENSIVE_AURA, (long) (userHeal * IStat.FP_MODIFIER));
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
 
                 championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, getName(), healthBoostStrength, (long) (getDuration(level) * 1000L));
@@ -118,8 +119,8 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                     target.playSound(target, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 1.1f);
                     target.spawnParticle(Particle.HEART, target.getLocation().add(new Vector(0, 1, 0)), 6, 0.5, 0.5, 0.5);
 
-                    playerStatContainer.incrementStat(ClientStat.HEAL_DEALT_DEFENSIVE_AURA, targetHeal);
-                    championsManager.getClientManager().search().online(target).getStatContainer().incrementStat(ClientStat.HEAL_RECEIVED_DEFENSIVE_AURA, targetHeal);
+                    playerStatContainer.incrementStat(ClientStat.HEAL_DEALT_DEFENSIVE_AURA, (long) (targetHeal * IStat.FP_MODIFIER));
+                    championsManager.getClientManager().search().online(target).getStatContainer().incrementStat(ClientStat.HEAL_RECEIVED_DEFENSIVE_AURA, (long) (targetHeal * IStat.FP_MODIFIER));
                 }
             }
         }

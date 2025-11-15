@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
+import org.json.JSONObject;
 
 @Builder
 @Getter
@@ -22,31 +20,15 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class LootChestStat implements IBuildableStat {
-    public static final String PREFIX = "LOOT_CHEST";
+    public static final String TYPE = "LOOT_CHEST";
 
-    private static StringBuilderParser<LootChestStatBuilder> parser = new StringBuilderParser<>(
-            List.of(
-                LootChestStat::parsePrefix,
-                    LootChestStat::parseSource,
-                    LootChestStat::parseItem
-            )
-    );
+    public static LootChestStat fromData(String statType, JSONObject data) {
+        LootChestStat.LootChestStatBuilder builder = LootChestStat.builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.source(data.getString("source"));
+        builder.item(data.optString("source", null));
 
-    public static LootChestStat fromString(String string) {
-        return parser.parse(LootChestStat.builder(), string).build();
-    }
-
-    private static LootChestStatBuilder parsePrefix(LootChestStatBuilder builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-
-    private static LootChestStatBuilder parseSource(LootChestStatBuilder builder, String input) {
-        return builder.source(input);
-    }
-
-    private static LootChestStatBuilder parseItem(LootChestStatBuilder builder, String input) {
-        return builder.item(input);
+        return builder.build();
     }
 
     @NotNull
@@ -59,21 +41,17 @@ public class LootChestStat implements IBuildableStat {
     /**
      * Copies the stat represented by this statName into this object
      *
-     * @param statName the statname
+     * @param statType the statname
+     * @param data
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        LootChestStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        LootChestStat other = fromData(statType, data);
         this.source = other.source;
         this.item = other.item;
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 
     /**
@@ -84,19 +62,25 @@ public class LootChestStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         return statContainer.getProperty(periodKey, this);
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        source,
-                        item
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("source", source)
+                .putOpt("item", item);
     }
 
     /**
@@ -132,17 +116,6 @@ public class LootChestStat implements IBuildableStat {
     @Override
     public boolean isSavable() {
         return true;
-    }
-
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        return getStatName().equals(statName);
     }
 
     /**
