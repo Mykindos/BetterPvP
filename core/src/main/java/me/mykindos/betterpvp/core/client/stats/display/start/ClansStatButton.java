@@ -120,10 +120,10 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
         final int deaths = deathsStat.getStat(statContainer, periodKey).intValue();
         final float killDeathRatio = (float) kills / (deaths == 0 ? 1 : deaths);
 
-        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey), ChronoUnit.MILLIS);
 
-        final double dominanceGained = dominanceGainedStat.getStat(statContainer, periodKey);
-        final double dominanceLost = dominanceLostStat.getStat(statContainer, periodKey);
+        final double dominanceGained = (double) dominanceGainedStat.getStat(statContainer, periodKey) / 1000L;
+        final double dominanceLost = (double) dominanceLostStat.getStat(statContainer, periodKey) / 1000L;
         final double dominanceDelta = dominanceGained - dominanceLost;
 
         final int pillagesAttacked = pillageAttackStat.getStat(statContainer, periodKey).intValue();

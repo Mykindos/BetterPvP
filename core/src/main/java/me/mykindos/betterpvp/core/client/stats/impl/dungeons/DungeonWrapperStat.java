@@ -14,12 +14,13 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IWrapperStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A stat that wraps around another {@link IStat} that adds game, team, and map context
@@ -32,55 +33,28 @@ import java.util.Map;
 @NoArgsConstructor
 public class DungeonWrapperStat extends DungeonStat implements IWrapperStat {
 
-    public static final String PREFIX = "DUNGEON_WRAPPER";
+    public static final String TYPE = "DUNGEON_WRAPPER";
 
     private static final StatBuilder statBuilder = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(StatBuilder.class);
 
-    private static final StringBuilderParser<DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?>> parser = new StringBuilderParser<>(
-            "#",
-            "##",
-            List.of(
-                    DungeonWrapperStat::parsePrefix,
-                    DungeonWrapperStat::parseName
-            ),
-            List.of(
-                    DungeonWrapperStat::parseWrappedStat
-            )
-    );
-
-    /**
-     * Constructs the given String into a Stat
-     * @param string the stringified stat
-     * @return this stat
-     * @throws IllegalArgumentException if this string does not represent this Stat
-     */
-    public static DungeonWrapperStat fromString(String string) {
-        return parser.parse(DungeonWrapperStat.builder(), string).build();
+    public static DungeonWrapperStat fromData(String statType, JSONObject data) {
+        DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?> builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.dungeonName(data.getString("dungeonName"));
+        JSONObject wrappedData = data.getJSONObject("wrappedStat");
+        builder.wrappedStat(statBuilder.getStatForStatData(wrappedData.getString("statType"), wrappedData));
+        return builder.build();
     }
 
     @NotNull
     private IStat wrappedStat;
 
-    private static DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?> parsePrefix(DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?> builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-    private static DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?> parseWrappedStat(DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?> builder, String input) {
-        final IStat wrappedStat = statBuilder.getStatForStatName(input);
-        if (wrappedStat instanceof DungeonStat) throw new IllegalArgumentException("Wrapped stat cannot also be a DungeonStat");
-        return builder.wrappedStat(wrappedStat);
-    }
-
-    private static DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?> parseName(DungeonWrapperStat.DungeonWrapperStatBuilder<?, ?> builder, String input) {
-        return builder.dungeonName(input);
-    }
-
-    private boolean filterDungeonStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterDungeonStat(Map.Entry<IStat, Long> entry) {
         final DungeonWrapperStat stat = (DungeonWrapperStat) entry.getKey();
         return dungeonName.equals(stat.dungeonName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
-    private boolean filterWrappedStat (Map.Entry<IStat, Double> entry) {
+    private boolean filterWrappedStat (Map.Entry<IStat, Long> entry) {
         final DungeonWrapperStat stat = (DungeonWrapperStat) entry.getKey();
         return wrappedStat.containsStat(stat.wrappedStat);
     }
@@ -95,24 +69,16 @@ public class DungeonWrapperStat extends DungeonStat implements IWrapperStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
-        if (joptsimple.internal.Strings.isNullOrEmpty(dungeonName)) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
+        if (Strings.isNullOrEmpty(dungeonName)) {
             return this.getFilteredStat(statContainer, periodKey, this::filterDungeonStat);
         }
         return this.getFilteredStat(statContainer, periodKey, this::filterWrappedStat);
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        dungeonName
-                ),
-                List.of(
-                        wrappedStat.getStatName()
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
     }
 
     /**
@@ -138,27 +104,6 @@ public class DungeonWrapperStat extends DungeonStat implements IWrapperStat {
                 wrappedStat.isSavable();
     }
 
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    //TODO, this might not be true anymore
-    public boolean containsStat(final String statName) {
-        try {
-            final DungeonWrapperStat other = fromString(statName);
-            //all filled fields must equal all the other filled fields
-            //TODO check the logic here
-            if (!Strings.isNullOrEmpty(dungeonName) && !dungeonName.equals(other.dungeonName)) return false;
-
-            return wrappedStat.containsStat(other.wrappedStat);
-        } catch (IllegalArgumentException ignored) {
-            return false;
-        }
-    }
-
     @Override
     public boolean containsStat(final IStat otherStat) {
         if (!(otherStat instanceof DungeonWrapperStat other)) return false;
@@ -176,19 +121,20 @@ public class DungeonWrapperStat extends DungeonStat implements IWrapperStat {
     public @NotNull IStat getGenericStat() {
         return DungeonWrapperStat.builder().wrappedStat(wrappedStat.getGenericStat()).build();
     }
-
-
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        final DungeonWrapperStat other = fromString(statName);
-        this.dungeonName = other.dungeonName;
-        this.wrappedStat = other.wrappedStat;
-        return this;
+    public @Nullable JSONObject getJsonData() {
+        return Objects.requireNonNull(super.getJsonData())
+                .put("wrappedStat", (wrappedStat.getJsonData() == null ? new JSONObject() : wrappedStat.getJsonData())
+                        .putOnce("statType", wrappedStat.getStatType())
+                );
     }
 
     @Override
-    public String getPrefix() {
-        return PREFIX;
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        final DungeonWrapperStat other = fromData(statType, data);
+        this.dungeonName = other.dungeonName;
+        this.wrappedStat = other.wrappedStat;
+        return this;
     }
 
 }

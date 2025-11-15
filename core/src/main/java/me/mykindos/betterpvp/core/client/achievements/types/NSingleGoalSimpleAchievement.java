@@ -10,12 +10,12 @@ import java.util.Map;
 
 public abstract class NSingleGoalSimpleAchievement extends NSimpleAchievement {
 
-    protected NSingleGoalSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat... watchedStats) {
+    protected NSingleGoalSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Long goal, IStat... watchedStats) {
         super(name, namespacedKey, achievementCategory, achievementType, createMap(goal, watchedStats));
     }
 
-    private static Map<IStat, Double> createMap(Double goal, IStat... watchedStats) {
-        Map<IStat, Double> map = new HashMap<>();
+    private static Map<IStat, Long> createMap(Long goal, IStat... watchedStats) {
+        Map<IStat, Long> map = new HashMap<>();
         Arrays.stream(watchedStats).forEach(stat -> map.put(stat, goal));
         return map;
     }

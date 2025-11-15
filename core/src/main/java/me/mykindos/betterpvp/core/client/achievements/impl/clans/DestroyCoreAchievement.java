@@ -23,7 +23,7 @@ public class DestroyCoreAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("clans", "core_destroy"),
                 AchievementCategories.CLANS,
                 AchievementType.GLOBAL,
-                1d,
+                1L,
                 ClanWrapperStat.builder().wrappedStat(
                         ClientStat.CLANS_DESTROY_CORE
                 ).build()

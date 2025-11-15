@@ -47,21 +47,12 @@ public class StatContainer implements Unique, IStatMapListener {
         return client.getUniqueId();
     }
 
-    //todo enum verions
-    public Double getAllProperty(IStat stat) {
-        return stats.getAll(stat);
-    }
-
-    public Double getCurrentProperty(IStat stat) {
-        return getProperty(PERIOD_KEY, stat);
-    }
-
     @NotNull
-    public Double getProperty(String period, IStat stat) {
-        return Optional.ofNullable(stats.get(period, stat)).orElse(0d);
+    public Long getProperty(String period, IStat stat) {
+        return Optional.ofNullable(stats.get(period, stat)).orElse(0L);
     }
 
-    public void incrementStat(@Nullable IStat stat, double amount) {
+    public void incrementStat(@Nullable IStat stat, long amount) {
         if (stat == null) {
             log.warn("Attempted to save a null stat").submit();
             return;
@@ -76,7 +67,7 @@ public class StatContainer implements Unique, IStatMapListener {
     }
 
     @Override
-    public void onMapValueChanged(IStat stat, Double newValue, @Nullable Double oldValue) {
+    public void onMapValueChanged(IStat stat, Long newValue, @Nullable Long oldValue) {
         try {
             UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                 new StatPropertyUpdateEvent(this, stat, newValue, oldValue).callEvent();

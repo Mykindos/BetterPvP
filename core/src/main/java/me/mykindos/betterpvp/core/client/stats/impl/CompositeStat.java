@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,14 +13,14 @@ import java.util.Set;
 public class CompositeStat implements IStat {
     private final Set<IStat> stats = new HashSet<>();
     @Getter
-    private final String statName;
+    private final String statType;
 
-    public CompositeStat(String statName, IStat... stats) {
-        this(statName, Set.of(stats));
+    public CompositeStat(String statType, IStat... stats) {
+        this(statType, Set.of(stats));
     }
 
-    public CompositeStat(String statName, Set<IStat> stats) {
-        this.statName = statName;
+    public CompositeStat(String statType, Set<IStat> stats) {
+        this.statType = statType;
         this.stats.addAll(stats);
     }
 
@@ -31,10 +33,20 @@ public class CompositeStat implements IStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
        return stats.stream()
-               .mapToDouble(stat -> stat.getStat(statContainer, periodKey))
+               .mapToLong(stat -> stat.getStat(statContainer, periodKey))
                .sum();
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return null;
     }
 
     /**
@@ -46,7 +58,7 @@ public class CompositeStat implements IStat {
      */
     @Override
     public String getSimpleName() {
-        return statName;
+        return statType;
     }
 
     /**
@@ -57,12 +69,6 @@ public class CompositeStat implements IStat {
     @Override
     public boolean isSavable() {
         return false;
-    }
-
-    //todo check logic here
-    @Override
-    public boolean containsStat(String statName) {
-        return stats.stream().anyMatch(stat -> stat.containsStat(statName));
     }
 
     /**

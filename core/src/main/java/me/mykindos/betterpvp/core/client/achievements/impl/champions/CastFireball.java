@@ -27,7 +27,7 @@ import java.util.List;
 public class CastFireball extends SingleSimpleAchievement {
     @Inject
     public CastFireball() {
-        super("I Cast Fireball", new NamespacedKey("champions", "cast_fireball_100"), AchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 100d,
+        super("I Cast Fireball", new NamespacedKey("champions", "cast_fireball_100"), AchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 100L,
                 new GenericStat(
                         ChampionsSkillStat.builder()
                         .action(ChampionsSkillStat.Action.USE)
