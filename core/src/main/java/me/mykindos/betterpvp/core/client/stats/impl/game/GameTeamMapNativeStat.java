@@ -12,12 +12,13 @@ import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @SuperBuilder
 @Getter
@@ -29,70 +30,58 @@ import java.util.Map;
  * Represents stats only present in Game
  */
 public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildableStat{
-    public static final String PREFIX = "GAME_NATIVE";
-    //todo formatter
+    public static final String TYPE = "GAME_NATIVE";
 
-    private static StringBuilderParser<GameTeamMapNativeStatBuilder<?, ?>> parser = new StringBuilderParser<>(
-            List.of(
-                    GameTeamMapNativeStat::parsePrefix,
-                    GameTeamMapNativeStat::parseAction,
-                        GameTeamMapNativeStat::parseGameName,
-                    GameTeamMapNativeStat::parseTeamName,
-                    GameTeamMapNativeStat::parseMapName
-            )
-    );
-
-    public static GameTeamMapNativeStat fromString(String string) {
-        return parser.parse(GameTeamMapNativeStat.builder(), string).build();
+    public static GameTeamMapNativeStat fromData(@NotNull String type, JSONObject object) {
+        GameTeamMapNativeStatBuilder<?, ?> builder = builder();
+        if (!Strings.isNullOrEmpty(type)) {
+            type = object.getString("type");
+        }
+        Preconditions.checkArgument(type.equals(TYPE));
+        builder.action(Action.valueOf(object.getString("action")));
+        builder.gameId(object.getLong("gameId"));
+        builder.gameName(object.getString("gameName"));
+        builder.mapName(object.getString("mapName"));
+        builder.teamName(object.getString("teamName"));
+        return builder.build();
     }
 
     @NotNull
     private Action action;
 
-    private static GameTeamMapNativeStatBuilder<?, ?> parsePrefix(GameTeamMapNativeStatBuilder<?, ?> builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
+    private boolean filterGameIdStat(Map.Entry<IStat, Long> entry) {
+        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        return Objects.requireNonNull(gameId).equals(stat.gameId) && action.equals(stat.action);
     }
 
-    private static GameTeamMapNativeStatBuilder<?, ?> parseAction(GameTeamMapNativeStatBuilder<?, ?> builder, String input) {
-        return builder.action(Action.valueOf(input));
-    }
-
-    private static GameTeamMapNativeStatBuilder<?, ?> parseGameName(GameTeamMapNativeStatBuilder<?, ?> builder, String input) {
-        return builder.gameName(input);
-    }
-
-    private static GameTeamMapNativeStatBuilder<?, ?> parseMapName(GameTeamMapNativeStatBuilder<?, ?> builder, String input) {
-        return builder.mapName(input);
-    }
-
-    private static GameTeamMapNativeStatBuilder<?, ?> parseTeamName(GameTeamMapNativeStatBuilder<?, ?> builder, String input) {
-        return builder.teamName(input);
-    }
-
-    private boolean filterGameFullStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterGameFullStat(Map.Entry<IStat, Long> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
         return gameName.equals(stat.gameName) && action.equals(stat.action);
     }
 
-    private boolean filterGameTeamStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterGameTeamStat(Map.Entry<IStat, Long> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
         return action.equals(stat.action) && gameName.equals(stat.gameName) && teamName.equals(stat.teamName);
     }
 
-    private boolean filterGameMapStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterGameMapStat(Map.Entry<IStat, Long> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
         return action.equals(stat.action) && gameName.equals(stat.gameName) && mapName.equals(stat.mapName);
     }
 
-    private boolean filterTeamOnlyStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterTeamOnlyStat(Map.Entry<IStat, Long> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
         return teamName.equals(stat.teamName) && action.equals(stat.action);
     }
 
-    private boolean filterActionOnlyStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterActionOnlyStat(Map.Entry<IStat, Long> entry) {
         final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
         return action.equals(stat.action);
+    }
+
+    private boolean filterAllStat(Map.Entry<IStat, Long> entry) {
+        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        return gameName.equals(stat.gameName) && mapName.equals(stat.mapName) && teamName.equals(stat.teamName) && action.equals(stat.action);
     }
 
     /**
@@ -103,7 +92,11 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
+        //if gameId is specified, it is a specific game
+        if (gameId != null) {
+            return getFilteredStat(statContainer, periodKey, this::filterGameIdStat);
+        }
         if (!Strings.isNullOrEmpty(gameName)) {
             //have a game name
             if (Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
@@ -132,20 +125,23 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
             return getFilteredStat(statContainer, periodKey, this::filterActionOnlyStat);
         }
         //all are specified, do stat "normally"
-        return statContainer.getProperty(periodKey, this);
+        return getFilteredStat(statContainer, periodKey, this::filterAllStat);
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        action.name(),
-                        gameName,
-                        teamName,
-                        mapName
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return Objects.requireNonNull(super.getJsonData())
+                .putOnce("action", action.name());
     }
 
     /**
@@ -160,39 +156,6 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         return UtilFormat.cleanString(action.name());
     }
 
-    /**
-     * Whether this stat is directly savable to the database
-     *
-     * @return {@code true} if it is, {@code false} otherwise
-     */
-    @Override
-    //todo
-    public boolean isSavable() {
-        return !Strings.isNullOrEmpty(mapName);
-    }
-
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        try {
-            final GameTeamMapNativeStat other = fromString(statName);
-            //all filled fields must equal all the other filled fields
-            if (!action.equals(other.action)) return false;
-            //TODO check the logic here
-            if (!Strings.isNullOrEmpty(gameName) && !gameName.equals(other.gameName)) return false;
-            if (!Strings.isNullOrEmpty(teamName) && !teamName.equals(other.teamName)) return false;
-            if (!Strings.isNullOrEmpty(mapName) && !mapName.equals(other.mapName)) return false;
-            return true;
-        } catch (IllegalArgumentException ignored) {
-            return false;
-        }
-    }
-
     @Override
     public boolean containsStat(IStat otherStat) {
         if (!(otherStat instanceof GameTeamMapNativeStat other)) return false;
@@ -201,6 +164,7 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         if (!Strings.isNullOrEmpty(gameName) && !gameName.equals(other.gameName)) return false;
         if (!Strings.isNullOrEmpty(teamName) && !teamName.equals(other.teamName)) return false;
         if (!Strings.isNullOrEmpty(mapName) && !mapName.equals(other.mapName)) return false;
+        if (gameId != null && !gameId.equals(other.gameId)) return false;
         return true;
     }
 
@@ -216,18 +180,14 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
     }
 
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        GameTeamMapNativeStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        GameTeamMapNativeStat other = fromData(statType, data);
         this.action = other.action;
         this.gameName = other.gameName;
         this.teamName = other.teamName;
         this.mapName = other.mapName;
+        this.gameId = other.gameId;
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 
     public enum Action {

@@ -37,7 +37,7 @@ public class DeathAchievement extends SingleSimpleAchievement {
         super("Death", key,
                 AchievementCategories.DEATH_TYPE,
                 AchievementType.PERIOD,
-                (double) goal,
+                (long) goal,
                 new GenericStat(
                 MinecraftStat.builder()
                         .statistic(Statistic.DEATHS)

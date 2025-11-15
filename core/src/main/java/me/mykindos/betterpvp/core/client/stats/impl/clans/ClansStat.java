@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 @SuperBuilder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,6 +29,18 @@ public abstract class ClansStat implements IBuildableStat {
     @Nullable("When not in a Clan")
     protected Long clanId;
 
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOpt("clanName", clanName)
+                .putOpt("clanId", clanId);
+    }
 
     /**
      * Get the qualified name of the stat, if one exists.

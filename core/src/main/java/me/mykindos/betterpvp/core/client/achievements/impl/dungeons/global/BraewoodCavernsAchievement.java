@@ -23,7 +23,7 @@ public class BraewoodCavernsAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("dungeons", "braewood_caverns_global_1"),
                 AchievementCategories.DUNGEONS,
                 AchievementType.GLOBAL,
-                1d,
+                1L,
                 //this allows dungeon stats outside of clans, could also just be a ClanWrapperStat
                 new GenericStat(
                         DungeonNativeStat.builder()

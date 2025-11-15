@@ -80,6 +80,8 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         // Add to new team
         team.getParticipants().add(participant);
 
+        getGameInfo().getPlayerTeams().put(participant.getPlayer().getUniqueId(), team.getProperties().name());
+
         // Update player tab color
         GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
         return true;
@@ -169,6 +171,17 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
     @Nullable
     public Team getTeam(TeamProperties properties) {
         return teams.get(properties);
+    }
+
+    @Nullable
+    public Team getTeam(@Nullable String teamName) {
+        return teams.entrySet().stream()
+                .filter(entry -> {
+                    return entry.getKey().name().equals(teamName);
+                })
+                .map(Map.Entry::getValue)
+                .findAny()
+                .orElse(null);
     }
 
     @Override

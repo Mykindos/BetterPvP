@@ -23,7 +23,7 @@ public class UnclaimOtherAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("clans", "unclaim_other"),
                 AchievementCategories.CLANS,
                 AchievementType.GLOBAL,
-                1d,
+                1L,
                 ClanWrapperStat.builder()
                         .wrappedStat(ClientStat.CLANS_UNCLAIM_OTHER_TERRITORY)
                         .build()

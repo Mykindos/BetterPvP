@@ -17,12 +17,18 @@ public class StatManager {
     private final ServerController serverController;
     private final MapManager mapManager;
     private final ClientManager clientManager;
+    private final GameInfoRepository gameInfoRepository;
 
     @Inject
-    public StatManager(ServerController serverController, MapManager mapManager, ClientManager clientManager) {
+    public StatManager(ServerController serverController, MapManager mapManager, ClientManager clientManager, GameInfoRepository gameInfoRepository) {
         this.serverController = serverController;
         this.mapManager = mapManager;
         this.clientManager = clientManager;
+        this.gameInfoRepository = gameInfoRepository;
+    }
+
+    public void save(GameInfo gameInfo) {
+        gameInfoRepository.save(gameInfo);
     }
 
     public GameTeamMapStat.GameTeamMapStatBuilder<?, ?> addGameMapStatElements(UUID id, GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder) {
@@ -46,7 +52,7 @@ public class StatManager {
      * @param statBuilder
      * @param amount
      */
-    public void incrementGameMapStat(UUID id, GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder, double amount) {
+    public void incrementGameMapStat(UUID id, GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder, long amount) {
         IStat finalStat = addGameMapStatElements(id, statBuilder).build();
         clientManager.incrementStatOffline(id, finalStat, amount);
     }
