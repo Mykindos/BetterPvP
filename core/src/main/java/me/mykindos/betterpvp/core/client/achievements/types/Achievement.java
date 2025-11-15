@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
-import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
@@ -27,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +44,6 @@ import java.util.Set;
 public abstract class Achievement implements IAchievement, Listener, IStat {
 
     protected static final AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
-    protected static final ClientSQLLayer clientSQLLayer = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class);
     @Getter
     @Setter
     private String name;
@@ -74,7 +73,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         this.watchedStats.addAll(Arrays.stream(watchedStats).toList());
     }
 
-    protected Double getValue(StatContainer container, IStat stat, @Nullable String period) {
+    protected Long getValue(StatContainer container, IStat stat, @Nullable String period) {
         return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD_KEY) : stat.getStat(container, period);
     }
 
@@ -84,7 +83,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
      * @param stat
      * @return
      */
-    protected Double getValue(StatContainer container, IStat stat) {
+    protected Long getValue(StatContainer container, IStat stat) {
         return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD_KEY) : stat.getStat(container, StatContainer.PERIOD_KEY);
     }
 
@@ -95,9 +94,9 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         if (!enabled) return;
         try {
             final IStat stat = event.getStat();
-            final Double newValue = event.getNewValue();
+            final Long newValue = event.getNewValue();
             @Nullable
-            final Double oldValue = event.getOldValue();
+            final Long oldValue = event.getOldValue();
             final StatContainer container = event.getContainer();
 
             //validate and retrieve
@@ -112,7 +111,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
             final IStat changedStat = statsTemp.getFirst();
 
-            Map<IStat, Double> otherProperties = new HashMap<>();
+            Map<IStat, Long> otherProperties = new HashMap<>();
             watchedStats.stream()
                     .filter(iStat -> !stat.containsStat(stat))
                     .forEach(iStat -> {
@@ -128,13 +127,15 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void onChangeValue(StatContainer container, IStat stat, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<IStat, Double> otherProperties) {
+    public void onChangeValue(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherProperties) {
         handleNotify(container, stat, newValue, oldValue, otherProperties);
         handleComplete(container);
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
+        long oldLong = (long) (oldPercent * FP_MODIFIER);
+        long newLong = (long) (newPercent * FP_MODIFIER);
         log.info("achievement change {}", getName()).submit();
-        new StatPropertyUpdateEvent(container, this, (double) newPercent, (double) oldPercent).callEvent();
+        new StatPropertyUpdateEvent(container, this, newLong,oldLong).callEvent();
     }
 
     @Override
@@ -201,7 +202,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void handleNotify(StatContainer container, IStat stat, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<IStat, Double> otherStats) {
+    public void handleNotify(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherStats) {
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherStats));
         for (float threshold : notifyThresholds) {
@@ -224,8 +225,8 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         }
     }
 
-    private Map<IStat, Double> constructMap(IStat stat, Double value, Map<IStat, Double> otherProperties) {
-        Map<IStat, Double> newMap = new HashMap<>(otherProperties);
+    private Map<IStat, Long> constructMap(IStat stat, Long value, Map<IStat, Long> otherProperties) {
+        Map<IStat, Long> newMap = new HashMap<>(otherProperties);
         newMap.put(stat, value);
         return newMap;
     }
@@ -238,13 +239,23 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
-        return (double) getPercentComplete(statContainer, periodKey);
+    public Long getStat(StatContainer statContainer, String periodKey) {
+        return (long) (getPercentComplete(statContainer, periodKey) * FP_MODIFIER);
     }
 
     @Override
-    public String getStatName() {
+    public @NotNull String getStatType() {
         return namespacedKey.asString();
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return null;
     }
 
     /**
@@ -269,15 +280,9 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         return false;
     }
 
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
     @Override
-    public boolean containsStat(String statName) {
-        return getStatName().equals(statName);
+    public boolean containsStat(IStat otherStat) {
+        return this.equals(otherStat);
     }
 
     /**

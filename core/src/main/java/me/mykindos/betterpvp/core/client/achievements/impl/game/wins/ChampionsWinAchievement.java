@@ -29,7 +29,7 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
         super("Champions Wins", key,
                 AchievementCategories.GAME_CHAMPIONS_WINS,
                 AchievementType.GLOBAL,
-                (double) goal,
+                (long) goal,
                 GameTeamMapNativeStat.builder()
                         .action(GameTeamMapNativeStat.Action.WIN)
                         .build()

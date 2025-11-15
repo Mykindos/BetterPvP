@@ -5,8 +5,9 @@ import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class GenericStat implements IStat {
     @NotNull
     private final IStat stat;
 
-    private boolean filterStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterStat(Map.Entry<IStat, Long> entry) {
         return containsStat(entry.getKey());
     }
 
@@ -31,7 +32,7 @@ public class GenericStat implements IStat {
      * @return the stat value represented by this stat
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         return getFilteredStat(statContainer, periodKey, this::filterStat);
     }
 
@@ -41,8 +42,18 @@ public class GenericStat implements IStat {
      * @return
      */
     @Override
-    public String getStatName() {
-        return "GENERIC " + stat.getStatName();
+    public @NotNull String getStatType() {
+        return "GENERIC " + stat.getStatType();
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return null;
     }
 
     /**
@@ -78,17 +89,6 @@ public class GenericStat implements IStat {
     @Override
     public boolean isSavable() {
         return false;
-    }
-
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        throw new NotImplementedException("string containsStat is deprecated");
     }
 
     /**
