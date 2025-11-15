@@ -271,17 +271,18 @@ public class ClientSQLLayer {
             context.select(CLIENT_STATS.PERIOD, CLIENT_STATS.STATNAME, CLIENT_STATS.STAT)
                     .from(CLIENT_STATS)
                     //todo change to id PK
+                    //todo update to new table
                     .where(CLIENT_STATS.CLIENT.eq(client.getUuid()))
                     .fetch()
                     .forEach(record -> {
                         final String period = record.get(CLIENT_STATS.PERIOD);
                         final String statName = record.get(CLIENT_STATS.STATNAME);
-                        final IStat stat = statBuilder.getStatForStatName(statName);
+                        //final IStat stat = statBuilder.getStatForStatName(statName);
                         final double value = record.get(CLIENT_STATS.STAT);
                         try {
-                            tempMap.put(period, stat, value, true);
+                            //tempMap.put(period, stat, value, true);
                         } catch (Exception e) {
-                            log.error("Error saving stat {} ({}), period {}, value {}", stat, statName, period, value, e).submit();
+                            //log.error("Error saving stat {} ({}), period {}, value {}", stat, statName, period, value, e).submit();
                         }
                     });
             statContainer.getStats().copyFrom(tempMap);
@@ -468,15 +469,15 @@ public class ClientSQLLayer {
         }
     }
 
-    private Query getSaveStatProperty(StatContainer statContainer, String period, IStat stat, Double value) {
-        log.info("Saving {}", stat.getStatName()).submit();
+    private Query getSaveStatProperty(StatContainer statContainer, String period, IStat stat, Long value) {
+        log.info("Saving {}", stat.getStatType()).submit();
         return database.getDslContext().insertInto(CLIENT_STATS)
                 .set(CLIENT_STATS.CLIENT, statContainer.getUniqueId().toString())
                 .set(CLIENT_STATS.PERIOD, period)
-                .set(CLIENT_STATS.STATNAME, stat.getStatName())
-                .set(CLIENT_STATS.STAT, value)
+                .set(CLIENT_STATS.STATNAME, stat.getStatType())
+                .set(CLIENT_STATS.STAT, value.doubleValue())
                 .onDuplicateKeyUpdate()
-                .set(CLIENT_STATS.STAT, value);
+                .set(CLIENT_STATS.STAT, value.doubleValue());
     }
 
 

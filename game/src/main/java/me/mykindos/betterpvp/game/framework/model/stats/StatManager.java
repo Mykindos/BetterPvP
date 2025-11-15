@@ -25,6 +25,8 @@ public class StatManager {
         this.clientManager = clientManager;
     }
 
+    //TODO implement gameId stat
+
     public GameTeamMapStat.GameTeamMapStatBuilder<?, ?> addGameMapStatElements(UUID id, GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder) {
         final String gameName = serverController.getCurrentState().isInLobby() ? GameTeamMapStat.LOBBY_GAME_NAME : serverController.getCurrentGame().getConfiguration().getName();
         statBuilder.gameName(gameName);
@@ -46,7 +48,7 @@ public class StatManager {
      * @param statBuilder
      * @param amount
      */
-    public void incrementGameMapStat(UUID id, GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder, double amount) {
+    public void incrementGameMapStat(UUID id, GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder, long amount) {
         IStat finalStat = addGameMapStatElements(id, statBuilder).build();
         clientManager.incrementStatOffline(id, finalStat, amount);
     }

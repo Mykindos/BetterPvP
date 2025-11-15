@@ -112,7 +112,7 @@ public class SkillStatListener extends TimedStatListener {
         lastUpdateMap.put(player.getUniqueId(), currentTime);
     }
 
-    private void incrementStats(Client client, ChampionsSkillStat.Action action, double value) {
+    private void incrementStats(Client client, ChampionsSkillStat.Action action, long value) {
         final Optional<Role> roleOptional = roleManager.getObject(client.getUniqueId());
         if (roleOptional.isEmpty()) return;
         final Role role = roleOptional.get();
@@ -121,7 +121,7 @@ public class SkillStatListener extends TimedStatListener {
         incrementBuildStats(build, client, action, value);
     }
 
-    private void incrementBuildStats(RoleBuild build, Client client, ChampionsSkillStat.Action action, double value) {
+    private void incrementBuildStats(RoleBuild build, Client client, ChampionsSkillStat.Action action, long value) {
         build.getActiveSkills().forEach(skill -> {
             final ChampionsSkillStat stat = ChampionsSkillStat.builder()
                     .action(action)

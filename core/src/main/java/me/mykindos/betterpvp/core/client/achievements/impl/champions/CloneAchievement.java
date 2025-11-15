@@ -23,7 +23,7 @@ public class CloneAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("champions", "clone_100"),
                 AchievementCategories.CHAMPIONS,
                 AchievementType.GLOBAL,
-                100d,
+                100L,
                 new GenericStat(
                         ChampionsSkillStat.builder()
                         .action(ChampionsSkillStat.Action.USE)

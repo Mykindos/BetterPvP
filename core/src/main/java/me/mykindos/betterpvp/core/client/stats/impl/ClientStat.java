@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.util.Set;
 
@@ -57,6 +58,9 @@ public enum ClientStat implements IClientStat {
     CLANS_SET_CORE("Set Core", "Number of times you set your clan core"),
     CLANS_TELEPORT_CORE("Teleport to Core", "Number of times you teleported to your clan core"),
 
+    /**
+     * Multiplied by 1000 when storing
+     */
     CLANS_CLANS_EXPERIENCE("Clan Experience", "Clan experience you earned"),
 
     CLANS_ENERGY_DROPPED("Energy Dropped", "Energy dropped as a result of your actions", "I.e. killing a boss, mining a block"),
@@ -72,12 +76,21 @@ public enum ClientStat implements IClientStat {
 
     CLANS_DESTROY_CORE("Destroy Core", "Number of times you destroyed an opposing Clan's core"),
     CLANS_CORE_DESTROYED("Core Destroyed", "Number of times your Clan was destroyed"),
+    /**
+     * Multiplied by 1000 when storing
+     */
     CLANS_CORE_DAMAGE("Core Damage", "Amount of damage you dealt to the core"),
 
     CLANS_CANNON_SHOT("Cannon Shots", "Number of times you fired a cannon"),
     CLANS_CANNON_BLOCK_DAMAGE("Cannon Block Damage", "Amount of block damage you have dealt with cannons"),
 
+    /**
+     * Multiplied by 1000 when storing
+     */
     CLANS_DOMINANCE_GAINED("Dominance Gained", "Dominance you gained for your Clan"),
+    /**
+     * Multiplied by 1000 when storing
+     */
     CLANS_DOMINANCE_LOST("Dominance Lost", "Dominance you lost for your Clan"),
 
     CLANS_CLAN_LEAVE("Clan Leave", "Number of times you left a Clan"),
@@ -116,7 +129,7 @@ public enum ClientStat implements IClientStat {
     ClientStat(String name, Material material, int customModelData, boolean glowing, Set<IStat> compositeStats, String... description) {
         this.name = name;
         this.description = description;
-        this.compositeStat =  compositeStats != null ? new CompositeStat(getStatName(), compositeStats) : null;
+        this.compositeStat =  compositeStats != null ? new CompositeStat(getStatType(), compositeStats) : null;
         this.material = material;
         this.customModelData = customModelData;
         this.glowing = glowing;
@@ -125,7 +138,7 @@ public enum ClientStat implements IClientStat {
 
 
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         if (compositeStat == null) {
             return statContainer.getProperty(periodKey,this);
         }
@@ -133,8 +146,18 @@ public enum ClientStat implements IClientStat {
     }
 
     @Override
-    public String getStatName() {
+    public @NotNull String getStatType() {
         return name();
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return null;
     }
 
     /**
@@ -170,14 +193,6 @@ public enum ClientStat implements IClientStat {
     @Override
     public boolean isSavable() {
         return compositeStat == null;
-    }
-
-    @Override
-    public boolean containsStat(String statName) {
-        if (compositeStat == null) {
-            return getStatName().equals(statName);
-        }
-        return compositeStat.containsStat(statName);
     }
 
     @Override

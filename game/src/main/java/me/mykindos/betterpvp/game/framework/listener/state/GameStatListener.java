@@ -4,17 +4,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapStat;
 import me.mykindos.betterpvp.core.client.stats.listeners.TimedStatListener;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.TeamGame;
+import me.mykindos.betterpvp.game.framework.manager.MapManager;
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStartSpectatingEvent;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStopSpectatingEvent;
+import me.mykindos.betterpvp.game.framework.model.stats.GameInfo;
 import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.state.GameState;
@@ -25,10 +29,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -36,18 +38,19 @@ import java.util.stream.Collectors;
 @CustomLog
 public class GameStatListener extends TimedStatListener {
     private final StatManager statManager;
+    private final MapManager mapManager;
     private final ServerController serverController;
     private final PlayerController playerController;
 
-    private final Map<UUID, Team> playerTeams = new ConcurrentHashMap<>();
     private final Set<UUID> players = new HashSet<>();
 
     @Inject
-    public GameStatListener(ServerController serverController, PlayerController playerController, ClientManager clientManager, StatManager statManager) {
+    public GameStatListener(ServerController serverController, PlayerController playerController, ClientManager clientManager, StatManager statManager, MapManager mapManager) {
         super(clientManager);
         this.serverController = serverController;
         this.playerController = playerController;
         this.statManager = statManager;
+        this.mapManager = mapManager;
         setupStateHandlers();
     }
 
@@ -57,16 +60,7 @@ public class GameStatListener extends TimedStatListener {
                     .forEach(this::updateParticipantTime);
         });
         serverController.getStateMachine().addEnterHandler(GameState.IN_GAME, oldState -> {
-            Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GamePlugin.class), () -> {
-                players.addAll(playerController.getParticipants().keySet().stream().map(Player::getUniqueId).collect(Collectors.toSet()));
-                if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
-                    for (Team team : teamGame.getParticipants()) {
-                        for (Player player : team.getPlayers()) {
-                            playerTeams.put(player.getUniqueId(), team);
-                        }
-                    }
-                }
-            }, 1L);
+            Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GamePlugin.class), this::onGameStart, 1L);
         });
 
         serverController.getStateMachine().addEnterHandler(GameState.ENDING, oldState -> {
@@ -77,6 +71,16 @@ public class GameStatListener extends TimedStatListener {
             playerController.getParticipants().values()
                     .forEach(this::updateParticipantTime);
         });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerJoin(ClientJoinEvent event) {
+        if (serverController.getCurrentState().isInLobby()) {
+            serverController.getLobbyInfo().getPlayerTeams().put(event.getPlayer().getUniqueId(), GameTeamMapStat.NONE_TEAM_NAME);
+            return;
+        }
+
+        assignGameTeam(event.getClient().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -99,26 +103,55 @@ public class GameStatListener extends TimedStatListener {
                     log.warn("Participant {} stopped spectating in a team game but is not on a team", event.getPlayer().getName()).submit();
                     return;
                 }
-                //always keep original team
-                playerTeams.putIfAbsent(event.getPlayer().getUniqueId(), team);
+                //store stats for last team
+                teamGame.getGameInfo().getPlayerTeams().put(event.getPlayer().getUniqueId(), team.getProperties().name());
             }, 1L);
 
         }
     }
 
+    public void assignGameTeam(UUID id) {
+        final GameInfo gameInfo = serverController.getCurrentGame().getGameInfo();
+        if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
+            final Team team = teamGame.getPlayerTeam(id);
+            gameInfo.getPlayerTeams().put(id, team == null ? GameTeamMapStat.SPECTATOR_TEAM_NAME : team.getProperties().name());
+        } else {
+            gameInfo.getPlayerTeams().put(id, GameTeamMapStat.NONE_TEAM_NAME);
+        }
+    }
+
+    public void onGameStart() {
+        //todo save lobby info
+        players.addAll(playerController.getParticipants().keySet().stream().map(Player::getUniqueId).collect(Collectors.toSet()));
+        serverController.getCurrentGame().setGameInfo(new GameInfo(
+                serverController.getCurrentGame().getConfiguration().getName(),
+                mapManager.getCurrentMap().getName()
+        ));
+        //initialize teams
+        playerController.getParticipants().keySet().stream().map(Player::getUniqueId)
+                .forEach(this::assignGameTeam);
+    }
+
+
     public void onGameEnd() {
         if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
-            playerTeams.forEach((id, team) -> {
-                statManager.incrementGameMapStat(id, GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.MATCHES_PLAYED), 1);
+            final GameInfo gameInfo = teamGame.getGameInfo();
+            //todo iterate through info player teams, then increment wins/losses. Then setup lobby game info.
+            gameInfo.getPlayerTeams().forEach((id, teamName) -> {
+                final Team team = teamGame.getTeam(teamName);
                 if (teamGame.getWinners().contains(team)) {
                     statManager.incrementGameMapStat(id, GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.WIN), 1);
-                } else {
+                } else if (team != null) {
                     statManager.incrementGameMapStat(id, GameTeamMapNativeStat.builder().action(GameTeamMapNativeStat.Action.LOSS), 1);
                 }
             });
-        } //todo other games
-        playerTeams.clear();
-        players.clear();
+        }
+        serverController.setLobbyInfo(
+                new GameInfo(
+                        GameInfo.LOBBY_GAME_NAME,
+                        mapManager.getWaitingLobby().getMetadata().getName()
+                )
+        );
     }
 
     @Override

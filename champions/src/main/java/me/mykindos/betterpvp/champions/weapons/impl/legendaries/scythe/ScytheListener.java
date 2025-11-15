@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -98,7 +99,7 @@ public class ScytheListener implements Listener {
         if (scythe.isHoldingWeapon(damager) && scythe.tracked.containsKey(damager)) {
             final double soulCount = scythe.tracked.get(damager).getSoulCount();
             double actualHeal = UtilEntity.health(damager, scythe.baseHeal + scythe.healPerSoul * soulCount);
-            clientManager.search().online(damager).getStatContainer().incrementStat(ClientStat.HEAL_SCYTHE, actualHeal);
+            clientManager.search().online(damager).getStatContainer().incrementStat(ClientStat.HEAL_SCYTHE, (long) (actualHeal * IStat.FP_MODIFIER));
         }
     }
 

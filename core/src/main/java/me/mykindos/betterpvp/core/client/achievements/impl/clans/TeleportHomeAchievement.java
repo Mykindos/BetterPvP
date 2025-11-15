@@ -23,7 +23,7 @@ public class TeleportHomeAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("clans", "teleport_core"),
                 AchievementCategories.CLANS,
                 AchievementType.GLOBAL,
-                1d,
+                1L,
                 ClanWrapperStat.builder()
                         .wrappedStat(ClientStat.CLANS_TELEPORT_CORE)
                         .build()
