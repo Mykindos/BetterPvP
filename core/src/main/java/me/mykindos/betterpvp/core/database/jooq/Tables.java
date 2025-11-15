@@ -14,7 +14,10 @@ import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameData;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams;
 import me.mykindos.betterpvp.core.database.jooq.tables.GamerProperties;
+import me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetCombatData;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetLogMessagesByContextAndAction;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetLogMessagesByContextAndValue;
@@ -41,6 +44,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GetClientStatsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetCombatDataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetLogMessagesByContextAndActionRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetLogMessagesByContextAndValueRecord;
@@ -115,9 +119,58 @@ public class Tables {
     public static final FilteredWords FILTERED_WORDS = FilteredWords.FILTERED_WORDS;
 
     /**
+     * The table <code>public.game_data</code>.
+     */
+    public static final GameData GAME_DATA = GameData.GAME_DATA;
+
+    /**
+     * The table <code>public.game_teams</code>.
+     */
+    public static final GameTeams GAME_TEAMS = GameTeams.GAME_TEAMS;
+
+    /**
      * The table <code>public.gamer_properties</code>.
      */
     public static final GamerProperties GAMER_PROPERTIES = GamerProperties.GAMER_PROPERTIES;
+
+    /**
+     * The table <code>public.get_client_stats</code>.
+     */
+    public static final GetClientStats GET_CLIENT_STATS = GetClientStats.GET_CLIENT_STATS;
+
+    /**
+     * Call <code>public.get_client_stats</code>.
+     */
+    public static Result<GetClientStatsRecord> GET_CLIENT_STATS(
+          Configuration configuration
+        , Long clientParam
+    ) {
+        return configuration.dsl().selectFrom(me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+              clientParam
+        )).fetch();
+    }
+
+    /**
+     * Get <code>public.get_client_stats</code> as a table.
+     */
+    public static GetClientStats GET_CLIENT_STATS(
+          Long clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+            clientParam
+        );
+    }
+
+    /**
+     * Get <code>public.get_client_stats</code> as a table.
+     */
+    public static GetClientStats GET_CLIENT_STATS(
+          Field<Long> clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+            clientParam
+        );
+    }
 
     /**
      * The table <code>public.get_combat_data</code>.

@@ -36,7 +36,7 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
     public UseAllSkillsAchievement(ChampionsSkillManager skillManager) {
         super("Use All Skills", new NamespacedKey("champions", "use_all_skills"),
                 AchievementCategories.CHAMPIONS,
-                AchievementType.GLOBAL, 60_000d,
+                AchievementType.GLOBAL, 60_000L,
                 getAllSkills(skillManager));
         //cannot register via BPvPListener as it loads before skills are loaded
         ListenerLoader.register(JavaPlugin.getPlugin(Champions.class), this);

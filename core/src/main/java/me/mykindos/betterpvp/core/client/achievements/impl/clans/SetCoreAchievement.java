@@ -22,7 +22,7 @@ public class SetCoreAchievement extends SingleSimpleAchievement {
         super("Set Core", new NamespacedKey("clans", "set_core"),
                 AchievementCategories.CLANS,
                 AchievementType.GLOBAL,
-                1d,
+                1L,
                 ClanWrapperStat.builder()
                         .wrappedStat(ClientStat.CLANS_SET_CORE)
                         .build()

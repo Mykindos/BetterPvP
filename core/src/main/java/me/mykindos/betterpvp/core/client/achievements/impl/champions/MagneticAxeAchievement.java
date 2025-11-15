@@ -23,7 +23,7 @@ public class MagneticAxeAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("champions", "magnetic_axe_100"),
                 AchievementCategories.CHAMPIONS,
                 AchievementType.GLOBAL,
-                100d,
+                100L,
                 new GenericStat(
                         ChampionsSkillStat.builder()
                         .action(ChampionsSkillStat.Action.USE)

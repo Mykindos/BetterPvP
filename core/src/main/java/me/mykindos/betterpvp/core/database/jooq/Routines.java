@@ -4,6 +4,7 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
+import me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetCombatData;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetLogMessagesByContextAndAction;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetLogMessagesByContextAndValue;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKills;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKillstreak;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopRating;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetWorldLogsForBlock;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GetClientStatsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetCombatDataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetLogMessagesByContextAndActionRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetLogMessagesByContextAndValueRecord;
@@ -26,7 +28,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillsRecord
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
-
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -37,6 +38,40 @@ import org.jooq.Result;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Routines {
+
+    /**
+     * Call <code>public.get_client_stats</code>.
+     */
+    public static Result<GetClientStatsRecord> getClientStats(
+          Configuration configuration
+        , Long clientParam
+    ) {
+        return configuration.dsl().selectFrom(me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+              clientParam
+        )).fetch();
+    }
+
+    /**
+     * Get <code>public.get_client_stats</code> as a table.
+     */
+    public static GetClientStats getClientStats(
+          Long clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+            clientParam
+        );
+    }
+
+    /**
+     * Get <code>public.get_client_stats</code> as a table.
+     */
+    public static GetClientStats getClientStats(
+          Field<Long> clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+            clientParam
+        );
+    }
 
     /**
      * Call <code>public.get_combat_data</code>.

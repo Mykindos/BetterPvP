@@ -22,7 +22,7 @@ import java.util.List;
  */
 public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchievement {
 
-    protected SingleSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat watchedStat) {
+    protected SingleSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Long goal, IStat watchedStat) {
         super(name, namespacedKey, achievementCategory, achievementType, goal, watchedStat);
     }
 
@@ -30,17 +30,17 @@ public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchieveme
         return getWatchedStats().stream().findAny().orElseThrow();
     }
 
-    protected Double getGoal() {
+    protected Long getGoal() {
         return statGoals.get(getKey());
     }
 
-    protected Double getProperty(StatContainer container) {
+    protected Long getProperty(StatContainer container) {
         return getValue(container, getKey());
     }
 
     @Override
     public List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
-        Double value = getValue(container, getKey(), period);
+        Long value = getValue(container, getKey(), period);
         List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, period));
         Component bar = progressComponent.getFirst();
         progressComponent.removeFirst();

@@ -11,13 +11,12 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 @Builder
@@ -26,19 +25,15 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class EffectDurationStat implements IBuildableStat {
-    public static final String PREFIX = "EFFECT_DURATION";
+    public static final String TYPE = "EFFECT_DURATION";
 
-    private static StringBuilderParser<EffectDurationStatBuilder> parser = new StringBuilderParser<>(
-            List.of(
-                    EffectDurationStat::parsePrefix,
-                    EffectDurationStat::parseRelation,
-                    EffectDurationStat::parseEffectType,
-                    EffectDurationStat::parseEffectName
-            )
-    );
-
-    public static EffectDurationStat fromString(String string) {
-        return parser.parse(EffectDurationStat.builder(), string).build();
+    public static EffectDurationStat fromData(String statType, JSONObject data) {
+        EffectDurationStat.EffectDurationStatBuilder builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.relation(Relation.valueOf(data.getString("relation")));
+        builder.effectType(data.getString("effectType"));
+        builder.effectName(data.optString("effectName"));
+        return builder.build();
     }
 
     @NotNull
@@ -49,24 +44,7 @@ public class EffectDurationStat implements IBuildableStat {
     @Builder.Default
     private String effectName = "";
 
-    private static EffectDurationStatBuilder parsePrefix(EffectDurationStatBuilder builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-
-    private static EffectDurationStatBuilder parseRelation(EffectDurationStatBuilder builder, String input) {
-        return builder.relation(Relation.valueOf(input));
-    }
-
-    private static EffectDurationStatBuilder parseEffectType(EffectDurationStatBuilder builder, String input) {
-        return builder.effectType(input);
-    }
-
-    private static EffectDurationStatBuilder parseEffectName(EffectDurationStatBuilder builder, String input) {
-        return builder.effectName(input);
-    }
-
-    private boolean filterEffectTypeStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterEffectTypeStat(Map.Entry<IStat, Long> entry) {
         EffectDurationStat stat = (EffectDurationStat) entry.getKey();
         return effectType.equals(stat.effectType);
     }
@@ -79,7 +57,7 @@ public class EffectDurationStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         if (effectName == null) {
             return getFilteredStat(statContainer, periodKey, this::filterEffectTypeStat);
         }
@@ -87,15 +65,21 @@ public class EffectDurationStat implements IBuildableStat {
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        relation.name(),
-                        effectType,
-                        effectName
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("relation", relation.name())
+                .putOnce("effectType", effectType)
+                .putOnce("effectName", effectName);
     }
 
     /**
@@ -141,17 +125,6 @@ public class EffectDurationStat implements IBuildableStat {
     }
 
     /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        return statName.startsWith(getStatName());
-    }
-
-    /**
      * Whether this stat contains this otherSTat
      *
      * @param otherStat
@@ -179,16 +152,11 @@ public class EffectDurationStat implements IBuildableStat {
     }
 
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        EffectDurationStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        EffectDurationStat other = fromData(statType, data);
         relation = other.getRelation();
         effectType = other.getEffectType();
         effectName = other.getEffectName();
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 }

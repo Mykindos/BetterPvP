@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.StatData> {
     @Getter
     //period, statname, stat
-    protected final ConcurrentHashMap<String, ConcurrentHashMap<IStat, Double>> myMap = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String, ConcurrentHashMap<IStat, Long>> myMap = new ConcurrentHashMap<>();
     protected final List<IStatMapListener> listeners = new ArrayList<>();
 
     /**
@@ -31,8 +31,8 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
      * @param value
      * @param silent
      */
-    public void put(String period, @NotNull IStat stat, Double value, boolean silent) {
-        AtomicReference<Double> oldValue = new AtomicReference<>();
+    public void put(String period, @NotNull IStat stat, Long value, boolean silent) {
+        AtomicReference<Long> oldValue = new AtomicReference<>();
         myMap.compute(period, (k, v) -> {
             if (v == null) {
                 v = new ConcurrentHashMap<>();
@@ -45,27 +45,27 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
         }
     }
 
-    public void increase(String period, IStat stat, Double amount) {
+    public void increase(String period, IStat stat, Long amount) {
         synchronized (myMap) {
-            Double newValue = myMap.computeIfAbsent(period, (k) -> new ConcurrentHashMap<>())
+            Long newValue = myMap.computeIfAbsent(period, (k) -> new ConcurrentHashMap<>())
                     .compute(stat, (sk, sv) -> sv == null ? amount : sv + amount);
-            Double oldValue = newValue - amount;
+            Long oldValue = newValue - amount;
             listeners.forEach(l -> l.onMapValueChanged(stat, newValue, oldValue));
         }
     }
 
     @Nullable
-    public Double get(String period, IStat stat) {
+    public Long get(String period, IStat stat) {
         if (StatContainer.GLOBAL_PERIOD_KEY.equals(period)) return getAll(stat);
 
-        final ConcurrentHashMap<IStat, Double> periodMap = myMap.get(period);
+        final ConcurrentHashMap<IStat, Long> periodMap = myMap.get(period);
         if (periodMap == null) return null;
         return periodMap.get(stat);
     }
 
-    public Double getAll(IStat stat) {
+    public Long getAll(IStat stat) {
         return myMap.values().stream()
-                .mapToDouble(map -> Optional.ofNullable(map.get(stat)).orElse(0d))
+                .mapToLong(map -> Optional.ofNullable(map.get(stat)).orElse(0L))
                 .sum();
     }
 
@@ -74,9 +74,9 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
      * @param period the period or {@code "Global"} if global
      * @return
      */
-    public Map<IStat, Double> getStatsOfPeriod(@NotNull String period) {
+    public Map<IStat, Long> getStatsOfPeriod(@NotNull String period) {
         if (StatContainer.GLOBAL_PERIOD_KEY.equals(period)) {
-            final Map<IStat, Double> globalMap = new ConcurrentHashMap<>();
+            final Map<IStat, Long> globalMap = new ConcurrentHashMap<>();
             myMap.values().forEach(map -> {
                 map.forEach((statName, stat) ->
                     globalMap.compute(statName, (key, value) ->
@@ -86,7 +86,7 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
             });
             return globalMap;
         }
-        final Map<IStat, Double> periodMap = myMap.get(period);
+        final Map<IStat, Long> periodMap = myMap.get(period);
         if (periodMap != null) return periodMap;
         return Map.of();
     }
@@ -125,6 +125,6 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     public static class StatData {
         private final String period;
         private final IStat stat;
-        private final Double value;
+        private final Long value;
     }
 }

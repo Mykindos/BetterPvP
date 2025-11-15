@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.combat.health.EntityHealthService;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
@@ -85,17 +86,17 @@ public class RegenerationEffect extends VanillaEffectType {
                     if (!applier.getUniqueId().equals(livingEntity.getUniqueId())) {
                         //if applier does not equal target, applier might be offline
                         clientManager.search().offline(applier.getUniqueId()).thenAccept(applierOptional ->
-                                applierOptional.ifPresent(applierClient -> applierClient.getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_TO_OTHERS, actualHeal)
+                                applierOptional.ifPresent(applierClient -> applierClient.getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_TO_OTHERS, (long) (actualHeal * IStat.FP_MODIFIER))
                                 )
                         );
                     } else {
-                        clientManager.search().online(applier).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_SELF, actualHeal);
+                        clientManager.search().online(applier).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_SELF, (long) (actualHeal * IStat.FP_MODIFIER));
                     }
                 }
                 if (livingEntity instanceof Player target) {
                     LivingEntity applier = effect.getApplier().get();
                     if (!(applier != null && applier.getUniqueId().equals(target.getUniqueId()))) {
-                        clientManager.search().online(target).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_FROM_OTHERS, actualHeal);
+                        clientManager.search().online(target).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_FROM_OTHERS, (long) (actualHeal * IStat.FP_MODIFIER));
                     }
                 }
             }

@@ -23,7 +23,7 @@ public class FleshHookAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("champions", "flesh_hook_100"),
                 AchievementCategories.CHAMPIONS,
                 AchievementType.GLOBAL,
-                100d,
+                100L,
                 new GenericStat(
                         ChampionsSkillStat.builder()
                         .action(ChampionsSkillStat.Action.USE)

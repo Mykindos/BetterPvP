@@ -9,46 +9,30 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
+import org.json.JSONObject;
 
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class RoleStat implements IBuildableStat {
-    public static final String PREFIX = "CHAMPIONS_ROLE";
+    public static final String TYPE = "CHAMPIONS_ROLE";
 
-    private static StringBuilderParser<RoleStatBuilder> parser = new StringBuilderParser<>(
-            List.of(
-                    RoleStat::parsePrefix,
-                    RoleStat::parseAction,
-                    RoleStat::parseRole
-            )
-    );
+    public static RoleStat fromData(String statType, JSONObject data) {
+        RoleStat.RoleStatBuilder builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.action(Action.valueOf(data.getString("action")));
+        String dataRole = data.optString("role", null);
+        Role roleEnum = dataRole == null ? null : Role.valueOf(dataRole);
+        builder.role(roleEnum);
 
-    public static RoleStat fromString(String string) {
-        return parser.parse(RoleStat.builder(), string).build();
+        return builder.build();
     }
 
-    private static RoleStatBuilder parsePrefix(RoleStatBuilder builder, String input) {
-        Preconditions.checkArgument(PREFIX.equals(input));
-        return builder;
-    }
-    private static RoleStatBuilder parseAction(RoleStatBuilder builder, String input) {
-        return builder.action(Action.valueOf(input));
-    }
-    private static RoleStatBuilder parseRole(RoleStatBuilder builder, String input) {
-        if (input.equals("null")) {
-            return builder.role(null);
-        }
-        return builder.role(Role.valueOf(input));
-    }
 
     @NotNull
     private Action action;
@@ -63,17 +47,25 @@ public class RoleStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         return statContainer.getProperty(periodKey, this);
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(List.of(
-                PREFIX,
-                action.name(),
-                role == null ? "null" : role.name()
-        ));
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .put("action", action.name())
+                .putOpt("role", role);
     }
 
     /**
@@ -99,17 +91,6 @@ public class RoleStat implements IBuildableStat {
     }
 
     /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        return statName.equals(getStatName());
-    }
-
-    /**
      * Whether this stat contains this otherSTat
      *
      * @param otherStat
@@ -117,7 +98,7 @@ public class RoleStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(IStat otherStat) {
-        return IBuildableStat.super.containsStat(otherStat);
+        return this.equals(otherStat);
     }
 
     /**
@@ -134,21 +115,17 @@ public class RoleStat implements IBuildableStat {
     /**
      * Copies the stat represented by this statName into this object
      *
-     * @param statName the statname
+     * @param statType the statname
+     * @param data
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        final RoleStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        final RoleStat other = fromData(statType, data);
         this.action = other.action;
         this.role = other.role;
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 
     public enum Action {

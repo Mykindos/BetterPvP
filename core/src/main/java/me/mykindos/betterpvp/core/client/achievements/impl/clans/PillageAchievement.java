@@ -23,7 +23,7 @@ public class PillageAchievement extends SingleSimpleAchievement {
                 new NamespacedKey("clans", "pillage_attack"),
                 AchievementCategories.CLANS,
                 AchievementType.GLOBAL,
-                1d,
+                1L,
                 ClanWrapperStat.builder()
                         .wrappedStat(ClientStat.CLANS_ATTACK_PILLAGE)
                         .build()

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -224,7 +225,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
                     UtilDamage.doDamage(dmg);
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
                     double actualHeal = UtilEntity.health(player, getHealthPerEnemyHit(level));
-                    championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_WREATH, actualHeal);
+                    championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_WREATH, (long) (actualHeal * IStat.FP_MODIFIER));
                 }
                 targets.addAll(hit);
 

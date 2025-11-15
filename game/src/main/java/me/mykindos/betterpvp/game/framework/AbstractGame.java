@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.game.framework.configuration.GenericGameConfiguration;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
 import me.mykindos.betterpvp.game.framework.model.attribute.BoundAttribute;
+import me.mykindos.betterpvp.game.framework.model.stats.GameInfo;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
@@ -29,6 +30,9 @@ public abstract sealed class AbstractGame<C extends GenericGameConfiguration, W 
 
     @Setter @Getter
     private List<W> winners = new ArrayList<>();
+
+    @Setter @Getter
+    private GameInfo gameInfo;
 
     protected AbstractGame(C configuration) {
         this.configuration = configuration;

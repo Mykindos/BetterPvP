@@ -8,6 +8,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.game.framework.event.AcceptingPlayersStateEvent;
 import me.mykindos.betterpvp.game.framework.event.GameChangeEvent;
 import me.mykindos.betterpvp.game.framework.event.PreGameChangeEvent;
+import me.mykindos.betterpvp.game.framework.model.stats.GameInfo;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.framework.state.GameStateMachine;
 import org.bukkit.event.Listener;
@@ -27,6 +28,9 @@ public final class ServerController implements Listener {
     private final GameStateMachine stateMachine;
     @Getter
     private AbstractGame<?, ?> currentGame;
+    @Getter
+    @Setter
+    private GameInfo lobbyInfo;
     @Getter
     @Setter
     private boolean acceptingPlayers = false;

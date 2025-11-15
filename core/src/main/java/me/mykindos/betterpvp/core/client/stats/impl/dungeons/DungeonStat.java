@@ -11,6 +11,8 @@ import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 @SuperBuilder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,5 +42,16 @@ public abstract class DungeonStat implements IBuildableStat {
         }
 
         return stringBuilder.append(getSimpleName()).toString();
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("dungeonName", dungeonName);
     }
 }

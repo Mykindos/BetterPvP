@@ -24,9 +24,9 @@ public abstract class NSimpleAchievement extends Achievement {
     /**
      * The goal of this achievement, what will be the mark of achieving it
      */
-    protected Map<IStat, Double> statGoals;
+    protected Map<IStat, Long> statGoals;
 
-    protected NSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Map<IStat, Double> statGoals) {
+    protected NSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Map<IStat, Long> statGoals) {
         super(name, namespacedKey, achievementCategory, achievementType, statGoals.keySet().toArray(IStat[]::new));
         this.statGoals = new HashMap<>(statGoals);
     }
@@ -35,9 +35,9 @@ public abstract class NSimpleAchievement extends Achievement {
     public float getPercentComplete(StatContainer container, @Nullable String period) {
 
         //todo abstract getting this property map
-        Map<IStat, Double> propertyMap = new HashMap<>();
+        Map<IStat, Long> propertyMap = new HashMap<>();
         for (IStat property : getWatchedStats()) {
-            Double value = getValue(container, property, period);
+            Long value = getValue(container, property, period);
             propertyMap.put(property, value);
         }
         return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
@@ -50,27 +50,27 @@ public abstract class NSimpleAchievement extends Achievement {
             return previousPriority;
         }
         return (int) statGoals.values().stream()
-                .mapToDouble(Double::doubleValue)
+                .mapToLong(Long::longValue)
                 .sum();
     }
 
     @Override
-    public float calculatePercent(Map<IStat, Double> statMap) {
+    public float calculatePercent(Map<IStat, Long> statMap) {
         double total = statGoals.values().stream()
-                .mapToDouble(Double::doubleValue)
+                .mapToLong(Long::longValue)
                 .sum();
         double current = statMap.entrySet().stream()
-                .mapToDouble(entrySet -> {
-                    double localTotal = statGoals.get(entrySet.getKey());
+                .mapToLong(entrySet -> {
+                    long localTotal = statGoals.get(entrySet.getKey());
                     return Math.min(localTotal, entrySet.getValue());
                 }).sum();
         return (float) ((float) current/total);
     }
 
     public float calculateCurrentElementPercent(StatContainer statContainer, IStat iStat) {
-        double goal = statGoals.get(iStat);
-        double current = getValue(statContainer, iStat);
-        return (float) Math.clamp(current/goal, 0.0, 1.0);
+        long goal = statGoals.get(iStat);
+        long current = getValue(statContainer, iStat);
+        return (float) Math.clamp((double) current /goal, 0.0, 1.0);
     }
 
     /* //TODO

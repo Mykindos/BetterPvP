@@ -30,7 +30,7 @@ public class DefeatAllBossesOnceAchievement extends NSingleGoalSimpleAchievement
                 new NamespacedKey("events", "defeat_all_bosses"),
                 AchievementCategories.EVENT,
                 AchievementType.GLOBAL,
-                1d,
+                1L,
                 new GenericStat(
                         BossStat.builder()
                         .action(BossStat.Action.KILL)

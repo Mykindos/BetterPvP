@@ -2,24 +2,39 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.function.Predicate;
 
 public interface IStat {
     /**
+     * The amount that {@link Double} or {@link Float} values are multiplied then cast to long by
+     */
+    static long FP_MODIFIER = 1000L;
+
+    /**
      * Get the stat represented by this object from the statContainer
      * @param statContainer the statContainer to source the value from
      * @param periodKey the period to fetch from
      * @return the stat value represented by this stat
      */
-    Double getStat(StatContainer statContainer, String periodKey);
+    Long getStat(StatContainer statContainer, String periodKey);
 
     /**
      * Get the name that is stored in the DB
      * @return
      */
-    String getStatName();
+    @NotNull
+    String getStatType();
+
+    /**
+     * Get the jsonb data in string format for this object
+     * @return
+     */
+    @Nullable
+    JSONObject getJsonData();
 
     //todo implement the following 2 functions for generic
     /**
@@ -29,7 +44,7 @@ public interface IStat {
      * @return the simple name
      */
     default String getSimpleName() {
-        return getStatName();
+        return getStatType();
     }
 
     /**
@@ -50,20 +65,11 @@ public interface IStat {
     boolean isSavable();
 
     /**
-     * Whether this stat contains this statName
-     * @param statName
-     * @return
-     */
-    @Deprecated
-    boolean containsStat(String statName);
-    /**
      * Whether this stat contains this otherSTat
      * @param otherStat
      * @return
      */
-    default boolean containsStat(IStat otherStat) {
-        return containsStat(otherStat.getStatName());
-    }
+    boolean containsStat(IStat otherStat);
 
     /**
      * Gets the sum of all stats that meet the filter. A predicate that throws an {@link IllegalArgumentException} or {@link ClassCastException} will default to {@code false}
@@ -72,7 +78,7 @@ public interface IStat {
      * @param filter the predicate to check each stat against. If it throws an {@link IllegalArgumentException} or {@link ClassCastException}, that test is treated as false
      * @return the total value of the stats that meet the filter
      */
-    default Double getFilteredStat(StatContainer statContainer, String periodKey, Predicate<Map.Entry<IStat, Double>> filter) {
+    default Long getFilteredStat(StatContainer statContainer, String periodKey, Predicate<Map.Entry<IStat, Long>> filter) {
         return statContainer.getStats().getStatsOfPeriod(periodKey).entrySet().stream()
                 .filter((entry) -> {
                     try {
@@ -81,7 +87,7 @@ public interface IStat {
                         return false;
                     }
                 })
-                .mapToDouble(Map.Entry::getValue)
+                .mapToLong(Map.Entry::getValue)
                 .sum();
     }
 

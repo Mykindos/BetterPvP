@@ -8,6 +8,9 @@ import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
@@ -34,30 +37,40 @@ public class StatBuilder {
                 .collect(Collectors.toSet());
     }
 
-    public IStat getStatForStatName(@NotNull String statName) {
+    public IStat getStatForStatData(@NotNull String statType, JSONObject data) {
         for (Class<? extends IBuildableStat> buildableStat : builderStats) {
             try {
-                return buildableStat.getConstructor().newInstance().copyFromStatname(statName);
-            } catch (IllegalArgumentException ignored) {
+                return buildableStat.getConstructor().newInstance().copyFromStatData(statType, data);
+            } catch (IllegalArgumentException | JSONException ignored) {
             } catch (Exception e) {
-                log.error("Error getting stat for name {} ", statName, e).submit();
+                log.error("Error getting stat for name {} ", statType, e).submit();
             }
         }
         try {
-            return ClientStat.valueOf(statName);
+            return ClientStat.valueOf(statType);
         } catch (IllegalArgumentException ignored) {
         }
 
-        log.warn("No stat found for {}", statName).submit();
+        log.warn("No stat found for {}", statType).submit();
         return new IStat() {
             @Override
-            public Double getStat(StatContainer statContainer, String periodKey) {
-                return statContainer.getProperty(getStatName(), this);
+            public Long getStat(StatContainer statContainer, String periodKey) {
+                return statContainer.getProperty(getStatType(), this);
             }
 
             @Override
-            public String getStatName() {
-                return statName;
+            public @NotNull String getStatType() {
+                return statType;
+            }
+
+            /**
+             * Get the jsonb data in string format for this object
+             *
+             * @return
+             */
+            @Override
+            public @Nullable JSONObject getJsonData() {
+                return null;
             }
 
             @Override
@@ -66,13 +79,8 @@ public class StatBuilder {
             }
 
             @Override
-            public boolean containsStat(String statName) {
-                return getStatName().equals(statName);
-            }
-
-            @Override
             public boolean containsStat(IStat otherStat) {
-                return containsStat(otherStat.getStatName());
+                return this.equals(otherStat);
             }
 
             /**

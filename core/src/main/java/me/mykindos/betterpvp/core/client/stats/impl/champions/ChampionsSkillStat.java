@@ -18,8 +18,8 @@ import me.mykindos.betterpvp.core.skill.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 @Builder
@@ -30,15 +30,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class ChampionsSkillStat implements IBuildableStat {
-    public static final String PREFIX = "CHAMPIONS_SKILL";
-    private static StringBuilderParser<ChampionsSkillStatBuilder> parser = new StringBuilderParser<>(
-            List.of(
-                    ChampionsSkillStat::parsePrefix,
-                    ChampionsSkillStat::parseAction,
-                    ChampionsSkillStat::parseSkillName,
-                    ChampionsSkillStat::parseLevel
-            )
-    );
+    public static final String TYPE = "CHAMPIONS_SKILL";
 
     @NotNull
     private Action action;
@@ -48,25 +40,14 @@ public class ChampionsSkillStat implements IBuildableStat {
     private int level = -1;
 
 
-    public static ChampionsSkillStat fromString(String statName) {
-        return parser.parse(ChampionsSkillStat.builder(), statName).build();
-    }
+    public static ChampionsSkillStat fromData(String statType, JSONObject data) {
+        ChampionsSkillStat.ChampionsSkillStatBuilder builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.action(Action.valueOf(data.getString("action")));
+        builder.skillName(data.optString("skillName"));
+        builder.level(data.getInt("level"));
 
-    private static ChampionsSkillStatBuilder parsePrefix(ChampionsSkillStatBuilder builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-
-    private static ChampionsSkillStatBuilder parseAction(ChampionsSkillStatBuilder builder, String input) {
-        return builder.action(Action.valueOf(input));
-    }
-
-    private static ChampionsSkillStatBuilder parseSkillName(ChampionsSkillStatBuilder builder, String input) {
-        return builder.skillName(input);
-    }
-
-    private static ChampionsSkillStatBuilder parseLevel(ChampionsSkillStatBuilder builder, String input) {
-        return builder.level(Integer.parseInt(input));
+        return builder.build();
     }
 
 
@@ -78,7 +59,7 @@ public class ChampionsSkillStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         if (skillName == null) {
             return getActionComposite(statContainer, periodKey);
         }
@@ -88,31 +69,38 @@ public class ChampionsSkillStat implements IBuildableStat {
         return statContainer.getProperty(periodKey, this);
     }
 
-    private Double getActionComposite(StatContainer statContainer, String period) {
+    private Long getActionComposite(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().getStatName().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name())
-                ).mapToDouble(Map.Entry::getValue)
+                        entry.getKey().getStatType().startsWith(TYPE + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name())
+                ).mapToLong(Map.Entry::getValue)
                 .sum();
     }
 
-    private Double getSkillComposite(StatContainer statContainer, String period) {
+    private Long getSkillComposite(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().getStatName().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + skillName)
-                ).mapToDouble(Map.Entry::getValue)
+                        entry.getKey().getStatType().startsWith(TYPE + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + skillName)
+                ).mapToLong(Map.Entry::getValue)
                 .sum();
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(List.of(
-                PREFIX,
-                action.name(),
-                //null values are allowed
-                skillName,
-                level == -1 ? "" : String.valueOf(level)
-        ));
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .put("action", action.name())
+                .putOpt("skillName", skillName)
+                .put("level", level);
     }
 
     /**
@@ -165,17 +153,6 @@ public class ChampionsSkillStat implements IBuildableStat {
     }
 
     /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        return statName.startsWith(getStatName());
-    }
-
-    /**
      * Whether this stat contains this otherSTat
      *
      * @param otherStat
@@ -207,22 +184,18 @@ public class ChampionsSkillStat implements IBuildableStat {
     /**
      * Copies the stat represented by this statName into this object
      *
-     * @param statName the statname
+     * @param statType the statname
+     * @param data
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        ChampionsSkillStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        ChampionsSkillStat other = fromData(statType, data);
         this.action = other.action;
         this.skillName = other.skillName;
         this.level = other.level;
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
     
     public enum Action {

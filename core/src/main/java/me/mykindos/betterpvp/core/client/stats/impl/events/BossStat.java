@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class BossStat implements IBuildableStat {
-    public static final String PREFIX = "EVENT_BOSS";
+    public static final String TYPE = "EVENT_BOSS";
 
     private static StringBuilderParser<BossStatBuilder> parser = new StringBuilderParser<>(
             List.of(
@@ -35,12 +36,16 @@ public class BossStat implements IBuildableStat {
             )
     );
 
-    public static BossStat fromString(String string) {
-        return parser.parse(BossStat.builder(), string).build();
+    public static BossStat fromData(String type, JSONObject data) {
+        BossStat.BossStatBuilder builder = BossStat.builder();
+        Preconditions.checkArgument(type.equals(TYPE));
+        builder.action(Action.valueOf(data.getString("action")));
+        builder.bossName(data.getString("bossName"));
+        return builder.build();
     }
 
     private static BossStatBuilder parsePrefix(BossStatBuilder builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
+        Preconditions.checkArgument(input.equals(TYPE));
         return builder;
     }
 
@@ -61,28 +66,24 @@ public class BossStat implements IBuildableStat {
     /**
      * Copies the stat represented by this statName into this object
      *
-     * @param statName the statname
+     * @param statType the statname
+     * @param data
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        BossStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        BossStat other = fromData(statType, data);
         this.action = other.action;
         this.bossName = other.bossName;
         return this;
     }
 
-    @Override
-    public String getPrefix() {
-        return PREFIX;
-    }
-
-    private Double getActionStat(StatContainer statContainer, String period) {
+    private Long getActionStat(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().getStatName().startsWith(PREFIX + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action)
-                ).mapToDouble(Map.Entry::getValue)
+                        entry.getKey().getStatType().startsWith(TYPE + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action)
+                ).mapToLong(Map.Entry::getValue)
                 .sum();
     }
 
@@ -94,7 +95,7 @@ public class BossStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         if (Strings.isNullOrEmpty(bossName)) {
             return getActionStat(statContainer, periodKey);
         }
@@ -102,14 +103,20 @@ public class BossStat implements IBuildableStat {
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        action.name(),
-                        bossName
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("action", action.name())
+                .putOnce("bossName", bossName);
     }
 
     /**
@@ -150,17 +157,6 @@ public class BossStat implements IBuildableStat {
     @Override
     public boolean isSavable() {
         return !Strings.isNullOrEmpty(bossName);
-    }
-
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        return statName.startsWith(getStatName());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.impl.core;
 
 import com.google.common.base.Preconditions;
+import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -27,8 +29,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class MinecraftStat implements IBuildableStat {
     //todo convert to parser
-    public static final String PREFIX = "MINECRAFT_";
-    public static final String QUALIFIER_SEPARATOR = "__";
+    public static final String TYPE = "MINECRAFT";
 
     /**
      * The {@link Statistic} this {@link MinecraftStat} represents
@@ -64,47 +65,20 @@ public class MinecraftStat implements IBuildableStat {
         return builder.build();
     }
 
-    /**
-     * Get the {@link MinecraftStat} represented by this statName
-     * @param statName the statName
-     * @return the {@link MinecraftStat}
-     * @throws IllegalArgumentException if the {@code statName} does not represent a {@link MinecraftStat}
-     */
-    public static MinecraftStat fromString(@NotNull final String statName) {
-        Preconditions.checkArgument(statName.startsWith(PREFIX), "statName must start with " + PREFIX);
+
+    public static MinecraftStat fromData(@NotNull final String statType, JSONObject data) {
         final MinecraftStatBuilder builder = MinecraftStat.builder();
-        final int extraIndex = statName.lastIndexOf(QUALIFIER_SEPARATOR);
-        final String typeName = statName.substring(PREFIX.length(), extraIndex != -1 ? extraIndex : statName.length());
-
-        final Statistic stat = Statistic.valueOf(typeName);
-
-        builder.statistic(stat);
-
-        if (isMaterialStatistic(stat)) {
-
-            try {
-                final Material mat = Material.getMaterial(statName.substring(PREFIX.length() + typeName.length() + QUALIFIER_SEPARATOR.length()));
-                if (mat != null) {
-                    builder.material(mat);
-                }
-            } catch (StringIndexOutOfBoundsException ignored) {
-                //out of bounds = no material
-            }
-
+        Preconditions.checkArgument(statType.startsWith(TYPE), "statName must start with " + TYPE);
+        builder.statistic(Statistic.valueOf(data.getString("statistic")));
+        builder.statistic(Statistic.valueOf(data.getString("statistic")));
+        String dataMaterial = data.optString("material", null);
+        if (!Strings.isNullOrEmpty(dataMaterial)) {
+            builder.material(Material.valueOf(dataMaterial));
         }
-
-        if (isEntityStatistic(stat)) {
-            try {
-                final EntityType ent = EntityType.fromName(statName.substring(PREFIX.length() + typeName.length() + QUALIFIER_SEPARATOR.length()));
-                if (ent != null) {
-                    builder.entityType(ent);
-                }
-            } catch (StringIndexOutOfBoundsException ignored) {
-                //out of bounds = no entity type
-            }
-
+        String dataEntity = data.optString("entityType", null);
+        if (!Strings.isNullOrEmpty(dataMaterial)) {
+            builder.entityType(EntityType.valueOf(dataEntity));
         }
-
         return builder.build();
     }
 
@@ -113,22 +87,7 @@ public class MinecraftStat implements IBuildableStat {
      * @return
      */
     public String getBaseStat() {
-        return PREFIX + statistic.name();
-    }
-
-    /**
-     * Get the full stat, used to store values
-     * @return
-     * @see MinecraftStat#fromString(String)
-     */
-    public String getFullStat() {
-        if (material != null) {
-            return getBaseStat() + QUALIFIER_SEPARATOR + material.name();
-        }
-        if (entityType != null) {
-            return getBaseStat() + QUALIFIER_SEPARATOR + entityType.name();
-        }
-        return getBaseStat();
+        return TYPE + statistic.name();
     }
 
     /**
@@ -137,7 +96,7 @@ public class MinecraftStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         //material composite
         if (isMaterialStatistic(statistic) && material == null) {
             return getCompositeMinecraftStat(statContainer, periodKey);
@@ -149,17 +108,30 @@ public class MinecraftStat implements IBuildableStat {
         return statContainer.getProperty(periodKey, this);
     }
 
-    public Double getCompositeMinecraftStat(StatContainer statContainer, String period) {
+    public Long getCompositeMinecraftStat(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().getStatName().startsWith(this.getBaseStat())
-                ).mapToDouble(Map.Entry::getValue)
+                        entry.getKey().getStatType().startsWith(this.getBaseStat())
+                ).mapToLong(Map.Entry::getValue)
                 .sum();
     }
 
     @Override
-    public String getStatName() {
-        return getFullStat();
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("statistic", statistic.name())
+                .putOpt("material", material)
+                .putOpt("entityType", entityType);
     }
 
     /**
@@ -197,33 +169,6 @@ public class MinecraftStat implements IBuildableStat {
         return isEntityStatistic(statistic) && entityType != null;
     }
 
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        try {
-            final MinecraftStat other = MinecraftStat.fromString(statName);
-            //this is a qualified material statistic, check to make sure it is exact
-            if (isMaterialStatistic(statistic) && material != null) {
-                return statistic.equals(other.getStatistic()) && material.equals(other.getMaterial());
-            }
-
-            //this is a qualified entityType statistic, check to make sure it is exact
-            if (isEntityStatistic(statistic) && entityType != null) {
-                return statistic.equals(other.getStatistic()) && entityType.equals(other.getEntityType());
-            }
-
-            //this is a generic or a non-qualified statistic, therefore check if the base statistic is equal
-            return statistic.equals(other.getStatistic());
-
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
 
     @Override
     public boolean containsStat(IStat stat) {
@@ -262,16 +207,11 @@ public class MinecraftStat implements IBuildableStat {
     }
 
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        MinecraftStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        MinecraftStat other = fromData(statType, data);
         this.statistic = other.getStatistic();
         this.material = other.getMaterial();
         this.entityType = other.getEntityType();
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 }

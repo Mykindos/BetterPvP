@@ -30,7 +30,7 @@ public class OpenUndeadChests extends SingleSimpleAchievement {
         super("Open Undead Chests", key,
                 AchievementCategories.EVENT_UNDEAD_CHESTS,
                 AchievementType.GLOBAL,
-                (double) goal,
+                (long) goal,
                 new GenericStat(ClientStat.EVENT_UNDEAD_CITY_OPEN_CHEST)
         );
     }

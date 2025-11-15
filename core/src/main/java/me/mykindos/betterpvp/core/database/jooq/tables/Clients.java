@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards.ClientRewar
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.ClientStatsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats.CombatStatsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords.FilteredWordsPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameData.GameDataPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams.GameTeamsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.GamerProperties.GamerPropertiesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores.IgnoresPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions.KillContributionsPath;
@@ -209,6 +211,20 @@ public class Clients extends TableImpl<ClientsRecord> {
         return _clientRewards;
     }
 
+    private transient ClientStatsPath _clientStatsClientFkey;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.client_stats</code> table, via the
+     * <code>client_stats_client_fkey</code> key
+     */
+    public ClientStatsPath clientStatsClientFkey() {
+        if (_clientStatsClientFkey == null)
+            _clientStatsClientFkey = new ClientStatsPath(this, null, Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY.getInverseKey());
+
+        return _clientStatsClientFkey;
+    }
+
     private transient CombatStatsPath _combatStats;
 
     /**
@@ -235,17 +251,31 @@ public class Clients extends TableImpl<ClientsRecord> {
         return _filteredWords;
     }
 
-    private transient ClientStatsPath _clientStats;
+    private transient ClientStatsPath _fkClient;
 
     /**
      * Get the implicit to-many join path to the
-     * <code>public.client_stats</code> table
+     * <code>public.client_stats</code> table, via the <code>fk_client</code>
+     * key
      */
-    public ClientStatsPath clientStats() {
-        if (_clientStats == null)
-            _clientStats = new ClientStatsPath(this, null, Keys.CLIENT_STATS__FK_CLIENT.getInverseKey());
+    public ClientStatsPath fkClient() {
+        if (_fkClient == null)
+            _fkClient = new ClientStatsPath(this, null, Keys.CLIENT_STATS__FK_CLIENT.getInverseKey());
 
-        return _clientStats;
+        return _fkClient;
+    }
+
+    private transient GameTeamsPath _gameTeams;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.game_teams</code>
+     * table
+     */
+    public GameTeamsPath gameTeams() {
+        if (_gameTeams == null)
+            _gameTeams = new GameTeamsPath(this, null, Keys.GAME_TEAMS__GAME_TEAMS_CLIENT_FKEY.getInverseKey());
+
+        return _gameTeams;
     }
 
     private transient GamerPropertiesPath _gamerProperties;
@@ -324,6 +354,14 @@ public class Clients extends TableImpl<ClientsRecord> {
             _punishments = new PunishmentsPath(this, null, Keys.PUNISHMENTS__PUNISHMENTS_CLIENT_FKEY.getInverseKey());
 
         return _punishments;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.game_data</code> table
+     */
+    public GameDataPath gameData() {
+        return gameTeams().gameData();
     }
 
     /**

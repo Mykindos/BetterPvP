@@ -12,6 +12,6 @@ public class StatPropertyUpdateEvent extends CustomEvent {
 
     private final StatContainer container;
     private final IStat stat;
-    private final Double newValue;
-    private final Double oldValue;
+    private final Long newValue;
+    private final Long oldValue;
 }

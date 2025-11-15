@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.utilities.MobPathfinder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
@@ -250,7 +251,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 StatContainer statContainer = championsManager.getClientManager().search().online(cloneOwner).getStatContainer();
 
                 double actualHeal = UtilEntity.health(cloneOwner, healthPerEnemyHit);
-                statContainer.incrementStat(ClientStat.HEAL_CLONE, actualHeal);
+                statContainer.incrementStat(ClientStat.HEAL_CLONE, (long) (actualHeal * IStat.FP_MODIFIER));
                 statContainer.incrementStat(ClientStat.CLONE_ATTACK, 1);
 
                 sendEffects(event.getLivingDamagee());
