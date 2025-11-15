@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -262,7 +263,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
             leechDmg.setIgnoreArmour(true);
             UtilDamage.doCustomDamage(leechDmg);
             double actualHeal = UtilEntity.health(leech.getOwner(), getLeechedHealth(level));
-            championsManager.getClientManager().search().online(leech.getOwner()).getStatContainer().incrementStat(ClientStat.HEAL_LEECH, actualHeal);
+            championsManager.getClientManager().search().online(leech.getOwner()).getStatContainer().incrementStat(ClientStat.HEAL_LEECH, (long) (actualHeal * IStat.FP_MODIFIER));
         }
     }
 

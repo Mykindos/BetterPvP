@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.AggregateFunction;
@@ -13,7 +14,6 @@ import org.jooq.AggregateFunction;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +25,7 @@ import static org.jooq.impl.DSL.countDistinct;
 public class AchievementCompletionRepository {
 
     private final Database database;
+    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
     public AchievementCompletionRepository(Database database) {
@@ -35,7 +36,7 @@ public class AchievementCompletionRepository {
             return database.getAsyncDslContext().executeAsyncVoid(context -> {
                 context.insertInto(ACHIEVEMENT_COMPLETIONS)
                         //todo to make id like client
-                        .set(ACHIEVEMENT_COMPLETIONS.ID, object.getId().toString())
+                        .set(ACHIEVEMENT_COMPLETIONS.ID, object.getId())
                         //todo convert achievement completion to store client
                         .set(ACHIEVEMENT_COMPLETIONS.CLIENT, object.getClient().getId())
                         .set(ACHIEVEMENT_COMPLETIONS.PERIOD, object.getPeriod())
@@ -55,7 +56,7 @@ public class AchievementCompletionRepository {
                     .where(ACHIEVEMENT_COMPLETIONS.CLIENT.eq(container.getClient().getId()))
                     .fetch()
                     .forEach(record -> {
-                                final UUID completionId = UUID.fromString(record.get(ACHIEVEMENT_COMPLETIONS.ID));
+                                final long completionId = record.get(ACHIEVEMENT_COMPLETIONS.ID);
                                 final String period = record.get(ACHIEVEMENT_COMPLETIONS.PERIOD);
                                 final String namespace = record.get(ACHIEVEMENT_COMPLETIONS.NAMESPACE);
                                 final String key = record.get(ACHIEVEMENT_COMPLETIONS.KEYNAME);
@@ -131,7 +132,7 @@ public class AchievementCompletionRepository {
 
     @NotNull
     public CompletableFuture<AchievementCompletion> saveCompletion(@NotNull StatContainer container, @NotNull NamespacedKey achievement, String period) {
-        final AchievementCompletion completion = new AchievementCompletion(UUID.randomUUID(),
+        final AchievementCompletion completion = new AchievementCompletion(ID_GENERATOR.nextId(),
                 container.getClient(),
                 achievement,
                 period,

@@ -29,7 +29,7 @@ public class PointsCapturedAchievement extends SingleSimpleAchievement {
         super("Points Captured", key,
                 AchievementCategories.GAME_POINTS_CAPTURED,
                 AchievementType.GLOBAL,
-                (double) goal,
+                (long) goal,
                 GameTeamMapNativeStat.builder()
                         .action(GameTeamMapNativeStat.Action.CONTROL_POINT_CAPTURED)
                         .build()

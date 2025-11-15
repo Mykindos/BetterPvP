@@ -15,11 +15,11 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IWrapperStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,67 +30,31 @@ import java.util.Objects;
 @Getter
 @CustomLog
 public class ClanWrapperStat extends ClansStat implements IWrapperStat {
-    public static final String PREFIX = "CLANS_WRAPPER";
+    public static final String TYPE = "CLANS_WRAPPER";
 
     private static final StatBuilder statBuilder = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(StatBuilder.class);
 
-    private static final StringBuilderParser<ClanWrapperStatBuilder<?, ?>> parser = new StringBuilderParser<>(
-            //clans wrapper needs different delimiters than dungeons or events because it will wrap those stats too
-            "!",
-            "!!",
-            List.of(
-                    ClanWrapperStat::parsePrefix,
-                    ClanWrapperStat::parseClanID,
-                    ClanWrapperStat::parseClanName
-            ),
-            List.of(
-                    ClanWrapperStat::parseWrappedStat
-            )
-    );
-
-    /**
-     * Constructs the given String into a Stat
-     * @param string the stringified stat
-     * @return this stat
-     * @throws IllegalArgumentException if this string does not represent this Stat
-     */
-    public static ClanWrapperStat fromString(String string) {
-        return parser.parse(ClanWrapperStat.builder(), string).build();
+    public ClanWrapperStat fromData (String statType, JSONObject data) {
+        ClanWrapperStat.ClanWrapperStatBuilder<?, ?> builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.clanName(data.getString("clanName"));
+        builder.clanId(data.optLongObject("clanName", null));
+        JSONObject wrappedData = data.getJSONObject("wrappedStat");
+        builder.wrappedStat(statBuilder.getStatForStatData(wrappedData.getString("statType"), wrappedData));
+        return builder.build();
     }
 
     @NotNull
     private IStat wrappedStat;
 
-    private static ClanWrapperStatBuilder<?, ?> parsePrefix(ClanWrapperStatBuilder<?, ?> builder, String input) {
-        Preconditions.checkArgument(input.equals(PREFIX));
-        return builder;
-    }
-    private static ClanWrapperStatBuilder<?, ?> parseWrappedStat(ClanWrapperStatBuilder<?, ?> builder, String input) {
-        final IStat wrappedStat = statBuilder.getStatForStatName(input);
-        if (wrappedStat instanceof ClansStat) throw new IllegalArgumentException("Wrapped stat cannot also be a ClansStat");
-        return builder.wrappedStat(wrappedStat);
-    }
-
-    private static ClanWrapperStatBuilder<?, ?> parseClanName(ClanWrapperStatBuilder<?, ?> builder, String input) {
-        return builder.clanName((input));
-    }
-
-    private static ClanWrapperStatBuilder<?, ?> parseClanID(ClanWrapperStatBuilder<?, ?> builder, String input) {
-        try {
-            return builder.clanId(Long.valueOf(input));
-        } catch (IllegalArgumentException ignored) {
-            return builder.clanId(null);
-        }
-    }
-
-    private boolean filterClanStat(Map.Entry<IStat, Double> entry) {
+    private boolean filterClanStat(Map.Entry<IStat, Long> entry) {
         final ClanWrapperStat stat = (ClanWrapperStat) entry.getKey();
         return clanName.equals(stat.clanName) &&
                 Objects.equals(clanId, stat.clanId) &&
                 wrappedStat.containsStat(stat.wrappedStat);
     }
 
-    private boolean filterWrappedStat (Map.Entry<IStat, Double> entry) {
+    private boolean filterWrappedStat (Map.Entry<IStat, Long> entry) {
         final ClanWrapperStat stat = (ClanWrapperStat) entry.getKey();
         return wrappedStat.containsStat(stat.wrappedStat);
     }
@@ -99,22 +63,18 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
     /**
      * Copies the stat represented by this statName into this object
      *
-     * @param statName the statname
+     * @param statType the statname
+     * @param data
      * @return this stat
      * @throws IllegalArgumentException if this statName does not represent this stat
      */
     @Override
-    public @NotNull IBuildableStat copyFromStatname(@NotNull String statName) {
-        final ClanWrapperStat other = fromString(statName);
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        final ClanWrapperStat other = fromData(statType, data);
         this.clanName = other.clanName;
         this.clanId = other.clanId;
         this.wrappedStat = other.wrappedStat;
         return this;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
     }
 
     /**
@@ -125,7 +85,7 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
      * @return
      */
     @Override
-    public Double getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, String periodKey) {
         //clanName being empty means it is for all Clans
         if (Strings.isNullOrEmpty(clanName)) {
             return this.getFilteredStat(statContainer, periodKey, this::filterWrappedStat);
@@ -135,17 +95,8 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
     }
 
     @Override
-    public String getStatName() {
-        return parser.asString(
-                List.of(
-                        PREFIX,
-                        clanId == null ? ClansStat.NO_ID_REPLACE : clanId.toString(),
-                        clanName
-                ),
-                List.of(
-                        wrappedStat.getStatName()
-                )
-        );
+    public @NotNull String getStatType() {
+        return TYPE;
     }
 
     /**
@@ -170,21 +121,6 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
         return !Strings.isNullOrEmpty(clanName) && wrappedStat.isSavable();
     }
 
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-    @Override
-    public boolean containsStat(String statName) {
-        try {
-            return containsStat(fromString(statName));
-        } catch (IllegalArgumentException ignored) {
-            return false;
-        }
-    }
-
     @Override
     public boolean containsStat(IStat otherStat) {
         if (!(otherStat instanceof ClanWrapperStat other)) return false;
@@ -202,5 +138,13 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
     @Override
     public @NotNull IStat getGenericStat() {
         return ClanWrapperStat.builder().wrappedStat(wrappedStat.getGenericStat()).build();
+    }
+
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return Objects.requireNonNull(super.getJsonData())
+                .put("wrappedStat", (wrappedStat.getJsonData() == null ? new JSONObject() : wrappedStat.getJsonData())
+                        .putOnce("statType", wrappedStat.getStatType())
+                );
     }
 }

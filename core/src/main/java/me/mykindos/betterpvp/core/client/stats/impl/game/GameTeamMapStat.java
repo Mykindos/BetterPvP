@@ -11,6 +11,8 @@ import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 @SuperBuilder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +32,19 @@ public abstract class GameTeamMapStat implements IBuildableStat {
     @NotNull
     @Builder.Default
     protected String teamName = "";
+    @Nullable
+    protected Long gameId;
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .putOnce("gameId", gameId);
+    }
 
     /**
      * Get the qualified name of the stat, if one exists.
@@ -56,5 +71,15 @@ public abstract class GameTeamMapStat implements IBuildableStat {
         }
 
         return stringBuilder.append(getSimpleName()).toString();
+    }
+
+    /**
+     * Whether this stat is directly savable to the database
+     *
+     * @return {@code true} if it is, {@code false} otherwise
+     */
+    @Override
+    public boolean isSavable() {
+        return gameId != null;
     }
 }
