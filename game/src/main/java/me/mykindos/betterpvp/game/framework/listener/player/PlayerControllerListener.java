@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -14,8 +16,6 @@ import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutMan
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 @BPvPListener
 @Singleton
@@ -43,13 +43,13 @@ public class PlayerControllerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onJoin(PlayerJoinEvent event) {
+    public void onJoin(ClientJoinEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
         playerController.registerPlayer(event.getPlayer(), new Participant(event.getPlayer(), client));
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onQuit(PlayerQuitEvent event) {
+    public void onQuit(ClientQuitEvent event) {
         playerController.unregisterPlayer(event.getPlayer());
         layoutManager.getHotBarLayouts().remove(event.getPlayer().getUniqueId());
     }

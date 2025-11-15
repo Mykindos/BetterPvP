@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class CustomEvent extends Event{
+public abstract class CustomEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 

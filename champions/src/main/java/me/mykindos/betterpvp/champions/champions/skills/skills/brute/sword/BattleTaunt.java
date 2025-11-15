@@ -136,8 +136,8 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public void activate(Player player, int level) {
-        active.add(player.getUniqueId());
+    public boolean activate(Player player, int level) {
+        return active.add(player.getUniqueId());
     }
 
     @Override

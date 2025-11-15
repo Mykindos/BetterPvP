@@ -102,7 +102,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
 
 
     @Override
-    public void activate(Player player,int level) {
+    public boolean activate(Player player, int level) {
         double healthReduction = getHealthReduction(level);
 
 
@@ -145,6 +145,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
                     this.cancel();
             }
         }.runTaskTimer(champions, 0, 1);
+        return true;
     }
 
     @Override
