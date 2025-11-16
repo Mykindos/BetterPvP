@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -97,6 +98,9 @@ public class Clans extends BPvPPlugin {
             leaderboardLoader.registerLeaderboards(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
+
+            var uuidManager = injector.getInstance(UUIDManager.class);
+            uuidManager.loadObjectsFromNamespace("clans");
 
             final Adapters adapters = new Adapters(this);
             final Reflections reflectionAdapters = new Reflections(PACKAGE);

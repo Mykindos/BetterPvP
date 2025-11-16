@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -90,6 +91,9 @@ public class Champions extends BPvPPlugin {
             leaderboardLoader.registerLeaderboards(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
+
+            var uuidManager = injector.getInstance(UUIDManager.class);
+            uuidManager.loadObjectsFromNamespace("champions");
 
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapters.class));
