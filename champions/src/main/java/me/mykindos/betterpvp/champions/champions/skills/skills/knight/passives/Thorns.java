@@ -70,7 +70,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler

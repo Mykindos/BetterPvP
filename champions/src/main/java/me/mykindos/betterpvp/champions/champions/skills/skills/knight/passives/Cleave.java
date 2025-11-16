@@ -76,7 +76,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler

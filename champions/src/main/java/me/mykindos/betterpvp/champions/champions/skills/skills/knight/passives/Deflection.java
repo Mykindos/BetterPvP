@@ -86,7 +86,7 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
 
