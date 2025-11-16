@@ -21,8 +21,6 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -31,16 +29,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
 public class SkillMenu extends AbstractGui implements Windowed {
-
-    /**
-     * The tag resolver for skill descriptions.
-     * It will parse all tags with the name 'val'
-     */
-    public static final TagResolver TAG_RESOLVER = TagResolver.resolver(
-            TagResolver.resolver("val", Tag.styling(NamedTextColor.GREEN)),
-            TagResolver.resolver("effect", Tag.styling(NamedTextColor.WHITE)),
-            TagResolver.resolver("stat", Tag.styling(NamedTextColor.YELLOW))
-    );
 
     private final RoleBuild roleBuild;
     private final RoleBuild promptBuild;

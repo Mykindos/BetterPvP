@@ -11,8 +11,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -35,7 +36,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
@@ -139,7 +139,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
                 if (hit.isPresent()) {
                     final LivingEntity target = hit.get();
-                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
+                    var cde = UtilDamage.doDamage(new DamageEvent(target, player, player, new SkillDamageCause(this), getDamage(level), getName()));
                     if (cde != null && !cde.isCancelled()) {
                         VelocityData targetVelocityData = new VelocityData(player.getLocation().getDirection(), 2, true, 0.4, 0.4, 0.4, true);
                         UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK_CUSTOM);

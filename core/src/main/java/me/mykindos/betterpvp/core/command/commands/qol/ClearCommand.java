@@ -7,26 +7,34 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @CustomLog
 public class ClearCommand extends Command {
 
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
+    private final ItemRegistry registry;
     private final ClientManager clientManager;
 
     @Inject
-    public ClearCommand(ItemHandler itemHandler, ClientManager clientManager) {
-        this.itemHandler = itemHandler;
+    public ClearCommand(ItemFactory itemFactory, ItemRegistry registry, ClientManager clientManager) {
+        this.itemFactory = itemFactory;
+        this.registry = registry;
         this.clientManager = clientManager;
     }
 
@@ -55,8 +63,19 @@ public class ClearCommand extends Command {
         }
     }
 
+    private Map<ItemInstance, UUID> getUUIDItems(Player target) {
+        final List<ItemInstance> items = itemFactory.fromArray(target.getInventory().getContents());
+        final Map<ItemInstance, UUID> map = new HashMap<>();
+        for (ItemInstance item : items) {
+            if (item == null) continue;
+            final Optional<UUIDProperty> uuidCompt = item.getComponent(UUIDProperty.class);
+            uuidCompt.ifPresent(uuidProperty -> map.put(item, uuidProperty.getUniqueId()));
+        }
+        return map;
+    }
+
     private void doClear(Player runner, Player target) {
-        List<UUIDItem> uuidItems = itemHandler.getUUIDItems(target);
+        Map<ItemInstance, UUID> uuidItems = getUUIDItems(target);
         Component successFeedback = UtilMessage.deserialize("<yellow>%s</yellow> cleared <yellow>%s</yellow>'s inventory",
                 runner.getName(), target.getName());
         if (uuidItems.isEmpty()) {
@@ -67,13 +86,12 @@ public class ClearCommand extends Command {
 
         new ConfirmationMenu("Inventory has UUIDItems, confirm clear", (success) -> {
             if (Boolean.TRUE.equals(success)) {
-
-                itemHandler.getUUIDItems(target).forEach(uuidItem -> {
+                getUUIDItems(target).forEach((item, uuid) -> {
                     log.info("{} cleared ({}) from {}'s inventory",
-                            runner.getName(), uuidItem.getUuid(), target.getName())
+                            runner.getName(), uuid, target.getName())
                             .setAction("ITEM_CLEAR")
                             .addClientContext(runner)
-                            .addItemContext(uuidItem)
+                            .addItemContext(registry, item)
                             .addClientContext(target, true)
                             .submit();
                 });

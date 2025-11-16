@@ -25,7 +25,7 @@ public class SkillWeapons {
 
     public static boolean isBooster(Material material) {
         return switch (material) {
-            case GOLDEN_AXE, GOLDEN_SWORD, NETHERITE_SWORD, NETHERITE_AXE, CROSSBOW -> true;
+            case GOLDEN_AXE, GOLDEN_SWORD, NETHERITE_SWORD, NETHERITE_AXE -> true;
             default -> false;
         };
     }

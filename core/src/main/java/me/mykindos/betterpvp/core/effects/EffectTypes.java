@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.effects.types.negative.BleedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.BlindnessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.ConcussedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.DarknessEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.DeathsCurseEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.EntangledEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.FrozenEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
@@ -18,6 +20,7 @@ import me.mykindos.betterpvp.core.effects.types.negative.SilenceEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.SlownessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.StunEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.VulnerabilityEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.WeaknessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.WitherEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.AttackSpeedEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.CooldownReductionEffect;
@@ -29,6 +32,7 @@ import me.mykindos.betterpvp.core.effects.types.positive.ImmuneEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.InvisibilityEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.InvulnerableEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.JumpBoostEffect;
+import me.mykindos.betterpvp.core.effects.types.positive.NightVisionEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.NoFallEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.ProtectionEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.RegenerationEffect;
@@ -71,6 +75,9 @@ public class EffectTypes {
     public static final EffectType DARKNESS = createEffectType(new DarknessEffect());
     public static final EffectType FROZEN = createEffectType(new FrozenEffect());
     public static final EffectType ANTI_HEAL = createEffectType(new AntiHealEffect());
+    public static final EffectType ENTANGLED = createEffectType(new EntangledEffect());
+    public static final EffectType DEATHS_CURSE = createEffectType(new DeathsCurseEffect());
+    public static final EffectType WEAKNESS = createEffectType(new WeaknessEffect());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
@@ -91,6 +98,7 @@ public class EffectTypes {
     public static final EffectType JUMP_BOOST = createEffectType(new JumpBoostEffect());
     public static final EffectType INVULNERABLE = createEffectType(new InvulnerableEffect());
     public static final EffectType GLOWING = createEffectType(new GlowingEffect());
+    public static final EffectType NIGHT_VISION = createEffectType(new NightVisionEffect());
     // </editor-fold>
 
     public static EffectType createEffectType(EffectType effectType) {

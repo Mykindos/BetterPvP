@@ -14,10 +14,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -35,7 +33,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.util.Vector;
 
@@ -82,7 +79,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 "",
                 "Grant yourself and allies within " + getValueString(this::getRange, level) + " blocks",
                 "a barrier which reduces the damage of the next " + getValueString(this::numAttacksToReduce, level, 0),
-                "incoming attacks by " + getValueString(this::getDamageReduction, level, 1, "%", 0),
+                "incoming attacks by " + getValueString(this::getDamageReduction, level, 100, "%", 0),
                 "",
                 "Barrier lasts for " + getValueString(this::getDuration, level) + " seconds, and does not stack",
                 "",
@@ -127,15 +124,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
         if (event.getDamagee() instanceof Player player) {
-
             ShieldData shieldData = shieldDataMap.get(player.getUniqueId());
             if (shieldData != null) {
-                // Add a percentage-based damage reduction modifier
-                double reductionPercent = shieldData.getDamageReduction();
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+                event.addModifier(new SkillDamageModifier.Multiplier(this, (1 - shieldData.getDamageReduction())));
                 shieldData.count--;
             }
         }
@@ -255,10 +248,10 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         baseRange = getConfig("baseRange", 8.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 6.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.50, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 12.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);
 
-        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 1.0, Double.class);
+        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 2.0, Double.class);
         healthReductionPerPlayerAffectedDecreasePerLevel = getConfig("healthReductionPerPlayerAffectedDecreasePerLevel", 0.0, Double.class);
 
         baseDuration = getConfig("baseDuration", 20.0, Double.class);

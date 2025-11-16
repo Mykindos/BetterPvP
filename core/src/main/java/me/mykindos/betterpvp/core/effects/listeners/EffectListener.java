@@ -182,7 +182,7 @@ public class EffectListener implements Listener {
         if (!event.isAllowed()) return;
 
         if (effectManager.hasEffect(event.getDamagee(), EffectTypes.PROTECTION)
-                || effectManager.hasEffect(event.getDamagee(), EffectTypes.INVISIBILITY)
+                || effectManager.hasEffect(event.getDamagee(), EffectTypes.VANISH)
                 || effectManager.hasEffect(event.getDamagee(), EffectTypes.FROZEN)) {
             event.setResult(Event.Result.DENY);
         }

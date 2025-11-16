@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.clans.clans.core.mailbox;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @CustomLog
 public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
@@ -28,17 +30,17 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
     private final ClanMailbox clanMailbox;
     private final ItemStack itemStack;
 
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
-    public ClanMailboxItem(ClanMailbox clanMailbox, ItemStack itemStack, ItemHandler itemHandler) {
+    public ClanMailboxItem(ClanMailbox clanMailbox, ItemStack itemStack, ItemFactory itemFactory) {
         this.clanMailbox = clanMailbox;
         this.itemStack = itemStack;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     @Override
     public ItemProvider getItemProvider(GuiClanMailbox gui) {
-        ItemStack item = itemStack.clone();
+        ItemStack item = itemFactory.fromItemStack(itemStack).orElseThrow().getView().get();
         item.editMeta(meta -> {
             List<Component> lore = meta.lore();
             if (lore == null) {
@@ -73,14 +75,21 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
                     clickedInventory.setItem(event.getSlot(), null);
                 }
                 player.getInventory().addItem(itemStack);
-                itemHandler.getUUIDItem(itemStack).ifPresent((uuidItem -> {
-                    Location location = clanMailbox.getClan().getCore().getPosition();
-                    log.info("{} retrieved ({}) from {} at {}", player.getName(), uuidItem.getUuid(),
-                                    "Clan Mailbox", UtilWorld.locationToString(location))
-                            .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(uuidItem)
-                            .addBlockContext(Objects.requireNonNull(location).getBlock()).submit();
-                }));
 
+                itemFactory.fromItemStack(itemStack).ifPresent(itemInstance -> {
+                    itemInstance.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+                        final UUID uuid = uuidProperty.getUniqueId();
+                        Location location = clanMailbox.getClan().getCore().getPosition();
+                        log.info("{} retrieved ({}) from {} at {}", player.getName(), uuid, "Clan Mailbox", UtilWorld.locationToString(location))
+                                .setAction("ITEM_RETRIEVE")
+                                .addClientContext(player)
+                                .addLocationContext(location)
+                                .addItemContext(itemFactory.getItemRegistry(), itemInstance)
+                                .addBlockContext(Objects.requireNonNull(location).getBlock()).submit();
+                    });
+                });
+
+                new GuiClanMailbox(clanMailbox, itemFactory, null).show(player);
                 //new GuiClanMailbox(clanMailbox, itemHandler, null).show(player);
             } else {
                 log.warn("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();

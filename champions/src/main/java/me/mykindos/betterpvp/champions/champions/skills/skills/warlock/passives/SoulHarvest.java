@@ -108,7 +108,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
             }
         }
 
-        souls.removeIf(soul -> soul.getExpiry() - System.currentTimeMillis() <= 0);
+        souls.removeIf(soul -> soul.getExpiry() - System.currentTimeMillis() <= 0 || !soul.getLocation().isWorldLoaded());
         souls.forEach(soul -> {
             List<Player> newActives = new ArrayList<>(active);
             newActives.removeIf(p -> p.getUniqueId().equals(soul.getUuid()));

@@ -5,18 +5,13 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Container;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 
 import java.util.List;
 
@@ -87,15 +82,6 @@ public class InsuranceListener extends ClanListener {
         }
 
         return material.isAir();
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onUpdateLore(ItemUpdateLoreEvent event) {
-
-        Material material = event.getItem().getMaterial();
-        if (shouldNotRestoreBlock(material)) {
-            event.getItemLore().add(Component.text("This block will not be restored after a siege.", NamedTextColor.DARK_GRAY));
-        }
     }
 
 }

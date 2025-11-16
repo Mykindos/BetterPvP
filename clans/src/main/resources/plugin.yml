@@ -6,7 +6,6 @@ version: '1.0'
 depend: [Core]
 api-version: '1.21'
 softdepend:
-  - ProtocolLib
   - Progression
   - LibsDisguises
   - ModelEngine

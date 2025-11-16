@@ -22,7 +22,7 @@ public abstract class PlayerManager<T extends Unique> {
     public static final String LOAD_ERROR_FORMAT_SERVER = "Could not load entity for: {}";
     public static final String RETRIEVE_ERROR_FORMAT_SERVER = "Could not retrieve entity for: {}";
     
-    private final BPvPPlugin plugin;
+    protected final BPvPPlugin plugin;
 
     protected PlayerManager(BPvPPlugin plugin) {
         this.plugin = plugin;

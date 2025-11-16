@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.combat.listeners.mythicmobs;
 
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -17,24 +16,20 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import com.ticxo.modelengine.api.model.bone.ModelBone;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityRemoveEvent;
 
 import java.util.Optional;
 
@@ -68,7 +63,7 @@ public class HealthBarAdapter implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onDamage(final CustomDamageEvent event) {
+    public void onDamage(final DamageEvent event) {
         if (!enabled) {
             return;
         }
@@ -77,11 +72,7 @@ public class HealthBarAdapter implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onRemove(final EntityRemoveFromWorldEvent event) {
-        if (!UtilEntity.isRemoved(event.getEntity()) || !UtilEntity.getRemovalReason(event.getEntity()).isDestroy()) {
-            return;
-        }
-
+    public void onRemove(final EntityRemoveEvent event) {
         this.healthBars.removeAll(event.getEntity()).forEach(HealthBar::despawn);
     }
 
@@ -155,15 +146,7 @@ public class HealthBarAdapter implements Listener {
             }
 
             final ModelBone bone = opt.get();
-            final Location location = bone.getLocation();
-            final TextDisplay display = location.getWorld().spawn(location, TextDisplay.class, ent -> {
-                ent.setPersistent(false);
-                ent.setBillboard(Display.Billboard.CENTER);
-                ent.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-            });
-
-            UtilEntity.setViewRangeBlocks(display, 10);
-            final HealthBar healthBar = new HealthBar(display, living, model, bone);
+            final HealthBar healthBar = new HealthBar(model, bone);
             healthBar.update();
             healthBars.put(entity, healthBar);
         }, 1L);

@@ -20,7 +20,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.utilities.MobPathfinder;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -221,7 +221,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onCustomDamageEvent(CustomDamageEvent event) {
+    public void onDamageEvent(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
 
         //Lock/Switch clone onto player being damaged by its owner.
         if (event.getDamager() instanceof Player damager && clones.containsKey(damager)) {
@@ -231,7 +232,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 return;
             }
 
-            clones.get(damager).getPathFinder().setTarget(event.getDamagee());
+            clones.get(damager).getPathFinder().setTarget(event.getLivingDamagee());
             return;
         }
 
@@ -244,7 +245,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
                 UtilPlayer.health(cloneOwner, healthPerEnemyHit);
 
-                sendEffects(event.getDamagee());
+                sendEffects(event.getLivingDamagee());
                 return;
             }
         }
@@ -381,12 +382,12 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         duration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.5, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 8.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);
 
         baseHealth = getConfig("baseHealth", 10.0, Double.class);
 
-        healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
+        healthPerEnemyHit = getConfig("healthPerEnemyHit", 2.0, Double.class);
 
         leapStrength = getConfig("leapStrength", 2.0, Double.class);
         blindnessLevel = getConfig("blindnessLevel", 2, Integer.class);

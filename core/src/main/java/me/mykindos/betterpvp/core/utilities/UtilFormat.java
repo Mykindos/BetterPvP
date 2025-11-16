@@ -29,14 +29,19 @@ public class UtilFormat {
      *
      * @param one the first input string
      * @param two the second input string
-     * @return true if the cosine similarity of the two strings is greater than 0.6, false otherwise
+     * @param threshold the minimum cosine similarity threshold required for the strings to be considered similar
+     * @return true if the cosine similarity of the two strings is greater than the one specified
      */
-    public static boolean isSimilar(final String one, final String two) {
+    public static boolean isSimilar(final String one, final String two, final double threshold) {
         final Map<CharSequence, Integer> query =
                 Arrays.stream(one.split("")).collect(Collectors.toMap(c -> c, c -> 1, Integer::sum));
         final Map<CharSequence, Integer> online =
                 Arrays.stream(two.split("")).collect(Collectors.toMap(c -> c, c -> 1, Integer::sum));
-        return new CosineSimilarity().cosineSimilarity(query, online) > 0.6;
+        return new CosineSimilarity().cosineSimilarity(query, online) > threshold;
+    }
+
+    public static boolean isSimilar(final String one, final String two) {
+        return isSimilar(one, two, 0.6);
     }
 
     /**

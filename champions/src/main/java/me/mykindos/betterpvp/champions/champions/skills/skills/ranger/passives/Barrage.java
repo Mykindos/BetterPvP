@@ -3,11 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -16,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -24,7 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,6 +39,11 @@ import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.WeakHashMap;
 
 import static org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED;
 
@@ -52,7 +52,7 @@ import static org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED;
 public class Barrage extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
-    private final GamerDisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
     private final List<Arrow> arrows = new ArrayList<>();
     private double baseCharge;
     private double chargeIncreasePerLevel;
@@ -166,8 +166,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         charging.remove(player);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDamage(DamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         int level = getLevel(player);

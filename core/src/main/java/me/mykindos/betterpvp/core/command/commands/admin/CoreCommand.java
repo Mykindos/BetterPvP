@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
-import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -15,6 +14,7 @@ import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -33,12 +33,10 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-
     }
 
     @Override
@@ -66,9 +64,6 @@ public class CoreCommand extends Command implements IConsoleCommand {
         private ResourcePackHandler resourcePackHandler;
 
         @Inject
-        private WeaponManager weaponManager;
-
-        @Inject
         private RuleManager ruleManager;
 
         @Override
@@ -89,10 +84,11 @@ public class CoreCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             core.reload();
+            core.getReloadables().forEach(Reloadable::reload);
+
             commandLoader.reload(core.getClass().getPackageName());
             tipManager.reloadTips(core);
             resourcePackHandler.reload();
-            weaponManager.reload(core);
             ruleManager.reload(core);
 
             UtilMessage.message(sender, "Core", "Successfully reloaded core");

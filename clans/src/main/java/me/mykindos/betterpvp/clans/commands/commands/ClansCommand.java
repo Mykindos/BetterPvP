@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
-import me.mykindos.betterpvp.clans.weapons.ClansWeaponManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
@@ -16,6 +15,7 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -67,9 +67,6 @@ public class ClansCommand extends Command implements IConsoleCommand {
         private Fields fields;
 
         @Inject
-        private ClansWeaponManager clansWeaponManager;
-
-        @Inject
         private ClanVaultRestrictions clanVaultRestrictions;
 
         @Inject
@@ -93,12 +90,12 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             clans.reload();
+            clans.getReloadables().forEach(Reloadable::reload);
 
             commandLoader.reload(clans.getClass().getPackageName());
             tipManager.reloadTips(clans);
 
             fields.reload(clans);
-            clansWeaponManager.reload();
             clanVaultRestrictions.reload();
 
 

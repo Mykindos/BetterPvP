@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.listener;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.shops.Shops;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
@@ -28,6 +29,15 @@ public class ShopsListenerLoader extends ListenerLoader {
                 if(!Modifier.isAbstract(clazz.getModifiers())) {
                     load(clazz);
                 }
+            }
+        }
+
+        Set<Class<? extends Reloadable>> reloadHooks = reflections.getSubTypesOf(Reloadable.class);
+        for (var hookClass : reloadHooks) {
+            if (!Modifier.isAbstract(hookClass.getModifiers())) {
+                final Reloadable hook = plugin.getInjector().getInstance(hookClass);
+                hook.reload();
+                plugin.getReloadables().add(hook);
             }
         }
 

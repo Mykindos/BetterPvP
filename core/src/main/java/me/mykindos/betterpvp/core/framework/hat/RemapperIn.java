@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import me.mykindos.betterpvp.core.Core;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -14,12 +13,10 @@ import java.util.Optional;
 
 public class RemapperIn implements PacketListener {
 
-    private final Core core;
     private final PacketHatController controller;
     private final HatProtocol protocol;
 
-    public RemapperIn(Core core, PacketHatController controller, HatProtocol protocol) {
-        this.core = core;
+    public RemapperIn(PacketHatController controller, HatProtocol protocol) {
         this.controller = controller;
         this.protocol = protocol;
     }
@@ -49,6 +46,5 @@ public class RemapperIn implements PacketListener {
             this.protocol.broadcast(event.getPlayer(), true);
         }
     }
-
 
 }

@@ -6,7 +6,6 @@ package me.mykindos.betterpvp.champions.database.jooq;
 
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsCombatStats;
-import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsDamagevalues;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKilldeathData;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKills;
@@ -24,7 +23,6 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKdrByC
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillstreakByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopRatingByClassRecord;
-
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -45,11 +43,6 @@ public class Tables {
      * The table <code>public.champions_combat_stats</code>.
      */
     public static final ChampionsCombatStats CHAMPIONS_COMBAT_STATS = ChampionsCombatStats.CHAMPIONS_COMBAT_STATS;
-
-    /**
-     * The table <code>public.champions_damagevalues</code>.
-     */
-    public static final ChampionsDamagevalues CHAMPIONS_DAMAGEVALUES = ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES;
 
     /**
      * The table <code>public.champions_kill_contributions</code>.

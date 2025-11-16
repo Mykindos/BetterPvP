@@ -21,7 +21,7 @@ dependencies {
     compileOnly(project(":champions"))
     compileOnly(project(":shops"))
     compileOnly(libs.mineplex)
-    compileOnly(libs.protocollib)
+    compileOnly(libs.packetevents)
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)

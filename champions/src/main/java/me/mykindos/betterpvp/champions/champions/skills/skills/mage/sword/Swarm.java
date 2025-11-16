@@ -10,8 +10,9 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -31,7 +32,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
@@ -41,6 +41,8 @@ import java.util.ListIterator;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.WeakHashMap;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
 @Singleton
 @BPvPListener
@@ -167,14 +169,13 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
                         championsManager.getEffects().addEffect(other, EffectTypes.SHOCK, 800L);
                     }
 
-                    final CustomDamageEvent event = new CustomDamageEvent(other,
+                    final DamageEvent event = new DamageEvent(other,
                             player,
                             null,
-                            DamageCause.CUSTOM,
+                            new SkillDamageCause(this).withBukkitCause(PROJECTILE),
                             batDamage,
-                            false,
                             getName());
-                    UtilDamage.doCustomDamage(event);
+                    UtilDamage.doDamage(event);
 
                     if (!event.isCancelled()) {
                         Vector vector = bat.getLocation().getDirection();

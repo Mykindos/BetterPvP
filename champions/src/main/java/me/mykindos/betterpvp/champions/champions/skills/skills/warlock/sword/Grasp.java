@@ -11,7 +11,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
@@ -34,7 +35,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
 
 @Singleton
 @BPvPListener
@@ -121,7 +123,12 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
             if (!cooldownJump.get(player).contains(target)) {
 
-                UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
+                UtilDamage.doDamage(new DamageEvent(target,
+                        player,
+                        null,
+                        new SkillDamageCause(this).withCategory(RANGED),
+                        getDamage(level),
+                        getName()));
                 cooldownJump.get(player).add(target);
                 VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory(target.getLocation(), targetLocation), 1.0, false, 0, 0.5, 1, true);
                 UtilVelocity.velocity(target, player, velocityData);

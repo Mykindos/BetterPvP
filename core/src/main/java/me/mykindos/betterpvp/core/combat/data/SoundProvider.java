@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.combat.data;
 
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -15,13 +15,14 @@ import java.util.function.Function;
 /**
  * Provides a sound for a given custom damage event.
  */
-public interface SoundProvider extends Function<@NotNull CustomDamageEvent, @Nullable Sound> {
+public interface SoundProvider extends Function<@NotNull DamageEvent, @Nullable Sound> {
 
     /**
      * The default sound provider. Uses the default Minecraft sounds.
      */
     SoundProvider DEFAULT = event -> {
-        final LivingEntity damagee = event.getDamagee();
+        final LivingEntity damagee = event.getLivingDamagee();
+        if (damagee == null) return null;
         final org.bukkit.Sound sound = damagee.getHurtSound();
         if (sound == null) {
             return null;

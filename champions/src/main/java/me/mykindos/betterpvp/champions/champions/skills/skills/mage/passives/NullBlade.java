@@ -7,14 +7,14 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
@@ -47,8 +47,8 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (event.getDamagee().hasMetadata("PlayerSpawned")) return;
 
         if (!(event.getDamager() instanceof Player dam)) return;
@@ -58,9 +58,9 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
             double degeneration = getSiphonedEnergy(level);
 
             if (event.getDamagee() instanceof Player target) {
-                championsManager.getEnergy().degenerateEnergy(target, degeneration, EnergyEvent.CAUSE.CUSTOM);
+                championsManager.getEnergy().degenerateEnergy(target, degeneration, EnergyEvent.Cause.CUSTOM);
             }
-            championsManager.getEnergy().regenerateEnergy(dam, degeneration, EnergyEvent.CAUSE.CUSTOM);
+            championsManager.getEnergy().regenerateEnergy(dam, degeneration, EnergyEvent.Cause.CUSTOM);
         }
     }
 

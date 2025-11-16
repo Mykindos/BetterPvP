@@ -2,13 +2,11 @@ package me.mykindos.betterpvp.shops.shops.menus.buttons;
 
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.inventory.window.WindowManager;
-import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -33,8 +31,6 @@ import java.util.List;
 public class SellAllButton extends AbstractItem implements CooldownButton {
 
     private final List<IShopItem> shopItems;
-    private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
     private final ShopItemSellService shopItemService;
 
     @Override

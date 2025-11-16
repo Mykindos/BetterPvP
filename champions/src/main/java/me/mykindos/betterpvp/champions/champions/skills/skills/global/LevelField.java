@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,11 +9,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
@@ -25,7 +21,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -36,6 +32,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -129,10 +129,10 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamageReceive(CustomDamageEvent event) {
+    public void onDamageReceive(DamageEvent event) {
         if(!(event.getDamagee() instanceof Player defender)) return;
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (event.getBukkitCause() != DamageCause.ENTITY_ATTACK) return;
 
         int level = getLevel(defender);
         if (level > 0) {
@@ -141,10 +141,10 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
     }
 
     @EventHandler (priority = EventPriority.LOW)
-    public void onDamageDeal(CustomDamageEvent event) {
+    public void onDamageDeal(DamageEvent event) {
         if(!(event.getDamager() instanceof Player attacker)) return;
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
 
         var level = getLevel(attacker);
         if (level > 0) {
@@ -152,7 +152,7 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
         }
     }
 
-    private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker, int level) {
+    private void processLevelFieldSkill(Player relevantPlayer, DamageEvent event, boolean isAttacker, int level) {
         List<LivingEntity> nearbyEnemiesList = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius);
         nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned") || e.hasMetadata("owner"));
         int nearbyEnemies = nearbyEnemiesList.size();
@@ -164,13 +164,9 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
         double damageMod = Math.min(nearbyDifference, getMaxEnemies(level));
 
         if (isAttacker) {
-            // Add a flat damage modifier for attackers
-            double damageToAdd = damageMod * getDamage(level);
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+            event.addModifier(new SkillDamageModifier.Flat(this, damageMod * getDamage(level)));
         } else {
-            // Add a flat damage reduction modifier for defenders
-            double damageToReduce = damageMod * getDamageReduction(level);
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToReduce, getName(), ModifierValue.FLAT, ModifierOperation.DECREASE);
+            event.addModifier(new SkillDamageModifier.Flat(this, -damageMod * getDamageReduction(level)));
         }
     }
 
