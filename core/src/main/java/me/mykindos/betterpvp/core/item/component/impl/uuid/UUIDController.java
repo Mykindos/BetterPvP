@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -49,9 +48,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,13 +105,11 @@ public class UUIDController implements Listener {
     }
 
     public Optional<UUIDItem> getUUIDItem(ItemStack itemStack) {
-        if (itemStack != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            if (itemMeta != null) {
-                PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
-                if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
-                    return uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING))).toString());
-                }
+        if (itemStack != null && !itemStack.getType().isAir()) {
+            final ItemInstance itemInstance = itemFactory.fromItemStack(itemStack).orElseThrow();
+            final Optional<UUIDProperty> component = itemInstance.getComponent(UUIDProperty.class);
+            if (component.isPresent()) {
+                return uuidManager.getObject(component.get().getUniqueId());
             }
         }
         return Optional.empty();
