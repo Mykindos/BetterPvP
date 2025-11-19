@@ -480,7 +480,7 @@ public class ClientSQLLayer {
                 .set(CLIENT_STATS.CLIENT, statContainer.getClient().getId())
                 .set(CLIENT_STATS.PERIOD, period)
                 .set(CLIENT_STATS.STATTYPE, stat.getStatType())
-                .set(CLIENT_STATS.STATDATA, JSONB.jsonbOrNull(stat.getJsonData() == null ? null : stat.getJsonData().toString()))
+                .set(CLIENT_STATS.STATDATA, JSONB.jsonb(stat.getJsonData() == null ? "{}" : stat.getJsonData().toString()))
                 .set(CLIENT_STATS.STAT, value)
                 .onDuplicateKeyUpdate()
                 .set(CLIENT_STATS.STAT, value);
