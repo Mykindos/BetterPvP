@@ -34,9 +34,6 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
 
     public static GameTeamMapNativeStat fromData(@NotNull String type, JSONObject object) {
         GameTeamMapNativeStatBuilder<?, ?> builder = builder();
-        if (!Strings.isNullOrEmpty(type)) {
-            type = object.getString("type");
-        }
         Preconditions.checkArgument(type.equals(TYPE));
         builder.action(Action.valueOf(object.getString("action")));
         builder.gameId(object.getLong("gameId"));

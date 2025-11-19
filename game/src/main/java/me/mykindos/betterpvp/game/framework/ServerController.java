@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.game.framework.model.stats.GameInfo;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.framework.state.GameStateMachine;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -29,8 +30,11 @@ public final class ServerController implements Listener {
     @Getter
     private AbstractGame<?, ?> currentGame;
     @Getter
-    @Setter
     private GameInfo lobbyInfo;
+    /**
+     * Whether the current valid {@link GameInfo} is the lobby or game one
+     */
+    private boolean useLobbyInfo;
     @Getter
     @Setter
     private boolean acceptingPlayers = false;
@@ -124,6 +128,26 @@ public final class ServerController implements Listener {
 
         this.currentGame = null;
         return true;
+    }
+
+    @Contract(value = "_ -> _", mutates = "this")
+    public void setLobbyGameInfo(GameInfo gameInfo) {
+        lobbyInfo = gameInfo;
+        useLobbyInfo = true;
+    }
+
+    @Contract(value = "_ -> _", mutates = "this")
+    public void setGameGameInfo(GameInfo gameInfo) {
+        currentGame.setGameInfo(gameInfo);
+        useLobbyInfo = false;
+    }
+
+    /**
+     * Gets the current valid {@link GameInfo} based on {@link ServerController#useLobbyInfo}
+     * @return the valid {@link GameInfo}
+     */
+    public GameInfo getCurrentGameInfo() {
+        return useLobbyInfo ? lobbyInfo : currentGame.getGameInfo();
     }
 
 }
