@@ -6,6 +6,7 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
@@ -47,6 +48,7 @@ import java.util.Set;
 @CustomLog
 public class Core extends BPvPPlugin {
 
+    @Getter
     private final String PACKAGE = getClass().getPackageName();
 
     @Getter
@@ -141,6 +143,9 @@ public class Core extends BPvPPlugin {
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
 
+        var coreAchievementLoader = injector.getInstance(CoreAchievementLoader.class);
+        coreAchievementLoader.loadAll(PACKAGE);
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
@@ -186,7 +191,7 @@ public class Core extends BPvPPlugin {
 
     @Override
     public void onDisable() {
-        clientManager.processStatUpdates(false);
+        clientManager.processPropertyUpdates(false);
         clientManager.shutdown();
         redis.shutdown();
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();

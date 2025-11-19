@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.game.achievements.loader.GameAchievementLoader;
 import me.mykindos.betterpvp.game.command.loader.GameCommandLoader;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.listener.state.GameMapHandler;
@@ -76,8 +77,11 @@ public final class GamePlugin extends BPvPPlugin {
         var listenerLoader = injector.getInstance(GameListenerLoader.class);
         listenerLoader.registerListeners(PACKAGE);
 
-        var shopsCommandLoader = injector.getInstance(GameCommandLoader.class);
-        shopsCommandLoader.loadCommands(PACKAGE);
+        var gameCommandLoader = injector.getInstance(GameCommandLoader.class);
+        gameCommandLoader.loadCommands(PACKAGE);
+
+        var gameAchievementLoader = injector.getInstance(GameAchievementLoader.class);
+        gameAchievementLoader.loadAll(PACKAGE);
 
         final Adapters adapters = new Adapters(this);
         final Reflections reflectionAdapters = new Reflections(PACKAGE);

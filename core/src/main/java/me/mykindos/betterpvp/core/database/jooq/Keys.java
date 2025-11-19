@@ -4,14 +4,18 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameData;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams;
 import me.mykindos.betterpvp.core.database.jooq.tables.GamerProperties;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores;
 import me.mykindos.betterpvp.core.database.jooq.tables.Itemdurability;
@@ -22,6 +26,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
+import me.mykindos.betterpvp.core.database.jooq.tables.PeriodMeta;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
@@ -29,14 +34,18 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Servers;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.AchievementCompletionsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ArmourRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ChunkBlockTaggingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientNameHistoryRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientPropertiesRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientRewardsRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientStatsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.CombatStatsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.FilteredWordsRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GameDataRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GameTeamsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GamerPropertiesRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.IgnoresRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ItemdurabilityRecord;
@@ -47,6 +56,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.KillsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.LogsContextRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.LogsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.OfflineMessagesRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.PeriodMetaRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.PropertyMapRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.PunishmentsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.RealmsRecord;
@@ -54,7 +64,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.ServersRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.UuiditemsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsMetadataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -73,16 +82,20 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<AchievementCompletionsRecord> ACHIEVEMENT_COMPLETIONS_PKEY = Internal.createUniqueKey(AchievementCompletions.ACHIEVEMENT_COMPLETIONS, DSL.name("achievement_completions_pkey"), new TableField[] { AchievementCompletions.ACHIEVEMENT_COMPLETIONS.ID }, true);
     public static final UniqueKey<ArmourRecord> ARMOUR_PK = Internal.createUniqueKey(Armour.ARMOUR, DSL.name("armour_pk"), new TableField[] { Armour.ARMOUR.ITEM }, true);
     public static final UniqueKey<ChunkBlockTaggingRecord> CHUNK_BLOCK_TAGGING_UK = Internal.createUniqueKey(ChunkBlockTagging.CHUNK_BLOCK_TAGGING, DSL.name("chunk_block_tagging_uk"), new TableField[] { ChunkBlockTagging.CHUNK_BLOCK_TAGGING.REALM, ChunkBlockTagging.CHUNK_BLOCK_TAGGING.CHUNK, ChunkBlockTagging.CHUNK_BLOCK_TAGGING.BLOCK_KEY, ChunkBlockTagging.CHUNK_BLOCK_TAGGING.TAG }, true);
     public static final UniqueKey<ClientNameHistoryRecord> CLIENT_NAME_HISTORY_PKEY = Internal.createUniqueKey(ClientNameHistory.CLIENT_NAME_HISTORY, DSL.name("client_name_history_pkey"), new TableField[] { ClientNameHistory.CLIENT_NAME_HISTORY.CLIENT, ClientNameHistory.CLIENT_NAME_HISTORY.NAME }, true);
     public static final UniqueKey<ClientPropertiesRecord> CLIENT_PROPERTIES_PKEY = Internal.createUniqueKey(ClientProperties.CLIENT_PROPERTIES, DSL.name("client_properties_pkey"), new TableField[] { ClientProperties.CLIENT_PROPERTIES.CLIENT, ClientProperties.CLIENT_PROPERTIES.PROPERTY }, true);
     public static final UniqueKey<ClientRewardsRecord> CLIENT_REWARDS_PKEY = Internal.createUniqueKey(ClientRewards.CLIENT_REWARDS, DSL.name("client_rewards_pkey"), new TableField[] { ClientRewards.CLIENT_REWARDS.CLIENT, ClientRewards.CLIENT_REWARDS.SEASON }, true);
+    public static final UniqueKey<ClientStatsRecord> PK_CLIENT = Internal.createUniqueKey(ClientStats.CLIENT_STATS, DSL.name("pk_client"), new TableField[] { ClientStats.CLIENT_STATS.CLIENT, ClientStats.CLIENT_STATS.PERIOD, ClientStats.CLIENT_STATS.STATTYPE, ClientStats.CLIENT_STATS.STATDATA }, true);
     public static final UniqueKey<ClientsRecord> CLIENTS_PKEY = Internal.createUniqueKey(Clients.CLIENTS, DSL.name("clients_pkey"), new TableField[] { Clients.CLIENTS.ID }, true);
     public static final UniqueKey<ClientsRecord> CLIENTS_UUID_KEY = Internal.createUniqueKey(Clients.CLIENTS, DSL.name("clients_uuid_key"), new TableField[] { Clients.CLIENTS.UUID }, true);
     public static final UniqueKey<CombatStatsRecord> COMBAT_STATS_PKEY = Internal.createUniqueKey(CombatStats.COMBAT_STATS, DSL.name("combat_stats_pkey"), new TableField[] { CombatStats.COMBAT_STATS.CLIENT, CombatStats.COMBAT_STATS.REALM }, true);
     public static final UniqueKey<FilteredWordsRecord> FILTERED_WORDS_PKEY = Internal.createUniqueKey(FilteredWords.FILTERED_WORDS, DSL.name("filtered_words_pkey"), new TableField[] { FilteredWords.FILTERED_WORDS.ID }, true);
     public static final UniqueKey<FilteredWordsRecord> FILTERED_WORDS_WORD_KEY = Internal.createUniqueKey(FilteredWords.FILTERED_WORDS, DSL.name("filtered_words_word_key"), new TableField[] { FilteredWords.FILTERED_WORDS.WORD }, true);
+    public static final UniqueKey<GameDataRecord> GAME_DATA_PKEY = Internal.createUniqueKey(GameData.GAME_DATA, DSL.name("game_data_pkey"), new TableField[] { GameData.GAME_DATA.ID }, true);
+    public static final UniqueKey<GameTeamsRecord> PK_GAME_TEAMS = Internal.createUniqueKey(GameTeams.GAME_TEAMS, DSL.name("pk_game_teams"), new TableField[] { GameTeams.GAME_TEAMS.ID, GameTeams.GAME_TEAMS.CLIENT }, true);
     public static final UniqueKey<GamerPropertiesRecord> GAMER_PROPERTIES_PKEY = Internal.createUniqueKey(GamerProperties.GAMER_PROPERTIES, DSL.name("gamer_properties_pkey"), new TableField[] { GamerProperties.GAMER_PROPERTIES.CLIENT, GamerProperties.GAMER_PROPERTIES.REALM, GamerProperties.GAMER_PROPERTIES.PROPERTY }, true);
     public static final UniqueKey<IgnoresRecord> IGNORES_PKEY = Internal.createUniqueKey(Ignores.IGNORES, DSL.name("ignores_pkey"), new TableField[] { Ignores.IGNORES.CLIENT, Ignores.IGNORES.IGNORED }, true);
     public static final UniqueKey<ItemdurabilityRecord> ITEMDURABILITY_PKEY = Internal.createUniqueKey(Itemdurability.ITEMDURABILITY, DSL.name("itemdurability_pkey"), new TableField[] { Itemdurability.ITEMDURABILITY.ITEM }, true);
@@ -94,6 +107,7 @@ public class Keys {
     public static final UniqueKey<KillsRecord> KILLS_PKEY = Internal.createUniqueKey(Kills.KILLS, DSL.name("kills_pkey"), new TableField[] { Kills.KILLS.ID }, true);
     public static final UniqueKey<LogsRecord> LOGS_PKEY = Internal.createUniqueKey(Logs.LOGS, DSL.name("logs_pkey"), new TableField[] { Logs.LOGS.ID }, true);
     public static final UniqueKey<OfflineMessagesRecord> OFFLINE_MESSAGES_PKEY = Internal.createUniqueKey(OfflineMessages.OFFLINE_MESSAGES, DSL.name("offline_messages_pkey"), new TableField[] { OfflineMessages.OFFLINE_MESSAGES.ID }, true);
+    public static final UniqueKey<PeriodMetaRecord> PERIOD_META_PKEY = Internal.createUniqueKey(PeriodMeta.PERIOD_META, DSL.name("period_meta_pkey"), new TableField[] { PeriodMeta.PERIOD_META.PERIOD }, true);
     public static final UniqueKey<PropertyMapRecord> PROPERTY_MAP_PKEY = Internal.createUniqueKey(PropertyMap.PROPERTY_MAP, DSL.name("property_map_pkey"), new TableField[] { PropertyMap.PROPERTY_MAP.PROPERTY, PropertyMap.PROPERTY_MAP.TYPE }, true);
     public static final UniqueKey<PunishmentsRecord> PUNISHMENTS_PKEY = Internal.createUniqueKey(Punishments.PUNISHMENTS, DSL.name("punishments_pkey"), new TableField[] { Punishments.PUNISHMENTS.ID }, true);
     public static final UniqueKey<RealmsRecord> REALMS_PKEY = Internal.createUniqueKey(Realms.REALMS, DSL.name("realms_pkey"), new TableField[] { Realms.REALMS.ID }, true);
@@ -111,8 +125,12 @@ public class Keys {
     public static final ForeignKey<ClientNameHistoryRecord, ClientsRecord> CLIENT_NAME_HISTORY__CLIENT_NAME_HISTORY_CLIENT_FKEY = Internal.createForeignKey(ClientNameHistory.CLIENT_NAME_HISTORY, DSL.name("client_name_history_client_fkey"), new TableField[] { ClientNameHistory.CLIENT_NAME_HISTORY.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
     public static final ForeignKey<ClientPropertiesRecord, ClientsRecord> CLIENT_PROPERTIES__CLIENT_PROPERTIES_CLIENT_FKEY = Internal.createForeignKey(ClientProperties.CLIENT_PROPERTIES, DSL.name("client_properties_client_fkey"), new TableField[] { ClientProperties.CLIENT_PROPERTIES.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
     public static final ForeignKey<ClientRewardsRecord, ClientsRecord> CLIENT_REWARDS__CLIENT_REWARDS_CLIENT_FKEY = Internal.createForeignKey(ClientRewards.CLIENT_REWARDS, DSL.name("client_rewards_client_fkey"), new TableField[] { ClientRewards.CLIENT_REWARDS.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
+    public static final ForeignKey<ClientStatsRecord, ClientsRecord> CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY = Internal.createForeignKey(ClientStats.CLIENT_STATS, DSL.name("client_stats_client_fkey"), new TableField[] { ClientStats.CLIENT_STATS.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
+    public static final ForeignKey<ClientStatsRecord, ClientsRecord> CLIENT_STATS__FK_CLIENT = Internal.createForeignKey(ClientStats.CLIENT_STATS, DSL.name("fk_client"), new TableField[] { ClientStats.CLIENT_STATS.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
     public static final ForeignKey<CombatStatsRecord, ClientsRecord> COMBAT_STATS__COMBAT_STATS_CLIENT_FKEY = Internal.createForeignKey(CombatStats.COMBAT_STATS, DSL.name("combat_stats_client_fkey"), new TableField[] { CombatStats.COMBAT_STATS.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
     public static final ForeignKey<FilteredWordsRecord, ClientsRecord> FILTERED_WORDS__FILTERED_WORDS_CREATED_BY_FKEY = Internal.createForeignKey(FilteredWords.FILTERED_WORDS, DSL.name("filtered_words_created_by_fkey"), new TableField[] { FilteredWords.FILTERED_WORDS.CREATED_BY }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
+    public static final ForeignKey<GameTeamsRecord, ClientsRecord> GAME_TEAMS__GAME_TEAMS_CLIENT_FKEY = Internal.createForeignKey(GameTeams.GAME_TEAMS, DSL.name("game_teams_client_fkey"), new TableField[] { GameTeams.GAME_TEAMS.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
+    public static final ForeignKey<GameTeamsRecord, GameDataRecord> GAME_TEAMS__GAME_TEAMS_ID_FKEY = Internal.createForeignKey(GameTeams.GAME_TEAMS, DSL.name("game_teams_id_fkey"), new TableField[] { GameTeams.GAME_TEAMS.ID }, Keys.GAME_DATA_PKEY, new TableField[] { GameData.GAME_DATA.ID }, true);
     public static final ForeignKey<GamerPropertiesRecord, ClientsRecord> GAMER_PROPERTIES__GAMER_PROPERTIES_CLIENT_FKEY = Internal.createForeignKey(GamerProperties.GAMER_PROPERTIES, DSL.name("gamer_properties_client_fkey"), new TableField[] { GamerProperties.GAMER_PROPERTIES.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
     public static final ForeignKey<IgnoresRecord, ClientsRecord> IGNORES__IGNORES_CLIENT_FKEY = Internal.createForeignKey(Ignores.IGNORES, DSL.name("ignores_client_fkey"), new TableField[] { Ignores.IGNORES.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
     public static final ForeignKey<IgnoresRecord, ClientsRecord> IGNORES__IGNORES_IGNORED_FKEY = Internal.createForeignKey(Ignores.IGNORES, DSL.name("ignores_ignored_fkey"), new TableField[] { Ignores.IGNORES.IGNORED }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);

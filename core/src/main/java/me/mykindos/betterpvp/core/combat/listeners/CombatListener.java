@@ -1,19 +1,18 @@
 package me.mykindos.betterpvp.core.combat.listeners;
 
 import com.google.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.core.DamageReasonStat;
+import me.mykindos.betterpvp.core.client.stats.impl.core.DamageStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
+import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Type;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
@@ -70,6 +69,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
@@ -262,6 +268,7 @@ public class CombatListener implements Listener {
         processDamageData(event);
 
         applyFinalDamage(cde);
+        incrementStats(reductionEvent);
     }
 
     private void playHitSounds(DamageEvent event) {
@@ -315,6 +322,55 @@ public class CombatListener implements Listener {
         } else {
             cde.getDamagee().setHealth(cde.getDamagee().getHealth() - cde.getDamage());
         }
+    }
+
+    private void incrementStats(CustomDamageReductionEvent cdre) {
+        if (cdre.getCustomDamageEvent().getDamager() instanceof Player damager) {
+            final Relation relation = Relation.DEALT;
+            final DamageCause damageCause = cdre.getCustomDamageEvent().getCause();
+
+
+            DamageStat.DamageStatBuilder baseDamageStatBuilder = DamageStat.builder()
+                    .relation(relation)
+                    .damageCause(damageCause);
+            //increment damager's dealt, ignoring armor
+            final StatContainer damagerContainer = clientManager.search().online(damager).getStatContainer();
+            damagerContainer.incrementStat(baseDamageStatBuilder.type(Type.AMOUNT).build(), (long) (cdre.getInitialDamage() * IStat.FP_MODIFIER));
+            damagerContainer.incrementStat(baseDamageStatBuilder.type(Type.COUNT).build(), 1);
+
+            for (String reason : cdre.getCustomDamageEvent().getReason()) {
+                DamageReasonStat.DamageReasonStatBuilder baseDamageReasonBuilder = DamageReasonStat.builder()
+                        .relation(relation)
+                        .damageCause(damageCause)
+                        .reason(reason);
+                damagerContainer.incrementStat(baseDamageReasonBuilder.type(Type.AMOUNT).build(), (long) (cdre.getInitialDamage() * IStat.FP_MODIFIER));
+                damagerContainer.incrementStat(baseDamageReasonBuilder.type(Type.COUNT).build(), 1);
+            }
+        }
+        if (cdre.getCustomDamageEvent().getDamagee() instanceof Player damagee) {
+            final Relation relation = Relation.RECEIVED;
+            final DamageCause damageCause = cdre.getCustomDamageEvent().getCause();
+
+
+            DamageStat.DamageStatBuilder baseDamageStatBuilder = DamageStat.builder()
+                    .relation(relation)
+                    .damageCause(damageCause);
+            //increment damager's dealt, ignoring armor
+            final StatContainer damageeContainer = clientManager.search().online(damagee).getStatContainer();
+            damageeContainer.incrementStat(baseDamageStatBuilder.type(Type.AMOUNT).build(), (long) (cdre.getInitialDamage() * IStat.FP_MODIFIER));
+            damageeContainer.incrementStat(baseDamageStatBuilder.type(Type.COUNT).build(), 1);
+
+
+            for (String reason : cdre.getCustomDamageEvent().getReason()) {
+                DamageReasonStat.DamageReasonStatBuilder baseDamageReasonBuilder = DamageReasonStat.builder()
+                        .relation(relation)
+                        .damageCause(damageCause)
+                        .reason(reason);
+                damageeContainer.incrementStat(baseDamageReasonBuilder.type(Type.AMOUNT).build(), (long) (cdre.getInitialDamage() * IStat.FP_MODIFIER));
+                damageeContainer.incrementStat(baseDamageReasonBuilder.type(Type.COUNT).build(), 1);
+            }
+        }
+
     }
 
 
