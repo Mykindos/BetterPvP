@@ -38,12 +38,18 @@ public class StatBuilder {
     }
 
     public IStat getStatForStatData(@NotNull String statType, JSONObject data) {
+        //todo make builder stats a map based on statType
         for (Class<? extends IBuildableStat> buildableStat : builderStats) {
+            IBuildableStat newInstance = null;
             try {
-                return buildableStat.getConstructor().newInstance().copyFromStatData(statType, data);
-            } catch (IllegalArgumentException | JSONException ignored) {
+                newInstance = buildableStat.getConstructor().newInstance();
+                return newInstance.copyFromStatData(statType, data);
+            } catch (IllegalArgumentException | JSONException exception) {
+                if (newInstance != null && statType.equals(newInstance.getStatType())) {
+                    log.error("Error creating a stat of type {} data {} ", statType, data, exception).submit();
+                }
             } catch (Exception e) {
-                log.error("Error getting stat for name {} ", statType, e).submit();
+                log.error("Error getting stat for name {} {}", statType, data.toString(), e).submit();
             }
         }
         try {
@@ -51,7 +57,7 @@ public class StatBuilder {
         } catch (IllegalArgumentException ignored) {
         }
 
-        log.warn("No stat found for {}", statType).submit();
+        log.warn("No stat found for {} {}", statType, data.toString()).submit();
         return new IStat() {
             @Override
             public Long getStat(StatContainer statContainer, String periodKey) {
@@ -70,7 +76,7 @@ public class StatBuilder {
              */
             @Override
             public @Nullable JSONObject getJsonData() {
-                return null;
+                return data;
             }
 
             @Override
