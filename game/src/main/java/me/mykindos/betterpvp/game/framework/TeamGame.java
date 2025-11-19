@@ -80,7 +80,9 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         // Add to new team
         team.getParticipants().add(participant);
 
-        getGameInfo().getPlayerTeams().put(participant.getPlayer().getUniqueId(), team.getProperties().name());
+        if (getGameInfo() != null) {
+            getGameInfo().getPlayerTeams().put(participant.getPlayer().getUniqueId(), team.getProperties().name());
+        }
 
         // Update player tab color
         GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());

@@ -57,7 +57,7 @@ public class StatContainer implements Unique, IStatMapListener {
             log.warn("Attempted to save a null stat").submit();
             return;
         }
-        Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");
+        Preconditions.checkArgument(stat.isSavable(), "Stat %s must be savable to increment", stat.getQualifiedName());
         synchronized (this) {
             final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(getUniqueId(), stat));
             final IStat wrappedStat = wrapStatEvent.getStat();
