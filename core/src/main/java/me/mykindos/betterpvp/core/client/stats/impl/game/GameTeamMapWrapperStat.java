@@ -42,9 +42,6 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
 
     public static GameTeamMapWrapperStat fromData(String type, JSONObject object) {
         GameTeamMapWrapperStat.GameTeamMapWrapperStatBuilder<?, ?> builder = builder();
-        if (!Strings.isNullOrEmpty(type)) {
-            type = object.getString("type");
-        }
         Preconditions.checkArgument(type.equals(TYPE));
         builder.gameId(object.getLong("gameId"));
         builder.gameName(object.getString("gameName"));
@@ -159,6 +156,16 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
                 .put("wrappedStat", (wrappedStat.getJsonData() == null ? new JSONObject() : wrappedStat.getJsonData())
                         .putOnce("statType", wrappedStat.getStatType())
                 );
+    }
+
+    /**
+     * Whether this stat is directly savable to the database
+     *
+     * @return {@code true} if it is, {@code false} otherwise
+     */
+    @Override
+    public boolean isSavable() {
+        return super.isSavable() && wrappedStat.isSavable();
     }
 
     @Override

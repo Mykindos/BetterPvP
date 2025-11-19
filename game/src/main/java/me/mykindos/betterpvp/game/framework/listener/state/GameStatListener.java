@@ -28,10 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Singleton
 @BPvPListener
@@ -42,8 +39,6 @@ public class GameStatListener extends TimedStatListener {
     private final ServerController serverController;
     private final PlayerController playerController;
 
-    private final Set<UUID> players = new HashSet<>();
-
     @Inject
     public GameStatListener(ServerController serverController, PlayerController playerController, ClientManager clientManager, StatManager statManager, MapManager mapManager) {
         super(clientManager);
@@ -51,6 +46,11 @@ public class GameStatListener extends TimedStatListener {
         this.playerController = playerController;
         this.statManager = statManager;
         this.mapManager = mapManager;
+        //initialize game info to avoid NPE
+        serverController.setLobbyGameInfo(new GameInfo(
+                GameInfo.LOBBY_GAME_NAME,
+                mapManager.getWaitingLobby().getMetadata().getName()
+        ));
         setupStateHandlers();
     }
 
@@ -98,8 +98,8 @@ public class GameStatListener extends TimedStatListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onStopSpectate(ParticipantStopSpectatingEvent event) {
+        //todo do we update spectate time correctly?
         lastUpdateMap.put(event.getParticipant().getPlayer().getUniqueId(), System.currentTimeMillis());
-        players.add(event.getPlayer().getUniqueId());
         if (serverController.getCurrentState() == GameState.IN_GAME && serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
             Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GamePlugin.class), () -> {
                 Team team = teamGame.getPlayerTeam(event.getPlayer());
@@ -126,15 +126,15 @@ public class GameStatListener extends TimedStatListener {
 
     public void onGameStart() {
         statManager.save(serverController.getLobbyInfo());
-        players.addAll(playerController.getParticipants().keySet().stream().map(Player::getUniqueId).collect(Collectors.toSet()));
-        serverController.getCurrentGame().setGameInfo(new GameInfo(
+        serverController.setGameGameInfo(new GameInfo(
                 serverController.getCurrentGame().getConfiguration().getName(),
                 mapManager.getCurrentMap().getName()
         ));
-        //initialize teams
-        playerController.getParticipants().keySet().stream().map(Player::getUniqueId)
+        //initialize teams, to add players that queued for a team before game start
+        playerController.getParticipants().keySet().stream()
+                .map(Player::getUniqueId)
                 .forEach(this::assignGameTeam);
-        statManager.save(serverController.getCurrentGame().getGameInfo());
+        statManager.save(serverController.getCurrentGameInfo());
     }
 
 
@@ -151,13 +151,13 @@ public class GameStatListener extends TimedStatListener {
             });
         }
         statManager.save(serverController.getCurrentGame().getGameInfo());
-        serverController.setLobbyInfo(
+        serverController.setLobbyGameInfo(
                 new GameInfo(
                         GameInfo.LOBBY_GAME_NAME,
                         mapManager.getWaitingLobby().getMetadata().getName()
                 )
         );
-        statManager.save(serverController.getLobbyInfo());
+        statManager.save(serverController.getCurrentGameInfo());
     }
 
     @Override
@@ -172,6 +172,12 @@ public class GameStatListener extends TimedStatListener {
         updateParticipantTime(participant, currentTime - lastUpdate, false);
     }
 
+    /**
+     *
+     * @param participant the participant
+     * @param deltaTime the elapsed time (ms)
+     * @param force whether to forcefully increment GAME_TIME_PLAYED after a player has just switched to spectator
+     */
     private void updateParticipantTime(Participant participant, long deltaTime, boolean force) {
         final Client client = participant.getClient();
         if (!participant.isSpectating() || force) {

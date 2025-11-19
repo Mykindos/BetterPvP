@@ -31,8 +31,8 @@ public abstract sealed class AbstractGame<C extends GenericGameConfiguration, W 
     @Setter @Getter
     private List<W> winners = new ArrayList<>();
 
-    @Setter @Getter
-    private GameInfo gameInfo;
+    @Getter @Setter
+    protected GameInfo gameInfo;
 
     protected AbstractGame(C configuration) {
         this.configuration = configuration;

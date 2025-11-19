@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS client_stats (
     Client      BIGINT          REFERENCES clients(id)    NOT NULL,
     Period      VARCHAR(127)    NOT NULL,
     StatType    VARCHAR(127)    NOT NULL,
-    StatData    JSONB           default  NULL,
+    StatData    JSONB           NOT NULL,
     Stat        BIGINT          NOT NULL,
     CONSTRAINT PK_Client PRIMARY KEY (Client, Period, StatType, StatData),
     CONSTRAINT FK_Client FOREIGN KEY (Client) REFERENCES clients(id)
@@ -61,7 +61,7 @@ BEGIN
         cs.Stat
     FROM client_stats cs
     LEFT JOIN game_data gd
-        ON gd.id = (cs.Data ->> 'gameId')::bigint
+        ON gd.id = (cs.StatData ->> 'gameId')::bigint
     LEFT JOIN game_teams gt
         ON gt.id = gd.id
         AND gt.client = cs.client;
