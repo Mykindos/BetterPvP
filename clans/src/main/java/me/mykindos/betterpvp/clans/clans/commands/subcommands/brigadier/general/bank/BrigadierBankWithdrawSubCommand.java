@@ -81,7 +81,7 @@ public class BrigadierBankWithdrawSubCommand extends BrigadierClanSubCommand {
                             gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() + amountToWithdraw);
 
                             executorClan.messageClan("<yellow>" + executor.getName() + " <gray>withdrew <green>$" + amountToWithdraw + " <gray>from the clan bank.", null, true);
-                            log.info("{} withdrew ${} from clan {}", executor.getName(), amountToWithdraw, executorClan.getId().toString()).submit();
+                            log.info("{} withdrew ${} from clan {}", executor.getName(), amountToWithdraw, executorClan.getId()).submit();
 
                             return Command.SINGLE_SUCCESS;
                         })

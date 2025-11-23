@@ -81,7 +81,7 @@ public class BrigadierBankDepositSubCommand extends BrigadierClanSubCommand {
                             gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - amountToDeposit);
 
                             executorClan.messageClan("<yellow>" + executor.getName() + " <gray>deposited <green>$" + amountToDeposit + " <gray>into the clan bank.", null, true);
-                            log.info("{} deposited ${} into clan {}", executor.getName(), amountToDeposit, executorClan.getId().toString()).submit();
+                            log.info("{} deposited ${} into clan {}", executor.getName(), amountToDeposit, executorClan.getId()).submit();
 
                             return Command.SINGLE_SUCCESS;
                         })
