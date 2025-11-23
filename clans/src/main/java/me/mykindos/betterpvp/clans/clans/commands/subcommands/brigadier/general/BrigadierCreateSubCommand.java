@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.chat.filter.IFilterService;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -28,13 +29,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.UUID;
-
 @Singleton
 @CustomLog
 @BrigadierSubCommand(BrigadierClansCommand.class)
 public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
     private final IFilterService filterService;
+    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
     @Inject
     protected BrigadierCreateSubCommand(ClientManager clientManager, ClanManager clanManager, IFilterService filterService) {
         super(clientManager, clanManager);
@@ -115,7 +115,7 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
 
     private void createClan(Player creator, String name) {
         UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
-            Clan clan = new Clan(UUID.randomUUID());
+            Clan clan = new Clan(ID_GENERATOR.nextId());
             clan.setName(name);
             clan.setOnline(true);
             clan.getProperties().registerListener(clan);
