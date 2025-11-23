@@ -66,7 +66,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
 
                     new CachedLogMenu(executorClan.getName(),
                             LogContext.CLAN,
-                            executorClan.getId().toString(),
+                            Long.toString(executorClan.getId()),
                             null,
                             CachedLogMenu.CLANS,
                             JavaPlugin.getPlugin(Clans.class),
@@ -84,7 +84,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
                             final Player executor = getPlayerFromExecutor(context);
                             new CachedLogMenu(target.getName(),
                                     LogContext.CLAN,
-                                    target.getId().toString(),
+                                    Long.toString(target.getId()),
                                     null,
                                     CachedLogMenu.CLANS,
                                     JavaPlugin.getPlugin(Clans.class),
