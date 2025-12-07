@@ -98,21 +98,18 @@ public class MinecraftStat implements IBuildableStat {
     public Long getStat(StatContainer statContainer, String periodKey) {
         //material composite
         if (isMaterialStatistic(statistic) && material == null) {
-            return getCompositeMinecraftStat(statContainer, periodKey);
+            return getFilteredStat(statContainer, periodKey, this::filterMinecraftStat);
         }
         //entity composite
         if (isEntityStatistic(statistic) && entityType == null) {
-            return getCompositeMinecraftStat(statContainer, periodKey);
+            return getFilteredStat(statContainer, periodKey, this::filterMinecraftStat);
         }
         return statContainer.getProperty(periodKey, this);
     }
 
-    public Long getCompositeMinecraftStat(StatContainer statContainer, String period) {
-        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
-                .filter(entry ->
-                        entry.getKey().getStatType().startsWith(this.getBaseStat())
-                ).mapToLong(Map.Entry::getValue)
-                .sum();
+    boolean filterMinecraftStat(Map.Entry<IStat, Long> entry) {
+        MinecraftStat other = (MinecraftStat) entry.getKey();
+        return statistic.equals(other.statistic);
     }
 
     @Override
