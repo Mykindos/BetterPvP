@@ -129,7 +129,7 @@ public enum ClientStat implements IClientStat {
     ClientStat(String name, Material material, int customModelData, boolean glowing, Set<IStat> compositeStats, String... description) {
         this.name = name;
         this.description = description;
-        this.compositeStat =  compositeStats != null ? new CompositeStat(getStatType(), compositeStats) : null;
+        this.compositeStat = compositeStats != null ? new CompositeStat(getStatType(), compositeStats) : null;
         this.material = material;
         this.customModelData = customModelData;
         this.glowing = glowing;

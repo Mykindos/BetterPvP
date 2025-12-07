@@ -13,7 +13,6 @@ import lombok.ToString;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.skill.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Builder
 @Getter
@@ -61,28 +61,21 @@ public class ChampionsSkillStat implements IBuildableStat {
     @Override
     public Long getStat(StatContainer statContainer, String periodKey) {
         if (skillName == null) {
-            return getActionComposite(statContainer, periodKey);
+            return getFilteredStat(statContainer, periodKey, this::filterAction);
         }
         if (level == -1) {
-            return getSkillComposite(statContainer, periodKey);
+            return getFilteredStat(statContainer, periodKey, this::filterSkill);
         }
         return statContainer.getProperty(periodKey, this);
     }
 
-    private Long getActionComposite(StatContainer statContainer, String period) {
-        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
-                .filter(entry ->
-                        entry.getKey().getStatType().startsWith(TYPE + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name())
-                ).mapToLong(Map.Entry::getValue)
-                .sum();
+    private boolean filterAction(Map.Entry<IStat, Long> entry) {
+        ChampionsSkillStat other = (ChampionsSkillStat) entry.getKey();
+        return action.equals(other.action);
     }
-
-    private Long getSkillComposite(StatContainer statContainer, String period) {
-        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
-                .filter(entry ->
-                        entry.getKey().getStatType().startsWith(TYPE + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + skillName)
-                ).mapToLong(Map.Entry::getValue)
-                .sum();
+    private boolean filterSkill(Map.Entry<IStat, Long> entry) {
+        ChampionsSkillStat other = (ChampionsSkillStat) entry.getKey();
+        return action.equals(other.action) && Objects.requireNonNull(skillName).equalsIgnoreCase(other.skillName);
     }
 
     @Override
