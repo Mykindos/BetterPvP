@@ -22,6 +22,9 @@ import org.json.JSONObject;
 public abstract class ClansStat implements IBuildableStat {
     public static final String NO_CLAN_NAME = "No";
     public static final String NO_ID_REPLACE = "No";
+    /**
+     * The Clan Name, empty if getting stat of all Clans
+     */
     @NotNull
     @Builder.Default
     protected String clanName = "";
