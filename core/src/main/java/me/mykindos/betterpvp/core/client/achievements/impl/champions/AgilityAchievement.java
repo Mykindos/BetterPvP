@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievem
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 @CustomLog
 @Singleton
+@BPvPListener
 public class AgilityAchievement extends SingleSimpleAchievement {
     @Inject
     public AgilityAchievement() {
