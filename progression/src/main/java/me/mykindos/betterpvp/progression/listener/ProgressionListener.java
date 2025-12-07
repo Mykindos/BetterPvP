@@ -7,9 +7,10 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
-import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
@@ -56,9 +57,9 @@ public class ProgressionListener implements Listener {
         final String tree = event.getProfession();
         final TextComponent actionBarText;
         if (amount > 0) {
-            actionBarText = Component.text("+" + String.format("%.1f", amount) + " " + tree + " XP", NamedTextColor.DARK_AQUA);
+            actionBarText = Component.text("+" + UtilFormat.formatNumber(amount, 1) + " " + tree + " XP", NamedTextColor.DARK_AQUA);
         } else {
-            String amountString = String.valueOf(amount);
+            String amountString = UtilFormat.formatNumber(amount);
             if (amount == 0) {
                 amountString = "+" + amountString;
             }
@@ -70,6 +71,9 @@ public class ProgressionListener implements Listener {
 
         // Title levelup
         if (!event.isLevelUp()) {
+            if (event.getGainedExp() > 10) {
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
+            }
             return;
         }
 
@@ -86,7 +90,7 @@ public class ProgressionListener implements Listener {
             gamer.getTitleQueue().add(501, titleCmpt);
         }
 
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0f);
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
     }
 
 }

@@ -12,7 +12,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill
 import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -20,9 +22,9 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -141,8 +143,13 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 } else {
                     UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
 
-                    CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
-                    UtilServer.callEvent(cde);
+                    DamageEvent cde = new DamageEvent(hit,
+                            damager,
+                            null,
+                            new SkillDamageCause(this).withBukkitCause(DamageCause.PROJECTILE).withCategory(DamageCauseCategory.RANGED),
+                            getDamage(level),
+                            "Inferno");
+                    UtilDamage.doDamage(cde);
                 }
             }
         }
@@ -197,4 +204,3 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     }
 
 }
-

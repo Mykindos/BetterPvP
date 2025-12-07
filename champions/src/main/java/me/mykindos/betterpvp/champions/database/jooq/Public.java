@@ -4,12 +4,8 @@
 package me.mykindos.betterpvp.champions.database.jooq;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsCombatStats;
-import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsDamagevalues;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKilldeathData;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKills;
@@ -27,13 +23,15 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKdrByC
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillstreakByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopRatingByClassRecord;
-
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -58,11 +56,6 @@ public class Public extends SchemaImpl {
      * The table <code>public.champions_combat_stats</code>.
      */
     public final ChampionsCombatStats CHAMPIONS_COMBAT_STATS = ChampionsCombatStats.CHAMPIONS_COMBAT_STATS;
-
-    /**
-     * The table <code>public.champions_damagevalues</code>.
-     */
-    public final ChampionsDamagevalues CHAMPIONS_DAMAGEVALUES = ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES;
 
     /**
      * The table <code>public.champions_kill_contributions</code>.
@@ -448,7 +441,6 @@ public class Public extends SchemaImpl {
         return Arrays.asList(
             ChampionsBuilds.CHAMPIONS_BUILDS,
             ChampionsCombatStats.CHAMPIONS_COMBAT_STATS,
-            ChampionsDamagevalues.CHAMPIONS_DAMAGEVALUES,
             ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS,
             ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA,
             ChampionsKills.CHAMPIONS_KILLS,

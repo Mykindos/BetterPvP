@@ -4,42 +4,33 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
+import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
 
 @WithReflection
 @CustomLog
 public class LegendsCommand extends Command {
 
-    private final ClientManager clientManager;
-    private final UUIDManager uuidManager;
-
-    private final ItemHandler itemHandler;
-
+    private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public LegendsCommand(ClientManager clientManager, UUIDManager uuidManager, ItemHandler itemHandler, WeaponManager weaponManager) {
-        this.itemHandler = itemHandler;
-        this.clientManager = clientManager;
-        this.uuidManager = uuidManager;
+    public LegendsCommand(ItemRegistry itemRegistry, ItemFactory itemFactory) {
+        this.itemRegistry = itemRegistry;
+        this.itemFactory = itemFactory;
     }
 
     @Singleton
@@ -50,7 +41,7 @@ public class LegendsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "give the target all legends";
+        return "give the target all legendary and mythic weapons";
     }
 
     @Override
@@ -67,26 +58,27 @@ public class LegendsCommand extends Command {
             return;
         }
 
+        final List<ItemInstance> legends = itemRegistry.getItems().values().stream()
+                .filter(item -> item instanceof WeaponItem)
+                .map(itemFactory::create)
+                .filter(item -> item.getRarity().isImportant())
+                .toList();
 
-        for (BPvPItem bPvPItem : itemHandler.getLegends()) {
-            ItemStack itemStack = itemHandler.updateNames(bPvPItem.getItemStack());
-            itemHandler.updateNames(itemStack);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            UUIDItem uuidItem = null;
+        for (ItemInstance item : legends) {
+            ItemStack itemStack = item.createItemStack();
 
-            if (itemMeta != null) {
-                PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
-                if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
-                    uuidItem = uuidManager.getObject(UUID.fromString(Objects.requireNonNull(pdc.get(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING)))).orElse(null);
-                }
-            }
-            if (uuidItem != null) {
-                log.info("{} spawned and gave ({}) to {}", player.getName(), uuidItem.getUuid(), target.getName())
-                        .setAction("ITEM_SPAWN").addClientContext(player).addClientContext(target, true).addItemContext(uuidItem).submit();
+            item.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+                UUID uuid = uuidProperty.getUniqueId();
+                log.info("{} spawned and gave ({}) to {}", player.getName(), uuid, target.getName())
+                        .setAction("ITEM_SPAWN")
+                        .addClientContext(player)
+                        .addClientContext(target, true)
+                        .addItemContext(itemRegistry, item)
+                        .submit();
+            });
 
-            }
             target.getInventory().addItem(itemStack);
-            }
+        }
         }
 
     public Component getUsage() {

@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -39,13 +39,13 @@ public class FieldsListener extends ClanListener {
 
     private final WeakHashMap<Player, Map<Block, FieldsInteractable>> profiles = new WeakHashMap<>();
     private Fields fields;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public FieldsListener(ClanManager clanManager, ClientManager clientManager, Fields fields, ItemHandler itemHandler) {
+    public FieldsListener(ClanManager clanManager, ClientManager clientManager, Fields fields, ItemFactory itemFactory) {
         super(clanManager, clientManager);
         this.fields = fields;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     private boolean isFields(Block block) {
@@ -105,7 +105,7 @@ public class FieldsListener extends ClanListener {
             return; // If the block isn't active yet, ignore
         }
 
-        final boolean allow = type.processInteraction(event, block, itemHandler);
+        final boolean allow = type.processInteraction(event, block, itemFactory);
 
         if (allow) {
             event.setInform(false); // Block the message that they cant break

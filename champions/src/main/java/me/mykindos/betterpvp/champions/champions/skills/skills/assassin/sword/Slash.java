@@ -12,9 +12,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -32,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.util.RayTraceResult;
 
@@ -128,9 +128,9 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private void hit(Player caster, int level, LivingEntity hit) {
-        CustomDamageEvent cde = new CustomDamageEvent(hit, caster, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Slash");
+        DamageEvent cde = new DamageEvent(hit, caster, null, new SkillDamageCause(this), getDamage(level), "Slash");
         cde.setDamageDelay(0);
-        UtilDamage.doCustomDamage(cde);
+        UtilDamage.doDamage(cde);
 
         if (!cde.isCancelled()) {
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.8f, 2f);

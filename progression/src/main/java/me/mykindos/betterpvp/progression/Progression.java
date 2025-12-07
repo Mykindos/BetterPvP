@@ -15,16 +15,17 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemKey;
+import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
+import me.mykindos.betterpvp.progression.item.ProgressionFishBootstrap;
 import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
-import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -53,8 +54,11 @@ public class Progression extends BPvPPlugin {
 
         var core = (Core) Bukkit.getPluginManager().getPlugin("Core");
         if (core != null) {
-            Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
-            Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
+
+            final Adapters adapters = new Adapters(this);
+            final Reflections reflections = new Reflections(PACKAGE);
+            final Reflections fieldReflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
+            Set<Field> fields = fieldReflections.getFieldsAnnotatedWith(Config.class);
 
             injector = core.getInjector().createChildInjector(new ProgressionInjectorModule(this), new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
@@ -63,11 +67,12 @@ public class Progression extends BPvPPlugin {
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 
+            final ItemLoader itemLoader = new ItemLoader(this);
+            itemLoader.load(adapters, reflections.getTypesAnnotatedWith(ItemKey.class));
+            this.registerItems();
+
             var skillManager = injector.getInstance(ProgressionSkillManager.class);
             skillManager.loadSkills();
-
-            var itemHandler = injector.getInstance(ItemHandler.class);
-            itemHandler.loadItemData("progression");
 
             var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
             listenerLoader.registerListeners(PACKAGE);
@@ -80,17 +85,17 @@ public class Progression extends BPvPPlugin {
 
             updateEventExecutor.loadPlugin(this);
 
-            injector.getInstance(ProgressionWeaponManager.class).load();
-
             var progressionTipManager = injector.getInstance(ProgressionTipLoader.class);
             progressionTipManager.loadTips(PACKAGE);
 
-            final Adapters adapters = new Adapters(this);
-            final Reflections reflectionAdapters = new Reflections(PACKAGE);
-            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
-            adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
 
+            adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapter.class));
+            adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapters.class));
         }
+    }
+
+    private void registerItems() {
+        this.injector.getInstance(ProgressionFishBootstrap.class).register();
     }
 
     @Override

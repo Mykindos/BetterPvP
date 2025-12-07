@@ -86,7 +86,7 @@ public class GuiSelectPattern extends AbstractGui implements Windowed {
                     .with(banner.get())
                     .displayName(Component.text("Select ", NamedTextColor.WHITE, TextDecoration.BOLD)
                             .append(Component.text(name, NamedTextColor.GREEN, TextDecoration.BOLD)))
-                    .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                    .hideAdditionalTooltip(true)
                     .build();
 
             setItem(slot, new SimpleItem(item) {

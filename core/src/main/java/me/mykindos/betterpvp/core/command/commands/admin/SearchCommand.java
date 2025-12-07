@@ -8,9 +8,9 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDController;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDItem;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
@@ -93,9 +93,7 @@ public class SearchCommand extends Command {
             }
 
             UUIDItem uuidItem = uuidItemOptional.get();
-
             new CachedLogMenu(uuidItem.getIdentifier(), LogContext.ITEM, uuid.toString(), "ITEM_", CachedLogMenu.ITEM, JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
-
         }
 
         @Override
@@ -189,7 +187,7 @@ public class SearchCommand extends Command {
         ClientManager clientManager;
 
         @Inject
-        ItemHandler itemHandler;
+        UUIDController uuidController;
 
         @Override
         public String getName() {
@@ -209,7 +207,7 @@ public class SearchCommand extends Command {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 boolean hasAtLeastOneUUIDItem = false;
                 Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", online.getName());
-                for (UUIDItem uuidItem : itemHandler.getUUIDItems(online)) {
+                for (UUIDItem uuidItem : uuidController.getUUIDItems(online).keySet()) {
                     if (!hasAtLeastOneUUIDItem) {
                         hasAtLeastOneUUIDItem = true;
                     }

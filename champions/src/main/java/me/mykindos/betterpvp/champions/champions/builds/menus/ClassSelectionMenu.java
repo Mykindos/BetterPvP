@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelectionButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ToggleShowPassiveButton;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
-import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -22,10 +21,9 @@ public class ClassSelectionMenu extends AbstractGui implements Windowed {
      * The menu used to choose which role to manage builds for
      * @param buildManager the BuildManager
      * @param skillManager the ChampionsSkillManager
-     * @param armourManager the ArmourManager
      * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
      */
-    public ClassSelectionMenu(BuildManager buildManager, ChampionsSkillManager skillManager, ArmourManager armourManager,
+    public ClassSelectionMenu(BuildManager buildManager, ChampionsSkillManager skillManager,
                               @Nullable RoleBuild roleBuild, boolean shouldShowPassives) {
         super(9, 3);
 
@@ -40,11 +38,11 @@ public class ClassSelectionMenu extends AbstractGui implements Windowed {
         final Iterator<Role> iterator = Arrays.stream(Role.values()).iterator();
         for (int slot : slots) {
             final Role role = iterator.next();
-            setItem(slot, new ClassSelectionButton(buildManager, skillManager, role, armourManager, roleBuild, this,
+            setItem(slot, new ClassSelectionButton(buildManager, skillManager, role, roleBuild, this,
                     shouldShowPassives));
         }
 
-        setItem(26, new ToggleShowPassiveButton(buildManager, skillManager, armourManager, shouldShowPassives));
+        setItem(26, new ToggleShowPassiveButton(buildManager, skillManager, shouldShowPassives));
 
         setBackground(Menu.BACKGROUND_ITEM);
     }

@@ -12,7 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -103,8 +104,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent e) {
-        if (e.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent e) {
+        if (!e.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(e.getDamager() instanceof Player damager)) return;
         if (!active.containsKey(damager)) return;
 

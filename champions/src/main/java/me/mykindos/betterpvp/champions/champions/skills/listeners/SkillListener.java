@@ -2,13 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
@@ -37,8 +30,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
-import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
-import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -46,7 +37,6 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillE
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
-import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -55,12 +45,16 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -77,6 +71,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 @Singleton
 @BPvPListener
 @CustomLog
@@ -89,13 +91,14 @@ public class SkillListener implements Listener {
     private final EffectManager effectManager;
     private final ClientManager clientManager;
     private final ChampionsSkillManager skillManager;
-    private final WeaponManager weaponManager;
+    private final ItemFactory itemFactory;
 
     private final HashSet<UUID> inventoryDrop = new HashSet<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
-                         EnergyService energyService, EffectManager effectManager, ClientManager clientManager, ChampionsSkillManager skillManager, WeaponManager weaponManager) {
+                         EnergyService energyService, EffectManager effectManager, ClientManager clientManager,
+                         ChampionsSkillManager skillManager, ItemFactory itemFactory) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
@@ -103,8 +106,7 @@ public class SkillListener implements Listener {
         this.effectManager = effectManager;
         this.clientManager = clientManager;
         this.skillManager = skillManager;
-        this.weaponManager = weaponManager;
-
+        this.itemFactory = itemFactory;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -199,8 +201,14 @@ public class SkillListener implements Listener {
         }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
         if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
-            Optional<IWeapon> iWeaponOptional = weaponManager.getWeaponByItemStack(droppedItem);
-            if (iWeaponOptional.isEmpty() || !(iWeaponOptional.get() instanceof LegendaryWeapon)) {
+
+            final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(droppedItem);
+            if (itemOpt.isEmpty()) {
+                return; // Not a valid item
+            }
+
+            ItemInstance itemInstance = itemOpt.get();
+            if (!(itemInstance.getBaseItem() instanceof WeaponItem)) {
                 return;
             }
         }
@@ -266,8 +274,7 @@ public class SkillListener implements Listener {
 
                     if (skill instanceof ChannelSkill channelSkill) {
                         if (channelSkill.shouldShowShield(player)) {
-                            event.setUseShield(true);
-                            event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
+                            event.setBlockingItem(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_BLOCKING_ITEM : ItemStack.of(Material.SHIELD));
                         }
                     }
                 }

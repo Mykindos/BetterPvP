@@ -1,9 +1,16 @@
 package me.mykindos.betterpvp.progression.profession.fishing.fish;
 
+import com.google.common.base.Preconditions;
+import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -14,25 +21,43 @@ import java.util.UUID;
  * custom implementation.
  */
 @Data
+@CustomLog
 public class SimpleFishType implements FishType {
 
     private static final Random RANDOM = new Random();
 
-    private final String name;
+    private final String key;
+    private final ItemFactory itemFactory;
+    private NamespacedKey itemKey;
+    private String name;
     private int minWeight;
     private int maxWeight;
     private int frequency;
-    private int modelData;
-    private Material material;
 
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
-        final String key = name.toLowerCase().replace(" ", "_");
+        this.name = config.getOrSaveString("fishing.loot." + key + ".name", "Fish");
         this.frequency = config.getOrSaveInt("fishing.loot." + key + ".frequency", 1);
         this.minWeight = config.getOrSaveInt("fishing.loot." + key + ".minWeight", 1);
         this.maxWeight = config.getOrSaveInt("fishing.loot." + key + ".maxWeight", 1);
-        this.modelData = config.getOrSaveInt("fishing.loot." + key + ".modelData", 0);
-        this.material = Material.valueOf(config.getString("fishing.loot." + key + ".material", "COD"));
+        String itemKey = config.getOrSaveString("fishing.loot." + key + ".item", "minecraft:cod");
+        if (itemKey == null) {
+            throw new IllegalArgumentException("Item key cannot be null!");
+        }
+
+        final NamespacedKey namespacedKey = NamespacedKey.fromString(itemKey);
+        if (namespacedKey == null) {
+            throw new IllegalArgumentException("Invalid item key: " + itemKey);
+        }
+        this.itemKey = namespacedKey;
+    }
+
+    public ItemStack generateItem(int count) {
+        final BaseItem baseItem =  itemFactory.getItemRegistry().getItem(itemKey);
+        Preconditions.checkArgument(baseItem != null, "Invalid item key: " + itemKey);
+        final ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
+        itemStack.setAmount(count);
+        return itemStack;
     }
 
     @Override

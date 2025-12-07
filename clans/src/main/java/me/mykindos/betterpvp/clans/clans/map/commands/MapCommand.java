@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
@@ -18,11 +18,11 @@ import org.bukkit.inventory.meta.MapMeta;
 @Singleton
 public class MapCommand extends Command {
 
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public MapCommand(ItemHandler itemHandler){
-        this.itemHandler = itemHandler;
+    public MapCommand(ItemFactory itemFactory){
+        this.itemFactory = itemFactory;
     }
 
     @Override
@@ -38,11 +38,11 @@ public class MapCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if(!UtilInventory.contains(player, Material.FILLED_MAP, 1)) {
-            ItemStack itemstack = new ItemStack(Material.FILLED_MAP);
-            MapMeta meta = (MapMeta) itemstack.getItemMeta();
+            ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
+            MapMeta meta = (MapMeta) itemStack.getItemMeta();
             meta.setMapView(Bukkit.getMap(0));
-            itemstack.setItemMeta(meta);
-            player.getInventory().addItem(itemHandler.updateNames(itemstack));
+            itemStack.setItemMeta(meta);
+            player.getInventory().addItem(itemFactory.convertItemStack(itemStack).orElse(itemStack));
         }else{
             UtilMessage.message(player, "Clans", "You already have a map in your inventory");
         }

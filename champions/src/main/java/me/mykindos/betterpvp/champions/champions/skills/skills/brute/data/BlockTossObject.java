@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.data;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -27,7 +28,6 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.joml.Quaternionf;
@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
 public final class BlockTossObject {
 
@@ -317,7 +319,12 @@ public final class BlockTossObject {
                 final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
                 VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
                 UtilVelocity.velocity(ent, caster, velocityData);
-                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, skill.getName()));
+                UtilDamage.doDamage(new DamageEvent(ent,
+                        caster,
+                        null,
+                        new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
+                        damage,
+                        skill.getName()));
                 UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
             }
         }

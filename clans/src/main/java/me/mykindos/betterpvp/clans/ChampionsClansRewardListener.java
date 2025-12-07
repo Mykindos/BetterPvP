@@ -7,13 +7,15 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageReceivedEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -25,13 +27,13 @@ public class ChampionsClansRewardListener implements Listener {
 
     private final Clans clans;
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public ChampionsClansRewardListener(Clans clans, ClientManager clientManager, ItemHandler itemHandler) {
+    public ChampionsClansRewardListener(Clans clans, ClientManager clientManager, ItemFactory itemFactory) {
         this.clans = clans;
         this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     @EventHandler
@@ -40,7 +42,8 @@ public class ChampionsClansRewardListener implements Listener {
         if (!event.getMessage().getMetadata().containsKey("uuid")) return;
 
         CompletableFuture.runAsync(() -> {
-            ItemStack itemStack = itemHandler.getItem("dungeons:dungeon_token").getItemStack();
+            final BaseItem baseItem = Objects.requireNonNull(itemFactory.getItemRegistry().getItem("dungeons:dungeon_token"));
+            ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
 
             String uuid = event.getMessage().getMetadata().get("uuid");
             CompletableFuture<Optional<Client>> clientOptionalFuture = clientManager.search().offline(UUID.fromString(uuid));

@@ -4,9 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.item.WaterBlock;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -14,20 +15,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 public class ClanWaterBlockTip extends ClanTip {
-    private final ItemHandler itemHandler;
-    private BPvPItem waterBlock = null;
+
+    private final ItemFactory itemFactory;
+    private final WaterBlock waterBlock;
+
     @Inject
-    protected ClanWaterBlockTip(Clans clans, ItemHandler itemHandler) {
+    protected ClanWaterBlockTip(Clans clans, ItemFactory itemFactory, WaterBlock waterBlock) {
         super(clans, 1, 2);
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
+        this.waterBlock = waterBlock;
     }
 
     @Override
     public Component generateComponent() {
-        waterBlock = itemHandler.getItem("clans:water_block");
-        if (waterBlock == null) return Component.empty();
+
+        final ItemInstance instance = itemFactory.create(waterBlock);
         return Component.empty().append(Component.text("You can place water in your territory by buying or crafting a "))
-                .append(waterBlock.getName()).hoverEvent(waterBlock.getItemStack().asHoverEvent())
+                .append(instance.getView().getName()).hoverEvent(instance.getView().get().asHoverEvent())
                 .append(Component.text(" (lapis block), then placing it like you would a water bucket"));
     }
 
@@ -43,6 +47,6 @@ public class ClanWaterBlockTip extends ClanTip {
                 setComponent(generateComponent());
             });
         }
-        return waterBlock != null && waterBlock.isEnabled();
+        return waterBlock != null;
     }
 }

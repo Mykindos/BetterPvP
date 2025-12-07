@@ -4,14 +4,13 @@ import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.apache.commons.text.WordUtils;
@@ -28,7 +27,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Warden;
 import org.bukkit.event.EventHandler;
@@ -42,7 +40,6 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -55,14 +52,11 @@ import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -71,7 +65,7 @@ import java.util.Objects;
 public class WorldListener implements Listener {
 
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     /*
      * Throws out red dye everywhere when players die
@@ -80,9 +74,9 @@ public class WorldListener implements Listener {
     private final HashMap<Item, Long> blood = new HashMap<>();
 
     @Inject
-    public WorldListener(ClientManager clientManager, ItemHandler itemHandler) {
+    public WorldListener(ClientManager clientManager, ItemFactory itemFactory) {
         this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     /*
@@ -313,131 +307,23 @@ public class WorldListener implements Listener {
     }
 
     /*
-     * Modifies the drops for just about all mobs in minecraft
-     */
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void handleDeath(EntityDeathEvent event) {
-
-        event.setDroppedExp(0);
-
-        if (event.getEntity().customName() == null) {
-            if (event.getEntityType() != EntityType.PLAYER) {
-                event.getDrops().clear();
-                List<ItemStack> drops = new ArrayList<>();
-
-                if (event.getEntityType() == EntityType.CHICKEN) {
-                    drops.add(new ItemStack(Material.CHICKEN, 1));
-                    drops.add(new ItemStack(Material.FEATHER, 2 + UtilMath.randomInt(1)));
-                } else if (event.getEntityType() == EntityType.COW) {
-                    drops.add(new ItemStack(Material.BEEF, 1 + UtilMath.randomInt(3)));
-                    drops.add(new ItemStack(Material.LEATHER, 1 + UtilMath.randomInt(2)));
-                }
-                if (event.getEntityType() == EntityType.MOOSHROOM) {
-                    drops.add(new ItemStack(Material.BEEF, 1 + UtilMath.randomInt(3)));
-                    drops.add(new ItemStack(Material.RED_MUSHROOM, 2 + UtilMath.randomInt(2)));
-                } else if (event.getEntityType() == EntityType.OCELOT) {
-                    int rand = UtilMath.randomInt(10);
-                    if (rand == 0 || rand == 1 || rand == 2) {
-                        drops.add(new ItemStack(Material.LEATHER, 1 + UtilMath.randomInt(2)));
-                    } else if (rand == 3 || rand == 4 || rand == 5) {
-                        drops.add(new ItemStack(Material.COD, 2 + UtilMath.randomInt(2)));
-                    } else if (rand == 6 || rand == 7) {
-                        drops.add(new ItemStack(Material.COAL, 1 + UtilMath.randomInt(2)));
-                    } else {
-                        drops.add(new ItemStack(Material.COD, 10 + UtilMath.randomInt(10)));
-                    }
-                    drops.add(new ItemStack(Material.BONE, 4 + UtilMath.randomInt(4)));
-
-                } else if (event.getEntityType() == EntityType.PIG) {
-                    drops.add(new ItemStack(Material.PORKCHOP, 1 + UtilMath.randomInt(2)));
-                } else if (event.getEntityType() == EntityType.SHEEP) {
-                    drops.add(new ItemStack(Material.WHITE_WOOL, 1 + UtilMath.randomInt(3)));
-                    drops.add(new ItemStack(Material.WHITE_WOOL, 1 + UtilMath.randomInt(4)));
-                } else if (event.getEntityType() == EntityType.VILLAGER) {
-                    drops.add(new ItemStack(Material.BONE, 2 + UtilMath.randomInt(3)));
-                } else if (event.getEntityType() == EntityType.BLAZE) {
-                    drops.add(new ItemStack(Material.BLAZE_ROD, 1));
-                    drops.add(new ItemStack(Material.BONE, 6 + UtilMath.randomInt(7)));
-                } else if (event.getEntityType() == EntityType.CAVE_SPIDER) {
-
-                    drops.add(new ItemStack(Material.COBWEB, 1));
-                    drops.add(new ItemStack(Material.STRING, 2 + UtilMath.randomInt(3)));
-                    drops.add(new ItemStack(Material.SPIDER_EYE, 1));
-                    drops.add(new ItemStack(Material.BONE, 4 + UtilMath.randomInt(4)));
-
-                } else if (event.getEntityType() == EntityType.CREEPER) {
-                    drops.add(new ItemStack(Material.COAL, 2 + UtilMath.randomInt(4)));
-                    drops.add(new ItemStack(Material.BONE, 4 + UtilMath.randomInt(7)));
-                } else if (event.getEntityType() == EntityType.ENDERMAN) {
-                    drops.add(new ItemStack(Material.BONE, 12 + UtilMath.randomInt(8)));
-                } else if (event.getEntityType() == EntityType.GHAST) {
-                    drops.add(new ItemStack(Material.GHAST_TEAR, 1));
-                    drops.add(new ItemStack(Material.BONE, 16 + UtilMath.randomInt(8)));
-                } else if (event.getEntityType() == EntityType.IRON_GOLEM) {
-                    drops.add(new ItemStack(Material.IRON_INGOT, 2 + UtilMath.randomInt(3)));
-                    drops.add(new ItemStack(Material.BONE, 12 + UtilMath.randomInt(6)));
-                } else if (event.getEntityType() == EntityType.MAGMA_CUBE) {
-                    drops.add(new ItemStack(Material.MAGMA_CREAM, UtilMath.randomInt(1, 3)));
-                    drops.add(new ItemStack(Material.BONE, 1 + UtilMath.randomInt(2)));
-                } else if (event.getEntityType() == EntityType.ZOMBIFIED_PIGLIN) {
-                    PigZombie z = (PigZombie) event.getEntity();
-                    if (z.getEquipment().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
-                        drops.add(new ItemStack(Material.GOLDEN_AXE));
-                    }
-                    drops.add(new ItemStack(Material.BONE, 2 + UtilMath.randomInt(2)));
-                    if (UtilMath.randomInt(50) > 48) {
-                        ItemStack[] temp = {new ItemStack(Material.CHAINMAIL_HELMET), new ItemStack(Material.CHAINMAIL_BOOTS),
-                                new ItemStack(Material.CHAINMAIL_CHESTPLATE), new ItemStack(Material.CHAINMAIL_LEGGINGS)};
-                        drops.add(temp[UtilMath.randomInt(temp.length - 1)]);
-                    }
-                    if (UtilMath.randomInt(100) > 90) {
-                        drops.add(new ItemStack(Material.GOLDEN_PICKAXE));
-                    } else if (UtilMath.randomInt(1000) > 990) {
-                        drops.add(new ItemStack(Material.GOLDEN_SWORD));
-                    }
-                } else if (event.getEntityType() == EntityType.SILVERFISH) {
-                    drops.add(new ItemStack(Material.BONE, 1 + UtilMath.randomInt(2)));
-                } else if (event.getEntityType() == EntityType.SKELETON) {
-                    drops.add(new ItemStack(Material.ARROW, 4 + UtilMath.randomInt(5)));
-                    drops.add(new ItemStack(Material.BONE, 3 + UtilMath.randomInt(4)));
-                } else if (event.getEntityType() == EntityType.SLIME) {
-                    drops.add(new ItemStack(Material.SLIME_BALL, 1));
-                    drops.add(new ItemStack(Material.BONE, 1 + UtilMath.randomInt(2)));
-                } else if (event.getEntityType() == EntityType.SPIDER) {
-                    drops.add(new ItemStack(Material.STRING, 2 + UtilMath.randomInt(3)));
-                    drops.add(new ItemStack(Material.COBWEB, 1));
-                    drops.add(new ItemStack(Material.SPIDER_EYE, 1));
-                    drops.add(new ItemStack(Material.BONE, 4 + UtilMath.randomInt(4)));
-                } else if (event.getEntityType() == EntityType.ZOMBIE) {
-                    event.getDrops().add(new ItemStack(Material.ROTTEN_FLESH, 1));
-                    drops.add(new ItemStack(Material.BONE, 3 + UtilMath.randomInt(4)));
-                } else if (event.getEntityType() == EntityType.RABBIT) {
-                    drops.add(new ItemStack(Material.RABBIT_HIDE, 1 + UtilMath.randomInt(3)));
-                    drops.add(new ItemStack(Material.BONE, 2 + UtilMath.randomInt(3)));
-                }
-
-                for (ItemStack t : drops) {
-                    event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), t);
-                }
-            }
-        }
-
-    }
-
-    /*
      * Updates the names of items that are picked up from the ground (sets there name to be yellow from white)
      * Other than enchanted armour
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPickup(EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player) {
-            itemHandler.updateNames(event.getItem().getItemStack());
+            final ItemStack itemStack = event.getItem().getItemStack();
+            final ItemStack result = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+            event.getItem().setItemStack(result);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSpawnItem(ItemSpawnEvent event) {
-        itemHandler.updateNames(event.getEntity().getItemStack());
+        final ItemStack itemStack = event.getEntity().getItemStack();
+        final ItemStack result = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+        event.getEntity().setItemStack(result);
     }
 
     /*
@@ -487,16 +373,6 @@ public class WorldListener implements Listener {
         }
     }
 
-    /**
-     * No hand swapping!
-     *
-     * @param event the event
-     */
-    @EventHandler
-    public void onSwapHand(PlayerSwapHandItemsEvent event) {
-        event.setCancelled(true);
-    }
-
     /*
      * Stops ground items from being destroyed from things like lava, fire, lightning, etc.
      */
@@ -517,7 +393,7 @@ public class WorldListener implements Listener {
     }
 
     @EventHandler
-    public void onDamageWarden(CustomDamageEvent event) {
+    public void onDamageWarden(DamageEvent event) {
         if (event.getDamagee() instanceof Warden) {
             event.setKnockback(false);
         }

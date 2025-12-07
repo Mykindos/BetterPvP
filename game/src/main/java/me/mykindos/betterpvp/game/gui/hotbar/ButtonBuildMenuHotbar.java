@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.game.framework.manager.InventoryProvider;
@@ -33,7 +33,7 @@ public class ButtonBuildMenuHotbar extends ControlItem<BuildMenu> {
 
     private final InventoryProvider inventoryProvider;
     private final HotBarLayoutManager layoutManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final Role role;
     private final GamerBuilds builds;
     private final int buildId;
@@ -57,7 +57,7 @@ public class ButtonBuildMenuHotbar extends ControlItem<BuildMenu> {
         final HotBarLayout layout = Objects.requireNonNull(layoutManager.getLayout(player, buildOpt.get()));
 
         final WeakReference<Player> playerRef = new WeakReference<>(player);
-        new HotBarEditor(role, layout, layoutManager, itemHandler, getGui(), p -> {
+        new HotBarEditor(role, layout, layoutManager, itemFactory, getGui(), p -> {
             Player cachedPlayer = playerRef.get();
             if (cachedPlayer != null) {
                 inventoryProvider.refreshInventory(cachedPlayer);

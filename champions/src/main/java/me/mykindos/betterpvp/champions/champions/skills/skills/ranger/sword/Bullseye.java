@@ -13,8 +13,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -202,15 +203,16 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-        LivingEntity damagee = event.getDamagee();
+        if (!event.isDamageeLiving()) return;
+        LivingEntity damagee = event.getLivingDamagee();
         if (bullsEyeData.get(damager.getUniqueId()) == null) return;
         if (damagee == bullsEyeData.get(damager.getUniqueId()).getTarget()) {
             int playerLevel = getLevel(damager);
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
-            event.setDamage(getBonusDamage(playerLevel) + (event.getDamage()));
+            event.addModifier(new SkillDamageModifier.Flat(this, getBonusDamage(playerLevel)));
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> hit you with <alt>" + getName());
 

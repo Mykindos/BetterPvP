@@ -6,13 +6,13 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
-import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.AbstractGame;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -212,7 +212,7 @@ public class GameStartHandler implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDamage(CustomDamageEvent event) {
+    public void onPlayerDamage(DamageEvent event) {
         if (isCountdownActive()) {
             event.setCancelled(true);
         }

@@ -7,14 +7,14 @@ import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 @EqualsAndHashCode(callSuper = true)
 @Getter
 public abstract class EnergyEvent extends CustomCancellableEvent {
-    private final CAUSE cause;
+    private final Cause cause;
 
-    protected EnergyEvent(CAUSE cause) {
+    protected EnergyEvent(Cause cause) {
         this.cause = cause;
     }
 
 
-    public enum CAUSE {
+    public enum Cause {
         /**
          * This event was caused by using energy
          */

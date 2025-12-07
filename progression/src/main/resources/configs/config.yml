@@ -18,255 +18,83 @@ woodcutting:
 
   loot:
     stick:
-      material: STICK
-      customModelData: 0
+      item: minecraft:stick
       frequency: 50000
       minAmount: 1
       maxAmount: 5
     oak_sapling:
-      material: OAK_SAPLING
-      customModelData: 0
+      item: minecraft:oak_sapling
       frequency: 30000
       minAmount: 1
       maxAmount: 5
     tree_bark:
-      material: GLISTERING_MELON_SLICE
-      customModelData: 1
+      item: progression:tree_bark
       frequency: 2000
       minAmount: 1
       maxAmount: 3
     diamond:
-      material: DIAMOND
-      customModelData: 0
+      item: minecraft:diamond
       frequency: 3000
       minAmount: 1
       maxAmount: 5
     gold_ingot:
-      material: GOLD_INGOT
-      customModelData: 0
+      item: minecraft:gold_ingot
       frequency: 3000
       minAmount: 1
       maxAmount: 5
     leather:
-      material: LEATHER
-      customModelData: 0
+      item: minecraft:leather
       frequency: 3000
       minAmount: 1
       maxAmount: 5
     emerald:
-      material: EMERALD
-      customModelData: 0
+      item: minecraft:emerald
       frequency: 3000
       minAmount: 1
       maxAmount: 5
     netherite_ingot:
-      material: NETHERITE_INGOT
-      customModelData: 0
+      item: minecraft:netherite_ingot
       frequency: 3000
       minAmount: 1
       maxAmount: 5
     golden_sword:
-      material: GOLDEN_SWORD
-      customModelData: 0
+      item: champions:booster_sword
       frequency: 500
       minAmount: 1
       maxAmount: 1
     golden_axe:
-      material: GOLDEN_AXE
-      customModelData: 0
+      item: champions:booster_axe
       frequency: 500
       minAmount: 1
       maxAmount: 1
     diamond_sword:
-      material: DIAMOND_SWORD
-      customModelData: 0
+      item: champions:power_sword
       frequency: 500
       minAmount: 1
       maxAmount: 1
     diamond_axe:
-      material: DIAMOND_AXE
-      customModelData: 0
+      item: champions:power_axe
       frequency: 500
-      minAmount: 1
-      maxAmount: 1
-    power_1:
-      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 500
-      minAmount: 1
-      maxAmount: 1
-    power_2:
-      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 300
-      minAmount: 1
-      maxAmount: 1
-    power_3:
-      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    scorching_3:
-      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    frost_3:
-      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
       minAmount: 1
       maxAmount: 1
     ancient_sword:
-      material: NETHERITE_SWORD
-      customModelData: 0
+      item: champions:ancient_sword
       frequency: 500
       minAmount: 1
       maxAmount: 1
     ancient_axe:
-      material: NETHERITE_AXE
-      customModelData: 0
+      item: champions:ancient_axe
       frequency: 500
       minAmount: 1
       maxAmount: 1
-    unbreaking_1:
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 500
+    scorching_rune:
+      item: core:scorching_rune
+      frequency: 25
       minAmount: 1
       maxAmount: 1
-    unbreaking_2:
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 300
-      minAmount: 1
-      maxAmount: 1
-    unbreaking_3:
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    resistance_1:
-      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 500
-      minAmount: 1
-      maxAmount: 1
-    resistance_2:
-      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 300
-      minAmount: 1
-      maxAmount: 1
-    resistance_3:
-      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    fortune_1:
-      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 500
-      minAmount: 1
-      maxAmount: 1
-    fortune_2:
-      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 300
-      minAmount: 1
-      maxAmount: 1
-    fortune_3:
-      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    insight_1:
-      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 500
-      minAmount: 1
-      maxAmount: 1
-    insight_2:
-      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 300
-      minAmount: 1
-      maxAmount: 1
-    insight_3:
-      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    conq_1:
-      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 500
-      minAmount: 1
-      maxAmount: 1
-    conq_2:
-      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 300
-      minAmount: 1
-      maxAmount: 1
-    conq_3:
-      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    reinforcing_1:
-      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 500
-      minAmount: 1
-      maxAmount: 1
-    reinforcing_2:
-      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 300
-      minAmount: 1
-      maxAmount: 1
-    reinforcing_3:
-      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    haste_4:
-      material: SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 10
-      minAmount: 1
-      maxAmount: 1
-    alacrity_4:
-      material: SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 10
-      minAmount: 1
-      maxAmount: 1
-    unbreaking_4:
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 10
-      minAmount: 1
-      maxAmount: 1
-    frost_4:
-      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 10
-      minAmount: 1
-      maxAmount: 1
-    scorching_4:
-      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 50
+    unbreaking_rune:
+      item: core:unbreaking_rune
+      frequency: 25
       minAmount: 1
       maxAmount: 1
   enabled: true
@@ -377,303 +205,134 @@ fishing:
   loot:
     ancient_sword:
       type: treasure
-      material: NETHERITE_SWORD
-      customModelData: 0
+      item: champions:ancient_sword
       frequency: 1000
       minAmount: 1
       maxAmount: 1
     ancient_axe:
       type: treasure
-      material: NETHERITE_AXE
-      customModelData: 0
+      item: champions:ancient_axe
       frequency: 1000
       minAmount: 1
       maxAmount: 1
     dungeontoken:
       type: treasure
-      material: ECHO_SHARD
-      customModelData: 1
+      item: dungeons:dungeon_token
       frequency: 13
       minAmount: 1
       maxAmount: 1
     aegis:
       type: treasure
-      material: SHIELD
-      customModelData: 99
+      item: champions:thunderclap_aegis
       frequency: 6
       minAmount: 1
       maxAmount: 1
     broadsword:
       type: treasure
-      material: MUSIC_DISC_CAT
-      customModelData: 1
+      item: champions:giants_broadsword
       frequency: 5
       minAmount: 1
       maxAmount: 1
     maul:
       type: treasure
-      material: MUSIC_DISC_FAR
-      customModelData: 1
+      item: champions:magnetic_maul
       frequency: 5
       minAmount: 1
       maxAmount: 1
     windblade:
       type: treasure
-      material: MUSIC_DISC_MELLOHI
-      customModelData: 1
+      item: champions:wind_blade
       frequency: 3
       minAmount: 1
       maxAmount: 1
     scythe:
       type: treasure
-      material: MUSIC_DISC_STAL
-      customModelData: 1
+      item: champions:scythe_of_the_fallen_lord
       frequency: 3
       minAmount: 1
       maxAmount: 1
     hyperaxe:
       type: treasure
-      material: MUSIC_DISC_BLOCKS
-      customModelData: 1
+      item: champions:hyper_axe
       frequency: 5
       minAmount: 1
       maxAmount: 1
     rake:
       type: treasure
-      material: MUSIC_DISC_WARD
-      customModelData: 2
+      item: champions:rake
       frequency: 7
       minAmount: 1
       maxAmount: 1
     runedpick:
       type: treasure
-      material: MUSIC_DISC_WARD
-      customModelData: 1
+      item: champions:runed_pickaxe
       frequency: 7
       minAmount: 1
       maxAmount: 1
     alligatorstooth:
       type: treasure
-      material: MUSIC_DISC_MALL
-      customModelData: 1
+      item: champions:alligators_tooth
       frequency: 5
       minAmount: 1
       maxAmount: 1
     diamond:
       type: treasure
-      material: DIAMOND
-      customModelData: 0
+      item: minecraft:diamond
       frequency: 7500
       minAmount: 1
       maxAmount: 3
     gold_ingot:
       type: treasure
-      material: GOLD_INGOT
-      customModelData: 0
+      item: minecraft:gold_ingot
       frequency: 7500
       minAmount: 1
       maxAmount: 3
     netherite_ingot:
       type: treasure
-      material: NETHERITE_INGOT
-      customModelData: 0
+      item: minecraft:netherite_ingot
       frequency: 7500
       minAmount: 1
       maxAmount: 3
     leather:
       type: treasure
-      material: LEATHER
-      customModelData: 0
+      item: minecraft:leather
       frequency: 7500
       minAmount: 1
       maxAmount: 3
     golden_sword:
       type: treasure
-      material: GOLDEN_SWORD
-      customModelData: 0
+      item: minecraft:golden_sword
       frequency: 3000
       minAmount: 1
       maxAmount: 1
     golden_axe:
       type: treasure
-      material: GOLDEN_AXE
-      customModelData: 0
+      item: minecraft:golden_axe
       frequency: 3000
       minAmount: 1
       maxAmount: 1
     diamond_sword:
       type: treasure
-      material: DIAMOND_SWORD
-      customModelData: 0
+      item: champions:power_sword
       frequency: 3000
       minAmount: 1
       maxAmount: 1
     diamond_axe:
       type: treasure
-      material: DIAMOND_AXE
-      customModelData: 0
+      item: champions:power_axe
       frequency: 3000
       minAmount: 1
       maxAmount: 1
-    power_1:
+    scorching_rune:
       type: treasure
-      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 4000
-      minAmount: 1
-      maxAmount: 1
-    power_2:
-      type: treasure
-      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 3000
-      minAmount: 1
-      maxAmount: 1
-    power_3:
-      type: treasure
-      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
+      item: core:scorching_rune
       frequency: 100
       minAmount: 1
       maxAmount: 1
-    scorching_3:
+    unbreaking_rune:
       type: treasure
-      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    frost_3:
-      type: treasure
-      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    unbreaking_1:
-      type: treasure
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 4000
-      minAmount: 1
-      maxAmount: 1
-    unbreaking_2:
-      type: treasure
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 3000
-      minAmount: 1
-      maxAmount: 1
-    unbreaking_3:
-      type: treasure
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    resistance_1:
-      type: treasure
-      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 4000
-      minAmount: 1
-      maxAmount: 1
-    resistance_2:
-      type: treasure
-      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 3000
-      minAmount: 1
-      maxAmount: 1
-    resistance_3:
-      type: treasure
-      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    fortune_1:
-      type: treasure
-      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 4000
-      minAmount: 1
-      maxAmount: 1
-    fortune_2:
-      type: treasure
-      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 3000
-      minAmount: 1
-      maxAmount: 1
-    fortune_3:
-      type: treasure
-      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    insight_1:
-      type: treasure
-      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 4000
-      minAmount: 1
-      maxAmount: 1
-    insight_2:
-      type: treasure
-      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 3000
-      minAmount: 1
-      maxAmount: 1
-    insight_3:
-      type: treasure
-      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    conq_1:
-      type: treasure
-      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 4000
-      minAmount: 1
-      maxAmount: 1
-    conq_2:
-      type: treasure
-      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 3000
-      minAmount: 1
-      maxAmount: 1
-    conq_3:
-      type: treasure
-      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    reinforcing_1:
-      type: treasure
-      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 1
-      frequency: 4000
-      minAmount: 1
-      maxAmount: 1
-    reinforcing_2:
-      type: treasure
-      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 2
-      frequency: 3000
-      minAmount: 1
-      maxAmount: 1
-    reinforcing_3:
-      type: treasure
-      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 3
-      frequency: 100
+      item: core:unbreaking_rune
+      frequency: 25
       minAmount: 1
       maxAmount: 1
     zombie:
@@ -694,126 +353,126 @@ fishing:
       maxWeight: 50
       minWeight: 1
       frequency: 100000
-      modelData: 1
+      item: progression:trout
     salmon:
       type: fish
       name: Salmon
       maxWeight: 50
       minWeight: 1
       frequency: 100000
-      modelData: 2
+      item: progression:salmon
     bluegill:
       type: fish
       name: Bluegill
       maxWeight: 50
       minWeight: 1
       frequency: 100000
-      modelData: 3
+      item: progression:bluegill
     gar:
       type: fish
       name: Gar
       maxWeight: 50
       minWeight: 1
       frequency: 100000
-      modelData: 4
+      item: progression:gar
     carp:
       type: fish
       name: Carp
       maxWeight: 150
       minWeight: 1
       frequency: 40000
-      modelData: 5
+      item: progression:carp
     catfish:
       type: fish
       name: Catfish
       maxWeight: 150
       minWeight: 1
       frequency: 40000
-      modelData: 6
+      item: progression:catfish
     cod:
       type: fish
       name: Cod
       maxWeight: 150
       minWeight: 1
       frequency: 40000
-      modelData: 7
+      item: progression:cod
     drum:
       type: fish
       name: Drum
       maxWeight: 150
       minWeight: 1
       frequency: 40000
-      modelData: 8
+      item: progression:drum
     sablefish:
       type: fish
       name: Sablefish
       maxWeight: 150
       minWeight: 1
       frequency: 40000
-      modelData: 9
+      item: progression:sablefish
     kingfish:
       type: fish
       name: Kingfish
       maxWeight: 250
       minWeight: 100
       frequency: 25000
-      modelData: 10
+      item: progression:kingfish
     cobia:
       type: fish
       name: Cobia
       maxWeight: 250
       minWeight: 100
       frequency: 25000
-      modelData: 11
+      item: progression:cobia
     sea_bass:
       type: fish
       name: Sea Bass
       maxWeight: 250
       minWeight: 100
       frequency: 25000
-      modelData: 12
+      item: progression:sea_bass
     tuna:
       type: fish
       name: Tuna
       maxWeight: 500
       minWeight: 200
       frequency: 4000
-      modelData: 13
+      item: progression:tuna
     swordfish:
       type: fish
       name: Swordfish
       maxWeight: 500
       minWeight: 200
       frequency: 4000
-      modelData: 14
+      item: progression:swordfish
     grouper:
       type: fish
       name: Grouper
       maxWeight: 700
       minWeight: 400
       frequency: 3000
-      modelData: 16
+      item: progression:grouper
     marlin:
       type: fish
       name: Marlin
       maxWeight: 1500
       minWeight: 500
       frequency: 1500
-      modelData: 15
+      item: progression:marlin
     sturgeon:
       type: fish
       name: Sturgeon
       maxWeight: 1000
       minWeight: 500
       frequency: 400
-      modelData: 17
+      item: progression:sturgeon
     sunfish:
       type: fish
       name: Sunfish
       maxWeight: 2000
       minWeight: 1000
       frequency: 200
-      modelData: 18
+      item: progression:sunfish
   xpPerPound: 0.5
 # Web Config settings
 # If enabled, the plugin will load from local files first,

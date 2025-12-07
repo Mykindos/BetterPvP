@@ -132,7 +132,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
                 passiveTravelSpeed,
                 applyTravelSpeed,
                 healthSeconds,
-                mobHealthModifier);
+                mobHealthModifier,
+                this);
         projectile.redirect(player.getLocation().getDirection());
         projectiles.put(player, projectile);
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>%s %d</alt>.", getName(), level);
@@ -189,10 +190,10 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
         this.applyTravelSpeed = getConfig("applyTravelSpeed", 6.0, Double.class);
         this.damagePerSecond = getConfig("damagePerSecond", 3.0, Double.class);
         this.damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        this.regenPerSecond = getConfig("regenPerSecond", 1.0, Double.class);
-        this.regenIncreasePerLevel = getConfig("regenIncreasePerLevel", 0.5, Double.class);
-        this.impactHealthMultiplier = getConfig("impactHealthMultiplier", 0.3, Double.class);
-        this.impactHealthMultiplierIncreasePerLevel = getConfig("impactHealthMultiplierIncreasePerLevel", 0.1, Double.class);
+        this.regenPerSecond = getConfig("regenPerSecond", 2.0, Double.class);
+        this.regenIncreasePerLevel = getConfig("regenIncreasePerLevel", 1.0, Double.class);
+        this.impactHealthMultiplier = getConfig("impactHealthMultiplier", 0.1, Double.class);
+        this.impactHealthMultiplierIncreasePerLevel = getConfig("impactHealthMultiplierIncreasePerLevel", 0.05, Double.class);
         this.healthSeconds = getConfig("healthSeconds", 0.5, Double.class);
         this.mobHealthModifier = getConfig("mobHealthModifier", 0.5, Double.class);
     }

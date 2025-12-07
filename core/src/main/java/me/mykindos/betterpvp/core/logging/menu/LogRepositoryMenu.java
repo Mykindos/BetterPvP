@@ -9,8 +9,8 @@ import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,9 +26,9 @@ public class LogRepositoryMenu extends AbstractPagedGui<Item> implements Windowe
                 "# # # < - > # # R")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(previous))
-                .addIngredient('>', new ForwardButton()));
+                .addIngredient('>', new PageForwardButton()));
         this.title = title;
         pool.forEach(previousableButton -> previousableButton.setPrevious(this));
         setContent(pool.stream().map(Item.class::cast).toList());

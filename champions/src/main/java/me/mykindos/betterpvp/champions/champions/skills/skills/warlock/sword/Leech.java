@@ -11,7 +11,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
@@ -28,13 +30,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.MAGIC;
 
 @Singleton
 @BPvPListener
@@ -88,16 +92,19 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         return Role.WARLOCK;
     }
 
-    @EventHandler (ignoreCancelled = true)
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+
+    @EventHandler
+    public void onDamage(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!active.contains(damager.getUniqueId())) return;
 
         int level = getLevel(damager);
         if (level > 0) {
-            leechData.add(new LeechData(damager, damager, event.getDamagee()));
-            chainEnemies(damager, event.getDamagee());
+            final LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
+            leechData.add(new LeechData(damager, damager, damagee));
+            chainEnemies(damager, damagee);
             active.remove(damager.getUniqueId());
 
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
@@ -257,9 +264,13 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     public void dealDamage() {
         for (LeechData leech : leechData) {
             int level = getLevel(leech.getOwner());
-            CustomDamageEvent leechDmg = new CustomDamageEvent(leech.getTarget(), leech.getOwner(), null, EntityDamageEvent.DamageCause.MAGIC, getLeechedHealth(level), false, getName());
-            leechDmg.setIgnoreArmour(true);
-            UtilDamage.doCustomDamage(leechDmg);
+            DamageEvent leechDmg = new DamageEvent(leech.getTarget(),
+                    leech.getOwner(),
+                    null,
+                    new SkillDamageCause(this, true).withCategory(MAGIC),
+                    getLeechedHealth(level),
+                    getName());
+            UtilDamage.doDamage(leechDmg);
             UtilPlayer.health(leech.getOwner(), getLeechedHealth(level));
         }
     }
@@ -292,7 +303,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         baseRange = getConfig("baseRange", 7.0, Double.class);
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.0, Double.class);
 
-        baseLeechedHealth = getConfig("baseLeechedHealth", 1.0, Double.class);
+        baseLeechedHealth = getConfig("baseLeechedHealth", 2.0, Double.class);
         leachedHealthIncreasePerLevel = getConfig("leachedHealthIncreasePerLevel", 0.0, Double.class);
 
         maximumEnemies = getConfig("maximumEnemies", 2, Integer.class);

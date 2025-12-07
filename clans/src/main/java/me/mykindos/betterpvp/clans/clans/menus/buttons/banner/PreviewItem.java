@@ -22,7 +22,7 @@ public class PreviewItem extends ControlItem<BannerMenu> {
     public ItemProvider getItemProvider(BannerMenu gui) {
         return ItemView.of(gui.getBuilder().build().get()).toBuilder()
                 .displayName(Component.text("Preview", NamedTextColor.GREEN, TextDecoration.BOLD))
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .action(ClickActions.ALL, Component.text("Change Base Color"))
                 .build();
     }

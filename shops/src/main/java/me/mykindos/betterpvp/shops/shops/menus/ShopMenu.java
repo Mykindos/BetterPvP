@@ -4,7 +4,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.shops.shops.menus.buttons.ShopItemButton;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @CustomLog
 public class ShopMenu extends AbstractGui {
 
-    public ShopMenu(int page, List<IShopItem> shopItems, ItemHandler itemHandler, ClientManager clientManager) {
+    public ShopMenu(int page, List<IShopItem> shopItems, ItemFactory itemFactory, ClientManager clientManager) {
         super(9, 6);
 
         for (IShopItem shopItem : shopItems) {
@@ -23,7 +23,7 @@ public class ShopMenu extends AbstractGui {
                 shopItem.setSlot(shopItem.getSlot() - 3);
             }
 
-            setItem(shopItem.getSlot(), new ShopItemButton(shopItem, itemHandler, clientManager));
+            setItem(shopItem.getSlot(), new ShopItemButton(shopItem, itemFactory, clientManager));
 
         }
 

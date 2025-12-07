@@ -30,7 +30,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
                 .material(Material.IRON_SWORD)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .build();
         SimpleItem hackingItem = new SimpleItem(hackingProvider, click -> {
             new ViewCollectionMenu("Hacking", hackingItems, this).show(click.getPlayer());
@@ -43,7 +43,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
                 .material(Material.ANVIL)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .build();
         SimpleItem gameplayItem = new SimpleItem(gameplayProvider, click -> {
             new ViewCollectionMenu("Gameplay", gameplayItems, this).show(click.getPlayer());
@@ -56,7 +56,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
                 .material(Material.WRITABLE_BOOK)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .build();
         SimpleItem chatItem = new SimpleItem(chatProvider, click -> {
             new ViewCollectionMenu("Chat", chatItems, this).show(click.getPlayer());
@@ -69,7 +69,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
                 .material(Material.PAPER)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .build();
         SimpleItem otherItem = new SimpleItem(otherProvider, click -> {
             new ViewCollectionMenu("Chat", otherItems, this).show(click.getPlayer());

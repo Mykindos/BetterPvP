@@ -11,18 +11,21 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -97,14 +100,14 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
         if (blocksMelee && blocksArrow) {
-            if (!(event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() != DamageCause.PROJECTILE)) return;
+            if (!(event.getBukkitCause() == DamageCause.ENTITY_ATTACK || event.getBukkitCause() != DamageCause.PROJECTILE)) return;
         } else if (blocksMelee) {
-            if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+            if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         } else if (blocksArrow) {
-            if (event.getCause() != DamageCause.PROJECTILE) return;
+            if (event.getBukkitCause() != DamageCause.PROJECTILE) return;
         } else return;
 
         if (!(event.getDamagee() instanceof Player player)) return;
@@ -124,15 +127,11 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 return;
             }
 
-            event.getDamager().setVelocity(event.getDamagee().getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
+            event.getDamager().setVelocity(player.getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
 
-            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, getDamage(level), false, getName());
-            UtilDamage.doCustomDamage(customDamageEvent);
-
-            // Add a percentage-based damage reduction modifier
-            double reductionPercent = getDamageReduction(level); // Convert to percentage
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
-
+            DamageEvent DamageEvent = new DamageEvent(event.getDamager(), player, null, new SkillDamageCause(this), getDamage(level), getName());
+            UtilDamage.doDamage(DamageEvent);
+            event.addModifier(new SkillDamageModifier.Multiplier(this, (1.0 - getDamageReduction(level))));
             if (event.getDamage() <= 0) {
                 event.cancel(getName());
             }
@@ -162,7 +161,14 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 iterator.remove();
             }
             else {
-                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_STEP, 0.5F, 1.0F);
+                new SoundEffect(Sound.BLOCK_STONE_STEP, 1.0f, 1.0f).play(player.getEyeLocation());
+                Particle.BLOCK.builder()
+                        .data(Material.STONE.createBlockData())
+                        .count(10)
+                        .location(player.getLocation().add(0, player.getHeight() / 2, 0))
+                        .offset(0.5, 0.25, 0.5)
+                        .allPlayers()
+                        .spawn();
             }
 
         }
@@ -172,11 +178,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     @Override
     public boolean isShieldInvisible() {
         return false;
-    }
-
-    @Override
-    public boolean shouldShowShield(Player player) {
-        return !championsManager.getCooldowns().hasCooldown(player, getName());
     }
 
     @Override

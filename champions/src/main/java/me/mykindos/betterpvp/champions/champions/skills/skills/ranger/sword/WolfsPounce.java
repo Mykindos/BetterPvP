@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.WeakHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
@@ -18,8 +14,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -33,7 +30,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -42,8 +39,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.RayTraceResult;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -51,7 +52,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
-    private final GamerDisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
             charging,
             gamer -> true);
 
@@ -175,7 +176,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         double damage = getDamage(level) * pounce.getData().getCharge();
 
         // Effects & Damage
-        UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
+        UtilDamage.doDamage(new DamageEvent(damagee, damager, null, new SkillDamageCause(this), damage, getName()));
         championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
         // Cues
@@ -185,7 +186,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @EventHandler
-    public void onDamageReceived(CustomDamageEvent event) {
+    public void onDamageReceived(DamageEvent event) {
         if (event.isCancelled() || !(event.getDamagee() instanceof Player player)) {
             return;
         }

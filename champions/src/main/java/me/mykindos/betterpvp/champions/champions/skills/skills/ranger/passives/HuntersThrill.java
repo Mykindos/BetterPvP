@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.Stack
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -75,7 +75,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     }
 
     @EventHandler (ignoreCancelled = true)
-    public void onArrowHit(CustomDamageEvent event) {
+    public void onArrowHit(DamageEvent event) {
         Projectile projectile = event.getProjectile();
         boolean isArrow = projectile instanceof Arrow;
         boolean isTrident = projectile instanceof Trident;

@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -11,27 +13,37 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Sound;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class HotBarItemButton extends ControlItem<HotBarEditor> {
 
+    private final ItemFactory itemFactory;
     private final HotBarItem hotBarItem;
 
-    public HotBarItemButton(HotBarItem hotBarItem) {
+    public HotBarItemButton(ItemFactory itemFactory, HotBarItem hotBarItem) {
+        this.itemFactory = itemFactory;
         this.hotBarItem = hotBarItem;
     }
 
     @Override
     public ItemProvider getItemProvider(HotBarEditor gui) {
-        final BPvPItem item = getGui().getItemHandler().getItem(hotBarItem.getNamespacedKey());
-        final ItemView.ItemViewBuilder builder = ItemView.of(item.getItemStack()).toBuilder();
+        final BaseItem baseItem = Objects.requireNonNull(itemFactory.getItemRegistry().getItem(hotBarItem.getNamespacedKey()));
+        final ItemInstance instance = itemFactory.create(baseItem);
+        final ItemStack itemStack = instance.createItemStack();
+        itemStack.setAmount(hotBarItem.getAmount());
+
+        final ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
 
         // Display name
-        builder.displayName(item.getName()
+        builder.displayName(instance.getView().getName()
                 .appendSpace()
                 .append(Component.text("●", NamedTextColor.GRAY))
                 .appendSpace()

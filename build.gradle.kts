@@ -17,6 +17,10 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 repositories {
 
     mavenLocal()
@@ -39,7 +43,9 @@ subprojects {
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.spongepowered.org/maven/")
         maven("https://repo.opencollab.dev/maven-releases/")
-        maven("https://repo.md-5.net/repository/public/")
+        maven("https://repo.nexomc.com/releases")
+        maven("https://repo.nexomc.com/snapshots")
+        maven("https://repo.md-5.net/content/groups/public/")
         maven("https://jitpack.io")
         maven("https://repo.viaversion.com")
         maven("https://repo.opencollab.dev/main/")
@@ -55,7 +61,6 @@ subprojects {
 
     // Set java language version
     plugins.apply("java")
-    plugins.apply("org.inferred.processors")
     plugins.apply("com.gradleup.shadow")
     plugins.apply("org.jetbrains.kotlin.jvm")
     java {
@@ -65,6 +70,7 @@ subprojects {
     // Shadow
     tasks.withType<ShadowJar>().configureEach {
         relocate("com.github.benmanes.caffeine", "me.mykindos.betterpvp.caffeine")
+        relocate("com.jeff_media.morepersistentdatatypes", "me.mykindos.morepersistentdatatypes")
         archiveBaseName.set(project.name)
         archiveVersion.set("")
         archiveClassifier.set("")

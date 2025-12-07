@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.model.team.TeamProperties;
 import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;

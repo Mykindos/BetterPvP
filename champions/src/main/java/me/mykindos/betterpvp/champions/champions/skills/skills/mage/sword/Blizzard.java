@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -112,12 +112,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     }
 
     @EventHandler
-    public void onHit(CustomDamageEvent event) {
-        if (event.isCancelled()) return;
+    public void onHit(DamageEvent event) {
+        if (event.isCancelled() || !event.isDamageeLiving()) return;
         if (event.getProjectile() instanceof Snowball snowball) {
             if (snowball.getShooter() instanceof Player damager) {
                 if (snow.containsKey(snowball)) {
-                    LivingEntity damagee = event.getDamagee();
+                    LivingEntity damagee = event.getLivingDamagee();
 
                     int level = getLevel(damager);
                     Vector direction = snowball.getVelocity().normalize();

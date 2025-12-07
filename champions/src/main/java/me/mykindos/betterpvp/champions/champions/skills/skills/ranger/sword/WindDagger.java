@@ -12,7 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -23,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Iterator;
@@ -152,8 +152,8 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
     }
 
     @EventHandler (ignoreCancelled = true)
-    public void reduceCooldown(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+    public void reduceCooldown(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!hasSkill(player)) return;
 

@@ -8,7 +8,8 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -18,7 +19,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 @Singleton
 @BPvPListener
@@ -60,14 +60,15 @@ public class CripplingBlow extends Skill implements PassiveSkill, DebuffSkill {
 
 
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
         if (!(event.getDamager() instanceof Player player)) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!SkillWeapons.isHolding(player, SkillType.AXE)) return;
 
         int level = getLevel(player);
         if (level > 0) {
-            LivingEntity target = event.getDamagee();
+            LivingEntity target = event.getLivingDamagee();
             championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
             event.addReason(getName());
             event.setKnockback(false);

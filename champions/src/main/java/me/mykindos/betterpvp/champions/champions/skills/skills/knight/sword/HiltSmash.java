@@ -10,8 +10,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
@@ -30,7 +31,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -144,7 +144,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
-            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(level), false, getName()));
+            UtilDamage.doDamage(new DamageEvent(ent, player, null, new SkillDamageCause(this), getDamage(level), getName()));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
         }
     }

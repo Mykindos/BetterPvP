@@ -9,7 +9,9 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -31,7 +33,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -46,6 +47,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.WeakHashMap;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.FIRE;
 
 
 @Singleton
@@ -160,9 +163,14 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
 
-            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Napalm");
+            DamageEvent cde = new DamageEvent(hit,
+                    damager,
+                    null,
+                    new SkillDamageCause(this).withBukkitCause(FIRE),
+                    getDamage(level),
+                    "Napalm Arrow");
             cde.setDamageDelay(damageDelay);
-            if (!Objects.requireNonNull(UtilDamage.doCustomDamage(cde)).isCancelled()) {
+            if (!Objects.requireNonNull(UtilDamage.doDamage(cde)).isCancelled()) {
                 UtilEntity.setFire(hit, damager, (long) getBurnDuration(level) * 1000L);
             }
         }
@@ -180,7 +188,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     }
 
     @EventHandler
-    public void onArrowDamage(CustomDamageEvent event) {
+    public void onArrowDamage(DamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!napalmArrows.containsValue(arrow)) return;
@@ -260,7 +268,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         velocityMultiplier = getConfig("velocityMultiplier", 0.4, Double.class);
         yComponentVelocityMultiplier = getConfig("yComponentVelocityMultiplier", 1.0, Double.class);
-        damageDelay = getConfig("damageDelay", 50, Integer.class);
+        damageDelay = getConfig("damageDelay", (int) DamageCause.DEFAULT_DELAY, Integer.class);
         numFlames = getConfig("numFlames", 75, Integer.class);
     }
 }

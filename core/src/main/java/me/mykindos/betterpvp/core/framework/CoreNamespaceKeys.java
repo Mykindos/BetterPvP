@@ -24,4 +24,11 @@ public class CoreNamespaceKeys {
     public static final NamespacedKey HATS_IS_HAT = new NamespacedKey("hats", "hat_name");
     public static final NamespacedKey NO_DAMAGE = new NamespacedKey("core", "no-damage");
 
+    public static final NamespacedKey BASEITEM_HASHCODE_KEY = new NamespacedKey("core", "version");
+
+    public static final NamespacedKey CANNON_LOADED = new NamespacedKey("clans", "cannon_loaded");
+    public static final NamespacedKey CANNON_HEALTHBAR = new NamespacedKey("clans", "cannon_healthbar");
+    public static final NamespacedKey CANNON_LEGEND = new NamespacedKey("clans", "cannon_legend");
+    public static final NamespacedKey CANNON_PROPERTIES = new NamespacedKey("core", "cannon_properties");
+
 }

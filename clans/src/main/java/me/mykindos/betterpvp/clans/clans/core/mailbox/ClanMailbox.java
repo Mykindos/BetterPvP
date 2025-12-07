@@ -8,7 +8,7 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Player;
@@ -50,10 +50,10 @@ public final class ClanMailbox {
         return UtilItem.serializeItemStackList(contents);
     }
 
-    public void show(Player player, ItemHandler itemHandler, Windowed previous) throws IllegalStateException {
+    public void show(Player player, ItemFactory itemFactory, Windowed previous) throws IllegalStateException {
         Preconditions.checkState(!isLocked(), "Clan mailbox is locked");
         lockedBy = player.getName();
-        new GuiClanMailbox(this, itemHandler, previous).show(player).addCloseHandler(() -> {
+        new GuiClanMailbox(this, itemFactory, previous).show(player).addCloseHandler(() -> {
             ClanRepository instance = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClanRepository.class);
             instance.updateClanMailbox(clan).whenComplete((unused, throwable) -> {
                 if(throwable != null) {
@@ -66,7 +66,7 @@ public final class ClanMailbox {
         });
     }
 
-    public void show(Player player, ItemHandler itemHandler) throws IllegalStateException {
-        show(player, itemHandler, null);
+    public void show(Player player, ItemFactory itemFactory) throws IllegalStateException {
+        show(player, itemFactory, null);
     }
 }

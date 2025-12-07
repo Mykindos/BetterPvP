@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.components.champions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -41,30 +41,42 @@ public enum Role {
         return name;
     }
 
-    public void equip(ItemHandler itemHandler, Player player, boolean armorOnly) {
-        player.getInventory().setHelmet(itemHandler.updateNames(new ItemStack(helmet)));
-        player.getInventory().setChestplate(itemHandler.updateNames(new ItemStack(chestplate)));
-        player.getInventory().setLeggings(itemHandler.updateNames(new ItemStack(leggings)));
-        player.getInventory().setBoots(itemHandler.updateNames(new ItemStack(boots)));
+    public void equip(ItemFactory itemFactory, Player player, boolean armorOnly) {
+        player.getInventory().setHelmet(getItem(itemFactory, helmet));
+        player.getInventory().setChestplate(getItem(itemFactory, chestplate));
+        player.getInventory().setLeggings(getItem(itemFactory, leggings));
+        player.getInventory().setBoots(getItem(itemFactory, boots));
 
-        if (!armorOnly) {
-            if (!player.getInventory().contains(Material.IRON_SWORD)) {
-                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_SWORD)));
-            }
-
-            if (!player.getInventory().contains(Material.IRON_AXE)) {
-                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_AXE)));
-            }
-
-            if (this == Role.ASSASSIN || this == Role.RANGER) {
-                if (!player.getInventory().contains(Material.BOW)) {
-                    player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.BOW)));
-                }
-
-                int numArrows = this == Role.RANGER ? 64 : 32;
-                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.ARROW, numArrows)));
-            }
+        if (armorOnly) {
+            return;
         }
+
+        if (!player.getInventory().contains(Material.IRON_SWORD)) {
+            player.getInventory().addItem(getItem(itemFactory, Material.IRON_SWORD));
+        }
+
+        if (!player.getInventory().contains(Material.IRON_AXE)) {
+            player.getInventory().addItem(getItem(itemFactory, Material.IRON_AXE));
+        }
+
+        if (this == Role.ASSASSIN || this == Role.RANGER) {
+            if (!player.getInventory().contains(Material.BOW)) {
+                player.getInventory().addItem(getItem(itemFactory, Material.BOW));
+            }
+
+            final ItemStack arrow = new ItemStack(Material.ARROW);
+            final ItemStack arrowItem = getItem(itemFactory, arrow);
+            arrowItem.setAmount(this == Role.RANGER ? 64 : 32);
+            player.getInventory().addItem(arrowItem);
+        }
+    }
+
+    private ItemStack getItem(ItemFactory itemFactory, ItemStack itemStack) {
+        return itemFactory.create(itemFactory.getFallbackItem(itemStack)).createItemStack();
+    }
+
+    private ItemStack getItem(ItemFactory itemFactory, Material material) {
+        return getItem(itemFactory, new ItemStack(material));
     }
 
 }

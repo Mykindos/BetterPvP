@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -20,7 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
-import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
@@ -34,6 +33,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.Optional;
 
 @BPvPListener
 @Singleton

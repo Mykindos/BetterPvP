@@ -38,12 +38,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_NAME_HISTORY;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_PROPERTIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_REWARDS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GAMER_PROPERTIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.IGNORES;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.*;
 
 @CustomLog
 @Singleton
@@ -511,5 +506,6 @@ public class ClientSQLLayer {
             }
         });
     }
+
 
 }

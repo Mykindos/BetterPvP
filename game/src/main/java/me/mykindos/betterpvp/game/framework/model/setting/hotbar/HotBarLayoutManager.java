@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.game.framework.model.setting.hotbar;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.inject.Inject;
@@ -14,9 +15,10 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.game.database.jooq.tables.records.ChampionsHotbarLayoutsRecord;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.game.framework.manager.RoleSelectorManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -51,18 +53,20 @@ public class HotBarLayoutManager {
     private final ClientManager clientManager;
     private final BuildManager buildManager;
     private final RoleSelectorManager roleSelectorManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
+    private final ItemRegistry itemRegistry;
 
     @Config(path = "hotbar-layout-tokens", defaultValue = "10")
     @Inject
     private int hotBarLayoutTokens;
 
     @Inject
-    public HotBarLayoutManager(Database database, ClientManager clientManager, RoleSelectorManager roleSelectorManager, ItemHandler itemHandler) {
+    public HotBarLayoutManager(Database database, ClientManager clientManager, RoleSelectorManager roleSelectorManager, ItemFactory itemFactory, ItemRegistry itemRegistry) {
         this.database = database;
         this.clientManager = clientManager;
         this.roleSelectorManager = roleSelectorManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
+        this.itemRegistry = itemRegistry;
         this.buildManager = JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(BuildManager.class);
     }
 
@@ -238,8 +242,9 @@ public class HotBarLayoutManager {
                 continue;
             }
 
-            final BPvPItem bPvPItem = itemHandler.getItem(item.getNamespacedKey());
-            final ItemStack itemStack = itemHandler.updateNames(bPvPItem.getItemStack(item.getAmount()));
+            final BaseItem baseItem = Objects.requireNonNull(itemRegistry.getItem(item.getNamespacedKey()));
+            final ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
+            itemStack.setAmount(item.getAmount());
             player.getInventory().setItem(i, itemStack);
         }
 
@@ -262,7 +267,10 @@ public class HotBarLayoutManager {
         final HotBarLayout layout = getLayout(player, build);
         final HotBarItem hotBarItem = layout.getLayout().get(slot);
         if (hotBarItem == null) return null;
-        final BPvPItem bPvPItem = itemHandler.getItem(hotBarItem.getNamespacedKey());
-        return itemHandler.updateNames(bPvPItem.getItemStack(hotBarItem.getAmount()));
+        final BaseItem item = itemFactory.getItemRegistry().getItem(hotBarItem.getNamespacedKey());
+        Preconditions.checkNotNull(item, "Item for HotBarItemButton cannot be null");
+        final ItemStack itemStack = itemFactory.create(item).createItemStack();
+        itemStack.setAmount(hotBarItem.getAmount());
+        return itemStack;
     }
 }

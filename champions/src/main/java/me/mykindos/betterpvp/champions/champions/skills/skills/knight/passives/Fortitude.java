@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -83,7 +83,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onHit(CustomDamageEvent event) {
+    public void onHit(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
         int level = getLevel(player);
         if (level <= 0) return;
@@ -119,9 +119,9 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
         }
     }
     public void loadSkillConfig() {
-        healRate = getConfig("healRate", 1.0, Double.class);
-        baseHeal = getConfig("baseHeal", 3.0, Double.class);
-        healIncreasePerLevel = getConfig("healIncreasePerLevel", 1.0, Double.class);
+        healRate = getConfig("healRate", 2.5, Double.class);
+        baseHeal = getConfig("baseHeal", 7.5, Double.class);
+        healIncreasePerLevel = getConfig("healIncreasePerLevel", 2.5, Double.class);
         healInterval = getConfig("healInterval", 1.5, Double.class);
     }
 }

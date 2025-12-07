@@ -179,7 +179,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void loadSkillConfig() {
-        baseHealthReduction = getConfig("baseHealthReduction", 2.0, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
         healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.0, Double.class);
 
         baseRange = getConfig("baseRange", 5.0, Double.class);
@@ -188,7 +188,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
 
-        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 1.0, Double.class);
+        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 2.0, Double.class);
         healthReductionPerPlayerAffectedDecreasePerLevel = getConfig("healthReductionPerPlayerAffectedDecreasePerLevel", 0.0, Double.class);
     }
 }

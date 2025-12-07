@@ -7,10 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -63,9 +61,9 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
-    public void onFall(CustomDamageEvent e) {
+    public void onFall(DamageEvent e) {
         if (!(e.getDamagee() instanceof Player player)) return;
-        if (e.getCause() != DamageCause.FALL) return;
+        if (e.getBukkitCause() != DamageCause.FALL) return;
 
         int level = getLevel(player);
         if (level > 0) {
@@ -73,8 +71,7 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
             if (e.getDamage() <= damageReduction) {
                 e.setCancelled(true);
             } else {
-                // Add a flat damage reduction modifier
-                e.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageReduction, getName(), ModifierValue.FLAT, ModifierOperation.DECREASE);
+                e.addModifier(new SkillDamageModifier.Flat(this, -getDamageReduction(level)));
             }
         }
     }

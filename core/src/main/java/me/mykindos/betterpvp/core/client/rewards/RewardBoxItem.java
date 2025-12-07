@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.core.client.rewards;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @CustomLog
 public class RewardBoxItem extends ControlItem<GuiRewardBox> {
@@ -28,12 +30,12 @@ public class RewardBoxItem extends ControlItem<GuiRewardBox> {
     private final RewardBox rewardBox;
     private final ItemStack itemStack;
 
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
-    public RewardBoxItem(RewardBox rewardBox, ItemStack itemStack, ItemHandler itemHandler) {
+    public RewardBoxItem(RewardBox rewardBox, ItemStack itemStack, ItemFactory itemFactory) {
         this.rewardBox = rewardBox;
         this.itemStack = itemStack;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     @Override
@@ -69,14 +71,20 @@ public class RewardBoxItem extends ControlItem<GuiRewardBox> {
                     clickedInventory.setItem(event.getSlot(), null);
                 }
                 player.getInventory().addItem(itemStack);
-                itemHandler.getUUIDItem(itemStack).ifPresent((uuidItem -> {
-                    Location location = player.getLocation();
-                    log.info("{} retrieved ({}) from {} at {}", player.getName(), uuidItem.getUuid(),
-                                    "Reward Box", UtilWorld.locationToString(location))
-                            .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(uuidItem)
-                            .addBlockContext(Objects.requireNonNull(location).getBlock()).submit();
-                }));
 
+                itemFactory.fromItemStack(itemStack).ifPresent(item -> {
+                    item.getComponent(UUIDProperty.class).ifPresent(uuidProperty -> {
+                        final UUID uuid = uuidProperty.getUniqueId();
+                        final Location location = player.getLocation();
+                        log.info("{} retrieved ({}) from {} at {}",
+                                        player.getName(),
+                                        uuid,
+                                        "Reward Box",
+                                        UtilWorld.locationToString(location))
+                                .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(itemFactory.getItemRegistry(), item)
+                                .addBlockContext(Objects.requireNonNull(location).getBlock()).submit();
+                    });
+                });
             } else {
                 player.closeInventory();
                 log.error("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();

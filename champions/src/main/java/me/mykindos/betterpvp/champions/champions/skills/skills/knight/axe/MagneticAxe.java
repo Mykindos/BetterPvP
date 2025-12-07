@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -14,10 +15,17 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -25,6 +33,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,12 +47,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static me.mykindos.betterpvp.core.utilities.Resources.ItemModel.INVISIBLE;
+
 @Singleton
 @BPvPListener
 public class MagneticAxe extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
-    private final ItemHandler itemHandler;
-
+    private final ItemFactory itemFactory;
+    private final BaseItem placeholderItem;
     private final Map<Player, List<AxeProjectile>> data = new HashMap<>();
 
     private double baseDamage;
@@ -51,9 +64,14 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     private double speed;
 
     @Inject
-    public MagneticAxe(Champions champions, ChampionsManager championsManager, ItemHandler itemHandler) {
+    public MagneticAxe(Champions champions, ChampionsManager championsManager, ItemFactory itemFactory, ItemRegistry registry) {
         super(champions, championsManager);
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
+
+        this.placeholderItem = new BaseItem("Magnetic Axe Placeholder",
+                ItemView.builder().material(Material.STICK).itemModel(INVISIBLE).hideTooltip(true).build().get(),
+                ItemGroup.MISC,
+                ItemRarity.COMMON);
     }
 
     @Override
@@ -107,7 +125,6 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         return SkillActions.RIGHT_CLICK;
     }
 
-
     @Override
     public void activate(Player player, int level) {
         if (!isHolding(player)) return;
@@ -116,7 +133,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         int slot = player.getInventory().getHeldItemSlot();
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 1.0F);
 
-        player.getInventory().setItemInMainHand(itemHandler.getItem("champions:ghost_handle").getItemStack());
+        player.getInventory().setItemInMainHand(itemFactory.create(placeholderItem).createItemStack());
 
         Vector perpendicularAxis = player.getLocation().getDirection().crossProduct(new Vector(0, 1, 0)).normalize();
         Location rightHandPosition = player.getLocation().add(0, 1, 0).add(perpendicularAxis.multiply(0.3));
@@ -186,7 +203,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
+    public void onDeathTracker(PlayerDeathEvent event) {
         Player player = event.getEntity();
         Location deathLocation = player.getLocation();
 
@@ -221,15 +238,58 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     private void returnAxeToPlayer(Player player, AxeProjectile axeProjectile) {
-        final BPvPItem ghostHandle = itemHandler.getItem("champions:ghost_handle");
         final ItemStack originalAxe = axeProjectile.getItemStack();
         final ItemStack slotItem = player.getInventory().getItem(axeProjectile.getSlot());
-        if (ghostHandle.matches(slotItem)) {
+
+        if (slotItem != null && matches(slotItem)) {
             player.getInventory().setItem(axeProjectile.getSlot(), originalAxe);
         }
 
         axeProjectile.remove();
         axeProjectile.setMarkForRemoval(true);
+    }
+
+    private boolean matches(ItemStack itemStack) {
+        if (itemStack == null) return false;
+        return itemFactory.create(placeholderItem).getItemStack().isSimilar(itemStack);
+    }
+
+    @EventHandler
+    public void onInventoryInteract(InventoryClickEvent event) {
+        if (this.matches(event.getCurrentItem())) {
+            event.setCancelled(true);
+        }
+        if (this.matches(event.getCursor())) {
+            event.setCancelled(true);
+        }
+
+        if (event.getAction() != InventoryAction.HOTBAR_SWAP) return;
+        if (event.getClickedInventory() == null) return;
+        final ItemStack hotbarItem = event.getClickedInventory().getItem(event.getHotbarButton());
+        if (this.matches(hotbarItem)) {
+            event.setCancelled(true);
+        }
+
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        if (!this.matches(event.getItemDrop().getItemStack())) return;
+        event.setCancelled(true);
+    }
+
+    //prevent this item from dropping on death
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Iterator<ItemStack> iterator = event.getPlayer().getInventory().iterator();
+
+        UtilInventory.remove(event.getPlayer(), itemFactory.create(placeholderItem).createItemStack());
+        while (iterator.hasNext()) {
+            ItemStack current = iterator.next();
+            if (this.matches(current)) {
+                current.setAmount(0);
+            }
+        }
     }
 
     @Override

@@ -41,36 +41,10 @@ public interface Windowed {
                 .setViewer(player)
                 .setGui(gui)
                 .build(player);
-        JavaPlugin.getPlugin(Core.class).getLogger().info("%s opened GUI %s".formatted(player.getName(), this.getClass().getName()));
 
         window.open();
 
         return window;
-
-    }
-
-    /**
-     * Represents a menu with a texture.
-     */
-    interface Textured extends Windowed {
-
-        @Override
-        default @NotNull Component getTitle() {
-            // These are the negative space characters that center the texture on the window.
-            // They are specific to our resourcepack.
-            return Component.translatable("space.-8", NamedTextColor.WHITE).font(Resources.Font.SPACE)
-                    .append(Component.text(getMappedTexture(), NamedTextColor.WHITE).font(Resources.Font.MENUS))
-                    .append(Component.translatable("space.8", NamedTextColor.WHITE).font(Resources.Font.SPACE));
-        }
-
-        /**
-         * Returns the title char for a window with a custom UI.
-         * <p>
-         * Essentially, it's mapped to a white title with negative space characters to center
-         * the texture on the window and remove the default color overlay.
-         * @return  The font character on the server resourcepack that is mapped to the texture.
-         */
-        char getMappedTexture();
 
     }
 

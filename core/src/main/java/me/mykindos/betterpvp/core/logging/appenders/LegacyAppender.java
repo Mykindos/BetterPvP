@@ -18,6 +18,9 @@ public class LegacyAppender implements LogAppender {
             case "TRACE":
                 log.trace(pendingLog.getMessage(), pendingLog.getArgs());
                 break;
+            case "DEBUG":
+                log.debug(pendingLog.getMessage(), pendingLog.getArgs());
+                break;
             default:
                 log.info(pendingLog.getMessage(), pendingLog.getArgs());
         }

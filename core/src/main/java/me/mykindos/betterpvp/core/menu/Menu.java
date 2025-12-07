@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -19,6 +20,12 @@ import java.util.Objects;
 @UtilityClass
 public class Menu {
 
+    public static final ItemProvider INVISIBLE_BACKGROUND_ITEM = ItemView.builder()
+            .material(Material.PAPER)
+            .itemModel(Resources.ItemModel.INVISIBLE)
+            .hideTooltip(true)
+            .build();
+
     /**
      * The {@link ItemProvider} for {@link ItemStack}s used as background items in menus.
      */
@@ -31,10 +38,6 @@ public class Menu {
      * The default {@link Item} implementation for background items in menus.
      */
     public static final Item BACKGROUND_GUI_ITEM = new SimpleItem(BACKGROUND_ITEM, click -> SoundEffect.WRONG_ACTION.play(click.getPlayer()));
-
-    static {
-        Structure.addGlobalIngredient('#', BACKGROUND_GUI_ITEM);
-    }
 
     /**
      * Get a lore that fixes all lore lines to the same length, as to avoid
@@ -74,4 +77,8 @@ public class Menu {
     }
 
 
+    public static void registerGlobalIngredients() {
+        Structure.addGlobalIngredient('X', BACKGROUND_GUI_ITEM);
+        Structure.addGlobalIngredient('0', INVISIBLE_BACKGROUND_ITEM);
+    }
 }

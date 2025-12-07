@@ -12,12 +12,12 @@ import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -28,7 +28,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -41,7 +40,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -49,13 +47,15 @@ import java.util.function.Function;
 @BPvPListener
 public class RoleListener implements Listener {
 
+    private final ItemFactory itemFactory;
     private final RoleManager roleManager;
     private final ClientManager clientManager;
     private final BuildManager buildManager;
     private final RoleSoundProvider soundProvider;
 
     @Inject
-    public RoleListener(RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, RoleSoundProvider soundProvider) {
+    public RoleListener(ItemFactory itemFactory, RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, RoleSoundProvider soundProvider) {
+        this.itemFactory = itemFactory;
         this.roleManager = roleManager;
         this.clientManager = clientManager;
         this.buildManager = buildManager;
@@ -85,17 +85,6 @@ public class RoleListener implements Listener {
             int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
             gamer.saveProperty(roleProperty, timesEquipped);
         }
-
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-
-            if (UtilEffect.isNegativePotionEffect(effect)) {
-                continue;
-            }
-
-            player.removePotionEffect(effect.getType());
-
-        }
-
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
 
@@ -190,14 +179,16 @@ public class RoleListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void damageSound(PreCustomDamageEvent pre) {
-        if (pre.getCustomDamageEvent().getDamageSource().getDamageType() == DamageType.FALL) return;
-        pre.getCustomDamageEvent().setSoundProvider(soundProvider);
+    public void damageSound(DamageEvent pre) {
+        pre.setSoundProvider(soundProvider);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onShootBow(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
+        if (event.getBow() != null && itemFactory.isCustomItem(event.getBow())) {
+            return; // custom bow
+        }
 
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.message(player, "Bow", "You cannot shoot a bow in liquid.");

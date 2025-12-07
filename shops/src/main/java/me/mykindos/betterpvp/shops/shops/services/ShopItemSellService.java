@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
@@ -19,18 +21,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 @CustomLog
 public class ShopItemSellService {
 
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public ShopItemSellService(ClientManager clientManager, ItemHandler itemHandler) {
+    public ShopItemSellService(ClientManager clientManager, ItemFactory itemFactory) {
         this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     /**
@@ -104,16 +107,17 @@ public class ShopItemSellService {
         }
 
         // Log item UUID if available
-        itemHandler.getUUIDItem(item).ifPresent(uuidItem -> {
-            Location location = player.getLocation();
-            log.info("{} sold ({}) at {}", player.getName(), uuidItem.getUuid(),
-                            UtilWorld.locationToString((location)))
-                    .setAction("ITEM_SELL")
-                    .addClientContext(player)
-                    .addItemContext(uuidItem)
-                    .addLocationContext(location)
-                    .submit();
-        });
+        final ItemInstance instance = itemFactory.fromItemStack(item).orElseThrow();
+        final Location location = player.getLocation();
+        Optional<UUIDProperty> component = instance.getComponent(UUIDProperty.class);
+        component.ifPresent(uuidProperty ->
+                log.info("{} sold ({}) at {}", player.getName(), uuidProperty.getUniqueId(),
+                                UtilWorld.locationToString((location)))
+                        .setAction("ITEM_SELL")
+                        .addClientContext(player)
+                        .addItemContext(itemFactory.getItemRegistry(), instance)
+                        .addLocationContext(location)
+                        .submit());
 
         return new SellResult(true, amountToSell, cost, shopItem.getItemName());
     }

@@ -277,7 +277,7 @@ public class Punishment {
                 .glow(isActive())
                 .lore(lore)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+                .hideAdditionalTooltip(true);
         return itemViewBuilder.build();
     }
 }

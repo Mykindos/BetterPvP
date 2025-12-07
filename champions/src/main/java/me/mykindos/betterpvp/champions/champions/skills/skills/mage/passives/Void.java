@@ -2,14 +2,14 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -21,6 +21,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+
+import java.util.HashMap;
 
 @Singleton
 @BPvPListener
@@ -119,7 +121,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee) || !active.contains(damagee.getUniqueId())) {
             return;
         }
@@ -130,8 +132,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
         }
 
         double energyReduced = event.getDamage() * getEnergyReduction(level);
-        event.setDamage(event.getDamage() - getDamageReduction(level));
-        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced, EnergyEvent.CAUSE.USE);
+        event.addModifier(new SkillDamageModifier.Flat(this, -getDamageReduction(level)));
+        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced, EnergyEvent.Cause.USE);
 
         event.setKnockback(false);
     }

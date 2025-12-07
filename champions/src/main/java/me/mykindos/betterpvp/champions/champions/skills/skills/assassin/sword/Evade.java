@@ -9,8 +9,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -31,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -96,8 +96,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
 
     @EventHandler (priority = EventPriority.LOW)
-    public void onEvade(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onEvade(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
@@ -228,7 +228,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent e) {
+    public void onDamage(DamageEvent e) {
         if (e.getDamager() instanceof Player player) {
             if (active.contains(player.getUniqueId())) {
                 e.cancel("Skill: Evade");

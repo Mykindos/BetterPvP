@@ -2,34 +2,22 @@ package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
+import me.mykindos.betterpvp.core.combat.listeners.DamageEventProcessor;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilDamage {
 
-    public static CustomDamageEvent doCustomDamage(CustomDamageEvent event) {
-
-        PreCustomDamageEvent preCustomDamageEvent = UtilServer.callEvent(new PreCustomDamageEvent(event));
-        if (!preCustomDamageEvent.isCancelled()) {
-            return UtilServer.callEvent(event);
-        }
-
-        event.setCancelled(true);
-        return event;
-    }
-
+    /**
+     * Processes a damage event through the new unified system
+     * @param event the damage event to process
+     * @return the processed damage event
+     */
     public static DamageEvent doDamage(DamageEvent event) {
-
-        PreDamageEvent preDamageEvent = UtilServer.callEvent(new PreDamageEvent(event));
-        if (!preDamageEvent.isCancelled()) {
-            return UtilServer.callEvent(event);
-        }
-
-        event.setCancelled(true);
-
+        final DamageEventProcessor processor = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(DamageEventProcessor.class);
+        processor.processDamageEvent(event);
         return event;
     }
 }

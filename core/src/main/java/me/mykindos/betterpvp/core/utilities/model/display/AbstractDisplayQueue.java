@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
-import java.util.UUID;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityData;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
@@ -10,8 +9,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
 
-public abstract class AbstractDisplayQueue<T, G extends GamerDisplayObject<T>> implements IDisplayQueue<G> {
+
+public abstract class AbstractDisplayQueue<T, G extends DisplayObject<T>> implements IDisplayQueue<G> {
 
     private static final ExperienceBarData EMPTY = new ExperienceBarData(0);
 

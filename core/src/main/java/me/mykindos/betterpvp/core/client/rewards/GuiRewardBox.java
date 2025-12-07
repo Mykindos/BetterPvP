@@ -5,12 +5,12 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ public class GuiRewardBox extends AbstractPagedGui<Item> implements Windowed {
 
     private final String title;
 
-    public GuiRewardBox(RewardBox rewardBox, ItemHandler itemHandler, @Nullable Windowed previous) {
+    public GuiRewardBox(RewardBox rewardBox, ItemFactory itemFactory, @Nullable Windowed previous) {
         super(9, 6, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",
@@ -32,13 +32,13 @@ public class GuiRewardBox extends AbstractPagedGui<Item> implements Windowed {
                 "# # # < - > # # #")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(previous))
-                .addIngredient('>', new ForwardButton()));
+                .addIngredient('>', new PageForwardButton()));
         this.title = "Rewards";
         rewardBox.setLocked(true);
 
-        List<Item> mailboxItems = rewardBox.getContents().stream().map(item -> new RewardBoxItem(rewardBox, item, itemHandler))
+        List<Item> mailboxItems = rewardBox.getContents().stream().map(item -> new RewardBoxItem(rewardBox, item, itemFactory))
                 .map(Item.class::cast)
                 .toList();
         setContent(mailboxItems);

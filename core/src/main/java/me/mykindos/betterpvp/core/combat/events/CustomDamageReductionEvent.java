@@ -8,13 +8,18 @@ import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 @Data
 public class CustomDamageReductionEvent extends CustomEvent {
 
-    private final CustomDamageEvent customDamageEvent;
+    private final DamageEvent DamageEvent;
     private final double initialDamage;
     private double damage;
 
-    public CustomDamageReductionEvent(CustomDamageEvent customDamageEvent, double damage) {
-        this.customDamageEvent = customDamageEvent;
+    public CustomDamageReductionEvent(DamageEvent DamageEvent, double damage) {
+        this.DamageEvent = DamageEvent;
         this.damage = damage;
         this.initialDamage = damage;
+    }
+
+    public enum Cause {
+        ARMOR,
+        POTION
     }
 }

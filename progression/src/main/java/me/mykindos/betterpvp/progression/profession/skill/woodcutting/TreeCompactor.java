@@ -1,12 +1,15 @@
 package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -14,6 +17,7 @@ import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDepend
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -23,7 +27,6 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -32,18 +35,20 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     private final ProfessionProfileManager professionProfileManager;
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
+    private final ItemRegistry itemRegistry;
 
     @Getter
     private double cooldown;
 
     @Inject
     public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager,
-                         ClientManager clientManager, ItemHandler itemHandler) {
+                         ClientManager clientManager, ItemFactory itemFactory, ItemRegistry itemRegistry) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
+        this.itemRegistry = itemRegistry;
     }
 
     @Override
@@ -96,14 +101,25 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     @EventHandler
     public void onPlaceCompactedLog(BlockPlaceEvent event) {
-        BPvPItem compactedLog = itemHandler.getItem(event.getItemInHand());
-        if (compactedLog != null && Objects.equals(compactedLog.getIdentifier(), "progression:compacted_log")) {
-            Player player = event.getPlayer();
-            Client client = clientManager.search().online(player);
-            if (!client.isAdministrating()) {
-                event.setCancelled(true);
-                UtilMessage.simpleMessage(player, "Progression", "You cannot place this block");
-            }
+        Optional<ItemInstance> compactedLog = itemFactory.fromItemStack(event.getItemInHand());
+        if (compactedLog.isEmpty()) {
+            return;
+        }
+
+        final NamespacedKey key = itemRegistry.getKey(compactedLog.get().getBaseItem());
+        if (key == null) {
+            return; // Vanilla item or not registered
+        }
+
+        if  (!key.toString().equals("progression:compacted_log")) {
+            return; // Not a compacted log
+        }
+
+        Player player = event.getPlayer();
+        Client client = clientManager.search().online(player);
+        if (!client.isAdministrating()) {
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(player, "Progression", "You cannot place this block");
         }
     }
 
@@ -116,11 +132,14 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
         ItemStack result = event.getRecipe().getResult();
         if (result.getAmount() != 4 && result.getType() != Material.OAK_PLANKS) return;
 
-        BPvPItem compactedLog = itemHandler.getItem("progression:compacted_log");
-        if (compactedLog == null) return;
+        final BaseItem compactedLogItem = itemRegistry.getItem(new NamespacedKey("progression", "compacted_log"));
+        Preconditions.checkNotNull(compactedLogItem, "Compacted log item must not be null");
 
         Arrays.stream(event.getInventory().getMatrix()).forEach(itemStack -> {
-            if (!compactedLog.matches(itemStack)) return;
+            if (itemStack == null || itemStack.getType() == Material.AIR) return;
+
+            final ItemInstance instance = itemFactory.fromItemStack(itemStack).orElseThrow();
+            if (instance.getBaseItem() != compactedLogItem) return;
             event.setResult(Event.Result.DENY);
         });
     }

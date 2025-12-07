@@ -27,7 +27,7 @@ public class ViewListingsButton extends ControlItem<AuctionHouseMenu> {
     public ItemProvider getItemProvider(AuctionHouseMenu gui) {
         return ItemView.builder().material(Material.WRITTEN_BOOK)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .displayName(Component.text("View Listings", NamedTextColor.GREEN))
                 .lore(Component.text("Click to view all currently listed auctions", NamedTextColor.GRAY))
                 .build();

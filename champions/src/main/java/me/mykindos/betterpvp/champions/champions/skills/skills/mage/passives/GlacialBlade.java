@@ -9,7 +9,8 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -146,9 +147,14 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
 
-            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.PROJECTILE, getDamage(level), false, "Glacial Blade");
+            DamageEvent cde = new DamageEvent(hit,
+                    damager,
+                    null,
+                    new SkillDamageCause(this).withBukkitCause(DamageCause.PROJECTILE),
+                    getDamage(level),
+                    "Glacial Blade");
             cde.setDamageDelay(0);
-            UtilDamage.doCustomDamage(cde);
+            UtilDamage.doDamage(cde);
             hit.getWorld().playEffect(hit.getLocation(), Effect.STEP_SOUND, Material.GLASS);
             damager.playSound(damager.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0F, 1.0F);
 

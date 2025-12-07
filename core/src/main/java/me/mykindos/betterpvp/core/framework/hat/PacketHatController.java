@@ -9,16 +9,15 @@ import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -42,11 +41,13 @@ public class PacketHatController {
     @Getter
     private Function<Player, ItemStack> providerFunction = player -> provideHighestPriority(player).orElse(null);
     private final HatProtocol protocol;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public PacketHatController(Core core, HatProtocol protocol) {
-        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(core, this, protocol), PacketListenerPriority.HIGH);
+    public PacketHatController(HatProtocol protocol, ItemFactory itemFactory) {
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(this, protocol), PacketListenerPriority.HIGH);
         PacketEvents.getAPI().getEventManager().registerListener(new RemapperOut(this), PacketListenerPriority.HIGH);
+        this.itemFactory = itemFactory;
         this.protocol = protocol;
     }
 
@@ -83,11 +84,12 @@ public class PacketHatController {
                     ? itemStack.getItemMeta().displayName()
                     : itemStack.getData(DataComponentTypes.ITEM_NAME);
 
-            if (helmet != null) {
+            if (helmet != null && !helmet.getType().isAir()) {
+                final ItemStack view = itemFactory.fromItemStack(helmet).orElseThrow().getView().get();
                 Integer model = itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData()
                         ? itemStack.getItemMeta().getCustomModelData()
                         : null;
-                itemStack = helmet.getType() == Material.AIR ? itemStack : UtilItem.convertType(helmet, itemStack.getType(), model);
+                itemStack = UtilItem.convertType(view, itemStack.getType(), model);
             } else {
                 final ItemMeta meta = itemStack.getItemMeta();
                 meta.displayName(Component.text("No helmet")

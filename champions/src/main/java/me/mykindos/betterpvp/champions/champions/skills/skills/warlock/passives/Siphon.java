@@ -2,12 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -38,6 +32,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @BPvPListener
@@ -193,7 +194,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         int level = getLevel(player);
 
         if (target instanceof Player playerTarget) {
-            championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)), EnergyEvent.CAUSE.CUSTOM);
+            championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)), EnergyEvent.Cause.CUSTOM);
         }
 
         new BukkitRunnable() {
@@ -247,7 +248,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         speedDuration = getConfig("speedDuration", 2.5, Double.class);
         elapsedTimeToProcAbility = getConfig("elapsedTimeToProcAbility", 2.0, Double.class);
 
-        healthGainedOnRandomSiphon = getConfig("healthGainedOnRandomSiphon", 1.0D, Double.class);
+        healthGainedOnRandomSiphon = getConfig("healthGainedOnRandomSiphon", 2.0D, Double.class);
         randomSiphonHealthGainChance = getConfig("randomSiphonHealthGainChance", 0.1, Double.class);
     }
 }

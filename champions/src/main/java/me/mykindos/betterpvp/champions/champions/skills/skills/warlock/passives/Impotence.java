@@ -7,10 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -50,9 +48,9 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
                 "maximum of " + getValueString(this::getMaxEnemies, level) + " players",
                 "",
                 "Damage Reduction:",
-                "1 nearby enemy = <stat>" + String.format("%.1f",(calculateReduction(level, 1)))  + "%</stat>",
-                "2 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 2))) + "%</stat>",
-                "3 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 3))) + "%</stat>"
+                "1 nearby enemy = <stat>" + String.format("%.1f",(calculateReduction(level, 1)) * 100)  + "%</stat>",
+                "2 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 2)) * 100) + "%</stat>",
+                "3 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 3)) * 100) + "%</stat>"
         };
     }
 
@@ -75,7 +73,7 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
 
         int level = getLevel(player);
@@ -83,7 +81,9 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
 
         int nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level)).size();
 
-        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, calculateReduction(level, nearbyEnemies), getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+        double damageReduction = 1 - calculateReduction(level, nearbyEnemies);
+        event.addModifier(new SkillDamageModifier.Multiplier(this, damageReduction));
+;
 
         Location locationToPlayEffect = player.getLocation().add(0, 1, 0);
         player.getWorld().playEffect(locationToPlayEffect, Effect.OXIDISED_COPPER_SCRAPE, 0);
@@ -98,8 +98,8 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
         baseRadius = getConfig("baseRadius", 4.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
 
-        baseDecrease = getConfig("baseDecrease", 15.0, Double.class);
-        baseDecreasePerPlayer = getConfig("baseDecreasePerPlayer", 5.0, Double.class);
+        baseDecrease = getConfig("baseDecrease", 0.15, Double.class);
+        baseDecreasePerPlayer = getConfig("baseDecreasePerPlayer", 0.05, Double.class);
         decreaseIncreasePerLevel = getConfig("decreaseIncreasePerLevel", 0.0, Double.class);
 
         maxEnemies = getConfig("maxEnemies", 3, Integer.class);

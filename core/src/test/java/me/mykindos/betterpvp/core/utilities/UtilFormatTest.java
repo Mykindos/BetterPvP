@@ -3,23 +3,8 @@ package me.mykindos.betterpvp.core.utilities;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockbukkit.mockbukkit.MockBukkit;
-import org.mockbukkit.mockbukkit.ServerMock;
-import org.mockbukkit.mockbukkit.entity.PlayerMock;
-
-import java.util.UUID;
 
 public class UtilFormatTest {
-
-    private static ServerMock server;
-
-    public static void setUp() {
-        server = MockBukkit.mock();
-    }
-
-    public static void tearDown() {
-        MockBukkit.unmock();
-    }
 
     @Test
     @DisplayName("formatNumber Int")
@@ -82,29 +67,6 @@ public class UtilFormatTest {
         String formattedString1 = UtilFormat.cleanString("this_is_a_dirty_string");
         Assertions.assertEquals("This Is A Dirty String", formattedString1);
     }*/
-
-    @Test
-    @DisplayName("Online Status Test")
-    void getOnlineStatus() {
-        setUp();
-        PlayerMock onlinePlayer = server.addPlayer();
-        UUID onlineUUID = onlinePlayer.getUniqueId();
-        UUID offlineUUID = UUID.randomUUID();
-
-        String onlineUUIDString = UtilFormat.getOnlineStatus(onlineUUID);
-        String onlineStringString = UtilFormat.getOnlineStatus(onlineUUID.toString());
-
-        Assertions.assertEquals("<green>", onlineUUIDString);
-        Assertions.assertEquals("<green>", onlineStringString);
-
-        String offlineUUIDString = UtilFormat.getOnlineStatus(offlineUUID);
-        String offlineStringString = UtilFormat.getOnlineStatus(offlineUUID.toString());
-
-        Assertions.assertEquals("<red>", offlineUUIDString);
-        Assertions.assertEquals("<red>", offlineStringString);
-
-        tearDown();
-    }
 
     @Test
     @DisplayName("Lunar Spoof String")

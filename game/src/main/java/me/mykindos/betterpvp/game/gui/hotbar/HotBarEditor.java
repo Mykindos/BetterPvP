@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.window.Window;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -44,7 +44,7 @@ public class HotBarEditor extends AbstractGui {
     }
 
     private final HotBarLayoutManager hotBarLayoutManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     private final Role role;
     private int selectedSlot;
@@ -57,14 +57,11 @@ public class HotBarEditor extends AbstractGui {
 
     /**
      * Creates a new {@link AbstractGui} with the specified width and height.
-     *
-     * @param width  The width of the Gui
-     * @param height The height of the Gui
      */
-    public HotBarEditor(Role role, HotBarLayout current, HotBarLayoutManager manager, ItemHandler itemHandler, Windowed previous, Consumer<Player> onSave) {
+    public HotBarEditor(Role role, HotBarLayout current, HotBarLayoutManager manager, ItemFactory itemFactory, Windowed previous, Consumer<Player> onSave) {
         super(9, 10);
         this.hotBarLayoutManager = manager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
 
         this.role = role;
         this.original = current;
@@ -138,7 +135,7 @@ public class HotBarEditor extends AbstractGui {
                     guiIndex++;
                 }
                 if (Arrays.asList(hotBarItem.getAllowedRoles()).contains(role)) {
-                    setItem(guiIndex, new HotBarItemButton(hotBarItem));
+                    setItem(guiIndex, new HotBarItemButton(itemFactory, hotBarItem));
                 } else {
                     setItem(guiIndex, Menu.BACKGROUND_GUI_ITEM);
                 }

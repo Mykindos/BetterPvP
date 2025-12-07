@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,7 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -44,9 +41,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -172,10 +173,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         int level = getLevel(player);
 
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
-        UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, getDamage(level), false, "Takedown"));
+        UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), "Takedown"));
 
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName() + " " + level);
-        UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, getRecoilDamage(level), false, "Takedown Recoil"));
+        UtilDamage.doDamage(new DamageEvent(player, target, null, new SkillDamageCause(this), getRecoilDamage(level), "Takedown Recoil"));
 
         long duration = (long) (getDuration(level) * 1000L);
         championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, duration);

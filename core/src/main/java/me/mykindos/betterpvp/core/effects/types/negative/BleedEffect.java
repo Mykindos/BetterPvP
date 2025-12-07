@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.core.effects.types.negative;
 
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -46,9 +48,13 @@ public class BleedEffect extends VanillaEffectType {
         if (UtilTime.elapsed(lastBleedTime, 1000)) {
             // Apply damage to any LivingEntity (including players)
 
-            var cde = new CustomDamageEvent(livingEntity, effect.getApplier().get(), null, EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
-//            cde.setIgnoreArmour(true);
-            UtilDamage.doCustomDamage(cde);
+            var cde = new DamageEvent(livingEntity,
+                    effect.getApplier().get(),
+                    null,
+                    new VanillaDamageCause(EntityDamageEvent.DamageCause.MAGIC).withTrueDamage(TriState.FALSE),
+                    2.0,
+                    "Bleed");
+            UtilDamage.doDamage(cde);
 
             livingEntity.getWorld().playSound(livingEntity.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT_FREEZE, 1f, 2f);
             livingEntity.getWorld().playEffect(livingEntity.getLocation().add(0, 1, 0), org.bukkit.Effect.STEP_SOUND, Material.REDSTONE_BLOCK);

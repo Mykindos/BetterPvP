@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.WeakHashMap;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -25,11 +23,14 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+
+import java.util.Iterator;
+import java.util.WeakHashMap;
 
 @Slf4j
 @Singleton
@@ -38,7 +39,7 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, PestilenceProjectile> projectiles = new WeakHashMap<>();
-    private final GamerDisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private final EffectManager effectManager;
     private double poisonDuration;

@@ -20,8 +20,8 @@ import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueBut
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -54,9 +54,9 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                 "# # # < - > # # R")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(null))
-                .addIngredient('>', new ForwardButton())
+                .addIngredient('>', new PageForwardButton())
                 .addIngredient('R', new RefreshButton<>())
                 .addIngredient('C', new StringFilterButton<>("Select Category", List.of(FILTER_ALL, FILTER_CLAN, FILTER_CLIENT), 9, Material.WRITABLE_BOOK, 0))
                 .addIngredient('V', new StringFilterValueButton<>(9))

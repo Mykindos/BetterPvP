@@ -18,7 +18,7 @@ dependencies {
     compileOnly(libs.libsdisguises)
     compileOnly(project(":core"))
     compileOnly(project(":champions"))
-    compileOnly(libs.protocollib)
+    compileOnly(libs.packetevents)
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)

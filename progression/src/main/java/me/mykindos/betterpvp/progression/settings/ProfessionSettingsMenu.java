@@ -29,7 +29,7 @@ public class ProfessionSettingsMenu extends AbstractGui implements SettingCatego
                     .material(Material.GOLDEN_AXE)
                     .displayName(Component.text("Disable Treefeller", color))
                     .lore(Component.text("Disables treefeller from activating", NamedTextColor.GRAY))
-                    .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                    .hideAdditionalTooltip(true)
                     .frameLore(true)
                     .build()
                     .get();
@@ -56,7 +56,7 @@ public class ProfessionSettingsMenu extends AbstractGui implements SettingCatego
                         .displayName(Component.text("Profession Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
                         .lore(Component.text("View settings related to Professions", NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
-                        .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                        .hideAdditionalTooltip(true)
                         .frameLore(true)
                         .build())
                 .build();

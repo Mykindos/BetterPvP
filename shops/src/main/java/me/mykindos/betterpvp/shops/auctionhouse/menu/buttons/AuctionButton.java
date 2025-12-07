@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
@@ -22,6 +23,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class AuctionButton extends ControlItem<AuctionListingMenu> {
 
@@ -38,12 +40,8 @@ public class AuctionButton extends ControlItem<AuctionListingMenu> {
     @Override
     public ItemProvider getItemProvider(AuctionListingMenu gui) {
 
-        ItemStack itemStack = auction.getItemStack().clone();
+        ItemStack itemStack = auctionManager.getItemFactory().fromItemStack(auction.getItemStack()).orElseThrow().getView().get();
         itemStack.editMeta(meta -> {
-            if(meta.displayName() == null) {
-                meta.displayName(Component.text(itemStack.getType().name()));
-            }
-
             List<Component> lore = meta.lore();
             if (lore == null) {
                 lore = new ArrayList<>();

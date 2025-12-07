@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
@@ -26,9 +27,12 @@ import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.item.ItemKey;
+import me.mykindos.betterpvp.core.item.ItemLoader;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -84,12 +88,6 @@ public class Clans extends BPvPPlugin {
             clanManager = injector.getInstance(ClanManager.class);
             clanManager.loadFromList(clanManager.getRepository().getAll());
 
-            var itemHandler = injector.getInstance(ItemHandler.class);
-            itemHandler.loadItemData("clans");
-
-            var uuidManager = injector.getInstance(UUIDManager.class);
-            uuidManager.loadObjectsFromNamespace("clans");
-
             var clansSidebar = injector.getInstance(ClansSidebarListener.class);
             var sidebarController = injector.getInstance(SidebarController.class);
             if (clansSidebar.isEnabled()) {
@@ -101,11 +99,36 @@ public class Clans extends BPvPPlugin {
 
             updateEventExecutor.loadPlugin(this);
 
+            var uuidManager = injector.getInstance(UUIDManager.class);
+            uuidManager.loadObjectsFromNamespace("clans");
+
             final Adapters adapters = new Adapters(this);
             final Reflections reflectionAdapters = new Reflections(PACKAGE);
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
+            final ItemLoader itemLoader = new ItemLoader(this);
+            itemLoader.load(adapters, reflectionAdapters.getTypesAnnotatedWith(ItemKey.class));
+            this.registerItems();
+
+            clearCraftingRecipes();
         }
+    }
+
+    private void registerItems() {
+        this.injector.getInstance(ExplosiveResistanceBootstrap.class).register();
+    }
+
+    private void clearCraftingRecipes() {
+        CraftingRecipeRegistry recipeRegistry = injector.getInstance(CraftingRecipeRegistry.class);
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:oak_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:spruce_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:jungle_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:acacia_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:dark_oak_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:mangrove_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:cherry_boat"));
+        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:pale_oak_boat"));
     }
 
     @Override

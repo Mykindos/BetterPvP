@@ -1,8 +1,11 @@
 package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -11,8 +14,10 @@ import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandl
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,6 +37,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     private final ProfessionProfileManager professionProfileManager;
     private final WoodcuttingHandler woodcuttingHandler;
     private final BlockTagManager blockTagManager;
+    private final ItemFactory itemFactory;
 
     /**
      * Represents the percentage, per level, that <b>Tree Bark</b> will drop when any given log is stripped
@@ -39,11 +45,12 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     private double barkChanceIncreasePerLvl;
 
     @Inject
-    public BarkBounty(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingHandler woodcuttingHandler, BlockTagManager blockTagManager) {
+    public BarkBounty(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingHandler woodcuttingHandler, BlockTagManager blockTagManager, ItemFactory itemFactory) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.woodcuttingHandler = woodcuttingHandler;
         this.blockTagManager = blockTagManager;
+        this.itemFactory = itemFactory;
     }
 
     @Override
@@ -90,6 +97,8 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void whenPlayerStripsALog(PlayerStripLogEvent event) {
         if (event.wasEventDeniedAndCancelled()) return;
+        final BaseItem treeBark = itemFactory.getItemRegistry().getItem("progression:tree_bark");
+        Preconditions.checkState(treeBark != null, "Tree Bark item has not been registered!");
 
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.ADVENTURE) return;
@@ -103,10 +112,10 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
             if (skillLevel <= 0) return;
 
             if (Math.random() < getChanceForBarkToDrop(skillLevel)) {
-                ItemStack treeBark = new ItemStack(Material.GLISTERING_MELON_SLICE);
-                treeBark.editMeta(meta -> meta.setCustomModelData(1));
-
-                player.getWorld().dropItemNaturally(player.getLocation(), treeBark);
+                final ItemStack itemStack = itemFactory.create(treeBark).createItemStack();
+                final Location location = player.getEyeLocation().add(player.getLocation().getDirection().multiply(1));
+                final Item item = player.getWorld().dropItem(location, itemStack);
+                item.setVelocity(player.getLocation().getDirection().multiply(-0.2));
             }
         });
     }
