@@ -79,12 +79,9 @@ public class BossStat implements IBuildableStat {
         return this;
     }
 
-    private Long getActionStat(StatContainer statContainer, String period) {
-        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
-                .filter(entry ->
-                        entry.getKey().getStatType().startsWith(TYPE + StringBuilderParser.DEFAULT_INTRA_SEQUENCE_DELIMITER + action)
-                ).mapToLong(Map.Entry::getValue)
-                .sum();
+    private boolean filterActionStat(Map.Entry<IStat, Long> entry) {
+        BossStat other = (BossStat) entry.getKey();
+        return action.equals(other.action);
     }
 
     /**
@@ -97,7 +94,7 @@ public class BossStat implements IBuildableStat {
     @Override
     public Long getStat(StatContainer statContainer, String periodKey) {
         if (Strings.isNullOrEmpty(bossName)) {
-            return getActionStat(statContainer, periodKey);
+            return getFilteredStat(statContainer, periodKey, this::filterActionStat);
         }
         return statContainer.getProperty(periodKey, this);
     }
@@ -142,7 +139,7 @@ public class BossStat implements IBuildableStat {
     @Override
     public String getQualifiedName() {
         StringBuilder stringBuilder = new StringBuilder();
-        if (!com.google.common.base.Strings.isNullOrEmpty(bossName)) {
+        if (!Strings.isNullOrEmpty(bossName)) {
             stringBuilder.append(bossName);
             stringBuilder.append(" ");
         }

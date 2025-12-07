@@ -45,6 +45,11 @@ public class DamageStat implements IBuildableStat {
     private EntityDamageEvent.DamageCause damageCause;
 
 
+    private boolean filterDamageCause(Map.Entry<IStat, Long> entry) {
+        DamageStat other = (DamageStat) entry.getKey();
+        return relation.equals(other.relation) && type.equals(other.type);
+    }
+
     /**
      * Get the stat represented by this object from the statContainer
      *
@@ -55,13 +60,9 @@ public class DamageStat implements IBuildableStat {
     @Override
     public Long getStat(StatContainer statContainer, String periodKey) {
         if (damageCause == null) {
-            return statContainer.getStats().getStatsOfPeriod(periodKey).entrySet().stream()
-                    .filter(entry ->
-                    entry.getKey().getStatType().startsWith(getStatType())
-            ).mapToLong(Map.Entry::getValue)
-                    .sum();
+            return getFilteredStat(statContainer, periodKey, this::filterDamageCause);
         }
-        return statContainer.getProperty(getStatType(), this);
+        return statContainer.getProperty(periodKey, this);
     }
 
     @Override
