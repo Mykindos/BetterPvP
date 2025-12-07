@@ -4,8 +4,8 @@ core:
     season: Season 1
   database:
     supabase:
-      url: https://abcdefghijklmnop.supabase.co
-      service-key: my-supabase-service-key
+      url: "https://wenrbemzbvclukhgmbgz.supabase.co"
+      anon-key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlbnJiZW16YnZjbHVraGdtYmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNzA2MjEsImV4cCI6MjA3NDc0NjYyMX0.Pup-qcJLl7MNPy7DbW3SOyNoYAODc7XB5AvP5Yo8n4M"
     global:
       databaseName: betterpvp
       username: user
