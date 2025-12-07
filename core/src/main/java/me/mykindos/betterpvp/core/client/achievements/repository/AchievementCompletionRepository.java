@@ -11,7 +11,6 @@ import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.AggregateFunction;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
@@ -35,9 +34,7 @@ public class AchievementCompletionRepository {
     public CompletableFuture<Void> save(AchievementCompletion object) {
             return database.getAsyncDslContext().executeAsyncVoid(context -> {
                 context.insertInto(ACHIEVEMENT_COMPLETIONS)
-                        //todo to make id like client
                         .set(ACHIEVEMENT_COMPLETIONS.ID, object.getId())
-                        //todo convert achievement completion to store client
                         .set(ACHIEVEMENT_COMPLETIONS.CLIENT, object.getClient().getId())
                         .set(ACHIEVEMENT_COMPLETIONS.PERIOD, object.getPeriod())
                         .set(ACHIEVEMENT_COMPLETIONS.NAMESPACE, object.getKey().getNamespace())
@@ -71,7 +68,7 @@ public class AchievementCompletionRepository {
                             }
                     );
             return completions;
-        }).thenCompose(achievementCompletions -> loadCompletionRanks(container, achievementCompletions));
+        }).thenCompose(achievementCompletions -> loadCompletionRanks(achievementCompletions));
     }
 
     /**
@@ -79,7 +76,7 @@ public class AchievementCompletionRepository {
      * @param container the {@link PropertyContainer}
      * @param completions the {@link ConcurrentHashMap} to be modified in place
      */
-    public CompletableFuture<AchievementCompletionsConcurrentHashMap> loadCompletionRanks(StatContainer container, AchievementCompletionsConcurrentHashMap completions) {
+    public CompletableFuture<AchievementCompletionsConcurrentHashMap> loadCompletionRanks(AchievementCompletionsConcurrentHashMap completions) {
 
         return database.getAsyncDslContext().executeAsync(context -> {
             for (AchievementCompletion completion : completions) {
@@ -105,7 +102,8 @@ public class AchievementCompletionRepository {
         return database.getAsyncDslContext().executeAsync(context -> {
             final ConcurrentHashMap<String, ConcurrentHashMap<NamespacedKey, Integer>> completions = new ConcurrentHashMap<>();
             final AggregateFunction<Integer> totalCompletions = countDistinct(ACHIEVEMENT_COMPLETIONS.CLIENT);
-            context.select(ACHIEVEMENT_COMPLETIONS.PERIOD, ACHIEVEMENT_COMPLETIONS.NAMESPACE, totalCompletions)
+            context.select(ACHIEVEMENT_COMPLETIONS.PERIOD, ACHIEVEMENT_COMPLETIONS.NAMESPACE, ACHIEVEMENT_COMPLETIONS.KEYNAME, totalCompletions)
+                    .from(ACHIEVEMENT_COMPLETIONS)
                     .groupBy(
                             ACHIEVEMENT_COMPLETIONS.PERIOD,
                             ACHIEVEMENT_COMPLETIONS.NAMESPACE,
@@ -117,14 +115,11 @@ public class AchievementCompletionRepository {
                         final String keyname = record.get(ACHIEVEMENT_COMPLETIONS.KEYNAME);
                         final int numCompletions = record.get(totalCompletions);
                         final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
-                        completions.compute(period, (k, v) -> {
-                            if (v == null) {
-                                v = new ConcurrentHashMap<>();
-                            }
-                            v.put(namespacedKey, numCompletions);
-                            return v;
-                        });
-                    });
+                        completions.computeIfAbsent(period, (k) ->
+                            new ConcurrentHashMap<>()
+                        ).put(namespacedKey, numCompletions);
+                    }
+                    );
             return completions;
         });
     }
@@ -137,13 +132,12 @@ public class AchievementCompletionRepository {
                 achievement,
                 period,
                 //in testing, db was not saving the timestamp with the same precision
-                LocalDateTime.from(Instant.now().truncatedTo(ChronoUnit.SECONDS))
+                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         );
         return save(completion)
                 .thenApply((obj) -> {
-                    loadCompletionRanks(container,
-                            new AchievementCompletionsConcurrentHashMap().addCompletion(completion));
-                            return completion;
+                    loadCompletionRanks(new AchievementCompletionsConcurrentHashMap().addCompletion(completion));
+                    return completion;
                         }
                 );
     }

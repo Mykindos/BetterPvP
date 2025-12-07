@@ -63,10 +63,6 @@ public class AchievementManager extends Manager<String, IAchievement> {
         achievementCompletions.remove(id);
     }
 
-    public CompletableFuture<Void> saveGlobalCompletion(StatContainer container, NamespacedKey namespacedKey) {
-        return saveCompletion(container, namespacedKey, "");
-    }
-
     public CompletableFuture<Void> saveCompletion(StatContainer container, NamespacedKey achievement, String period) {
         return achievementCompletionRepository.saveCompletion(container, achievement, period)
                 .thenAccept(achievementCompletion -> {
@@ -77,13 +73,9 @@ public class AchievementManager extends Manager<String, IAchievement> {
     }
 
     public void updateTotalCompletions(NamespacedKey achievement, String period) {
-        totalAchievementCompletions.compute(period, (k, v) -> {
-                    if (v == null) {
-                        v = new ConcurrentHashMap<>();
-                    }
-                    v.compute(achievement, (key, value) -> value == null ? 1 : value + 1);
-                    return v;
-                });
+        totalAchievementCompletions.computeIfAbsent(period, (k) ->
+                    new ConcurrentHashMap<>()
+                ).compute(achievement, (key, value) -> value == null ? 1 : value + 1);
         final int total = totalAchievementCompletions.get(period).get(achievement);
 
         achievementCompletions.forEach((id, map) ->

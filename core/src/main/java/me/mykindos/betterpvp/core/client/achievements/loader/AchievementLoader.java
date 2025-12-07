@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.core.client.achievements.repository.AchievementMana
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
+import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
+import org.bukkit.event.Listener;
 
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -30,6 +32,10 @@ public abstract class AchievementLoader extends Loader {
         plugin.getInjector().injectMembers(achievement);
         achievement.loadConfig(plugin.getConfig("achievements"));
         achievementManager.addObject(achievement.getNamespacedKey().asString(), achievement);
+        if (achievement instanceof Listener listener) {
+            ListenerLoader.register(plugin, listener);
+        }
+
         count++;
 
     }

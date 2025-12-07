@@ -125,7 +125,8 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
     public boolean containsStat(IStat otherStat) {
         if (!(otherStat instanceof ClanWrapperStat other)) return false;
         if (!Strings.isNullOrEmpty(clanName) && !clanName.equals(other.clanName)) return false;
-        if (!Objects.equals(clanId, other.clanId)) return false;
+        //empty clanname means this is a generic stat, clanId equal does not matter
+        if (!Strings.isNullOrEmpty(clanName) && !Objects.equals(clanId, other.clanId)) return false;
         return wrappedStat.containsStat(other.wrappedStat);
     }
 
