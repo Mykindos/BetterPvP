@@ -72,14 +72,16 @@ public class DefeatAllBossesOnceAchievement extends NSingleGoalSimpleAchievement
     }
     @Override
     public List<Component> getProgressComponent(StatContainer container, String period) {
-        final BossStat skeletonKingStat = BossStat.builder()
+        final GenericStat skeletonKingStat = new GenericStat(BossStat.builder()
                 .action(BossStat.Action.KILL)
                 .bossName("Skeleton King")
-                .build();
-        final BossStat dreadbeardStat = BossStat.builder()
+                .build()
+        );
+        final GenericStat dreadbeardStat = new GenericStat(BossStat.builder()
                 .action(BossStat.Action.KILL)
                 .bossName("Dreadbeard")
-                .build();
+                .build()
+        );
         boolean killedSkeletonKing = skeletonKingStat.getStat(container, period) >= 1;
         List<Component> bar = super.getProgressComponent(container, period);
         bar.addAll(List.of(

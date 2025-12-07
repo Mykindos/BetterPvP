@@ -36,7 +36,6 @@ public class AchievementsCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        execute(player, args);
         new AchievementMenu(client, achievementManager, statPeriodManager).show(player);
     }
 

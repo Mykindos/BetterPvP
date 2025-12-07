@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.impl.clans.SetCoreAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
@@ -98,11 +99,14 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
             @Nullable
             final Long oldValue = event.getOldValue();
             final StatContainer container = event.getContainer();
-
             //validate and retrieve
             final List<IStat> statsTemp = watchedStats.stream()
                     .filter(iStat -> iStat.containsStat(stat))
                     .toList();
+            if (this instanceof SetCoreAchievement) {
+                log.info("Changed stat {}", stat.getQualifiedName()).submit();
+            }
+
             if (statsTemp.isEmpty()) return;
             if (statsTemp.size() > 1) {
                 throw new IllegalStateException("Expected 1 changed stat, but got " + statsTemp.size() + ". " +
@@ -161,16 +165,13 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         //todo localize timezones
         final Component timeComponent = Component.text(UtilTime.getDateTime(achievementCompletion.getTimestamp()), NamedTextColor.GOLD);
 
-        final Component placementComponent = UtilMessage.deserialize("<gold>#%s of %s", achievementCompletion.getCompletedRank(), achievementCompletion.getTotalCompletions());
+        final Component placementComponent = UtilMessage.deserialize("<gold>#%s of %s", achievementCompletion.getCompletedRank() + 1, achievementCompletion.getTotalCompletions());
 
         return new ArrayList<>(List.of(
                 Component.text("Completed", NamedTextColor.GOLD),
                 timeComponent,
                 placementComponent));
     }
-
-    //TODO do all completion/notification logic here. Define thresholds for notifications, allow overriding of notification methods. Probably should do in onChangeValue here
-    //TODO lower classes should define calculatePercent, which is how threshold/completion is determined. Check for passing percent for thresholds
 
     @Override
     public void notifyProgress(StatContainer container, Audience audience, float threshold) {
