@@ -126,5 +126,14 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
         private final String period;
         private final IStat stat;
         private final Long value;
+
+        @Override
+        public String toString() {
+            return "StatData{" +
+                    "period='" + period + '\'' +
+                    ", stat=" + stat.getQualifiedName() +
+                    ", value=" + value +
+                    '}';
+        }
     }
 }
