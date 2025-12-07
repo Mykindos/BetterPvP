@@ -56,15 +56,15 @@ public abstract class NSimpleAchievement extends Achievement {
 
     @Override
     public float calculatePercent(Map<IStat, Long> statMap) {
-        double total = statGoals.values().stream()
+        long total = statGoals.values().stream()
                 .mapToLong(Long::longValue)
                 .sum();
-        double current = statMap.entrySet().stream()
+        long current = statMap.entrySet().stream()
                 .mapToLong(entrySet -> {
                     long localTotal = statGoals.get(entrySet.getKey());
                     return Math.min(localTotal, entrySet.getValue());
                 }).sum();
-        return (float) ((float) current/total);
+        return ((float) current/total);
     }
 
     public float calculateCurrentElementPercent(StatContainer statContainer, IStat iStat) {

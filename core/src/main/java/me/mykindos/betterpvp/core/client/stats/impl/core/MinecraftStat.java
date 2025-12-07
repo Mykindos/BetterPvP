@@ -70,13 +70,12 @@ public class MinecraftStat implements IBuildableStat {
         final MinecraftStatBuilder builder = MinecraftStat.builder();
         Preconditions.checkArgument(statType.startsWith(TYPE), "statName must start with " + TYPE);
         builder.statistic(Statistic.valueOf(data.getString("statistic")));
-        builder.statistic(Statistic.valueOf(data.getString("statistic")));
         String dataMaterial = data.optString("material", null);
         if (!Strings.isNullOrEmpty(dataMaterial)) {
             builder.material(Material.valueOf(dataMaterial));
         }
         String dataEntity = data.optString("entityType", null);
-        if (!Strings.isNullOrEmpty(dataMaterial)) {
+        if (!Strings.isNullOrEmpty(dataEntity)) {
             builder.entityType(EntityType.valueOf(dataEntity));
         }
         return builder.build();

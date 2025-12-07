@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievem
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 @CustomLog
 @Singleton
+@BPvPListener
 public class DestroyCoreAchievement extends SingleSimpleAchievement {
     @Inject
     public DestroyCoreAchievement() {
