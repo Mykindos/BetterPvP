@@ -1,15 +1,11 @@
 package me.mykindos.betterpvp.core.block;
 
 import me.mykindos.betterpvp.core.block.data.DataHolder;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.data.LoadHandler;
+import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockbukkit.mockbukkit.MockBukkit;
-import org.mockbukkit.mockbukkit.ServerMock;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,16 +16,11 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SmartBlockChunkLoadingTest {
 
-    private ServerMock server;
-
-    // Test data class that implements UnloadHandler
+    // Test data class that implements LoadHandler
     public static class SmelterData implements LoadHandler {
         private final int fuel;
         private final int processTime;
@@ -48,18 +39,23 @@ public class SmartBlockChunkLoadingTest {
         public int getProcessTime() { return processTime; }
         public String getOwner() { return owner; }
 
-        // UnloadHandler implementation for testing
+        // LoadHandler implementation for testing
         @Override
         public void onUnload(@NotNull SmartBlockInstance instance) {
             unloadCalled.set(true);
             unloadCount.incrementAndGet();
         }
 
+        @Override
+        public void onLoad(@NotNull SmartBlockInstance instance) {
+            // Can be implemented if needed for testing
+        }
+
         // Test verification methods
         public boolean wasUnloadCalled() { return unloadCalled.get(); }
         public int getUnloadCount() { return unloadCount.get(); }
-        public void resetUnloadState() { 
-            unloadCalled.set(false); 
+        public void resetUnloadState() {
+            unloadCalled.set(false);
             unloadCount.set(0);
         }
 
@@ -131,46 +127,33 @@ public class SmartBlockChunkLoadingTest {
         }
     }
 
-    @BeforeEach
-    void setUp() {
-        server = MockBukkit.mock();
-    }
-
-    @AfterEach
-    void tearDown() {
-        MockBukkit.unmock();
-    }
-
     @Test
-    @DisplayName("UnloadHandler should be called when onUnload is invoked")
-    void testUnloadHandlerFunctionality() {
+    @DisplayName("LoadHandler should be called when onUnload is invoked")
+    void testLoadHandlerFunctionality() {
         // Arrange
         SmelterData smelterData = new SmelterData(100, 50, "TestPlayer");
         SmartSmelter smartSmelter = new SmartSmelter();
-        
-        // Create a mock block and instance for testing
-        var world = server.addSimpleWorld("world");
-        var block = world.getBlockAt(0, 64, 0);
-        SmartBlockInstance instance = new SmartBlockInstance(smartSmelter, block, null);
+
+        // Create a null instance for testing (the test data doesn't use the instance parameter)
+        SmartBlockInstance instance = null;
 
         // Act
         smelterData.onUnload(instance);
 
         // Assert
-        assertTrue(smelterData.wasUnloadCalled(), "UnloadHandler.onUnload should have been called");
+        assertTrue(smelterData.wasUnloadCalled(), "LoadHandler.onUnload should have been called");
         assertEquals(1, smelterData.getUnloadCount(), "onUnload should have been called exactly once");
     }
 
     @Test
-    @DisplayName("UnloadHandler can be called multiple times and tracks count correctly")
-    void testUnloadHandlerMultipleCalls() {
+    @DisplayName("LoadHandler can be called multiple times and tracks count correctly")
+    void testLoadHandlerMultipleCalls() {
         // Arrange
         SmelterData smelterData = new SmelterData(100, 50, "TestPlayer");
         SmartSmelter smartSmelter = new SmartSmelter();
-        
-        var world = server.addSimpleWorld("world");
-        var block = world.getBlockAt(0, 64, 0);
-        SmartBlockInstance instance = new SmartBlockInstance(smartSmelter, block, null);
+
+        // Create a null instance for testing (the test data doesn't use the instance parameter)
+        SmartBlockInstance instance = null;
 
         // Act
         smelterData.onUnload(instance);
@@ -178,20 +161,19 @@ public class SmartBlockChunkLoadingTest {
         smelterData.onUnload(instance);
 
         // Assert
-        assertTrue(smelterData.wasUnloadCalled(), "UnloadHandler.onUnload should have been called");
+        assertTrue(smelterData.wasUnloadCalled(), "LoadHandler.onUnload should have been called");
         assertEquals(3, smelterData.getUnloadCount(), "onUnload should have been called three times");
     }
 
     @Test
-    @DisplayName("UnloadHandler state can be reset correctly")
-    void testUnloadHandlerReset() {
+    @DisplayName("LoadHandler state can be reset correctly")
+    void testLoadHandlerReset() {
         // Arrange
         SmelterData smelterData = new SmelterData(100, 50, "TestPlayer");
         SmartSmelter smartSmelter = new SmartSmelter();
-        
-        var world = server.addSimpleWorld("world");
-        var block = world.getBlockAt(0, 64, 0);
-        SmartBlockInstance instance = new SmartBlockInstance(smartSmelter, block, null);
+
+        // Create a null instance for testing (the test data doesn't use the instance parameter)
+        SmartBlockInstance instance = null;
 
         // Act
         smelterData.onUnload(instance);
@@ -206,7 +188,7 @@ public class SmartBlockChunkLoadingTest {
     }
 
     @Test
-    @DisplayName("Smelter data serialization should work correctly with UnloadHandler")
+    @DisplayName("Smelter data serialization should work correctly with LoadHandler")
     void testSmelterDataSerialization() throws IOException {
         SmelterDataSerializer serializer = new SmelterDataSerializer();
         
