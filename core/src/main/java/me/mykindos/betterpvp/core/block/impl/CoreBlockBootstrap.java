@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
@@ -25,8 +26,9 @@ public class CoreBlockBootstrap {
 
     public void register() {
         final Reflections reflections = new Reflections(PACKAGE);
+        final Adapters adapters = new Adapters(core);
         for (Class<? extends SmartBlock> clazz : reflections.getSubTypesOf(SmartBlock.class)) {
-            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+            if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || !adapters.canLoad(clazz)) {
                 continue;
             }
 
