@@ -59,7 +59,7 @@ public class SupplyCrate extends Projectile {
 
     @Override
     public boolean isExpired() {
-        return impacted && UtilTime.elapsed(impactTime, aliveTime);
+        return (impacted && UtilTime.elapsed(impactTime, aliveTime)) || UtilTime.elapsed(creationTime, aliveTime * 10);
     }
 
     public boolean hasLoot() {
@@ -72,6 +72,10 @@ public class SupplyCrate extends Projectile {
 
     @Override
     protected void onTick() {
+        if (this.location.getChunk().isLoaded()) {
+            this.location.getChunk().load();
+        }
+
         this.backingEntity.setLocation(location.clone().add(0, 0.01, 0));
         if (!impacted) {
             Particle.CAMPFIRE_COSY_SMOKE.builder()
