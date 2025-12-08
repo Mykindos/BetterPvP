@@ -55,7 +55,6 @@ public class SupplyCrate extends Projectile {
             created.setSaved(false);
             created.setModelRotationLocked(true);
         });
-        // todo: spawn firework particles
     }
 
     @Override
