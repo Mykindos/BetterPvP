@@ -31,6 +31,7 @@ public class RewardsCommand extends Command {
         this.clientSQLLayer = clientSQLLayer;
         this.itemFactory = itemFactory;
         this.cooldownManager = cooldownManager;
+        this.aliases.add("inventory");
     }
 
     @Override
@@ -45,7 +46,7 @@ public class RewardsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(cooldownManager.use(player, "Rewards", 60 * 5, true, false)) {
+        if (cooldownManager.use(player, "Rewards", 1, true, false)) {
             CompletableFuture.runAsync(() -> {
                 RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
 

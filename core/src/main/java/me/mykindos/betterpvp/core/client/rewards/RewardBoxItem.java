@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -19,8 +18,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -40,21 +37,9 @@ public class RewardBoxItem extends ControlItem<GuiRewardBox> {
 
     @Override
     public ItemProvider getItemProvider(GuiRewardBox gui) {
-        ItemStack item = itemStack.clone();
-        item.editMeta(meta -> {
-            List<Component> lore = meta.lore();
-            if (lore == null) {
-                lore = new ArrayList<>();
-            }
-
-            lore.add(Component.text(""));
-            lore.add(UtilMessage.DIVIDER);
-            lore.add(Component.text(""));
-            lore.add(Component.text(ClickActions.LEFT.getName() + " to ", NamedTextColor.WHITE).append(Component.text("Withdraw", NamedTextColor.YELLOW)));
-            meta.lore(lore);
-        });
-
-        return ItemView.of(item);
+        return ItemView.of(itemFactory.fromItemStack(itemStack).orElseThrow().getView().get()).toBuilder()
+                .action(ClickActions.ALL, Component.text("Claim"))
+                .build();
     }
 
     @Override

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.listener.loader;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.event.Listener;
@@ -16,7 +17,7 @@ import java.util.Set;
  */
 @CustomLog
 public class CoreListenerLoader extends ListenerLoader{
-
+    
     @Inject
     public CoreListenerLoader(Core plugin) {
         super(plugin);
@@ -32,8 +33,9 @@ public class CoreListenerLoader extends ListenerLoader{
         }
 
         Set<Class<? extends Reloadable>> reloadHooks = reflections.getSubTypesOf(Reloadable.class);
+        final Adapters adapters = new Adapters(plugin);
         for (var hookClass : reloadHooks) {
-            if (!Modifier.isAbstract(hookClass.getModifiers())) {
+            if (adapters.canLoad(hookClass) && !Modifier.isAbstract(hookClass.getModifiers())) {
                 final Reloadable hook = plugin.getInjector().getInstance(hookClass);
                 hook.reload();
                 plugin.getReloadables().add(hook);
