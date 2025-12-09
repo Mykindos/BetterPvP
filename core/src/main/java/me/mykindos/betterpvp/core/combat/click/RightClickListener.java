@@ -113,7 +113,7 @@ public class RightClickListener implements Listener {
             gamer.setLastBlock(System.currentTimeMillis());
             final RightClickEvent previousEvent = context.getEvent();
             final RightClickEvent event = new RightClickEvent(player,
-                    previousEvent.getBlockingItem(),
+                    null,
                     true,
                     previousEvent.getHand());
             UtilServer.callEvent(event);
@@ -163,7 +163,6 @@ public class RightClickListener implements Listener {
         final RightClickContext previous = rightClickCache.remove(player);
         if (previous != null) {
             clickEvent.setHoldClick(true);
-            clickEvent.setBlockingItem(previous.getEvent().getBlockingItem());
         }
 
         UtilServer.callEvent(clickEvent);
@@ -221,6 +220,7 @@ public class RightClickListener implements Listener {
 
         // Replace offhand with shield because we are blocking
         player.getInventory().setItemInOffHand(UtilItem.makeUndroppable(event.getBlockingItem()));
+        player.startUsingItem(EquipmentSlot.OFF_HAND);
     }
 
     @EventHandler
