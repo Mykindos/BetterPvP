@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
-import net.objecthunter.exp4j.tokenizer.OperatorToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -87,29 +86,61 @@ public class UtilLocation {
      * @param then             An optional callback to handle the result of the teleportation operation (true if successful, false otherwise).
      */
     public static void teleportToward(final @NotNull LivingEntity entity, final @NotNull Vector direction, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
+        // Stop raying if we don't have line of sight
+        Optional<Location> teleportLocationOpt = gracefulRayTrace(entity.getLocation(), direction, teleportDistance, entity.getBoundingBox(), entity::hasLineOfSight);
+
+        if (teleportLocationOpt.isEmpty()) {
+            // prevent teleport at all
+            if (then != null) {
+                then.accept(Boolean.FALSE);
+            }
+            return;
+        }
+
+        Location teleportLocation = teleportLocationOpt.get();
+
+        // Adjust pitch and yaw to match the direction they are facing
+        teleportLocation.setPitch(entity.getLocation().getPitch());
+        teleportLocation.setYaw(entity.getLocation().getYaw());
+
+        // Shift them out of the location to avoid PHASING and SUFFOCATION
+        entity.leaveVehicle();
+
+        // Teleport
+        // Asynchronously because, for some reason, spigot fires PlayerInteractEvent twice if the entity looks at a block
+        // causing them to use the skill again after being teleported
+        // teleportAsync somehow fixes that
+        entity.teleportAsync(teleportLocation).thenAccept(result -> {
+            if (!fallDamage) {
+                entity.setFallDistance(0);
+            }
+
+            if (then != null) {
+                then.accept(result);
+            }
+        });
+    }
+
+    public static Optional<Location> gracefulRayTrace(final @NotNull Location origin, final @NotNull Vector direction, double teleportDistance, final @NotNull BoundingBox boundingBox, final @NotNull Predicate<@NotNull Location> predicate) {
         // Iterate from their location to their destination
         // Modify the base location by the direction they are facing
         direction.normalize();
-        Location teleportLocation = entity.getLocation();
+        Location teleportLocation = origin.clone();
         WorldBorder worldBorder = teleportLocation.getWorld().getWorldBorder();
 
         final int iterations = (int) Math.ceil(teleportDistance / 0.2f);
         for (int i = 1; i <= iterations; i++) {
             // Extend their location by the direction they are facing by 0.2 blocks per iteration
             final Vector increment = direction.clone().multiply(0.2 * i);
-            final Location newLocation = entity.getLocation().add(increment);
+            final Location newLocation = origin.clone().add(increment);
 
             if (!worldBorder.isInside(newLocation)) {
-                // prevent teleport at all
-                if (then != null) {
-                    then.accept(Boolean.FALSE);
-                }
-                return;
+                return Optional.empty();
             }
 
             try {
                 // Get the bounding box of the entity as if they were standing on the new location
-                BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), newLocation);
+                BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(boundingBox.clone(), newLocation);
 
                 // Only cancel for collision if the block isn't passable AND we hit its collision shape
                 final Location blockOnTop = newLocation.clone().add(0, 1.0, 0);
@@ -131,11 +162,11 @@ public class UtilLocation {
 
                     // At this point, we can ATTEMPT to skip the block at their feet
                     final Vector horizontalIncrement = increment.clone().setY(0);
-                    final Location frontLocation = entity.getLocation().add(horizontalIncrement);
-                    relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), frontLocation);
+                    final Location frontLocation = origin.clone().add(horizontalIncrement);
+                    relativeBoundingBox = UtilLocation.copyAABBToLocation(boundingBox.clone(), frontLocation);
                     if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)
-                            || wouldCollide(frontLocation.clone().add(0, entity.getHeight() / 2, 0).getBlock(), relativeBoundingBox)
-                            || wouldCollide(frontLocation.clone().add(0, entity.getHeight(), 0).getBlock(), relativeBoundingBox)) {
+                            || wouldCollide(frontLocation.clone().add(0, boundingBox.getHeight() / 2, 0).getBlock(), relativeBoundingBox)
+                            || wouldCollide(frontLocation.clone().add(0, boundingBox.getHeight(), 0).getBlock(), relativeBoundingBox)) {
                         continue; // Cancel if that block we're skipping to is not passable
                     }
 
@@ -147,38 +178,19 @@ public class UtilLocation {
                     break; // Stop raying if we hit a block above their head
                 }
 
-                if (!entity.hasLineOfSight(newTeleportLocation) || !entity.hasLineOfSight(headBlock)) {
-                    break; // Stop raying if we don't have line of sight
+                if (!predicate.test(newTeleportLocation) || !predicate.test(headBlock)) {
+                    break;
                 }
 
                 teleportLocation = newTeleportLocation;
             } catch (IllegalArgumentException ex) {
                 log.warn("Invalid argument provided to copyAABBToLocation", ex).submit();
-                return;
+                return Optional.empty();
             }
         }
 
-        // Adjust pitch and yaw to match the direction they are facing
-        teleportLocation.setPitch(entity.getLocation().getPitch());
-        teleportLocation.setYaw(entity.getLocation().getYaw());
-
-        // Shift them out of the location to avoid PHASING and SUFFOCATION
-        entity.leaveVehicle();
-        teleportLocation = UtilLocation.shiftOutOfBlocks(teleportLocation, entity.getBoundingBox());
-
-        // Teleport
-        // Asynchronously because, for some reason, spigot fires PlayerInteractEvent twice if the entity looks at a block
-        // causing them to use the skill again after being teleported
-        // teleportAsync somehow fixes that
-        entity.teleportAsync(teleportLocation).thenAccept(result -> {
-            if (!fallDamage) {
-                entity.setFallDistance(0);
-            }
-
-            if (then != null) {
-                then.accept(result);
-            }
-        });
+        teleportLocation = UtilLocation.shiftOutOfBlocks(teleportLocation, boundingBox);
+        return Optional.of(teleportLocation);
     }
 
     /**

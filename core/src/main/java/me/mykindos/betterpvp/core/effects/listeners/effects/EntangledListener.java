@@ -8,14 +8,11 @@ import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
 
@@ -37,6 +34,7 @@ public class EntangledListener implements Listener {
 
         Optional<Effect> effectOpt = effectManager.getEffect(entity, EffectTypes.ENTANGLED);
         if (effectOpt.isPresent() && !event.getVelocityType().equals(VelocityType.KNOCKBACK_CUSTOM)) {
+            event.setCancelled(true);
         }
     }
 

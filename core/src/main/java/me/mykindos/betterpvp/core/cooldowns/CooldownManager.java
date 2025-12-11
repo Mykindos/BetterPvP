@@ -386,6 +386,12 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
                 }
 
                 if (!silent) {
+                    Client client = clientManager.search().online(player);
+                    final boolean soundSetting = (boolean) client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED).orElse(false);
+                    if (soundSetting) {
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
+                    }
+
                     UtilMessage.simpleMessage(player, "Recharge", "<alt>%s</alt> has been recharged.", ability);
                 }
             }

@@ -186,9 +186,11 @@ public class DamageEventFinalizer {
         net.kyori.adventure.sound.Sound sound = provider.apply(event);
         if (sound != null) {
             if (provider.fromEntity()) {
-                damagee.getWorld().playSound(sound, damagee);
+//                damagee.getWorld().playSound(sound, damagee);
+                damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(),
+                        sound.volume(), sound.pitch());
             } else {
-                damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(), 
+                damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(),
                         sound.volume(), sound.pitch());
             }
         }
