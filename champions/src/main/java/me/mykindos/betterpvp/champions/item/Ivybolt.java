@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.item.ivybolt;
+package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

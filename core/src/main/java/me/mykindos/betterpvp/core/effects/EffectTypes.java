@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.effects.types.negative.ConcussedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.DarknessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.DeathsCurseEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.EntangledEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.FrenzyEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.FrozenEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
@@ -78,6 +79,7 @@ public class EffectTypes {
     public static final EffectType ENTANGLED = createEffectType(new EntangledEffect());
     public static final EffectType DEATHS_CURSE = createEffectType(new DeathsCurseEffect());
     public static final EffectType WEAKNESS = createEffectType(new WeaknessEffect());
+    public static final EffectType FRENZY = createEffectType(new FrenzyEffect());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
