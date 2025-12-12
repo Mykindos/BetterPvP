@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemNameRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
-import me.mykindos.betterpvp.core.item.renderer.NameComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameRarityRenderer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
@@ -55,7 +54,7 @@ public class BaseItem implements Item {
     }
 
     public BaseItem(Component name, ItemStack model, ItemGroup group, ItemRarity rarity) {
-        this(model, group, itemInstance -> rarity, new LoreComponentRenderer(), new NameComponentRenderer(name));
+        this(model, group, itemInstance -> rarity, new LoreComponentRenderer(), new NameRarityRenderer(name));
     }
 
     public BaseItem(@NotNull ItemStack model,
