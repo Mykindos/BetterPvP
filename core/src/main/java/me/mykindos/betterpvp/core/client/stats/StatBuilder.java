@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
@@ -27,7 +26,7 @@ public class StatBuilder {
     }
 
     private Set<Class<? extends IBuildableStat>>  load() {
-        Reflections reflections = new Reflections(JavaPlugin.getPlugin(Core.class).getPACKAGE());
+        Reflections reflections = new Reflections(Core.PACKAGE);
         Set<Class<? extends IBuildableStat>> classes = reflections.getSubTypesOf(IBuildableStat.class);
         return classes.stream()
                 .filter(clazz -> !clazz.isInterface())

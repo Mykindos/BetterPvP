@@ -6,11 +6,10 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
-import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
 import me.mykindos.betterpvp.core.block.SmartBlockModule;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
+import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
@@ -218,7 +217,6 @@ public class Core extends BPvPPlugin {
         injector.getInstance(SmartBlockDataManager.class).saveWorlds().join();
         log.info("Saved all cust0om blocks").submit();
 
-        clientManager.processStatUpdates(false);
         clientManager.processPropertyUpdates(false);
         clientManager.shutdown();
         log.info("Processed all pending stat updates and shut down client manager").submit();

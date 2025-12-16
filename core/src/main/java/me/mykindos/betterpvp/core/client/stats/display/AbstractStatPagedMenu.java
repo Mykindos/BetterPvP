@@ -13,8 +13,8 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,9 +45,9 @@ public abstract class AbstractStatPagedMenu extends AbstractPagedGui<Item> imple
                             "# # # < - > # # #")
                     .addIngredient('x',Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                     .addIngredient('#',Menu.BACKGROUND_ITEM)
-                    .addIngredient('<', new PreviousButton())
+                    .addIngredient('<', new PageBackwardButton())
                     .addIngredient('-', new StatBackButton(previous))
-                    .addIngredient('>', new ForwardButton())
+                    .addIngredient('>', new PageForwardButton())
                     .addIngredient('P', new PeriodFilterButton(periodKey, statPeriodManager))
         );
         if (!(getItem(8, 0) instanceof StringFilterButton<?> periodButton)) throw new IllegalStateException("Item in this slot must be a StringFilterButton");

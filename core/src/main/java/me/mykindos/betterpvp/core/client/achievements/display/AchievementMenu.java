@@ -24,8 +24,8 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
@@ -65,9 +65,9 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
                         .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                         .addIngredient('#', Menu.BACKGROUND_ITEM)
                         .addIngredient('P', new PeriodFilterButton(periodKey, statPeriodManager))
-                        .addIngredient('<', new PreviousButton())
+                        .addIngredient('<', new PageBackwardButton())
                         .addIngredient('-', new StatBackButton(previous))
-                        .addIngredient('>', new ForwardButton())
+                        .addIngredient('>', new PageForwardButton())
         );
         this.statPeriodManager = statPeriodManager;
         if (getItem(7, 0) instanceof AchievementPeriodFilterButton filterButton) {
