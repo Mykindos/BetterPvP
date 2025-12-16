@@ -15,13 +15,14 @@ import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterValueButton;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
-import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterButton;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.filter.IContextFilterButton;
+import me.mykindos.betterpvp.core.menu.button.filter.StringContext;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -42,7 +43,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
     private final Clan clan;
     private final ClanManager clanManager;
 
-    private IStringFilterButton categoryButton;
+    private IContextFilterButton<StringContext> categoryButton;
     private IStringFilterValueButton valueButton;
 
     public ClanKillLogMenu(Clan clan, ClanManager clanManager) {
@@ -68,7 +69,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
             refreshButton.setRefresh(this::refresh);
         }
 
-        if (getItem(7, 0) instanceof IStringFilterButton filterButton) {
+        if (getItem(7, 0) instanceof StringFilterButton filterButton) {
             this.categoryButton = filterButton;
             filterButton.setRefresh(this::refresh);
         }
@@ -86,7 +87,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
     }
 
     private CompletableFuture<Boolean> refresh() {
-        valueButton.setSelectedContext(categoryButton.getSelectedFilter());
+        valueButton.setSelectedContext(categoryButton.getSelectedFilter().getContext());
         valueButton.getContextValues().clear();
 
         return CompletableFuture.supplyAsync(() -> {
@@ -123,7 +124,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
     }
 
     private boolean matchesSelectedFilter(KillClanLog killClanLog) {
-        String context = categoryButton.getSelectedFilter();
+        String context = categoryButton.getSelectedFilter().getContext();
         String selectedValue = valueButton.getSelected();
 
         if (Objects.equals(context, FILTER_ALL)) {
