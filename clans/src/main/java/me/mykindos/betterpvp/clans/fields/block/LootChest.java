@@ -41,7 +41,7 @@ public class LootChest implements FieldsInteractable, Listener {
     }
 
     @Override
-    public boolean processInteraction(ClientManager clientManager, event, FieldsBlock block, ItemFactory itemFactory) {
+    public boolean processInteraction(ClientManager clientManager, TerritoryInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
         if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.INTERACT)) {
             return false; // They didn't right-click the chest
         }

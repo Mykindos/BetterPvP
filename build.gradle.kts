@@ -44,7 +44,6 @@ subprojects {
         maven("https://repo.opencollab.dev/maven-releases/")
         maven("https://repo.nexomc.com/releases")
         maven("https://repo.nexomc.com/snapshots")
-        maven("https://repo.md-5.net/content/groups/public/")
         maven("https://mvn.lib.co.nz/public")
         maven("https://jitpack.io")
         maven("https://repo.viaversion.com")
