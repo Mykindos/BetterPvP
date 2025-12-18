@@ -270,9 +270,13 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
                             if (entry != null) {
                                 resultMap.put(entry.getKey(), entry.getValue());
                             }
+                        } catch (InterruptedException e) {
+                            log.warn("Interrupted while getting result from reconstruction future for chunk {},{}",
+                                    chunk.getX(), chunk.getZ(), e).submit();
+                            Thread.currentThread().interrupt();
                         } catch (Exception e) {
                             log.warn("Failed to get result from reconstruction future for chunk {},{}",
-                                chunk.getX(), chunk.getZ(), e).submit();
+                                    chunk.getX(), chunk.getZ(), e).submit();
                         }
                     }
                     return resultMap;
