@@ -6,15 +6,16 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.command.brigadier.arguments.types.BPvPItemArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.BooleanArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.CustomEffectArgumentType;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.CustomItemArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.UUIDItemArgumentType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDItem;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class BPvPArgumentTypes {
     private static final PlayerNameArgumentType PLAYER_NAME_ARGUMENT = (PlayerNameArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), PlayerNameArgumentType.class);
     private static final CustomEffectArgumentType CUSTOM_EFFECT_ARGUMENT = (CustomEffectArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), CustomEffectArgumentType.class);
     private static final BooleanArgumentType BOOLEAN_ARGUMENT = (BooleanArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), BooleanArgumentType.class);
-    private static final BPvPItemArgumentType BPVPITEM_ARGUMENT = (BPvPItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), BPvPItemArgumentType.class);
+    private static final CustomItemArgumentType CUSTOM_ITEM_ARGUMENT = (CustomItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), CustomItemArgumentType.class);
     public static BPvPArgumentType<?, ?> createArgumentType(BPvPPlugin plugin, Class<? extends BPvPArgumentType<?, ?>> clazz) {
 
         BPvPArgumentType<?, ?> argumentType = plugin.getInjector().getInstance(clazz);
@@ -81,11 +82,11 @@ public class BPvPArgumentTypes {
     }
 
     /**
-     * Suggests {@link BPvPItem#getIdentifier() indentifiers}
-     * <p>Casting class {@link BPvPItem}</p>
-     * @return the {@link BPvPItemArgumentType}
+     * Suggests {@link ItemRegistry#getItems()}  indentifiers}
+     * <p>Casting class {@link BaseItem}</p>
+     * @return the {@link CustomItemArgumentType}
      */
-    public static BPvPItemArgumentType bPvPItem() {
-        return BPVPITEM_ARGUMENT;
+    public static CustomItemArgumentType customItemType() {
+        return CUSTOM_ITEM_ARGUMENT;
     }
 }
