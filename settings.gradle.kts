@@ -131,6 +131,9 @@ dependencyResolutionManagement {
             // Library - Nexo
             library("nexo", "com.nexomc", "nexo").version("1.7.1")
 
+            // Library - Oraxen
+            library("oraxen", "io.th0rgal", "oraxen").version("1.200.0")
+
             library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.9")
 
             // Library - McPets

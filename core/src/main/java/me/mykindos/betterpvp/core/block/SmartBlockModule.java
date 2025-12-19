@@ -19,9 +19,17 @@ public class SmartBlockModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        if (Compatibility.TEXTURE_PROVIDER && Compatibility.MODEL_ENGINE) {
-            // Use NEXO implementation
-            install(getNexoModule());
+        if (Compatibility.MODEL_ENGINE) {
+            if (Compatibility.NEXO) {
+                // Use NEXO implementation
+                install(getNexoModule());
+            } else if (Compatibility.ORAXEN) {
+                // Use ORAXEN implementation
+                install(getOraxenModule());
+            } else {
+                bind(SmartBlockFactory.class).to(DefaultSmartBlockFactory.class);
+                bind(SmartBlockInteractionService.class).to(DefaultSmartBlockInteractionService.class);
+            }
         } else {
             bind(SmartBlockFactory.class).to(DefaultSmartBlockFactory.class);
             bind(SmartBlockInteractionService.class).to(DefaultSmartBlockInteractionService.class);
@@ -53,6 +61,17 @@ public class SmartBlockModule extends AbstractModule {
             return module;
         } else {
             throw new IllegalStateException("NexoSmartBlockModule is not a Module");
+        }
+    }
+
+    @SneakyThrows
+    private Module getOraxenModule() {
+        final Class<?> clazz = Class.forName("me.mykindos.betterpvp.core.block.oraxen.OraxenSmartBlockModule");
+        final Object o = clazz.getConstructor().newInstance();
+        if (o instanceof Module module) {
+            return module;
+        } else {
+            throw new IllegalStateException("OraxenSmartBlockModule is not a Module");
         }
     }
 }

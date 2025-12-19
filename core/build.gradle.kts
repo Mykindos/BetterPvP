@@ -37,6 +37,7 @@ dependencies {
     api(libs.mini.placeholders)
     api(libs.caffeine)
     compileOnly(libs.nexo)
+    compileOnly(libs.oraxen)
 
     compileOnly(libs.mineplex)
     compileOnly(libs.lombok)

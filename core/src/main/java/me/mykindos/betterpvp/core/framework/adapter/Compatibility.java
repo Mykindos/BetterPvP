@@ -29,7 +29,17 @@ public class Compatibility {
     /**
      * Whether the server is running Nexo
      */
-    public static boolean TEXTURE_PROVIDER = Bukkit.getPluginManager().getPlugin("Nexo") != null;
+    public static boolean NEXO = Bukkit.getPluginManager().getPlugin("Nexo") != null;
+
+    /**
+     * Whether the server is running Oraxen
+     */
+    public static boolean ORAXEN = Bukkit.getPluginManager().getPlugin("Oraxen") != null;
+
+    /**
+     * Whether the server is running a texture provider (Nexo or Oraxen)
+     */
+    public static boolean TEXTURE_PROVIDER = NEXO || ORAXEN;
 
     /**
      * Whether the server is running WorldEdit

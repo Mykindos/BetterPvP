@@ -53,6 +53,7 @@ subprojects {
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.polar.top/repository/polar/")
         maven("https://mvn.lib.co.nz/public/")
+        maven("https://repo.oraxen.com/releases")
         maven {
           url =  uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
