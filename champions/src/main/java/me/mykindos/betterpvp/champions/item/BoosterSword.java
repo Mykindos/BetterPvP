@@ -55,7 +55,7 @@ public class BoosterSword extends WeaponItem {
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('G', new RecipeIngredient(goldBlock, 1));
         builder.setIngredient('S', new RecipeIngredient(stick, 1));
-        registry.registerRecipe(new NamespacedKey("champions", "booster_sword"), builder.build());
+        registry.registerRecipe(new NamespacedKey("core", "booster_sword"), builder.build());
     }
 
 }
