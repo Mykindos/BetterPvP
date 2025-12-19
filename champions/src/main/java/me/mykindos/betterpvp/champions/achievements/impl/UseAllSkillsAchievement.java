@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.NSingleGoalSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
@@ -42,16 +43,17 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
         ListenerLoader.register(JavaPlugin.getPlugin(Champions.class), this);
     }
 
-    private static ChampionsSkillStat[] getAllSkills(ChampionsSkillManager skillManager) {
+    private static GenericStat[] getAllSkills(ChampionsSkillManager skillManager) {
         return skillManager.getObjects().values().stream()
                 .filter(Skill::isEnabled)
                 .map(skill ->
-                        ChampionsSkillStat.builder()
+                        new GenericStat(ChampionsSkillStat.builder()
                                 .action(ChampionsSkillStat.Action.TIME_PLAYED)
                                 .skill(skill)
                                 .build()
+                        )
                 )
-                .toArray(ChampionsSkillStat[]::new);
+                .toArray(GenericStat[]::new);
     }
 
     /**
@@ -84,9 +86,12 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
     @Override
     public List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
         int completed = getWatchedStats().stream()
+                .map(GenericStat.class::cast)
+                .map(GenericStat::getStat)
                 .map(ChampionsSkillStat.class::cast)
-                .filter(stat -> calculateCurrentElementPercent(container, stat) < 1.0f)
-                .toList().size();
+                .filter(stat -> calculateCurrentElementPercent(container, stat) >= 1.0f)
+                .toList()
+                .size();
         int total = getWatchedStats().size();
         List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, period));
         Component bar = progressComponent.getFirst();
@@ -97,8 +102,10 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
 
     private List<Component> getRemainingElements(StatContainer statContainer) {
         List<ChampionsSkillStat> neededStats = getWatchedStats().stream()
+                .map(GenericStat.class::cast)
+                .map(GenericStat::getStat)
                 .map(ChampionsSkillStat.class::cast)
-                .filter(stat -> calculateCurrentElementPercent(statContainer, stat) >= 1.0f)
+                .filter(stat -> calculateCurrentElementPercent(statContainer, stat) < 1.0f)
                 .toList();
         List<Component> components = new ArrayList<>();
         if (neededStats.isEmpty()) return List.of();
