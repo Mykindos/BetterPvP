@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.progression.commands.loader.BrigadierProgressionCom
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
+import me.mykindos.betterpvp.progression.commands.loader.BrigadierProgressionCommandLoader;
 import me.mykindos.betterpvp.core.item.impl.interaction.TreeFellerInteraction;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;

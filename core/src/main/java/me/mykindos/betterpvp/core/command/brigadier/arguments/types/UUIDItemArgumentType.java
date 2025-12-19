@@ -11,8 +11,8 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDItem;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
