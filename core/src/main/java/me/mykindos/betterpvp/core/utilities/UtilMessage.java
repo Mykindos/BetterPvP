@@ -24,6 +24,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -375,7 +376,7 @@ public class UtilMessage {
 
     public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
         sender.sendMessage(UtilMessage.deserialize("<red>" + exception.getMessage()));
-    };
+    }
 
     /**
      * Broadcasts a pre-built component to all players on the server with a formatted prefix

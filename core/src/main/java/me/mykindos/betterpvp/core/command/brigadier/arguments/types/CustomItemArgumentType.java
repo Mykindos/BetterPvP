@@ -11,21 +11,21 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-public class BPvPItemArgumentType extends BPvPArgumentType<BPvPItem, NamespacedKey> implements CustomArgumentType.Converted<BPvPItem, NamespacedKey> {
+public class CustomItemArgumentType extends BPvPArgumentType<BaseItem, NamespacedKey> implements CustomArgumentType.Converted<@NotNull BaseItem, @NotNull NamespacedKey> {
 
-    private final ItemHandler itemHandler;
+    private final ItemRegistry itemRegistry;
     @Inject
-    protected BPvPItemArgumentType(ItemHandler itemHandler) {
+    protected CustomItemArgumentType(ItemRegistry itemRegistry) {
         super("BPvPItem");
-        this.itemHandler = itemHandler;
+        this.itemRegistry = itemRegistry;
     }
 
     /**
@@ -36,8 +36,8 @@ public class BPvPItemArgumentType extends BPvPArgumentType<BPvPItem, NamespacedK
      * @throws CommandSyntaxException if an exception occurs while parsing
      */
     @Override
-    public @NotNull BPvPItem convert(@NotNull NamespacedKey nativeType) throws CommandSyntaxException {
-        final BPvPItem item = itemHandler.getItem(nativeType.asString());
+    public @NotNull BaseItem convert(@NotNull NamespacedKey nativeType) throws CommandSyntaxException {
+        final BaseItem item = itemRegistry.getItem(nativeType);
         if (item == null) {
             throw ArgumentException.UNKNOWN_BPVPITEM.create(nativeType);
         }
@@ -57,7 +57,8 @@ public class BPvPItemArgumentType extends BPvPArgumentType<BPvPItem, NamespacedK
 
     @Override
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
-        itemHandler.getItemIdentifiers().stream()
+        itemRegistry.getItemsSorted().keySet().stream()
+                .map(NamespacedKey::toString)
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();

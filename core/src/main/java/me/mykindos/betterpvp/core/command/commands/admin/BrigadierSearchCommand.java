@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDItem;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
