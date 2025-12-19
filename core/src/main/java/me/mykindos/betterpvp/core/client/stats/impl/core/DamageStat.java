@@ -6,13 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Type;
+import me.mykindos.betterpvp.core.combat.cause.DamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -26,13 +29,14 @@ import java.util.Objects;
 @NoArgsConstructor
 public class DamageStat implements IBuildableStat {
     public static final String TYPE = "DAMAGE";
+    private static final DamageCauseRegistry damageCauseRegistry = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(DamageCauseRegistry.class);
 
     public static DamageStat fromData(String statType, JSONObject data) {
         DamageStat.DamageStatBuilder builder = builder();
         Preconditions.checkArgument(statType.equals(TYPE));
         builder.relation(Relation.valueOf(data.getString("relation")));
         builder.type(Type.valueOf(data.getString("type")));
-        builder.damageCause(EntityDamageEvent.DamageCause.valueOf(data.getString("damageCause")));
+        builder.damageCause(damageCauseRegistry.get(data.getString("damageCause")));
         return builder.build();
     }
 
@@ -42,7 +46,7 @@ public class DamageStat implements IBuildableStat {
     @NotNull
     private Type type;
     @Nullable
-    private EntityDamageEvent.DamageCause damageCause;
+    private DamageCause damageCause;
 
 
     private boolean filterDamageCause(Map.Entry<IStat, Long> entry) {
@@ -80,7 +84,7 @@ public class DamageStat implements IBuildableStat {
         return new JSONObject()
                 .putOnce("relation", relation.name())
                 .putOnce("type", type.name())
-                .putOnce("damageCause", Objects.requireNonNull(damageCause).name());
+                .putOnce("damageCause", Objects.requireNonNull(damageCause).getName());
     }
 
     /**
@@ -98,7 +102,7 @@ public class DamageStat implements IBuildableStat {
                 .append(UtilFormat.cleanString(type.name()));
         if (damageCause != null) {
             stringBuilder.append(" ")
-                    .append(UtilFormat.cleanString(damageCause.name()));
+                    .append(UtilFormat.cleanString(damageCause.getName()));
         }
 
         return stringBuilder.toString();
