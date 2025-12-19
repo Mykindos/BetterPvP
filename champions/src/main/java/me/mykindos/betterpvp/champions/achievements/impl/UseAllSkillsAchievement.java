@@ -86,10 +86,10 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
     @Override
     public List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
         int completed = getWatchedStats().stream()
+                .filter(stat -> calculateCurrentElementPercent(container, stat) < 1.0f)
                 .map(GenericStat.class::cast)
                 .map(GenericStat::getStat)
                 .map(ChampionsSkillStat.class::cast)
-                .filter(stat -> calculateCurrentElementPercent(container, stat) >= 1.0f)
                 .toList()
                 .size();
         int total = getWatchedStats().size();
@@ -102,10 +102,10 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
 
     private List<Component> getRemainingElements(StatContainer statContainer) {
         List<ChampionsSkillStat> neededStats = getWatchedStats().stream()
+                .filter(stat -> calculateCurrentElementPercent(statContainer, stat) >= 1.0f)
                 .map(GenericStat.class::cast)
                 .map(GenericStat::getStat)
                 .map(ChampionsSkillStat.class::cast)
-                .filter(stat -> calculateCurrentElementPercent(statContainer, stat) < 1.0f)
                 .toList();
         List<Component> components = new ArrayList<>();
         if (neededStats.isEmpty()) return List.of();

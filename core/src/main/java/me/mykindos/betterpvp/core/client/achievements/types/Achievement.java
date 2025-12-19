@@ -6,7 +6,6 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
-import me.mykindos.betterpvp.core.client.achievements.impl.clans.SetCoreAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
@@ -103,9 +102,6 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
             final List<IStat> statsTemp = watchedStats.stream()
                     .filter(iStat -> iStat.containsStat(stat))
                     .toList();
-            if (this instanceof SetCoreAchievement) {
-                log.info("Changed stat {}", stat.getQualifiedName()).submit();
-            }
 
             if (statsTemp.isEmpty()) return;
             if (statsTemp.size() > 1) {
