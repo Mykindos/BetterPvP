@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.UUID;
 
 @Data
 public class PendingLog {
