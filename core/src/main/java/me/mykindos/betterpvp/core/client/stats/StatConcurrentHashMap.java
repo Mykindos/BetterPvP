@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @CustomLog
 public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.StatData> {
     @Getter
-    //period, statname, stat
+    //period, istat, value
     protected final ConcurrentHashMap<String, ConcurrentHashMap<IStat, Long>> myMap = new ConcurrentHashMap<>();
     protected final List<IStatMapListener> listeners = new ArrayList<>();
 
