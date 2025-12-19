@@ -242,7 +242,7 @@ public class HotBarLayoutManager {
                 continue;
             }
 
-            final BaseItem baseItem = Objects.requireNonNull(itemRegistry.getItem(item.getNamespacedKey()));
+            final BaseItem baseItem = Objects.requireNonNull(itemRegistry.getItem(item.getNamespacedKey()), "No item registered for " + item.getNamespacedKey());
             final ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
             itemStack.setAmount(item.getAmount());
             player.getInventory().setItem(i, itemStack);

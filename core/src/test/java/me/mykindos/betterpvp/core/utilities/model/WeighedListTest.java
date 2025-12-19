@@ -105,12 +105,12 @@ class WeighedListTest {
         weighedList.add(20000, 1, "progression:tree_bark");
 
         // Weapons and tools
-        weighedList.add(5000, 1, "champions:booster_sword");
-        weighedList.add(5000, 1, "champions:booster_axe");
-        weighedList.add(5000, 1, "champions:power_sword");
-        weighedList.add(5000, 1, "champions:power_axe");
-        weighedList.add(5000, 1, "champions:ancient_sword");
-        weighedList.add(5000, 1, "champions:ancient_axe");
+        weighedList.add(5000, 1, "core:booster_sword");
+        weighedList.add(5000, 1, "core:booster_axe");
+        weighedList.add(5000, 1, "core:power_sword");
+        weighedList.add(5000, 1, "core:power_axe");
+        weighedList.add(5000, 1, "core:ancient_sword");
+        weighedList.add(5000, 1, "core:ancient_axe");
 
         // T1 Runes
         weighedList.add(5000, 1, "champions:power_rune_t1");
@@ -185,12 +185,12 @@ class WeighedListTest {
         weighedList.add(20000, 1, "progression:tree_bark");
 
         // Weapons and tools
-        weighedList.add(5000, 1, "champions:booster_sword");
-        weighedList.add(5000, 1, "champions:booster_axe");
-        weighedList.add(5000, 1, "champions:power_sword");
-        weighedList.add(5000, 1, "champions:power_axe");
-        weighedList.add(5000, 1, "champions:ancient_sword");
-        weighedList.add(5000, 1, "champions:ancient_axe");
+        weighedList.add(5000, 1, "core:booster_sword");
+        weighedList.add(5000, 1, "core:booster_axe");
+        weighedList.add(5000, 1, "core:power_sword");
+        weighedList.add(5000, 1, "core:power_axe");
+        weighedList.add(5000, 1, "core:ancient_sword");
+        weighedList.add(5000, 1, "core:ancient_axe");
 
         // T1 Runes
         weighedList.add(5000, 1, "champions:power_rune_t1");
