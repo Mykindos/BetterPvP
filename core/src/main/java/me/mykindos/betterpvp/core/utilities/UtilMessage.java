@@ -27,6 +27,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -331,7 +332,7 @@ public class UtilMessage {
 
     public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
         sender.sendMessage(UtilMessage.deserialize("<red>" + exception.getMessage()));
-    };
+    }
 
     /**
      * Broadcasts a message to every online player, building the component <b>per recipient</b> so that any
