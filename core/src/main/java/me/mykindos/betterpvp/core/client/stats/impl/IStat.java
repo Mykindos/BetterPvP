@@ -7,12 +7,11 @@ import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.function.Predicate;
-
 public interface IStat {
     /**
      * The amount that {@link Double} or {@link Float} values are multiplied then cast to long by
      */
-    static long FP_MODIFIER = 1000L;
+    long FP_MODIFIER = 1000L;
 
     /**
      * Get the stat represented by this object from the statContainer

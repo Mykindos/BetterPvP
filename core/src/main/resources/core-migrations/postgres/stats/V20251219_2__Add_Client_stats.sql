@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS client_stats (
     Client      BIGINT          REFERENCES clients(id)    NOT NULL,
     Period      VARCHAR(127)    NOT NULL,
     StatType    VARCHAR(127)    NOT NULL,
-    StatData    JSONB           NOT NULL,
+    StatData    JSONB           NOT NULL DEFAULT '{}',
     Stat        BIGINT          NOT NULL,
     CONSTRAINT PK_Client PRIMARY KEY (Client, Period, StatType, StatData),
     CONSTRAINT FK_Client FOREIGN KEY (Client) REFERENCES clients(id)
