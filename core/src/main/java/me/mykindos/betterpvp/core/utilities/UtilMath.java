@@ -51,10 +51,10 @@ public class UtilMath {
         final com.mojang.math.Transformation result = new com.mojang.math.Transformation(transformationMatrix);
 
         return new Transformation(
-                transformation.getTranslation().add(result.getTranslation()),
-                result.getLeftRotation(),
-                result.getScale(),
-                result.getRightRotation()
+                new Vector3f(transformation.getTranslation()).add(result.getTranslation()),
+                new Quaternionf(result.getLeftRotation()),
+                new Vector3f(result.getScale()),
+                new Quaternionf(result.getRightRotation())
         );
     }
 
