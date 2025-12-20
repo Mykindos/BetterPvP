@@ -93,7 +93,7 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
         try {
             return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
                 ctx.insertInto(SMART_BLOCK_DATA)
-                        .set(SMART_BLOCK_DATA.REALM, Core.getCurrentRealm())
+                        .set(SMART_BLOCK_DATA.REALM, Core.getCurrentRealm().getRealm())
                         .set(SMART_BLOCK_DATA.WORLD, instance.getLocation().getWorld().getName())
                         .set(SMART_BLOCK_DATA.CHUNK_KEY, Chunk.getChunkKey(instance.getLocation()))
                         .set(SMART_BLOCK_DATA.BLOCK_KEY, UtilBlock.getBlockKey(instance.getHandle()))
@@ -129,7 +129,7 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
                                 SMART_BLOCK_DATA.DATA_TYPE_CLASS,
                                 SMART_BLOCK_DATA.DATA)
                         .from(SMART_BLOCK_DATA)
-                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm()))
+                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm().getRealm()))
                         .and(SMART_BLOCK_DATA.WORLD.eq(world))
                         .and(SMART_BLOCK_DATA.CHUNK_KEY.eq(chunkKey))
                         .and(SMART_BLOCK_DATA.BLOCK_KEY.eq(blockKey))
@@ -165,7 +165,7 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
 
             return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
                 ctx.deleteFrom(SMART_BLOCK_DATA)
-                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm()))
+                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm().getRealm()))
                         .and(SMART_BLOCK_DATA.WORLD.eq(world))
                         .and(SMART_BLOCK_DATA.CHUNK_KEY.eq(chunkKey))
                         .and(SMART_BLOCK_DATA.BLOCK_KEY.eq(blockKey))
@@ -201,7 +201,7 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
                                 SMART_BLOCK_DATA.DATA_TYPE_CLASS,
                                 SMART_BLOCK_DATA.DATA)
                         .from(SMART_BLOCK_DATA)
-                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm()))
+                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm().getRealm()))
                         .and(SMART_BLOCK_DATA.WORLD.eq(world))
                         .and(SMART_BLOCK_DATA.CHUNK_KEY.eq(chunkKey))
                         .orderBy(SMART_BLOCK_DATA.BLOCK_KEY)
@@ -328,7 +328,7 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
 
             return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
                 ctx.deleteFrom(SMART_BLOCK_DATA)
-                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm()))
+                        .where(SMART_BLOCK_DATA.REALM.eq(Core.getCurrentRealm().getRealm()))
                         .and(SMART_BLOCK_DATA.WORLD.eq(chunk.getWorld().getName()))
                         .and(SMART_BLOCK_DATA.CHUNK_KEY.eq(chunkKey))
                         .execute();

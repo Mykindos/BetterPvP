@@ -48,9 +48,9 @@ public class LogRepository {
             DSLContext ctx = database.getDslContext();
             Result<? extends Record> result;
             if (actionFilter != null) {
-                result = GET_LOG_MESSAGES_BY_CONTEXT_AND_ACTION(ctx.configuration(), key, value, actionFilter, Core.getCurrentRealm());
+                result = GET_LOG_MESSAGES_BY_CONTEXT_AND_ACTION(ctx.configuration(), key, value, actionFilter, Core.getCurrentRealm().getRealm());
             } else {
-                result = GET_LOG_MESSAGES_BY_CONTEXT_AND_VALUE(ctx.configuration(), key, value, Core.getCurrentRealm());
+                result = GET_LOG_MESSAGES_BY_CONTEXT_AND_VALUE(ctx.configuration(), key, value, Core.getCurrentRealm().getRealm());
             }
 
             result.forEach(logRecord -> {
@@ -93,7 +93,7 @@ public class LogRepository {
                     DSLContext ctx = database.getDslContext();
 
                     int deletedRows = ctx.deleteFrom(LOGS)
-                            .where(LOGS.REALM.eq(Core.getCurrentRealm()))
+                            .where(LOGS.REALM.eq(Core.getCurrentRealm().getRealm()))
                             .and(LOGS.ACTION.eq(""))
                             .and(LOGS.LOG_TIME.le(System.currentTimeMillis() - daysToMillis))
                             .limit(batchSize)

@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.stats.repository;
 
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
 import me.mykindos.betterpvp.champions.stats.ChampionsKill;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
@@ -9,8 +11,6 @@ import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
-import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,7 +100,7 @@ public class ChampionsCombatData extends CombatData {
             // Insert/update victim rating using INSERT ... ON DUPLICATE KEY UPDATE
             ctx.insertInto(CHAMPIONS_COMBAT_STATS)
                     .set(CHAMPIONS_COMBAT_STATS.CLIENT, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
-                    .set(CHAMPIONS_COMBAT_STATS.REALM, Core.getCurrentRealm())
+                    .set(CHAMPIONS_COMBAT_STATS.REALM, Core.getCurrentRealm().getRealm())
                     .set(CHAMPIONS_COMBAT_STATS.CLASS, role == null ? "" : role.toString())
                     .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
                     .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
