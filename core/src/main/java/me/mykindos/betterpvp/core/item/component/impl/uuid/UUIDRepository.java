@@ -36,7 +36,7 @@ public class UUIDRepository implements IRepository<UUIDItem> {
             database.getDslContext()
                     .selectFrom(UUIDITEMS)
                     .where(UUIDITEMS.NAMESPACE.eq(namespace))
-                    .and(UUIDITEMS.REALM.eq(Core.getCurrentRealm()))
+                    .and(UUIDITEMS.REALM.eq(Core.getCurrentRealm().getRealm()))
                     .fetch()
                     .forEach(uuidItemRecord -> {
                         UUID uuid = UUID.fromString(uuidItemRecord.get(UUIDITEMS.UUID));
@@ -56,7 +56,7 @@ public class UUIDRepository implements IRepository<UUIDItem> {
             database.getDslContext()
                     .insertInto(UUIDITEMS)
                     .set(UUIDITEMS.UUID, object.getUuid().toString())
-                    .set(UUIDITEMS.REALM, Core.getCurrentRealm())
+                    .set(UUIDITEMS.REALM, Core.getCurrentRealm().getRealm())
                     .set(UUIDITEMS.NAMESPACE, object.getNamespace())
                     .set(UUIDITEMS.KEYNAME, object.getKey())
                     .execute();

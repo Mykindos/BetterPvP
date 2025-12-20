@@ -40,7 +40,7 @@ public class WoodcuttingRepository {
     }
 
     public void createPartitions() {
-        int season = Core.getCurrentSeason();
+        int season = Core.getCurrentRealm().getSeason();
         String partitionTableName = "progression_woodcutting_season_" + season;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
@@ -59,7 +59,7 @@ public class WoodcuttingRepository {
 
             ctx.insertInto(PROGRESSION_WOODCUTTING)
                     .set(PROGRESSION_WOODCUTTING.CLIENT, client.getId())
-                    .set(PROGRESSION_WOODCUTTING.SEASON, Core.getCurrentSeason())
+                    .set(PROGRESSION_WOODCUTTING.SEASON, Core.getCurrentRealm().getSeason())
                     .set(PROGRESSION_WOODCUTTING.MATERIAL, material.name())
                     .set(PROGRESSION_WOODCUTTING.LOCATION, UtilWorld.locationToString(location))
                     .set(PROGRESSION_WOODCUTTING.AMOUNT, amount)
