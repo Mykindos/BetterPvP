@@ -36,7 +36,7 @@ public class PostgresDatabaseConnection implements IDatabaseConnection {
 
         hikariConfig.setDriverClassName("org.postgresql.Driver");
         hikariConfig.setJdbcUrl("jdbc:postgresql://" + sqlServer + "/" + sqlDatabaseName);
-        hikariConfig.setPoolName(Core.getCurrentServerName());
+        hikariConfig.setPoolName(Core.getCurrentServer().getName());
         hikariConfig.setUsername(sqlUsername);
         hikariConfig.setPassword(sqlPassword);
         hikariConfig.setMaximumPoolSize(maxPoolSize);
