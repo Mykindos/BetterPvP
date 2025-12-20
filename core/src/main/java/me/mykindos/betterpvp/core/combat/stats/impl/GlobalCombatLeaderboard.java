@@ -149,7 +149,7 @@ public final class GlobalCombatLeaderboard extends PlayerLeaderboard<CombatData>
     }
 
     private @NotNull Table<?> getStatement(CombatSort sortType) {
-        final int currentRealm = Core.getCurrentRealm();
+        final int currentRealm = Core.getCurrentRealm().getRealm();
         final int topResults = 10;
 
         return switch (sortType) {

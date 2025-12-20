@@ -90,7 +90,7 @@ public class ClanRepository implements IRepository<Clan> {
         try {
             var records = database.getDslContext()
                     .selectFrom(CLANS)
-                    .where(CLANS.REALM.eq(Core.getCurrentRealm()))
+                    .where(CLANS.REALM.eq(Core.getCurrentRealm().getRealm()))
                     .fetch();
 
             for (var clanRecord : records) {
@@ -203,7 +203,7 @@ public class ClanRepository implements IRepository<Clan> {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ctx.insertInto(CLANS)
                     .set(CLANS.ID, clan.getId())
-                    .set(CLANS.REALM, Core.getCurrentRealm())
+                    .set(CLANS.REALM, Core.getCurrentRealm().getRealm())
                     .set(CLANS.NAME, clan.getName())
                     .set(CLANS.ADMIN, clan.isAdmin() ? 1 : 0)
                     .execute();
