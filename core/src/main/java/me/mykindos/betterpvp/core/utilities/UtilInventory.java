@@ -17,6 +17,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -311,8 +312,11 @@ public class UtilInventory {
         ClientInformation clientOptions= ClientInformation.createDefault();
         ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, gameProfile, clientOptions);
 
-        ValueInput loadedData = server.getPlayerList().playerIo.load(serverPlayer, ProblemReporter.DISCARDING).orElse(null);
-        if(loadedData == null) return null;
+        CompoundTag compound = server.getPlayerList().playerIo.load(serverPlayer.nameAndId()).orElse(null);
+        if(compound == null) return null;
+
+        // Wrap CompoundTag with TagValueInput to use codec-based loading
+        ValueInput loadedData = TagValueInput.createGlobal(ProblemReporter.DISCARDING, compound);
 
         //create Minecraft Inventory
         Inventory inventory = serverPlayer.getInventory();
