@@ -194,7 +194,6 @@ public class ChampionsSkillStat implements IBuildableStat {
     public enum Action {
         USE,
         EQUIP,
-        //todo formatter
         TIME_PLAYED,
         KILL,
         DEATH,

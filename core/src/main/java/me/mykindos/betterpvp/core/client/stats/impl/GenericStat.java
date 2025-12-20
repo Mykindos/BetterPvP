@@ -100,7 +100,7 @@ public class GenericStat implements IStat {
     @Override
     public boolean containsStat(IStat otherStat) {
         while (true) {
-            if (otherStat.containsStat(stat)) {
+            if (stat.containsStat(otherStat)) {
                 return true;
             }
             if (otherStat instanceof final IWrapperStat wrapperStat) {
