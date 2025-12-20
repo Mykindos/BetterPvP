@@ -59,7 +59,7 @@ public class ShopItemRepository {
                     // Fetch dynamic pricing
                     var dynamicPricingRecord = ctx.selectFrom(SHOPITEMS_DYNAMIC_PRICING)
                             .where(SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID.eq(id))
-                            .and(SHOPITEMS_DYNAMIC_PRICING.REALM.eq(Core.getCurrentServer()))
+                            .and(SHOPITEMS_DYNAMIC_PRICING.REALM.eq(Core.getCurrentServer().getId()))
                             .fetchOne();
 
                     if (dynamicPricingRecord != null) {
@@ -115,7 +115,7 @@ public class ShopItemRepository {
                 queries.add(ctx.update(SHOPITEMS_DYNAMIC_PRICING)
                         .set(SHOPITEMS_DYNAMIC_PRICING.CURRENT_STOCK, dynamicShopItem.getCurrentStock())
                         .where(SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID.eq(dynamicShopItem.getId()))
-                        .and(SHOPITEMS_DYNAMIC_PRICING.REALM.eq(Core.getCurrentServer())));
+                        .and(SHOPITEMS_DYNAMIC_PRICING.REALM.eq(Core.getCurrentServer().getId())));
             }
 
             ctx.batch(queries).execute();
@@ -140,7 +140,7 @@ public class ShopItemRepository {
                     )
                     .select(ctx.select(
                                             SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID,
-                                            DSL.val(Core.getCurrentServer()),
+                                            DSL.val(Core.getCurrentServer().getId()),
                                             SHOPITEMS_DYNAMIC_PRICING.MIN_SELL_PRICE,
                                             SHOPITEMS_DYNAMIC_PRICING.BASE_SELL_PRICE,
                                             SHOPITEMS_DYNAMIC_PRICING.MAX_SELL_PRICE,

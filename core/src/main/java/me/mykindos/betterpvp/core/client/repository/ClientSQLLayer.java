@@ -52,7 +52,6 @@ import static me.mykindos.betterpvp.core.database.jooq.Tables.GAMER_PROPERTIES;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_CLIENT_STATS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.IGNORES;
 import static me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.CLIENT_STATS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.*;
 
 
 
@@ -263,7 +262,7 @@ public class ClientSQLLayer {
             Result<Record2<String, String>> result = ctx.select(GAMER_PROPERTIES.PROPERTY, GAMER_PROPERTIES.VALUE)
                     .from(GAMER_PROPERTIES)
                     .where(GAMER_PROPERTIES.CLIENT.eq(client.getId()))
-                    .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm()))
+                    .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getRealm()))
                     .fetch();
             loadPropertiesAsync(result, gamer);
         });
@@ -372,7 +371,7 @@ public class ClientSQLLayer {
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
         Query query = database.getDslContext().insertInto(GAMER_PROPERTIES)
                 .set(GAMER_PROPERTIES.CLIENT, gamer.getId())
-                .set(GAMER_PROPERTIES.REALM, Core.getCurrentRealm())
+                .set(GAMER_PROPERTIES.REALM, Core.getCurrentRealm().getRealm())
                 .set(GAMER_PROPERTIES.PROPERTY, property)
                 .set(GAMER_PROPERTIES.VALUE, value.toString())
                 .onConflict(GAMER_PROPERTIES.CLIENT, GAMER_PROPERTIES.REALM, GAMER_PROPERTIES.PROPERTY)
@@ -592,7 +591,7 @@ public class ClientSQLLayer {
             try {
                 ctx.insertInto(CLIENT_REWARDS)
                         .set(CLIENT_REWARDS.CLIENT, client.getId())
-                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentSeason())
+                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentRealm().getSeason())
                         .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
                         .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
                         .doUpdate()

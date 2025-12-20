@@ -41,6 +41,8 @@ import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.metal.MetalRecipeBootstrap;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldBootstrap;
 import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Server;
 import me.mykindos.betterpvp.core.sound.SoundManager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.OrientedVector;
@@ -83,19 +85,11 @@ public class Core extends BPvPPlugin {
 
     @Getter
     @Setter
-    private static int currentServer;
+    private static Server currentServer;
 
     @Getter
     @Setter
-    private static String currentServerName;
-
-    @Getter
-    @Setter
-    private static int currentSeason;
-
-    @Getter
-    @Setter
-    private static int currentRealm;
+    private static Realm currentRealm;
 
     @Override
     public void onEnable() {
@@ -196,15 +190,17 @@ public class Core extends BPvPPlugin {
                 serverName = "Champions";
             }
 
-            setCurrentServer(database.getServerId(serverName));
+            int id = database.getServerId(serverName);
+            setCurrentServer(new Server(id, serverName));
         } else {
             String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
-            setCurrentServerName(serverName);
-            setCurrentServer(database.getServerId(serverName));
+            int id = database.getServerId(serverName);
+            setCurrentServer(new Server(id, serverName));
         }
 
-        setCurrentSeason(getConfig().getOrSaveInt("core.info.season", 0));
-        setCurrentRealm(database.getRealmId(getCurrentServer(), getCurrentSeason()));
+        int currentSeason = getConfig().getOrSaveInt("core.info.season", 0);
+        int realmId = database.getRealmId(getCurrentServer().getId(), currentSeason);
+        setCurrentRealm(new Realm(realmId, currentSeason));
     }
 
     @Override

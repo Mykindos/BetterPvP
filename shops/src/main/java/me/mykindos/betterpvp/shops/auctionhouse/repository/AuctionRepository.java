@@ -17,9 +17,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 import static me.mykindos.betterpvp.shops.database.jooq.Tables.AUCTIONS;
 import static me.mykindos.betterpvp.shops.database.jooq.Tables.AUCTION_TRANSACTION_HISTORY;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 @Singleton
 @CustomLog
@@ -47,7 +47,7 @@ public class AuctionRepository implements IRepository<Auction> {
                     .on(AUCTIONS.ID.eq(AUCTION_TRANSACTION_HISTORY.AUCTION_ID))
                     .leftJoin(CLIENTS.as("buyer_clients"))
                     .on(AUCTION_TRANSACTION_HISTORY.BUYER.eq(CLIENTS.as("buyer_clients").ID))
-                    .where(AUCTIONS.REALM.eq(Core.getCurrentRealm()))
+                    .where(AUCTIONS.REALM.eq(Core.getCurrentRealm().getRealm()))
                     .fetch();
 
             for (var result : results) {
@@ -92,7 +92,7 @@ public class AuctionRepository implements IRepository<Auction> {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ctx.insertInto(AUCTIONS)
                     .set(AUCTIONS.ID, auction.getAuctionID())
-                    .set(AUCTIONS.REALM, Core.getCurrentRealm())
+                    .set(AUCTIONS.REALM, Core.getCurrentRealm().getRealm())
                     .set(AUCTIONS.ITEM, Base64.getEncoder().encodeToString(itemStack.serializeAsBytes()))
                     .set(AUCTIONS.PRICE, auction.getSellPrice())
                     .set(AUCTIONS.EXPIRY, auction.getExpiryTime())
