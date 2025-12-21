@@ -42,6 +42,7 @@ import me.mykindos.betterpvp.core.metal.MetalRecipeBootstrap;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldBootstrap;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.server.Server;
 import me.mykindos.betterpvp.core.sound.SoundManager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -55,6 +56,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.Set;
 
 @CustomLog
@@ -85,11 +87,7 @@ public class Core extends BPvPPlugin {
 
     @Getter
     @Setter
-    private static Server currentServer;
-
-    @Getter
-    @Setter
-    private static Realm currentRealm;
+    private static Realm currentRealm = new Realm(-1,new Server(-1, "Uninitialized"), new Season(-1, "Uninitialized", LocalDate.now()));
 
     @Override
     public void onEnable() {
@@ -180,6 +178,7 @@ public class Core extends BPvPPlugin {
     }
 
     private void setupServerAndSeason() {
+        Server server;
         if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
             String serverName = getCommonNameViaReflection();
             if (serverName == null) {
@@ -191,16 +190,18 @@ public class Core extends BPvPPlugin {
             }
 
             int id = database.getServerId(serverName);
-            setCurrentServer(new Server(id, serverName));
+            server = new Server(id, serverName);
         } else {
             String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
             int id = database.getServerId(serverName);
-            setCurrentServer(new Server(id, serverName));
+            server = new Server(id, serverName);
         }
 
-        int currentSeason = getConfig().getOrSaveInt("core.info.season", 0);
-        int realmId = database.getRealmId(getCurrentServer().getId(), currentSeason);
-        setCurrentRealm(new Realm(realmId, currentSeason));
+        final int currentSeason = getConfig().getOrSaveInt("core.info.season", 1);
+        final String seasonName = getConfig().getOrSaveString("core.info.seasonName", "Season 1");
+        final Season season = database.getOrCreateSeason(currentSeason, seasonName);
+        int realmId = database.getRealmId(server.getId(), currentSeason);
+        setCurrentRealm(new Realm(realmId, server, season));
     }
 
     @Override
