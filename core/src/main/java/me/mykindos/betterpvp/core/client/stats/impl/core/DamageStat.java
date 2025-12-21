@@ -8,12 +8,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Type;
 import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseRegistry;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -54,19 +56,12 @@ public class DamageStat implements IBuildableStat {
         return relation.equals(other.relation) && type.equals(other.type);
     }
 
-    /**
-     * Get the stat represented by this object from the statContainer
-     *
-     * @param statContainer
-     * @param periodKey
-     * @return
-     */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         if (damageCause == null) {
-            return getFilteredStat(statContainer, periodKey, this::filterDamageCause);
+            return getFilteredStat(statContainer, type, period, this::filterDamageCause);
         }
-        return statContainer.getProperty(periodKey, this);
+        return statContainer.getProperty(type, period, this);
     }
 
     @Override

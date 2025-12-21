@@ -85,7 +85,7 @@ public class MiningOresMinedLeaderboard extends PlayerLeaderboard<Integer> {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             try {
                 Result<GetTopMiningByOreRecord> results = ctx.selectFrom(GET_TOP_MINING_BY_ORE.call(
-                        Core.getCurrentRealm().getSeason(),
+                        Core.getCurrentRealm().getSeason().getId(),
                         10,
                         miningHandler.getDbMaterialsArray())).fetch();
 

@@ -1,6 +1,10 @@
 package me.mykindos.betterpvp.core.client.stats.impl;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.server.Period;
+import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Season;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -14,12 +18,14 @@ public interface IStat {
     long FP_MODIFIER = 1000L;
 
     /**
-     * Get the stat represented by this object from the statContainer
+     * Get the stat represented by this object from the statContainer.
+     * period object must be the correct type as defined by the type
      * @param statContainer the statContainer to source the value from
-     * @param periodKey the period to fetch from
+     * @param type what type of period is being fetched from
+     * @param period The period being fetched from, must be {@link Realm} or {@link Season} if type is not ALL
      * @return the stat value represented by this stat
      */
-    Long getStat(StatContainer statContainer, String periodKey);
+    Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period);
 
     /**
      * Get the name that is stored in the DB
@@ -77,8 +83,8 @@ public interface IStat {
      * @param filter the predicate to check each stat against. If it throws an {@link IllegalArgumentException} or {@link ClassCastException}, that test is treated as false
      * @return the total value of the stats that meet the filter
      */
-    default Long getFilteredStat(StatContainer statContainer, String periodKey, Predicate<Map.Entry<IStat, Long>> filter) {
-        return statContainer.getStats().getStatsOfPeriod(periodKey).entrySet().stream()
+    default Long getFilteredStat(StatContainer statContainer, StatFilterType type, Period period, Predicate<Map.Entry<IStat, Long>> filter) {
+        return statContainer.getStats().getStatsOfPeriod(type, period).entrySet().stream()
                 .filter((entry) -> {
                     try {
                         return filter.test(entry);
