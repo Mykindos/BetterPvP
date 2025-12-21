@@ -4,11 +4,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.display.AchievementMenu;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
-import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
+import me.mykindos.betterpvp.core.client.stats.RealmManager;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -20,16 +22,18 @@ import org.jetbrains.annotations.NotNull;
 public class AchievementCategoryButton extends AbstractItem {
     private final IAchievementCategory achievementCategory;
     private final AchievementManager achievementManager;
-    private final StatPeriodManager statPeriodManager;
+    private final RealmManager realmManager;
     private final Client client;
-    private final String period;
+    private final StatFilterType type;
+    private final Period period;
     private final Windowed current;
 
-    public AchievementCategoryButton(IAchievementCategory achievementCategory, String period, Client client, AchievementManager achievementManager, StatPeriodManager statPeriodManager, Windowed current) {
+    public AchievementCategoryButton(IAchievementCategory achievementCategory, StatFilterType type, Period period, Client client, AchievementManager achievementManager, RealmManager realmManager, Windowed current) {
         this.achievementCategory = achievementCategory;
-        this.statPeriodManager = statPeriodManager;
+        this.realmManager = realmManager;
         this.achievementManager = achievementManager;
         this.client = client;
+        this.type = type;
         this.period = period;
         this.current = current;
     }
@@ -63,6 +67,6 @@ public class AchievementCategoryButton extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        new AchievementMenu(client, achievementCategory, period, achievementManager, statPeriodManager, current).show(player);
+        new AchievementMenu(client, achievementCategory, type, period, achievementManager, realmManager, current).show(player);
     }
 }

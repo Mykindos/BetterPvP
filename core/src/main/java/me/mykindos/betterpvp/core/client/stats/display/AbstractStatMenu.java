@@ -3,13 +3,18 @@ package me.mykindos.betterpvp.core.client.stats.display;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.stats.display.filter.PeriodFilterButton;
-import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
+import me.mykindos.betterpvp.core.client.stats.RealmManager;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.client.stats.display.filter.RealmFilterButton;
+import me.mykindos.betterpvp.core.client.stats.display.filter.SeasonFilterButton;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
-import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.server.Period;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,16 +22,17 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 public abstract class AbstractStatMenu extends AbstractGui implements IAbstractStatMenu {
-    //todo abstract these to interface
     @NotNull
     private final Client client;
     @Nullable
     private final Windowed previous;
-    private final StatPeriodManager statPeriodManager;
+    private final RealmManager realmManager;
 
-    private String periodKey;
+    private final SeasonFilterButton seasonFilterButton;
+    private final RealmFilterButton realmFilterButton;
 
-    private final StringFilterButton<IAbstractStatMenu> periodFilterButton;
+    private StatFilterType type;
+    private Period period;
 
     /**
      * Creates a new {@link AbstractGui} with the specified width and height.
@@ -34,24 +40,39 @@ public abstract class AbstractStatMenu extends AbstractGui implements IAbstractS
      * @param width  The width of the Gui
      * @param height The height of the Gui
      */
-    protected AbstractStatMenu(@NotNull Client client, @Nullable Windowed previous, String periodKey, StatPeriodManager statPeriodManager) {
+    protected AbstractStatMenu(@NotNull Client client, @Nullable Windowed previous, StatFilterType type, @Nullable Period period, RealmManager realmManager) {
         super(9, 6);
-        this.client = client;
-        this.periodFilterButton = new PeriodFilterButton(periodKey, statPeriodManager);
+        this.seasonFilterButton = new SeasonFilterButton(
+                IAbstractStatMenu.getSeasonContext(type, period),
+                IAbstractStatMenu.getSeasonContexts(realmManager));
+        this.realmFilterButton = new RealmFilterButton(
+                IAbstractStatMenu.getRealmContext(type, period),
+                IAbstractStatMenu.getRealmContexts(seasonFilterButton.getSelectedFilter().getSeason(), realmManager));
 
-        Structure baseStructure = new Structure("########P",
-                "#########",
-                "#########",
-                "#########",
-                "#########",
-                "####B####")
-                .addIngredient('#', Menu.BACKGROUND_GUI_ITEM)
-                .addIngredient('B', new StatBackButton(previous))
-                .addIngredient('P', this.periodFilterButton);
+
+        Structure baseStructure = new Structure(
+                "# # # # # # # S R",
+                "# x x x x x x x #",
+                "# x x x x x x x #",
+                "# x x x x x x x #",
+                "# x x x x x x x #",
+                "# # # < - > # # #")
+                .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                .addIngredient('#',Menu.BACKGROUND_ITEM)
+                .addIngredient('<', new PageBackwardButton())
+                .addIngredient('-', new StatBackButton(previous))
+                .addIngredient('>', new PageForwardButton())
+                .addIngredient('S', seasonFilterButton)
+                .addIngredient('R', realmFilterButton);
+
         applyStructure(baseStructure);
+
+        this.client = client;
         this.previous = previous;
-        this.periodKey = periodKey;
-        this.statPeriodManager = statPeriodManager;
+        this.realmManager = realmManager;
+
+        this.type = type;
+        this.period = period;
     }
 
 

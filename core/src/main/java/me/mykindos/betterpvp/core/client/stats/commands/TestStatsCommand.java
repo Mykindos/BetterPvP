@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.RealmManager;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.start.StartStatMenu;
-import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.model.IStringName;
 import org.bukkit.entity.Player;
@@ -14,11 +14,11 @@ import org.bukkit.entity.Player;
 @Singleton
 @CustomLog
 public class TestStatsCommand extends Command implements IStringName {
-    private final StatPeriodManager statPeriodManager;
+    private final RealmManager realmManager;
 
     @Inject
-    public TestStatsCommand(StatPeriodManager statPeriodManager) {
-        this.statPeriodManager = statPeriodManager;
+    public TestStatsCommand(RealmManager realmManager) {
+        this.realmManager = realmManager;
     }
 
     @Override
@@ -33,8 +33,7 @@ public class TestStatsCommand extends Command implements IStringName {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final String periodKey = args.length > 0 ? args[0] : StatContainer.GLOBAL_PERIOD_KEY;
-        new StartStatMenu(client, null, periodKey, statPeriodManager).show(player);
+        new StartStatMenu(client, null, StatFilterType.ALL, null, realmManager).show(player);
         client.getStatContainer().getStats().iterator().forEachRemaining(statData -> {
             log.info(statData.toString()).submit();
         });
