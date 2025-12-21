@@ -57,7 +57,7 @@ public class ProfessionProfileRepository {
     }
 
     public void createPartitions() {
-        int season = Core.getCurrentRealm().getSeason();
+        int season = Core.getCurrentRealm().getSeason().getId();
         String partitionTableName = "progression_builds_season_" + season;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
@@ -89,7 +89,7 @@ public class ProfessionProfileRepository {
 
             org.jooq.Query query = ctx.insertInto(PROGRESSION_EXP)
                     .set(PROGRESSION_EXP.CLIENT, client.getId())
-                    .set(PROGRESSION_EXP.SEASON, Core.getCurrentRealm().getSeason())
+                    .set(PROGRESSION_EXP.SEASON, Core.getCurrentRealm().getSeason().getId())
                     .set(PROGRESSION_EXP.PROFESSION, profession)
                     .set(PROGRESSION_EXP.EXPERIENCE, (long) experience)
                     .onConflict()
@@ -108,7 +108,7 @@ public class ProfessionProfileRepository {
             DSLContext ctx = database.getDslContext();
             Result<ProgressionExpRecord> results = ctx.selectFrom(PROGRESSION_EXP)
                     .where(PROGRESSION_EXP.CLIENT.eq(client.getId()))
-                    .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentRealm().getSeason()))
+                    .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentRealm().getSeason().getId()))
                     .fetch();
             results.forEach(result -> {
                 String profession = result.getProfession();
@@ -132,7 +132,7 @@ public class ProfessionProfileRepository {
                     .select(PROGRESSION_PROPERTIES.PROPERTY, PROGRESSION_PROPERTIES.VALUE)
                     .from(PROGRESSION_PROPERTIES)
                     .where(PROGRESSION_PROPERTIES.CLIENT.eq(client.getId()))
-                    .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentRealm().getSeason()))
+                    .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentRealm().getSeason().getId()))
                     .and(PROGRESSION_PROPERTIES.PROFESSION.eq(data.getProfession()))
                     .fetch();
 
@@ -150,7 +150,7 @@ public class ProfessionProfileRepository {
             DSLContext ctx = database.getDslContext();
             Result<ProgressionBuildsRecord> results = ctx.selectFrom(PROGRESSION_BUILDS)
                     .where(PROGRESSION_BUILDS.CLIENT.eq(client.getId()))
-                    .and(PROGRESSION_BUILDS.SEASON.eq(Core.getCurrentRealm().getSeason())).fetch();
+                    .and(PROGRESSION_BUILDS.SEASON.eq(Core.getCurrentRealm().getSeason().getId())).fetch();
 
             results.forEach(buildRecord -> {
                 String profession = buildRecord.getProfession();
@@ -178,7 +178,7 @@ public class ProfessionProfileRepository {
             build.getSkills().forEach((skill, level) -> {
                 Query query = ctx.insertInto(PROGRESSION_BUILDS)
                         .set(PROGRESSION_BUILDS.CLIENT, client.getId())
-                        .set(PROGRESSION_BUILDS.SEASON, Core.getCurrentRealm().getSeason())
+                        .set(PROGRESSION_BUILDS.SEASON, Core.getCurrentRealm().getSeason().getId())
                         .set(PROGRESSION_BUILDS.PROFESSION, build.getProfession())
                         .set(PROGRESSION_BUILDS.SKILL, skill.getName())
                         .set(PROGRESSION_BUILDS.LEVEL, level)
@@ -204,7 +204,7 @@ public class ProfessionProfileRepository {
 
             Query query = ctx.insertInto(PROGRESSION_PROPERTIES)
                     .set(PROGRESSION_PROPERTIES.CLIENT, client.getId())
-                    .set(PROGRESSION_PROPERTIES.SEASON, Core.getCurrentRealm().getSeason())
+                    .set(PROGRESSION_PROPERTIES.SEASON, Core.getCurrentRealm().getSeason().getId())
                     .set(PROGRESSION_PROPERTIES.PROFESSION, profession)
                     .set(PROGRESSION_PROPERTIES.PROPERTY, property)
                     .set(PROGRESSION_PROPERTIES.VALUE, value.toString())

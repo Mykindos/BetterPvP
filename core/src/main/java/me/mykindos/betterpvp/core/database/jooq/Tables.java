@@ -4,7 +4,9 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
-import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsAll;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
@@ -35,10 +37,10 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
-import me.mykindos.betterpvp.core.database.jooq.tables.PeriodMeta;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
+import me.mykindos.betterpvp.core.database.jooq.tables.Seasons;
 import me.mykindos.betterpvp.core.database.jooq.tables.Servers;
 import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
@@ -69,9 +71,19 @@ import org.jooq.Result;
 public class Tables {
 
     /**
-     * The table <code>public.achievement_completions</code>.
+     * The table <code>public.achievement_completions_all</code>.
      */
-    public static final AchievementCompletions ACHIEVEMENT_COMPLETIONS = AchievementCompletions.ACHIEVEMENT_COMPLETIONS;
+    public static final AchievementCompletionsAll ACHIEVEMENT_COMPLETIONS_ALL = AchievementCompletionsAll.ACHIEVEMENT_COMPLETIONS_ALL;
+
+    /**
+     * The table <code>public.achievement_completions_realm</code>.
+     */
+    public static final AchievementCompletionsRealm ACHIEVEMENT_COMPLETIONS_REALM = AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM;
+
+    /**
+     * The table <code>public.achievement_completions_season</code>.
+     */
+    public static final AchievementCompletionsSeason ACHIEVEMENT_COMPLETIONS_SEASON = AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON;
 
     /**
      * The table <code>public.armour</code>.
@@ -748,11 +760,6 @@ public class Tables {
     public static final OfflineMessages OFFLINE_MESSAGES = OfflineMessages.OFFLINE_MESSAGES;
 
     /**
-     * The table <code>public.period_meta</code>.
-     */
-    public static final PeriodMeta PERIOD_META = PeriodMeta.PERIOD_META;
-
-    /**
      * The table <code>public.property_map</code>.
      */
     public static final PropertyMap PROPERTY_MAP = PropertyMap.PROPERTY_MAP;
@@ -766,6 +773,11 @@ public class Tables {
      * The table <code>public.realms</code>.
      */
     public static final Realms REALMS = Realms.REALMS;
+
+    /**
+     * The table <code>public.seasons</code>.
+     */
+    public static final Seasons SEASONS = Seasons.SEASONS;
 
     /**
      * The table <code>public.servers</code>.

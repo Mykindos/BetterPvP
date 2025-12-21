@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.bukkit.NamespacedKey;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 
 public abstract class NSingleGoalSimpleAchievement extends NSimpleAchievement {
 
-    protected NSingleGoalSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Long goal, IStat... watchedStats) {
+    protected NSingleGoalSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, StatFilterType achievementType, Long goal, IStat... watchedStats) {
         super(name, namespacedKey, achievementCategory, achievementType, createMap(goal, watchedStats));
     }
 

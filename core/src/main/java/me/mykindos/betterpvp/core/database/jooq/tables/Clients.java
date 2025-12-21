@@ -211,18 +211,17 @@ public class Clients extends TableImpl<ClientsRecord> {
         return _clientRewards;
     }
 
-    private transient ClientStatsPath _clientStatsClientFkey;
+    private transient ClientStatsPath _clientStats;
 
     /**
      * Get the implicit to-many join path to the
-     * <code>public.client_stats</code> table, via the
-     * <code>client_stats_client_fkey</code> key
+     * <code>public.client_stats</code> table
      */
-    public ClientStatsPath clientStatsClientFkey() {
-        if (_clientStatsClientFkey == null)
-            _clientStatsClientFkey = new ClientStatsPath(this, null, Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY.getInverseKey());
+    public ClientStatsPath clientStats() {
+        if (_clientStats == null)
+            _clientStats = new ClientStatsPath(this, null, Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY.getInverseKey());
 
-        return _clientStatsClientFkey;
+        return _clientStats;
     }
 
     private transient CombatStatsPath _combatStats;
@@ -249,20 +248,6 @@ public class Clients extends TableImpl<ClientsRecord> {
             _filteredWords = new FilteredWordsPath(this, null, Keys.FILTERED_WORDS__FILTERED_WORDS_CREATED_BY_FKEY.getInverseKey());
 
         return _filteredWords;
-    }
-
-    private transient ClientStatsPath _fkClient;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>public.client_stats</code> table, via the <code>fk_client</code>
-     * key
-     */
-    public ClientStatsPath fkClient() {
-        if (_fkClient == null)
-            _fkClient = new ClientStatsPath(this, null, Keys.CLIENT_STATS__FK_CLIENT.getInverseKey());
-
-        return _fkClient;
     }
 
     private transient GameTeamsPath _gameTeams;

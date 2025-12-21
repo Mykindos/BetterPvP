@@ -4,15 +4,14 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients.ClientsPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.Realms.RealmsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientStatsRecord;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.JSONB;
 import org.jooq.Name;
@@ -64,9 +63,9 @@ public class ClientStats extends TableImpl<ClientStatsRecord> {
     public final TableField<ClientStatsRecord, Long> CLIENT = createField(DSL.name("client"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.client_stats.period</code>.
+     * The column <code>public.client_stats.realm</code>.
      */
-    public final TableField<ClientStatsRecord, String> PERIOD = createField(DSL.name("period"), SQLDataType.VARCHAR(127).nullable(false), this, "");
+    public final TableField<ClientStatsRecord, Integer> REALM = createField(DSL.name("realm"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>public.client_stats.stattype</code>.
@@ -76,7 +75,7 @@ public class ClientStats extends TableImpl<ClientStatsRecord> {
     /**
      * The column <code>public.client_stats.statdata</code>.
      */
-    public final TableField<ClientStatsRecord, JSONB> STATDATA = createField(DSL.name("statdata"), SQLDataType.JSONB.nullable(false), this, "");
+    public final TableField<ClientStatsRecord, JSONB> STATDATA = createField(DSL.name("statdata"), SQLDataType.JSONB.nullable(false).defaultValue(DSL.field(DSL.raw("'{}'::jsonb"), SQLDataType.JSONB)), this, "");
 
     /**
      * The column <code>public.client_stats.stat</code>.
@@ -151,44 +150,37 @@ public class ClientStats extends TableImpl<ClientStatsRecord> {
     }
 
     @Override
-    public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.IDX_STAT_CLIENT);
-    }
-
-    @Override
     public UniqueKey<ClientStatsRecord> getPrimaryKey() {
         return Keys.PK_CLIENT;
     }
 
     @Override
     public List<ForeignKey<ClientStatsRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY, Keys.CLIENT_STATS__FK_CLIENT);
+        return Arrays.asList(Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY, Keys.CLIENT_STATS__CLIENT_STATS_REALM_FKEY);
     }
 
-    private transient ClientsPath _clientStatsClientFkey;
+    private transient ClientsPath _clients;
 
     /**
-     * Get the implicit join path to the <code>public.clients</code> table, via
-     * the <code>client_stats_client_fkey</code> key.
+     * Get the implicit join path to the <code>public.clients</code> table.
      */
-    public ClientsPath clientStatsClientFkey() {
-        if (_clientStatsClientFkey == null)
-            _clientStatsClientFkey = new ClientsPath(this, Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY, null);
+    public ClientsPath clients() {
+        if (_clients == null)
+            _clients = new ClientsPath(this, Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY, null);
 
-        return _clientStatsClientFkey;
+        return _clients;
     }
 
-    private transient ClientsPath _fkClient;
+    private transient RealmsPath _realms;
 
     /**
-     * Get the implicit join path to the <code>public.clients</code> table, via
-     * the <code>fk_client</code> key.
+     * Get the implicit join path to the <code>public.realms</code> table.
      */
-    public ClientsPath fkClient() {
-        if (_fkClient == null)
-            _fkClient = new ClientsPath(this, Keys.CLIENT_STATS__FK_CLIENT, null);
+    public RealmsPath realms() {
+        if (_realms == null)
+            _realms = new RealmsPath(this, Keys.CLIENT_STATS__CLIENT_STATS_REALM_FKEY, null);
 
-        return _fkClient;
+        return _realms;
     }
 
     @Override

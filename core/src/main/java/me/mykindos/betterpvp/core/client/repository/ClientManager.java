@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
@@ -353,8 +354,8 @@ public class ClientManager extends PlayerManager<Client> {
         this.sqlLayer.processPropertyUpdates(async);
     }
 
-    public CompletableFuture<Void> processStatUpdates(String period) {
-        return this.sqlLayer.processStatUpdates(getLoaded(), period);
+    public CompletableFuture<Void> processStatUpdates(Realm realm) {
+        return this.sqlLayer.processStatUpdates(getLoaded(), realm);
     }
 
 

@@ -18,18 +18,18 @@ public class GetClientStatsRecord extends TableRecordImpl<GetClientStatsRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>public.get_client_stats.period</code>.
+     * Setter for <code>public.get_client_stats.realm</code>.
      */
-    public GetClientStatsRecord setPeriod(String value) {
+    public GetClientStatsRecord setRealm(Integer value) {
         set(0, value);
         return this;
     }
 
     /**
-     * Getter for <code>public.get_client_stats.period</code>.
+     * Getter for <code>public.get_client_stats.realm</code>.
      */
-    public String getPeriod() {
-        return (String) get(0);
+    public Integer getRealm() {
+        return (Integer) get(0);
     }
 
     /**
@@ -91,10 +91,10 @@ public class GetClientStatsRecord extends TableRecordImpl<GetClientStatsRecord> 
     /**
      * Create a detached, initialised GetClientStatsRecord
      */
-    public GetClientStatsRecord(String period, String stattype, JSONB data, Long stat) {
+    public GetClientStatsRecord(Integer realm, String stattype, JSONB data, Long stat) {
         super(GetClientStats.GET_CLIENT_STATS);
 
-        setPeriod(period);
+        setRealm(realm);
         setStattype(stattype);
         setData(data);
         setStat(stat);

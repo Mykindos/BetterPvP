@@ -4,7 +4,9 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
-import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsAll;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
@@ -35,10 +37,10 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
-import me.mykindos.betterpvp.core.database.jooq.tables.PeriodMeta;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
+import me.mykindos.betterpvp.core.database.jooq.tables.Seasons;
 import me.mykindos.betterpvp.core.database.jooq.tables.Servers;
 import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
@@ -79,9 +81,19 @@ public class Public extends SchemaImpl {
     public static final Public PUBLIC = new Public();
 
     /**
-     * The table <code>public.achievement_completions</code>.
+     * The table <code>public.achievement_completions_all</code>.
      */
-    public final AchievementCompletions ACHIEVEMENT_COMPLETIONS = AchievementCompletions.ACHIEVEMENT_COMPLETIONS;
+    public final AchievementCompletionsAll ACHIEVEMENT_COMPLETIONS_ALL = AchievementCompletionsAll.ACHIEVEMENT_COMPLETIONS_ALL;
+
+    /**
+     * The table <code>public.achievement_completions_realm</code>.
+     */
+    public final AchievementCompletionsRealm ACHIEVEMENT_COMPLETIONS_REALM = AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM;
+
+    /**
+     * The table <code>public.achievement_completions_season</code>.
+     */
+    public final AchievementCompletionsSeason ACHIEVEMENT_COMPLETIONS_SEASON = AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON;
 
     /**
      * The table <code>public.armour</code>.
@@ -758,11 +770,6 @@ public class Public extends SchemaImpl {
     public final OfflineMessages OFFLINE_MESSAGES = OfflineMessages.OFFLINE_MESSAGES;
 
     /**
-     * The table <code>public.period_meta</code>.
-     */
-    public final PeriodMeta PERIOD_META = PeriodMeta.PERIOD_META;
-
-    /**
      * The table <code>public.property_map</code>.
      */
     public final PropertyMap PROPERTY_MAP = PropertyMap.PROPERTY_MAP;
@@ -776,6 +783,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.realms</code>.
      */
     public final Realms REALMS = Realms.REALMS;
+
+    /**
+     * The table <code>public.seasons</code>.
+     */
+    public final Seasons SEASONS = Seasons.SEASONS;
 
     /**
      * The table <code>public.servers</code>.
@@ -818,7 +830,9 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
-            AchievementCompletions.ACHIEVEMENT_COMPLETIONS,
+            AchievementCompletionsAll.ACHIEVEMENT_COMPLETIONS_ALL,
+            AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM,
+            AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON,
             Armour.ARMOUR,
             ChunkBlockTagging.CHUNK_BLOCK_TAGGING,
             ClientNameHistory.CLIENT_NAME_HISTORY,
@@ -849,10 +863,10 @@ public class Public extends SchemaImpl {
             Logs.LOGS,
             LogsContext.LOGS_CONTEXT,
             OfflineMessages.OFFLINE_MESSAGES,
-            PeriodMeta.PERIOD_META,
             PropertyMap.PROPERTY_MAP,
             Punishments.PUNISHMENTS,
             Realms.REALMS,
+            Seasons.SEASONS,
             Servers.SERVERS,
             SmartBlockData.SMART_BLOCK_DATA,
             Uuiditems.UUIDITEMS,
