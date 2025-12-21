@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.display.start;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
@@ -10,6 +11,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -42,7 +44,8 @@ public class GenericStatButton extends ControlItem<IAbstractStatMenu> {
     protected List<Component> getGenericStatsDescription() {
         final IAbstractStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
 
         final GenericStat timePlayedStat = new GenericStat(ClientStat.TIME_PLAYED);
         final GenericStat spectateTimePlayedStat = new GenericStat(
@@ -70,16 +73,16 @@ public class GenericStatButton extends ControlItem<IAbstractStatMenu> {
                 .build()
         );
 
-        final int kills = killsStat.getStat(statContainer, periodKey).intValue();
-        final int deaths = deathsStat.getStat(statContainer, periodKey).intValue();
+        final int kills = killsStat.getStat(statContainer, type, period).intValue();
+        final int deaths = deathsStat.getStat(statContainer, type, period).intValue();
         final float killDeathRatio = (float) kills / (deaths == 0 ? 1 : deaths);
 
 
-        Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+        Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
         //subtract game spectate time from overall time
-        timePlayed = timePlayed.minus(spectateTimePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+        timePlayed = timePlayed.minus(spectateTimePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
         //subtract lobby time from overall time
-        timePlayed = timePlayed.minus(lobbyTimePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+        timePlayed = timePlayed.minus(lobbyTimePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
 
 
         return new ArrayList<>(

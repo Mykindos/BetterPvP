@@ -5,96 +5,136 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Season;
 import org.bukkit.NamespacedKey;
 
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Singleton
 @CustomLog
 //todo proper async handling (and in repository)
-public class AchievementManager extends Manager<String, IAchievement> {
+public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
 
     @Getter
     private final AchievementCategoryManager achievementCategoryManager;
 
-    private final ConcurrentHashMap<UUID, AchievementCompletionsConcurrentHashMap> achievementCompletions = new ConcurrentHashMap<>();
+    private final ClientManager clientManager;
+
     //todo, update this across server instances
     //Period, Achievement, TotalCount
-    private ConcurrentHashMap<String, ConcurrentHashMap<NamespacedKey, Integer>> totalAchievementCompletions = null;
+    private ConcurrentMap<NamespacedKey, Integer> totalAllAchievementCompletions = null;
+    private ConcurrentMap<Season, ConcurrentMap<NamespacedKey, Integer>> totalSeasonCompletions = null;
+    private ConcurrentMap<Realm, ConcurrentMap<NamespacedKey, Integer>> totalRealmCompletions = null;
 
     private final AchievementCompletionRepository achievementCompletionRepository;
 
     @Inject
-    public AchievementManager(AchievementCategoryManager achievementCategoryManager, AchievementCompletionRepository achievementCompletionRepository, Core core) {
+    public AchievementManager(AchievementCategoryManager achievementCategoryManager, AchievementCompletionRepository achievementCompletionRepository, Core core, ClientManager clientManager) {
         this.achievementCategoryManager = achievementCategoryManager;
         this.achievementCompletionRepository = achievementCompletionRepository;
+        this.clientManager = clientManager;
         updateTotalAchievementCompletions();
     }
 
-    @Override
-    public void addObject(String identifier, IAchievement object) {
-        log.info("loading {}", object.getNamespacedKey().asString()).submit();
-        if (getObject(identifier).isPresent()) {
-            throw new IllegalArgumentException("Duplicate achievement for type " + identifier);
-        }
-        super.addObject(identifier, object);
-    }
 
-    public CompletableFuture<Void> loadContainer(StatContainer container) {
-        return achievementCompletionRepository.loadForContainer(container).thenAccept(
+    public CompletableFuture<Void> loadAchievementCompletionsAsync(Client client) {
+        return achievementCompletionRepository.loadForContainer(client.getStatContainer()).thenAccept(
                 completions -> {
-                    achievementCompletions.put(container.getUniqueId(), completions);
-                    completions.forEach(completion -> {
-                        int total = totalAchievementCompletions.get(completion.getPeriod()).get(completion.getKey());
-                        completion.setTotalCompletions(total);
+                    completions.asMap().values().forEach(completion -> {
+                        updateTotalCompletions(getObject(completion.getKey()).orElseThrow(), completion.getPeriod());
                     });
+                    client.getStatContainer().getAchievementCompletions().fromOther(completions);
                 }
         );
     }
 
-    public void unloadId(UUID id) {
-        achievementCompletions.remove(id);
-    }
-
-    public CompletableFuture<Void> saveCompletion(StatContainer container, NamespacedKey achievement, String period) {
+    public CompletableFuture<Void> saveCompletion(StatContainer container, IAchievement achievement, Object period) {
         return achievementCompletionRepository.saveCompletion(container, achievement, period)
                 .thenAccept(achievementCompletion -> {
-                    achievementCompletions.get(container.getUniqueId()).addCompletion(achievementCompletion);
+                    container.getAchievementCompletions().addCompletion(achievementCompletion);
                     updateTotalCompletions(achievement, achievementCompletion.getPeriod());
                 });
 
     }
 
-    public void updateTotalCompletions(NamespacedKey achievement, String period) {
-        totalAchievementCompletions.computeIfAbsent(period, (k) ->
-                    new ConcurrentHashMap<>()
-                ).compute(achievement, (key, value) -> value == null ? 1 : value + 1);
-        final int total = totalAchievementCompletions.get(period).get(achievement);
+    public void updateTotalCompletions(IAchievement achievement, Object period) {
+        int total = 0;
+        switch (achievement.getAchievementFilterType()) {
+            case ALL ->
+                total = totalAllAchievementCompletions.compute(achievement.getNamespacedKey(),
+                        (key, value) -> value == null ? 1 : value + 1);
+            case SEASON ->
+                total = totalSeasonCompletions.computeIfAbsent((Season) period, (k) ->
+                        new ConcurrentHashMap<>()
+                ).compute(achievement.getNamespacedKey(), (key, value) -> value == null ? 1 : value + 1);
+            case REALM ->
+                total = totalRealmCompletions.computeIfAbsent((Realm) period, (k) ->
+                        new ConcurrentHashMap<>()
+                ).compute(achievement.getNamespacedKey(), (key, value) -> value == null ? 1 : value + 1);
+        }
 
-        achievementCompletions.forEach((id, map) ->
-            map.getCompletion(achievement, period).ifPresent(achievementCompletion -> achievementCompletion.setTotalCompletions(total))
+        final int finalTotal = total;
+        clientManager.getLoaded().forEach(client -> {
+            client.getStatContainer().getAchievementCompletions().getCompletion(achievement, period).ifPresent(achievementCompletion -> {
+                achievementCompletion.setTotalCompletions(finalTotal);
+            });
+        });
+    }
+
+
+    public CompletableFuture<Void> updateTotalAchievementCompletions() {
+        return CompletableFuture.allOf(
+                updateTotalAllAchievementCompletions(),
+                updateTotalSeasonAchievementCompletions(),
+                updateTotalRealmAchievementCompletions()
         );
     }
 
-    public Optional<AchievementCompletion> getAchievementCompletion(UUID user, NamespacedKey namespacedKey, String period) {
-        return achievementCompletions.get(user).getCompletion(namespacedKey, period);
+    private CompletableFuture<Void> updateTotalAllAchievementCompletions() {
+        return achievementCompletionRepository.loadTotalAllAchievementCompletions().thenApply(totalCompletions -> {
+            totalAllAchievementCompletions = totalCompletions;
+            clientManager.getLoaded().forEach(client -> {
+                client.getStatContainer().getAchievementCompletions().getAllMap().forEach((key, completion) -> {
+                    int total = totalAllAchievementCompletions.get(key);
+                    completion.setTotalCompletions(total);
+                });
+            });
+            return null;
+        });
     }
 
-    public CompletableFuture<Void> updateTotalAchievementCompletions() {
-        return achievementCompletionRepository.loadTotalAchievementCompletions().thenApply(totalCompletions -> {
-            totalAchievementCompletions = totalCompletions;
-            totalAchievementCompletions.forEach((period, achievementTotals) -> {
-                achievementTotals.forEach((achievement, total) -> {
-                    achievementCompletions.forEach((id, map) -> {
-                        map.getCompletion(achievement, period)
-                                .ifPresent(completion -> completion.setTotalCompletions(total));
+    private CompletableFuture<Void> updateTotalSeasonAchievementCompletions() {
+        return achievementCompletionRepository.loadTotalSeasonAchievementCompletions().thenApply(totalCompletions -> {
+            totalSeasonCompletions = totalCompletions;
+            clientManager.getLoaded().forEach(client -> {
+                client.getStatContainer().getAchievementCompletions().getSeasonMap().forEach((period, map) -> {
+                    map.forEach((key, completion) -> {
+                        int total = totalSeasonCompletions.get(period).get(key);
+                        completion.setTotalCompletions(total);
+                    });
+                });
+            });
+            return null;
+        });
+    }
+
+    private CompletableFuture<Void> updateTotalRealmAchievementCompletions() {
+        return achievementCompletionRepository.loadTotalRealmAchievementCompletions().thenApply(totalCompletions -> {
+            totalRealmCompletions = totalCompletions;
+            clientManager.getLoaded().forEach(client -> {
+                client.getStatContainer().getAchievementCompletions().getRealmMap().forEach((period, map) -> {
+                    map.forEach((key, completion) -> {
+                        int total = totalRealmCompletions.get(period).get(key);
+                        completion.setTotalCompletions(total);
                     });
                 });
             });

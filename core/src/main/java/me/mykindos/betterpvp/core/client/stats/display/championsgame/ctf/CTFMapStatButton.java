@@ -45,6 +45,6 @@ public class CTFMapStatButton extends ControlItem<AbstractStatMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final AbstractStatMenu gui = getGui();
-        new CTFMapStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
+        new CTFMapStatMenu(gui.getClient(), gui, gui.getType(), gui.getPeriod(), gui.getRealmManager()).show(player);
     }
 }

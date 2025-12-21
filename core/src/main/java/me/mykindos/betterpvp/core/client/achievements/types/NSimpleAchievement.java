@@ -1,9 +1,10 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
@@ -26,26 +27,26 @@ public abstract class NSimpleAchievement extends Achievement {
      */
     protected Map<IStat, Long> statGoals;
 
-    protected NSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Map<IStat, Long> statGoals) {
-        super(name, namespacedKey, achievementCategory, achievementType, statGoals.keySet().toArray(IStat[]::new));
+    protected NSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, StatFilterType achievementFilterType, Map<IStat, Long> statGoals) {
+        super(name, namespacedKey, achievementCategory, achievementFilterType, statGoals.keySet().toArray(IStat[]::new));
         this.statGoals = new HashMap<>(statGoals);
     }
 
     @Override
-    public float getPercentComplete(StatContainer container, @Nullable String period) {
+    public float getPercentComplete(StatContainer container, StatFilterType type, @Nullable Period period) {
 
         //todo abstract getting this property map
         Map<IStat, Long> propertyMap = new HashMap<>();
-        for (IStat property : getWatchedStats()) {
-            Long value = getValue(container, property, period);
-            propertyMap.put(property, value);
+        for (IStat stat : getWatchedStats()) {
+            Long value = getValue(container, stat, type, period);
+            propertyMap.put(stat, value);
         }
         return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
     }
 
     @Override
-    public int getPriority(StatContainer container, String period) {
-        int previousPriority = super.getPriority(container, period);
+    public int getPriority(StatContainer container, StatFilterType type, Period period) {
+        int previousPriority = super.getPriority(container, type, period);
         if (previousPriority < 1_000_000) {
             return previousPriority;
         }

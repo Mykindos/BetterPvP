@@ -9,8 +9,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
@@ -95,16 +97,16 @@ public class MinecraftStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         //material composite
         if (isMaterialStatistic(statistic) && material == null) {
-            return getFilteredStat(statContainer, periodKey, this::filterMinecraftStat);
+            return getFilteredStat(statContainer, type, period, this::filterMinecraftStat);
         }
         //entity composite
         if (isEntityStatistic(statistic) && entityType == null) {
-            return getFilteredStat(statContainer, periodKey, this::filterMinecraftStat);
+            return getFilteredStat(statContainer, type, period, this::filterMinecraftStat);
         }
-        return statContainer.getProperty(periodKey, this);
+        return statContainer.getProperty(type, period, this);
     }
 
     boolean filterMinecraftStat(Map.Entry<IStat, Long> entry) {

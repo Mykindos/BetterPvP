@@ -12,9 +12,11 @@ import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.StatBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IWrapperStat;
+import me.mykindos.betterpvp.core.server.Period;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,21 +79,14 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
         return this;
     }
 
-    /**
-     * Get the stat represented by this object from the statContainer
-     *
-     * @param statContainer
-     * @param periodKey
-     * @return
-     */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         //clanName being empty means it is for all Clans
         if (Strings.isNullOrEmpty(clanName)) {
-            return this.getFilteredStat(statContainer, periodKey, this::filterWrappedStat);
+            return this.getFilteredStat(statContainer, type, period, this::filterWrappedStat);
         }
 
-        return this.getFilteredStat(statContainer, periodKey, this::filterClanStat);
+        return this.getFilteredStat(statContainer, type, period, this::filterClanStat);
     }
 
     @Override

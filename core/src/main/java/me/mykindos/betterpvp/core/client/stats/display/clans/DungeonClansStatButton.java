@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.display.clans;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
@@ -9,6 +10,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonWrapperStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -38,7 +40,8 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
     private List<Component> getDungeonStats() {
         final IAbstractClansStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
         final String clanName = gui.getClanContext().getClanName();
         final Long clanId = gui.getClanContext().getClanId();
 
@@ -71,12 +74,12 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                 )
                 .build();
 
-        final int dungeonWins = dungeonWinsStat.getStat(statContainer, periodKey).intValue();
-        final int dungeonEnters = dungeonEntersStat.getStat(statContainer, periodKey).intValue();
-        final int dungeonLosses = dungeonLossesStat.getStat(statContainer, periodKey).intValue();
+        final int dungeonWins = dungeonWinsStat.getStat(statContainer, type, period).intValue();
+        final int dungeonEnters = dungeonEntersStat.getStat(statContainer, type, period).intValue();
+        final int dungeonLosses = dungeonLossesStat.getStat(statContainer, type, period).intValue();
         final String dungeonWinRate = UtilFormat.formatNumber(((double) dungeonWins / (dungeonEnters == 0 ? 1 : dungeonEnters)) * 100, 2) + "%";
 
-        final Duration timePlayed = Duration.of(dungeonTimePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+        final Duration timePlayed = Duration.of(dungeonTimePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
 
         return new ArrayList<>(
                 List.of(

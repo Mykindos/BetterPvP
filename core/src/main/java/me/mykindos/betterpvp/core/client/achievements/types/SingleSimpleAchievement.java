@@ -1,13 +1,13 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchievement {
 
-    protected SingleSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Long goal, IStat watchedStat) {
+    protected SingleSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, StatFilterType achievementType, Long goal, IStat watchedStat) {
         super(name, namespacedKey, achievementCategory, achievementType, goal, watchedStat);
     }
 
@@ -39,9 +39,9 @@ public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchieveme
     }
 
     @Override
-    public List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
-        Long value = getValue(container, getKey(), period);
-        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, period));
+    public List<Component> getProgressComponent(StatContainer container, StatFilterType type, Period period) {
+        Long value = getValue(container, getKey(), type, period);
+        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, type, period));
         Component bar = progressComponent.getFirst();
         progressComponent.removeFirst();
         progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", value, getGoal())));
