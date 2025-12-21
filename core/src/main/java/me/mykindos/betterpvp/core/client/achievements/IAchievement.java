@@ -4,11 +4,13 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.types.Achievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -36,7 +38,7 @@ public interface IAchievement {
     String getName();
 
     /**
-     * Listens for the event to call {@link IAchievement#onChangeValue(PropertyContainer, String, Object, Object, Map)} if valid
+     * Listens for the event to call {@link IAchievement#onChangeValue(StatContainer, IStat, Long, Long, Map)} if valid
      * @param event
      */
     void onPropertyChangeListener(final StatPropertyUpdateEvent event);
@@ -65,7 +67,7 @@ public interface IAchievement {
      * Get the AchievementType of this {@link IAchievement}
      * @return
      */
-    AchievementType getAchievementType();
+    StatFilterType getAchievementFilterType();
 
     /**
      * Get the {@link NamespacedKey} for this achievement
@@ -81,8 +83,8 @@ public interface IAchievement {
      * @param period
      * @return
      */
-    default int getPriority(final StatContainer container, final String period) {
-        return (int) (1_000_000 - (getPercentComplete(container, period) * 1_000_000));
+    default int getPriority(final StatContainer container, StatFilterType type, @Nullable("When type is ALL") Period period) {
+        return (int) (1_000_000 - (getPercentComplete(container, type, period) * 1_000_000));
     }
 
     /**
@@ -91,9 +93,9 @@ public interface IAchievement {
      * @param container the {@link PropertyContainer}
      * @return
      */
-    default Description getDescription(final StatContainer container, final String period) {
+    default Description getDescription(final StatContainer container, StatFilterType type, Period period) {
         return Description.builder()
-                .icon(getItemProvider(container, period))
+                .icon(getItemProvider(container, type, period))
                 .build();
     }
 
@@ -104,12 +106,12 @@ public interface IAchievement {
      * @param period
      * @return
      */
-    default ItemProvider getItemProvider(final StatContainer container, final String period) {
+    default ItemProvider getItemProvider(final StatContainer container, StatFilterType type, @Nullable("When type is ALL") Period period) {
         return ItemView.builder()
-                .material(getMaterial(container, period))
-                .customModelData(getCustomModelData(container, period))
-                .displayName(getDisplayName(container, period))
-                .lore(getLore(container, period))
+                .material(getMaterial(container, type, period))
+                .customModelData(getCustomModelData(container, type, period))
+                .displayName(getDisplayName(container, type, period))
+                .lore(getLore(container, type, period))
                 .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
@@ -123,7 +125,7 @@ public interface IAchievement {
      * @param period
      * @return
      */
-    default Component getDisplayName(final StatContainer container, final String period) {
+    default Component getDisplayName(final StatContainer container, StatFilterType type, @Nullable("When type is ALL") Period period) {
         return Component.text(getName(), NamedTextColor.WHITE);
     }
 
@@ -133,7 +135,7 @@ public interface IAchievement {
      * @param period
      * @return
      */
-    default Material getMaterial(final StatContainer container, final String period) {
+    default Material getMaterial(final StatContainer container, StatFilterType type, Period period) {
         return Material.PAPER;
     }
     /**
@@ -142,7 +144,7 @@ public interface IAchievement {
      * @param period
      * @return
      */
-    default int getCustomModelData(final StatContainer container, final String period) {
+    default int getCustomModelData(final StatContainer container, StatFilterType type, Period period) {
         return 0;
     }
 
@@ -154,7 +156,7 @@ public interface IAchievement {
      * @param period
      * @return
      */
-    default List<String> getStringDescription(final StatContainer container, final String period) {
+    default List<String> getStringDescription(final StatContainer container, StatFilterType type, Period period) {
         return List.of();
     }
 
@@ -165,11 +167,11 @@ public interface IAchievement {
      * @param period
      * @return
      */
-    default List<Component> getLore(final StatContainer container, final String period) {
-        List<Component> lore = new ArrayList<>(getStringDescription(container, period).stream()
+    default List<Component> getLore(final StatContainer container, StatFilterType type, Period period) {
+        List<Component> lore = new ArrayList<>(getStringDescription(container, type, period).stream()
                 .map(UtilMessage::deserialize)
                 .toList());
-        lore.addAll(this.getProgressComponent(container, period));
+        lore.addAll(this.getProgressComponent(container, type, period));
         lore.addAll(this.getCompletionComponent(container));
         return lore;
     }
@@ -180,7 +182,7 @@ public interface IAchievement {
      * @param container the {@link PropertyContainer}
      * @return between {@code 0.0f} (no progress) and {@code 1.0f} (completed)
      */
-    float getPercentComplete(final StatContainer container, @Nullable final String period);
+    float getPercentComplete(final StatContainer container, StatFilterType type, @Nullable("When type is ALL") Period period);
 
     /**
      * Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config}
@@ -205,8 +207,8 @@ public interface IAchievement {
      * @param container the {@link PropertyContainer} this {@link Achievement} is for
      * @return
      */
-    default List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
-        float percentage = getPercentComplete(container, period);
+    default List<Component> getProgressComponent(StatContainer container, StatFilterType type, @Nullable("When type is ALL") Period period) {
+        float percentage = getPercentComplete(container, type, period);
         ProgressBar progressBar = ProgressBar.withProgress(percentage);
         return new ArrayList<>(List.of(progressBar.build()));
     }

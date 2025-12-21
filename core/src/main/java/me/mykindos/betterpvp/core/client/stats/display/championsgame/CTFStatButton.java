@@ -1,12 +1,14 @@
 package me.mykindos.betterpvp.core.client.stats.display.championsgame;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.ctf.CTFStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.start.ChampionsStatButton;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -45,7 +47,8 @@ public class CTFStatButton extends ChampionsStatButton {
     protected List<Component> getCTFStatsDescription(final String teamName, final String mapName) {
         final IAbstractStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
 
         final String gameName = "Capture The Flag";
 
@@ -80,13 +83,13 @@ public class CTFStatButton extends ChampionsStatButton {
                 .mapName(mapName)
                 .build();
 
-        final int flagCaptures = flagCapturesStat.getStat(statContainer, periodKey).intValue();
-        final int flagPickups = flagPickupsStat.getStat(statContainer, periodKey).intValue();
-        final int flagKills = flagKillsStat.getStat(statContainer, periodKey).intValue();
+        final int flagCaptures = flagCapturesStat.getStat(statContainer, type, period).intValue();
+        final int flagPickups = flagPickupsStat.getStat(statContainer, type, period).intValue();
+        final int flagKills = flagKillsStat.getStat(statContainer, type, period).intValue();
 
-        final int suddenKills = suddenKillsStat.getStat(statContainer, periodKey).intValue();
-        final int suddenDeaths = suddenDeathsStat.getStat(statContainer, periodKey).intValue();
-        final int suddenCaptures = suddenCapturesStat.getStat(statContainer, periodKey).intValue();
+        final int suddenKills = suddenKillsStat.getStat(statContainer, type, period).intValue();
+        final int suddenDeaths = suddenDeathsStat.getStat(statContainer, type, period).intValue();
+        final int suddenCaptures = suddenCapturesStat.getStat(statContainer, type, period).intValue();
 
         final List<Component> dominationStats = new ArrayList<>(
                 getChampionsStatsDescription(gameName, teamName, mapName)
@@ -118,6 +121,6 @@ public class CTFStatButton extends ChampionsStatButton {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final IAbstractStatMenu gui = getGui();
-        new CTFStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
+        new CTFStatMenu(gui.getClient(), gui, gui.getType(), gui.getPeriod(), gui.getRealmManager()).show(player);
     }
 }

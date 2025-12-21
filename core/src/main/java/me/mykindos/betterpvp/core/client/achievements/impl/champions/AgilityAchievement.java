@@ -3,13 +3,14 @@ package me.mykindos.betterpvp.core.client.achievements.impl.champions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.server.Period;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -24,7 +25,7 @@ public class AgilityAchievement extends SingleSimpleAchievement {
         super("Can't Get Me!",
                 new NamespacedKey("champions", "agility_100"),
                 AchievementCategories.CHAMPIONS,
-                AchievementType.GLOBAL,
+                StatFilterType.ALL,
                 100L,
                 new GenericStat(
                         ChampionsSkillStat.builder()
@@ -36,12 +37,12 @@ public class AgilityAchievement extends SingleSimpleAchievement {
     }
 
     @Override
-    public Material getMaterial(StatContainer container, String period) {
+    public Material getMaterial(StatContainer container, StatFilterType type, Period period) {
         return Material.WIND_CHARGE;
     }
 
     @Override
-    public List<String> getStringDescription(StatContainer container, String period) {
+    public List<String> getStringDescription(StatContainer container, StatFilterType type, Period period) {
         return List.of("<gold>Use <white>Agility <yellow>100 <gray>times");
     }
 }

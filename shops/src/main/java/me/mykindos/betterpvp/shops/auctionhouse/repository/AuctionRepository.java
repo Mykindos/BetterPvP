@@ -47,7 +47,7 @@ public class AuctionRepository implements IRepository<Auction> {
                     .on(AUCTIONS.ID.eq(AUCTION_TRANSACTION_HISTORY.AUCTION_ID))
                     .leftJoin(CLIENTS.as("buyer_clients"))
                     .on(AUCTION_TRANSACTION_HISTORY.BUYER.eq(CLIENTS.as("buyer_clients").ID))
-                    .where(AUCTIONS.REALM.eq(Core.getCurrentRealm().getRealm()))
+                    .where(AUCTIONS.REALM.eq(Core.getCurrentRealm().getId()))
                     .fetch();
 
             for (var result : results) {
@@ -92,7 +92,7 @@ public class AuctionRepository implements IRepository<Auction> {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ctx.insertInto(AUCTIONS)
                     .set(AUCTIONS.ID, auction.getAuctionID())
-                    .set(AUCTIONS.REALM, Core.getCurrentRealm().getRealm())
+                    .set(AUCTIONS.REALM, Core.getCurrentRealm().getId())
                     .set(AUCTIONS.ITEM, Base64.getEncoder().encodeToString(itemStack.serializeAsBytes()))
                     .set(AUCTIONS.PRICE, auction.getSellPrice())
                     .set(AUCTIONS.EXPIRY, auction.getExpiryTime())

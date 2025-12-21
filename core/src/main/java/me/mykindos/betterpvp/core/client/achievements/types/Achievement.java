@@ -4,14 +4,17 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.server.Period;
+import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -53,7 +56,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     @Nullable(value = "if has no category, i.e. top level")
     private final NamespacedKey achievementCategory;
     @Getter
-    private final AchievementType achievementType;
+    private final StatFilterType achievementFilterType;
     @Getter
     private final Set<IStat> watchedStats = new HashSet<>();
     /**
@@ -65,16 +68,17 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     protected boolean enabled;
     protected boolean doRewards;
 
-    protected Achievement(String name, NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, IStat... watchedStats) {
+    protected Achievement(String name, NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, StatFilterType achievementFilterType, IStat... watchedStats) {
         this.name = name;
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
-        this.achievementType = achievementType;
+        this.achievementFilterType = achievementFilterType;
         this.watchedStats.addAll(Arrays.stream(watchedStats).toList());
     }
 
-    protected Long getValue(StatContainer container, IStat stat, @Nullable String period) {
-        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD_KEY) : stat.getStat(container, period);
+    //todo this logic might need to change
+    protected Long getValue(StatContainer container, IStat stat, StatFilterType type, @Nullable("When type is ALL") Period period) {
+        return stat.getStat(container, type, period);
     }
 
     /**
@@ -84,7 +88,14 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
      * @return
      */
     protected Long getValue(StatContainer container, IStat stat) {
-        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD_KEY) : stat.getStat(container, StatContainer.PERIOD_KEY);
+        return switch (getAchievementFilterType()) {
+            case ALL ->
+                stat.getStat(container, StatFilterType.ALL, null);
+            case SEASON ->
+                stat.getStat(container, StatFilterType.SEASON, Core.getCurrentRealm().getSeason());
+            case REALM ->
+                stat.getStat(container, StatFilterType.REALM, Core.getCurrentRealm());
+        };
     }
 
 
@@ -171,26 +182,33 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @Override
     public void notifyProgress(StatContainer container, Audience audience, float threshold) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), UtilFormat.formatNumber(getPercentComplete(container, getPeriod()) * 100)));
+        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), UtilFormat.formatNumber(getPercentComplete(container, achievementFilterType, getPeriod()) * 100)));
     }
 
     @Override
     public void notifyComplete(StatContainer container, Audience audience) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <gold>Completed!",  getName(), getPercentComplete(container, getPeriod())));
+        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <gold>Completed!",  getName(), getPercentComplete(container, achievementFilterType, getPeriod())));
     }
 
-    protected String getPeriod() {
-        return getAchievementType() == AchievementType.GLOBAL ? StatContainer.GLOBAL_PERIOD_KEY : StatContainer.PERIOD_KEY;
+    protected Period getPeriod() {
+        return switch (getAchievementFilterType()) {
+            case ALL ->
+                    null;
+            case SEASON ->
+                    Core.getCurrentRealm().getSeason();
+            case REALM ->
+                    Core.getCurrentRealm();
+        };
     }
 
     @Override
     public Optional<AchievementCompletion> getAchievementCompletion(StatContainer container) {
-        return achievementManager.getAchievementCompletion(container.getUniqueId(), namespacedKey, getPeriod());
+        return container.getAchievementCompletions().getCompletion(this, getPeriod());
     }
 
     @Override
     public void complete(StatContainer container) {
-        achievementManager.saveCompletion(container, namespacedKey, getPeriod());
+        achievementManager.saveCompletion(container, this, getPeriod());
     }
 
     @Override
@@ -213,7 +231,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     @Override
     public void handleComplete(StatContainer container) {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
-        if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, getPeriod()) >= 1.0f) {
+        if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, achievementFilterType, getPeriod()) >= 1.0f) {
             complete(container);
             notifyComplete(container, Bukkit.getPlayer(container.getUniqueId()));
             if (doRewards) {
@@ -229,15 +247,17 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     /**
-     * Get the stat represented by this object from the statContainer
+     * Get the stat represented by this object from the statContainer.
+     * period object must be the correct type as defined by the type
      *
-     * @param statContainer
-     * @param periodKey
-     * @return
+     * @param statContainer the statContainer to source the value from
+     * @param type          what type of period is being fetched from
+     * @param period        The period being fetched from, must be {@link Realm} or {@link Season} if type is not ALL
+     * @return the stat value represented by this stat
      */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
-        return (long) (getPercentComplete(statContainer, periodKey) * FP_MODIFIER);
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
+        return (long) (getPercentComplete(statContainer, type, period) * IStat.FP_MODIFIER);
     }
 
     @Override

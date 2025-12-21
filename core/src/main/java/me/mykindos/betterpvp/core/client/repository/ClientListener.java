@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -327,7 +326,7 @@ public class ClientListener implements Listener {
         } finally {
             try {
                 this.clientManager.processPropertyUpdates(true);
-                this.clientManager.processStatUpdates(StatContainer.PERIOD_KEY);
+                this.clientManager.processStatUpdates(Core.getCurrentRealm());
             } catch (Exception ex) {
                 log.error("Error processing stat updates", ex).submit();
                 if (ex.getCause() != null) {

@@ -45,7 +45,7 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
         final RoleStatistics roleStatistics = new RoleStatistics(combatDataMap, roleManager, player);
         return database.getAsyncDslContext().executeAsync(ctx -> {
 
-            Result<GetChampionsDataRecord> dataRecords = GET_CHAMPIONS_DATA(ctx.configuration(), player.toString(), Core.getCurrentRealm().getRealm());
+            Result<GetChampionsDataRecord> dataRecords = GET_CHAMPIONS_DATA(ctx.configuration(), player.toString(), Core.getCurrentRealm().getId());
             dataRecords.forEach(result -> {
                 String className = result.getClass_();
                 Role role = className.isEmpty() ? null : Role.valueOf(className);

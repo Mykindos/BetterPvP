@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.display.clans;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
@@ -9,6 +10,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -39,7 +41,8 @@ public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu>
     private List<Component> getPersonalStats() {
         final IAbstractClansStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
         final String clanName = gui.getClanContext().getClanName();
         final Long clanId = gui.getClanContext().getClanId();
 
@@ -81,20 +84,20 @@ public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu>
                 .wrappedStat(ClientStat.CLANS_ENERGY_COLLECTED)
                 .build();
 
-        final int kills = killsStat.getStat(statContainer, periodKey).intValue();
-        final int deaths = deathsStat.getStat(statContainer, periodKey).intValue();
+        final int kills = killsStat.getStat(statContainer, type, period).intValue();
+        final int deaths = deathsStat.getStat(statContainer, type, period).intValue();
         final float killDeathRatio = (float) kills / (deaths == 0 ? 1 : deaths);
 
-        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey), ChronoUnit.MILLIS);
+        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
 
-        final double dominanceGained = (double) dominanceGainedStat.getStat(statContainer, periodKey) / IStat.FP_MODIFIER;
-        final double dominanceLost = (double) dominanceLostStat.getStat(statContainer, periodKey) / IStat.FP_MODIFIER;
+        final double dominanceGained = (double) dominanceGainedStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
+        final double dominanceLost = (double) dominanceLostStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
         final double dominanceDelta = dominanceGained - dominanceLost;
 
-        final double clanExperience = (double) clanExperienceStat.getStat(statContainer, periodKey) / IStat.FP_MODIFIER;
+        final double clanExperience = (double) clanExperienceStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
 
-        final double energyDrop = clanEnergyDropStat.getStat(statContainer, periodKey);
-        final double energyCollected = clanEnergyCollectedStat.getStat(statContainer, periodKey);
+        final double energyDrop = clanEnergyDropStat.getStat(statContainer, type, period);
+        final double energyCollected = clanEnergyCollectedStat.getStat(statContainer, type, period);
 
         return new ArrayList<>(
                 List.of(

@@ -11,8 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.skill.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
@@ -51,22 +53,15 @@ public class ChampionsSkillStat implements IBuildableStat {
     }
 
 
-    /**
-     * Get the stat represented by this object from the statContainer
-     *
-     * @param statContainer
-     * @param periodKey
-     * @return
-     */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period object) {
         if (skillName == null) {
-            return getFilteredStat(statContainer, periodKey, this::filterAction);
+            return getFilteredStat(statContainer, type, object, this::filterAction);
         }
         if (level == -1) {
-            return getFilteredStat(statContainer, periodKey, this::filterSkill);
+            return getFilteredStat(statContainer, type, object, this::filterSkill);
         }
-        return statContainer.getProperty(periodKey, this);
+        return statContainer.getProperty(type, object, this);
     }
 
     private boolean filterAction(Map.Entry<IStat, Long> entry) {

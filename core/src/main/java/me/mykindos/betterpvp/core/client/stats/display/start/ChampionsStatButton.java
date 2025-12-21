@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.stats.display.start;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.ChampionsGameStatMenu;
@@ -12,6 +13,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapWrapperStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -45,7 +47,8 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
     protected List<Component> getChampionsStatsDescription(final String gameName, final String teamName, final String mapName) {
         final IAbstractStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
 
         final GameTeamMapNativeStat winStat = GameTeamMapNativeStat.builder()
                 .gameName(gameName)
@@ -99,19 +102,19 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
                 .build();
 
 
-        final int wins = winStat.getStat(statContainer, periodKey).intValue();
-        final int losses = lossStat.getStat(statContainer, periodKey).intValue();
-        final int matchesPlayed = matchesPlayedStat.getStat(statContainer, periodKey).intValue();
+        final int wins = winStat.getStat(statContainer, type, period).intValue();
+        final int losses = lossStat.getStat(statContainer, type, period).intValue();
+        final int matchesPlayed = matchesPlayedStat.getStat(statContainer, type, period).intValue();
 
-        final int kills = killsStat.getStat(statContainer, periodKey).intValue();
-        final int deaths = deathsStat.getStat(statContainer, periodKey).intValue();
+        final int kills = killsStat.getStat(statContainer, type, period).intValue();
+        final int deaths = deathsStat.getStat(statContainer, type, period).intValue();
         final float killDeathRatio = (float) kills / (deaths == 0 ? 1 : deaths);
 
 
-        Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+        Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
         if (gameName.isEmpty()) {
             //subtract lobby time from overall time
-            timePlayed = timePlayed.minus(lobbyTimePlayedStat.getStat(statContainer, periodKey).longValue(), ChronoUnit.MILLIS);
+            timePlayed = timePlayed.minus(lobbyTimePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
         }
 
         return new ArrayList<>(
@@ -139,7 +142,7 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final IAbstractStatMenu gui = getGui();
-        new ChampionsGameStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
+        new ChampionsGameStatMenu(gui.getClient(), gui, gui.getType(), gui.getPeriod(), gui.getRealmManager()).show(player);
         //todo
     }
 }

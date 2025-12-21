@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.server.Period;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -25,17 +27,10 @@ public class CompositeStat implements IStat {
     }
 
 
-    /**
-     * Get the stat represented by this object from the statContainer
-     *
-     * @param statContainer
-     * @param periodKey
-     * @return
-     */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
        return stats.stream()
-               .mapToLong(stat -> stat.getStat(statContainer, periodKey))
+               .mapToLong(stat -> stat.getStat(statContainer, type, period))
                .sum();
     }
 

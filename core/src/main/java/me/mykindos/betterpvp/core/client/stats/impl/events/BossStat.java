@@ -9,15 +9,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 @Builder
@@ -28,29 +28,12 @@ import java.util.Map;
 public class BossStat implements IBuildableStat {
     public static final String TYPE = "EVENT_BOSS";
 
-    private static StringBuilderParser<BossStatBuilder> parser = new StringBuilderParser<>(
-            List.of(
-                    BossStat::parsePrefix,
-                    BossStat::parseAction,
-                    BossStat::parseName
-            )
-    );
-
     public static BossStat fromData(String type, JSONObject data) {
         BossStat.BossStatBuilder builder = BossStat.builder();
         Preconditions.checkArgument(type.equals(TYPE));
         builder.action(Action.valueOf(data.getString("action")));
         builder.bossName(data.getString("bossName"));
         return builder.build();
-    }
-
-    private static BossStatBuilder parsePrefix(BossStatBuilder builder, String input) {
-        Preconditions.checkArgument(input.equals(TYPE));
-        return builder;
-    }
-
-    private static BossStatBuilder parseAction(BossStatBuilder builder, String input) {
-        return builder.action(Action.valueOf(input));
     }
 
     private static BossStatBuilder parseName(BossStatBuilder builder, String input) {
@@ -84,19 +67,12 @@ public class BossStat implements IBuildableStat {
         return action.equals(other.action);
     }
 
-    /**
-     * Get the stat represented by this object from the statContainer
-     *
-     * @param statContainer
-     * @param periodKey
-     * @return
-     */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         if (Strings.isNullOrEmpty(bossName)) {
-            return getFilteredStat(statContainer, periodKey, this::filterActionStat);
+            return getFilteredStat(statContainer, type, period, this::filterActionStat);
         }
-        return statContainer.getProperty(periodKey, this);
+        return statContainer.getProperty(type, period, this);
     }
 
     @Override

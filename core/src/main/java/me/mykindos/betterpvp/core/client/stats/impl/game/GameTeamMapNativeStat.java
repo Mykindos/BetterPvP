@@ -10,8 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -89,40 +91,40 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
      * @return
      */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         //if gameId is specified, it is a specific game
         if (gameId != null) {
-            return getFilteredStat(statContainer, periodKey, this::filterGameIdStat);
+            return getFilteredStat(statContainer, type, period, this::filterGameIdStat);
         }
         if (!Strings.isNullOrEmpty(gameName)) {
             //have a game name
             if (Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
                 //only game name
-                return getFilteredStat(statContainer, periodKey, this::filterGameFullStat);
+                return getFilteredStat(statContainer, type, period, this::filterGameFullStat);
             }
             if (Strings.isNullOrEmpty(mapName)) {
                 //no map name
-                return getFilteredStat(statContainer, periodKey, this::filterGameTeamStat);
+                return getFilteredStat(statContainer, type, period, this::filterGameTeamStat);
             }
             if (Strings.isNullOrEmpty(teamName)) {
                 //no team name
-                return getFilteredStat(statContainer, periodKey, this::filterGameMapStat);
+                return getFilteredStat(statContainer, type, period, this::filterGameMapStat);
             }
         }
 
         if (!Strings.isNullOrEmpty(teamName) && Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName)) {
             //no map or game but team
-            return getFilteredStat(statContainer, periodKey, this::filterTeamOnlyStat);
+            return getFilteredStat(statContainer, type, period, this::filterTeamOnlyStat);
         }
 
         //no map only stat because maps are tied to games
 
         if (Strings.isNullOrEmpty(gameName) && Strings.isNullOrEmpty(mapName) && Strings.isNullOrEmpty(teamName)) {
             //have action
-            return getFilteredStat(statContainer, periodKey, this::filterActionOnlyStat);
+            return getFilteredStat(statContainer, type, period, this::filterActionOnlyStat);
         }
         //all are specified, do stat "normally"
-        return getFilteredStat(statContainer, periodKey, this::filterAllStat);
+        return getFilteredStat(statContainer, type, period, this::filterAllStat);
     }
 
     @Override

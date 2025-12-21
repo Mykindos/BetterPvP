@@ -1,13 +1,14 @@
 package me.mykindos.betterpvp.core.client.achievements.impl.events.undeadchests;
 
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -29,7 +30,7 @@ public class OpenUndeadChests extends SingleSimpleAchievement {
     public OpenUndeadChests(NamespacedKey key, int goal) {
         super("Open Undead Chests", key,
                 AchievementCategories.EVENT_UNDEAD_CHESTS,
-                AchievementType.GLOBAL,
+                StatFilterType.ALL,
                 (long) goal,
                 new GenericStat(ClientStat.EVENT_UNDEAD_CITY_OPEN_CHEST)
         );
@@ -48,7 +49,7 @@ public class OpenUndeadChests extends SingleSimpleAchievement {
      * @return
      */
     @Override
-    public Material getMaterial(StatContainer container, String period) {
+    public Material getMaterial(StatContainer container, StatFilterType type, Period period) {
         return Material.WHITE_BANNER;
     }
 
@@ -62,7 +63,7 @@ public class OpenUndeadChests extends SingleSimpleAchievement {
      * @return
      */
     @Override
-    public List<String> getStringDescription(StatContainer container, String period) {
+    public List<String> getStringDescription(StatContainer container, StatFilterType type, Period period) {
         return List.of("<gray>Open Undead Chests <yellow>" + getGoal().intValue() + "</yellow> times");
     }
 }

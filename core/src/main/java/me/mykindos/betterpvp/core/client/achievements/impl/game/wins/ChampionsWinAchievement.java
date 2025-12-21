@@ -1,12 +1,13 @@
 package me.mykindos.betterpvp.core.client.achievements.impl.game.wins;
 
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -28,7 +29,7 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
     public ChampionsWinAchievement(NamespacedKey key, int goal) {
         super("Champions Wins", key,
                 AchievementCategories.GAME_CHAMPIONS_WINS,
-                AchievementType.GLOBAL,
+                StatFilterType.ALL,
                 (long) goal,
                 GameTeamMapNativeStat.builder()
                         .action(GameTeamMapNativeStat.Action.WIN)
@@ -49,7 +50,7 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
      * @return
      */
     @Override
-    public Material getMaterial(StatContainer container, String period) {
+    public Material getMaterial(StatContainer container, StatFilterType type, Period period) {
         return Material.BELL;
     }
 
@@ -63,7 +64,7 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
      * @return
      */
     @Override
-    public List<String> getStringDescription(StatContainer container, String period) {
+    public List<String> getStringDescription(StatContainer container, StatFilterType type, Period period) {
         return List.of("<gray>Win Champions Games <yellow>" + getGoal().intValue() + "</yellow> times");
     }
 }

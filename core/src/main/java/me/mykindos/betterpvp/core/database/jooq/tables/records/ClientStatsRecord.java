@@ -34,18 +34,18 @@ public class ClientStatsRecord extends UpdatableRecordImpl<ClientStatsRecord> {
     }
 
     /**
-     * Setter for <code>public.client_stats.period</code>.
+     * Setter for <code>public.client_stats.realm</code>.
      */
-    public ClientStatsRecord setPeriod(String value) {
+    public ClientStatsRecord setRealm(Integer value) {
         set(1, value);
         return this;
     }
 
     /**
-     * Getter for <code>public.client_stats.period</code>.
+     * Getter for <code>public.client_stats.realm</code>.
      */
-    public String getPeriod() {
-        return (String) get(1);
+    public Integer getRealm() {
+        return (Integer) get(1);
     }
 
     /**
@@ -98,7 +98,7 @@ public class ClientStatsRecord extends UpdatableRecordImpl<ClientStatsRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record4<Long, String, String, JSONB> key() {
+    public Record4<Long, Integer, String, JSONB> key() {
         return (Record4) super.key();
     }
 
@@ -116,11 +116,11 @@ public class ClientStatsRecord extends UpdatableRecordImpl<ClientStatsRecord> {
     /**
      * Create a detached, initialised ClientStatsRecord
      */
-    public ClientStatsRecord(Long client, String period, String stattype, JSONB statdata, Long stat) {
+    public ClientStatsRecord(Long client, Integer realm, String stattype, JSONB statdata, Long stat) {
         super(ClientStats.CLIENT_STATS);
 
         setClient(client);
-        setPeriod(period);
+        setRealm(realm);
         setStattype(stattype);
         setStatdata(statdata);
         setStat(stat);

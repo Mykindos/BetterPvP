@@ -4,15 +4,13 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm.AchievementCompletionsRealmPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.ClientStatsPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.Seasons.SeasonsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Servers.ServersPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.RealmsRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -33,6 +31,10 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -150,7 +152,19 @@ public class Realms extends TableImpl<RealmsRecord> {
 
     @Override
     public List<ForeignKey<RealmsRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.REALMS__REALMS_SERVER_FKEY);
+        return Arrays.asList(Keys.REALMS__REALM_SEASON_FK, Keys.REALMS__REALMS_SERVER_FKEY);
+    }
+
+    private transient SeasonsPath _seasons;
+
+    /**
+     * Get the implicit join path to the <code>public.seasons</code> table.
+     */
+    public SeasonsPath seasons() {
+        if (_seasons == null)
+            _seasons = new SeasonsPath(this, Keys.REALMS__REALM_SEASON_FK, null);
+
+        return _seasons;
     }
 
     private transient ServersPath _servers;
@@ -163,6 +177,32 @@ public class Realms extends TableImpl<RealmsRecord> {
             _servers = new ServersPath(this, Keys.REALMS__REALMS_SERVER_FKEY, null);
 
         return _servers;
+    }
+
+    private transient AchievementCompletionsRealmPath _achievementCompletionsRealm;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.achievement_completions_realm</code> table
+     */
+    public AchievementCompletionsRealmPath achievementCompletionsRealm() {
+        if (_achievementCompletionsRealm == null)
+            _achievementCompletionsRealm = new AchievementCompletionsRealmPath(this, null, Keys.ACHIEVEMENT_COMPLETIONS_REALM__ACHIEVEMENT_COMPLETIONS_REALM_REALM_FKEY.getInverseKey());
+
+        return _achievementCompletionsRealm;
+    }
+
+    private transient ClientStatsPath _clientStats;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.client_stats</code> table
+     */
+    public ClientStatsPath clientStats() {
+        if (_clientStats == null)
+            _clientStats = new ClientStatsPath(this, null, Keys.CLIENT_STATS__CLIENT_STATS_REALM_FKEY.getInverseKey());
+
+        return _clientStats;
     }
 
     @Override

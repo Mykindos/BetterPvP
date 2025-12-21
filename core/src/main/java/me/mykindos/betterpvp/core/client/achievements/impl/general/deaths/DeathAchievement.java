@@ -1,14 +1,15 @@
 package me.mykindos.betterpvp.core.client.achievements.impl.general.deaths;
 
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -36,7 +37,7 @@ public class DeathAchievement extends SingleSimpleAchievement {
     public DeathAchievement(NamespacedKey key, int goal) {
         super("Death", key,
                 AchievementCategories.DEATH_TYPE,
-                AchievementType.PERIOD,
+                StatFilterType.SEASON,
                 (long) goal,
                 new GenericStat(
                 MinecraftStat.builder()
@@ -59,11 +60,11 @@ public class DeathAchievement extends SingleSimpleAchievement {
      * @return
      */
     @Override
-    public Description getDescription(StatContainer container, String period) {
+    public Description getDescription(StatContainer container, StatFilterType type, Period period) {
         List<Component> lore = new ArrayList<>(List.of(
             UtilMessage.deserialize("<gray>Die <yellow>%s</yellow> times", getGoal().intValue())
         ));
-        lore.addAll(this.getProgressComponent(container, period));
+        lore.addAll(this.getProgressComponent(container, type, period));
         lore.addAll(this.getCompletionComponent(container));
         ItemProvider itemProvider = ItemView.builder()
                 .material(Material.SKELETON_SKULL)

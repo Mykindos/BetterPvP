@@ -6,14 +6,18 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
+import me.mykindos.betterpvp.core.server.Season;
 import org.jooq.DSLContext;
+import org.jooq.Record3;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+import java.time.LocalDate;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.REALMS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.SEASONS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.SERVERS;
 
 /**
@@ -127,6 +131,33 @@ public class Database {
 
             return realmId != null ? realmId : 0;
         });
+    }
+
+    /**
+     * Creates the season if no season for seasonId Exists
+     * @param seasonId
+     * @param seasonName
+     */
+    public Season getOrCreateSeason(int seasonId, String seasonName) {
+        return dslContext.transactionResult(config -> {
+            DSLContext ctx = DSL.using(config);
+            Record3<Integer, String, LocalDate> result = ctx.insertInto(SEASONS)
+                    .set(SEASONS.ID, seasonId)
+                    .set(SEASONS.NAME, seasonName)
+                    .onConflict(SEASONS.ID)
+                    .doUpdate()
+                    .set(SEASONS.NAME, seasonName)
+                    .returningResult(SEASONS.ID, SEASONS.NAME, SEASONS.START)
+                    .fetchOne();
+            if (result == null) {
+                log.warn("no result from getting season").submit();
+                return new Season(seasonId, seasonName, LocalDate.now());
+            }
+
+            return new Season(result.get(SEASONS.ID), result.get(SEASONS.NAME), result.get(SEASONS.START));
+        });
+
+
     }
 
 }

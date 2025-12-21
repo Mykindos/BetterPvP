@@ -6,15 +6,16 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.NSingleGoalSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -37,7 +38,7 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
     public UseAllSkillsAchievement(ChampionsSkillManager skillManager) {
         super("Use All Skills", new NamespacedKey("champions", "use_all_skills"),
                 AchievementCategories.CHAMPIONS,
-                AchievementType.GLOBAL, 60_000L,
+                StatFilterType.ALL, 60_000L,
                 getAllSkills(skillManager));
         //cannot register via BPvPListener as it loads before skills are loaded
         ListenerLoader.register(JavaPlugin.getPlugin(Champions.class), this);
@@ -65,13 +66,13 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
      * @return
      */
     @Override
-    public Description getDescription(StatContainer container, String period) {
+    public Description getDescription(StatContainer container, StatFilterType type, Period period) {
         List<Component> lore = new ArrayList<>(
                 List.of(
                         UtilMessage.deserialize("<gray>Use all skills for 1 minute")
                 ));
         lore.addAll(getRemainingElements(container));
-        lore.addAll(this.getProgressComponent(container, period));
+        lore.addAll(this.getProgressComponent(container, type, period));
         lore.addAll(this.getCompletionComponent(container));
         ItemProvider itemProvider = ItemView.builder()
                 .material(Material.ENCHANTED_BOOK )
@@ -84,7 +85,7 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
     }
 
     @Override
-    public List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
+    public List<Component> getProgressComponent(StatContainer container, StatFilterType type, @Nullable Period period) {
         int completed = getWatchedStats().stream()
                 .filter(stat -> calculateCurrentElementPercent(container, stat) >= 1.0f)
                 .map(GenericStat.class::cast)
@@ -93,7 +94,7 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
                 .toList()
                 .size();
         int total = getWatchedStats().size();
-        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, period));
+        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, type, period));
         Component bar = progressComponent.getFirst();
         progressComponent.removeFirst();
         progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", completed, total)));

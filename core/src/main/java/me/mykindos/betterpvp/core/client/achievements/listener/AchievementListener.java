@@ -3,12 +3,8 @@ package me.mykindos.betterpvp.core.client.achievements.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
-import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
-import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 @BPvPListener
@@ -20,16 +16,6 @@ public class AchievementListener implements Listener {
     @Inject
     public AchievementListener(AchievementManager achievementManager) {
         this.achievementManager = achievementManager;
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onClientJoin(ClientJoinEvent event) {
-        achievementManager.loadContainer(event.getClient().getStatContainer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onClientQuit(ClientQuitEvent event) {
-        achievementManager.unloadId(event.getClient().getUniqueId());
     }
 
     @UpdateEvent(delay = 1000L * 60 * 10, isAsync = true)

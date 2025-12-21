@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.display;
 
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.filter.ClanContext;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClansStat;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
@@ -33,7 +33,7 @@ public interface IAbstractClansStatMenu extends IAbstractStatMenu {
                 ClanContext.ALL
         ));
         contexts.addAll(
-                client.getStatContainer().getStats().getStatsOfPeriod(StatContainer.GLOBAL_PERIOD_KEY)
+                client.getStatContainer().getStats().getStatsOfPeriod(StatFilterType.ALL, null)
                         .keySet().stream()
                         .filter(ClansStat.class::isInstance)
                         .map(ClansStat.class::cast)

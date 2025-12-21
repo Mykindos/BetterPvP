@@ -31,7 +31,7 @@ public abstract class AchievementLoader extends Loader {
         IAchievement achievement = (IAchievement) plugin.getInjector().getInstance(clazz);
         plugin.getInjector().injectMembers(achievement);
         achievement.loadConfig(plugin.getConfig("achievements"));
-        achievementManager.addObject(achievement.getNamespacedKey().asString(), achievement);
+        achievementManager.addObject(achievement.getNamespacedKey(), achievement);
         if (achievement instanceof Listener listener) {
             ListenerLoader.register(plugin, listener);
         }
@@ -47,7 +47,7 @@ public abstract class AchievementLoader extends Loader {
         plugin.saveConfig();
         for (IAchievement achievement : achievements) {
             //these achievements are injected by the loader
-            achievementManager.addObject(achievement.getNamespacedKey().asString(), achievement);
+            achievementManager.addObject(achievement.getNamespacedKey(), achievement);
             count++;
         }
         plugin.saveConfig();

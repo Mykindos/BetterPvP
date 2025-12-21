@@ -9,9 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,11 +59,11 @@ public class EffectDurationStat implements IBuildableStat {
      * @return
      */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         if (effectName == null) {
-            return getFilteredStat(statContainer, periodKey, this::filterEffectTypeStat);
+            return getFilteredStat(statContainer, type, period, this::filterEffectTypeStat);
         }
-        return statContainer.getProperty(periodKey, this);
+        return statContainer.getProperty(type, period, this);
     }
 
     @Override

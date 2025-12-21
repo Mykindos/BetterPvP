@@ -7,19 +7,24 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletionRepository;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesRepository;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
+import me.mykindos.betterpvp.core.client.stats.RealmManager;
 import me.mykindos.betterpvp.core.client.stats.StatBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatConcurrentHashMap;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.jetbrains.annotations.Nullable;
@@ -62,10 +67,11 @@ public class ClientSQLLayer {
     private final Database database;
     private final PropertyMapper propertyMapper;
     private final StatBuilder statBuilder;
+    private final RealmManager realmManager;
+    private final AchievementManager achievementManager;
     @Getter
     private final PunishmentRepository punishmentRepository;
-
-    private final OfflineMessagesRepository offlineMessagesRepository;
+    private final AchievementCompletionRepository achievementCompletionRepository;
 
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedPropertyUpdates;
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedSharedPropertyUpdates;
@@ -74,12 +80,14 @@ public class ClientSQLLayer {
     private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
-    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, StatBuilder statBuilder, PunishmentRepository punishmentRepository, OfflineMessagesRepository offlineMessagesRepository) {
+    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, StatBuilder statBuilder, RealmManager realmManager, PunishmentRepository punishmentRepository, OfflineMessagesRepository offlineMessagesRepository, AchievementManager achievementManager, AchievementCompletionRepository achievementCompletionRepository) {
         this.database = database;
         this.propertyMapper = propertyMapper;
         this.statBuilder = statBuilder;
+        this.realmManager = realmManager;
         this.punishmentRepository = punishmentRepository;
-        this.offlineMessagesRepository = offlineMessagesRepository;
+        this.achievementManager = achievementManager;
+        this.achievementCompletionRepository = achievementCompletionRepository;
         this.queuedPropertyUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
         this.queuedSharedPropertyUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
         this.queuedStatUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
@@ -196,7 +204,6 @@ public class ClientSQLLayer {
         client.getIgnores().addAll(ignoresFuture.join());
     }
 
-
     private Set<UUID> getIgnoresForClient(Client client) {
         Set<UUID> ignores = new HashSet<>();
 
@@ -262,7 +269,7 @@ public class ClientSQLLayer {
             Result<Record2<String, String>> result = ctx.select(GAMER_PROPERTIES.PROPERTY, GAMER_PROPERTIES.VALUE)
                     .from(GAMER_PROPERTIES)
                     .where(GAMER_PROPERTIES.CLIENT.eq(client.getId()))
-                    .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getRealm()))
+                    .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getId()))
                     .fetch();
             loadPropertiesAsync(result, gamer);
         });
@@ -275,15 +282,15 @@ public class ClientSQLLayer {
             final StatConcurrentHashMap tempMap = new StatConcurrentHashMap();
             GET_CLIENT_STATS(context.configuration(), client.getId())
                     .forEach(record -> {
-                        final String period = record.getPeriod();
+                        final int realm = record.getRealm();
                         final String statType = record.getStattype();
                         final JSONObject statData = new JSONObject(record.getData().toString());
                         final IStat stat = statBuilder.getStatForStatData(statType, statData);
                         final long value = record.get(CLIENT_STATS.STAT);
                         try {
-                            tempMap.put(period, stat, value, true);
+                            tempMap.put(realmManager.getObject(realm).orElseThrow(), stat, value, true);
                         } catch (Exception e) {
-                            log.error("Error saving stat {} ({}), period {}, value {}", stat, statType, period, value, e).submit();
+                            log.error("Error saving stat {} ({}), realm {}, value {}", stat, statType, realm, value, e).submit();
                         }
                     });
             statContainer.getStats().copyFrom(tempMap);
@@ -371,7 +378,7 @@ public class ClientSQLLayer {
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
         Query query = database.getDslContext().insertInto(GAMER_PROPERTIES)
                 .set(GAMER_PROPERTIES.CLIENT, gamer.getId())
-                .set(GAMER_PROPERTIES.REALM, Core.getCurrentRealm().getRealm())
+                .set(GAMER_PROPERTIES.REALM, Core.getCurrentRealm().getId())
                 .set(GAMER_PROPERTIES.PROPERTY, property)
                 .set(GAMER_PROPERTIES.VALUE, value.toString())
                 .onConflict(GAMER_PROPERTIES.CLIENT, GAMER_PROPERTIES.REALM, GAMER_PROPERTIES.PROPERTY)
@@ -458,26 +465,26 @@ public class ClientSQLLayer {
 
     }
 
-    public CompletableFuture<Void> processStatUpdates(Set<Client> clients, String period) {
-        List<Query> statementsToRun = clients.stream().flatMap(client -> getStatUpdates(client, period).stream()).toList();
+    public CompletableFuture<Void> processStatUpdates(Set<Client> clients, Realm realm) {
+        List<Query> statementsToRun = clients.stream().flatMap(client -> getStatUpdates(client, realm).stream()).toList();
         return executeQueriesAsTransaction(statementsToRun, false);
     }
 
-    private List<Query> getStatUpdates(Client client, String period) {
+    private List<Query> getStatUpdates(Client client, Realm realm) {
         synchronized (client.getStatContainer()) {
-            List<Query> statementStream = client.getStatContainer().getChangedStats().stream().map(statName -> {
-                return getSaveStatProperty(client.getStatContainer(), period, statName, client.getStatContainer().getProperty(period, statName));
+            List<Query> statementStream = client.getStatContainer().getChangedStats().stream().map(stat -> {
+                return getSaveStatProperty(client.getStatContainer(), realm, stat, client.getStatContainer().getProperty(StatFilterType.REALM, realm, stat));
             }).toList();
             client.getStatContainer().getChangedStats().clear();
             return statementStream;
         }
     }
 
-    private Query getSaveStatProperty(StatContainer statContainer, String period, IStat stat, Long value) {
-        log.info("Saving {}", stat.getStatType()).submit();
+    private Query getSaveStatProperty(StatContainer statContainer, Realm realm, IStat stat, Long value) {
+        log.debug("Saving {}", stat.getStatType()).submit();
         return database.getDslContext().insertInto(CLIENT_STATS)
                 .set(CLIENT_STATS.CLIENT, statContainer.getClient().getId())
-                .set(CLIENT_STATS.PERIOD, period)
+                .set(CLIENT_STATS.REALM, realm.getId())
                 .set(CLIENT_STATS.STATTYPE, stat.getStatType())
                 .set(CLIENT_STATS.STATDATA, JSONB.jsonb(stat.getJsonData() == null ? "{}" : stat.getJsonData().toString()))
                 .set(CLIENT_STATS.STAT, value)
@@ -591,7 +598,7 @@ public class ClientSQLLayer {
             try {
                 ctx.insertInto(CLIENT_REWARDS)
                         .set(CLIENT_REWARDS.CLIENT, client.getId())
-                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentRealm().getSeason())
+                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentRealm().getSeason().getId())
                         .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
                         .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
                         .doUpdate()

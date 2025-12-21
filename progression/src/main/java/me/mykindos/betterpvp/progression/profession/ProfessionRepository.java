@@ -27,7 +27,7 @@ public class ProfessionRepository {
     }
 
     public void createPartitions() {
-        int season = Core.getCurrentRealm().getSeason();
+        int season = Core.getCurrentRealm().getSeason().getId();
         String partitionTableName = "progression_exp_season_" + season;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
@@ -50,7 +50,7 @@ public class ProfessionRepository {
                         .and(PROGRESSION_EXP.CLIENT.eq(ctx.select(CLIENTS.ID)
                                         .from(CLIENTS)
                                         .where(CLIENTS.UUID.eq(player.toString()))))
-                        .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentRealm().getSeason()))
+                        .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentRealm().getSeason().getId()))
                         .orderBy(PROGRESSION_EXP.EXPERIENCE.desc())
                         .limit(1)
                         .fetchOne(PROGRESSION_EXP.EXPERIENCE);
@@ -72,7 +72,7 @@ public class ProfessionRepository {
                         .from(PROGRESSION_EXP)
                         .join(CLIENTS).on(PROGRESSION_EXP.CLIENT.eq(CLIENTS.ID))
                         .where(PROGRESSION_EXP.PROFESSION.eq(profession))
-                        .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentRealm().getSeason()))
+                        .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentRealm().getSeason().getId()))
                         .orderBy(PROGRESSION_EXP.EXPERIENCE.desc())
                         .limit(10)
                         .fetch()

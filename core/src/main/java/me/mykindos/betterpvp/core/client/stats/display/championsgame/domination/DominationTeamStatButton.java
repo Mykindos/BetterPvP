@@ -55,6 +55,6 @@ public class DominationTeamStatButton extends DominationStatButton {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final IAbstractStatMenu gui = getGui();
-        new DominationTeamMapStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager(), teamName).show(player);
+        new DominationTeamMapStatMenu(gui.getClient(), gui, gui.getType(), gui.getPeriod(), gui.getRealmManager(), teamName).show(player);
     }
 }

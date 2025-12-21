@@ -1,13 +1,14 @@
 package me.mykindos.betterpvp.core.client.achievements.impl.dungeons;
 
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -29,7 +30,7 @@ public class BraewoodCavernsPeriodAchievement extends SingleSimpleAchievement {
     public BraewoodCavernsPeriodAchievement(NamespacedKey key, int goal) {
         super("Beat the Braewoods Cavern", key,
                 AchievementCategories.DUNGEONS_BRAEWOOD_CAVERNS_PERIOD,
-                AchievementType.PERIOD,
+                StatFilterType.SEASON,
                 (long) goal,
                 //this allows dungeon stats outside of clans, could also just be a ClanWrapperStat
                 new GenericStat(
@@ -54,7 +55,7 @@ public class BraewoodCavernsPeriodAchievement extends SingleSimpleAchievement {
      * @return
      */
     @Override
-    public Material getMaterial(StatContainer container, String period) {
+    public Material getMaterial(StatContainer container, StatFilterType type, Period period) {
         return Material.OAK_SAPLING;
     }
 
@@ -68,7 +69,7 @@ public class BraewoodCavernsPeriodAchievement extends SingleSimpleAchievement {
      * @return
      */
     @Override
-    public List<String> getStringDescription(StatContainer container, String period) {
+    public List<String> getStringDescription(StatContainer container, StatFilterType type, Period period) {
         return List.of("<gray>Beat the Braewoods Cavern <yellow>" + getGoal().intValue() + "</yellow> times");
     }
 }

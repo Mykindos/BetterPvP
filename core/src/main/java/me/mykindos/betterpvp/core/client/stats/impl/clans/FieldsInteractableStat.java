@@ -8,8 +8,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,16 +36,9 @@ public class FieldsInteractableStat implements IBuildableStat {
     @NotNull
     private String name;
 
-    /**
-     * Get the stat represented by this object from the statContainer
-     *
-     * @param statContainer
-     * @param periodKey
-     * @return
-     */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
-        return statContainer.getProperty(periodKey, this);
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
+        return statContainer.getProperty(type, period, this);
     }
 
     @Override

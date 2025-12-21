@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.display.clans;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
@@ -8,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -33,7 +35,8 @@ public class EventClansStatButton extends ControlItem<IAbstractClansStatMenu> {
     private List<Component> getEventStats() {
         final IAbstractClansStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
         final String clanName = gui.getClanContext().getClanName();
         final Long clanId = gui.getClanContext().getClanId();
 
@@ -52,8 +55,8 @@ public class EventClansStatButton extends ControlItem<IAbstractClansStatMenu> {
                 .wrappedStat(ClientStat.EVENT_UNDEAD_CITY_OPEN_CHEST)
                 .build();
 
-        final int eventBossesKilled = eventBossesKilledStat.getStat(statContainer, periodKey).intValue();
-        final int undeadChestsOpened = undeadChestsOpenedStat.getStat(statContainer, periodKey).intValue();
+        final int eventBossesKilled = eventBossesKilledStat.getStat(statContainer, type, period).intValue();
+        final int undeadChestsOpened = undeadChestsOpenedStat.getStat(statContainer, type, period).intValue();
 
         return new ArrayList<>(
                 List.of(

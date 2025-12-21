@@ -5,6 +5,8 @@ import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.server.Period;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -24,16 +26,9 @@ public class GenericStat implements IStat {
         return containsStat(entry.getKey());
     }
 
-    /**
-     * Get the stat represented by this object from the statContainer
-     *
-     * @param statContainer the statContainer to source the value from
-     * @param periodKey     the period to fetch from
-     * @return the stat value represented by this stat
-     */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
-        return getFilteredStat(statContainer, periodKey, this::filterStat);
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
+        return getFilteredStat(statContainer, type, period, this::filterStat);
     }
 
     /**

@@ -119,7 +119,7 @@ public class RollbackSubCommand extends Command {
                         .and(WORLD_LOGS_METADATA.META_VALUE.eq(finalTargetPlayer)));
             }
 
-            query.addConditions(WORLD_LOGS.REALM.eq(Core.getCurrentRealm().getRealm()));
+            query.addConditions(WORLD_LOGS.REALM.eq(Core.getCurrentRealm().getId()));
             query.addConditions(WORLD_LOGS.WORLD.eq(playerLocation.getWorld().getName()));
             query.addConditions(WORLD_LOGS.BLOCK_X.ge(playerLocation.getBlockX() - finalRadius));
             query.addConditions(WORLD_LOGS.BLOCK_X.le(playerLocation.getBlockX() + finalRadius));

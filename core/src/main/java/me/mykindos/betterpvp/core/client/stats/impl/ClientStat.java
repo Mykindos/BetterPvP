@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.server.Period;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -138,11 +140,11 @@ public enum ClientStat implements IClientStat {
 
 
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         if (compositeStat == null) {
-            return statContainer.getProperty(periodKey,this);
+            return statContainer.getProperty(type, period,this);
         }
-        return compositeStat.getStat(statContainer, periodKey);
+        return compositeStat.getStat(statContainer, type, period);
     }
 
     @Override

@@ -58,7 +58,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
         try {
             var records = database.getDslContext()
                     .selectFrom(CLANS_FIELDS_ORES)
-                    .where(CLANS_FIELDS_ORES.REALM.eq(Core.getCurrentRealm().getRealm()))
+                    .where(CLANS_FIELDS_ORES.REALM.eq(Core.getCurrentRealm().getId()))
                     .fetch();
 
             for (var fieldsRecord : records) {
@@ -86,7 +86,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     public void delete(String world, int x, int y, int z) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ctx.deleteFrom(CLANS_FIELDS_ORES)
-                    .where(CLANS_FIELDS_ORES.REALM.eq(Core.getCurrentRealm().getRealm()))
+                    .where(CLANS_FIELDS_ORES.REALM.eq(Core.getCurrentRealm().getId()))
                     .and(CLANS_FIELDS_ORES.WORLD.eq(world))
                     .and(CLANS_FIELDS_ORES.X.eq(x))
                     .and(CLANS_FIELDS_ORES.Y.eq(y))
@@ -132,7 +132,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
     private Query getQueryForBlockEntry(DSLContext ctx, FieldsBlockEntry entry) {
         return ctx.insertInto(CLANS_FIELDS_ORES)
-                .set(CLANS_FIELDS_ORES.REALM, Core.getCurrentRealm().getRealm())
+                .set(CLANS_FIELDS_ORES.REALM, Core.getCurrentRealm().getId())
                 .set(CLANS_FIELDS_ORES.WORLD, entry.getWorld())
                 .set(CLANS_FIELDS_ORES.X, entry.getX())
                 .set(CLANS_FIELDS_ORES.Y, entry.getY())

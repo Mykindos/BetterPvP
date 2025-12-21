@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.display.clans;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
@@ -8,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -34,7 +36,8 @@ public class PillageClansStatButton extends ControlItem<IAbstractClansStatMenu> 
     private List<Component> getPillageStats() {
         final IAbstractClansStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
         final String clanName = gui.getClanContext().getClanName();
         final Long clanId = gui.getClanContext().getClanId();
 
@@ -67,15 +70,15 @@ public class PillageClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                 .wrappedStat(ClientStat.CLANS_CANNON_BLOCK_DAMAGE)
                 .build();
 
-        final int pillagesAttacked = pillageAttackStat.getStat(statContainer, periodKey).intValue();
-        final int coresDestroy = coreDestroyStat.getStat(statContainer, periodKey).intValue();
+        final int pillagesAttacked = pillageAttackStat.getStat(statContainer, type, period).intValue();
+        final int coresDestroy = coreDestroyStat.getStat(statContainer, type, period).intValue();
         final String winRate = UtilFormat.formatNumber(((double) pillagesAttacked / (coresDestroy == 0 ? 1 : coresDestroy) ) * 100, 2) + "%";
-        final double coreDamage = (double) coreDamageStat.getStat(statContainer, periodKey) / IStat.FP_MODIFIER;
-        final int cannonShots = cannonShotsStat.getStat(statContainer, periodKey).intValue();
-        final int cannonBlockDamage = cannonBlockDamageStat.getStat(statContainer, periodKey).intValue();
+        final double coreDamage = (double) coreDamageStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
+        final int cannonShots = cannonShotsStat.getStat(statContainer, type, period).intValue();
+        final int cannonBlockDamage = cannonBlockDamageStat.getStat(statContainer, type, period).intValue();
 
-        final int pillagesDefended = pillageDefendStat.getStat(statContainer, periodKey).intValue();
-        final int coresDestroyed = coreDestroyedStat.getStat(statContainer, periodKey).intValue();
+        final int pillagesDefended = pillageDefendStat.getStat(statContainer, type, period).intValue();
+        final int coresDestroyed = coreDestroyedStat.getStat(statContainer, type, period).intValue();
         final String lossRate = UtilFormat.formatNumber(((double) pillagesDefended / (coresDestroyed == 0 ? 1 : coresDestroyed)) * 100, 2) + "%";
 
         return new ArrayList<>(

@@ -3,9 +3,9 @@ package me.mykindos.betterpvp.core.client.stats.listeners;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,7 +26,7 @@ public class StatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(ClientQuitEvent event) {
-        log.error("process stats on quit").submit();
-        clientManager.getSqlLayer().processStatUpdates(Set.of(event.getClient()), StatContainer.PERIOD_KEY);
+        log.debug("process stats on quit").submit();
+        clientManager.getSqlLayer().processStatUpdates(Set.of(event.getClient()), Core.getCurrentRealm());
     }
 }

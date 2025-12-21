@@ -11,9 +11,11 @@ import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.StatBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IWrapperStat;
+import me.mykindos.betterpvp.core.server.Period;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,11 +71,11 @@ public class DungeonWrapperStat extends DungeonStat implements IWrapperStat {
      * @return
      */
     @Override
-    public Long getStat(StatContainer statContainer, String periodKey) {
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         if (Strings.isNullOrEmpty(dungeonName)) {
-            return this.getFilteredStat(statContainer, periodKey, this::filterDungeonStat);
+            return this.getFilteredStat(statContainer, type, period, this::filterDungeonStat);
         }
-        return this.getFilteredStat(statContainer, periodKey, this::filterWrappedStat);
+        return this.getFilteredStat(statContainer, type, period, this::filterWrappedStat);
     }
 
     @Override

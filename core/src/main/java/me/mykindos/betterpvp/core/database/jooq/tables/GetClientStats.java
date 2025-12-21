@@ -41,9 +41,9 @@ public class GetClientStats extends TableImpl<GetClientStatsRecord> {
     }
 
     /**
-     * The column <code>public.get_client_stats.period</code>.
+     * The column <code>public.get_client_stats.realm</code>.
      */
-    public final TableField<GetClientStatsRecord, String> PERIOD = createField(DSL.name("period"), SQLDataType.VARCHAR, this, "");
+    public final TableField<GetClientStatsRecord, Integer> REALM = createField(DSL.name("realm"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>public.get_client_stats.stattype</code>.

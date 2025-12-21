@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
@@ -59,8 +60,8 @@ public class StatBuilder {
         log.warn("No stat found for {} {}", statType, data.toString()).submit();
         return new IStat() {
             @Override
-            public Long getStat(StatContainer statContainer, String periodKey) {
-                return statContainer.getProperty(getStatType(), this);
+            public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period object) {
+                return statContainer.getProperty(type, object, this);
             }
 
             @Override

@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.core.client.stats.display.start;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.display.clans.ClansStatMenu;
+import me.mykindos.betterpvp.core.client.stats.display.filter.ClanContext;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
@@ -12,6 +14,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -60,7 +63,8 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
     protected List<Component> getClanStats(String clanName, @Nullable Long clanId) {
         final IAbstractStatMenu gui = getGui();
         final StatContainer statContainer = gui.getClient().getStatContainer();
-        final String periodKey = gui.getPeriodKey();
+        final StatFilterType type = gui.getType();
+        final Period period = gui.getPeriod();
 
         final ClanWrapperStat.ClanWrapperStatBuilder<?, ?> clanStatBuilder = ClanWrapperStat.builder()
                         .clanName(clanName)
@@ -116,27 +120,27 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
                         .build()
                 ).build();
 
-        final int kills = killsStat.getStat(statContainer, periodKey).intValue();
-        final int deaths = deathsStat.getStat(statContainer, periodKey).intValue();
+        final int kills = killsStat.getStat(statContainer, type, period).intValue();
+        final int deaths = deathsStat.getStat(statContainer, type, period).intValue();
         final float killDeathRatio = (float) kills / (deaths == 0 ? 1 : deaths);
 
-        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, periodKey), ChronoUnit.MILLIS);
+        final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
 
-        final double dominanceGained = (double) dominanceGainedStat.getStat(statContainer, periodKey) / 1000L;
-        final double dominanceLost = (double) dominanceLostStat.getStat(statContainer, periodKey) / 1000L;
+        final double dominanceGained = (double) dominanceGainedStat.getStat(statContainer, type, period) / 1000L;
+        final double dominanceLost = (double) dominanceLostStat.getStat(statContainer, type, period) / 1000L;
         final double dominanceDelta = dominanceGained - dominanceLost;
 
-        final int pillagesAttacked = pillageAttackStat.getStat(statContainer, periodKey).intValue();
-        final int coresDestroy = coreDestroyStat.getStat(statContainer, periodKey).intValue();
+        final int pillagesAttacked = pillageAttackStat.getStat(statContainer, type, period).intValue();
+        final int coresDestroy = coreDestroyStat.getStat(statContainer, type, period).intValue();
         final String winRate = UtilFormat.formatNumber(((double) pillagesAttacked / (coresDestroy == 0 ? 1 : coresDestroy) ) * 100, 2) + "%";
 
-        final int pillagesDefended = pillageDefendStat.getStat(statContainer, periodKey).intValue();
-        final int coresDestroyed = coreDestroyedStat.getStat(statContainer, periodKey).intValue();
+        final int pillagesDefended = pillageDefendStat.getStat(statContainer, type, period).intValue();
+        final int coresDestroyed = coreDestroyedStat.getStat(statContainer, type, period).intValue();
         final String lossRate = UtilFormat.formatNumber(((double) pillagesDefended / (coresDestroyed == 0 ? 1 : coresDestroyed)) * 100, 2) + "%";
 
-        final int eventBossesKilled = eventBossesKilledStat.getStat(statContainer, periodKey).intValue();
-        final int dungeonWins = dungeonWinsStat.getStat(statContainer, periodKey).intValue();
-        final int dungeonEnters = dungeonEntersStat.getStat(statContainer, periodKey).intValue();
+        final int eventBossesKilled = eventBossesKilledStat.getStat(statContainer, type, period).intValue();
+        final int dungeonWins = dungeonWinsStat.getStat(statContainer, type, period).intValue();
+        final int dungeonEnters = dungeonEntersStat.getStat(statContainer, type, period).intValue();
         final String dungeonWinRate = UtilFormat.formatNumber(((double) dungeonWins / (dungeonEnters == 0 ? 1 : dungeonEnters)) * 100, 2) + "%";
 
 
@@ -174,6 +178,6 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         IAbstractStatMenu gui = getGui();
         if (gui instanceof IAbstractClansStatMenu) return;
-        new ClansStatMenu(gui.getClient(), gui, gui.getPeriodKey(), gui.getStatPeriodManager()).show(player);
+        new ClansStatMenu(gui.getClient(), gui, gui.getType(), gui.getPeriod(), ClanContext.ALL, gui.getRealmManager()).show(player);
     }
 }

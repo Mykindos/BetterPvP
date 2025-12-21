@@ -5,10 +5,12 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletionsConcurrentHashMap;
 import me.mykindos.betterpvp.core.client.stats.events.IStatMapListener;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.events.WrapStatEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,18 +24,15 @@ import java.util.UUID;
 
 @CustomLog
 public class StatContainer implements Unique, IStatMapListener {
-    /**
-     * The current period of stat collecting
-     */
-    public static final String PERIOD_KEY = JavaPlugin.getPlugin(Core.class).getConfig().getOrSaveString("stats.period", "test");
-
-    public static final String GLOBAL_PERIOD_KEY = "Global";
 
     @Getter
     private final Client client;
 
     @Getter
     private final StatConcurrentHashMap stats = new StatConcurrentHashMap();
+
+    @Getter
+    private final AchievementCompletionsConcurrentHashMap achievementCompletions = new AchievementCompletionsConcurrentHashMap();
     @Getter
     private final Set<IStat> changedStats = new HashSet<>();
 
@@ -48,8 +47,8 @@ public class StatContainer implements Unique, IStatMapListener {
     }
 
     @NotNull
-    public Long getProperty(String period, IStat stat) {
-        return Optional.ofNullable(stats.get(period, stat)).orElse(0L);
+    public Long getProperty(StatFilterType type, @Nullable Period period, IStat stat) {
+        return Optional.ofNullable(stats.get(type, period, stat)).orElse(0L);
     }
 
     public void incrementStat(@Nullable IStat stat, long amount) {
@@ -62,7 +61,7 @@ public class StatContainer implements Unique, IStatMapListener {
             final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(getUniqueId(), stat));
             final IStat wrappedStat = wrapStatEvent.getStat();
             changedStats.add(wrappedStat);
-            this.getStats().increase(StatContainer.PERIOD_KEY, wrappedStat, amount);
+            this.getStats().increase(Core.getCurrentRealm(), wrappedStat, amount);
         }
     }
 
