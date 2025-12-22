@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
 import org.bukkit.NamespacedKey;
@@ -50,23 +51,34 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
         return achievementCompletionRepository.loadForContainer(client.getStatContainer()).thenAccept(
                 completions -> {
                     completions.asMap().values().forEach(completion -> {
-                        updateTotalCompletions(getObject(completion.getKey()).orElseThrow(), completion.getPeriod());
+                        int total = getTotalCompletion(getObject(completion.getKey()).orElseThrow(), completion.getPeriod());
+                        completion.setTotalCompletions(total);
                     });
                     client.getStatContainer().getAchievementCompletions().fromOther(completions);
                 }
         );
     }
 
-    public CompletableFuture<Void> saveCompletion(StatContainer container, IAchievement achievement, Object period) {
+    public CompletableFuture<Void> saveCompletion(StatContainer container, IAchievement achievement, Period period) {
         return achievementCompletionRepository.saveCompletion(container, achievement, period)
                 .thenAccept(achievementCompletion -> {
                     container.getAchievementCompletions().addCompletion(achievementCompletion);
                     updateTotalCompletions(achievement, achievementCompletion.getPeriod());
                 });
-
     }
 
-    public void updateTotalCompletions(IAchievement achievement, Object period) {
+    public int getTotalCompletion(IAchievement achievement, Period period) {
+        return switch (achievement.getAchievementFilterType()) {
+            case ALL ->
+                    totalAllAchievementCompletions.get(achievement.getNamespacedKey());
+            case SEASON ->
+                    totalSeasonCompletions.get((Season) period).get(achievement.getNamespacedKey());
+            case REALM ->
+                    totalRealmCompletions.get((Realm) period).get(achievement.getNamespacedKey());
+        };
+    }
+
+    public void updateTotalCompletions(IAchievement achievement, Period period) {
         int total = 0;
         switch (achievement.getAchievementFilterType()) {
             case ALL ->

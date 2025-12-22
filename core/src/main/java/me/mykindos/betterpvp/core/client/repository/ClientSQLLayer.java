@@ -7,10 +7,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletionRepository;
-import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesRepository;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
@@ -68,10 +65,8 @@ public class ClientSQLLayer {
     private final PropertyMapper propertyMapper;
     private final StatBuilder statBuilder;
     private final RealmManager realmManager;
-    private final AchievementManager achievementManager;
     @Getter
     private final PunishmentRepository punishmentRepository;
-    private final AchievementCompletionRepository achievementCompletionRepository;
 
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedPropertyUpdates;
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedSharedPropertyUpdates;
@@ -80,14 +75,12 @@ public class ClientSQLLayer {
     private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
-    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, StatBuilder statBuilder, RealmManager realmManager, PunishmentRepository punishmentRepository, OfflineMessagesRepository offlineMessagesRepository, AchievementManager achievementManager, AchievementCompletionRepository achievementCompletionRepository) {
+    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, StatBuilder statBuilder, RealmManager realmManager, PunishmentRepository punishmentRepository) {
         this.database = database;
         this.propertyMapper = propertyMapper;
         this.statBuilder = statBuilder;
         this.realmManager = realmManager;
         this.punishmentRepository = punishmentRepository;
-        this.achievementManager = achievementManager;
-        this.achievementCompletionRepository = achievementCompletionRepository;
         this.queuedPropertyUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
         this.queuedSharedPropertyUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
         this.queuedStatUpdates = new AtomicReference<>(new ConcurrentHashMap<>());
@@ -198,7 +191,6 @@ public class ClientSQLLayer {
         CompletableFuture<Set<UUID>> ignoresFuture = CompletableFuture.supplyAsync(() ->
                 getIgnoresForClient(client));
         CompletableFuture<Void> propertiesFuture = loadAllPropertiesConcurrently(client);
-
         CompletableFuture.allOf(punishmentsFuture, ignoresFuture, propertiesFuture).join();
         client.getPunishments().addAll(punishmentsFuture.join());
         client.getIgnores().addAll(ignoresFuture.join());

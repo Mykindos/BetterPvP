@@ -14,11 +14,13 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 public interface IAbstractStatMenu extends Gui, Windowed {
     Client getClient();
@@ -64,7 +66,8 @@ public interface IAbstractStatMenu extends Gui, Windowed {
         return newRealmContexts;
     }
 
-    static SeasonContext getSeasonContext(StatFilterType type, Object period) {
+    @NotNull
+    static SeasonContext getSeasonContext(@NotNull StatFilterType type, @Nullable Period period) {
         if (type == StatFilterType.ALL) {
             return SeasonContext.ALL;
         }
@@ -74,17 +77,18 @@ public interface IAbstractStatMenu extends Gui, Windowed {
         if (period instanceof Realm realm) {
             return new SeasonContext(realm.getSeason());
         }
-        return null;
+        throw new IllegalStateException();
     }
 
-    static RealmContext getRealmContext(StatFilterType type, Object period) {
+    @NotNull
+    static RealmContext getRealmContext(@NotNull StatFilterType type, @Nullable Period period) {
         if (type == StatFilterType.ALL || type == StatFilterType.SEASON) {
             return RealmContext.ALL;
         }
         if (period instanceof Realm realm) {
             return new RealmContext(realm);
         }
-        return null;
+        throw new IllegalStateException();
     }
 
 

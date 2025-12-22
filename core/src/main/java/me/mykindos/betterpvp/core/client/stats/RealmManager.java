@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.stats;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -20,6 +21,7 @@ public class RealmManager extends Manager<Integer, Realm> {
     private final Map<Integer, Season> seasonMap = new HashMap<>();
     private final Multimap<Season, Realm> seasonRealmMap = ArrayListMultimap.create();
 
+    @Inject
     public RealmManager(RealmRepository realmRepository) {
         this.realmRepository = realmRepository;
         objects.putAll(realmRepository.loadAll().join());

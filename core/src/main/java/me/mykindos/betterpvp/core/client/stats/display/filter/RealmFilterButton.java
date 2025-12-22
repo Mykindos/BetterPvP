@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.display.filter;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.menu.button.filter.FilterButton;
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,15 +20,16 @@ public class RealmFilterButton extends FilterButton<IAbstractStatMenu, RealmCont
      * @param displayMaterial the material of the item
      * @param customModelData the custom model data of the item
      */
-    public RealmFilterButton(RealmContext currentContext, List<RealmContext> contexts) {
-        super("Clan", contexts, 9, Material.IRON_DOOR, 0);
+    public RealmFilterButton(@NotNull RealmContext currentContext, List<RealmContext> contexts) {
+        super("Realm", contexts, 9, Material.ANVIL, 0);
         this.setSelectedFilter(currentContext);
         setRefresh(this::onChangeSeason);
     }
 
-    void onSeasonChange(RealmContext currentContext, Collection<RealmContext> newContexts) {
+    void onSeasonChange(@NotNull RealmContext currentContext, Collection<RealmContext> newContexts) {
         this.getContexts().clear();
         this.getContexts().addAll(newContexts);
+        this.getContexts().sort(null);
         this.setSelectedFilter(currentContext);
     }
 

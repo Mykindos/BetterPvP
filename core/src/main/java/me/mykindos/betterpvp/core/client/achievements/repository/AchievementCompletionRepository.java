@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.stats.RealmManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
@@ -156,7 +157,7 @@ public class AchievementCompletionRepository {
                                         container.getClient(),
                                         new NamespacedKey(namespace, key),
                                         StatFilterType.SEASON,
-                                        realmManager.getSeason(season),
+                                        realmManager.getSeason(season).orElseThrow(),
                                         timestamp
                                 );
                                 completions.addCompletion(achievementCompletion);
@@ -186,7 +187,7 @@ public class AchievementCompletionRepository {
                                         container.getClient(),
                                         new NamespacedKey(namespace, key),
                                         StatFilterType.SEASON,
-                                        realmManager.getObject(realm),
+                                        realmManager.getObject(realm).orElseThrow(),
                                         timestamp
                                 );
                                 completions.addCompletion(achievementCompletion);
@@ -342,7 +343,7 @@ public class AchievementCompletionRepository {
 
 
     @NotNull
-    public CompletableFuture<AchievementCompletion> saveCompletion(@NotNull StatContainer container, @NotNull IAchievement achievement, Object period) {
+    public CompletableFuture<AchievementCompletion> saveCompletion(@NotNull StatContainer container, @NotNull IAchievement achievement, Period period) {
         final AchievementCompletion completion = new AchievementCompletion(ID_GENERATOR.nextId(),
                 container.getClient(),
                 achievement.getNamespacedKey(),

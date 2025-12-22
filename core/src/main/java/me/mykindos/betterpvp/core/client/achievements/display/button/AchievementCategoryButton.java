@@ -18,17 +18,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AchievementCategoryButton extends AbstractItem {
     private final IAchievementCategory achievementCategory;
     private final AchievementManager achievementManager;
     private final RealmManager realmManager;
     private final Client client;
+    @NotNull
     private final StatFilterType type;
+    @Nullable
     private final Period period;
     private final Windowed current;
 
-    public AchievementCategoryButton(IAchievementCategory achievementCategory, StatFilterType type, Period period, Client client, AchievementManager achievementManager, RealmManager realmManager, Windowed current) {
+    public AchievementCategoryButton(IAchievementCategory achievementCategory, @NotNull StatFilterType type, @Nullable Period period, Client client, AchievementManager achievementManager, RealmManager realmManager, Windowed current) {
         this.achievementCategory = achievementCategory;
         this.realmManager = realmManager;
         this.achievementManager = achievementManager;
