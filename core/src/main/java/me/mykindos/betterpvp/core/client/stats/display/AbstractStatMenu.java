@@ -12,8 +12,6 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
-import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.server.Period;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -56,12 +54,10 @@ public abstract class AbstractStatMenu extends AbstractGui implements IAbstractS
                 "# x x x x x x x #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
-                "# # # < - > # # #")
+                "# # # # - # # # #")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#',Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new StatBackButton(previous))
-                .addIngredient('>', new PageForwardButton())
                 .addIngredient('S', seasonFilterButton)
                 .addIngredient('R', realmFilterButton);
 
