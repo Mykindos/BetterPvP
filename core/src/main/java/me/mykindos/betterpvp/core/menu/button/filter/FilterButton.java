@@ -62,6 +62,7 @@ public class FilterButton<G extends Gui, Type extends IFilterContext<Type>> exte
         this.customModelData = customModelData;
         this.selected = 0;
         this.selectedFilter = contexts.getFirst();
+        this.contexts.sort(null);
     }
 
     @Override
@@ -74,8 +75,11 @@ public class FilterButton<G extends Gui, Type extends IFilterContext<Type>> exte
     }
 
     public void setSelectedFilter(Type filter) {
+        if (filter == null) return;
         int newSelected = contexts.indexOf(filter);
-        if (newSelected < 0) throw new NoSuchElementException();
+        if (newSelected < 0) {
+            throw new NoSuchElementException("Unknown element " + filter);
+        }
         setSelected(newSelected);
     }
 

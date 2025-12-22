@@ -51,6 +51,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
     private final SeasonFilterButton seasonFilterButton;
     private final RealmFilterButton realmFilterButton;
 
+    @NotNull
     private StatFilterType type;
     private Period period;
 
@@ -58,7 +59,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
         this(client, null, StatFilterType.ALL, null, achievementManager, realmManager, null);
     }
 
-    public AchievementMenu(@NotNull Client client, @Nullable IAchievementCategory achievementCategory, StatFilterType type, Period period, AchievementManager achievementManager, RealmManager realmManager, @Nullable Windowed previous) {
+    public AchievementMenu(@NotNull Client client, @Nullable IAchievementCategory achievementCategory, @NotNull StatFilterType type, @Nullable Period period, AchievementManager achievementManager, RealmManager realmManager, @Nullable Windowed previous) {
         super(9, 6, false, new Structure(
                 "# # # # # # # S R",
                 "# x x x x x x x #",
@@ -77,7 +78,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
                         IAbstractStatMenu.getSeasonContexts(realmManager)))
                 .addIngredient('R', new RealmFilterButton(
                         IAbstractStatMenu.getRealmContext(type, period),
-                        IAbstractStatMenu.getRealmContexts(IAbstractStatMenu.getSeasonContext(type, period) == null ? null : Objects.requireNonNull(IAbstractStatMenu.getSeasonContext(type, period)).getSeason(), realmManager)))
+                        IAbstractStatMenu.getRealmContexts(Objects.requireNonNull(IAbstractStatMenu.getSeasonContext(type, period)).getSeason(), realmManager)))
         );
         if (!(getItem(7, 0) instanceof SeasonFilterButton seasonButton)) throw new IllegalStateException("Item in this slot must be a SeasonFilterButton");
         this.seasonFilterButton = seasonButton;
@@ -89,6 +90,28 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
         this.achievementManager = achievementManager;
         this.achievementCategory = achievementCategory;
         this.previous = previous;
+
+        this.type = type;
+        this.period = period;
+
+        seasonButton.setRefresh(() ->
+                seasonButton.onChangeSeason().thenApply(status -> {
+                    if (status.equals(Boolean.FALSE)) return Boolean.FALSE;
+                    setContent(getItems());
+                    return Boolean.TRUE;
+                })
+        );
+
+        realmButton.setRefresh(() ->
+                realmButton.onChangeSeason().thenApply(status -> {
+                    if (status.equals(Boolean.FALSE)) return Boolean.FALSE;
+                    setContent(getItems());
+                    return Boolean.TRUE;
+                })
+        );
+
+
+
         setContent(getItems());
     }
 
