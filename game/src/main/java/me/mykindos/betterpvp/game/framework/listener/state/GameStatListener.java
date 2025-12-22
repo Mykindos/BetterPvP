@@ -75,15 +75,14 @@ public class GameStatListener extends TimedStatListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(ClientJoinEvent event) {
-        if (serverController.getCurrentState().isInLobby()) {
-            serverController.getLobbyInfo().getPlayerTeams().put(event.getPlayer().getUniqueId(), GameTeamMapStat.NONE_TEAM_NAME);
-            statManager.save(serverController.getLobbyInfo());
-            return;
-        }
 
         assignGameTeam(event.getClient().getUniqueId());
         //we always need to make sure that there is an entry in game_teams for a player,
         //even if the game eventually crashes
+        if (serverController.getCurrentState().isInLobby()) {
+            statManager.save(serverController.getLobbyInfo());
+            return;
+        }
         statManager.save(serverController.getCurrentGame().getGameInfo());
     }
 
@@ -115,6 +114,10 @@ public class GameStatListener extends TimedStatListener {
     }
 
     public void assignGameTeam(UUID id) {
+        if (serverController.getCurrentState().isInLobby()) {
+            serverController.getLobbyInfo().getPlayerTeams().put(id, GameTeamMapStat.NONE_TEAM_NAME);
+            return;
+        }
         final GameInfo gameInfo = serverController.getCurrentGame().getGameInfo();
         if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
             final Team team = teamGame.getPlayerTeam(id);
@@ -157,6 +160,9 @@ public class GameStatListener extends TimedStatListener {
                         mapManager.getWaitingLobby().getMetadata().getName()
                 )
         );
+        playerController.getParticipants().keySet().stream()
+                .map(Player::getUniqueId)
+                .forEach(this::assignGameTeam);
         statManager.save(serverController.getCurrentGameInfo());
     }
 

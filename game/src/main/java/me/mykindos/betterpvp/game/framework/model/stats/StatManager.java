@@ -44,7 +44,7 @@ public class StatManager {
     public GameTeamMapStat.GameTeamMapStatBuilder<?, ?> addGameMapStatElements(@NotNull UUID id, @NotNull GameTeamMapStat.GameTeamMapStatBuilder<?, ?> statBuilder) {
         final GameInfo gameInfo = serverController.getCurrentGameInfo();
         final String gameName = gameInfo.getGameName();
-        final String teamName = gameInfo.getPlayerTeams().get(id);
+        final String teamName = gameInfo.getPlayerTeams().get(id) == null ? GameTeamMapStat.NONE_TEAM_NAME : gameInfo.getPlayerTeams().get(id);
         final String mapName = gameInfo.getMapName();
         final long gameId = gameInfo.getId();
         statBuilder.gameName(gameName);
