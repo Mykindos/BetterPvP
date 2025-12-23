@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.core.menu.button.filter;
 
-public interface IFilterContext<Type> extends Comparable<IFilterContext<Type>>{
+public interface IFilterContext<T> extends Comparable<IFilterContext<T>>{
     /**
      * Get the string representation to show for this object
      * @return the element to display for this object
      */
     String getDisplay();
-    Type getType();
+    T getType();
 }

@@ -15,8 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.concurrent.CompletableFuture;
-
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 

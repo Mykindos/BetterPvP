@@ -1,11 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.model.item;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import lombok.Builder;

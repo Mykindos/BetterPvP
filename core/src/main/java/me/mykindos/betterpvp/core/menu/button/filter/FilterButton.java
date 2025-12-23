@@ -27,18 +27,18 @@ import java.util.function.Supplier;
 
 /**
  * @param <G> the gui
- * @param <Type> the type of the context
+ * @param <T> the type of the context
  */
-public class FilterButton<G extends Gui, Type extends IFilterContext<Type>> extends ControlItem<G> implements IContextFilterButton<Type> {
+public class FilterButton<G extends Gui, T extends IFilterContext<T>> extends ControlItem<G> implements IContextFilterButton<T> {
 
 
     @Getter
-    private final List<Type> contexts;
+    private final List<T> contexts;
     @Setter
     @Nullable
     private Supplier<CompletableFuture<Boolean>> refresh;
     @Getter
-    private Type selectedFilter;
+    private T selectedFilter;
     private int selected;
     private final int numToShow;
     private final String title;
@@ -54,7 +54,7 @@ public class FilterButton<G extends Gui, Type extends IFilterContext<Type>> exte
      * @param displayMaterial the material of the item
      * @param customModelData the custom model data of the item
      */
-    public FilterButton(String title, List<Type> contexts, int numToShow, Material displayMaterial, int customModelData) {
+    public FilterButton(String title, List<T> contexts, int numToShow, Material displayMaterial, int customModelData) {
         this.title = title;
         this.contexts = new ArrayList<>(contexts);
         this.numToShow = numToShow;
@@ -66,7 +66,7 @@ public class FilterButton<G extends Gui, Type extends IFilterContext<Type>> exte
     }
 
     @Override
-    public void add(@NotNull Type newFilter) {
+    public void add(@NotNull T newFilter) {
         if (contexts.contains(newFilter)) {
             return;
         }
@@ -74,7 +74,7 @@ public class FilterButton<G extends Gui, Type extends IFilterContext<Type>> exte
         contexts.sort(null);
     }
 
-    public void setSelectedFilter(Type filter) {
+    public void setSelectedFilter(T filter) {
         if (filter == null) return;
         int newSelected = contexts.indexOf(filter);
         if (newSelected < 0) {

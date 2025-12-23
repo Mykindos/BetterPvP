@@ -4,12 +4,12 @@ import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 
 import java.util.List;
 
-public interface IContextFilterButton<Type extends IFilterContext<Type>> extends IRefreshButton {
-    void add(Type newFilter);
+public interface IContextFilterButton<T extends IFilterContext<T>> extends IRefreshButton {
+    void add(T newFilter);
 
-    List<Type> getContexts();
+    List<T> getContexts();
 
-    Type getSelectedFilter();
+    T getSelectedFilter();
 
-    void setSelectedFilter(Type selectedFilter);
+    void setSelectedFilter(T selectedFilter);
 }
