@@ -36,10 +36,6 @@ public class BossStat implements IBuildableStat {
         return builder.build();
     }
 
-    private static BossStatBuilder parseName(BossStatBuilder builder, String input) {
-        return builder.bossName(input);
-    }
-
     @NotNull
     private Action action;
 

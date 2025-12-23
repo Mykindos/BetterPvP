@@ -30,12 +30,12 @@ import java.util.Objects;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DamageStat implements IBuildableStat {
-    public static final String TYPE = "DAMAGE";
+    public static final String STAT_TYPE = "DAMAGE";
     private static final DamageCauseRegistry damageCauseRegistry = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(DamageCauseRegistry.class);
 
     public static DamageStat fromData(String statType, JSONObject data) {
         DamageStat.DamageStatBuilder builder = builder();
-        Preconditions.checkArgument(statType.equals(TYPE));
+        Preconditions.checkArgument(statType.equals(STAT_TYPE));
         builder.relation(Relation.valueOf(data.getString("relation")));
         builder.type(Type.valueOf(data.getString("type")));
         builder.damageCause(damageCauseRegistry.get(data.getString("damageCause")));
@@ -66,7 +66,7 @@ public class DamageStat implements IBuildableStat {
 
     @Override
     public @NotNull String getStatType() {
-        return TYPE;
+        return STAT_TYPE;
     }
 
     /**

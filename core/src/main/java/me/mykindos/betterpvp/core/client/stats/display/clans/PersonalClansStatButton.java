@@ -128,6 +128,6 @@ public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu>
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-
+        //doesn't show a menu
     }
 }

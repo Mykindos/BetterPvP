@@ -43,7 +43,6 @@ import java.util.Objects;
 @CustomLog
 public class ClanCoreCrystalListener extends ClanListener implements Listener {
 
-    private final ClanManager clanManager;
     private final ItemFactory itemFactory;
 
     @Inject
@@ -61,7 +60,6 @@ public class ClanCoreCrystalListener extends ClanListener implements Listener {
     @Inject
     public ClanCoreCrystalListener(final ClanManager clanManager, final ClientManager clientManager, ItemFactory itemFactory) {
         super(clanManager, clientManager);
-        this.clanManager = clanManager;
         this.itemFactory = itemFactory;
     }
 

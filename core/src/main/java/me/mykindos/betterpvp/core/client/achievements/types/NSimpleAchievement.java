@@ -36,12 +36,17 @@ public abstract class NSimpleAchievement extends Achievement {
     public float getPercentComplete(StatContainer container, StatFilterType type, @Nullable Period period) {
 
         //todo abstract getting this property map
+        Map<IStat, Long> propertyMap = getPropertyMap(container, type, period);
+        return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
+    }
+
+    public Map<IStat, Long> getPropertyMap(StatContainer container, StatFilterType type, @Nullable Period period) {
         Map<IStat, Long> propertyMap = new HashMap<>();
         for (IStat stat : getWatchedStats()) {
             Long value = getValue(container, stat, type, period);
             propertyMap.put(stat, value);
         }
-        return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
+        return propertyMap;
     }
 
     @Override
@@ -73,15 +78,4 @@ public abstract class NSimpleAchievement extends Achievement {
         long current = getValue(statContainer, iStat);
         return (float) Math.clamp((double) current /goal, 0.0, 1.0);
     }
-
-    /* //TODO
-    @Override
-    protected List<Component> getProgressComponent(T container) {
-        C current = getProperty(container);
-        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container));
-        Component bar = progressComponent.getFirst();
-        progressComponent.removeFirst();
-        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", current, goal)));
-        return progressComponent;
-    }*/
 }

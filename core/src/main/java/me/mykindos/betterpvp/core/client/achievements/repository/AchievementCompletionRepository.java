@@ -117,11 +117,11 @@ public class AchievementCompletionRepository {
                     .from(ACHIEVEMENT_COMPLETIONS_ALL)
                     .where(ACHIEVEMENT_COMPLETIONS_ALL.CLIENT.eq(container.getClient().getId()))
                     .fetch()
-                    .forEach(record -> {
-                                final long completionId = record.get(ACHIEVEMENT_COMPLETIONS_ALL.ID);
-                                final String namespace = record.get(ACHIEVEMENT_COMPLETIONS_ALL.NAMESPACE);
-                                final String key = record.get(ACHIEVEMENT_COMPLETIONS_ALL.KEYNAME);
-                                final LocalDateTime timestamp = record.get(ACHIEVEMENT_COMPLETIONS_ALL.TIMESTAMP);
+                    .forEach(rec -> {
+                                final long completionId = rec.get(ACHIEVEMENT_COMPLETIONS_ALL.ID);
+                                final String namespace = rec.get(ACHIEVEMENT_COMPLETIONS_ALL.NAMESPACE);
+                                final String key = rec.get(ACHIEVEMENT_COMPLETIONS_ALL.KEYNAME);
+                                final LocalDateTime timestamp = rec.get(ACHIEVEMENT_COMPLETIONS_ALL.TIMESTAMP);
                                 final AchievementCompletion achievementCompletion = new AchievementCompletion(completionId,
                                         container.getClient(),
                                         new NamespacedKey(namespace, key),
@@ -147,12 +147,12 @@ public class AchievementCompletionRepository {
                     .from(ACHIEVEMENT_COMPLETIONS_SEASON)
                     .where(ACHIEVEMENT_COMPLETIONS_SEASON.CLIENT.eq(container.getClient().getId()))
                     .fetch()
-                    .forEach(record -> {
-                                final long completionId = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.ID);
-                                final String namespace = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.NAMESPACE);
-                                final int season = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.SEASON);
-                                final String key = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.KEYNAME);
-                                final LocalDateTime timestamp = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.TIMESTAMP);
+                    .forEach(rec -> {
+                                final long completionId = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.ID);
+                                final String namespace = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.NAMESPACE);
+                                final int season = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.SEASON);
+                                final String key = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.KEYNAME);
+                                final LocalDateTime timestamp = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.TIMESTAMP);
                                 final AchievementCompletion achievementCompletion = new AchievementCompletion(completionId,
                                         container.getClient(),
                                         new NamespacedKey(namespace, key),
@@ -177,12 +177,12 @@ public class AchievementCompletionRepository {
                     .from(ACHIEVEMENT_COMPLETIONS_REALM)
                     .where(ACHIEVEMENT_COMPLETIONS_REALM.CLIENT.eq(container.getClient().getId()))
                     .fetch()
-                    .forEach(record -> {
-                                final long completionId = record.get(ACHIEVEMENT_COMPLETIONS_REALM.ID);
-                                final String namespace = record.get(ACHIEVEMENT_COMPLETIONS_REALM.NAMESPACE);
-                                final int realm = record.get(ACHIEVEMENT_COMPLETIONS_REALM.REALM);
-                                final String key = record.get(ACHIEVEMENT_COMPLETIONS_REALM.KEYNAME);
-                                final LocalDateTime timestamp = record.get(ACHIEVEMENT_COMPLETIONS_REALM.TIMESTAMP);
+                    .forEach(rec -> {
+                                final long completionId = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.ID);
+                                final String namespace = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.NAMESPACE);
+                                final int realm = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.REALM);
+                                final String key = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.KEYNAME);
+                                final LocalDateTime timestamp = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.TIMESTAMP);
                                 final AchievementCompletion achievementCompletion = new AchievementCompletion(completionId,
                                         container.getClient(),
                                         new NamespacedKey(namespace, key),
@@ -251,11 +251,11 @@ public class AchievementCompletionRepository {
                                     )
                                     .from(ALL)
                                     .fetch();
-                    result.forEach(record -> {
-                        final String namespace = record.get(namespaceField);
-                        final String keyName = record.get(keynameField);
+                    result.forEach(rec -> {
+                        final String namespace = rec.get(namespaceField);
+                        final String keyName = rec.get(keynameField);
                         final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyName);
-                        final int rank = record.get(rankField);
+                        final int rank = rec.get(rankField);
                         completionMap.get(namespacedKey).setCompletedRank(rank);
                     });
                     return completions;
