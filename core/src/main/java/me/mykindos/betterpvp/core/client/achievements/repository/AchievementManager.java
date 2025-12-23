@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentMap;
 
 @Singleton
 @CustomLog
-//todo proper async handling (and in repository)
 public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
 
     @Getter
