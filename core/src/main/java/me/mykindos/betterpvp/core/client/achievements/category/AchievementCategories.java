@@ -6,7 +6,7 @@ public class AchievementCategories {
 
     private AchievementCategories() {
     }
-    //todo list of specific namespace keys for categories
+
     public static final NamespacedKey COMBAT_CATEGORY = new NamespacedKey("core", "combat_category");
     public static final NamespacedKey DEATH_TYPE = new NamespacedKey("core", "death_category");
 

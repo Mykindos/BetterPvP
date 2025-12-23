@@ -134,7 +134,6 @@ public class ChampionsSkillStat implements IBuildableStat {
     @Override
     public boolean isSavable() {
         if (action == Action.EQUIP) {
-            //todo this might not be true anymore
             return skillName != null;
         }
         return level != -1 && skillName != null;

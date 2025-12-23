@@ -49,7 +49,7 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                 .clanName(clanName)
                 .clanId(clanId);
 
-        //todo manually put normal event bosses i.e. dreadbeard
+        //todo manually put normal dungeons
         final ClanWrapperStat dungeonEntersStat = clanStatBuilder
                 .wrappedStat(DungeonNativeStat.builder()
                         .action(DungeonNativeStat.Action.ENTER)
