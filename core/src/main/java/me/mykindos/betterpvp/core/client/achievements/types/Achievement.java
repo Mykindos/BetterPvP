@@ -41,7 +41,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * todo
+ * Represents an Achievement. Achievements are for a certain period (ALL, meaning stats across all realms,
+ * SEASON, stats across all realms that have a speicific season, and REALM, for the specific realm
  */
 @CustomLog
 public abstract class Achievement implements IAchievement, Listener, IStat {
@@ -76,7 +77,6 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         this.watchedStats.addAll(Arrays.stream(watchedStats).toList());
     }
 
-    //todo this logic might need to change
     protected Long getValue(StatContainer container, IStat stat, StatFilterType type, @Nullable("When type is ALL") Period period) {
         return stat.getStat(container, type, period);
     }
@@ -154,7 +154,6 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         this.enabled = config.getOrSaveBoolean(basePath + getPath("enabled"), true);
         this.notifyThresholds = config.getOrSaveFloatList(basePath + getPath("notifyThresholds"), List.of(0.50f, 0.90f));
         this.doRewards = config.getOrSaveBoolean(basePath + getPath("doRewards"), true);
-        //todo load basic information
     }
 
     protected String getPath(String key) {
