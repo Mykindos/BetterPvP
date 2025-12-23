@@ -23,13 +23,6 @@ public enum ClientStat implements IClientStat {
     REGENERATION_EFFECT_FROM_OTHERS("Healing received from others by regeneration", "Healing by regeneration from other sources"),
     REGENERATION_EFFECT_SELF("Healing self with regeneration", "Healing yourself with the regeneration effect"),
 
-    HEALING_DEALT("Healing Dealt",
-            Set.of(
-                    REGENERATION_EFFECT_TO_OTHERS,
-                    REGENERATION_EFFECT_SELF
-            ), //todo include all healing sources
-            "All Healing you have ever done"),
-
     TIME_PLAYED("Time Played", Material.CLOCK, 0, false, "Time spent playing"),
 
     //champions
@@ -99,8 +92,29 @@ public enum ClientStat implements IClientStat {
     CLANS_CLAN_JOIN("Join Clan", "Number of times you joined a Clan"),
     CLANS_CLAN_CREATE("Create Clan", "Number of Clans you created"),
 
+    HEALING_DEALT("Healing Dealt",
+            Set.of(
+                    REGENERATION_EFFECT_TO_OTHERS,
+                    REGENERATION_EFFECT_SELF,
+                    HEAL_DEALT_DEFENSIVE_AURA,
+                    HEAL_SELF_DEFENSIVE_AURA,
+                    HEAL_RECALL,
+                    HEAL_BLOODLUST,
+                    HEAL_FORTITUDE,
+                    HEAL_RIPOSTE,
+                    HEAL_DEALT_BIOTIC_QUIVER,
+                    HEAL_SELF_BIOTIC_QUIVER,
+                    HEAL_VITALITY_SPORES,
+                    HEAL_CLONE,
+                    HEAL_SIPHON,
+                    HEAL_LEECH,
+                    HEAL_WREATH,
+                    HEAL_SCYTHE
+                    ),
+            "All Healing you have ever done"),
+
     //events
-    //todo undead city keys collected/chests opened
+    //todo undead city keys collected
 
     //EVENT_UNDEAD_CITY_SPAWN_KEY("Spawn Keys", "Cause keys to drop"),
     EVENT_UNDEAD_CITY_OPEN_CHEST("Open Chest", "Amount of chests you opened");
@@ -213,7 +227,7 @@ public enum ClientStat implements IClientStat {
      */
     @Override
     public @NotNull IStat getGenericStat() {
-        //todo add a way to get set composite parents
+        //todo add a way to get set composite parents like i.e. HEALING_DEALT for REGENERATION_EFFECT_TO_OTHERS ??
         return this;
     }
 }

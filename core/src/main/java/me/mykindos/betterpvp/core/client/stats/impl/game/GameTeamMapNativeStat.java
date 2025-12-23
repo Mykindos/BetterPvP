@@ -159,7 +159,6 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
     public boolean containsStat(IStat otherStat) {
         if (!(otherStat instanceof GameTeamMapNativeStat other)) return false;
         if (!action.equals(other.action)) return false;
-        //TODO check the logic here
         if (!Strings.isNullOrEmpty(gameName) && !gameName.equals(other.gameName)) return false;
         if (!Strings.isNullOrEmpty(teamName) && !teamName.equals(other.teamName)) return false;
         if (!Strings.isNullOrEmpty(mapName) && !mapName.equals(other.mapName)) return false;
@@ -214,6 +213,6 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         LOSS,
         MATCHES_PLAYED,
 
-        RESTOCK//todo
+        RESTOCK //todo add to gui
     }
 }

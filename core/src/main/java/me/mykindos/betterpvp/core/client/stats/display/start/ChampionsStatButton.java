@@ -143,6 +143,5 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final IAbstractStatMenu gui = getGui();
         new ChampionsGameStatMenu(gui.getClient(), gui, gui.getType(), gui.getPeriod(), gui.getRealmManager()).show(player);
-        //todo
     }
 }
