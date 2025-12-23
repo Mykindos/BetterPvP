@@ -1,8 +1,11 @@
 package me.mykindos.betterpvp.core.client.stats.display;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StatFormatterUtility {
 
     public static Component formatStat(String title, Object value) {

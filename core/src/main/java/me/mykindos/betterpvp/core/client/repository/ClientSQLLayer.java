@@ -273,12 +273,12 @@ public class ClientSQLLayer {
         return database.getAsyncDslContext().executeAsyncVoid(context -> {
             final StatConcurrentHashMap tempMap = new StatConcurrentHashMap();
             GET_CLIENT_STATS(context.configuration(), client.getId())
-                    .forEach(record -> {
-                        final int realm = record.getRealm();
-                        final String statType = record.getStattype();
-                        final JSONObject statData = new JSONObject(record.getData().toString());
+                    .forEach(rec -> {
+                        final int realm = rec.getRealm();
+                        final String statType = rec.getStattype();
+                        final JSONObject statData = new JSONObject(rec.getData().toString());
                         final IStat stat = statBuilder.getStatForStatData(statType, statData);
-                        final long value = record.get(CLIENT_STATS.STAT);
+                        final long value = rec.get(CLIENT_STATS.STAT);
                         try {
                             tempMap.put(realmManager.getObject(realm).orElseThrow(), stat, value, true);
                         } catch (Exception e) {

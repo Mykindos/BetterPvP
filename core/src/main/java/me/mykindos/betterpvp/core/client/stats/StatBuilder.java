@@ -54,52 +54,53 @@ public class StatBuilder {
         }
         try {
             return ClientStat.valueOf(statType);
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException e) {
+            log.warn("No stat found for {} {}", statType, data.toString()).submit();
+            return new IStat() {
+                @Override
+                public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period object) {
+                    return statContainer.getProperty(type, object, this);
+                }
+
+                @Override
+                public @NotNull String getStatType() {
+                    return statType;
+                }
+
+                /**
+                 * Get the jsonb data in string format for this object
+                 *
+                 * @return
+                 */
+                @Override
+                public @Nullable JSONObject getJsonData() {
+                    return data;
+                }
+
+                @Override
+                public boolean isSavable() {
+                    return true;
+                }
+
+                @Override
+                public boolean containsStat(IStat otherStat) {
+                    return this.equals(otherStat);
+                }
+
+                /**
+                 * <p>Get the generic stat that includes this stat.</p>
+                 * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+                 *
+                 * @return the generic stat
+                 */
+                @Override
+                public @NotNull IStat getGenericStat() {
+                    return this;
+                }
+            };
         }
 
-        log.warn("No stat found for {} {}", statType, data.toString()).submit();
-        return new IStat() {
-            @Override
-            public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period object) {
-                return statContainer.getProperty(type, object, this);
-            }
 
-            @Override
-            public @NotNull String getStatType() {
-                return statType;
-            }
-
-            /**
-             * Get the jsonb data in string format for this object
-             *
-             * @return
-             */
-            @Override
-            public @Nullable JSONObject getJsonData() {
-                return data;
-            }
-
-            @Override
-            public boolean isSavable() {
-                return true;
-            }
-
-            @Override
-            public boolean containsStat(IStat otherStat) {
-                return this.equals(otherStat);
-            }
-
-            /**
-             * <p>Get the generic stat that includes this stat.</p>
-             * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
-             *
-             * @return the generic stat
-             */
-            @Override
-            public @NotNull IStat getGenericStat() {
-                return this;
-            }
-        };
 
     }
 
