@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.clans.logging.button.ClanKillLogButton;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
@@ -69,7 +70,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
             refreshButton.setRefresh(this::refresh);
         }
 
-        if (getItem(7, 0) instanceof StringFilterButton filterButton) {
+        if (getItem(7, 0) instanceof StringFilterButton<? extends Gui> filterButton) {
             this.categoryButton = filterButton;
             filterButton.setRefresh(this::refresh);
         }
