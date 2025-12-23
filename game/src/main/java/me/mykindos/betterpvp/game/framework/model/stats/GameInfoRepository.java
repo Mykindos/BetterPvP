@@ -42,11 +42,11 @@ public class GameInfoRepository implements IRepository<GameInfo> {
                             .onConflictDoNothing()
             );
             object.getPlayerTeams().forEach((uuid, teamName) -> {
-                final long client_id = clientManager.search().offline(uuid).join().orElseThrow().getId();
+                final long clientId = clientManager.search().offline(uuid).join().orElseThrow().getId();
                 queries.add(
                         context.insertInto(GAME_TEAMS)
                                 .set(GAME_TEAMS.ID, object.getId())
-                                .set(GAME_TEAMS.CLIENT, client_id)
+                                .set(GAME_TEAMS.CLIENT, clientId)
                                 .set(GAME_TEAMS.TEAM, teamName)
                                 .onDuplicateKeyUpdate()
                                 .set(GAME_TEAMS.TEAM, teamName)

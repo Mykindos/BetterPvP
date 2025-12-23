@@ -200,7 +200,7 @@ public class AchievementCompletionRepository {
     public CompletableFuture<AchievementCompletionsConcurrentHashMap> loadCompletionRanks(StatContainer statContainer, AchievementCompletionsConcurrentHashMap completions) {
         return database.getAsyncDslContext().executeAsync(context -> {
             Map<NamespacedKey, AchievementCompletion> completionMap = completions.asMap();
-                    Table<Record3<String, String, LocalDateTime>> ALL =
+                    Table<Record3<String, String, LocalDateTime>> all =
                             DSL.select(
                                             ACHIEVEMENT_COMPLETIONS_ALL.NAMESPACE,
                                             ACHIEVEMENT_COMPLETIONS_ALL.KEYNAME,
@@ -233,15 +233,15 @@ public class AchievementCompletionRepository {
                             DSL.rowNumber()
                                     .over(
                                             DSL.partitionBy(
-                                                            ALL.field("Namespace"),
-                                                            ALL.field("Keyname")
+                                                            all.field("Namespace"),
+                                                            all.field("Keyname")
                                                     )
-                                                    .orderBy(ALL.field("Timestamp"))
+                                                    .orderBy(all.field("Timestamp"))
                                     )
                                     .minus(DSL.inline(1))
                                     .as("rank");
-                   Field<String> namespaceField = ALL.field("Namespace", String.class);
-                   Field<String> keynameField = ALL.field("Keyname", String.class);
+                   Field<String> namespaceField = all.field("Namespace", String.class);
+                   Field<String> keynameField = all.field("Keyname", String.class);
 
                     Result<Record3<String, String, Integer>> result =
                             context.select(
@@ -249,7 +249,7 @@ public class AchievementCompletionRepository {
                                             keynameField,
                                             rankField
                                     )
-                                    .from(ALL)
+                                    .from(all)
                                     .fetch();
                     result.forEach(rec -> {
                         final String namespace = rec.get(namespaceField);
@@ -274,10 +274,10 @@ public class AchievementCompletionRepository {
                             ACHIEVEMENT_COMPLETIONS_SEASON.NAMESPACE,
                             ACHIEVEMENT_COMPLETIONS_SEASON.KEYNAME
                     ).fetch()
-                    .forEach(record -> {
-                        final String namespace = record.get(ACHIEVEMENT_COMPLETIONS_ALL.NAMESPACE);
-                        final String keyname = record.get(ACHIEVEMENT_COMPLETIONS_ALL.KEYNAME);
-                        final int numCompletions = record.get(totalCompletions);
+                    .forEach(rec -> {
+                        final String namespace = rec.get(ACHIEVEMENT_COMPLETIONS_ALL.NAMESPACE);
+                        final String keyname = rec.get(ACHIEVEMENT_COMPLETIONS_ALL.KEYNAME);
+                        final int numCompletions = rec.get(totalCompletions);
                         final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
                         completions.put(namespacedKey, numCompletions);
                     });
@@ -299,11 +299,11 @@ public class AchievementCompletionRepository {
                             ACHIEVEMENT_COMPLETIONS_SEASON.NAMESPACE,
                             ACHIEVEMENT_COMPLETIONS_SEASON.KEYNAME
                     ).fetch()
-                    .forEach(record -> {
-                        final int season = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.SEASON);
-                        final String namespace = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.NAMESPACE);
-                        final String keyname = record.get(ACHIEVEMENT_COMPLETIONS_SEASON.KEYNAME);
-                        final int numCompletions = record.get(totalCompletions);
+                    .forEach(rec -> {
+                        final int season = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.SEASON);
+                        final String namespace = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.NAMESPACE);
+                        final String keyname = rec.get(ACHIEVEMENT_COMPLETIONS_SEASON.KEYNAME);
+                        final int numCompletions = rec.get(totalCompletions);
                         final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
                         completions.computeIfAbsent(realmManager.getSeason(season).orElseThrow(), (k) ->
                             new ConcurrentHashMap<>()
@@ -327,11 +327,11 @@ public class AchievementCompletionRepository {
                             ACHIEVEMENT_COMPLETIONS_REALM.NAMESPACE,
                             ACHIEVEMENT_COMPLETIONS_REALM.KEYNAME
                     ).fetch()
-                    .forEach(record -> {
-                        final int realm = record.get(ACHIEVEMENT_COMPLETIONS_REALM.REALM);
-                        final String namespace = record.get(ACHIEVEMENT_COMPLETIONS_REALM.NAMESPACE);
-                        final String keyname = record.get(ACHIEVEMENT_COMPLETIONS_REALM.KEYNAME);
-                        final int numCompletions = record.get(totalCompletions);
+                    .forEach(rec -> {
+                        final int realm = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.REALM);
+                        final String namespace = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.NAMESPACE);
+                        final String keyname = rec.get(ACHIEVEMENT_COMPLETIONS_REALM.KEYNAME);
+                        final int numCompletions = rec.get(totalCompletions);
                         final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
                         completions.computeIfAbsent(realmManager.getObject(realm).orElseThrow(), (k) ->
                                 new ConcurrentHashMap<>()
