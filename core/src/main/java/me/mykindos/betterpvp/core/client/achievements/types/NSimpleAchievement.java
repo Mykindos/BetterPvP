@@ -34,8 +34,6 @@ public abstract class NSimpleAchievement extends Achievement {
 
     @Override
     public float getPercentComplete(StatContainer container, StatFilterType type, @Nullable Period period) {
-
-        //todo abstract getting this property map
         Map<IStat, Long> propertyMap = getPropertyMap(container, type, period);
         return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
     }

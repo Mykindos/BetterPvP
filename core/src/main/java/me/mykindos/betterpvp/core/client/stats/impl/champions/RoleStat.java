@@ -124,7 +124,6 @@ public class RoleStat implements IBuildableStat {
     }
 
     public enum Action {
-        //todo formatter
         TIME_PLAYED,
         EQUIP
     }

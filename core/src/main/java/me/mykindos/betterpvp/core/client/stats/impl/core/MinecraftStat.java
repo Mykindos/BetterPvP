@@ -30,7 +30,6 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class MinecraftStat implements IBuildableStat {
-    //todo convert to parser
     public static final String TYPE = "MINECRAFT";
 
     /**
