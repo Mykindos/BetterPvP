@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.listener.loader;
 
 import com.google.inject.Inject;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
