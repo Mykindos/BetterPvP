@@ -45,8 +45,8 @@ public class SupabaseLootTableLoader implements LootTableLoader {
     }
 
     public void reloadCredentials() {
-        this.supabaseUrl = plugin.getConfig("config").getString("core.database.supabase.url", "https://abcdefghijklmnop.supabase.co");
-        this.supabaseKey = plugin.getConfig("config").getString("core.database.supabase.anon-key", "my-supabase-anon-key");
+        this.supabaseUrl = plugin.getConfig("config").getString("core.database.supabase.url", "");
+        this.supabaseKey = plugin.getConfig("config").getString("core.database.supabase.anon-key", "");
     }
 
     /**

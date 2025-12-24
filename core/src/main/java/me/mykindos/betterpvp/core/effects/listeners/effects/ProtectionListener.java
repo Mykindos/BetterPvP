@@ -158,6 +158,7 @@ public class ProtectionListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEffectReceive(EffectReceiveEvent event) {
         if (!(event.getTarget() instanceof final Player target)) return;
+        if(!event.getEffect().getEffectType().isNegative()) return;
         WeakReference<LivingEntity> applierRef = event.getEffect().getApplier();
         if(applierRef != null) {
             LivingEntity applier = applierRef.get();
