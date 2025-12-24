@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.progression.profession.fishing.fish;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -58,6 +57,7 @@ public class Fish implements FishingLoot {
                 UtilItem.reserveItem(item, event.getPlayer(), 10);
                 // For some reason the entity doesnt have the correct velocity at the time of execution, wait 1 tick.
                 UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> item.setVelocity(entity.getVelocity()), 1);
+                UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), item::remove, 20L * 30L); // Despawn fish after 30 seconds
 
             }
 
