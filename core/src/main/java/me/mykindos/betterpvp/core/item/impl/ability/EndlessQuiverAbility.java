@@ -72,6 +72,7 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -192,10 +193,10 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
 
         // If it has endless quiver and the old one doesn't, take their arrows
         // If it doesn't have endless quiver and the new one does, refund arrows
-        final ItemInstance oldItem = itemFactory.fromItemStack(event.getOldItemStack()).orElseThrow();
-        final ItemInstance newItem = itemFactory.fromItemStack(event.getNewItemStack()).orElseThrow();
+        final Optional<ItemInstance> oldItemOpt = itemFactory.fromItemStack(event.getOldItemStack());
+        final ItemInstance newItem = itemFactory.fromItemStack(event.getNewItemStack()).orElseThrow(() -> new NoSuchElementException("No such element for new itemstack " + event.getNewItemStack()));
 
-        final Optional<AbilityContainerComponent> oldContainerOpt = oldItem.getComponent(AbilityContainerComponent.class);
+        final Optional<AbilityContainerComponent> oldContainerOpt = oldItemOpt.isEmpty() ? Optional.empty() : oldItemOpt.get().getComponent(AbilityContainerComponent.class);
         boolean oldHasEndlessQuiver = oldContainerOpt.isPresent() && oldContainerOpt.get().getAbilities().contains(this);
 
         final Optional<AbilityContainerComponent> newContainerOpt = newItem.getComponent(AbilityContainerComponent.class);
