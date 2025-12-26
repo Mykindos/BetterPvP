@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import org.bukkit.Location;
 
 public class VillagerShopkeeper extends StandardShopkeeper {

@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import org.bukkit.Location;
 
 

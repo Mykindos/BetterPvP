@@ -51,7 +51,7 @@ public class CoreWorldListener implements Listener {
     public CoreWorldListener(ClientManager clientManager, WorldHandler worldHandler) {
         this.clientManager = clientManager;
         this.worldHandler = worldHandler;
-        ((CraftServer) Bukkit.getServer()).getServer().setFlightAllowed(true);
+        ((CraftServer) Bukkit.getServer()).getServer().setAllowFlight(true);
 
 
         GlobalConfiguration paperConfig = GlobalConfiguration.get();

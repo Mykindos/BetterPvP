@@ -43,7 +43,7 @@ dependencyResolutionManagement {
         create("libs") {
             // Versions
             version("kotlin", "2.1.0")
-            version("paper", "1.21.8-R0.1-SNAPSHOT")
+            version("paper", "1.21.11-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-SNAPSHOT")
             version("jackson", "2.17.2")
             version("mineplex", "1.21.4")
@@ -122,8 +122,8 @@ dependencyResolutionManagement {
             library("sidebar-packetevents", "net.megavex", "scoreboard-library-packetevents").versionRef("sidebar")
 
             // Library - WorldEdit
-            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")
-            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
+            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.14.2")
+            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.14.2")
 
             // Library - Mythic
             library("mythic", "io.lumine", "Mythic-Dist").version("5.9.5")

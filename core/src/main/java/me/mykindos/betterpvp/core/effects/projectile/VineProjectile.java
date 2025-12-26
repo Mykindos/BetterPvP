@@ -92,7 +92,7 @@ public class VineProjectile extends ReturningLinkProjectile {
     protected Display createLink(double height) {
         final Location location = lead.getLocation();
         return location.getWorld().spawn(location, BlockDisplay.class, spawned -> {
-            spawned.setBlock(Material.CHAIN.createBlockData());
+            spawned.setBlock(Material.IRON_CHAIN.createBlockData());
             spawned.setGlowing(false);
 
             Transformation transformation = spawned.getTransformation();

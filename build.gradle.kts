@@ -103,8 +103,6 @@ subprojects {
 
     }
 
-
-
 }
 
 sonar {

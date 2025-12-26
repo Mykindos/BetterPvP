@@ -40,7 +40,7 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
         ((ItemDisplay) lead).setItemStack(swordItem);
 
         final Collection<Player> receivers = location.getNearbyPlayers(60);
-        final BlockData data = Material.CHAIN.createBlockData();
+        final BlockData data = Material.IRON_CHAIN.createBlockData();
         for (Location point : interpolateLine()) {
             Particle.BLOCK.builder()
                     .count(3)
@@ -77,7 +77,7 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
     protected Display createLink(double height) {
         final Location location = lead.getLocation();
         return location.getWorld().spawn(location, BlockDisplay.class, spawned -> {
-            spawned.setBlock(Material.CHAIN.createBlockData());
+            spawned.setBlock(Material.IRON_CHAIN.createBlockData());
             spawned.setGlowing(false);
 
             Transformation transformation = spawned.getTransformation();
