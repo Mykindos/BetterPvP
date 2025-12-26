@@ -4,15 +4,22 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsAll;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameData;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams;
 import me.mykindos.betterpvp.core.database.jooq.tables.GamerProperties;
+import me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetCombatData;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetLogMessagesByContextAndAction;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetLogMessagesByContextAndValue;
@@ -33,11 +40,13 @@ import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
+import me.mykindos.betterpvp.core.database.jooq.tables.Seasons;
 import me.mykindos.betterpvp.core.database.jooq.tables.Servers;
 import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GetClientStatsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetCombatDataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetLogMessagesByContextAndActionRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetLogMessagesByContextAndValueRecord;
@@ -74,6 +83,21 @@ public class Public extends SchemaImpl {
     public static final Public PUBLIC = new Public();
 
     /**
+     * The table <code>public.achievement_completions_all</code>.
+     */
+    public final AchievementCompletionsAll ACHIEVEMENT_COMPLETIONS_ALL = AchievementCompletionsAll.ACHIEVEMENT_COMPLETIONS_ALL;
+
+    /**
+     * The table <code>public.achievement_completions_realm</code>.
+     */
+    public final AchievementCompletionsRealm ACHIEVEMENT_COMPLETIONS_REALM = AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM;
+
+    /**
+     * The table <code>public.achievement_completions_season</code>.
+     */
+    public final AchievementCompletionsSeason ACHIEVEMENT_COMPLETIONS_SEASON = AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON;
+
+    /**
      * The table <code>public.armour</code>.
      */
     public final Armour ARMOUR = Armour.ARMOUR;
@@ -99,6 +123,11 @@ public class Public extends SchemaImpl {
     public final ClientRewards CLIENT_REWARDS = ClientRewards.CLIENT_REWARDS;
 
     /**
+     * The table <code>public.client_stats</code>.
+     */
+    public final ClientStats CLIENT_STATS = ClientStats.CLIENT_STATS;
+
+    /**
      * The table <code>public.clients</code>.
      */
     public final Clients CLIENTS = Clients.CLIENTS;
@@ -114,9 +143,58 @@ public class Public extends SchemaImpl {
     public final FilteredWords FILTERED_WORDS = FilteredWords.FILTERED_WORDS;
 
     /**
+     * The table <code>public.game_data</code>.
+     */
+    public final GameData GAME_DATA = GameData.GAME_DATA;
+
+    /**
+     * The table <code>public.game_teams</code>.
+     */
+    public final GameTeams GAME_TEAMS = GameTeams.GAME_TEAMS;
+
+    /**
      * The table <code>public.gamer_properties</code>.
      */
     public final GamerProperties GAMER_PROPERTIES = GamerProperties.GAMER_PROPERTIES;
+
+    /**
+     * The table <code>public.get_client_stats</code>.
+     */
+    public final GetClientStats GET_CLIENT_STATS = GetClientStats.GET_CLIENT_STATS;
+
+    /**
+     * Call <code>public.get_client_stats</code>.
+     */
+    public static Result<GetClientStatsRecord> GET_CLIENT_STATS(
+          Configuration configuration
+        , Long clientParam
+    ) {
+        return configuration.dsl().selectFrom(me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+              clientParam
+        )).fetch();
+    }
+
+    /**
+     * Get <code>public.get_client_stats</code> as a table.
+     */
+    public static GetClientStats GET_CLIENT_STATS(
+          Long clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+            clientParam
+        );
+    }
+
+    /**
+     * Get <code>public.get_client_stats</code> as a table.
+     */
+    public static GetClientStats GET_CLIENT_STATS(
+          Field<Long> clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats.GET_CLIENT_STATS.call(
+            clientParam
+        );
+    }
 
     /**
      * The table <code>public.get_combat_data</code>.
@@ -709,6 +787,11 @@ public class Public extends SchemaImpl {
     public final Realms REALMS = Realms.REALMS;
 
     /**
+     * The table <code>public.seasons</code>.
+     */
+    public final Seasons SEASONS = Seasons.SEASONS;
+
+    /**
      * The table <code>public.servers</code>.
      */
     public final Servers SERVERS = Servers.SERVERS;
@@ -749,15 +832,22 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            AchievementCompletionsAll.ACHIEVEMENT_COMPLETIONS_ALL,
+            AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM,
+            AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON,
             Armour.ARMOUR,
             ChunkBlockTagging.CHUNK_BLOCK_TAGGING,
             ClientNameHistory.CLIENT_NAME_HISTORY,
             ClientProperties.CLIENT_PROPERTIES,
             ClientRewards.CLIENT_REWARDS,
+            ClientStats.CLIENT_STATS,
             Clients.CLIENTS,
             CombatStats.COMBAT_STATS,
             FilteredWords.FILTERED_WORDS,
+            GameData.GAME_DATA,
+            GameTeams.GAME_TEAMS,
             GamerProperties.GAMER_PROPERTIES,
+            GetClientStats.GET_CLIENT_STATS,
             GetCombatData.GET_COMBAT_DATA,
             GetLogMessagesByContextAndAction.GET_LOG_MESSAGES_BY_CONTEXT_AND_ACTION,
             GetLogMessagesByContextAndValue.GET_LOG_MESSAGES_BY_CONTEXT_AND_VALUE,
@@ -778,6 +868,7 @@ public class Public extends SchemaImpl {
             PropertyMap.PROPERTY_MAP,
             Punishments.PUNISHMENTS,
             Realms.REALMS,
+            Seasons.SEASONS,
             Servers.SERVERS,
             SmartBlockData.SMART_BLOCK_DATA,
             Uuiditems.UUIDITEMS,

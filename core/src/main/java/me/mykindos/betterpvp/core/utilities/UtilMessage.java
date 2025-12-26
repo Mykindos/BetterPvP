@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import net.kyori.adventure.audience.Audience;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.ExperienceTag;
@@ -195,7 +196,7 @@ public class UtilMessage {
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
      *
      * @param sender  The CommandSender
-     * @param prefix  The prefix
+     * @param prefix  The PREFIX
      * @param message Message to send to the CommandSender
      */
     public static void simpleMessage(Audience sender, String prefix, String message) {
@@ -304,7 +305,7 @@ public class UtilMessage {
     /**
      * Broadcasts a message to all players on the server with formatting
      *
-     * @param prefix  The prefix of the message
+     * @param prefix  The PREFIX of the message
      * @param message The message to be broadcasted
      */
     public static void broadcast(String prefix, String message) {
@@ -314,7 +315,7 @@ public class UtilMessage {
     /**
      * Broadcasts a message to all players on the server with formatting
      *
-     * @param prefix  The prefix of the message
+     * @param prefix  The PREFIX of the message
      * @param message The message to be broadcasted
      * @param args    The args to interpolate in the string
      */

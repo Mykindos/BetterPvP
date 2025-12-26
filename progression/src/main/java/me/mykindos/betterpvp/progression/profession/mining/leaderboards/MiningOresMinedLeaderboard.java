@@ -6,13 +6,13 @@ import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.progression.database.jooq.tables.records.GetTopMiningByOreRecord;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.GetTopMiningByOreRecord;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -85,7 +85,7 @@ public class MiningOresMinedLeaderboard extends PlayerLeaderboard<Integer> {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             try {
                 Result<GetTopMiningByOreRecord> results = ctx.selectFrom(GET_TOP_MINING_BY_ORE.call(
-                        Core.getCurrentSeason(),
+                        Core.getCurrentRealm().getSeason().getId(),
                         10,
                         miningHandler.getDbMaterialsArray())).fetch();
 

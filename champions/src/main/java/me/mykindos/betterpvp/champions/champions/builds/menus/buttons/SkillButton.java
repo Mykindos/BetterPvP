@@ -69,7 +69,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             BuildSkill currentBuildSkill = roleBuild.getBuildSkill(this.skill.getType());
             if (promptBuild.getId() == roleBuild.getId()) {
                 //if this is a skill we want
-                if (promptBuild.getActiveSkills().contains(this.skill)) {
+                if (promptBuild.getActiveSkills().contains(currentBuildSkill)) {
                     //we have it, set flashing if not correct level
                     if (currentBuildSkill != null &&
                             promptBuildSkill.getSkill().equals(currentBuildSkill.getSkill())) {
@@ -86,7 +86,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             }
         }
 
-        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));
+        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(this.skill));
         if (active) {
             Material flashMaterial = this.isFlash() ? Material.WRITTEN_BOOK : Material.BOOK;
             builder.material(this.isFlashing() ? flashMaterial : Material.WRITTEN_BOOK);
@@ -121,6 +121,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (clickType == ClickType.DOUBLE_CLICK) return;
+        RoleBuild previous = roleBuild.copy();
 
         BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
 
@@ -143,7 +144,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
                 roleBuild.setSkill(buildSkill.getSkill().getType(), null);
 
                 // Call events
-                UtilServer.callEvent(new SkillDequipEvent(player, buildSkill.getSkill(), roleBuild));
+                UtilServer.callEvent(new SkillDequipEvent(player, buildSkill, roleBuild, previous));
 
                 // Replace
                 buildSkill = null;
@@ -160,11 +161,11 @@ public class SkillButton extends FlashingButton<SkillMenu> {
                 BuildSkill newSkill = new BuildSkill(skill, 1);
                 roleBuild.setSkill(skill.getType(), newSkill);
                 roleBuild.takePoint();
-                UtilServer.callEvent(new SkillEquipEvent(player, newSkill.getSkill(), roleBuild));
+                UtilServer.callEvent(new SkillEquipEvent(player, newSkill, roleBuild, previous));
             } else { // Otherwise, increase the level
                 roleBuild.takePoint();
                 roleBuild.setSkill(skill.getType(), skill, buildSkill.getLevel() + 1);
-                UtilServer.callEvent(new SkillUpdateEvent(player, buildSkill.getSkill(), roleBuild));
+                UtilServer.callEvent(new SkillUpdateEvent(player, buildSkill, roleBuild, previous));
             }
 
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
@@ -190,13 +191,13 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             // If we have no points, remove the skill
             if (buildSkill.getLevel() == 0) {
                 roleBuild.setSkill(skill.getType(), null);
-                UtilServer.callEvent(new SkillDequipEvent(player, buildSkill.getSkill(), roleBuild));
+                UtilServer.callEvent(new SkillDequipEvent(player, buildSkill, roleBuild, previous));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
                 getGui().updateControlItems();
                 return;
             }
 
-            UtilServer.callEvent(new SkillUpdateEvent(player, buildSkill.getSkill(), roleBuild));
+            UtilServer.callEvent(new SkillUpdateEvent(player, buildSkill, roleBuild, previous));
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 2.0F);
             getGui().updateControlItems();
         } else {
