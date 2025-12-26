@@ -69,6 +69,8 @@ public abstract class Projectile {
         final long time = System.currentTimeMillis();
         this.elapsedMillis = time - lastTick;
         if (!impacted) {
+            onTick();
+
             final Optional<RayTraceResult> result = checkCollision();
             if (result.isPresent()) {
                 final CollisionResult collisionResult = onCollide(result.get());
@@ -92,8 +94,6 @@ public abstract class Projectile {
             } else {
                 move();
             }
-
-            onTick();
             this.lastTick = time;
             return;
         }
