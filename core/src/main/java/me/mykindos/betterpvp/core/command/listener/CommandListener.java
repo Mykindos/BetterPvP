@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.command.listener;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -9,6 +10,7 @@ import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommandManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
@@ -24,14 +26,16 @@ import java.util.Set;
 
 @CustomLog
 @BPvPListener
+@Singleton
 public class CommandListener implements Listener {
 
     private final ClientManager clientManager;
     private final CommandManager commandManager;
+    private final BrigadierCommandManager brigadierCommandManager;
     private final Set<String> mineplexCommands;
 
     @Inject
-    public CommandListener(ClientManager clientManager, CommandManager commandManager) {
+    public CommandListener(ClientManager clientManager, CommandManager commandManager, BrigadierCommandManager brigadierCommandManager) {
         this.clientManager = clientManager;
         this.commandManager = commandManager;
         mineplexCommands = Set.of(
@@ -44,6 +48,7 @@ public class CommandListener implements Listener {
                 "ignore",
                 "report"
                 );
+        this.brigadierCommandManager = brigadierCommandManager;
     }
 
     @EventHandler
@@ -130,10 +135,8 @@ public class CommandListener implements Listener {
 
     @EventHandler
     public void onCommandListSent(PlayerCommandSendEvent event) {
-        Client client = clientManager.search().online(event.getPlayer());
-
+        final Client client = clientManager.search().online(event.getPlayer());
         event.getCommands().removeIf(command -> {
-
             String[] args = command.split(":");
             if(args.length == 2) {
                 return args[0].equalsIgnoreCase(args[1]);
@@ -142,17 +145,19 @@ public class CommandListener implements Listener {
             return false;
         });
 
-        if(event.getPlayer().isOp() || client.hasRank(Rank.ADMIN)) return;
+        if (event.getPlayer().isOp()) return;
 
 
-        event.getCommands().removeIf(command -> {
-            if (mineplexCommands.contains(command)) {
-                //Allow certain mineplex commands
+        event.getCommands().removeIf(commandString -> {
+            if (brigadierCommandManager.getObject(commandString).isPresent()) {
+                //brigadier commands handle showing themselves or not, allow that to happen
+                //if we are seeing it here, it should be shown to the user
                 return false;
             }
-            Optional<ICommand> commandOptional = commandManager.getCommand(command, new String[]{});
+            final Optional<ICommand> commandOptional = commandManager.getCommand(commandString, new String[]{});
             if (commandOptional.isPresent()) {
-                ICommand command1 = commandOptional.get();
+
+                final ICommand command1 = commandOptional.get();
                 return !client.hasRank(command1.getRequiredRank()) && !event.getPlayer().isOp();
             }
 
