@@ -62,7 +62,7 @@ public class FeatherFeetAbility extends ItemAbility implements Listener {
         if (mainHand.getType() != Material.AIR) {
             itemFactory.fromItemStack(mainHand).ifPresent(instance -> {
                 Optional<AbilityContainerComponent> container = instance.getComponent(AbilityContainerComponent.class);
-                if (container.isPresent() && container.get().getAbilities().stream().anyMatch(ability -> ability instanceof FeatherFeetAbility)) {
+                if (container.isPresent() && container.get().getContainer().stream().anyMatch(ability -> ability instanceof FeatherFeetAbility)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -74,7 +74,7 @@ public class FeatherFeetAbility extends ItemAbility implements Listener {
         if (offHand.getType() != Material.AIR) {
             itemFactory.fromItemStack(offHand).ifPresent(instance -> {
                 Optional<AbilityContainerComponent> container = instance.getComponent(AbilityContainerComponent.class);
-                if (container.isPresent() && container.get().getAbilities().stream().anyMatch(ability -> ability instanceof FeatherFeetAbility)) {
+                if (container.isPresent() && container.get().getContainer().stream().anyMatch(ability -> ability instanceof FeatherFeetAbility)) {
                     event.setCancelled(true);
                 }
             });

@@ -196,10 +196,10 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         final ItemInstance newItem = itemFactory.fromItemStack(event.getNewItemStack()).orElseThrow();
 
         final Optional<AbilityContainerComponent> oldContainerOpt = oldItem.getComponent(AbilityContainerComponent.class);
-        boolean oldHasEndlessQuiver = oldContainerOpt.isPresent() && oldContainerOpt.get().getAbilities().contains(this);
+        boolean oldHasEndlessQuiver = oldContainerOpt.isPresent() && oldContainerOpt.get().getContainer().contains(this);
 
         final Optional<AbilityContainerComponent> newContainerOpt = newItem.getComponent(AbilityContainerComponent.class);
-        boolean newHasEndlessQuiver = newContainerOpt.isPresent() && newContainerOpt.get().getAbilities().contains(this);
+        boolean newHasEndlessQuiver = newContainerOpt.isPresent() && newContainerOpt.get().getContainer().contains(this);
 
         if (!oldHasEndlessQuiver && newHasEndlessQuiver) {
             takePacketArrow(event.getPlayer());
@@ -225,7 +225,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             final Optional<AbilityContainerComponent> containerOpt = itemInstance.getComponent(AbilityContainerComponent.class);
             if (containerOpt.isPresent()) {
                 final AbilityContainerComponent container = containerOpt.get();
-                if (container.getAbilities().contains(this)) {
+                if (container.getContainer().contains(this)) {
                     takePacketArrow(event.getPlayer());
                     hideArrows(event.getPlayer());
                     activeTicks.remove(event.getPlayer());
@@ -244,7 +244,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
             final Optional<AbilityContainerComponent> containerOpt = itemInstance.getComponent(AbilityContainerComponent.class);
             if (containerOpt.isPresent()) {
                 final AbilityContainerComponent container = containerOpt.get();
-                if (container.getAbilities().contains(this)) {
+                if (container.getContainer().contains(this)) {
                     showArrows(event.getPlayer());
                     takePacketArrow(event.getPlayer());
                 }
@@ -291,7 +291,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         if (containerOpt.isEmpty()) return;
 
         final AbilityContainerComponent container = containerOpt.get();
-        if (container.getAbilities().contains(this)) {
+        if (container.getContainer().contains(this)) {
             arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
             if (useFunction != null) {
                 useFunction.accept(event.getEntity());
@@ -325,7 +325,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         }
 
         final AbilityContainerComponent container = containerOpt.get();
-        if (!container.getAbilities().contains(this)) {
+        if (!container.getContainer().contains(this)) {
             return;
         }
 
@@ -400,7 +400,7 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         }
 
         final AbilityContainerComponent container = containerOpt.get();
-        if (!container.getAbilities().contains(this)) {
+        if (!container.getContainer().contains(this)) {
             return; // doesnt have endless quiver
         }
 

@@ -51,7 +51,7 @@ public class AbilityContainerSerializer implements ComponentSerializer<AbilityCo
         List<String> abilities = new ArrayList<>();
 
         PersistentDataContainer abilitiesContainer = container.getAdapterContext().newPersistentDataContainer();
-        for (ItemAbility ability : instance.getAbilities()) {
+        for (ItemAbility ability : instance.getContainer()) {
             Preconditions.checkNotNull(ability, "Ability cannot be null");
             NamespacedKey abilityKey = ability.getKey();
             Preconditions.checkNotNull(abilityKey, "Ability key cannot be null");

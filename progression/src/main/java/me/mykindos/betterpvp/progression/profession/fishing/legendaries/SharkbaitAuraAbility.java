@@ -75,7 +75,7 @@ public class SharkbaitAuraAbility extends ItemAbility implements Listener {
         itemFactory.fromItemStack(player.getInventory().getItemInMainHand()).ifPresent(item -> {
             // Check if this ability is on the item
             Optional<AbilityContainerComponent> abilityContainer = item.getComponent(AbilityContainerComponent.class);
-            if (abilityContainer.isPresent() && abilityContainer.get().getAbilities().contains(this)) {
+            if (abilityContainer.isPresent() && abilityContainer.get().getContainer().contains(this)) {
                 event.getHook().setWaitTime((int) (event.getHook().getWaitTime() * catchSpeedMultiplier));
                 activeHooks.add(event.getHook());
                 return;

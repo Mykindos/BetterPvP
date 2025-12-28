@@ -29,6 +29,6 @@ public class BuildersBox extends BaseItem {
     }
 
     private LootTable getLootTable() {
-        return lootTableRegistry.loadLootTable("builders_box");
+        return lootTableRegistry.loadLootTable("tbuilders_box");
     }
 }

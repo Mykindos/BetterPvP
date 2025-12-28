@@ -102,7 +102,7 @@ public class VineSnareAbility extends ItemAbility implements Listener {
         if (containerOpt.isEmpty()) return;
         final AbilityContainerComponent container = containerOpt.get();
 
-        if (container.getAbilities().contains(this)) {
+        if (container.getContainer().contains(this)) {
             event.setCancelled(true);
 
             if (event.getEntity() instanceof Player player) {

@@ -248,7 +248,7 @@ public class ItemAbilityListener implements Listener {
         }
 
         final AbilityContainerComponent container = containerOpt.get();
-        final List<@NotNull ItemAbility> abilities = container.getAbilities().stream()
+        final List<@NotNull ItemAbility> abilities = container.getContainer().stream()
                 .filter(ability -> ability.getTriggerType() == TriggerTypes.HOLD)
                 .toList();
 

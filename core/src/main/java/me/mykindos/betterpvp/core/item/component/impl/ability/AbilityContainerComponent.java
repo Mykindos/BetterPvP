@@ -2,12 +2,10 @@ package me.mykindos.betterpvp.core.item.component.impl.ability;
 
 import com.google.common.base.Preconditions;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.AbstractItemComponent;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
+import me.mykindos.betterpvp.core.item.component.impl.ContainerComponent;
 import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -27,15 +25,11 @@ import java.util.Optional;
  * the same trigger type.
  */
 @Builder
-public class AbilityContainerComponent extends AbstractItemComponent implements LoreComponent {
-
-    @Singular
-    @Getter
-    private @NotNull List<@NotNull ItemAbility> abilities;
+public class AbilityContainerComponent extends ContainerComponent<ItemAbility> implements LoreComponent {
 
     public AbilityContainerComponent(@NotNull List<@NotNull ItemAbility> abilities) {
         super("abilities");
-        this.abilities = abilities;
+        this.container = abilities;
 
         Preconditions.checkArgument(!abilities.isEmpty(), "Abilities cannot be empty");
         final long nonPassiveCount = abilities.stream()
@@ -50,24 +44,22 @@ public class AbilityContainerComponent extends AbstractItemComponent implements 
     }
 
     public @NotNull Optional<ItemAbility> getAbility(@NotNull TriggerTypes triggerType) {
-        return abilities.stream()
+        return container.stream()
                 .filter(ability -> ability.getTriggerType() == triggerType)
                 .findFirst();
     }
 
     @Override
     public ItemComponent copy() {
-        return AbilityContainerComponent.builder()
-                .abilities(abilities)
-                .build();
+        return new AbilityContainerComponent(container);
     }
 
     @Override
     public List<Component> getLines(ItemInstance item) {
         final List<Component> lines = new ArrayList<>();
 
-        for (int i = 0; i < abilities.size(); i++) {
-            final ItemAbility ability = abilities.get(i);
+        for (int i = 0; i < container.size(); i++) {
+            final ItemAbility ability = container.get(i);
             final Component text = Component.text(ability.getDescription(), NamedTextColor.WHITE);
             final List<Component> components = ComponentWrapper.wrapLine(text, 30, true);
 
@@ -75,7 +67,7 @@ public class AbilityContainerComponent extends AbstractItemComponent implements 
                     .appendSpace()
                     .append(ability.getTriggerType().getName().applyFallbackStyle(Style.style(NamedTextColor.YELLOW, TextDecoration.BOLD)));
             components.addFirst(title);
-            if (i < abilities.size() - 1) {
+            if (i < container.size() - 1) {
                 components.add(Component.empty()); // Add a separator between abilities
             }
 
@@ -90,21 +82,42 @@ public class AbilityContainerComponent extends AbstractItemComponent implements 
         return -1;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+    public static class AbilityContainerComponentBuilder {
+        private final List<ItemAbility> container = new ArrayList<>();
 
-        AbilityContainerComponent that = (AbilityContainerComponent) o;
-        return abilities.equals(that.abilities);
+        /**
+         * Add a single ability to the container.
+         * @param ability The ability to add
+         * @return this builder
+         */
+        public AbilityContainerComponentBuilder ability(ItemAbility ability) {
+            this.container.add(ability);
+            return this;
+        }
+
+        /**
+         * Add multiple abilities to the container.
+         * @param abilities The abilities to add
+         * @return this builder
+         */
+        public AbilityContainerComponentBuilder abilities(ItemAbility... abilities) {
+            this.container.addAll(List.of(abilities));
+            return this;
+        }
+
+        /**
+         * Add multiple abilities to the container.
+         * @param abilities The abilities to add
+         * @return this builder
+         */
+        public AbilityContainerComponentBuilder abilities(List<ItemAbility> abilities) {
+            this.container.addAll(abilities);
+            return this;
+        }
+
+        public AbilityContainerComponent build() {
+            return new AbilityContainerComponent(container);
+        }
     }
 
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        // the abilities list hashcode is not the same for lists with the same elements, despite being equal
-        // so we sum the hashcodes of each ability
-        result = 31 * result + abilities.stream().mapToInt(ItemAbility::hashCode).sum();
-        return result;
-    }
 }
