@@ -7,10 +7,10 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionBuildsRecord;
 import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionExpRecord;
-import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
@@ -38,7 +38,7 @@ public class ProfessionProfileRepository {
 
     private final Database database;
     private final ClientManager clientManager;
-    private final ProgressionSkillManager skillManager;
+    private final ProfessionNodeManager skillManager;
     private final PropertyMapper propertyMapper;
     private final AtomicReference<ConcurrentHashMap<String, Query>> queuedStatUpdates =
             new AtomicReference<>(new ConcurrentHashMap<>());
@@ -47,7 +47,7 @@ public class ProfessionProfileRepository {
 
     @Inject
     public ProfessionProfileRepository(Database database, ClientManager clientManager,
-                                       ProgressionSkillManager skillManager, PropertyMapper propertyMapper) {
+                                       ProfessionNodeManager skillManager, PropertyMapper propertyMapper) {
         this.database = database;
         this.clientManager = clientManager;
         this.skillManager = skillManager;
@@ -235,6 +235,12 @@ public class ProfessionProfileRepository {
             ctx.batch(expUpdates.values().stream().toList()).execute();
             log.info("Updated experience with {} queries", expUpdates.size()).submit();
         }
+    }
+
+    public void deleteBuildsForClient(Client client) {
+        database.getAsyncDslContext().executeAsync(ctx -> ctx.deleteFrom(PROGRESSION_BUILDS)
+                .where(PROGRESSION_BUILDS.CLIENT.eq(client.getId()))
+                .execute());
     }
 
 }
