@@ -10,10 +10,10 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.CooldownProgressionSkill;
+import me.mykindos.betterpvp.progression.profession.skill.CooldownProfessionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.PerkActivator;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -22,11 +22,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @Singleton
-public class TreeFellerSkill extends WoodcuttingProgressionSkill implements CooldownProgressionSkill {
+public class TreeFellerSkill extends ProfessionSkillNode implements CooldownProfessionSkill {
 
     private final ItemRegistry itemRegistry;
     private final ItemFactory itemFactory;
@@ -44,8 +45,8 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     public Map<UUID, Integer> blocksFelledByPlayer = new HashMap<>();
 
     @Inject
-    public TreeFellerSkill(Progression progression, ItemRegistry itemRegistry, ItemFactory itemFactory, CooldownManager cooldownManager) {
-        super(progression);
+    public TreeFellerSkill(ItemRegistry itemRegistry, ItemFactory itemFactory, CooldownManager cooldownManager) {
+        super("Tree Feller");
         this.itemRegistry = itemRegistry;
         this.itemFactory = itemFactory;
         this.cooldownManager = cooldownManager;
@@ -125,8 +126,8 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     }
 
     @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
-        return new ProgressionSkillDependency(dependencies, 250);
+    public ProfessionNodeDependency getDependencies() {
+
+        return new ProfessionNodeDependency(List.of("Tree Tactician", "Forest Flourisher", "Bark Bounty"), 250);
     }
 }

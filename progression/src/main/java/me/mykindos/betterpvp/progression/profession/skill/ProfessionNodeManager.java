@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Singleton
 @CustomLog
-public class ProfessionNodeManager extends Manager<ProfessionNode> {
+public class ProfessionNodeManager extends Manager<String, ProfessionNode> {
 
     private final Progression progression;
 
