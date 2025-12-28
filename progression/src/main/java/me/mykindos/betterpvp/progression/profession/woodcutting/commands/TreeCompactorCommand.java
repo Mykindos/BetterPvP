@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeCompactor;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ import java.util.Objects;
 @Singleton
 public class TreeCompactorCommand extends Command {
 
+    private final ProfessionProfileManager professionProfileManager;
     private final TreeCompactor treeCompactor;
     private final ItemRegistry itemRegistry;
     private final ItemFactory itemFactory;
@@ -44,7 +46,8 @@ public class TreeCompactorCommand extends Command {
     );
 
     @Inject
-    public TreeCompactorCommand(TreeCompactor treeCompactor, ItemRegistry itemRegistry, ItemFactory itemFactory, CooldownManager cooldownManager) {
+    public TreeCompactorCommand(ProfessionProfileManager professionProfileManager, TreeCompactor treeCompactor, ItemRegistry itemRegistry, ItemFactory itemFactory, CooldownManager cooldownManager) {
+        this.professionProfileManager = professionProfileManager;
         this.treeCompactor = treeCompactor;
         this.itemRegistry = itemRegistry;
         this.itemFactory = itemFactory;
@@ -115,60 +118,64 @@ public class TreeCompactorCommand extends Command {
             return;
         }
 
-        if (!treeCompactor.doesPlayerHaveSkill(player)) {
-            feedbackMessage(player, "You do not have this command unlocked. See <green>/woodcutting");
-            return;
-        }
+        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
 
-        // Only 1 argument is acceptable
-        if (args.length != 1) {
-            UtilMessage.message(player, "Command", getUsage());
-            return;
-        }
+            int skillLevel = treeCompactor.getPlayerNodeLevel(profile);
+            if (skillLevel <= 0) {
+                feedbackMessage(player, "You do not have this command unlocked. See <green>/woodcutting");
+                return;
+            }
 
-        String inputtedLogType = args[0];
-        @Nullable Material inputtedLogTypeAsMaterial = logTypeToMaterial(inputtedLogType, false);
+            // Only 1 argument is acceptable
+            if (args.length != 1) {
+                UtilMessage.message(player, "Command", getUsage());
+                return;
+            }
+
+            String inputtedLogType = args[0];
+            @Nullable Material inputtedLogTypeAsMaterial = logTypeToMaterial(inputtedLogType, false);
 
 
-        if (inputtedLogTypeAsMaterial == null) {
-            feedbackMessage(player, "Unknown log type, <white>" + inputtedLogType);
-            return;
-        }
+            if (inputtedLogTypeAsMaterial == null) {
+                feedbackMessage(player, "Unknown log type, <white>" + inputtedLogType);
+                return;
+            }
 
-        if (!cooldownManager.use(player, TREE_COMPACTOR, treeCompactor.getCooldown(), true, false)) {
-            // Cooldown manager will already send a msg
-            return;
-        }
+            if (!cooldownManager.use(player, TREE_COMPACTOR, treeCompactor.getCooldown(), true, false)) {
+                // Cooldown manager will already send a msg
+                return;
+            }
 
-        List<Material> logTypesToCompact;
-        if (inputtedLogTypeAsMaterial.equals(Material.AIR)) {
-            logTypesToCompact = LOG_TYPES.stream()
-                    .map(logType -> logTypeToMaterial(logType, true))
-                    .filter(Objects::nonNull)
-                    .toList();
-        } else {
-            logTypesToCompact = List.of(inputtedLogTypeAsMaterial);
-        }
+            List<Material> logTypesToCompact;
+            if (inputtedLogTypeAsMaterial.equals(Material.AIR)) {
+                logTypesToCompact = LOG_TYPES.stream()
+                        .map(logType -> logTypeToMaterial(logType, true))
+                        .filter(Objects::nonNull)
+                        .toList();
+            } else {
+                logTypesToCompact = List.of(inputtedLogTypeAsMaterial);
+            }
 
-        int logsAfterCompaction = 0;
+            int logsAfterCompaction = 0;
 
-        for (Material logMaterial : logTypesToCompact) {
-            while (UtilInventory.contains(player, logMaterial, 64)) {
-                if (UtilInventory.remove(player, logMaterial, 64)) {
-                    final BaseItem compactedLog = getCompactedLog();
-                    final ItemInstance itemInstance = itemFactory.create(compactedLog);
-                    player.getInventory().addItem(itemInstance.createItemStack());
-                    logsAfterCompaction++;
+            for (Material logMaterial : logTypesToCompact) {
+                while (UtilInventory.contains(player, logMaterial, 64)) {
+                    if (UtilInventory.remove(player, logMaterial, 64)) {
+                        final BaseItem compactedLog = getCompactedLog();
+                        final ItemInstance itemInstance = itemFactory.create(compactedLog);
+                        player.getInventory().addItem(itemInstance.createItemStack());
+                        logsAfterCompaction++;
+                    }
                 }
             }
-        }
 
-        feedbackMessage(player, "Compacted your logs <green>" + logsAfterCompaction + "x");
+            feedbackMessage(player, "Compacted your logs <green>" + logsAfterCompaction + "x");
 
-        if (logsAfterCompaction == 0) cooldownManager.removeCooldown(player, TREE_COMPACTOR, true);
+            if (logsAfterCompaction == 0) cooldownManager.removeCooldown(player, TREE_COMPACTOR, true);
 
-        log.info("{} compacted {}x logs.", player.getName(), logsAfterCompaction)
-                .addClientContext(player).addLocationContext(player.getLocation()).submit();
+            log.info("{} compacted {}x logs.", player.getName(), logsAfterCompaction)
+                    .addClientContext(player).addLocationContext(player.getLocation()).submit();
+        });
     }
 
     private @NotNull BaseItem getCompactedLog() {

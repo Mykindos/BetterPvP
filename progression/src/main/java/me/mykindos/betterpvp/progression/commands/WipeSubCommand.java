@@ -49,7 +49,7 @@ public class WipeSubCommand extends Command {
             }
 
             Client target = targetOptional.get();
-            professionProfileManager.getRepository().deleteBuildsForGamer(target.getGamer());
+            professionProfileManager.getRepository().deleteBuildsForClient(target);
 
             professionProfileManager.getObject(target.getUniqueId()).ifPresent(profile -> {
                 profile.getProfessionDataMap().forEach((profession, data) -> {

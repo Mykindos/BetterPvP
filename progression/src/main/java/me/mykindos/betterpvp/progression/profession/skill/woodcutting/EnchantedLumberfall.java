@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.Loot;
@@ -14,43 +13,39 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.world.entity.item.ItemEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @CustomLog
 @Singleton
 @BPvPListener
-public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements Listener {
+public class EnchantedLumberfall extends ProfessionSkillNode implements Listener {
     private final ProfessionProfileManager professionProfileManager;
     private final ItemFactory itemFactory;
     private final WoodcuttingHandler woodcuttingHandler;
 
     @Inject
-    public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager,
+    public EnchantedLumberfall(ProfessionProfileManager professionProfileManager,
                                ItemFactory itemFactory, WoodcuttingHandler woodcuttingHandler) {
-        super(progression);
+        super("Enchanted Lumberfall");
         this.professionProfileManager = professionProfileManager;
         this.itemFactory = itemFactory;
         this.woodcuttingHandler = woodcuttingHandler;
@@ -75,9 +70,8 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     }
 
     @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 1);
+    public ProfessionNodeDependency getDependencies() {
+        return new ProfessionNodeDependency(List.of("Tree Feller"), 1);
     }
 
     /**
@@ -86,23 +80,6 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
      */
     public double specialItemDropChance(int level) {
         return 0.1 * Math.max(1, level);
-    }
-
-    /**
-     * @return the player's skill level
-     */
-    public int getPlayerSkillLevel(Player player) {
-        Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
-
-        return profile.map(this::getPlayerSkillLevel).orElse(0);
-    }
-
-    /**
-     * This function's purpose is to return a boolean that tells you if the player has the skill
-     * <b>Enchanted Lumberfall</b>
-     */
-    public boolean doesPlayerHaveSkill(Player player) {
-        return getPlayerSkillLevel(player) > 0;
     }
 
     @EventHandler
@@ -149,38 +126,42 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     }
 
     private void processItemStack(Player player, Location location, ItemStack itemStack) {
-        int count = itemStack.getAmount();
+        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
+            int skillLevel = getPlayerNodeLevel(profile);
+            if (skillLevel <= 0) return;
+            int count = itemStack.getAmount();
 
-        double chance = UtilMath.randDouble(0, 100);
-        boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerSkillLevel(player));
-        if (shouldDoubleDrops) {
-            count *= 2;
-            itemStack.setAmount(count);
-        }
-        ItemStack finalItemStack = itemFactory.convertItemStack(itemStack).orElse(itemStack);
-        final Component name;
-        if (itemStack.getItemMeta().hasDisplayName()) {
-            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
-        } else {
-            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
-                    Component.translatable(itemStack.getType().translationKey()));
-        }
+            double chance = UtilMath.randDouble(0, 100);
+            boolean shouldDoubleDrops = chance < specialItemDropChance(skillLevel);
+            if (shouldDoubleDrops) {
+                count *= 2;
+                itemStack.setAmount(count);
+            }
+            ItemStack finalItemStack = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+            final Component name;
+            if (itemStack.getItemMeta().hasDisplayName()) {
+                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+            } else {
+                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                        Component.translatable(itemStack.getType().translationKey()));
+            }
 
 
-        UtilItem.insert(player, finalItemStack);
+            UtilItem.insert(player, finalItemStack);
 
-        TextComponent messageToPlayer = Component.text("You found ")
-                .append(Component.text(UtilFormat.formatNumber(count)))
-                .append(Component.text(" "))
-                .append(name);
+            TextComponent messageToPlayer = Component.text("You found ")
+                    .append(Component.text(UtilFormat.formatNumber(count)))
+                    .append(Component.text(" "))
+                    .append(name);
 
-        if (shouldDoubleDrops) {
-            messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));
-        }
+            if (shouldDoubleDrops) {
+                messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));
+            }
 
-        UtilMessage.message(player, getProgressionTree(), messageToPlayer);
+            UtilMessage.message(player, getProgressionTree(), messageToPlayer);
 
-        log.info("{} found {}x {}.", player.getName(), count, itemStack.getType().name().toLowerCase())
-                .addClientContext(player).addLocationContext(location).submit();
+            log.info("{} found {}x {}.", player.getName(), count, itemStack.getType().name().toLowerCase())
+                    .addClientContext(player).addLocationContext(location).submit();
+        });
     }
 }
