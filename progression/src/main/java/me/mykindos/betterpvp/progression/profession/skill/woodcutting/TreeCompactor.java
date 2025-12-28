@@ -12,9 +12,8 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -27,11 +26,12 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
 @BPvPListener
-public class TreeCompactor extends WoodcuttingProgressionSkill implements Listener {
+public class TreeCompactor extends ProfessionSkillNode implements Listener {
 
     private final ProfessionProfileManager professionProfileManager;
     private final ClientManager clientManager;
@@ -42,9 +42,9 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     private double cooldown;
 
     @Inject
-    public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager,
+    public TreeCompactor(ProfessionProfileManager professionProfileManager,
                          ClientManager clientManager, ItemFactory itemFactory, ItemRegistry itemRegistry) {
-        super(progression);
+        super("Tree Compactor");
         this.professionProfileManager = professionProfileManager;
         this.clientManager = clientManager;
         this.itemFactory = itemFactory;
@@ -80,23 +80,6 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     public void loadConfig() {
         super.loadConfig();
         cooldown = getConfig("cooldown", 20.0, Double.class);
-    }
-
-    /**
-     * @return the player's skill level
-     */
-    public int getPlayerSkillLevel(Player player) {
-        Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
-
-        return profile.map(this::getPlayerSkillLevel).orElse(0);
-    }
-
-    /**
-     * This function's purpose is to return a boolean that tells you if the player has the skill
-     * <b>No More Leaves</b>
-     */
-    public boolean doesPlayerHaveSkill(Player player) {
-        return getPlayerSkillLevel(player) > 0;
     }
 
     @EventHandler
@@ -145,8 +128,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     }
 
     @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
-        return new ProgressionSkillDependency(dependencies, 250);
+    public ProfessionNodeDependency getDependencies() {
+        return new ProfessionNodeDependency(List.of("Tree Tactician", "Forest Flourisher", "Bark Bounty"), 250);
     }
 }
