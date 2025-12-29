@@ -8,7 +8,6 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentSerializationRegistry;
 import me.mykindos.betterpvp.core.item.model.VanillaItem;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;

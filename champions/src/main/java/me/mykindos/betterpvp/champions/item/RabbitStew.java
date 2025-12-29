@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.SpeedBoostAbility;
@@ -20,11 +21,18 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = false)
 public class RabbitStew extends BaseItem implements Reloadable {
 
+    private static final ItemStack model;
     private final SpeedBoostAbility speedBoostAbility;
+
+    static {
+        model = ItemStack.of(Material.RABBIT_STEW);
+        model.setData(DataComponentTypes.MAX_STACK_SIZE, 64);
+        model.unsetData(DataComponentTypes.CONSUMABLE);
+    }
 
     @Inject
     private RabbitStew(SpeedBoostAbility speedBoostAbility) {
-        super("Rabbit Stew", ItemStack.of(Material.RABBIT_STEW), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super("Rabbit Stew", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.speedBoostAbility = speedBoostAbility;
         this.speedBoostAbility.setConsumesItem(true);
         addBaseComponent(AbilityContainerComponent.builder().ability(speedBoostAbility).build());

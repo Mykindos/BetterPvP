@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.CleanseAbility;
@@ -21,11 +22,17 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = false)
 public class PurificationPotion extends BaseItem implements Reloadable {
 
+    private static final ItemStack model;
     private final CleanseAbility cleanseAbility;
+
+    static {
+        model = ItemStack.of(Material.HONEY_BOTTLE);
+        model.setData(DataComponentTypes.MAX_STACK_SIZE, 64);
+    }
 
     @Inject
     private PurificationPotion(EffectManager effectManager) {
-        super("Purification Potion", ItemStack.of(Material.POTION), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super("Purification Potion", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.cleanseAbility = new CleanseAbility(effectManager);
         this.cleanseAbility.setConsumesItem(true);
         addBaseComponent(AbilityContainerComponent.builder().ability(cleanseAbility).build());
