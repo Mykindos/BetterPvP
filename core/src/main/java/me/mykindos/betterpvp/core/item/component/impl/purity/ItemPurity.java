@@ -59,7 +59,7 @@ public enum ItemPurity {
      */
     @NotNull
     public Component createLoreComponent() {
-        final TextComponent stars = Component.text("⭐".repeat(this.level), NamedTextColor.YELLOW);
+        final TextComponent stars = Component.text("⭐".repeat(this.level + 1), NamedTextColor.YELLOW);
         final TextColor foreground = Objects.requireNonNull(TextColor.fromHexString("#828282"));
 
         return Component.empty()

@@ -24,9 +24,9 @@ public class NameRarityRenderer implements ItemNameRenderer {
 
     @Override
     public Component createName(ItemInstance item) {
-        // Check for purity-based name color override
+        // Check for purity-based name color override ONLY if attuned
         final Optional<PurityComponent> purityComponent = item.getComponent(PurityComponent.class);
-        if (purityComponent.isPresent()) {
+        if (purityComponent.isPresent() && purityComponent.get().isAttuned()) {
             final TextColor nameColorOverride = purityComponent.get().getPurity().getNameColorOverride();
             if (nameColorOverride != null) {
                 return name.applyFallbackStyle(nameColorOverride);

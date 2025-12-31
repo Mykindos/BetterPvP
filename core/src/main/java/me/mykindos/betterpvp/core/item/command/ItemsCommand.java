@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.menu.GuiItemViewer;
+import me.mykindos.betterpvp.core.item.menu.viewer.GuiItemViewer;
 import org.bukkit.entity.Player;
 
 @Singleton

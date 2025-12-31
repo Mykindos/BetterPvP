@@ -52,7 +52,7 @@ public class VirtualInventory extends Inventory {
         
         if (maxStackSizes == null) {
             this.maxStackSizes = new int[size];
-            Arrays.fill(this.maxStackSizes, 64);
+            Arrays.fill(this.maxStackSizes, 99);
         } else {
             this.maxStackSizes = maxStackSizes;
         }

@@ -42,9 +42,9 @@ public class LoreComponentRenderer implements ItemLoreRenderer {
                 .map(line -> line.decoration(TextDecoration.ITALIC, false))
                 .collect(Collectors.toCollection(ArrayList::new)); // Mutable list to allow removing the last element
 
-        // Purity ONLY if NEXO is available
+        // Purity ONLY if NEXO is available AND item is attuned
         final Optional<PurityComponent> purityComponent = item.getComponent(PurityComponent.class);
-        if (Compatibility.TEXTURE_PROVIDER && purityComponent.isPresent()) {
+        if (Compatibility.TEXTURE_PROVIDER && purityComponent.isPresent() && purityComponent.get().isAttuned()) {
             final ItemPurity purity = purityComponent.get().getPurity();
             components.addFirst(purity.createLoreComponent());
         }

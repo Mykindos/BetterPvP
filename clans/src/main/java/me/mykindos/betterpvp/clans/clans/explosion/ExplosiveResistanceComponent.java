@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.explosion;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.AbstractItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -37,7 +38,7 @@ public class ExplosiveResistanceComponent extends AbstractItemComponent implemen
         return List.of(
                 Component.text("Explosive Resistance", TextColor.color(212, 212, 212), TextDecoration.BOLD),
                 Component.empty()
-                        .append(MiniMessage.miniMessage().deserialize("<font:nexo:default><white>꒒"))
+                        .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>꒒"))
                         .appendSpace()
                         .append(Component.text(resistance, TextColor.color(255, 153, 0)))
         );

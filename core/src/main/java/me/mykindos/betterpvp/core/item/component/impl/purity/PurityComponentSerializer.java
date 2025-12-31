@@ -11,11 +11,12 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Serializer and deserializer for PurityComponent.
- * Stores purity as a string (enum name) in the PersistentDataContainer.
+ * Stores purity as a string (enum name) and attuned state as a byte in the PersistentDataContainer.
  */
 public class PurityComponentSerializer implements ComponentSerializer<PurityComponent>, ComponentDeserializer<PurityComponent> {
 
-    private static final NamespacedKey KEY = new NamespacedKey("betterpvp", "purity");
+    private static final NamespacedKey PURITY_KEY = new NamespacedKey("betterpvp", "purity");
+    private static final NamespacedKey ATTUNED_KEY = new NamespacedKey("betterpvp", "purity_attuned");
 
     @Override
     @NotNull
@@ -26,30 +27,43 @@ public class PurityComponentSerializer implements ComponentSerializer<PurityComp
     @Override
     @NotNull
     public NamespacedKey getKey() {
-        return KEY;
+        return PURITY_KEY;
     }
 
     @Override
     public void serialize(@NotNull PurityComponent instance, @NotNull PersistentDataContainer container) {
-        container.set(KEY, PersistentDataType.STRING, instance.getPurity().name());
+        // Serialize purity enum as string
+        container.set(PURITY_KEY, PersistentDataType.STRING, instance.getPurity().name());
+
+        // Serialize attuned state as byte (1 = attuned, 0 = not attuned)
+        container.set(ATTUNED_KEY, PersistentDataType.BYTE, instance.isAttuned() ? (byte) 1 : (byte) 0);
     }
 
     @Override
     public void delete(@NotNull PurityComponent instance, @NotNull PersistentDataContainer container) {
-        if (container.has(KEY, PersistentDataType.STRING)) {
-            container.remove(KEY);
+        if (container.has(PURITY_KEY, PersistentDataType.STRING)) {
+            container.remove(PURITY_KEY);
+        }
+        if (container.has(ATTUNED_KEY, PersistentDataType.BYTE)) {
+            container.remove(ATTUNED_KEY);
         }
     }
 
     @Override
     public @NotNull PurityComponent deserialize(@NotNull ItemInstance item, @NotNull PersistentDataContainer container) {
-        Preconditions.checkArgument(container.has(KEY, PersistentDataType.STRING), "Container does not have purity data");
-        String purityName = container.get(KEY, PersistentDataType.STRING);
+        // Deserialize purity
+        Preconditions.checkArgument(container.has(PURITY_KEY, PersistentDataType.STRING), "Container does not have purity data");
+        String purityName = container.get(PURITY_KEY, PersistentDataType.STRING);
         Preconditions.checkNotNull(purityName, "Purity data is null");
 
         try {
             ItemPurity purity = ItemPurity.valueOf(purityName);
-            return new PurityComponent(purity);
+
+            // Deserialize attuned state (default to false if not present for backward compatibility)
+            Byte attunedByte = container.get(ATTUNED_KEY, PersistentDataType.BYTE);
+            boolean attuned = attunedByte != null && attunedByte == 1;
+
+            return new PurityComponent(purity, attuned);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid purity value: " + purityName, e);
         }
