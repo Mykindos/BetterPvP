@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeDamageStat;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -28,7 +29,9 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
         addSerializableComponent(new DurabilityComponent(500));
 
         if (groups.contains(Group.MELEE)) {
-            addSerializableComponent(new StatContainerComponent().withBaseStat(new MeleeDamageStat(1f)));
+            addSerializableComponent(new StatContainerComponent()
+                    .withBaseStat(new MeleeDamageStat(1f))
+                    .withBaseStat(new MeleeAttackSpeedStat(0f)));
         }
     }
 

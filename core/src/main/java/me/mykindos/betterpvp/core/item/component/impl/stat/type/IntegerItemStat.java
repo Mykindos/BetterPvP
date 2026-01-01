@@ -12,7 +12,7 @@ public abstract class IntegerItemStat extends ItemStat<Integer> {
     }
 
     protected IntegerItemStat(String keyName, String name, String description, int value) {
-        super(keyName, name, name, description, value);
+        super(keyName, name, name.toLowerCase(), description, value);
     }
 
     @Override

@@ -13,7 +13,7 @@ public abstract class DoubleItemStat extends ItemStat<Double> {
     }
 
     protected DoubleItemStat(String keyName, String name, String description, double value) {
-        super(keyName, name, name, description, value);
+        super(keyName, name, name.toLowerCase(), description, value);
     }
 
     @Override
