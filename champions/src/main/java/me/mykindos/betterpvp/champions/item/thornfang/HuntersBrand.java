@@ -45,7 +45,7 @@ public class HuntersBrand extends ItemAbility implements Listener {
     private transient final ItemFactory itemFactory;
     private transient final EffectManager effectManager;
     private transient final Thornfang thornfang;
-    private transient final WeakHashMap<UUID, ResetTrackingData> resetTracking = new WeakHashMap<>();
+    private transient final WeakHashMap<Player, ResetTrackingData> resetTracking = new WeakHashMap<>();
 
     protected HuntersBrand(Champions champions, ItemFactory itemFactory, EffectManager effectManager, Thornfang thornfang) {
         super(new NamespacedKey(champions, "huntersbrand"),
@@ -90,10 +90,9 @@ public class HuntersBrand extends ItemAbility implements Listener {
      * Tracks consecutive resets on the same target.
      */
     public void onNeedlegraspReset(Player player, LivingEntity target) {
-        UUID playerUuid = player.getUniqueId();
         UUID targetUuid = target.getUniqueId();
 
-        ResetTrackingData data = resetTracking.computeIfAbsent(playerUuid, k -> new ResetTrackingData());
+        ResetTrackingData data = resetTracking.computeIfAbsent(player, k -> new ResetTrackingData());
 
         // Check if same target as last reset
         if (data.getCurrentTargetUuid() != null && !data.getCurrentTargetUuid().equals(targetUuid)) {
@@ -131,10 +130,16 @@ public class HuntersBrand extends ItemAbility implements Listener {
      */
     private void tick() {
         long timeoutMillis = (long) (resetCounterTimeoutSeconds * 1000);
-        Iterator<Map.Entry<UUID, ResetTrackingData>> iterator = resetTracking.entrySet().iterator();
+        Iterator<Map.Entry<Player, ResetTrackingData>> iterator = resetTracking.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            Map.Entry<UUID, ResetTrackingData> entry = iterator.next();
+            Map.Entry<Player, ResetTrackingData> entry = iterator.next();
+            final Player player = entry.getKey();
+            if (player == null || !player.isValid()) {
+                iterator.remove();
+                continue;
+            }
+
             ResetTrackingData data = entry.getValue();
 
             // Remove if inactive for too long

@@ -58,7 +58,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
     private transient final Champions champions;
     private transient final HuntersBrand huntersBrand;
     private transient final WeakHashMap<Player, NeedlegraspProjectile> activeProjectiles = new WeakHashMap<>();
-    private transient final WeakHashMap<UUID, PullState> activePulls = new WeakHashMap<>();
+    private transient final WeakHashMap<Player, PullState> activePulls = new WeakHashMap<>();
 
     protected Needlegrasp(Champions champions, CooldownManager cooldownManager, HuntersBrand huntersBrand) {
         super(new NamespacedKey(champions, "needlegrasp"),
@@ -132,11 +132,17 @@ public class Needlegrasp extends ItemAbility implements Listener {
         }
 
         // Clean up expired grace periods
-        Iterator<Map.Entry<UUID, PullState>> pullIterator = activePulls.entrySet().iterator();
+        Iterator<Map.Entry<Player, PullState>> pullIterator = activePulls.entrySet().iterator();
         long gracePeriodMillis = (long) (gracePeriodSeconds * 1000);
 
         while (pullIterator.hasNext()) {
-            Map.Entry<UUID, PullState> entry = pullIterator.next();
+            Map.Entry<Player, PullState> entry = pullIterator.next();
+            final Player player = entry.getKey();
+            if (player == null || !player.isValid()) {
+                pullIterator.remove();
+                continue;
+            }
+
             PullState state = entry.getValue();
 
             // Remove if effects applied or grace period expired
@@ -159,7 +165,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
      * Marks the collision and starts the grace period.
      */
     public void markCollisionOccurred(Player caster, LivingEntity target) {
-        PullState state = activePulls.computeIfAbsent(caster.getUniqueId(), k -> new PullState(target.getUniqueId()));
+        PullState state = activePulls.computeIfAbsent(caster, k -> new PullState(target.getUniqueId()));
         state.markCollisionOccurred();
 
         caster.setVelocity(new Vector());
@@ -181,7 +187,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
      * Called when player lands a melee hit during the grace period.
      */
     private void triggerCollision(Player caster, LivingEntity target) {
-        PullState state = activePulls.get(caster.getUniqueId());
+        PullState state = activePulls.get(caster);
         if (state == null || state.isEffectsApplied()) {
             return;
         }
@@ -245,7 +251,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
         if (!(event.getDamager() instanceof Player caster)) return;
         if (!(event.getDamagee() instanceof LivingEntity target)) return;
 
-        PullState state = activePulls.get(caster.getUniqueId());
+        PullState state = activePulls.get(caster);
         if (state == null) return;
 
         // Check if target matches
@@ -257,7 +263,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
         // Check if within grace period
         long gracePeriodMillis = (long)(gracePeriodSeconds * 1000);
         if (!state.isInGracePeriod(gracePeriodMillis)) {
-            activePulls.remove(caster.getUniqueId());
+            activePulls.remove(caster);
             return;
         }
 
