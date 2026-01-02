@@ -192,8 +192,14 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
 
         // If it has endless quiver and the old one doesn't, take their arrows
         // If it doesn't have endless quiver and the new one does, refund arrows
-        final ItemInstance oldItem = itemFactory.fromItemStack(event.getOldItemStack()).orElseThrow();
-        final ItemInstance newItem = itemFactory.fromItemStack(event.getNewItemStack()).orElseThrow();
+        final Optional<ItemInstance> oldItemOpt = itemFactory.fromItemStack(event.getOldItemStack());
+        if (!oldItemOpt.isPresent()) return;
+
+        final Optional<ItemInstance> newItemOpt = itemFactory.fromItemStack(event.getNewItemStack());
+        if (!newItemOpt.isPresent()) return;
+
+        final ItemInstance oldItem = oldItemOpt.orElseThrow();
+        final ItemInstance newItem = newItemOpt.orElseThrow();
 
         final Optional<AbilityContainerComponent> oldContainerOpt = oldItem.getComponent(AbilityContainerComponent.class);
         boolean oldHasEndlessQuiver = oldContainerOpt.isPresent() && oldContainerOpt.get().getContainer().contains(this);

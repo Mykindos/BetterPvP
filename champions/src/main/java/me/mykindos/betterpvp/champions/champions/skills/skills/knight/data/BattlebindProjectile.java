@@ -74,9 +74,8 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
     }
 
     @Override
-    protected Display createLink(double height) {
-        final Location location = lead.getLocation();
-        return location.getWorld().spawn(location, BlockDisplay.class, spawned -> {
+    protected Display createLink(Location spawnLocation, double height) {
+        return spawnLocation.getWorld().spawn(spawnLocation, BlockDisplay.class, spawned -> {
             spawned.setBlock(Material.CHAIN.createBlockData());
             spawned.setGlowing(false);
 
