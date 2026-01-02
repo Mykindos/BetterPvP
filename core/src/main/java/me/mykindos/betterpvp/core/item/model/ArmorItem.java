@@ -22,7 +22,7 @@ public abstract class ArmorItem extends BaseItem implements Reloadable {
         this.plugin = plugin;
         addSerializableComponent(new StatContainerComponent().withBaseStat(new ItemStat<>(StatTypes.HEALTH, 1)));
         addSerializableComponent(new DurabilityComponent(500));
-        addSerializableComponent(new RuneContainerComponent(2));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
     }
 
     @Override

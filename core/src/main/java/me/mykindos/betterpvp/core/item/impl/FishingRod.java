@@ -17,7 +17,7 @@ public class FishingRod extends VanillaItem {
     @Inject
     private FishingRod() {
         super(Material.FISHING_ROD, ItemRarity.COMMON);
-        addSerializableComponent(new RuneContainerComponent(2));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
     }
 
 }

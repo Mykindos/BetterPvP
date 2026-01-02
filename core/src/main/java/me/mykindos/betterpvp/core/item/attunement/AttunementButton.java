@@ -12,6 +12,9 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.currency.CurrencyUtils;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistribution;
+import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -44,6 +47,7 @@ public class AttunementButton extends ControlItem<Gui> {
     private final VirtualInventory goldInventory;
     private final VirtualInventory stoneInventory;
     private final VirtualInventory itemInventory;
+    private final RuneSlotDistributionRegistry runeSlotRegistry;
     private final boolean visible;
 
     @Override
@@ -213,6 +217,29 @@ public class AttunementButton extends ControlItem<Gui> {
         // Attune the item
         PurityComponent attuned = purity.withAttuned(true);
         ItemInstance attunedInstance = itemInstance.withComponent(attuned);
+
+        // Roll rune slots based on purity (if item has RuneContainerComponent)
+        Optional<RuneContainerComponent> runeContainerOpt =
+            attunedInstance.getComponent(RuneContainerComponent.class);
+        if (runeContainerOpt.isPresent()) {
+            RuneContainerComponent existingContainer = runeContainerOpt.get();
+
+            // Get distribution for this purity
+            RuneSlotDistribution distribution = runeSlotRegistry.getDistribution(purity.getPurity());
+
+            // Roll sockets and maxSockets
+            RuneSlotDistribution.RuneSlotRoll roll = distribution.roll();
+
+            // Create new container with rolled values, preserving existing runes
+            RuneContainerComponent newContainer = new RuneContainerComponent(
+                roll.getSockets(),
+                roll.getMaxSockets(),
+                existingContainer.getRunes()
+            );
+
+            // Apply the new container
+            attunedInstance = attunedInstance.withComponent(newContainer);
+        }
 
         // Consume gold
         ItemInstance remainingGold = CurrencyUtils.subtract(goldInstance, cost);

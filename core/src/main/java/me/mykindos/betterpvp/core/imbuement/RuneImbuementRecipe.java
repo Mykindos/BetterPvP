@@ -171,8 +171,12 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
         // Create a new container with the rune added
         List<Rune> newRunes = new ArrayList<>(existing.getRunes());
         newRunes.add(runeItem.getRune());
-        RuneContainerComponent newContainer = new RuneContainerComponent(existing.getSockets(), newRunes);
-        
+        RuneContainerComponent newContainer = new RuneContainerComponent(
+            existing.getSockets(),
+            existing.getMaxSockets(),
+            newRunes
+        );
+
         // Apply the updated container to the target item
         return targetItem.withComponent(newContainer);
     }

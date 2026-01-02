@@ -16,6 +16,6 @@ public class Bow extends VanillaItem {
 
     public Bow() {
         super("Bow", ItemStack.of(Material.BOW), ItemRarity.COMMON);
-        addSerializableComponent(new RuneContainerComponent(2));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
     }
 }

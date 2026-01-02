@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.currency.CurrencyComponent;
 import me.mykindos.betterpvp.core.item.impl.AttunementStone;
+import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -44,12 +45,14 @@ public class GuiAttunement extends AbstractGui implements Windowed {
     private final VirtualInventory itemInventory;
     private final Player player;
     private final ItemFactory itemFactory;
+    private final RuneSlotDistributionRegistry runeSlotRegistry;
 
     @Inject
-    public GuiAttunement(Player player, ItemFactory itemFactory) {
+    public GuiAttunement(Player player, ItemFactory itemFactory, RuneSlotDistributionRegistry runeSlotRegistry) {
         super(9, 3);
         this.player = player;
         this.itemFactory = itemFactory;
+        this.runeSlotRegistry = runeSlotRegistry;
 
         // Create VirtualInventories with placeholders
         this.goldInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
@@ -62,8 +65,8 @@ public class GuiAttunement extends AbstractGui implements Windowed {
         setupInventoryHandler(itemInventory, instance -> true);
 
         // Create button instances
-        AttunementButton primaryButton = new AttunementButton(itemFactory, goldInventory, stoneInventory, itemInventory, true);
-        AttunementButton secondaryButton = new AttunementButton(itemFactory, goldInventory, stoneInventory, itemInventory, false);
+        AttunementButton primaryButton = new AttunementButton(itemFactory, goldInventory, stoneInventory, itemInventory, runeSlotRegistry, true);
+        AttunementButton secondaryButton = new AttunementButton(itemFactory, goldInventory, stoneInventory, itemInventory, runeSlotRegistry, false);
 
         // Apply structure
         applyStructure(new Structure(

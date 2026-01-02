@@ -39,7 +39,7 @@ public class Sharkbait extends BaseItem implements Reloadable {
         this.auraAbility = auraAbility;
         
         // Add ability container
-        addSerializableComponent(new RuneContainerComponent(3));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
         addBaseComponent(AbilityContainerComponent.builder()
                 .ability(auraAbility)
                 .build());

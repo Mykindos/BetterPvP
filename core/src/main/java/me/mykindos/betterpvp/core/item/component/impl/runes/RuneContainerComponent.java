@@ -22,33 +22,68 @@ import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 /**
  * Container component that holds multiple runes for an item.
- * Defines the maximum number of rune sockets an item can have.
+ * Defines the current available sockets and maximum upgradeable socket capacity.
+ * <ul>
+ *     <li>sockets: Current number of rune slots available</li>
+ *     <li>maxSockets: Maximum number of sockets this item can be upgraded to</li>
+ * </ul>
  */
 @Getter
 public class RuneContainerComponent implements ItemComponent, LoreComponent {
 
     private static final NamespacedKey COMPONENT_KEY = new NamespacedKey("core", "rune-container");
-    
+
     private final int sockets;
+    private final int maxSockets;
     private final List<Rune> runes;
     
     /**
-     * Creates a new rune container with the specified number of sockets
-     * 
+     * Creates a new rune container with the specified number of sockets.
+     * For backwards compatibility, sets maxSockets equal to sockets.
+     *
      * @param sockets Maximum number of runes this item can hold
      */
     public RuneContainerComponent(int sockets) {
-        this(sockets, new ArrayList<>());
+        this(sockets, sockets, new ArrayList<>());
     }
-    
+
     /**
-     * Creates a new rune container with the specified sockets and runes
-     * 
+     * Creates a new rune container with the specified sockets and runes.
+     * For backwards compatibility, sets maxSockets equal to sockets.
+     *
      * @param sockets Maximum number of runes this item can hold
      * @param runes List of runes currently applied to the item
      */
     public RuneContainerComponent(int sockets, List<Rune> runes) {
+        this(sockets, sockets, runes);
+    }
+
+    /**
+     * Creates a new rune container with specified sockets and max capacity.
+     *
+     * @param sockets Current number of available rune slots
+     * @param maxSockets Maximum number of sockets this item can be upgraded to
+     */
+    public RuneContainerComponent(int sockets, int maxSockets) {
+        this(sockets, maxSockets, new ArrayList<>());
+    }
+
+    /**
+     * Creates a new rune container with specified sockets, max capacity, and runes.
+     *
+     * @param sockets Current number of available rune slots
+     * @param maxSockets Maximum number of sockets this item can be upgraded to
+     * @param runes List of runes currently applied to the item
+     * @throws IllegalArgumentException if maxSockets is less than sockets
+     */
+    public RuneContainerComponent(int sockets, int maxSockets, List<Rune> runes) {
+        if (maxSockets < sockets) {
+            throw new IllegalArgumentException(
+                "maxSockets (" + maxSockets + ") cannot be less than sockets (" + sockets + ")"
+            );
+        }
         this.sockets = sockets;
+        this.maxSockets = maxSockets;
         this.runes = new ArrayList<>(runes);
     }
     
@@ -100,7 +135,7 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
 
     @Override
     public @NotNull ItemComponent copy() {
-        return new RuneContainerComponent(sockets, List.copyOf(runes));
+        return new RuneContainerComponent(sockets, maxSockets, List.copyOf(runes));
     }
 
     @Override
@@ -146,13 +181,15 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
         if (o == null || getClass() != o.getClass()) return false;
 
         RuneContainerComponent that = (RuneContainerComponent) o;
-        return sockets == that.sockets && Objects.equals(runes, that.runes);
+        return sockets == that.sockets
+            && maxSockets == that.maxSockets
+            && Objects.equals(runes, that.runes);
     }
 
     @Override
     public int hashCode() {
-        // sum the hash codes of the sockets and runes
         int result = Integer.hashCode(sockets);
+        result = 31 * result + Integer.hashCode(maxSockets);
         result = 31 * result + (runes != null ? runes.stream().mapToInt(Rune::hashCode).sum() : 0);
         return result;
     }

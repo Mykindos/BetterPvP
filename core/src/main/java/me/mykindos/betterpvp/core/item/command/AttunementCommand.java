@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.item.command;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
@@ -9,6 +8,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.attunement.GuiAttunement;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
+import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -31,12 +31,12 @@ import java.util.Optional;
 public class AttunementCommand extends Command {
 
     private final ItemFactory itemFactory;
-    private final Injector injector;
+    private final RuneSlotDistributionRegistry runeSlotRegistry;
 
     @Inject
-    public AttunementCommand(ItemFactory itemFactory, Injector injector) {
+    public AttunementCommand(ItemFactory itemFactory, RuneSlotDistributionRegistry runeSlotRegistry) {
         this.itemFactory = itemFactory;
-        this.injector = injector;
+        this.runeSlotRegistry = runeSlotRegistry;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class AttunementCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         // No args -> open attunement menu
         if (args.length == 0) {
-            GuiAttunement gui = new GuiAttunement(player, itemFactory);
+            GuiAttunement gui = new GuiAttunement(player, itemFactory, runeSlotRegistry);
             gui.show(player);
             return;
         }
