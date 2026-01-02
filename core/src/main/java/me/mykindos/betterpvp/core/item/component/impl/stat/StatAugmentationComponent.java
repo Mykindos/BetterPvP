@@ -49,7 +49,7 @@ public class StatAugmentationComponent extends AbstractItemComponent implements 
 
     @Override
     public List<Component> getLines(ItemInstance item) {
-        final TextComponent description = Component.text("Apply this to an item at a Augmentation NPC to augment its stats.", NamedTextColor.GRAY, TextDecoration.ITALIC);
+        final TextComponent description = Component.text("Apply this to an item at a Reforge NPC to augment its stats.", NamedTextColor.GRAY, TextDecoration.ITALIC);
         List<Component> lines = new ArrayList<>(ComponentWrapper.wrapLine(description));
 
         for (StatAugmentation augmentation : augmentations) {

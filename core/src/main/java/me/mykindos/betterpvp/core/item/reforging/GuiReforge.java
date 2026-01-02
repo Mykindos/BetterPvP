@@ -67,7 +67,7 @@ public class GuiReforge extends AbstractGui implements Windowed {
                 "000000000")
                 .addIngredient('0', Menu.INVISIBLE_BACKGROUND_ITEM)
                 .addIngredient('I', InfoTabButton.builder()
-                        .description(Component.text("Reforging an item will randomize its statistics within the accepted range. Place an item and gold to reforge the item. 3Hover over the action button for error information."))
+                        .description(Component.text("Reforging an item will randomize its statistics within the accepted range. Place an item and gold to reforge the item. Hover over the action button for error information."))
                         .icon(ItemStack.of(Material.AIR))
                         .build())
                 .addIngredient('G', new PlaceholderInventorySlot(goldInventory, new ItemBuilder(createGoldPlaceholder())))
