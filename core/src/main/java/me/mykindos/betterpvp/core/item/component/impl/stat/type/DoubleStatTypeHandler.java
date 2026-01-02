@@ -90,4 +90,9 @@ public class DoubleStatTypeHandler implements StatTypeHandler<Double> {
         // bias=0.0 returns min, bias=1.0 returns max
         return min + (bias * (max - min));
     }
+
+    @Override
+    public double toDouble(Double value) {
+        return value;
+    }
 }

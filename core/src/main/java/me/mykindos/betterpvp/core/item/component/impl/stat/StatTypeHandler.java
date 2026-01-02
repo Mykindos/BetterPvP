@@ -113,4 +113,13 @@ public interface StatTypeHandler<T> {
      * @return A biased value between min and max
      */
     T randomBetweenBiased(T min, T max, double bias);
+
+    /**
+     * Converts a value of this type to a double.
+     * Used for calculating relative positions in ranges during delta serialization.
+     *
+     * @param value The value to convert
+     * @return The value as a double
+     */
+    double toDouble(T value);
 }

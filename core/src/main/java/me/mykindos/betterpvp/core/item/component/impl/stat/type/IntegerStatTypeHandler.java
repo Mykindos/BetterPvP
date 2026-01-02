@@ -89,4 +89,9 @@ public class IntegerStatTypeHandler implements StatTypeHandler<Integer> {
         double range = max - min;
         return min + (int) Math.round(bias * range);
     }
+
+    @Override
+    public double toDouble(Integer value) {
+        return value.doubleValue();
+    }
 }
