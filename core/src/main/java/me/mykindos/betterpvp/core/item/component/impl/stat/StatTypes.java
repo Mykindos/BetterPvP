@@ -21,7 +21,7 @@ import java.util.Objects;
 public final class StatTypes {
 
     // Constants for built-in stat types
-    public static final StatType<Integer> HEALTH = StatType.builder(new NamespacedKey("betterpvp", "health"), Integer.class)
+    public static final StatType<Double> HEALTH = StatType.builder(new NamespacedKey("betterpvp", "health"), Double.class)
             .name("Health")
             .description("Increases the health of the wearer.")
             .displayColor(TextColor.color(255, 0, 0))

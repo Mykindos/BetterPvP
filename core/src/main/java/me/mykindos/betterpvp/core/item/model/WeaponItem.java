@@ -46,23 +46,25 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(plugin, this);
-        final double damage = config.getConfig("damage.base", 1.0, Double.class);
-        final double damageMin = config.getConfig("damage.min", 0.0, Double.class);
-        final double damageMax = config.getConfig("damage.max", 2.0, Double.class);
-        getComponent(StatContainerComponent.class).ifPresent(statContainer -> {
-            statContainer.getStat(StatTypes.MELEE_DAMAGE).ifPresent(meleeDamage -> {
-                statContainer.withBaseStat(meleeDamage.withValue(damage).withRanges(damageMin, damageMax));
+        if (groups.contains(Group.MELEE)) {
+            final double damage = config.getConfig("damage.base", 1.0, Double.class);
+            final double damageMin = config.getConfig("damage.min", 0.0, Double.class);
+            final double damageMax = config.getConfig("damage.max", 2.0, Double.class);
+            getComponent(StatContainerComponent.class).ifPresent(statContainer -> {
+                statContainer.getStat(StatTypes.MELEE_DAMAGE).ifPresent(meleeDamage -> {
+                    statContainer.withBaseStat(meleeDamage.withValue(damage).withRanges(damageMin, damageMax));
+                });
             });
-        });
 
-        final double attackSpeed = config.getConfig("attack_speed.base", 0.0, Double.class);
-        final double attackSpeedMin = config.getConfig("attack_speed.min", -0.25, Double.class);
-        final double attackSpeedMax = config.getConfig("attack_speed.max", 0.25, Double.class);
-        getComponent(StatContainerComponent.class).ifPresent(statContainer -> {
-            statContainer.getStat(StatTypes.MELEE_ATTACK_SPEED).ifPresent(meleeAttackSpeed -> {
-                statContainer.withBaseStat(meleeAttackSpeed.withValue(attackSpeed).withRanges(attackSpeedMin, attackSpeedMax));
+            final double attackSpeed = config.getConfig("attack_speed.base", 0.0, Double.class);
+            final double attackSpeedMin = config.getConfig("attack_speed.min", -0.25, Double.class);
+            final double attackSpeedMax = config.getConfig("attack_speed.max", 0.25, Double.class);
+            getComponent(StatContainerComponent.class).ifPresent(statContainer -> {
+                statContainer.getStat(StatTypes.MELEE_ATTACK_SPEED).ifPresent(meleeAttackSpeed -> {
+                    statContainer.withBaseStat(meleeAttackSpeed.withValue(attackSpeed).withRanges(attackSpeedMin, attackSpeedMax));
+                });
             });
-        });
+        }
 
         final int durability = config.getConfig("durability", 500, Integer.class);
         getComponent(DurabilityComponent.class).ifPresent(durabilityComponent -> {
