@@ -75,7 +75,10 @@ public class ReforgingButton extends ControlItem<Gui> {
                 builder.lore(Component.text("Stats:", NamedTextColor.YELLOW, TextDecoration.BOLD));
                 deltaPreview.forEach(builder::lore);
                 builder.lore(Component.empty());
-                builder.lore(Component.text("All stats will be randomized!", NamedTextColor.RED, TextDecoration.ITALIC));
+                builder.lore(Component.empty()
+                        .append(Component.text("WARNING:", NamedTextColor.RED, TextDecoration.BOLD))
+                        .appendSpace()
+                        .append(Component.text("All stats will be randomized!", NamedTextColor.RED, TextDecoration.ITALIC)));
             }
 
             ItemRarity rarity = itemFactory.fromItemStack(Objects.requireNonNull(itemInventory.getItem(0))).orElseThrow().getRarity();
@@ -327,7 +330,7 @@ public class ReforgingButton extends ControlItem<Gui> {
      * @return A new stat with a biased random value
      */
     private <T> ItemStat<T> randomizeStat(ItemStat<T> stat, @Nullable PurityComponent purityComponent) {
-        ItemPurity purity = ItemPurity.FRAGILE;
+        ItemPurity purity = ItemPurity.PITIFUL;
         if (purityComponent != null && purityComponent.isAttuned()) {
             purity = purityComponent.getPurity();
         }
