@@ -16,6 +16,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -107,7 +108,7 @@ public class ItemView implements ItemProvider {
         }
 
         if (displayName != null) {
-            meta.displayName(displayName.decoration(TextDecoration.ITALIC, false));
+            meta.displayName(displayName.applyFallbackStyle(Style.style().decoration(TextDecoration.ITALIC, false).build()));
         }
 
         meta.lore(lore);
@@ -139,7 +140,7 @@ public class ItemView implements ItemProvider {
 
         final List<Component> curLore = meta.lore();
         if (curLore != null) {
-            meta.lore(curLore.stream().map(component -> UtilMessage.normalize(component).decoration(TextDecoration.ITALIC, false)).toList());
+            meta.lore(curLore.stream().map(component -> UtilMessage.normalize(component).applyFallbackStyle(Style.style().decoration(TextDecoration.ITALIC, false).build())).toList());
         }
 
         if (enchantments != null) {

@@ -55,7 +55,7 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
 
     /**
      * Gets all stats as a merged list, where base stats are overridden by modifier stats of the same type.
-     * 
+     *
      * @return A new list containing merged stats
      */
     @Contract(pure = true, value = "-> new")
@@ -66,9 +66,10 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
             boolean mergedFlag = false;
             for (int i = 0; i < merged.size(); i++) {
                 ItemStat<?> base = merged.get(i);
-                if (base.getClass() == modifier.getClass()) {
+                // Use type equality instead of class comparison
+                if (base.getType().equals(modifier.getType())) {
                     // Merge using the merge method
-                    merged.set(i, base.merge(modifier));
+                    merged.set(i, modifier);
                     mergedFlag = true;
                     break;
                 }
@@ -81,31 +82,31 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
     }
 
     /**
-     * Checks if this container has a stat of the given type.
-     * 
-     * @param clazz The stat class to check for
-     * @param <T>   The stat type
-     * @return true if this container has a stat of the given type, false otherwise
-     */
-    @Contract(pure = true)
-    public <T extends ItemStat<?>> boolean hasStat(@NotNull Class<T> clazz) {
-        return getStats().stream()
-                .anyMatch(clazz::isInstance);
-    }
-
-    /**
      * Gets a stat of the given type if present.
-     * 
-     * @param clazz The stat class to get
-     * @param <T>   The stat type
+     *
+     * @param type The stat type to get
+     * @param <T>  The stat value type
      * @return An Optional containing the stat if found, empty otherwise
      */
     @Contract(pure = true, value = "_ -> new")
-    public <T extends ItemStat<?>> @NotNull Optional<T> getStat(@NotNull Class<T> clazz) {
+    @SuppressWarnings("unchecked")
+    public <T> @NotNull Optional<ItemStat<T>> getStat(@NotNull StatType<T> type) {
         return getStats().stream()
-                .filter(clazz::isInstance)
-                .map(clazz::cast)
+                .filter(stat -> stat.getType().equals(type))
+                .map(stat -> (ItemStat<T>) stat)
                 .findFirst();
+    }
+
+    /**
+     * Checks if this container has a stat of the given type.
+     *
+     * @param type The stat type to check for
+     * @return true if this container has a stat of the given type, false otherwise
+     */
+    @Contract(pure = true)
+    public boolean hasStat(@NotNull StatType<?> type) {
+        return getStats().stream()
+                .anyMatch(stat -> stat.getType().equals(type));
     }
 
     /**
@@ -131,7 +132,7 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
     /**
      * Adds or replaces a base stat.
      * If a stat of the same type already exists, it will be replaced.
-     * 
+     *
      * @param stat The stat to add or replace
      * @return This component instance for method chaining
      */
@@ -139,7 +140,8 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
     public @NotNull StatContainerComponent withBaseStat(@NotNull ItemStat<?> stat) {
         boolean replaced = false;
         for (int i = 0; i < baseStats.size(); i++) {
-            if (baseStats.get(i).getClass() == stat.getClass()) {
+            // Use type equality instead of class comparison
+            if (baseStats.get(i).getType().equals(stat.getType())) {
                 baseStats.set(i, stat);
                 replaced = true;
                 break;
@@ -166,7 +168,7 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
     /**
      * Adds or replaces a modifier stat.
      * If a stat of the same type already exists, it will be replaced.
-     * 
+     *
      * @param stat The modifier stat to add or replace
      * @return This component instance for method chaining
      */
@@ -174,7 +176,8 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
     public @NotNull StatContainerComponent withModifierStat(@NotNull ItemStat<?> stat) {
         boolean replaced = false;
         for (int i = 0; i < modifierStats.size(); i++) {
-            if (modifierStats.get(i).getClass() == stat.getClass()) {
+            // Use type equality instead of class comparison
+            if (modifierStats.get(i).getType().equals(stat.getType())) {
                 modifierStats.set(i, stat);
                 replaced = true;
                 break;
@@ -212,7 +215,7 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
             final String value = stat.stringValue();
             final Component line = Component.text(value, stat.getValueColor())
                     .appendSpace()
-                    .append(Component.text(stat.getShortName(), NamedTextColor.GRAY));
+                    .append(Component.text(stat.getType().getShortName(), NamedTextColor.GRAY));
             lines.add(line);
         }
         return lines;

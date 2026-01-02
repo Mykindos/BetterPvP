@@ -5,8 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeDamageStat;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import org.bukkit.entity.LivingEntity;
@@ -52,12 +53,12 @@ public class MeleeDamageStatHandler implements Listener {
                 return; // No stat container, no stats
             }
 
-            final Optional<MeleeDamageStat> statOpt = statContainerOpt.get().getStat(MeleeDamageStat.class);
+            final Optional<ItemStat<Double>> statOpt = statContainerOpt.get().getStat(StatTypes.MELEE_DAMAGE);
             if (statOpt.isEmpty()) {
                 return; // No damage stat, no damage
             }
 
-            final MeleeDamageStat stat = statOpt.get();
+            final ItemStat<Double> stat = statOpt.get();
             event.setDamage(stat.getValue());
         });
     }

@@ -29,6 +29,8 @@ import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.inventory.InvUI;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypeRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.leaderboards.CoreLeaderboardLoader;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
@@ -168,6 +170,11 @@ public class Core extends BPvPPlugin {
     }
     
     private void registerItems() {
+        StatTypes.registerAll(this.injector.getInstance(StatTypeRegistry.class));
+
+        // Initialize purity reforge bias registry
+        this.injector.getInstance(me.mykindos.betterpvp.core.item.purity.bias.PurityReforgeBiasRegistry.class);
+
         this.injector.getInstance(CoreBlockBootstrap.class).register();
         this.injector.getInstance(MetalRecipeBootstrap.class).register();
         this.injector.getInstance(CastingMoldBootstrap.class).register();

@@ -6,9 +6,9 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeDamageStat;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.inventory.ItemStack;
@@ -30,8 +30,8 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
 
         if (groups.contains(Group.MELEE)) {
             addSerializableComponent(new StatContainerComponent()
-                    .withBaseStat(new MeleeDamageStat(1f))
-                    .withBaseStat(new MeleeAttackSpeedStat(0f)));
+                    .withBaseStat(new ItemStat<>(StatTypes.MELEE_DAMAGE, 1.0))
+                    .withBaseStat(new ItemStat<>(StatTypes.MELEE_ATTACK_SPEED, 0.0)));
         }
     }
 
@@ -46,10 +46,21 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(plugin, this);
-        final double damage = config.getConfig("damage", 1.0, Double.class);
+        final double damage = config.getConfig("damage.base", 1.0, Double.class);
+        final double damageMin = config.getConfig("damage.min", 0.0, Double.class);
+        final double damageMax = config.getConfig("damage.max", 2.0, Double.class);
         getComponent(StatContainerComponent.class).ifPresent(statContainer -> {
-            statContainer.getStat(MeleeDamageStat.class).ifPresent(meleeDamage -> {
-                statContainer.withBaseStat(meleeDamage.withValue(damage));
+            statContainer.getStat(StatTypes.MELEE_DAMAGE).ifPresent(meleeDamage -> {
+                statContainer.withBaseStat(meleeDamage.withValue(damage).withRanges(damageMin, damageMax));
+            });
+        });
+
+        final double attackSpeed = config.getConfig("attack_speed.base", 0.0, Double.class);
+        final double attackSpeedMin = config.getConfig("attack_speed.min", -0.25, Double.class);
+        final double attackSpeedMax = config.getConfig("attack_speed.max", 0.25, Double.class);
+        getComponent(StatContainerComponent.class).ifPresent(statContainer -> {
+            statContainer.getStat(StatTypes.MELEE_ATTACK_SPEED).ifPresent(meleeAttackSpeed -> {
+                statContainer.withBaseStat(meleeAttackSpeed.withValue(attackSpeed).withRanges(attackSpeedMin, attackSpeedMax));
             });
         });
 

@@ -52,11 +52,19 @@ public class AttunementButton extends ControlItem<Gui> {
 
         if (errors.isEmpty()) {
             // Success state
-            return ItemView.builder()
+            final ItemView.ItemViewBuilder builder = ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(visible ? Key.key("betterpvp", "menu/gui/attunement/button_success") : Material.AIR.getKey())
-                    .displayName(Component.text("GO!", NamedTextColor.GREEN, TextDecoration.BOLD))
-                    .build();
+                    .displayName(Component.text("GO!", NamedTextColor.GREEN, TextDecoration.BOLD));
+
+            builder.lore(Component.empty());
+            ItemRarity rarity = itemFactory.fromItemStack(Objects.requireNonNull(itemInventory.getItem(0))).orElseThrow().getRarity();
+            builder.lore(Component.empty()
+                    .append(Component.text("Cost:", NamedTextColor.GOLD, TextDecoration.BOLD))
+                    .appendSpace()
+                    .append(Component.text(getAttunementCost(rarity) + " gold", NamedTextColor.YELLOW)));
+
+            return builder.build();
         } else {
             // Error state
             ItemView.ItemViewBuilder builder = ItemView.builder()
