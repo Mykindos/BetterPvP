@@ -254,7 +254,6 @@ public class FrenzyListener implements Listener {
         }
     }
 
-    // fuck everyone
     private boolean isMovementSkill(IChampionsSkill skill) {
         final Class<? extends IChampionsSkill> clazz = skill.getClass();
         for (Class<?> superClass : clazz.getInterfaces()) {
