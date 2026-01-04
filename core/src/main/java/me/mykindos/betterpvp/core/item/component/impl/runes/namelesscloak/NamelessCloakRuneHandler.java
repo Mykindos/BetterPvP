@@ -98,7 +98,7 @@ public class NamelessCloakRuneHandler implements Listener {
 
             // prevents vfx/sfx spam
             if (!effectManager.hasEffect(player, EffectTypes.INVISIBILITY, RUNE_IDENTIFIER)
-                    && cooldownManager.use(player, RUNE_IDENTIFIER, 3, false)) {
+                    && cooldownManager.use(player, RUNE_IDENTIFIER, 5, false)) {
 
                 playVfxAndSfx(player);
             }

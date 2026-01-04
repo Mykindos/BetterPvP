@@ -4,13 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroups;
-import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -20,13 +17,10 @@ import java.util.List;
 
 @Singleton
 @EqualsAndHashCode
-public class NamelessCloakRune implements Rune, Reloadable {
+public class NamelessCloakRune implements Rune {
     public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "nameless_cloak");
 
     private final Provider<NamelessCloakRuneItem> itemProvider;
-
-    @Getter
-    private double timeOutOfCombat = 5.0;
 
     @Inject
     public NamelessCloakRune(Provider<NamelessCloakRuneItem> itemProvider) {
@@ -53,9 +47,4 @@ public class NamelessCloakRune implements Rune, Reloadable {
         return List.of(RuneGroups.CHESTPLATE);
     }
 
-    @Override
-    public void reload() {
-        final Config config = Config.item(Core.class, itemProvider.get());
-        this.timeOutOfCombat = config.getConfig("time-out-of-combat", 5.0, Double.class);
-    }
 }
