@@ -28,8 +28,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @BPvPListener
@@ -37,8 +39,7 @@ import java.util.WeakHashMap;
 public class NamelessCloakRuneHandler implements Listener {
 
     private final @NotNull String RUNE_IDENTIFIER = NamelessCloakRune.KEY.getKey();
-    private final Object DUMMY_OBJECT = new Object();  // for tracking purposes in WeakHashMap
-    private final WeakHashMap<LivingEntity, Object> tracked = new WeakHashMap<>();
+    private final Set<LivingEntity> tracked = Collections.newSetFromMap(new WeakHashMap<>());
 
     private final DamageLogManager damageLogManager;
     private final ClientManager clientManager;
@@ -77,7 +78,7 @@ public class NamelessCloakRuneHandler implements Listener {
             final @NotNull RuneContainerComponent runeContainer = container.get();
 
             if (runeContainer.hasRune(namelessCloakRune)) {
-                tracked.put(entity, DUMMY_OBJECT);
+                tracked.add(entity);
                 return;
             }
         }
@@ -85,7 +86,7 @@ public class NamelessCloakRuneHandler implements Listener {
 
     @UpdateEvent
     public void onTick() {
-        Iterator<LivingEntity> iterator = tracked.keySet().iterator();
+        Iterator<LivingEntity> iterator = tracked.iterator();
         while (iterator.hasNext()) {
             final @NotNull LivingEntity entity = iterator.next();
 
