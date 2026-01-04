@@ -140,7 +140,7 @@ dependencyResolutionManagement {
             library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
 
             // Library - Protocol
-            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.7")
+            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.13")
             library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.11.0")
 
             // Library - Mixins
