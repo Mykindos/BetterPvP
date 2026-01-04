@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.supplycrate.SupplyCrateController;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrateType;
 import me.mykindos.betterpvp.core.supplycrate.event.SupplyCrateDeployEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -59,7 +60,7 @@ public class DeployCrateAbility extends ItemAbility {
 
         }
 
-        final SupplyCrateDeployEvent event = new SupplyCrateDeployEvent(player, type);
+        final SupplyCrateDeployEvent event = UtilServer.callEvent(new SupplyCrateDeployEvent(player, type));
         if (event.isCancelled()) {
             new SoundEffect(Sound.ENTITY_ITEM_BREAK, 0.5f, 0.89f).play(player);
             return false;
