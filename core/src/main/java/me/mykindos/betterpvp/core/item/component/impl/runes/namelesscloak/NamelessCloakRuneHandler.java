@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
@@ -84,8 +85,15 @@ public class NamelessCloakRuneHandler implements Listener {
 
     @UpdateEvent
     public void onTick() {
-        for (@NotNull LivingEntity entity : tracked.keySet()) {
+        Iterator<LivingEntity> iterator = tracked.keySet().iterator();
+        while (iterator.hasNext()) {
+            final @NotNull LivingEntity entity = iterator.next();
+
             if (!(entity instanceof Player player)) continue;
+            if (!player.isOnline() || !player.isValid()) {
+                iterator.remove();
+                continue;
+            }
 
             // Check if they're in combat
             final @Nullable DamageLog lastDamager = damageLogManager.getLastDamager(entity);

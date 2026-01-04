@@ -6,10 +6,12 @@ import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroups;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,7 +36,9 @@ public class NamelessCloakRune implements Rune, Reloadable {
 
     @Override
     public @NotNull String getDescription() {
-        return "Nametags and skins are concealed while out of combat.";
+        return String.format(
+                "Conceals the wearer's nametag and skin while out of combat for <time>%s</time> seconds.",
+                UtilFormat.formatNumber(DamageLog.EXPIRY));
     }
 
     @Override

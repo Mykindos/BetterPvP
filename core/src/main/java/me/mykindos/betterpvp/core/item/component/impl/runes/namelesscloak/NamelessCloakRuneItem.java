@@ -15,6 +15,6 @@ public class NamelessCloakRuneItem extends RuneItem {
 
     @Inject
     private NamelessCloakRuneItem(NamelessCloakRune rune) {
-        super(rune, RuneColor.ARMOR, ItemRarity.RARE);
+        super(rune, RuneColor.ARMOR, ItemRarity.EPIC);
     }
 }
