@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 
 @Singleton
 @ItemKey("core:cannon")
+@PluginAdapter("ModelEngine")
 @EqualsAndHashCode(callSuper = false)
 public class CannonItem extends BaseItem implements Reloadable {
 
