@@ -48,7 +48,10 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
     
     @Override
     public @NotNull ItemInstance createPrimaryResult() {
-        return createPrimaryResult(List.of(itemFactory.create(baseItem), itemFactory.create(runeItem)));
+        ItemInstance item = itemFactory.create(baseItem);
+        // Some have a rune container that doesn't have sockets yet
+        item = item.withComponent(new RuneContainerComponent(1, 1));
+        return createPrimaryResult(List.of(item, itemFactory.create(runeItem)));
     }
     
     /**
