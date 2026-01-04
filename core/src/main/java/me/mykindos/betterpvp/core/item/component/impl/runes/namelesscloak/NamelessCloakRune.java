@@ -38,7 +38,7 @@ public class NamelessCloakRune implements Rune, Reloadable {
     public @NotNull String getDescription() {
         return String.format(
                 "Conceals the wearer's nametag and skin while out of combat for <time>%s</time> seconds.",
-                UtilFormat.formatNumber(DamageLog.EXPIRY));
+                UtilFormat.formatNumber((double) DamageLog.EXPIRY / 1000));
     }
 
     @Override
@@ -59,6 +59,6 @@ public class NamelessCloakRune implements Rune, Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.vfxDelay = config.getConfig("vfxDelay", 15, Double.class);
+        this.vfxDelay = config.getConfig("vfxDelay", 15.0, Double.class);
     }
 }
