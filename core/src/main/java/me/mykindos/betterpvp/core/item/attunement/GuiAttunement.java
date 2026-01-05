@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.currency.CurrencyComponent;
+import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.impl.AttunementStone;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -58,11 +59,12 @@ public class GuiAttunement extends AbstractGui implements Windowed {
         this.goldInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
         this.stoneInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
         this.itemInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
+        this.itemInventory.setGuiPriority(-Integer.MAX_VALUE); // We want people shift-clicking items last into here
 
         // Set up inventory handlers
         setupInventoryHandler(goldInventory, instance -> instance.getComponent(CurrencyComponent.class).isPresent());
         setupInventoryHandler(stoneInventory, instance -> instance.getBaseItem() instanceof AttunementStone);
-        setupInventoryHandler(itemInventory, instance -> true);
+        setupInventoryHandler(itemInventory, instance -> instance.getComponent(PurityComponent.class).isPresent());
 
         // Create button instances
         AttunementButton primaryButton = new AttunementButton(itemFactory, goldInventory, stoneInventory, itemInventory, runeSlotRegistry, true);

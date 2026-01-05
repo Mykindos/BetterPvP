@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
+import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponentSerializer;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.champions.tips.ChampionsTipLoader;
 import me.mykindos.betterpvp.core.Core;
@@ -26,6 +27,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
+import me.mykindos.betterpvp.core.item.component.serialization.ComponentSerializationRegistry;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -73,6 +75,7 @@ public class Champions extends BPvPPlugin {
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Champions"));
 
             final ItemLoader itemLoader = new ItemLoader(this);
+            registerSerializer();
             itemLoader.load(adapters, reflections.getTypesAnnotatedWith(ItemKey.class));
 
             var championsListenerLoader = injector.getInstance(ChampionsListenerLoader.class);
@@ -101,6 +104,10 @@ public class Champions extends BPvPPlugin {
             // We do this to force the static initializer to run, can be removed if we import this class anywhere
             Class.forName("me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes");
         }
+    }
+
+    private void registerSerializer() {
+        injector.getInstance(ComponentSerializationRegistry.class).register(new ArmorStorageComponentSerializer());
     }
 
 }

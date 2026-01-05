@@ -14,18 +14,15 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -34,10 +31,11 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -64,19 +62,35 @@ public class RoleListener implements Listener {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
-        roleManager.removeObject(event.getPlayer().getUniqueId().toString());
+        roleManager.cleanUp(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        roleManager.populate(event.getPlayer());
+        equipMessage(event.getPlayer(), roleManager.getRole(event.getPlayer()));
+    }
+
+    @EventHandler
+    public void onRemove(EntityRemoveEvent event) {
+        if (event.getEntity() instanceof LivingEntity livingEntity)  {
+            roleManager.cleanUp(livingEntity);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
+        final LivingEntity livingEntity = event.getLivingEntity();
+        livingEntity.getWorld().playSound(livingEntity.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
 
-        Player player = event.getPlayer();
+        if (!(livingEntity instanceof Player player)) {
+            return;
+        }
+
         Role role = event.getRole();
-
         if (role == null) {
             UtilMessage.simpleMessage(player, "Class", "Armor Class: <green>None");
         } else {
-            roleManager.addObject(player.getUniqueId().toString(), role);
             UtilMessage.simpleMessage(player, "Class", "You equipped <green>%s", role.getName());
             UtilMessage.message(player, equipMessage(player, role));
 
@@ -85,97 +99,24 @@ public class RoleListener implements Listener {
             int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
             gamer.saveProperty(roleProperty, timesEquipped);
         }
-
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
-
-    }
-
-    @UpdateEvent(delay = 250)
-    public void checkRoles() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-
-            if (!checkNoRoleEquipped(player)) {
-                checkEquippedRole(player);
-            } else {
-                equipRole(player, null);
-            }
-
-        }
-    }
-
-    private void checkEquippedRole(Player player) {
-        EntityEquipment equipment = player.getEquipment();
-        for (Role role : Role.values()) {
-            if (equipment.getHelmet().getType() == role.getHelmet()
-                    && equipment.getChestplate().getType() == role.getChestplate()
-                    && equipment.getLeggings().getType() == role.getLeggings()
-                    && equipment.getBoots().getType() == role.getBoots()) {
-                equipRole(player, role);
-                return;
-            }
-
-        }
-
-        equipRole(player, null);
     }
 
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {
         Player player = event.getPlayer();
-        roleManager.getObject(event.getPlayer().getUniqueId()).ifPresent(role -> {
-            if (event.getNewBuild().getRole() == role) {
-                UtilMessage.message(player, equipMessage(player, role));
-            }
-        });
+        final Role role = roleManager.getRole(player);
+        if (event.getNewBuild().getRole() == role) {
+            UtilMessage.message(player, equipMessage(player, role));
+        }
     }
 
     @EventHandler
     public void onDeleteBuild(DeleteBuildEvent event) {
         Player player = event.getPlayer();
-        roleManager.getObject(event.getPlayer().getUniqueId()).ifPresent(role -> {
-            if (event.getRoleBuild().getRole() == role) {
-                UtilMessage.message(player, equipMessage(player, role));
-            }
-        });
-    }
-
-    private void equipRole(Player player, Role role) {
-        if (role == null) {
-            if (roleManager.getObjects().containsKey(player.getUniqueId().toString())) {
-                final Optional<Role> previous = roleManager.getObject(player.getUniqueId().toString());
-                roleManager.removeObject(player.getUniqueId().toString());
-                UtilServer.callEvent(new RoleChangeEvent(player, null, previous.orElse(null)));
-            }
-            return;
+        final Role role = roleManager.getRole(player);
+        if (event.getRoleBuild().getRole() == role) {
+            UtilMessage.message(player, equipMessage(player, role));
         }
-
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isEmpty() || roleOptional.get() != role) {
-            UtilServer.callEvent(new RoleChangeEvent(player, role, roleOptional.orElse(null)));
-        }
-    }
-
-    private boolean checkNoRoleEquipped(Player player) {
-        for (ItemStack armour : player.getEquipment().getArmorContents()) {
-            if (armour == null || armour.getType() == Material.AIR) {
-
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Component equipMessage(Player player, Role role) {
-        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-        if (gamerBuildsOptional.isPresent()) {
-            GamerBuilds builds = gamerBuildsOptional.get();
-
-            RoleBuild build = builds.getActiveBuilds().get(role.getName());
-            if (build != null) {
-                return build.getBuildComponent();
-            }
-        }
-        return Component.empty();
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -185,26 +126,22 @@ public class RoleListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onShootBow(EntityShootBowEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
         if (event.getBow() != null && itemFactory.isCustomItem(event.getBow())) {
             return; // custom bow
         }
 
-        if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.message(player, "Bow", "You cannot shoot a bow in liquid.");
+        final LivingEntity livingEntity = event.getEntity();
+        if (UtilBlock.isInLiquid(livingEntity)) {
+            UtilMessage.message(livingEntity, "Bow", "You cannot shoot a bow in liquid.");
             event.setCancelled(true);
             return;
         }
 
-        roleManager.getObject(player.getUniqueId()).ifPresentOrElse(role -> {
-            if (role != Role.ASSASSIN && role != Role.RANGER) {
-                UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
-                event.setCancelled(true);
-            }
-        }, () -> {
-            UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
+        final Role role = roleManager.getRole(livingEntity).orElse(null);
+        if (role != Role.ASSASSIN && role != Role.RANGER) {
+            UtilMessage.message(livingEntity, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
             event.setCancelled(true);
-        });
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -212,17 +149,14 @@ public class RoleListener implements Listener {
         final Function<LivingEntity, Component> def = event.getNameFormat();
         event.setNameFormat(entity -> {
             Component name = def.apply(entity);
-            if (entity instanceof Player player) {
-                final Optional<Role> role = roleManager.getObject(player.getUniqueId());
-                if (role.isPresent()) {
-                    final TextComponent prefix = Component.text(role.get().getPrefix() + ".", NamedTextColor.GREEN);
-                    name = Component.join(JoinConfiguration.noSeparators(), prefix, name);
-                }
+            final Optional<Role> role = roleManager.getRole(entity);
+            if (role.isPresent()) {
+                final TextComponent prefix = Component.text(role.get().getPrefix() + ".", NamedTextColor.GREEN);
+                name = Component.join(JoinConfiguration.noSeparators(), prefix, name);
             }
             return name;
         });
     }
-
 
     @EventHandler
     public void onArmourChange(PlayerInteractEvent event) {
@@ -240,6 +174,19 @@ public class RoleListener implements Listener {
                 event.setUseItemInHand(Event.Result.DENY);
             }
         }
+    }
+
+    public Component equipMessage(Player player, Role role) {
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
+
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build != null) {
+                return build.getBuildComponent();
+            }
+        }
+        return Component.empty();
     }
 
 }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -47,11 +48,27 @@ public class EntityHealthService {
         return health;
     }
 
+    public void setBaseHealth(LivingEntity entity, double baseHealth) {
+        final AttributeInstance attribute = entity.getAttribute(Attribute.MAX_HEALTH);
+        Preconditions.checkNotNull(attribute, "Entity does not have a max health attribute: " + entity.getName());
+        attribute.setBaseValue(baseHealth);
+    }
+
+    public void resetBaseHealth(LivingEntity entity) {
+        final AttributeInstance attribute = entity.getAttribute(Attribute.MAX_HEALTH);
+        Preconditions.checkNotNull(attribute, "Entity does not have a max health attribute: " + entity.getName());
+        attribute.setBaseValue(attribute.getDefaultValue());
+    }
+
     public double getMaxHealth(LivingEntity entity) {
+        final double baseHealth = Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getBaseValue();
+        double additionalHealth = 0;
+
         final EntityEquipment equipment = entity.getEquipment();
-        Preconditions.checkNotNull(equipment, "Entity equipment cannot be null for entity: " + entity.getName());
-        double additionalHealth = getHealth(equipment.getArmorContents());
-        final double baseHealth = Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getDefaultValue();
+        if (equipment != null) {
+            additionalHealth += getHealth(equipment.getArmorContents());
+        }
+
         return baseHealth + additionalHealth;
     }
 

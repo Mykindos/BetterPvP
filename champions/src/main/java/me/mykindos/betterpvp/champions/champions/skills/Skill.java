@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
-import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -44,9 +43,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
-import java.util.function.IntToDoubleFunction;
-
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntToDoubleFunction;
 
@@ -366,16 +363,14 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     protected Optional<BuildSkill> getSkill(GamerBuilds gamerBuilds) {
-        Optional<Role> roleOptional = championsManager.getRoles().getObject(gamerBuilds.getClient().getUuid());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
-            if (role == getClassType() || getClassType() == null) {
-                RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
-                BuildSkill buildSkill = roleBuild.getBuildSkill(getType());
-                if (buildSkill != null && buildSkill.getSkill() != null) {
-                    if (buildSkill.getSkill().equals(this)) {
-                        return Optional.of(buildSkill);
-                    }
+        final Player player = Objects.requireNonNull(gamerBuilds.getClient().getGamer().getPlayer());
+        Role role = championsManager.getRoles().getRole(player);
+        if (role == getClassType() || getClassType() == null) {
+            RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
+            BuildSkill buildSkill = roleBuild.getBuildSkill(getType());
+            if (buildSkill != null && buildSkill.getSkill() != null) {
+                if (buildSkill.getSkill().equals(this)) {
+                    return Optional.of(buildSkill);
                 }
             }
         }
