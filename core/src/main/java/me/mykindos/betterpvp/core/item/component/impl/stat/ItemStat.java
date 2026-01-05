@@ -3,100 +3,119 @@ package me.mykindos.betterpvp.core.item.component.impl.stat;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.NamespacedKey;
-import me.mykindos.betterpvp.core.item.Item;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 /**
- * Represents a statistical attribute for an item.
- * This can include various properties such as damage, speed, etc.
- * <p>
- * Each statistic has an associated bukkit {@link org.bukkit.event.Listener} or handler class that
- * will manage its behavior and interactions within the game. Their instantiation and, hence, execution
- * order is determined by Guice, which is a dependency injection framework.
+ * Represents a statistical attribute value for an item.
+ * This is a value holder that references a StatType for its definition.
  * <p>
  * ItemStats are immutable and contained within a {@link StatContainerComponent}.
  * Serialization is handled by the StatSerializationRegistry.
+ *
+ * @param <T> The data type for this stat (Integer, Double, etc.)
  */
 @Getter
-public abstract class ItemStat<T> {
+public class ItemStat<T> {
 
     public static final TextColor RED = TextColor.color(255, 0, 0);
     public static final TextColor GREEN = TextColor.color(0, 255, 0);
     public static final TextColor BLUE = TextColor.color(0, 0, 255);
 
-    private final NamespacedKey key;
-    private final String name;
-    private final String shortName;
-    private final String description;
+    private final StatType<T> type;
     private final T value;
+    private final T baseRangeMin;
+    private final T rangeMax;
+    private final T rangeMinFlatModifier;
 
-    protected ItemStat(String keyName, String name, String shortName, String description, T value) {
-        this.key = new NamespacedKey("betterpvp", keyName.toLowerCase().replace("_", "-"));
-        this.name = name;
-        this.shortName = shortName;
-        this.description = description;
-        Preconditions.checkArgument(isValidValue(value), "value is not valid");
+    /**
+     * Full constructor with all fields.
+     */
+    public ItemStat(@NotNull StatType<T> type, @NotNull T value, @NotNull T baseRangeMin, @NotNull T rangeMax, @NotNull T rangeMinFlatModifier) {
+        Preconditions.checkNotNull(type, "type cannot be null");
+        Preconditions.checkNotNull(value, "value cannot be null");
+        Preconditions.checkArgument(type.isValidValue(value), "value is not valid for this stat type");
+
+        this.type = type;
         this.value = value;
+        this.baseRangeMin = baseRangeMin;
+        this.rangeMax = rangeMax;
+        this.rangeMinFlatModifier = rangeMinFlatModifier;
     }
-
-    public ItemStat(String keyName, String name, String description, TextColor valueColor, T value) {
-        this(keyName, name, name, description, value);
-    }
-
-    public void onApply(Item item, ItemStack stack) {
-        // Default implementation does nothing
-    }
-
-    public void onRemove(Item item, ItemStack stack) {
-        // Default implementation does nothing
-    }
-
-    protected boolean isValidValue(T value) {
-        return value != null;
-    }
-
-    protected abstract TextColor getValueColor();
-
-    public abstract String stringValue();
-
-    public abstract ItemStat<T> copy();
 
     /**
-     * Creates a new instance of this stat with a different value.
-     * This is the primary way to "edit" an immutable stat.
-     * 
-     * @param newValue The new value for the stat
-     * @return A new ItemStat instance with the updated value
+     * Constructor with ranges, no modifier.
      */
-    public abstract ItemStat<T> withValue(T newValue);
+    public ItemStat(@NotNull StatType<T> type, @NotNull T value, @NotNull T baseRangeMin, @NotNull T rangeMax) {
+        this(type, value, baseRangeMin, rangeMax, type.getZero());
+    }
 
     /**
-     * Merge this stat with another stat of the same type.
-     * By default, throws UnsupportedOperationException. Subclasses should override.
+     * Simple constructor with automatic ±1.0 ranges.
+     */
+    public ItemStat(@NotNull StatType<T> type, @NotNull T value) {
+        this(type, value,
+                type.subtract(value, type.getOne()),
+                type.add(value, type.getOne()),
+                type.getZero());
+    }
+
+    /**
+     * Gets the calculated minimum range value.
+     * This is the base range minimum plus any flat modifiers from reforging.
      *
-     * @param other The other stat to merge with
-     * @return A new merged ItemStat
+     * @return The effective minimum range value
      */
-    public ItemStat<T> merge(ItemStat<?> other) {
-        throw new UnsupportedOperationException("Merging not supported for this stat type: " + getClass());
+    public T getRangeMin() {
+        return type.add(baseRangeMin, rangeMinFlatModifier);
+    }
+
+    public String stringValue() {
+        return type.stringValue(value);
+    }
+
+    public TextColor getValueColor() {
+        return type.getValueColor(value);
+    }
+
+    public ItemStat<T> withValue(@NotNull T newValue) {
+        return new ItemStat<>(type, newValue, baseRangeMin, rangeMax, rangeMinFlatModifier);
+    }
+
+    public ItemStat<T> withRanges(@NotNull T newBaseRangeMin, @NotNull T newRangeMax) {
+        return new ItemStat<>(type, value, newBaseRangeMin, newRangeMax, rangeMinFlatModifier);
+    }
+
+    public ItemStat<T> withRangeMinFlatModifier(@NotNull T modifier) {
+        return new ItemStat<>(type, value, baseRangeMin, rangeMax, modifier);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ItemStat<T> merge(@NotNull ItemStat<?> other) {
+        Preconditions.checkArgument(type.equals(other.type), "Cannot merge stats of different types");
+        T mergedValue = type.merge(this.value, (T) other.value);
+        return new ItemStat<>(type, mergedValue, baseRangeMin, rangeMax, rangeMinFlatModifier);
+    }
+
+    public ItemStat<T> copy() {
+        return new ItemStat<>(type, value, baseRangeMin, rangeMax, rangeMinFlatModifier);
     }
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ItemStat<?> itemStat = (ItemStat<?>) o;
-        return Objects.equals(key, itemStat.key) && Objects.equals(value, itemStat.value);
+        return Objects.equals(type, itemStat.type)
+                && Objects.equals(value, itemStat.value)
+                && Objects.equals(baseRangeMin, itemStat.baseRangeMin)
+                && Objects.equals(rangeMax, itemStat.rangeMax)
+                && Objects.equals(rangeMinFlatModifier, itemStat.rangeMinFlatModifier);
     }
 
     @Override
     public int hashCode() {
-        // hashcode of key and namespace and value
-        int result = key.getNamespace().hashCode() * 31 + key.getKey().hashCode();
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-        return result;
+        return Objects.hash(type, value, baseRangeMin, rangeMax, rangeMinFlatModifier);
     }
 }

@@ -6,10 +6,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.HealthStat;
-import org.bukkit.NamespacedKey;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -42,8 +40,8 @@ public class EntityHealthService {
             }
 
             final StatContainerComponent container = componentOpt.get();
-            if (container.hasStat(HealthStat.class)) {
-                health += container.getStat(HealthStat.class).orElseThrow().getValue();
+            if (container.hasStat(StatTypes.HEALTH)) {
+                health += container.getStat(StatTypes.HEALTH).orElseThrow().getValue();
             }
         }
         return health;

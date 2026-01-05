@@ -49,7 +49,7 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
 
         // Create and add the mining speed ability
         this.ability = new EnhancedMiningAbility();
-        addSerializableComponent(new RuneContainerComponent(3));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
         addBaseComponent(AbilityContainerComponent.builder()
                 .ability(ability)
                 .build());

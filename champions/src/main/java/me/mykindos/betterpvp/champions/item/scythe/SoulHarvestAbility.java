@@ -485,7 +485,9 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
 
             // Calculate and apply bonus damage
             double bonusDamage = getMaxSoulsDamage() * soulCount / maxSouls;
-            event.addModifier(new ItemAbilityDamageModifier.Flat(this, bonusDamage));
+            if (bonusDamage > 0) {
+                event.addModifier(new ItemAbilityDamageModifier.Flat(this, bonusDamage));
+            }
         });
     }
 

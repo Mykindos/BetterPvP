@@ -3,21 +3,16 @@ package me.mykindos.betterpvp.core.item.component.impl.stat.serialization;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.HealthStat;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeDamageStat;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MovementStat;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypeRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import me.mykindos.betterpvp.core.item.component.impl.stat.serialization.impl.DoubleStatSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.stat.serialization.impl.IntegerStatSerializer;
-import me.mykindos.betterpvp.core.item.component.impl.stat.type.DoubleItemStat;
-import me.mykindos.betterpvp.core.item.component.impl.stat.type.IntegerItemStat;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Registry for managing stat serializers and deserializers.
@@ -26,83 +21,59 @@ import java.util.function.Function;
 @Singleton
 public class StatSerializationRegistry {
 
-    private final Map<Class<? extends ItemStat<?>>, StatSerializer<?>> serializers = new HashMap<>();
+    // Map value types (Double.class, Integer.class) to their serializers
+    private final Map<Class<?>, StatSerializer<?>> serializersByValueType = new HashMap<>();
     private final Map<NamespacedKey, StatDeserializer<?>> deserializers = new HashMap<>();
+    private final StatTypeRegistry typeRegistry;
+
+    // Singleton serializers
+    private final DoubleStatSerializer doubleSerializer;
+    private final IntegerStatSerializer integerSerializer;
 
     @Inject
-    public StatSerializationRegistry() {
+    public StatSerializationRegistry(StatTypeRegistry typeRegistry) {
+        this.typeRegistry = typeRegistry;
+
+        // Create singleton serializers
+        this.doubleSerializer = new DoubleStatSerializer(typeRegistry);
+        this.integerSerializer = new IntegerStatSerializer(typeRegistry);
+
         registerDefaultSerializers();
     }
 
     /**
-     * Register a serializer for a stat type.
-     * 
-     * @param serializer The serializer to register
-     * @param <T> The stat type
+     * Get a serializer for a stat based on its value type.
+     *
+     * @param valueType The value type (Double.class, Integer.class)
+     * @return The serializer for this value type
      */
-    public <T extends ItemStat<?>> void registerSerializer(@NotNull StatSerializer<T> serializer) {
-        serializers.put(serializer.getType(), serializer);
-    }
-
-    /**
-     * Register a deserializer for a stat type.
-     * 
-     * @param deserializer The deserializer to register
-     * @param <T> The stat type
-     */
-    public <T extends ItemStat<?>> void registerDeserializer(@NotNull StatDeserializer<T> deserializer) {
-        deserializers.put(deserializer.getKey(), deserializer);
-    }
-
-    /**
-     * Register a combined serializer/deserializer.
-     * 
-     * @param handler The handler that implements both interfaces
-     * @param <T> The stat type
-     */
-    public <T extends ItemStat<?>> void register(@NotNull StatSerializer<T> handler) {
-        registerSerializer(handler);
-        if (handler instanceof StatDeserializer) {
-            @SuppressWarnings("unchecked")
-            StatDeserializer<T> deserializer = (StatDeserializer<T>) handler;
-            registerDeserializer(deserializer);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T> StatSerializer<ItemStat<T>> getSerializerForValueType(@NotNull Class<T> valueType) {
+        StatSerializer<?> serializer = serializersByValueType.get(valueType);
+        if (serializer == null) {
+            throw new IllegalArgumentException("No serializer registered for value type: " + valueType);
         }
+        return (StatSerializer) serializer;
     }
 
     /**
-     * Convenient method to register a DoubleItemStat type.
-     * 
-     * @param key The namespaced key for this stat type
-     * @param statType The stat class
-     * @param constructor Function to create stat instances from double modifiers
-     * @param <T> The specific DoubleItemStat type
+     * Get a serializer for a stat based on the stat instance.
+     * Determines the value type from the stat's type.
+     *
+     * @param stat The stat instance
+     * @return The serializer for this stat
      */
-    public <T extends DoubleItemStat> void registerDoubleStat(@NotNull NamespacedKey key, @NotNull Class<T> statType, @NotNull Function<Double, T> constructor) {
-        register(new DoubleStatSerializer<>(key, statType, constructor));
-    }
-
-    /**
-     * Convenient method to register an IntegerItemStat type.
-     * 
-     * @param key The namespaced key for this stat type
-     * @param statType The stat class
-     * @param constructor Function to create stat instances from integer modifiers
-     * @param <T> The specific IntegerItemStat type
-     */
-    public <T extends IntegerItemStat> void registerIntegerStat(@NotNull NamespacedKey key, @NotNull Class<T> statType, @NotNull Function<Integer, T> constructor) {
-        register(new IntegerStatSerializer<>(key, statType, constructor));
-    }
-
-    /**
-     * Get a serializer for a stat type.
-     * 
-     * @param statType The stat type
-     * @return Optional containing the serializer if found
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends ItemStat<?>> Optional<StatSerializer<T>> getSerializer(@NotNull Class<T> statType) {
-        StatSerializer<?> serializer = serializers.get(statType);
-        return Optional.ofNullable((StatSerializer<T>) serializer);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T> StatSerializer<ItemStat<T>> getSerializer(@NotNull ItemStat<T> stat) {
+        // Determine value type from the stat's actual value
+        Object value = stat.getValue();
+        if (value instanceof Double) {
+            return (StatSerializer) doubleSerializer;
+        } else if (value instanceof Integer) {
+            return (StatSerializer) integerSerializer;
+        } else {
+            throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
+        }
     }
 
     /**
@@ -125,18 +96,8 @@ public class StatSerializationRegistry {
     }
 
     /**
-     * Check if a stat type can be serialized.
-     * 
-     * @param statType The stat type to check
-     * @return True if a serializer is registered for this type
-     */
-    public boolean canSerialize(@NotNull Class<? extends ItemStat<?>> statType) {
-        return serializers.containsKey(statType);
-    }
-
-    /**
      * Check if a stat key can be deserialized.
-     * 
+     *
      * @param key The stat key to check
      * @return True if a deserializer is registered for this key
      */
@@ -145,30 +106,17 @@ public class StatSerializationRegistry {
     }
 
     private void registerDefaultSerializers() {
-        // Register double-based stats using the convenient helper method
-        registerDoubleStat(
-            new NamespacedKey("betterpvp", "melee-damage"),
-            MeleeDamageStat.class,
-            MeleeDamageStat::new
-        );
+        // Register singleton serializers by value type
+        serializersByValueType.put(Double.class, doubleSerializer);
+        serializersByValueType.put(Integer.class, integerSerializer);
 
-        registerDoubleStat(
-            new NamespacedKey("betterpvp", "move-speed"),
-            MovementStat.class,
-            MovementStat::new
-        );
+        // Register deserializers for each stat type that uses these value types
+        // Double-based stats
+        deserializers.put(StatTypes.MELEE_DAMAGE.getKey(), doubleSerializer);
+        deserializers.put(StatTypes.MELEE_ATTACK_SPEED.getKey(), doubleSerializer);
+        deserializers.put(StatTypes.MOVEMENT.getKey(), doubleSerializer);
 
-        registerDoubleStat(
-            new NamespacedKey("betterpvp", "melee-attack-speed"),
-            MeleeAttackSpeedStat.class,
-            MeleeAttackSpeedStat::new
-        );
-
-        registerIntegerStat(
-            new NamespacedKey("betterpvp", "health"),
-            HealthStat.class,
-            HealthStat::new
-        );
-
+        // Integer-based stats
+        deserializers.put(StatTypes.HEALTH.getKey(), integerSerializer);
     }
 } 

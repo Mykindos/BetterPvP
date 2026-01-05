@@ -14,8 +14,6 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.RazorEdge;
@@ -64,23 +62,10 @@ public class HyperAxe extends WeaponItem implements Reloadable {
         this.itemFactory = itemFactory;
         this.attackSpeed = 1; // 100%+ attack speed by default
 
-        // Add attack speed stat
-        updateAttackSpeed();
-
         // Add components
         addBaseComponent(AbilityContainerComponent.builder()
                 .ability(hyperRushAbility)
                 .build());
-    }
-
-    private void updateAttackSpeed() {
-        getComponent(StatContainerComponent.class)
-                .orElseGet(() -> {
-                    StatContainerComponent newContainer = new StatContainerComponent();
-                    addBaseComponent(newContainer);
-                    return newContainer;
-                })
-                .withBaseStat(new MeleeAttackSpeedStat(attackSpeed));
     }
 
     @Override
@@ -95,7 +80,6 @@ public class HyperAxe extends WeaponItem implements Reloadable {
         
         // Configure attack speed
         this.attackSpeed = config.getConfig("attackSpeedPercentage", 1.3, Double.class);
-        updateAttackSpeed();
     }
 
     @Inject

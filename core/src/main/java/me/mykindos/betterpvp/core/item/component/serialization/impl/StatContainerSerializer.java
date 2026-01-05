@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Serializer and deserializer for StatContainerComponent.
@@ -48,16 +47,16 @@ public class StatContainerSerializer implements ComponentSerializer<StatContaine
 
     @Override
     public void serialize(@NotNull StatContainerComponent instance, @NotNull PersistentDataContainer container) {
-        if (!container.has(KEY, PersistentDataType.TAG_CONTAINER)) {
-            container.set(KEY, PersistentDataType.TAG_CONTAINER, container.getAdapterContext().newPersistentDataContainer());
-        }
-
-        PersistentDataContainer statsContainer = Objects.requireNonNull(container.get(KEY, PersistentDataType.TAG_CONTAINER));
+        List<PersistentDataContainer> collection = new ArrayList<>();
         
         // Serialize only modifier stats using their registered serializer
         for (ItemStat<?> stat : instance.getModifierStats()) {
-            serializeStat(stat, statsContainer);
+            PersistentDataContainer statContainer = container.getAdapterContext().newPersistentDataContainer();
+            serializeStat(stat, statContainer);
+            collection.add(statContainer);
         }
+
+        container.set(KEY, PersistentDataType.LIST.dataContainers(), collection);
     }
 
     @Override
@@ -69,20 +68,23 @@ public class StatContainerSerializer implements ComponentSerializer<StatContaine
 
     @Override
     public @NotNull StatContainerComponent deserialize(@NotNull ItemInstance item, @NotNull PersistentDataContainer container) {
-        Preconditions.checkArgument(container.has(KEY, PersistentDataType.TAG_CONTAINER), "Container does not have stats data");
-        PersistentDataContainer statsContainer = container.get(KEY, PersistentDataType.TAG_CONTAINER);
-        Preconditions.checkNotNull(statsContainer, "Stats container is null");
+        Preconditions.checkArgument(container.has(KEY, PersistentDataType.LIST.dataContainers()), "Container does not have stats data");
+        List<PersistentDataContainer> collection = container.get(KEY, PersistentDataType.LIST.dataContainers());
+        Preconditions.checkNotNull(collection, "Stats container is null");
         
         List<ItemStat<?>> modifierStats = new ArrayList<>();
         
         // Deserialize all registered stat types as modifiers
-        for (Map.Entry<NamespacedKey, StatDeserializer<?>> entry : statRegistry.getAllDeserializers().entrySet()) {
-            if (!entry.getValue().hasData(statsContainer)) {
-                continue;
-            }
+        for (PersistentDataContainer statContainer : collection) {
+            for (Map.Entry<NamespacedKey, StatDeserializer<?>> entry : statRegistry.getAllDeserializers().entrySet()) {
+                if (!entry.getValue().hasData(statContainer)) {
+                    continue;
+                }
 
-            ItemStat<?> stat = entry.getValue().deserialize(item, statsContainer);
-            modifierStats.add(stat);
+                ItemStat<?> stat = entry.getValue().deserialize(item, statContainer);
+                modifierStats.add(stat);
+                break;
+            }
         }
 
         // Check if the original base item has any base stats
@@ -96,13 +98,11 @@ public class StatContainerSerializer implements ComponentSerializer<StatContaine
 
     @SuppressWarnings("unchecked")
     private <T> void serializeStat(@NotNull ItemStat<T> stat, @NotNull PersistentDataContainer container) {
-        final Class<ItemStat<T>> clazz = (Class<ItemStat<T>>) stat.getClass();
-        statRegistry.getSerializer(clazz).ifPresentOrElse(
-            serializer -> serializer.serialize(stat, container),
-            () -> {
-                log.error("No serializer found for stat type: " + clazz.getName()).submit();
-                throw new IllegalArgumentException("No serializer found for stat type: " + clazz.getName());
-            }
-        );
+        try {
+            statRegistry.getSerializer(stat).serialize(stat, container);
+        } catch (IllegalArgumentException e) {
+            log.error("No serializer found for stat with value type: " + stat.getValue().getClass()).submit();
+            throw e;
+        }
     }
 } 

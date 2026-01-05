@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.menu;
+package me.mykindos.betterpvp.core.item.menu.viewer;
 
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.registry.RegistryBuilderFactory;

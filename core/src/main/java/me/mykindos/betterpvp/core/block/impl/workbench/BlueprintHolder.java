@@ -54,6 +54,7 @@ public class BlueprintHolder extends AbstractItem {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         ItemStack cursorItem = event.getCursor();
         if (clickType != ClickType.LEFT) {
+            player.updateInventory();
             return;
         }
 

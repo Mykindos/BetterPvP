@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.impl;
+package me.mykindos.betterpvp.core.item.component.impl.currency;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -14,6 +14,7 @@ public class GoldBars extends BaseItem {
 
     @Inject
     private GoldBars() {
-        super("Gold Bars", Item.model("gold_bars", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super("Gold Bars", Item.model("gold_bars", 99), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        addBaseComponent(new CurrencyComponent(1));
     }
 }
