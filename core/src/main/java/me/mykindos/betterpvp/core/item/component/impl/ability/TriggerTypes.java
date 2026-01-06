@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.item.component.impl.ability;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.KeybindComponent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,9 +15,19 @@ public enum TriggerTypes implements TriggerType {
     RIGHT_CLICK("RIGHT-CLICK"),
 
     /**
+     * Triggered when the item is shift-right-clicked.
+     */
+    SHIFT_RIGHT_CLICK("SHIFT-CLICK"),
+
+    /**
      * Triggered when the item is left-clicked.
      */
     LEFT_CLICK("LEFT-CLICK"),
+
+    /**
+     * Triggered when the item is shift-left-clicked.
+     */
+    SHIFT_LEFT_CLICK("SHIFT-CLICK"),
     
     /**
      * Triggered when the item is being held with a right-click.

@@ -120,10 +120,19 @@ public class ItemAbilityListener implements Listener {
 
             final AbilityContainerComponent container = containerOpt.get();
             Optional<ItemAbility> itemAbility = switch (event.getAction()) {
-                case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> container.getAbility(TriggerTypes.LEFT_CLICK);
-                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> container.getAbility(TriggerTypes.RIGHT_CLICK);
+                case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK ->
+                        event.getPlayer().isSneaking()
+                                ? container.getAbility(TriggerTypes.SHIFT_LEFT_CLICK)
+                                : container.getAbility(TriggerTypes.LEFT_CLICK);
+
+                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK ->
+                        event.getPlayer().isSneaking()
+                                ? container.getAbility(TriggerTypes.SHIFT_RIGHT_CLICK)
+                                : container.getAbility(TriggerTypes.RIGHT_CLICK);
+
                 default -> Optional.empty();
             };
+
 
             if (itemAbility.isPresent()) {
                 final Client client = clientManager.search().online(event.getPlayer());

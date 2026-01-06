@@ -2,30 +2,31 @@ package me.mykindos.betterpvp.core.components.champions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 
 @AllArgsConstructor
 @Getter
 public enum Role {
 
-    ASSASSIN("Assassin", "Assassin is a quick and agile class. With relatively low health and strong counters, this is not an easy class to be caught out in. Primarily suited for attacking distracted or otherwise occupied enemies, it will struggle against enemies that are prepared.",
+    ASSASSIN("Assassin", 36, "Assassin is a quick and agile class. With relatively low health and strong counters, this is not an easy class to be caught out in. Primarily suited for attacking distracted or otherwise occupied enemies, it will struggle against enemies that are prepared.",
             TextColor.color(224, 112, 0), Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS),
-    KNIGHT("Knight", "Knight is a strong, aggressive class. It thrives being on the attack, having options to increase damage, while also having a few that can keep them alive long enough to kill their opponent.",
+    KNIGHT("Knight", 50, "Knight is a strong, aggressive class. It thrives being on the attack, having options to increase damage, while also having a few that can keep them alive long enough to kill their opponent.",
             TextColor.color(227, 227, 227), Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS),
-    BRUTE("Brute", "Brute is a powerhouse that is rarely moved by others. It has good crowd control and defensive abilities.",
+    BRUTE("Brute", 50, "Brute is a powerhouse that is rarely moved by others. It has good crowd control and defensive abilities.",
             TextColor.color(112, 255, 241), Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS),
-    RANGER("Ranger", "Ranger is a ranged class skilled in the use of the bow. There are different options, rewarding precision, patience, or long distance accuracy.",
+    RANGER("Ranger", 40, "Ranger is a ranged class skilled in the use of the bow. There are different options, rewarding precision, patience, or long distance accuracy.",
             TextColor.color(148, 148, 148), Material.CHAINMAIL_HELMET, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_LEGGINGS, Material.CHAINMAIL_BOOTS),
-    MAGE("Mage", "Mage is a class skilled with different elements. Choose between life, ice, fire, and earth to support your teammates, trap the enemy, and kill them.",
+    MAGE("Mage", 40, "Mage is a class skilled with different elements. Choose between life, ice, fire, and earth to support your teammates, trap the enemy, and kill them.",
             TextColor.color(255, 237, 69), Material.GOLDEN_HELMET, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_LEGGINGS, Material.GOLDEN_BOOTS),
-    WARLOCK("Warlock", "Warlock is a class focused on health. Some abilities require the sacrifice in health, others punish enemies for proximity and low health.",
+    WARLOCK("Warlock", 40, "Warlock is a class focused on health. Some abilities require the sacrifice in health, others punish enemies for proximity and low health.",
             TextColor.color(117, 117, 117), Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS);
 
+    public static final Role DEFAULT = KNIGHT;
+
     private final String name;
+    private final double health;
     private final String description;
     private final TextColor color;
     private final Material helmet;
@@ -41,42 +42,14 @@ public enum Role {
         return name;
     }
 
-    public void equip(ItemFactory itemFactory, Player player, boolean armorOnly) {
-        player.getInventory().setHelmet(getItem(itemFactory, helmet));
-        player.getInventory().setChestplate(getItem(itemFactory, chestplate));
-        player.getInventory().setLeggings(getItem(itemFactory, leggings));
-        player.getInventory().setBoots(getItem(itemFactory, boots));
-
-        if (armorOnly) {
-            return;
-        }
-
-        if (!player.getInventory().contains(Material.IRON_SWORD)) {
-            player.getInventory().addItem(getItem(itemFactory, Material.IRON_SWORD));
-        }
-
-        if (!player.getInventory().contains(Material.IRON_AXE)) {
-            player.getInventory().addItem(getItem(itemFactory, Material.IRON_AXE));
-        }
-
-        if (this == Role.ASSASSIN || this == Role.RANGER) {
-            if (!player.getInventory().contains(Material.BOW)) {
-                player.getInventory().addItem(getItem(itemFactory, Material.BOW));
-            }
-
-            final ItemStack arrow = new ItemStack(Material.ARROW);
-            final ItemStack arrowItem = getItem(itemFactory, arrow);
-            arrowItem.setAmount(this == Role.RANGER ? 64 : 32);
-            player.getInventory().addItem(arrowItem);
-        }
-    }
-
-    private ItemStack getItem(ItemFactory itemFactory, ItemStack itemStack) {
-        return itemFactory.create(itemFactory.getFallbackItem(itemStack)).createItemStack();
-    }
-
-    private ItemStack getItem(ItemFactory itemFactory, Material material) {
-        return getItem(itemFactory, new ItemStack(material));
+    public Material getMaterial(EquipmentSlot equipmentSlot) {
+        return switch (equipmentSlot) {
+            case HEAD -> helmet;
+            case CHEST -> chestplate;
+            case LEGS -> leggings;
+            case FEET -> boots;
+            default -> throw new IllegalArgumentException("No material for equipment slot: " + equipmentSlot);
+        };
     }
 
 }

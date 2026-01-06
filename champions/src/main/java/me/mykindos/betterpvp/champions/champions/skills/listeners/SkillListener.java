@@ -213,31 +213,26 @@ public class SkillListener implements Listener {
             }
         }
 
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        Role role = roleManager.getRole(player);
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build == null) return;
 
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
+            for (Skill skill : build.getActiveSkills()) {
+                // Skip if not a toggle skill
+                if (!(skill instanceof ToggleSkill)) continue;
 
-                for (Skill skill : build.getActiveSkills()) {
-                    // Skip if not a toggle skill
-                    if (!(skill instanceof ToggleSkill)) continue;
+                // Check if they have booster
+                BuildSkill buildSkill = build.getBuildSkill(skill.getType());
+                int level = getLevel(player, buildSkill);
 
-                    // Check if they have booster
-                    BuildSkill buildSkill = build.getBuildSkill(skill.getType());
-                    int level = getLevel(player, buildSkill);
-
-                    UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
-                    event.setCancelled(true);
-                }
+                UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
+                event.setCancelled(true);
             }
         }
-
     }
 
     // Show shield for channel skills
@@ -255,27 +250,23 @@ public class SkillListener implements Listener {
             return;
         }
 
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        Role role = roleManager.getRole(player);
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build == null) return;
 
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
+            Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                    .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
-                Optional<Skill> skillOptional = build.getActiveSkills().stream()
-                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
+            if (skillOptional.isPresent()) {
+                Skill skill = skillOptional.get();
 
-                if (skillOptional.isPresent()) {
-                    Skill skill = skillOptional.get();
-
-                    if (skill instanceof ChannelSkill channelSkill) {
-                        if (channelSkill.shouldShowShield(player)) {
-                            event.setBlockingItem(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_BLOCKING_ITEM : ItemStack.of(Material.SHIELD));
-                        }
+                if (skill instanceof ChannelSkill channelSkill) {
+                    if (channelSkill.shouldShowShield(player)) {
+                        event.setBlockingItem(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_BLOCKING_ITEM : ItemStack.of(Material.SHIELD));
                     }
                 }
             }
@@ -344,38 +335,32 @@ public class SkillListener implements Listener {
             return;
         }
 
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        Role role = roleManager.getRole(player);
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build == null) return;
 
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
+            Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                    .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
-                Optional<Skill> skillOptional = build.getActiveSkills().stream()
-                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
+            if (skillOptional.isPresent()) {
+                Skill skill = skillOptional.get();
 
-                if (skillOptional.isPresent()) {
-                    Skill skill = skillOptional.get();
-
-                    if (skill instanceof InteractSkill interactSkill) {
-                        if (!Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
-                            return;
-                        }
+                if (skill instanceof InteractSkill interactSkill) {
+                    if (!Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
+                        return;
                     }
-
-                    int level = getLevel(player, build.getBuildSkill(skillType));
-                    UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
-
                 }
+
+                int level = getLevel(player, build.getBuildSkill(skillType));
+                UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
 
             }
 
         }
-
     }
 
     private void sendSkillUsed(Player player, IChampionsSkill skill, int level) {
@@ -477,11 +462,11 @@ public class SkillListener implements Listener {
     public void onLoadBuilds(ChampionsBuildLoadedEvent event) {
         final Player player = event.getPlayer();
 
-        Role role = roleManager.getObject(player.getUniqueId().toString()).orElse(null);
+        Role role = roleManager.getRole(player);
         GamerBuilds builds = event.getGamerBuilds();
 
         // Track new skills
-        String name = role == null ? null : role.getName();
+        String name = role.getName();
         RoleBuild build = builds.getActiveBuilds().get(name);
         if (build != null) {
             final Gamer gamer = this.clientManager.search().online(player).getGamer();
@@ -498,9 +483,11 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onRoleChange(RoleChangeEvent event) {
+        if (!(event.getLivingEntity() instanceof Player player)) {
+            return;
+        }
         final Role newRole = event.getRole();
         final Role previousRole = event.getPrevious();
-        final Player player = event.getPlayer();
 
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {

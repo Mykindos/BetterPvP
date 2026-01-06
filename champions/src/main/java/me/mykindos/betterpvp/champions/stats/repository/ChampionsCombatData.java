@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.stats.repository;
 
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
 import me.mykindos.betterpvp.champions.stats.ChampionsKill;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
@@ -9,8 +11,8 @@ import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
-import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,9 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
-import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLS;
-import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILL_CONTRIBUTIONS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.*;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 public class ChampionsCombatData extends CombatData {
@@ -42,11 +42,16 @@ public class ChampionsCombatData extends CombatData {
 
     @Override
     protected ChampionsKill generateKill(long killId, UUID killer, UUID victim, int ratingDelta, List<Contribution> contributions) {
-        final Role killerRole = roleManager.getObject(killer).orElse(null);
-        final Role victimRole = roleManager.getObject(victim).orElse(null);
+        final Player killerPlayer = Bukkit.getPlayer(killer);
+        final Player victimPlayer = Bukkit.getPlayer(victim);
+
+        final Role killerRole = killerPlayer == null ? null : roleManager.getRole(killerPlayer);
+        final Role victimRole = victimPlayer == null ? null : roleManager.getRole(victimPlayer);
+
         final Map<Contribution, Role> contributorRoles = new HashMap<>();
         contributions.forEach(contribution -> {
-            final Role contributorRole = roleManager.getObject(contribution.getContributor()).orElse(null);
+            final Player contributorPlayer = Bukkit.getPlayer(contribution.getContributor());
+            final Role contributorRole = contributorPlayer == null ? null : roleManager.getRole(contributorPlayer);
             contributorRoles.put(contribution, contributorRole);
         });
         return new ChampionsKill(killId, killer, victim, ratingDelta, contributions, killerRole, victimRole, contributorRoles);

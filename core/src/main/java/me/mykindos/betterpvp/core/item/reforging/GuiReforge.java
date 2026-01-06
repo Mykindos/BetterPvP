@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.currency.CurrencyComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatAugmentationComponent;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.purity.bias.PurityReforgeBiasRegistry;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -50,11 +51,12 @@ public class GuiReforge extends AbstractGui implements Windowed {
         this.goldInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
         this.powderInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
         this.itemInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
+        this.itemInventory.setGuiPriority(-Integer.MAX_VALUE); // We want people shift-clicking items last into here
 
         // Set up inventory handlers
         setupInventoryHandler(goldInventory, instance -> instance.getComponent(CurrencyComponent.class).isPresent());
         setupInventoryHandler(powderInventory, instance -> instance.getComponent(StatAugmentationComponent.class).isPresent());
-        setupInventoryHandler(itemInventory, instance -> true);
+        setupInventoryHandler(itemInventory, instance -> instance.getComponent(StatContainerComponent.class).isPresent());
 
         // Create button instances
         ReforgingButton primaryButton = new ReforgingButton(itemFactory, goldInventory, powderInventory, itemInventory, biasRegistry, true);

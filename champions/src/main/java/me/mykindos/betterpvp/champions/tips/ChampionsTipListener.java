@@ -14,8 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.Optional;
-
 @Singleton
 @BPvPListener
 public class ChampionsTipListener implements Listener {
@@ -36,8 +34,7 @@ public class ChampionsTipListener implements Listener {
         Player player = event.getPlayer();
         WeighedList<Tip> tipList = event.getTipList();
 
-        Optional<Role> roleOptional  = roleManager.getObject(player.getUniqueId());
-        final Role role = roleOptional.orElse(null);
+        final Role role  = roleManager.getRole(player);
 
         tipManager.getTips().forEach(tip -> {
             if (tip instanceof ChampionsTip championsTip) {
