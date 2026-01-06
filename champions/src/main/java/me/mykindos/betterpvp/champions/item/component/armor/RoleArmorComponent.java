@@ -27,10 +27,14 @@ public class RoleArmorComponent extends AbstractItemComponent implements LoreCom
     }
 
     public RoleArmorComponent(Role role, Role... extra) {
-        this(new HashSet<>() {{
-            add(role);
-            Collections.addAll(this, extra);
-        }});
+        this(buildRoleSet(role, extra));
+    }
+
+    private static Set<Role> buildRoleSet(Role role, Role... extra) {
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        Collections.addAll(roles, extra);
+        return roles;
     }
 
     @Override
