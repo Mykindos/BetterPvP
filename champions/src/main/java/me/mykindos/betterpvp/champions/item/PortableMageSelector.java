@@ -2,17 +2,11 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.item.ability.ArmorStorageEditAbility;
-import me.mykindos.betterpvp.champions.item.ability.PortableClassAbility;
-import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponent;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
-import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.impl.Rope;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -22,23 +16,13 @@ import org.bukkit.NamespacedKey;
 
 @ItemKey("champions:portable_mage_selector")
 @Singleton
-public class PortableMageSelector extends BaseItem {
+public class PortableMageSelector extends PortableClassSelectorItem{
 
     private transient boolean registered;
 
     @Inject
-    public PortableMageSelector() {
-        super("Portable Mage Selector",
-                Item.builder(Material.YELLOW_HARNESS).maxStackSize(1).build(),
-                ItemGroup.CONSUMABLE,
-                ItemRarity.UNCOMMON);
-        final PortableClassAbility portableClassAbility = new PortableClassAbility(Role.MAGE);
-        portableClassAbility.setConsumesItem(true);
-        addSerializableComponent(new ArmorStorageComponent(Role.MAGE, false));
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(portableClassAbility)
-                .ability(new ArmorStorageEditAbility())
-                .build());
+    private PortableMageSelector(Champions champions) {
+        super(champions, Role.MAGE, Material.YELLOW_HARNESS);
     }
 
     @Inject

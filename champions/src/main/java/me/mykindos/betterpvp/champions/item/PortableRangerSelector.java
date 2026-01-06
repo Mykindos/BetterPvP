@@ -2,17 +2,11 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.item.ability.ArmorStorageEditAbility;
-import me.mykindos.betterpvp.champions.item.ability.PortableClassAbility;
-import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponent;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
-import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.impl.Rope;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -22,23 +16,13 @@ import org.bukkit.NamespacedKey;
 
 @ItemKey("champions:portable_ranger_selector")
 @Singleton
-public class PortableRangerSelector extends BaseItem {
+public class PortableRangerSelector extends PortableClassSelectorItem {
 
     private transient boolean registered;
 
     @Inject
-    public PortableRangerSelector() {
-        super("Portable Ranger Selector",
-                Item.builder(Material.LIME_HARNESS).maxStackSize(1).build(),
-                ItemGroup.CONSUMABLE,
-                ItemRarity.UNCOMMON);
-        final PortableClassAbility portableClassAbility = new PortableClassAbility(Role.RANGER);
-        portableClassAbility.setConsumesItem(true);
-        addSerializableComponent(new ArmorStorageComponent(Role.RANGER, false));
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(portableClassAbility)
-                .ability(new ArmorStorageEditAbility())
-                .build());
+    private PortableRangerSelector(Champions champions) {
+        super(champions, Role.RANGER, Material.LIME_HARNESS);
     }
 
     @Inject

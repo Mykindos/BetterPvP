@@ -342,9 +342,10 @@ public class ClientSQLLayer {
 
     public void processStatUpdates(UUID uuid, boolean async) {
         // Process shared stat updates for this UUID
-        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedStatUpdates.updateAndGet(map -> {
-            map.remove(uuid.toString());
-            return map;
+        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedStatUpdates.getAndUpdate(map -> {
+            final ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
+            updated.remove(uuid.toString());
+            return updated;
         }).get(uuid.toString());
 
         if (sharedQueries != null && !sharedQueries.isEmpty()) {
@@ -353,9 +354,10 @@ public class ClientSQLLayer {
         }
 
         // Process stat updates for this UUID
-        ConcurrentHashMap<String, Query> gamerQueries = queuedStatUpdates.updateAndGet(map -> {
-            map.remove(uuid.toString());
-            return map;
+        ConcurrentHashMap<String, Query> gamerQueries = queuedStatUpdates.getAndUpdate(map -> {
+            final ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
+            updated.remove(uuid.toString());
+            return updated;
         }).get(uuid.toString());
 
         if (gamerQueries != null && !gamerQueries.isEmpty()) {

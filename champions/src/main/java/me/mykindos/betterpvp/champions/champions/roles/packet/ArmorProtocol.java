@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.google.inject.Inject;
@@ -68,11 +69,17 @@ public class ArmorProtocol implements Listener {
     }
 
     private void sendSetSlot(Player wearer, int slot, ItemStack itemStack) {
+        final User user = PacketEvents.getAPI().getPlayerManager().getUser(wearer);
+        //noinspection ConstantValue
+        if (user == null) {
+            return; // User CAN be null if they log off
+        }
+
         final WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(0,
                 0, // Allows changing player inventory
                 slot,
                 itemStack);
-        PacketEvents.getAPI().getPlayerManager().getUser(wearer).sendPacket(packet);
+        user.sendPacket(packet);
     }
 
     private ItemStack getArmor(LivingEntity wearer, org.bukkit.inventory.EquipmentSlot equipmentSlot) {
@@ -83,12 +90,15 @@ public class ArmorProtocol implements Listener {
 
     @EventHandler
     public void onArmor(EntityEquipmentChangedEvent event) {
-        UtilServer.runTaskLater(plugin, () -> broadcast(event.getEntity(), true), 4L);
+        UtilServer.runTask(plugin, () -> broadcast(event.getEntity(), true));
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
-        broadcast(event.getLivingEntity(), true);
+        // 1 tick later because it should be after the change take place
+        // this is a cancellable event, which means at this point we're not
+        // guaranteed that the role change has been applied yet
+        UtilServer.runTask(plugin, () -> broadcast(event.getLivingEntity(), true));
     }
 
 }
