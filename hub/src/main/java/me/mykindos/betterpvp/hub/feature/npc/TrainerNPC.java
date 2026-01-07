@@ -4,7 +4,6 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,16 +16,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Transformation;
+import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 public class TrainerNPC extends ModeledNPC implements HubNPC {
 
     private final CooldownManager cooldownManager;
+    private final Location ffaSpawnpoint;
 
-    TrainerNPC(HubNPCFactory factory, Entity entity, CooldownManager cooldownManager) {
+    TrainerNPC(HubNPCFactory factory, Entity entity, CooldownManager cooldownManager, @NotNull Location ffaSpawnpoint) {
         super(factory, entity);
         this.cooldownManager = cooldownManager;
+        this.ffaSpawnpoint = ffaSpawnpoint.clone();
 
         final Location tagLoc = entity.getLocation().add(0, 2.8, 0);
         attachToLifecycle(entity.getWorld().spawn(tagLoc, TextDisplay.class, display -> {
@@ -54,9 +56,9 @@ public class TrainerNPC extends ModeledNPC implements HubNPC {
             return;
         }
 
-        // todo: teleport player
         modeledEntity.getModel("dummy").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0, 1, false);
         new SoundEffect("emaginationfallenreaper", "custom.spell.rslash", 1f, 1f).play(runner);
+        runner.teleport(ffaSpawnpoint);
         Particle.SWEEP_ATTACK.builder()
                 .count(5)
                 .location(getEntity().getLocation().add(0, 2, 0))
@@ -64,6 +66,5 @@ public class TrainerNPC extends ModeledNPC implements HubNPC {
                 .extra(0)
                 .receivers(runner)
                 .spawn();
-        UtilMessage.message(runner, "NPC", "<red>Coming soon...");
     }
 }
