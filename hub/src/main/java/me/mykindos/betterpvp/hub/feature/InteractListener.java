@@ -24,7 +24,7 @@ public class InteractListener implements Listener {
         if (GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) {
             return;
         }
-        event.setCancelled(true); // TODO: wait for zoning system
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -32,7 +32,7 @@ public class InteractListener implements Listener {
         if (GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) {
             return;
         }
-        event.setCancelled(true); // TODO: wait for zoning system
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -40,7 +40,7 @@ public class InteractListener implements Listener {
         if (GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) {
             return;
         }
-        event.setCancelled(true); // TODO: wait for zoning system
+        event.setCancelled(true);
     }
 
 }

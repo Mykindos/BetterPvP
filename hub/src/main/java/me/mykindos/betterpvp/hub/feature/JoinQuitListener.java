@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.Bukkit;
+import me.mykindos.betterpvp.hub.model.HubWorld;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -20,6 +20,9 @@ public class JoinQuitListener implements Listener {
     @Inject
     private Location location;
 
+    @Inject
+    private HubWorld hubWorld;
+
     @EventHandler
     public void onJoin(ClientJoinEvent event) {
         event.setJoinMessage(null);
@@ -28,7 +31,7 @@ public class JoinQuitListener implements Listener {
         event.getPlayer().setExperienceLevelAndProgress(0);
 
         if (location.getWorld() == null) {
-            location.setWorld(Bukkit.getWorld("world"));
+            location.setWorld(hubWorld.getWorld());
         }
         event.getPlayer().teleport(location);
     }
