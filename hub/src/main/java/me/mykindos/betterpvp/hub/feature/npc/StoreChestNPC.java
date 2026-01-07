@@ -4,7 +4,7 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.store.OpenStoreEvent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
@@ -66,7 +66,6 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
             return;
         }
 
-        // todo: open store
         modeledEntity.getModel("chest_shadow").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0.2, 0.7, false);
         new SoundEffect(Sound.BLOCK_CHEST_LOCKED, 0.7f, 1f).play(runner);
         new SoundEffect("littleroom_piratepack", "littleroom.piratepack.captain_chest_item", 0f, 1f).play(runner);
@@ -83,7 +82,8 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
                     .receivers(runner)
                     .spawn();
         }, 25L);
-        UtilMessage.message(runner, "NPC", "<red>Coming soon...");
+
+        new OpenStoreEvent(runner).callEvent();
     }
 
     @Override

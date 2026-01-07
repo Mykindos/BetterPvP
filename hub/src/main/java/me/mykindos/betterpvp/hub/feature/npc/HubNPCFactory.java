@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.hub.feature.npc;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ticxo.modelengine.api.ModelEngineAPI;
+import dev.brauw.mapper.region.PerspectiveRegion;
+import dev.brauw.mapper.region.Region;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.ServerType;
@@ -11,12 +13,12 @@ import me.mykindos.betterpvp.core.npc.NPCRegistry;
 import me.mykindos.betterpvp.core.npc.model.NPC;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.hub.Hub;
+import me.mykindos.betterpvp.hub.model.HubWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.IronGolem;
@@ -24,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Singleton
@@ -33,12 +34,14 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
     private final List<NPC> npcs = new ArrayList<>();
     private final CooldownManager cooldownManager;
     private final Hub hub;
+    private final HubWorld hubWorld;
 
     @Inject
-    private HubNPCFactory(NPCRegistry registry, CooldownManager cooldownManager, Hub hub) {
+    private HubNPCFactory(NPCRegistry registry, CooldownManager cooldownManager, Hub hub, HubWorld hubWorld) {
         super("hub", registry);
         this.cooldownManager = cooldownManager;
         this.hub = hub;
+        this.hubWorld = hubWorld;
     }
 
     public boolean tryLoad(Hub hub) {
@@ -57,26 +60,36 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
             npc.remove();
         }
 
-        final World world = Bukkit.getWorld("world");
-        final Location storeLocation = Objects.requireNonNull(config.getLocation("npc.store"), "Store location is not set");
+        final World world = hubWorld.getWorld();
+        final Location storeLocation = getDataPoint("npc_store", PerspectiveRegion.class).getLocation();
         storeLocation.setWorld(world);
         this.npcs.add(this.spawnStore(storeLocation));
 
-        final Location trainerLocation = Objects.requireNonNull(config.getLocation("npc.trainer"), "Trainer location is not set");
+        final Location trainerLocation = getDataPoint("npc_trainer", PerspectiveRegion.class).getLocation();
         trainerLocation.setWorld(world);
-        this.npcs.add(this.spawnTrainer(trainerLocation));
+        final Location ffaSpawnpoint = getDataPoint("ffa_spawnpoint", PerspectiveRegion.class).getLocation();
+        this.npcs.add(this.spawnTrainer(trainerLocation, ffaSpawnpoint));
 
-        final Location classicLocation = Objects.requireNonNull(config.getLocation("npc.classic"), "Classic Selector location is not set");
+        final Location classicLocation = getDataPoint("npc_selector_classic", PerspectiveRegion.class).getLocation();
         classicLocation.setWorld(world);
         this.npcs.add(this.spawnInstanceSelector(classicLocation, ServerType.CLANS_CLASSIC, false));
 
-        final Location squadsLocation = Objects.requireNonNull(config.getLocation("npc.squads"), "Squads Selector location is not set");
+        final Location squadsLocation = getDataPoint("npc_selector_squads", PerspectiveRegion.class).getLocation();
         squadsLocation.setWorld(world);
         this.npcs.add(this.spawnInstanceSelector(squadsLocation, ServerType.CLANS_SQUADS, false));
 
-        final Location casualLocation = Objects.requireNonNull(config.getLocation("npc.casual"), "Casual Selector location is not set");
+        final Location casualLocation = getDataPoint("npc_selector_casual", PerspectiveRegion.class).getLocation();
         casualLocation.setWorld(world);
         this.npcs.add(this.spawnInstanceSelector(casualLocation, ServerType.CLANS_CASUAL, true));
+    }
+
+    private <T extends Region> T getDataPoint(String name, Class<T> type) {
+        return this.hubWorld.getRegions().stream()
+                .filter(region -> region.getName().equalsIgnoreCase(name))
+                .filter(type::isInstance)
+                .map(type::cast)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No region found with name: " + name));
     }
 
     private NPC spawnInstanceSelector(@NotNull Location location, ServerType serverType, boolean featured) {
@@ -110,14 +123,14 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
         return npc;
     }
 
-    private NPC spawnTrainer(@NotNull Location location) {
+    private NPC spawnTrainer(@NotNull Location location, @NotNull Location ffaSpawnpoint) {
         IronGolem golem = location.getWorld().spawn(location, IronGolem.class);
         golem.setAI(false);
         golem.setInvulnerable(true);
         golem.setPersistent(false);
         golem.setCollidable(false);
         golem.setInvisible(true);
-        final TrainerNPC npc = new TrainerNPC(this, golem, cooldownManager);
+        final TrainerNPC npc = new TrainerNPC(this, golem, cooldownManager, ffaSpawnpoint);
         registry.register(npc);
         return npc;
     }

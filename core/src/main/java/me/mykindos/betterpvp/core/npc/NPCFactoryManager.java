@@ -7,6 +7,6 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
  * Stores all NPCFactory instances
  */
 @Singleton
-public class NPCFactoryManager extends Manager<NPCFactory> {
+public class NPCFactoryManager extends Manager<String, NPCFactory> {
 
 }

@@ -15,7 +15,7 @@ dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
 
-    compileOnly("com.lunarclient:apollo-api:1.1.3")
+    compileOnly(libs.mapper)
     compileOnly(libs.libsdisguises)
     compileOnly(libs.mythic)
     compileOnly(project(":core"))

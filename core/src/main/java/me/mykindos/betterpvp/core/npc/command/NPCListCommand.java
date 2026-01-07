@@ -45,7 +45,7 @@ public class NPCListCommand extends Command {
 
         UtilMessage.message(player, "NPC", "Active NPCs:");
         boolean found = false;
-        for (NPC npc : registry.getObjects().values()) {
+        for (NPC npc : registry.getNPCs()) {
             final Component type = Component.text("Type: ")
                     .color(NamedTextColor.YELLOW)
                     .append(Component.text(npc.getFactory().getName()).color(NamedTextColor.DARK_GREEN));

@@ -8,6 +8,10 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.hub.Hub;
+import me.mykindos.betterpvp.hub.feature.zone.PlayerEnterZoneEvent;
+import me.mykindos.betterpvp.hub.feature.zone.PlayerExitZoneEvent;
+import me.mykindos.betterpvp.hub.feature.zone.Zone;
+import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.util.Vector;
 
@@ -30,6 +33,9 @@ public class DoubleJumpListener implements Listener {
     @Inject
     private Hub hub;
 
+    @Inject
+    private ZoneService zoneService;
+
     private final List<Player> doubleJumped = new ArrayList<>();
 
     private void queueFlight(Player player) {
@@ -38,14 +44,29 @@ public class DoubleJumpListener implements Listener {
         }, 1L);
     }
 
+    private void disableFlight(Player player) {
+        player.setAllowFlight(false);
+    }
+
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        queueFlight(event.getPlayer());
+    public void onExitZone(PlayerExitZoneEvent event) {
+        if (event.getZone() == Zone.COMMON) {
+            disableFlight(event.getPlayer());
+        }
+    }
+
+    @EventHandler
+    public void onEnterZone(PlayerEnterZoneEvent event) {
+        if (event.getZone() == Zone.COMMON) {
+            queueFlight(event.getPlayer());
+        }
     }
 
     @EventHandler
     public void onGamemodeChange(PlayerGameModeChangeEvent event) {
-        queueFlight(event.getPlayer());
+        if (zoneService.getZone(event.getPlayer()) == Zone.COMMON) {
+            queueFlight(event.getPlayer());
+        }
     }
 
     @EventHandler
@@ -54,8 +75,6 @@ public class DoubleJumpListener implements Listener {
         if (player.getGameMode().equals(GameMode.CREATIVE)) {
             return; // creative players can still fly, and people who double jumped can't double jump again
         }
-
-        // todo: zone system cancel event
 
         event.setCancelled(true);
         event.getPlayer().setAllowFlight(false);

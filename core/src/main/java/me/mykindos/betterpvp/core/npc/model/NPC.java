@@ -31,7 +31,7 @@ public abstract class NPC {
     }
 
     public void remove() {
-        factory.getRegistry().getObjects().remove(Integer.toString(id));
+        factory.getRegistry().unregister(this);
         if (entity != null) {
             entity.remove();
         }
