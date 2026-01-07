@@ -154,3 +154,9 @@ ivybolt:
   aliveTime: 3000
   entangleAmplifier: 1
   entangleSeconds: 5.0
+echo_pebble:
+  revealDuration: 5.0
+  radius: 5.0
+  needsLineOfSight: false
+  throwableExpiry: 10.0
+  cooldown: 10.0
