@@ -55,6 +55,6 @@ public class PowerSword extends WeaponItem {
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('D', new RecipeIngredient(diamondBlock, 1));
         builder.setIngredient('S', new RecipeIngredient(stick, 1));
-        registry.registerRecipe(new NamespacedKey("champions", "power_sword"), builder.build());
+        registry.registerRecipe(new NamespacedKey("core", "power_sword"), builder.build());
     }
 }
