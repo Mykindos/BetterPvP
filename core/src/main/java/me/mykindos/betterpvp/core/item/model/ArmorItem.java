@@ -28,16 +28,16 @@ public abstract class ArmorItem extends BaseItem implements Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(plugin, this);
-        final double health = config.getConfig("health.base", 1, Double.class);
-        final double healthMin = config.getConfig("health.min", 0, Double.class);
-        final double healthMax = config.getConfig("health.max", 2, Double.class);
+        final double health = config.getConfig("health.base", 1.0, Number.class).doubleValue();
+        final double healthMin = config.getConfig("health.min", 0.0, Number.class).doubleValue();
+        final double healthMax = config.getConfig("health.max", 2.0, Number.class).doubleValue();
         getComponent(StatContainerComponent.class).ifPresent(statContainer -> {
             statContainer.getStat(StatTypes.HEALTH).ifPresent(healthStat -> {
                 statContainer.withBaseStat(healthStat.withValue(health).withRanges(healthMin, healthMax));
             });
         });
 
-        final int durability = config.getConfig("durability", 500, Integer.class);
+        final int durability = config.getConfig("durability", 500, Number.class).intValue();
         getComponent(DurabilityComponent.class).ifPresent(durabilityComponent -> {
             durabilityComponent.setMaxDamage(durability);
         });
