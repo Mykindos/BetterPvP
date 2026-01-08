@@ -10,7 +10,9 @@ import me.mykindos.betterpvp.champions.champions.roles.packet.ArmorProtocol;
 import me.mykindos.betterpvp.champions.champions.roles.packet.RemapperIn;
 import me.mykindos.betterpvp.champions.champions.roles.packet.RemapperOut;
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.champions.RoleStat;
 import me.mykindos.betterpvp.core.combat.health.EntityHealthService;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -106,7 +108,13 @@ public class RoleManager {
 
             updateRole(livingEntity, role);
             if (livingEntity instanceof Player player) {
-                clientManager.search().online(player).getGamer().saveProperty(ChampionsProperty.CURRENT_ROLE, role.name());
+                final Client client = clientManager.search().online(player);
+                client.getGamer().saveProperty(ChampionsProperty.CURRENT_ROLE, role.name());
+                final RoleStat roleStat = RoleStat.builder()
+                        .role(role)
+                        .action(RoleStat.Action.EQUIP)
+                        .build();
+                client.getStatContainer().incrementStat(roleStat, 1);
             }
         }
         return true;

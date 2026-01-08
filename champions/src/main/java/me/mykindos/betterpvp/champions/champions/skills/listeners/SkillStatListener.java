@@ -25,7 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-import java.util.Optional;
+import java.util.Objects;
 
 @BPvPListener
 @Singleton
@@ -49,9 +49,10 @@ public class SkillStatListener extends TimedStatListener {
     @EventHandler
     public void onRoleChange(RoleChangeEvent event) {
         if (event.getPrevious() == null) return;
-        final GamerBuilds gamerBuilds = buildManager.getObject(event.getPlayer().getUniqueId()).orElseThrow();
+        if (!(event.getLivingEntity() instanceof Player player)) return;
+        final GamerBuilds gamerBuilds = buildManager.getObject(player.getUniqueId()).orElseThrow();
         final RoleBuild build = gamerBuilds.getActiveBuilds().get(event.getPrevious().getName());
-        earlyUpdateBuild(event.getPlayer(), build);
+        earlyUpdateBuild(player, build);
     }
 
 
@@ -113,9 +114,7 @@ public class SkillStatListener extends TimedStatListener {
     }
 
     private void incrementStats(Client client, ChampionsSkillStat.Action action, long value) {
-        final Optional<Role> roleOptional = roleManager.getObject(client.getUniqueId());
-        if (roleOptional.isEmpty()) return;
-        final Role role = roleOptional.get();
+        final Role role = roleManager.getRole(Objects.requireNonNull(client.getGamer().getPlayer()));
         final GamerBuilds gamerBuilds = buildManager.getObject(client.getUniqueId()).orElseThrow();
         final RoleBuild build = gamerBuilds.getActiveBuilds().get(role.getName());
         incrementBuildStats(build, client, action, value);
