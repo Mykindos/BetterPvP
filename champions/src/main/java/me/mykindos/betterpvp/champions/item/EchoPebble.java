@@ -37,12 +37,14 @@ public class EchoPebble extends BaseItem implements Reloadable {
     public void reload() {
         final @NotNull Config config = Config.item(Champions.class, this);
 
+        final double velocity = config.getConfig("velocity", 1.5, Double.class);
         final double revealDuration = config.getConfig("revealDuration", 5.0, Double.class);
         final double radius = config.getConfig("radius", 5.0, Double.class);
         final boolean needsLineOfSight = config.getConfig("needsLineOfSight", false, Boolean.class);
         final double throwableExpiry = config.getConfig("throwableExpiry", 10.0, Double.class);
         final double cooldown = config.getConfig("cooldown", 10.0, Double.class);
 
+        echoPebbleAbility.setVelocity(velocity);
         echoPebbleAbility.setRevealDuration(revealDuration);
         echoPebbleAbility.setRadius(radius);
         echoPebbleAbility.setNeedsLineOfSight(needsLineOfSight);

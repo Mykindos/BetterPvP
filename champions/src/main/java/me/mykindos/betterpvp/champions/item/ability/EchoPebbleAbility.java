@@ -48,6 +48,9 @@ import java.util.WeakHashMap;
 public class EchoPebbleAbility extends ItemAbility implements ThrowableListener {
 
     @EqualsAndHashCode.Include
+    private double velocity;
+
+    @EqualsAndHashCode.Include
     private double revealDuration;
 
     @EqualsAndHashCode.Include
@@ -68,10 +71,15 @@ public class EchoPebbleAbility extends ItemAbility implements ThrowableListener 
     
     private final Set<@NotNull LivingEntity> entitiesAlreadyHit = Collections.newSetFromMap(new WeakHashMap<>());
 
+    /*
+    TODO:
+    - test item model
+     */
+
     public EchoPebbleAbility(Champions champions, ChampionsManager championsManager, CooldownManager cooldownManager) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "echo_pebble"),
                 "Echo Pebble",
-                "Toss a pebble that reveals the location of hidden enemies in a radius upon landing. <effect>Vanished</effect> enemies are not revealed.",
+                "Toss a pebble that reveals the location of hidden enemies in a radius upon landing. Vanished enemies are not revealed.",
                 TriggerTypes.LEFT_CLICK);
 
         this.champions = champions;
@@ -91,7 +99,7 @@ public class EchoPebbleAbility extends ItemAbility implements ThrowableListener 
             meta.getPersistentDataContainer().set(CoreNamespaceKeys.UUID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
         });
 
-        item.setVelocity(player.getLocation().getDirection().multiply(1.8));  // todo: make velocity configurable
+        item.setVelocity(player.getLocation().getDirection().multiply(velocity));
         final @NotNull ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(),
                 (long) (throwableExpiry * 1000L), true);
 
@@ -120,14 +128,15 @@ public class EchoPebbleAbility extends ItemAbility implements ThrowableListener 
 
         final @NotNull Location impactLocation = throwableItem.getItem().getLocation();
 
-        doExplosion(player, impactLocation, radius * (1d/3), 5, 0L);
-        doExplosion(player, impactLocation, radius * (2d/3), 15, 10L);
-        doExplosion(player, impactLocation, radius, 25, 15L);
+        doExplosion(player, impactLocation, radius * (1d/3), 5, 0L, 0.5f);
+        doExplosion(player, impactLocation, radius * (2d/3), 15, 10L, 1f);
+        doExplosion(player, impactLocation, radius, 25, 15L, 1.5f);
 
         throwableItem.getItem().remove();
     }
 
-    private void doExplosion(@NotNull Player player, @NotNull Location impactLocation, double radius, int points, long explosionDelay) {
+    private void doExplosion(@NotNull Player player, @NotNull Location impactLocation, double radius, int points,
+                             long explosionDelay, float size) {
         final @NotNull List<Location> spherePoints = UtilLocation.getSphere(impactLocation, radius, points);
 
         UtilServer.runTaskLater(champions, () -> {
@@ -147,17 +156,23 @@ public class EchoPebbleAbility extends ItemAbility implements ThrowableListener 
             }
         }, explosionDelay);
 
-        spherePoints.forEach(point -> UtilServer.runTaskLater(champions, () -> playVfxAndSfx(impactLocation, point), explosionDelay));
+        spherePoints.forEach(point -> UtilServer.runTaskLater(champions, () -> playVfxAndSfx(impactLocation, point, size), explosionDelay));
     }
 
-    private void playVfxAndSfx(@NotNull Location impactLocation, Location point) {
-        final Color color = UtilMath.randDouble(0.0, 1.0) > 0.5 ? Color.TEAL : Color.BLUE;
-        final Color toColor = UtilMath.randDouble(0.0, 1.0) > 0.5 ? Color.BLUE : Color.AQUA;
-        new ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
+    private void playVfxAndSfx(@NotNull Location impactLocation, @NotNull Location point, float size) {
+
+        final double randomNum = UtilMath.randDouble(0.0, 1.0);
+        final @NotNull Color color;
+
+        if (randomNum < 0.33) color = Color.PURPLE;
+        else if (randomNum < 0.66) color = Color.TEAL;
+        else color = Color.AQUA;
+
+        new ParticleBuilder(Particle.DUST)
                 .location(point)
                 .count(1)
                 .extra(1)
-                .data(new Particle.DustTransition(color, toColor, 1.5f))
+                .data(new Particle.DustOptions(color, size))
                 .receivers(60)
                 .spawn();
 
