@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.skill.builds.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
@@ -70,6 +71,7 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
         ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.BARRIER)
                 .customModelData(1)
                 .displayName(Component.text(profession + " Level", NamedTextColor.BLUE))
+                .itemModel(Resources.ItemModel.INVISIBLE)
                 .lore(progressBarFinal)
                 .lore(Component.empty())
                 .lore(Component.text("Level: ", NamedTextColor.GRAY).append(Component.text(currentLevel, NamedTextColor.YELLOW)))
