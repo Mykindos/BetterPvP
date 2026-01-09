@@ -155,6 +155,7 @@ ivybolt:
   entangleAmplifier: 1
   entangleSeconds: 5.0
 echo_pebble:
+  velocity: 1.5
   revealDuration: 5.0
   radius: 5.0
   needsLineOfSight: false
