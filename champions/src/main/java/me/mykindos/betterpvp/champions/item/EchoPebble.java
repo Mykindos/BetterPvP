@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.item.ability.EchoPebbleAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
@@ -27,7 +28,7 @@ public class EchoPebble extends BaseItem implements Reloadable {
 
     @Inject
     private EchoPebble(Champions champions, ChampionsManager championsManager, CooldownManager cooldownManager) {
-        super("Echo Pebble", ItemStack.of(Material.BAKED_POTATO), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
+        super("Echo Pebble", Item.model("echo_pebble", 64), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
         this.echoPebbleAbility = new EchoPebbleAbility(champions, championsManager, cooldownManager);
         echoPebbleAbility.setConsumesItem(true);
         addBaseComponent(AbilityContainerComponent.builder().ability(echoPebbleAbility).build());
