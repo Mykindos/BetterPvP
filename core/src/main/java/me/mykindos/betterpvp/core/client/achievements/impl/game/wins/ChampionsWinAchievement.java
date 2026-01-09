@@ -39,7 +39,7 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
 
     @Override
     public String getName() {
-        return "Champions Wins " + getGoal().intValue();
+        return "Win " + getGoal().intValue() + " Champion's games";
     }
 
     /**

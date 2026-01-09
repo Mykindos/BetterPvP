@@ -38,7 +38,7 @@ public class OpenUndeadChests extends SingleSimpleAchievement {
 
     @Override
     public String getName() {
-        return "Open Undead Chests " + getGoal().intValue();
+        return "Open " + getGoal().intValue() + " Undead Chests" ;
     }
 
     /**

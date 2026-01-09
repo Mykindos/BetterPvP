@@ -39,7 +39,7 @@ public class PointsCapturedAchievement extends SingleSimpleAchievement {
 
     @Override
     public String getName() {
-        return "Points Captured " + getGoal().intValue();
+        return "Capture " + getGoal().intValue() + " Points";
     }
 
     /**
