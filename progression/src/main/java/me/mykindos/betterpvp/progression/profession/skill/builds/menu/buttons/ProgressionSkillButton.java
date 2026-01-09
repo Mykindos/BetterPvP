@@ -12,9 +12,9 @@ import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.ProfessionMenu;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.SkillNodeType;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -43,7 +43,7 @@ public class ProgressionSkillButton extends ControlItem<ProfessionMenu> {
                 progressionNode.getDisplayName(), levelsApplied, progressionNode.getMaxLevel());
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder().material(Material.YELLOW_DYE)
-                .itemModel(new NamespacedKey("nexo", "l_skilltree_node" + getModelData(levelsApplied)))
+                .itemModel(Key.key("minecraft", "l_skilltree_node" + getModelData(levelsApplied)))
                 .displayName(name);
         Optional.ofNullable(progressionNode.getFlag()).ifPresent(itemViewBuilder::flag);
         itemViewBuilder.glow(progressionNode.isGlowing());
