@@ -71,11 +71,6 @@ public class EchoPebbleAbility extends ItemAbility implements ThrowableListener 
     
     private final Set<@NotNull LivingEntity> entitiesAlreadyHit = Collections.newSetFromMap(new WeakHashMap<>());
 
-    /*
-    TODO:
-    - test item model
-     */
-
     public EchoPebbleAbility(Champions champions, ChampionsManager championsManager, CooldownManager cooldownManager) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "echo_pebble"),
                 "Echo Pebble",
