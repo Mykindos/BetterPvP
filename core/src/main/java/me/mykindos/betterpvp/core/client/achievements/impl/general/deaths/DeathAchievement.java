@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CustomLog
-//Config loaded achievement, this class will be skipped by reflaction
+//Config loaded achievement, this class will be skipped by reflection
 @NoReflection
 /**
  * Super class, is either extended or loaded by a loader {@link DeathAchievementLoader}
@@ -49,7 +49,7 @@ public class DeathAchievement extends SingleSimpleAchievement {
 
     @Override
     public String getName() {
-        return "Death " + getGoal().intValue();
+        return "Die " + getGoal().intValue() + " times";
     }
 
     /**
