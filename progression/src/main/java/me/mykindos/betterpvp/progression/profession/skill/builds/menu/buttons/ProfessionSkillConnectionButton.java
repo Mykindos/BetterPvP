@@ -4,8 +4,8 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
-import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.ConnectionType;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.ProfessionMenu;
+import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.ConnectionType;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -44,7 +44,7 @@ public class ProfessionSkillConnectionButton extends ControlItem<ProfessionMenu>
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
                 .material(Material.YELLOW_DYE)
                 .hideTooltip(true)
-                .itemModel(new NamespacedKey("nexo", "l_skilltree_path" + (allSkillsActive ?
+                .itemModel(new NamespacedKey("minecraft", "l_skilltree_path" + (allSkillsActive ?
                         connectionType.getActiveModelData(getGui().getSkillNodeType()) :
                         connectionType.getInactiveModelData())));
 
