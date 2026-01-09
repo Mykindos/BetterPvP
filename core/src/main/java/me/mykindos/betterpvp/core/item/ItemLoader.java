@@ -47,16 +47,21 @@ public final class ItemLoader {
                 continue;
             }
 
-            //noinspection unchecked
-            final BaseItem item = plugin.getInjector().getInstance((Class<? extends BaseItem>) itemClazz);
+            try {
+                //noinspection unchecked
+                final BaseItem item = plugin.getInjector().getInstance((Class<? extends BaseItem>) itemClazz);
 
-            if (itemClazz.isAnnotationPresent(FallbackItem.class)) {
-                // Fallback item
-                registerFallbackItem(namespacedKey, item, itemClazz.getAnnotation(FallbackItem.class));
-            } else {
-                // Default item
-                itemRegistry.registerItem(namespacedKey, item);
+                if (itemClazz.isAnnotationPresent(FallbackItem.class)) {
+                    // Fallback item
+                    registerFallbackItem(namespacedKey, item, itemClazz.getAnnotation(FallbackItem.class));
+                } else {
+                    // Default item
+                    itemRegistry.registerItem(namespacedKey, item);
+                }
+            } catch (Exception e) {
+                log.error("Error registering an item {}", namespacedKey, e).submit();
             }
+
         }
     }
 

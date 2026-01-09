@@ -37,10 +37,6 @@ public class ClansChampionsHook implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         final Player killed = event.getPlayer();
-        if (this.roleManager.getObject(killed.getUniqueId()).isEmpty()) {
-            return;
-        }
-
         final DamageLog lastDamage = this.damageLogManager.getLastDamager(killed);
         if (lastDamage == null || !(lastDamage.getDamager() instanceof Player)) {
             return;

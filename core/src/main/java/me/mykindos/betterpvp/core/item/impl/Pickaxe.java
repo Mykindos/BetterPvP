@@ -10,6 +10,6 @@ public class Pickaxe extends VanillaItem {
 
     public Pickaxe(String name, Material material, ItemRarity rarity) {
         super(name, ItemStack.of(material), rarity);
-        addSerializableComponent(new RuneContainerComponent(2));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
     }
 }

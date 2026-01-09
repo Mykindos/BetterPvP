@@ -19,8 +19,8 @@ import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -120,12 +120,12 @@ public class AssassinListener implements Listener, ConfigAccessor {
             return;
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Role role = roleManager.getObject(player.getUniqueId()).orElse(null);
+        for (LivingEntity livingEntity : roleManager.getLivingEntities()) {
+            Role role = roleManager.getRole(livingEntity).orElse(null);
             if (role == Role.ASSASSIN) {
-                effectManager.addEffect(player, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true, false, null);
+                effectManager.addEffect(livingEntity, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true, false, null);
             } else {
-                effectManager.removeEffect(player, EffectTypes.SPEED, "Assassin", false);
+                effectManager.removeEffect(livingEntity, EffectTypes.SPEED, "Assassin", false);
             }
         }
     }

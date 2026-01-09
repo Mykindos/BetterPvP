@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
@@ -30,7 +29,6 @@ import java.util.Map;
 @Singleton
 @EqualsAndHashCode(callSuper = true)
 @ItemKey("champions:runed_pickaxe")
-@FallbackItem(value = Material.DIAMOND_PICKAXE, keepRecipes = true)
 public class RunedPickaxe extends BaseItem implements Reloadable {
 
     private transient boolean registered;
@@ -49,7 +47,7 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
 
         // Create and add the mining speed ability
         this.ability = new EnhancedMiningAbility();
-        addSerializableComponent(new RuneContainerComponent(3));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
         addBaseComponent(AbilityContainerComponent.builder()
                 .ability(ability)
                 .build());

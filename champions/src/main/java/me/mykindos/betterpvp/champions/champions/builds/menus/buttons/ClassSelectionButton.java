@@ -8,8 +8,6 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.health.EntityHealthService;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -26,8 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,13 +57,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
             }
         }
 
-        final EntityHealthService entityHealthService = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(EntityHealthService.class);
-        this.reduction = entityHealthService.getHealth(new ItemStack[]{
-                ItemStack.of(role.getHelmet()),
-                ItemStack.of(role.getChestplate()),
-                ItemStack.of(role.getLeggings()),
-                ItemStack.of(role.getBoots())
-        });
+        this.reduction = role.getHealth();
     }
 
     @Override
@@ -83,14 +73,12 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
         final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
 
         List<Component> roleLore = new ArrayList<>(List.of(
-                Component.text("While wearing base armor:", NamedTextColor.GRAY),
                 Component.empty()
-                        .append(Component.text("+", TextColor.color(255, 0, 0)))
+                        .append(Component.text("Health:", NamedTextColor.GRAY))
+                        .appendSpace()
                         .append(Component.text(UtilFormat.formatNumber(reduction), TextColor.color(255, 0, 0)))
                         .appendSpace()
-                        .append(Component.text("❤", TextColor.color(255, 0, 0)))
-                        .appendSpace()
-                        .append(Component.text("Health", TextColor.color(255, 0, 0))),
+                        .append(Component.text("❤", TextColor.color(255, 0, 0))),
                 Component.empty()
         ));
 

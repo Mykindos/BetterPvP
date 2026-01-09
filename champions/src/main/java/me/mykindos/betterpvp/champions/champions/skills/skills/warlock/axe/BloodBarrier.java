@@ -150,9 +150,8 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 return true;
             }
 
-            boolean hasRole = championsManager.getRoles().hasRole(player);
-            if((entry.getValue().hasRole && !hasRole) || (!entry.getValue().hasRole && hasRole)) {
-                return true;
+            if (championsManager.getRoles().getRole(player) != entry.getValue().getRole()) {
+                return true; // They swapped roles, remove effecdt
             }
 
             return false;
@@ -199,16 +198,15 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
-        boolean playerHasRole = championsManager.getRoles().hasRole(player);
-        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), playerHasRole));
+        Role playerRole = championsManager.getRoles().getRole(player);
+        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), playerRole));
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
-
-            if(player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected(level)) < 1) {
+            if (player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected(level)) < 1) {
                 break;
             }
 
-            boolean allyHasRole = championsManager.getRoles().hasRole(ally);
-            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), allyHasRole));
+            Role allyRole = championsManager.getRoles().getRole(ally);
+            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), allyRole));
             healthReduction += getHealthReductionPerPlayerAffected(level);
         }
 
@@ -273,13 +271,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         public double damageReduction;
 
-        public boolean hasRole;
+        public Role role;
 
-        public ShieldData(long length, int count, double damageReduction, boolean hasRole) {
+        public ShieldData(long length, int count, double damageReduction, Role role) {
             this.endTime = System.currentTimeMillis() + length;
             this.count = count;
             this.damageReduction = damageReduction;
-            this.hasRole = hasRole;
+            this.role = role;
         }
 
     }

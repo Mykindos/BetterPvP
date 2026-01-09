@@ -1,0 +1,1 @@
+INSERT INTO property_map (property, type) VALUES ('CURRENT_ROLE', 'string') ON CONFLICT DO NOTHING;

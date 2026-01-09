@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.model.tag;
 
+import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -13,7 +14,7 @@ public class DamageTag implements Modifying {
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(255, 72, 0)))
                 .appendSpace()
-                .append(MiniMessage.miniMessage().deserialize("<font:nexo:default><white>꒘"))
+                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>꒘"))
                 .build();
     }
 }

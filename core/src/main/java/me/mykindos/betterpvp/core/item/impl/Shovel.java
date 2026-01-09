@@ -10,6 +10,6 @@ public class Shovel extends VanillaItem {
 
     public Shovel(String name, Material material, ItemRarity rarity) {
         super(Component.text(name), material, rarity);
-        addSerializableComponent(new RuneContainerComponent(2));
+        addSerializableComponent(new RuneContainerComponent(0, 0));
     }
 }

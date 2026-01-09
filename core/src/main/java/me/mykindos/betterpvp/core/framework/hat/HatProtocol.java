@@ -42,6 +42,7 @@ public class HatProtocol implements Listener {
         }
 
         // Just send to self
+        wearer.updateInventory();
         final WrapperPlayServerSetSlot packet2 = new WrapperPlayServerSetSlot(0,
                 0, // Allows changing player inventory
                 5,

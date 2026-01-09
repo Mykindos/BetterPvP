@@ -27,7 +27,8 @@ import java.util.Optional;
 public class RuneContainerSerializer implements ComponentSerializer<RuneContainerComponent>, ComponentDeserializer<RuneContainerComponent> {
 
     private static final NamespacedKey KEY = new NamespacedKey("betterpvp", "runes");
-    private static final NamespacedKey MAX_SLOTS_KEY = new NamespacedKey("betterpvp", "rune-max-sockets");
+    private static final NamespacedKey SOCKETS_KEY = new NamespacedKey("betterpvp", "rune-sockets");
+    private static final NamespacedKey MAX_SOCKETS_KEY = new NamespacedKey("betterpvp", "rune-max-sockets");
     private static final NamespacedKey LIST_KEY = new NamespacedKey("betterpvp", "rune-list");
 
     private final RuneRegistry runeRegistry;
@@ -55,7 +56,8 @@ public class RuneContainerSerializer implements ComponentSerializer<RuneContaine
         }
 
         PersistentDataContainer runesContainer = Objects.requireNonNull(container.get(KEY, PersistentDataType.TAG_CONTAINER));
-        runesContainer.set(MAX_SLOTS_KEY, PersistentDataType.INTEGER, instance.getSockets());
+        runesContainer.set(SOCKETS_KEY, PersistentDataType.INTEGER, instance.getSockets());
+        runesContainer.set(MAX_SOCKETS_KEY, PersistentDataType.INTEGER, instance.getMaxSockets());
 
         List<String> runeKeys = instance.getRunes().stream()
                 .map(rune -> rune.getKey().toString())
@@ -77,8 +79,12 @@ public class RuneContainerSerializer implements ComponentSerializer<RuneContaine
         Preconditions.checkArgument(container.has(KEY, PersistentDataType.TAG_CONTAINER), "PersistentDataContainer does not contain the RuneContainerComponent key");
 
         PersistentDataContainer runesContainer = Objects.requireNonNull(container.get(KEY, PersistentDataType.TAG_CONTAINER));
-        Integer maxSlots = runesContainer.get(MAX_SLOTS_KEY, PersistentDataType.INTEGER);
-        Preconditions.checkArgument(maxSlots != null, "RuneContainerComponent max slots cannot be null");
+        Integer sockets = runesContainer.get(SOCKETS_KEY, PersistentDataType.INTEGER);
+        Preconditions.checkArgument(sockets != null, "RuneContainerComponent slots cannot be null");
+
+        // Backwards compatibility: old items don't have maxSockets saved
+        Integer maxSockets = runesContainer.get(MAX_SOCKETS_KEY, PersistentDataType.INTEGER);
+        Preconditions.checkArgument(maxSockets != null, "RuneContainerComponent max slots cannot be null");
 
         List<Rune> runes = new ArrayList<>();
         List<String> runeKeys = runesContainer.get(LIST_KEY, PersistentDataType.LIST.strings());
@@ -92,6 +98,6 @@ public class RuneContainerSerializer implements ComponentSerializer<RuneContaine
                 log.warn("Rune with key {} not found in registry, skipping.", runeKey).submit();
             }
         }
-        return new RuneContainerComponent(maxSlots, runes);
+        return new RuneContainerComponent(sockets, maxSockets, runes);
     }
 } 

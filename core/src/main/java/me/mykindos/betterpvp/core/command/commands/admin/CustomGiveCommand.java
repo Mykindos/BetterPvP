@@ -108,7 +108,7 @@ public class CustomGiveCommand extends Command {
             final int stackSize = itemStack.getMaxStackSize();
             int giveAmount = Math.min(toGive, stackSize);
             itemStack.setAmount(giveAmount);
-            UtilItem.insert(player, itemStack);
+            UtilItem.insert(target, itemStack);
 
             // Give Uncommon+ rarities a UUID
             if (instance.getRarity().isImportant()) {

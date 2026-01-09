@@ -55,6 +55,10 @@ public class InfoTabButton extends AbstractItem {
             builder = ItemView.builder();
             builder.material(Material.PAPER);
             builder.itemModel(Key.key("betterpvp", "menu/tab/info"));
+        } else if (icon.getType().isAir()) {
+            builder = ItemView.builder();
+            builder.material(Material.PAPER);
+            builder.itemModel(Material.AIR.getKey());
         } else {
             builder = ItemView.of(icon).toBuilder();
         }

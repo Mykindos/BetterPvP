@@ -3,9 +3,10 @@ package me.mykindos.betterpvp.core.item.component.serialization;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
+import me.mykindos.betterpvp.core.item.component.impl.ability.serialization.ItemAbilitySerializationRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponentSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.fuel.FuelComponentSerializer;
-import me.mykindos.betterpvp.core.item.component.impl.ability.serialization.ItemAbilitySerializationRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponentSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.runes.serialization.RuneContainerSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.stat.serialization.StatSerializationRegistry;
@@ -47,6 +48,7 @@ public class ComponentSerializationRegistry {
         register(new AbilityContainerSerializer(itemAbilitySerializationRegistry));
         register(new FuelComponentSerializer());
         register(new DurabilityComponentSerializer());
+        register(new PurityComponentSerializer());
     }
 
     /**

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.item;
 
+import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.Consumable;
 import io.papermc.paper.datacomponent.item.CustomModelData;
@@ -7,12 +8,16 @@ import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A flexible builder for creating ItemStacks with various data components.
@@ -34,6 +39,18 @@ public class ModelBuilder {
     private Component displayName;
     private Boolean consumable;
     private Boolean unbreakable;
+    private final Set<DataComponentType.NonValued> nonValuedComponents = new HashSet<>();
+    private final Set<ValuedComponent<?>> valuedComponents = new HashSet<>();
+
+    public ModelBuilder data(DataComponentType.NonValued component) {
+        this.nonValuedComponents.add(component);
+        return this;
+    }
+
+    public <T> ModelBuilder data(DataComponentType.Valued<@NotNull T> component, T value) {
+        this.valuedComponents.add(new ValuedComponent<>(component, value));
+        return this;
+    }
 
     /**
      * Sets the custom model data for the item.
@@ -172,6 +189,24 @@ public class ModelBuilder {
             result.unsetData(DataComponentTypes.CONSUMABLE);
         }
 
+        for (DataComponentType.NonValued nonValuedComponent : nonValuedComponents) {
+            result.setData(nonValuedComponent);
+        }
+
+        for (ValuedComponent<?> component : valuedComponents) {
+            component.set(result);
+        }
+
         return result;
+    }
+
+    @Value
+    private class ValuedComponent<T> {
+        DataComponentType.Valued<T> type;
+        T value;
+
+        private void set(ItemStack itemStack) {
+            itemStack.setData(type, value);
+        }
     }
 } 
