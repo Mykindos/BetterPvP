@@ -130,7 +130,7 @@ public class EchoPebbleAbility extends ItemAbility implements ThrowableListener 
 
         doExplosion(player, impactLocation, radius * (1d/3), 5, 0L, 0.5f);
         doExplosion(player, impactLocation, radius * (2d/3), 15, 10L, 1f);
-        doExplosion(player, impactLocation, radius, 25, 15L, 1.5f);
+        doExplosion(player, impactLocation, radius, 25, 15L, 2f);
 
         throwableItem.getItem().remove();
     }
