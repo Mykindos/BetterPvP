@@ -16,8 +16,8 @@ import java.util.Set;
  * Due to the way spigot loads plugins, this code needs to be duplicated in order to use reflection properly
  */
 @CustomLog
-public class CoreListenerLoader extends ListenerLoader{
-    
+public class CoreListenerLoader extends ListenerLoader {
+
     @Inject
     public CoreListenerLoader(Core plugin) {
         super(plugin);

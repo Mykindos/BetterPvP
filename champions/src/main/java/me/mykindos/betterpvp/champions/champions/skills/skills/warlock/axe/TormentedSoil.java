@@ -168,7 +168,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
 
         double healthReduction = getHealthReduction(level);
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
@@ -184,6 +184,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         }
         tormentList.add(new Torment(player, loc.add(0, 0.5, 0), level));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 2f, 1.3f);
+        return true;
     }
 
     @Override

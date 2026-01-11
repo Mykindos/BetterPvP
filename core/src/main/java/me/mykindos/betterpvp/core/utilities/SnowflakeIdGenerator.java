@@ -45,8 +45,8 @@ public class SnowflakeIdGenerator {
     private final AtomicLong sequence = new AtomicLong(0L);
 
     public SnowflakeIdGenerator() {
-        this.serverId = generateServerId(Core.getCurrentServer() + "");
-        this.seasonId = generateSeasonId(Core.getCurrentSeason() + "");
+        this.serverId = generateServerId((Core.getCurrentRealm() == null ? -1 : Core.getCurrentRealm().getServer().getId()) + "");
+        this.seasonId = generateSeasonId((Core.getCurrentRealm() == null ? -1 : Core.getCurrentRealm().getSeason().getId()) + "");
     }
 
     /**

@@ -38,7 +38,7 @@ public class BlockTagRepository {
     }
 
     public void createPartitions() {
-        int realm = Core.getCurrentRealm();
+        int realm = Core.getCurrentRealm().getId();
         String partitionTableName = "chunk_block_tagging_realm_" + realm;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
@@ -58,7 +58,7 @@ public class BlockTagRepository {
         try {
             database.getDslContext()
                     .selectFrom(CHUNK_BLOCK_TAGGING)
-                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm()))
+                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm().getId()))
                     .and(CHUNK_BLOCK_TAGGING.CHUNK.eq(chunkString))
                     .fetch()
                     .forEach(record -> {
@@ -83,7 +83,7 @@ public class BlockTagRepository {
             pendingBlockTagUpdates.add(
                     database.getDslContext()
                             .insertInto(CHUNK_BLOCK_TAGGING)
-                            .set(CHUNK_BLOCK_TAGGING.REALM, Core.getCurrentRealm())
+                            .set(CHUNK_BLOCK_TAGGING.REALM, Core.getCurrentRealm().getId())
                             .set(CHUNK_BLOCK_TAGGING.CHUNK, UtilWorld.chunkToFile(block.getChunk()))
                             .set(CHUNK_BLOCK_TAGGING.BLOCK_KEY, blockKey)
                             .set(CHUNK_BLOCK_TAGGING.TAG, blockTag.getTag())
@@ -102,7 +102,7 @@ public class BlockTagRepository {
             pendingBlockTagUpdates.add(
                     database.getDslContext()
                             .deleteFrom(CHUNK_BLOCK_TAGGING)
-                            .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm()))
+                            .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm().getId()))
                             .and(CHUNK_BLOCK_TAGGING.CHUNK.eq(UtilWorld.chunkToFile(block.getChunk())))
                             .and(CHUNK_BLOCK_TAGGING.BLOCK_KEY.eq(UtilBlock.getBlockKey(block)))
                             .and(CHUNK_BLOCK_TAGGING.TAG.eq(tag))
@@ -116,7 +116,7 @@ public class BlockTagRepository {
         try {
             int deletedRows = database.getDslContext()
                     .deleteFrom(CHUNK_BLOCK_TAGGING)
-                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm()))
+                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm().getId()))
                     .and(CHUNK_BLOCK_TAGGING.LAST_UPDATED.lt(cutoff.toEpochMilli()))
                     .and(CHUNK_BLOCK_TAGGING.TAG.eq("PlayerManipulated"))
                     .execute();

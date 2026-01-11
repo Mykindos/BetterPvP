@@ -105,7 +105,7 @@ public class ChampionsCombatData extends CombatData {
             // Insert/update victim rating using INSERT ... ON DUPLICATE KEY UPDATE
             ctx.insertInto(CHAMPIONS_COMBAT_STATS)
                     .set(CHAMPIONS_COMBAT_STATS.CLIENT, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
-                    .set(CHAMPIONS_COMBAT_STATS.REALM, Core.getCurrentRealm())
+                    .set(CHAMPIONS_COMBAT_STATS.REALM, Core.getCurrentRealm().getId())
                     .set(CHAMPIONS_COMBAT_STATS.CLASS, role == null ? "" : role.toString())
                     .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
                     .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())

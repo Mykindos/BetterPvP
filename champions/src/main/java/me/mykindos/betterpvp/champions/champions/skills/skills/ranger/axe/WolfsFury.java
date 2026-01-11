@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Iterator;
@@ -181,10 +180,11 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
         active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
         championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), getStrengthLevel(level), (long) (getDuration(level) * 1000L));
+        return true;
     }
 
     public void deactivate(Player player) {

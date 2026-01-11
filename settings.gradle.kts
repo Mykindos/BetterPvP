@@ -28,7 +28,7 @@ pluginManagement {
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://mvn.lumine.io/repository/maven-public/")
         maven("https://repo.xenondevs.xyz/releases")
-        maven("https://repo.md-5.net/content/groups/public/")
+        maven("https://mvn.lib.co.nz/public")
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://jitpack.io")
         maven {

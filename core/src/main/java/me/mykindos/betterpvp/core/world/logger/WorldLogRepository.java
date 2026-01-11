@@ -53,7 +53,7 @@ public class WorldLogRepository {
     }
 
     public void createPartitions() {
-        int realm = Core.getCurrentRealm();
+        int realm = Core.getCurrentRealm().getId();
         String partitionTableName = "world_logs_realm_" + realm;
         String metadataPartitionTableName = "world_logs_metadata_realm_" + realm;
 
@@ -116,7 +116,7 @@ public class WorldLogRepository {
                         // Create main log record
                         WorldLogsRecord logRecord = ctxl.newRecord(WORLD_LOGS);
                         logRecord.setId(id);
-                        logRecord.setRealm(Core.getCurrentRealm());
+                        logRecord.setRealm(Core.getCurrentRealm().getId());
                         logRecord.setWorld(log.getWorld());
                         logRecord.setBlockX(log.getBlockX());
                         logRecord.setBlockY(log.getBlockY());
@@ -138,7 +138,7 @@ public class WorldLogRepository {
                             log.getMetadata().forEach((key, value) -> {
                                 WorldLogsMetadataRecord metadataRecord = ctxl.newRecord(WORLD_LOGS_METADATA);
                                 metadataRecord.setLogId(id);
-                                metadataRecord.setRealm(Core.getCurrentRealm());
+                                metadataRecord.setRealm(Core.getCurrentRealm().getId());
                                 metadataRecord.setMetaKey(key);
                                 metadataRecord.setMetaValue(value);
                                 metadataRecords.add(metadataRecord);
@@ -180,7 +180,7 @@ public class WorldLogRepository {
         try {
             Block block = session.getBlock();
             var results = GET_WORLD_LOGS_FOR_BLOCK(database.getDslContext().configuration(),
-                    Core.getCurrentRealm(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), (page - 1) * 10, 10);
+                    Core.getCurrentRealm().getId(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), (page - 1) * 10, 10);
 
             for (var logRecord : results) {
                 String world = logRecord.get(GET_WORLD_LOGS_FOR_BLOCK.WORLD);
@@ -240,7 +240,7 @@ public class WorldLogRepository {
      * @return Statement object ready for execution
      */
     public GetWorldLogsForBlock getStatementForBlock(Block block) {
-        return GET_WORLD_LOGS_FOR_BLOCK(Core.getCurrentRealm(),
+        return GET_WORLD_LOGS_FOR_BLOCK(Core.getCurrentRealm().getId(),
                 block.getWorld().getName(),
                 block.getX(), block.getY(), block.getZ(),
                 10, 0);
@@ -254,7 +254,7 @@ public class WorldLogRepository {
                 DSLContext ctx = database.getDslContext();
 
                 int deletedRows = ctx.deleteFrom(WORLD_LOGS)
-                        .where(WORLD_LOGS.REALM.eq(Core.getCurrentRealm()))
+                        .where(WORLD_LOGS.REALM.eq(Core.getCurrentRealm().getId()))
                         .and(WORLD_LOGS.TIME.le(cutoff.toEpochMilli()))
                         .limit(50000)
                         .execute();

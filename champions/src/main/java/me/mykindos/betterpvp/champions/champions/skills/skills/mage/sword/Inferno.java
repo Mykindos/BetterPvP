@@ -115,8 +115,9 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
+        return true;
     }
 
     @UpdateEvent(delay = 125)
