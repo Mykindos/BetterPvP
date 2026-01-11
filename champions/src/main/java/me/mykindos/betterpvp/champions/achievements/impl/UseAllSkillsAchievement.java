@@ -111,11 +111,12 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
         List<Component> components = new ArrayList<>();
         if (neededStats.isEmpty()) return List.of();
         components.add(Component.text("Needed:"));
-        for (int i = 0; i < 3; i++) {
+        final int toShow = Math.min(neededStats.size(), 3);
+        for (int i = 0; i < toShow; i++) {
             components.add(Component.text(Objects.requireNonNull(neededStats.get(i).getSkillName()), NamedTextColor.WHITE));
         }
         if (neededStats.size() > 3) {
-            components.add(UtilMessage.deserialize("<white>+<green>%s", neededStats.size() - 3));
+            components.add(UtilMessage.deserialize("<white>+<green>%s", neededStats.size() - toShow));
         }
         return components;
     }
