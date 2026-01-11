@@ -42,6 +42,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.WeakHashMap;
@@ -200,14 +202,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         UtilVelocity.velocity(item, player, velocityData);
 
         hooks.put(player, new Hook(throwable, data, level));
-        championsManager.getCooldowns().removeCooldown(player, getName(), true);
-        championsManager.getCooldowns().use(player,
-                getName(),
-                getCooldown(level),
-                showCooldownFinished(),
-                true,
-                isCancellable(),
-                this::shouldDisplayActionBar);
     }
 
     @Override
@@ -254,11 +248,31 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     @Override
+    public boolean isDelayedSkill() {
+        return true;
+    }
+
+    @Override
+    public boolean isUsingSkill(@NotNull Player player) {
+        // still charging -> still using
+        if (charging.containsKey(player)) return true;
+
+        // if a hook exists and the throwable/item is valid -> still using
+        final @Nullable Hook hook = hooks.get(player);
+        if (hook == null) return false;
+
+        final @Nullable ThrowableItem throwable = hook.getThrowable();
+        if (throwable == null) return false;
+
+        final @Nullable org.bukkit.entity.Item item = throwable.getItem();
+        return item != null && item.isValid();
+    }
+
+    @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
-
 
     @Value
     private static class Hook {
