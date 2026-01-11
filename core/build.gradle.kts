@@ -47,7 +47,9 @@ dependencies {
     compileOnly(libs.packetevents)
     compileOnly(libs.bundles.paper)
     compileOnly(libs.fawe)
-    compileOnly(libs.fawebukkit)
+    compileOnly(libs.fawebukkit) {
+        exclude(group = "org.lz4", module = "lz4-java")
+    }
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)

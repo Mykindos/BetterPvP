@@ -104,8 +104,6 @@ subprojects {
 
     }
 
-
-
 }
 
 sonar {
