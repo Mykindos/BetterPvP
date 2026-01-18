@@ -7,6 +7,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables;
 import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions.AchievementCompletionsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Seasons.SeasonsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.AchievementCompletionsSeasonRecord;
 import org.jooq.Condition;
@@ -31,7 +32,6 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -65,29 +65,9 @@ public class AchievementCompletionsSeason extends TableImpl<AchievementCompletio
     public final TableField<AchievementCompletionsSeasonRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.achievement_completions_season.client</code>.
-     */
-    public final TableField<AchievementCompletionsSeasonRecord, Long> CLIENT = createField(DSL.name("client"), SQLDataType.BIGINT.nullable(false), this, "");
-
-    /**
      * The column <code>public.achievement_completions_season.season</code>.
      */
     public final TableField<AchievementCompletionsSeasonRecord, Integer> SEASON = createField(DSL.name("season"), SQLDataType.INTEGER.nullable(false), this, "");
-
-    /**
-     * The column <code>public.achievement_completions_season.namespace</code>.
-     */
-    public final TableField<AchievementCompletionsSeasonRecord, String> NAMESPACE = createField(DSL.name("namespace"), SQLDataType.VARCHAR(255).nullable(false), this, "");
-
-    /**
-     * The column <code>public.achievement_completions_season.keyname</code>.
-     */
-    public final TableField<AchievementCompletionsSeasonRecord, String> KEYNAME = createField(DSL.name("keyname"), SQLDataType.VARCHAR(255).nullable(false), this, "");
-
-    /**
-     * The column <code>public.achievement_completions_season.timestamp</code>.
-     */
-    public final TableField<AchievementCompletionsSeasonRecord, LocalDateTime> TIMESTAMP = createField(DSL.name("timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     private AchievementCompletionsSeason(Name alias, Table<AchievementCompletionsSeasonRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -161,7 +141,7 @@ public class AchievementCompletionsSeason extends TableImpl<AchievementCompletio
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.IDX_ACHIEVEMENT_COMPLETIONS_SEASON, Indexes.IDX_ACHIEVEMENT_COMPLETIONS_TOTAL_SEASON);
+        return Arrays.asList(Indexes.IDX_ACHIEVEMENT_COMPLETIONS_SEASON);
     }
 
     @Override
@@ -170,8 +150,26 @@ public class AchievementCompletionsSeason extends TableImpl<AchievementCompletio
     }
 
     @Override
+    public List<UniqueKey<AchievementCompletionsSeasonRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.UC_SEASON);
+    }
+
+    @Override
     public List<ForeignKey<AchievementCompletionsSeasonRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ACHIEVEMENT_COMPLETIONS_SEASON__ACHIEVEMENT_COMPLETIONS_SEASON_SEASON_FKEY);
+        return Arrays.asList(Keys.ACHIEVEMENT_COMPLETIONS_SEASON__ACHIEVEMENT_COMPLETIONS_SEASON_ID_FKEY, Keys.ACHIEVEMENT_COMPLETIONS_SEASON__ACHIEVEMENT_COMPLETIONS_SEASON_SEASON_FKEY);
+    }
+
+    private transient AchievementCompletionsPath _achievementCompletions;
+
+    /**
+     * Get the implicit join path to the
+     * <code>public.achievement_completions</code> table.
+     */
+    public AchievementCompletionsPath achievementCompletions() {
+        if (_achievementCompletions == null)
+            _achievementCompletions = new AchievementCompletionsPath(this, Keys.ACHIEVEMENT_COMPLETIONS_SEASON__ACHIEVEMENT_COMPLETIONS_SEASON_ID_FKEY, null);
+
+        return _achievementCompletions;
     }
 
     private transient SeasonsPath _seasons;

@@ -7,6 +7,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables;
 import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions.AchievementCompletionsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms.RealmsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.AchievementCompletionsRealmRecord;
 import org.jooq.Condition;
@@ -31,7 +32,6 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -65,29 +65,9 @@ public class AchievementCompletionsRealm extends TableImpl<AchievementCompletion
     public final TableField<AchievementCompletionsRealmRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.achievement_completions_realm.client</code>.
-     */
-    public final TableField<AchievementCompletionsRealmRecord, Long> CLIENT = createField(DSL.name("client"), SQLDataType.BIGINT.nullable(false), this, "");
-
-    /**
      * The column <code>public.achievement_completions_realm.realm</code>.
      */
     public final TableField<AchievementCompletionsRealmRecord, Integer> REALM = createField(DSL.name("realm"), SQLDataType.INTEGER.nullable(false), this, "");
-
-    /**
-     * The column <code>public.achievement_completions_realm.namespace</code>.
-     */
-    public final TableField<AchievementCompletionsRealmRecord, String> NAMESPACE = createField(DSL.name("namespace"), SQLDataType.VARCHAR(255).nullable(false), this, "");
-
-    /**
-     * The column <code>public.achievement_completions_realm.keyname</code>.
-     */
-    public final TableField<AchievementCompletionsRealmRecord, String> KEYNAME = createField(DSL.name("keyname"), SQLDataType.VARCHAR(255).nullable(false), this, "");
-
-    /**
-     * The column <code>public.achievement_completions_realm.timestamp</code>.
-     */
-    public final TableField<AchievementCompletionsRealmRecord, LocalDateTime> TIMESTAMP = createField(DSL.name("timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     private AchievementCompletionsRealm(Name alias, Table<AchievementCompletionsRealmRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -161,7 +141,7 @@ public class AchievementCompletionsRealm extends TableImpl<AchievementCompletion
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.IDX_ACHIEVEMENT_COMPLETIONS_REALM, Indexes.IDX_ACHIEVEMENT_COMPLETIONS_TOTAL_REALM);
+        return Arrays.asList(Indexes.IDX_ACHIEVEMENT_COMPLETIONS_REALM);
     }
 
     @Override
@@ -170,8 +150,26 @@ public class AchievementCompletionsRealm extends TableImpl<AchievementCompletion
     }
 
     @Override
+    public List<UniqueKey<AchievementCompletionsRealmRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.UC_REALM);
+    }
+
+    @Override
     public List<ForeignKey<AchievementCompletionsRealmRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ACHIEVEMENT_COMPLETIONS_REALM__ACHIEVEMENT_COMPLETIONS_REALM_REALM_FKEY);
+        return Arrays.asList(Keys.ACHIEVEMENT_COMPLETIONS_REALM__ACHIEVEMENT_COMPLETIONS_REALM_ID_FKEY, Keys.ACHIEVEMENT_COMPLETIONS_REALM__ACHIEVEMENT_COMPLETIONS_REALM_REALM_FKEY);
+    }
+
+    private transient AchievementCompletionsPath _achievementCompletions;
+
+    /**
+     * Get the implicit join path to the
+     * <code>public.achievement_completions</code> table.
+     */
+    public AchievementCompletionsPath achievementCompletions() {
+        if (_achievementCompletions == null)
+            _achievementCompletions = new AchievementCompletionsPath(this, Keys.ACHIEVEMENT_COMPLETIONS_REALM__ACHIEVEMENT_COMPLETIONS_REALM_ID_FKEY, null);
+
+        return _achievementCompletions;
     }
 
     private transient RealmsPath _realms;
