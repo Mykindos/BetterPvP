@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
 import org.jetbrains.annotations.Nullable;
 
-public enum  StatFilterType {
+public enum StatFilterType {
     REALM(Realm.class),
     SEASON(Season.class),
     ALL(null);
@@ -16,6 +16,12 @@ public enum  StatFilterType {
 
     StatFilterType(Class<? extends Period> type) {
         this.type = type;
+    }
+
+    public static StatFilterType fromPeriod(Period period) {
+        if (period instanceof Season) return SEASON;
+        if (period instanceof Realm) return REALM;
+        return ALL;
     }
 
     public boolean filter(@Nullable Period period, Realm key) {
