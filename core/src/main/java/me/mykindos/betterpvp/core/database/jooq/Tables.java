@@ -4,7 +4,7 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
-import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsAll;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
@@ -19,6 +19,8 @@ import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords;
 import me.mykindos.betterpvp.core.database.jooq.tables.GameData;
 import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams;
 import me.mykindos.betterpvp.core.database.jooq.tables.GamerProperties;
+import me.mykindos.betterpvp.core.database.jooq.tables.GetAchievementCompletions;
+import me.mykindos.betterpvp.core.database.jooq.tables.GetClientAchievementRanks;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetCombatData;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetLogMessagesByContextAndAction;
@@ -30,6 +32,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKdr;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKills;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKillstreak;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopRating;
+import me.mykindos.betterpvp.core.database.jooq.tables.GetTotalAchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetWorldLogsForBlock;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions;
@@ -46,6 +49,8 @@ import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
 import me.mykindos.betterpvp.core.database.jooq.tables.Uuiditems;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GetAchievementCompletionsRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GetClientAchievementRanksRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetClientStatsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetCombatDataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetLogMessagesByContextAndActionRecord;
@@ -57,6 +62,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKdrRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchievementCompletionsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
 
 import org.jooq.Configuration;
@@ -71,9 +77,9 @@ import org.jooq.Result;
 public class Tables {
 
     /**
-     * The table <code>public.achievement_completions_all</code>.
+     * The table <code>public.achievement_completions</code>.
      */
-    public static final AchievementCompletionsAll ACHIEVEMENT_COMPLETIONS_ALL = AchievementCompletionsAll.ACHIEVEMENT_COMPLETIONS_ALL;
+    public static final AchievementCompletions ACHIEVEMENT_COMPLETIONS = AchievementCompletions.ACHIEVEMENT_COMPLETIONS;
 
     /**
      * The table <code>public.achievement_completions_realm</code>.
@@ -144,6 +150,84 @@ public class Tables {
      * The table <code>public.gamer_properties</code>.
      */
     public static final GamerProperties GAMER_PROPERTIES = GamerProperties.GAMER_PROPERTIES;
+
+    /**
+     * The table <code>public.get_achievement_completions</code>.
+     */
+    public static final GetAchievementCompletions GET_ACHIEVEMENT_COMPLETIONS = GetAchievementCompletions.GET_ACHIEVEMENT_COMPLETIONS;
+
+    /**
+     * Call <code>public.get_achievement_completions</code>.
+     */
+    public static Result<GetAchievementCompletionsRecord> GET_ACHIEVEMENT_COMPLETIONS(
+          Configuration configuration
+        , Long clientParam
+    ) {
+        return configuration.dsl().selectFrom(me.mykindos.betterpvp.core.database.jooq.tables.GetAchievementCompletions.GET_ACHIEVEMENT_COMPLETIONS.call(
+              clientParam
+        )).fetch();
+    }
+
+    /**
+     * Get <code>public.get_achievement_completions</code> as a table.
+     */
+    public static GetAchievementCompletions GET_ACHIEVEMENT_COMPLETIONS(
+          Long clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetAchievementCompletions.GET_ACHIEVEMENT_COMPLETIONS.call(
+            clientParam
+        );
+    }
+
+    /**
+     * Get <code>public.get_achievement_completions</code> as a table.
+     */
+    public static GetAchievementCompletions GET_ACHIEVEMENT_COMPLETIONS(
+          Field<Long> clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetAchievementCompletions.GET_ACHIEVEMENT_COMPLETIONS.call(
+            clientParam
+        );
+    }
+
+    /**
+     * The table <code>public.get_client_achievement_ranks</code>.
+     */
+    public static final GetClientAchievementRanks GET_CLIENT_ACHIEVEMENT_RANKS = GetClientAchievementRanks.GET_CLIENT_ACHIEVEMENT_RANKS;
+
+    /**
+     * Call <code>public.get_client_achievement_ranks</code>.
+     */
+    public static Result<GetClientAchievementRanksRecord> GET_CLIENT_ACHIEVEMENT_RANKS(
+          Configuration configuration
+        , Long clientParam
+    ) {
+        return configuration.dsl().selectFrom(me.mykindos.betterpvp.core.database.jooq.tables.GetClientAchievementRanks.GET_CLIENT_ACHIEVEMENT_RANKS.call(
+              clientParam
+        )).fetch();
+    }
+
+    /**
+     * Get <code>public.get_client_achievement_ranks</code> as a table.
+     */
+    public static GetClientAchievementRanks GET_CLIENT_ACHIEVEMENT_RANKS(
+          Long clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientAchievementRanks.GET_CLIENT_ACHIEVEMENT_RANKS.call(
+            clientParam
+        );
+    }
+
+    /**
+     * Get <code>public.get_client_achievement_ranks</code> as a table.
+     */
+    public static GetClientAchievementRanks GET_CLIENT_ACHIEVEMENT_RANKS(
+          Field<Long> clientParam
+    ) {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetClientAchievementRanks.GET_CLIENT_ACHIEVEMENT_RANKS.call(
+            clientParam
+        );
+    }
 
     /**
      * The table <code>public.get_client_stats</code>.
@@ -651,6 +735,29 @@ public class Tables {
         return me.mykindos.betterpvp.core.database.jooq.tables.GetTopRating.GET_TOP_RATING.call(
             realmParam,
             top
+        );
+    }
+
+    /**
+     * The table <code>public.get_total_achievement_completions</code>.
+     */
+    public static final GetTotalAchievementCompletions GET_TOTAL_ACHIEVEMENT_COMPLETIONS = GetTotalAchievementCompletions.GET_TOTAL_ACHIEVEMENT_COMPLETIONS;
+
+    /**
+     * Call <code>public.get_total_achievement_completions</code>.
+     */
+    public static Result<GetTotalAchievementCompletionsRecord> GET_TOTAL_ACHIEVEMENT_COMPLETIONS(
+          Configuration configuration
+    ) {
+        return configuration.dsl().selectFrom(me.mykindos.betterpvp.core.database.jooq.tables.GetTotalAchievementCompletions.GET_TOTAL_ACHIEVEMENT_COMPLETIONS.call(
+        )).fetch();
+    }
+
+    /**
+     * Get <code>public.get_total_achievement_completions</code> as a table.
+     */
+    public static GetTotalAchievementCompletions GET_TOTAL_ACHIEVEMENT_COMPLETIONS() {
+        return me.mykindos.betterpvp.core.database.jooq.tables.GetTotalAchievementCompletions.GET_TOTAL_ACHIEVEMENT_COMPLETIONS.call(
         );
     }
 

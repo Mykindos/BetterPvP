@@ -3,20 +3,24 @@ package me.mykindos.betterpvp.core.client.achievements.repository;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @CustomLog
 @Getter
-public class AchievementCompletionsConcurrentHashMap {
+public class AchievementCompletionsConcurrentHashMap implements Iterable<AchievementCompletion> {
     private final ConcurrentHashMap<NamespacedKey, AchievementCompletion> allMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Season, ConcurrentHashMap<NamespacedKey, AchievementCompletion>> seasonMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Realm, ConcurrentHashMap<NamespacedKey, AchievementCompletion>> realmMap = new ConcurrentHashMap<>();
@@ -40,10 +44,14 @@ public class AchievementCompletionsConcurrentHashMap {
         return this;
     }
 
-    public Optional<AchievementCompletion> getCompletion(IAchievement achievement, Object period) {
-        switch (achievement.getAchievementFilterType()) {
+    public Optional<AchievementCompletion> getCompletion(@NotNull IAchievement achievement, @Nullable Period period) {
+        return getCompletion(achievement.getNamespacedKey(), achievement.getAchievementFilterType(), period);
+    }
+
+    public Optional<AchievementCompletion> getCompletion(NamespacedKey namespacedKey, StatFilterType filterType, Period period) {
+        switch (filterType) {
             case ALL -> {
-                return Optional.ofNullable(allMap.get(achievement.getNamespacedKey()));
+                return Optional.ofNullable(allMap.get(namespacedKey));
             }
             case SEASON -> {
                 final ConcurrentHashMap<NamespacedKey, AchievementCompletion> periodMap = seasonMap.get((Season) period);
@@ -51,7 +59,7 @@ public class AchievementCompletionsConcurrentHashMap {
                 if (periodMap == null) {
                     return Optional.empty();
                 }
-                return Optional.ofNullable(periodMap.get(achievement.getNamespacedKey()));
+                return Optional.ofNullable(periodMap.get(namespacedKey));
             }
 
             case REALM -> {
@@ -60,33 +68,11 @@ public class AchievementCompletionsConcurrentHashMap {
                 if (periodMap == null) {
                     return Optional.empty();
                 }
-                return Optional.ofNullable(periodMap.get(achievement.getNamespacedKey()));
+                return Optional.ofNullable(periodMap.get(namespacedKey));
             }
         }
-        log.warn("Unknown AchievementCompletion type {}", achievement.getAchievementFilterType()).submit();
+        log.warn("Unknown AchievementCompletion type {}", filterType).submit();
         return Optional.empty();
-    }
-
-    public @NotNull ConcurrentMap<NamespacedKey, AchievementCompletion> asMap() {
-        final ConcurrentMap<NamespacedKey, AchievementCompletion> completions = new ConcurrentHashMap<>(allMap);
-
-        completions.putAll(seasonMap.values().stream()
-                .flatMap(periodMap -> periodMap.entrySet().stream())
-                .collect(Collectors.toConcurrentMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ))
-        );
-
-        completions.putAll(realmMap.values().stream()
-                .flatMap(periodMap -> periodMap.entrySet().stream())
-                .collect(Collectors.toConcurrentMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ))
-        );
-
-        return completions;
     }
 
     public void fromOther(AchievementCompletionsConcurrentHashMap other) {
@@ -96,5 +82,26 @@ public class AchievementCompletionsConcurrentHashMap {
         seasonMap.putAll(other.seasonMap);
         realmMap.clear();
         realmMap.putAll(other.realmMap);
+    }
+
+    /**
+     * Returns an iterator over elements of type {@code T}.
+     *
+     * @return an Iterator.
+     */
+    @Override
+    public @NotNull Iterator<AchievementCompletion> iterator() {
+        Set<AchievementCompletion> completions = new HashSet<>(allMap.values());
+        completions.addAll(seasonMap.values()
+                .stream()
+                .flatMap(map -> map.values().stream())
+                .collect(Collectors.toSet())
+        );
+        completions.addAll(realmMap.values()
+                .stream()
+                .flatMap(map -> map.values().stream())
+                .collect(Collectors.toSet())
+        );
+        return completions.iterator();
     }
 }

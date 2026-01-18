@@ -6,6 +6,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables;
 
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions.AchievementCompletionsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm.AchievementCompletionsRealmPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.ClientStatsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Seasons.SeasonsPath;
@@ -203,6 +204,14 @@ public class Realms extends TableImpl<RealmsRecord> {
             _clientStats = new ClientStatsPath(this, null, Keys.CLIENT_STATS__CLIENT_STATS_REALM_FKEY.getInverseKey());
 
         return _clientStats;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.achievement_completions</code> table
+     */
+    public AchievementCompletionsPath achievementCompletions() {
+        return achievementCompletionsRealm().achievementCompletions();
     }
 
     @Override

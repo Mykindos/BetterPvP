@@ -31,7 +31,7 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
 
     //todo, update this across server instances
     //Period, Achievement, TotalCount
-    private ConcurrentMap<NamespacedKey, Integer> totalAllAchievementCompletions = null;
+    private ConcurrentMap<NamespacedKey, Integer> totalAllAchievementCompletions;
     private ConcurrentMap<Season, ConcurrentMap<NamespacedKey, Integer>> totalSeasonCompletions = null;
     private ConcurrentMap<Realm, ConcurrentMap<NamespacedKey, Integer>> totalRealmCompletions = null;
 
@@ -42,6 +42,10 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
         this.achievementCategoryManager = achievementCategoryManager;
         this.achievementCompletionRepository = achievementCompletionRepository;
         this.clientManager = clientManager;
+
+        totalAllAchievementCompletions = new ConcurrentHashMap<>();
+        totalSeasonCompletions = new ConcurrentHashMap<>();
+        totalRealmCompletions = new ConcurrentHashMap<>();
         updateTotalAchievementCompletions();
     }
 
@@ -49,7 +53,7 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
     public CompletableFuture<Void> loadAchievementCompletionsAsync(Client client) {
         return achievementCompletionRepository.loadForContainer(client.getStatContainer()).thenAccept(
                 completions -> {
-                    completions.asMap().values().forEach(completion -> {
+                    completions.forEach(completion -> {
                         int total = getTotalCompletion(getObject(completion.getKey()).orElseThrow(), completion.getPeriod());
                         completion.setTotalCompletions(total);
                     });
@@ -103,45 +107,22 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
 
 
     public CompletableFuture<Void> updateTotalAchievementCompletions() {
-        return CompletableFuture.allOf(
-                updateTotalAllAchievementCompletions(),
-                updateTotalSeasonAchievementCompletions(),
-                updateTotalRealmAchievementCompletions()
-        );
-    }
-
-    private CompletableFuture<Void> updateTotalAllAchievementCompletions() {
-        return achievementCompletionRepository.loadTotalAllAchievementCompletions().thenApply(totalCompletions -> {
-            totalAllAchievementCompletions = totalCompletions;
+        return achievementCompletionRepository.updateTotalCompletions(
+                totalAllAchievementCompletions,
+                totalSeasonCompletions,
+                totalRealmCompletions
+        ).thenApply(n -> {
             clientManager.getLoaded().forEach(client -> {
                 client.getStatContainer().getAchievementCompletions().getAllMap().forEach((key, completion) -> {
                     int total = totalAllAchievementCompletions.get(key);
                     completion.setTotalCompletions(total);
                 });
-            });
-            return null;
-        });
-    }
-
-    private CompletableFuture<Void> updateTotalSeasonAchievementCompletions() {
-        return achievementCompletionRepository.loadTotalSeasonAchievementCompletions().thenApply(totalCompletions -> {
-            totalSeasonCompletions = totalCompletions;
-            clientManager.getLoaded().forEach(client -> {
                 client.getStatContainer().getAchievementCompletions().getSeasonMap().forEach((period, map) -> {
                     map.forEach((key, completion) -> {
                         int total = totalSeasonCompletions.get(period).get(key);
                         completion.setTotalCompletions(total);
                     });
                 });
-            });
-            return null;
-        });
-    }
-
-    private CompletableFuture<Void> updateTotalRealmAchievementCompletions() {
-        return achievementCompletionRepository.loadTotalRealmAchievementCompletions().thenApply(totalCompletions -> {
-            totalRealmCompletions = totalCompletions;
-            clientManager.getLoaded().forEach(client -> {
                 client.getStatContainer().getAchievementCompletions().getRealmMap().forEach((period, map) -> {
                     map.forEach((key, completion) -> {
                         int total = totalRealmCompletions.get(period).get(key);

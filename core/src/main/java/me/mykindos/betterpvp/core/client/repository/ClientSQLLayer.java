@@ -376,8 +376,6 @@ public class ClientSQLLayer {
                 .onConflict(GAMER_PROPERTIES.CLIENT, GAMER_PROPERTIES.REALM, GAMER_PROPERTIES.PROPERTY)
                 .doUpdate()
                 .set(GAMER_PROPERTIES.VALUE, value.toString());
-
-
         queuedPropertyUpdates.updateAndGet(map -> {
             ConcurrentHashMap<String, Query> propertyUpdates = map.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
             propertyUpdates.put(property, query);
