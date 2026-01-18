@@ -32,6 +32,7 @@ import org.bukkit.event.block.Action;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -160,16 +161,19 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         final Location origin = player.getLocation();
+        CompletableFuture<Boolean> activatedFuture = new CompletableFuture<>();
         UtilLocation.teleportForward(player, teleportDistance, false, success -> {
             if (!Boolean.TRUE.equals(success)) {
+                activatedFuture.complete(false);
                 return;
             }
 
             // Lessen charges and add cooldown to prevent from instantly getting a flash charge if they're full
             FlashData flashData = charges.get(player);
             if (flashData == null) {
+                activatedFuture.complete(false);
                 return;
             }
 
@@ -192,7 +196,10 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
 
             player.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.4F, 1.2F);
             player.getWorld().playSound(origin, Sound.ENTITY_SILVERFISH_DEATH, 1.0F, 1.6F);
+            activatedFuture.complete(true);
+
         });
+        return activatedFuture.join();
     }
 
     @UpdateEvent(delay = 100)

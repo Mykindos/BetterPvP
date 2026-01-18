@@ -228,7 +228,7 @@ public class ClientListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSettingsUpdated(ClientPropertyUpdateEvent event) {
-        this.clientManager.saveProperty(event.getClient(), event.getProperty(), event.getValue());
+        this.clientManager.saveProperty(event.getContainer(), event.getProperty(), event.getNewValue());
     }
 
     private void checkUnsetProperties(Client client) {
@@ -317,7 +317,8 @@ public class ClientListener implements Listener {
             log.error("Error fetching external data", e).submit();
         } finally {
             try {
-                this.clientManager.processStatUpdates(true);
+                this.clientManager.processPropertyUpdates(true);
+                this.clientManager.processStatUpdates(Core.getCurrentRealm());
             } catch (Exception ex) {
                 log.error("Error processing stat updates", ex).submit();
                 if (ex.getCause() != null) {
