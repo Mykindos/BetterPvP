@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -134,6 +135,7 @@ public class BoomerangProjectile extends Projectile {
                 recall();
                 new SoundEffect(Sound.ITEM_TOTEM_USE, 2.0f, 0.1f).play(getLocation());
                 Particle.FLASH.builder()
+                        .color(Color.WHITE)
                         .count(1)
                         .extra(0.1)
                         .location(location)
@@ -200,6 +202,7 @@ public class BoomerangProjectile extends Projectile {
                 .spawn();
         Particle.FLASH.builder()
                 .count(1)
+                .color(Color.WHITE)
                 .extra(0.1)
                 .location(location)
                 .receivers(60)

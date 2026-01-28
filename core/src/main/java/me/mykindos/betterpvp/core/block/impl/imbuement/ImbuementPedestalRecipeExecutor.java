@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -168,6 +169,7 @@ public class ImbuementPedestalRecipeExecutor {
                 .spawn();
         Particle.FLASH.builder()
                 .location(explosionCenter)
+                .color(Color.PURPLE)
                 .receivers(60)
                 .spawn();
 

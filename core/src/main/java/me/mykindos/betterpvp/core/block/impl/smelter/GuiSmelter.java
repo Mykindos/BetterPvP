@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.block.impl.smelter;
 
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
@@ -345,7 +344,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             final int maxMillibuckets = data.getMaxLiquidCapacity();
             final TextColor storedColor = new ProgressColor(millibuckets / (float) maxMillibuckets).inverted().getTextColor();
             final ItemView.ItemViewBuilder builder = ItemView.builder();
-            final int buckets = millibuckets / 1000;
+            final float buckets = millibuckets / 1000f;
             final String bucketsString = buckets == 1 ? "bucket" : "buckets";
 
             builder.material(Material.PAPER);
