@@ -24,7 +24,7 @@ public class WorldEditSmartBlockAdapter {
     @Subscribe
     public void onEditSession(EditSessionEvent event) {
         World world = BukkitAdapter.adapt(event.getWorld());
-        event.setExtent(new SmartBlockExtent(event.getExtent(), world, factory));
+//        event.setExtent(new SmartBlockExtent(event.getExtent(), world, factory));
     }
 
 }
