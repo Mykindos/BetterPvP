@@ -24,7 +24,7 @@ public class ReinforcedBruteLeggings extends ArmorItem {
     @Inject
     private ReinforcedBruteLeggings(Champions champions) {
         super(champions, "Reinforced Brute Leggings", Item.builder(Material.DIAMOND_LEGGINGS)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.BRUTE));
     }

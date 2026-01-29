@@ -33,6 +33,7 @@ public class Runesteel {
     }
 
     @Singleton
+    @ItemKey("core:runeblood_ore")
     public static class OreBlockItem extends MetalBlockItem {
         @Inject
         public OreBlockItem() {
@@ -41,6 +42,7 @@ public class Runesteel {
     }
 
     @Singleton
+    @ItemKey("core:runeblood_fragment")
     public static class Fragment extends MetalItem {
         @Inject
         public Fragment() {
@@ -49,6 +51,7 @@ public class Runesteel {
     }
 
     @Singleton
+    @ItemKey("core:runesteel_ingot")
     public static class Ingot extends MetalItem {
         @Inject
         public Ingot() {

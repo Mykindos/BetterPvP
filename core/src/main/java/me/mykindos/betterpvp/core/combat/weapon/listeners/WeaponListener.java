@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.core.combat.weapon.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -19,7 +15,9 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -77,8 +75,10 @@ public class WeaponListener implements Listener {
         new SoundEffect(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 0.8f, 2.0f).play(event.getLocation());
         new SoundEffect(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.2f, 2.0f).play(event.getLocation());
         new SoundEffect(Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1.2f, 2.0f).play(event.getLocation());
+        final TextColor color = item.getRarity().getColor();
         Particle.FLASH.builder()
                 .location(event.getLocation())
+                .color(Color.fromRGB(color.red(), color.green(), color.blue()))
                 .allPlayers()
                 .count(1)
                 .extra(0)

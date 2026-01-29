@@ -33,7 +33,7 @@ public class ReinforcedRangerBoots extends ArmorItem {
     @Inject
     private ReinforcedRangerBoots(Champions champions) {
         super(champions, "Reinforced Ranger Boots", Item.builder(Material.CHAINMAIL_BOOTS)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.RANGER));
     }

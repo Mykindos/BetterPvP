@@ -24,7 +24,7 @@ public class ReinforcedMageLeggings extends ArmorItem {
     @Inject
     private ReinforcedMageLeggings(Champions champions) {
         super(champions, "Reinforced Mage Leggings", Item.builder(Material.GOLDEN_LEGGINGS)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.MAGE));
     }

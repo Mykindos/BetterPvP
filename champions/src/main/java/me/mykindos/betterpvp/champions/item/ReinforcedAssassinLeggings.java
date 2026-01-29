@@ -24,7 +24,7 @@ public class ReinforcedAssassinLeggings extends ArmorItem {
     @Inject
     private ReinforcedAssassinLeggings(Champions champions) {
         super(champions, "Reinforced Assassin Leggings", Item.builder(Material.LEATHER_LEGGINGS)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.ASSASSIN));
     }

@@ -31,7 +31,7 @@ public class ReinforcedWarlockHelmet extends ArmorItem {
     @Inject
     private ReinforcedWarlockHelmet(Champions champions) {
         super(champions, "Reinforced Warlock Helmet", Item.builder(Material.NETHERITE_HELMET)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
     }
 

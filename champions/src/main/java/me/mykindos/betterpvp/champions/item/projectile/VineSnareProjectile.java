@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -105,6 +106,7 @@ public class VineSnareProjectile extends Projectile {
         markForRemoval = true;
 
         Particle.FLASH.builder()
+                .color(Color.WHITE)
                 .location(location)
                 .count(5)
                 .offset(hitboxSize / 2, hitboxSize / 2, hitboxSize /2)
