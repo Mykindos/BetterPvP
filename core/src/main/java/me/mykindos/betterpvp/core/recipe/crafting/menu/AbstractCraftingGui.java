@@ -104,6 +104,7 @@ public abstract class AbstractCraftingGui extends AbstractGui {
                             // Everything else, cancel
                             default:
                                 event.setCancelled(true);
+                                player.updateInventory();
                                 return;
                         }
                     }
