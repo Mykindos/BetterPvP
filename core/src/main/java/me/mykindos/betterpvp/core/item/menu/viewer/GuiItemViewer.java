@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -50,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
@@ -68,12 +71,13 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
     }
 
     private final ItemFactory itemFactory;
+    private final RecipeRegistries recipeRegistries;
     private boolean customOnly = true;
     private ItemRarity raritySearch = null;
     private String nameSearch = null;
     private CompletableFuture<Void> searchFuture = CompletableFuture.completedFuture(null);
 
-    public GuiItemViewer(ItemFactory itemFactory) {
+    public GuiItemViewer(ItemFactory itemFactory, RecipeRegistries recipeRegistries) {
         super(9, 6, false, new Structure(
                 "0XXX0XXX0",
                 "0XXX0XXX0",
@@ -89,6 +93,8 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
                         .wikiEntry("Test", url)
                         .description(Component.text("Most items have a recipe they can be obtained with. The anvil, workbench, smelter and imbuement pedestal all make use of recipes listed here."))
                         .build()));
+
+        this.recipeRegistries = recipeRegistries;
 
         setItem(45, new NameSearchButton());
         setItem(46, new CustomOnlyButton());
@@ -119,6 +125,20 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
             // do heavy work off-thread
             final Map<NamespacedKey, BaseItem> pool = itemFactory.getItemRegistry().getItemsSorted();
 
+            // Collect all BaseItems that are craftable (are the result of a recipe)
+            Set<BaseItem> craftableItems = recipeRegistries.getRecipes().stream()
+                    .map(recipe -> {
+                        Object result = recipe.getPrimaryResult();
+                        if (result instanceof BaseItem baseItem) {
+                            return baseItem;
+                        } else if (result instanceof ItemInstance itemInstance) {
+                            return itemInstance.getBaseItem();
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toSet());
+
             // sort entries by key (case-insensitive, key only)
             List<Map.Entry<NamespacedKey, BaseItem>> entries = new ArrayList<>(pool.entrySet());
             entries.sort(Comparator.comparing(
@@ -126,19 +146,25 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
                     String.CASE_INSENSITIVE_ORDER
             ));
 
+
             List<ItemInstance> result = new ArrayList<>(entries.size());
             for (Map.Entry<NamespacedKey, BaseItem> entry : entries) {
+
                 if (customOnly && entry.getKey().getNamespace().equals("minecraft")) {
                     continue;
                 }
+
                 if (nameSearch != null && !UtilFormat.isSimilar(entry.getKey().getKey(), nameSearch, 0.75) && !entry.getKey().getKey().contains(nameSearch)) {
                     continue;
                 }
+
+                if(!craftableItems.contains(entry.getValue())) continue;
 
                 ItemInstance instance = itemFactory.create(entry.getValue());
                 if (raritySearch == null || instance.getRarity() == raritySearch) {
                     result.add(instance);
                 }
+
             }
 
             return result;
@@ -293,13 +319,13 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
                     .build());
 
             builder.type(DialogType.confirmation(
-               ActionButton.builder(Component.text("Search")).action(DialogAction.customClick((response, audience) -> {
-                   final String text = response.getText("search");
-                   nameSearch = (text == null || text.isBlank()) ? null : text.toLowerCase().replace(" ", "_");
-                   refresh();
-                   notifyWindows();
-               }, ClickCallback.Options.builder().build())).build(),
-               ActionButton.builder(Component.text("Cancel")).build()
+                    ActionButton.builder(Component.text("Search")).action(DialogAction.customClick((response, audience) -> {
+                        final String text = response.getText("search");
+                        nameSearch = (text == null || text.isBlank()) ? null : text.toLowerCase().replace(" ", "_");
+                        refresh();
+                        notifyWindows();
+                    }, ClickCallback.Options.builder().build())).build(),
+                    ActionButton.builder(Component.text("Cancel")).build()
             ));
         }
     }

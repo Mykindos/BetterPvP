@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.menu.viewer.GuiItemViewer;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.crafting.menu.GuiCraftingTable;
 import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;
 import me.mykindos.betterpvp.core.stats.menu.LeaderboardCategoryMenu;
@@ -68,7 +69,8 @@ public class QuickMenu {
                 UtilServer.runTask(plugin, () -> {
                     swapCursor(player, () -> {
                         final ItemFactory factory = plugin.getInjector().getInstance(ItemFactory.class);
-                        new GuiItemViewer(factory).show(player);
+                        final RecipeRegistries registries = plugin.getInjector().getInstance(RecipeRegistries.class);
+                        new GuiItemViewer(factory, registries).show(player);
                     });
                 });
                 yield true;
