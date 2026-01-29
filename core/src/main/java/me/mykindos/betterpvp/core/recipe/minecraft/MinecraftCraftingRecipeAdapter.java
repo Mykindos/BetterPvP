@@ -103,7 +103,7 @@ public class MinecraftCraftingRecipeAdapter {
         
         // Create a builder for our shaped recipe
         ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(() -> {
-            return itemFactory.get().fromItemStack(result).orElseThrow();
+            return itemFactory.get().create(itemFactory.get().getFallbackItem(result));
         }, shape, itemFactory.get());
         
         // Add the ingredients
@@ -160,7 +160,7 @@ public class MinecraftCraftingRecipeAdapter {
         }
         
         return new ShapelessCraftingRecipe(() -> {
-            return itemFactory.get().fromItemStack(result).orElseThrow();
+            return itemFactory.get().create(itemFactory.get().getFallbackItem(result));
         }, ingredientMap, itemFactory.get(), false);
     }
 
