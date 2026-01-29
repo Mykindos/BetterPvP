@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.recipe.crafting.menu;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
@@ -18,12 +19,15 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +45,7 @@ public abstract class AbstractCraftingGui extends AbstractGui {
     protected final VirtualInventory craftingMatrix;
     protected final VirtualInventory resultInventory;
     protected boolean blocked = false;
+    private BukkitTask pendingUpdateTask = null;
 
     @Inject
     protected AbstractCraftingGui(CraftingManager craftingManager, ItemFactory itemFactory, int width, int height) {
@@ -50,21 +55,33 @@ public abstract class AbstractCraftingGui extends AbstractGui {
         this.craftingMatrix = new VirtualInventory(UUID.randomUUID(), new ItemStack[3 * 3]);
         this.resultInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
 
-        // Crafting matrix updating
+        // Crafting matrix updating with debouncing to prevent excessive recipe matching
         craftingMatrix.setPostUpdateHandler(event -> {
             Player player = null;
             if (event.getUpdateReason() instanceof PlayerUpdateReason updateReason) {
                 player = updateReason.getPlayer();
             }
-            final ItemStack newResult = processResult(player, craftingMatrix.getItems());
-            if (player != null && newResult != null && !newResult.isSimilar(resultInventory.getItem(0))) {
-                playUpdated(player);
+
+            // Cancel any pending update task
+            if (pendingUpdateTask != null && !pendingUpdateTask.isCancelled()) {
+                pendingUpdateTask.cancel();
             }
-            resultInventory.setItemSilently(0, newResult);
+
+            // Schedule a new update task with a 1-tick delay (50ms)
+            // This allows rapid item movements to be batched together
+            final Player finalPlayer = player;
+            pendingUpdateTask = Bukkit.getScheduler().runTaskLater(
+                JavaPlugin.getPlugin(Core.class),
+                () -> updateResultSlot(finalPlayer),
+                2L
+            );
         });
 
         // Item consumption when crafting
         resultInventory.setPreUpdateHandler(event -> {
+            if (true) {
+                return;
+            }
             Player player = null;
 
             if (blocked) {
@@ -119,7 +136,9 @@ public abstract class AbstractCraftingGui extends AbstractGui {
 
             // If crafting was successful, update the matrix again because the result may have changed
             event.setNewItem(processResult(player, craftingMatrix.getItems()));
-            playCrafted(player);
+            if (player != null) {
+                playCrafted(player);
+            }
         });
     }
 
@@ -202,6 +221,18 @@ public abstract class AbstractCraftingGui extends AbstractGui {
             resultInventory.setItemSilently(0, processResult(player, craftingMatrix.getItems()));
             playCrafted(player);
         }
+    }
+
+    /**
+     * Updates the result slot based on the current crafting matrix.
+     * This is called after debouncing to prevent excessive recipe matching.
+     */
+    private void updateResultSlot(@Nullable Player player) {
+        final ItemStack newResult = processResult(player, craftingMatrix.getItems());
+        if (player != null && newResult != null && !newResult.isSimilar(resultInventory.getItem(0))) {
+            playUpdated(player);
+        }
+        resultInventory.setItemSilently(0, newResult);
     }
 
     /**
