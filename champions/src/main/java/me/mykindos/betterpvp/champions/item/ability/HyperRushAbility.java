@@ -42,7 +42,7 @@ public class HyperRushAbility extends ItemAbility {
         super(new NamespacedKey(champions, "hyper_rush"),
                 "Hyper Rush",
                 "Gain a burst of speed at a high level for a short duration.",
-                TriggerTypes.RIGHT_CLICK);
+                TriggerTypes.OFF_HAND);
         this.champions = champions;
         this.cooldownManager = cooldownManager;
         this.effectManager = effectManager;

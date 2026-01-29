@@ -33,7 +33,7 @@ public class ReinforcedRangerChestplate extends ArmorItem {
     @Inject
     private ReinforcedRangerChestplate(Champions champions) {
         super(champions, "Reinforced Ranger Chestplate", Item.builder(Material.CHAINMAIL_CHESTPLATE)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.RANGER));
     }

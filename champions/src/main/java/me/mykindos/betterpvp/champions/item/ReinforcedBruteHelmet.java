@@ -24,7 +24,7 @@ public class ReinforcedBruteHelmet extends ArmorItem {
     @Inject
     private ReinforcedBruteHelmet(Champions champions) {
         super(champions, "Reinforced Brute Helmet", Item.builder(Material.DIAMOND_HELMET)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.BRUTE));
     }

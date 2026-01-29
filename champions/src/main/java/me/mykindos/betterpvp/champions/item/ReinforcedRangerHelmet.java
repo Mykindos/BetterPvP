@@ -33,7 +33,7 @@ public class ReinforcedRangerHelmet extends ArmorItem {
     @Inject
     private ReinforcedRangerHelmet(Champions champions) {
         super(champions, "Reinforced Ranger Helmet", Item.builder(Material.CHAINMAIL_HELMET)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.RANGER));
     }

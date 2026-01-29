@@ -24,7 +24,7 @@ public class ReinforcedMageBoots extends ArmorItem {
     @Inject
     private ReinforcedMageBoots(Champions champions) {
         super(champions, "Reinforced Mage Boots", Item.builder(Material.GOLDEN_BOOTS)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.MAGE));
     }

@@ -24,7 +24,7 @@ public class ReinforcedAssassinHelmet extends ArmorItem {
     @Inject
     private ReinforcedAssassinHelmet(Champions champions) {
         super(champions, "Reinforced Assassin Helmet", Item.builder(Material.LEATHER_HELMET)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.ASSASSIN));
     }

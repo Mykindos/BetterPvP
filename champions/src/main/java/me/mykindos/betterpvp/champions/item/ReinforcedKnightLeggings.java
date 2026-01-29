@@ -24,7 +24,7 @@ public class ReinforcedKnightLeggings extends ArmorItem {
     @Inject
     private ReinforcedKnightLeggings(Champions champions) {
         super(champions, "Reinforced Knight Leggings", Item.builder(Material.IRON_LEGGINGS)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.KNIGHT));
     }

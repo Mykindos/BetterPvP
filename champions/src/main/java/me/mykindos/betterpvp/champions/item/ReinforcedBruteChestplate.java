@@ -24,7 +24,7 @@ public class ReinforcedBruteChestplate extends ArmorItem {
     @Inject
     private ReinforcedBruteChestplate(Champions champions) {
         super(champions, "Reinforced Brute Chestplate", Item.builder(Material.DIAMOND_CHESTPLATE)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.BRUTE));
     }

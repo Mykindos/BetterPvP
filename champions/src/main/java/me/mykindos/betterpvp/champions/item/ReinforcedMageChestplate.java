@@ -24,7 +24,7 @@ public class ReinforcedMageChestplate extends ArmorItem {
     @Inject
     private ReinforcedMageChestplate(Champions champions) {
         super(champions, "Reinforced Mage Chestplate", Item.builder(Material.GOLDEN_CHESTPLATE)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.MAGE));
     }

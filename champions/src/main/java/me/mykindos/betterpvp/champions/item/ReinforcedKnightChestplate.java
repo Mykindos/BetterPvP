@@ -24,7 +24,7 @@ public class ReinforcedKnightChestplate extends ArmorItem {
     @Inject
     private ReinforcedKnightChestplate(Champions champions) {
         super(champions, "Reinforced Knight Chestplate", Item.builder(Material.IRON_CHESTPLATE)
-                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.SILENCE)).build())
+                .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.KNIGHT));
     }
