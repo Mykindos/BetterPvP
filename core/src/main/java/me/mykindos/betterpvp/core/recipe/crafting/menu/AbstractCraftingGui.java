@@ -6,15 +6,12 @@ import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
-import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingResult;
-import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -166,6 +163,7 @@ public abstract class AbstractCraftingGui extends AbstractGui {
         }
 
         UtilItem.insert(player, toInsert);
+        player.updateInventory();
         playCrafted(player);
     }
 
