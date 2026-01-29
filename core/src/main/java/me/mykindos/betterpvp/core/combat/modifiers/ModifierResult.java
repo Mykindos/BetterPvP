@@ -27,7 +27,7 @@ public class ModifierResult {
 
     public boolean isReductive() {
         return switch (damageOperator) {
-            case FLAT -> damageOperand < 0;
+            case FLAT -> damageOperand <= 0; // 0 is equivalent to no damage, meaning it's a reductive modifier
             case MULTIPLIER -> damageOperand < 1.0;
         };
     }
