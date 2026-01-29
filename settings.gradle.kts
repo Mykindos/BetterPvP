@@ -32,7 +32,7 @@ pluginManagement {
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://jitpack.io")
         maven {
-            url =  uri("http://mykindos.me:8081/repository/maven-public/")
+            url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }
@@ -137,7 +137,7 @@ dependencyResolutionManagement {
             library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.9")
 
             // Library - McPets
-            library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
+            library("mcpets", "fr.nocsy", "mcpets").version("4.1.10")
 
             // Library - Protocol
             library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.13")
