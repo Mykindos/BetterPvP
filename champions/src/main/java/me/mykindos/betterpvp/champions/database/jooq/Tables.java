@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKdrByC
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillstreakByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopRatingByClassRecord;
+
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;

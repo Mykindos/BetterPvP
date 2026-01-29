@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsBui
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKilldeathDataRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
+
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;

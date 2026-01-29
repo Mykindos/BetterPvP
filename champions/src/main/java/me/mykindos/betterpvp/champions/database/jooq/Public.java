@@ -4,6 +4,9 @@
 package me.mykindos.betterpvp.champions.database.jooq;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsCombatStats;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
@@ -23,15 +26,13 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKdrByC
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillstreakByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopRatingByClassRecord;
+
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 /**

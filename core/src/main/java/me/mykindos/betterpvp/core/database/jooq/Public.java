@@ -4,6 +4,9 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
@@ -49,15 +52,13 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillsRecord
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
+
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
