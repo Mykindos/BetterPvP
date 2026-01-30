@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
 import me.mykindos.betterpvp.game.impl.ctf.model.Flag;
+import me.mykindos.betterpvp.game.impl.event.PlayerContributePointsEvent;
 import org.bukkit.Location;
 
 @GameScoped
@@ -85,6 +86,7 @@ public class GameController implements Lifecycled {
     public void scoreCapture(Team capturer, Flag flag) {
         int currentCaptures = captures.getOrDefault(capturer, 0) + 1;
         captures.put(capturer, currentCaptures);
+        new PlayerContributePointsEvent(flag.getHolder(), 1);
         
         log.info("Team {} captured {} flag! Current score: {}", 
                 capturer.getProperties().name(), 
