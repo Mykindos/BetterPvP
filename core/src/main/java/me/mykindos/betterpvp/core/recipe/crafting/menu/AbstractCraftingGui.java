@@ -79,9 +79,6 @@ public abstract class AbstractCraftingGui extends AbstractGui {
 
         // Item consumption when crafting
         resultInventory.setPreUpdateHandler(event -> {
-            if (true) {
-                return;
-            }
             Player player = null;
 
             if (blocked) {
