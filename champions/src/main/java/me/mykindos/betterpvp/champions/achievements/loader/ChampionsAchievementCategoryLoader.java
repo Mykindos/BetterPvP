@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.champions.achievements.loader;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
@@ -10,6 +9,8 @@ import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCateg
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.loader.AchievementCategoryLoader;
 import org.reflections.Reflections;
+
+import java.util.Set;
 @Singleton
 @CustomLog
 public class ChampionsAchievementCategoryLoader extends AchievementCategoryLoader {
@@ -28,6 +29,6 @@ public class ChampionsAchievementCategoryLoader extends AchievementCategoryLoade
         loadSubCategories(subCategoryClasses);
 
         plugin.saveConfig();
-        log.error("Loaded {} categories for Champions", count).submit();
+        log.info("Loaded {} categories for Champions", count).submit();
     }
 }
