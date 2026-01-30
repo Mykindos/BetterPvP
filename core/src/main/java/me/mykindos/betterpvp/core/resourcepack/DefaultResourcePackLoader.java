@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 public class DefaultResourcePackLoader implements IResourcePackLoader {
@@ -24,20 +25,22 @@ public class DefaultResourcePackLoader implements IResourcePackLoader {
     }
 
     @Override
-    public ResourcePack loadResourcePack(String name) {
-        ExtendedYamlConfiguration resourcepacks = core.getConfig("resourcepacks");
+    public CompletableFuture<ResourcePack> loadResourcePack(String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            ExtendedYamlConfiguration resourcepacks = core.getConfig("resourcepacks");
 
-        String url = resourcepacks.getString("packs." + name + ".url");
-        if(url == null) return null;
+            String url = resourcepacks.getString("packs." + name + ".url");
+            if(url == null) return null;
 
-        String hash = resourcepacks.getString("packs." + name + ".hash");
-        if(hash == null) {
-            hash = calculateSHA1(url);
-        }
+            String hash = resourcepacks.getString("packs." + name + ".hash");
+            if(hash == null) {
+                hash = calculateSHA1(url);
+            }
 
-        UUID uuid = UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8));
+            UUID uuid = UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8));
 
-        return new ResourcePack(uuid, url, hash);
+            return new ResourcePack(uuid, url, hash);
+        });
     }
 
     private String calculateSHA1(String fileUrl) {

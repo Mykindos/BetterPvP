@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @CustomLog
@@ -19,8 +20,16 @@ public class ResourcePackHandler {
     private final HashMap<String, ResourcePack> resourcePacks = new HashMap<>();
     private IResourcePackLoader resourcePackLoader;
 
-    public ResourcePack getResourcePack(String name) {
-        return resourcePacks.computeIfAbsent(name, resourcePackLoader::loadResourcePack);
+    public CompletableFuture<ResourcePack> getResourcePack(String name) {
+        if (resourcePacks.containsKey(name)) {
+            return CompletableFuture.completedFuture(resourcePacks.get(name));
+        }
+        return resourcePackLoader.loadResourcePack(name).thenApply(
+                resourcePack -> {
+                    resourcePacks.put(name, resourcePack);
+                    return resourcePack;
+                }
+        );
     }
 
     @Inject
