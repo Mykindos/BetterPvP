@@ -2,13 +2,14 @@ package me.mykindos.betterpvp.core.client.achievements.category.loader;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import org.reflections.Reflections;
+
+import java.util.Set;
 
 @Singleton
 @CustomLog
@@ -29,6 +30,6 @@ public class CoreAchievementCategoryLoader extends AchievementCategoryLoader {
         loadSubCategories(subCategoryClasses);
 
         plugin.saveConfig();
-        log.error("Loaded {} categories for Core", count).submit();
+        log.info("Loaded {} categories for Core", count).submit();
     }
 }

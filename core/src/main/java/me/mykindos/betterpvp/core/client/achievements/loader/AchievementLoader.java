@@ -106,7 +106,7 @@ public abstract class AchievementLoader extends Loader {
             achievementManager.getAchievementCategoryManager().addObject(category.getNamespacedKey(), category);
             count++;
         } catch (Exception ex) {
-            log.error("Failed to load categoru", ex);
+            log.error("Failed to load category", ex);
         }
     }
 
