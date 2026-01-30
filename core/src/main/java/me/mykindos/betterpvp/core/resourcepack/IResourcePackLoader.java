@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.core.resourcepack;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface IResourcePackLoader {
 
-    ResourcePack loadResourcePack(String name);
+    CompletableFuture<ResourcePack> loadResourcePack(String name);
 
 }

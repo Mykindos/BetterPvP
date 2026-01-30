@@ -5,23 +5,27 @@ import com.mineplex.studio.sdk.modules.resourcepack.ResourcePackModule;
 import lombok.CustomLog;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 public class MineplexResourcePackLoader implements IResourcePackLoader {
 
     @Override
-    public ResourcePack loadResourcePack(String name) {
-        ResourcePackModule resourcePackModule = MineplexModuleManager.getRegisteredModule(ResourcePackModule.class);
+    public CompletableFuture<ResourcePack> loadResourcePack(String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            ResourcePackModule resourcePackModule = MineplexModuleManager.getRegisteredModule(ResourcePackModule.class);
 
-        Optional<com.mineplex.studio.sdk.modules.resourcepack.ResourcePack> resourcePackOptional = resourcePackModule.get(name);
-        if (resourcePackOptional.isEmpty()) {
-            log.error("Failed to load resource pack " + name).submit();
-            throw new RuntimeException("Failed to get resource pack from studio SDK");
-        }
+            Optional<com.mineplex.studio.sdk.modules.resourcepack.ResourcePack> resourcePackOptional = resourcePackModule.get(name);
+            if (resourcePackOptional.isEmpty()) {
+                log.error("Failed to load resource pack " + name).submit();
+                throw new RuntimeException("Failed to get resource pack from studio SDK");
+            }
 
-        com.mineplex.studio.sdk.modules.resourcepack.ResourcePack resourcePack = resourcePackOptional.get();
+            com.mineplex.studio.sdk.modules.resourcepack.ResourcePack resourcePack = resourcePackOptional.get();
 
-        return new ResourcePack(resourcePack.getUuid(), resourcePack.getUrl(), resourcePack.getSha1());
+            return new ResourcePack(resourcePack.getUuid(), resourcePack.getUrl(), resourcePack.getSha1());
+        });
+
     }
 
 }
