@@ -63,10 +63,12 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
     }
 
     public CompletableFuture<Void> saveCompletion(StatContainer container, IAchievement achievement, Period period) {
+        log.info("Start save completion for {} {}", container.getClient().getName(), achievement.getName()).submit();
         return achievementCompletionRepository.saveCompletion(container, achievement, period)
                 .thenAccept(achievementCompletion -> {
                     container.getAchievementCompletions().addCompletion(achievementCompletion);
                     updateTotalCompletions(achievement, achievementCompletion.getPeriod());
+                    log.info("End save completion for {} {}", container.getClient().getName(), achievement.getName()).submit();
                 });
     }
 

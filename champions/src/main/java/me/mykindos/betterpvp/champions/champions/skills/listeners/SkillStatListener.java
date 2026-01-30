@@ -58,7 +58,6 @@ public class SkillStatListener extends TimedStatListener {
 
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {
-        log.info("apply build").submit();
         earlyUpdateBuild(event.getPlayer(), event.getOldBuild());
     }
 

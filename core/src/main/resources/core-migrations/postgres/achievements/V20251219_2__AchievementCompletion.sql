@@ -87,9 +87,9 @@ AS $$
         acs.Season,
         acr.Realm
     FROM achievement_completions ac
-    JOIN achievement_completions_season acs
+    LEFT JOIN achievement_completions_season acs
         ON ac.Id = acs.Id
-    JOIN achievement_completions_realm acr
+    LEFT JOIN achievement_completions_realm acr
         ON ac.Id = acr.Id
 
     LEFT JOIN achievement_completions prev
@@ -99,15 +99,12 @@ AS $$
 
     LEFT JOIN achievement_completions_season prev_s
         ON prev_s.Id = prev.Id
-       AND prev_s.Season = acs.Season
 
     LEFT JOIN achievement_completions_realm prev_r
         ON prev_r.Id = prev.Id
-       AND prev_r.Realm = acr.Realm
 
     WHERE ac.Client = client_param
     GROUP BY
-        ac.Id,
         ac.Namespace,
         ac.Keyname,
         acs.Season,

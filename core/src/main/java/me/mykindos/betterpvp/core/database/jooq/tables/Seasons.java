@@ -165,7 +165,7 @@ public class Seasons extends TableImpl<SeasonsRecord> {
      */
     public RealmsPath realms() {
         if (_realms == null)
-            _realms = new RealmsPath(this, null, Keys.REALMS__REALM_SEASON_FK.getInverseKey());
+            _realms = new RealmsPath(this, null, Keys.REALMS__FK_REALM_SEASON.getInverseKey());
 
         return _realms;
     }
