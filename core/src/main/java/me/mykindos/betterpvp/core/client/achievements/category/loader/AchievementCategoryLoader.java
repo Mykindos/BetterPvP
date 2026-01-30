@@ -37,7 +37,7 @@ public abstract class AchievementCategoryLoader extends Loader {
             category.addChild(subCategory);
             plugin.getInjector().injectMembers(subCategory);
             achievementCategoryManager.addObject(subCategory.getNamespacedKey(), subCategory);
-            log.error("Added {} to {} sub achievement categories", subCategory.getNamespacedKey().asString(), category.getNamespacedKey().asString()).submit();
+            log.info("Added {} to {} sub achievement categories", subCategory.getNamespacedKey().asString(), category.getNamespacedKey().asString()).submit();
 
         }
     }
@@ -48,10 +48,10 @@ public abstract class AchievementCategoryLoader extends Loader {
             IAchievementCategory category = (IAchievementCategory) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(category);
             achievementCategoryManager.addObject(category.getNamespacedKey(), category);
-            log.warn("loaded {}", category.getNamespacedKey().asString()).submit();
+            log.info("loaded {}", category.getNamespacedKey().asString()).submit();
             count++;
         } catch (Exception ex) {
-            log.error("Failed to load categoru", ex);
+            log.error("Failed to load category", ex);
         }
     }
 

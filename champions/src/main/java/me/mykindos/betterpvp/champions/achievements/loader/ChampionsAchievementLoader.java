@@ -40,6 +40,6 @@ public class ChampionsAchievementLoader extends AchievementLoader {
         loadSubCategories(subCategoryClasses);
 
         plugin.saveConfig();
-        log.error("Loaded {} categories for Champions", count).submit();
+        log.info("Loaded {} categories for Champions", count).submit();
     }
 }
