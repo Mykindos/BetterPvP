@@ -153,7 +153,7 @@ public class Realms extends TableImpl<RealmsRecord> {
 
     @Override
     public List<ForeignKey<RealmsRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.REALMS__REALM_SEASON_FK, Keys.REALMS__REALMS_SERVER_FKEY);
+        return Arrays.asList(Keys.REALMS__FK_REALM_SEASON, Keys.REALMS__REALMS_SERVER_FKEY);
     }
 
     private transient SeasonsPath _seasons;
@@ -163,7 +163,7 @@ public class Realms extends TableImpl<RealmsRecord> {
      */
     public SeasonsPath seasons() {
         if (_seasons == null)
-            _seasons = new SeasonsPath(this, Keys.REALMS__REALM_SEASON_FK, null);
+            _seasons = new SeasonsPath(this, Keys.REALMS__FK_REALM_SEASON, null);
 
         return _seasons;
     }
