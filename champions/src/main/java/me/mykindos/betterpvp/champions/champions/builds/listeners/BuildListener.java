@@ -9,16 +9,18 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Optional;
 
@@ -41,9 +43,12 @@ public class BuildListener implements Listener {
         });
     }
 
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event){
-        buildManager.removeObject(event.getPlayer().getUniqueId().toString());
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onPlayerQuit(ClientQuitEvent event) {
+        //cleanup build after a player logouts, ensuring that this is still valid during the full ClientQuitEvent
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Champions.class), () -> {
+            buildManager.removeObject(event.getClient().getUuid());
+        }, 1L);
     }
 
     @EventHandler

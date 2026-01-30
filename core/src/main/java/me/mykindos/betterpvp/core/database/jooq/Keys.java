@@ -64,7 +64,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.SmartBlockDataRec
 import me.mykindos.betterpvp.core.database.jooq.tables.records.UuiditemsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsMetadataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -145,6 +144,6 @@ public class Keys {
     public static final ForeignKey<LogsContextRecord, LogsRecord> LOGS_CONTEXT__LOGS_CONTEXT_LOG_ID_FKEY = Internal.createForeignKey(LogsContext.LOGS_CONTEXT, DSL.name("logs_context_log_id_fkey"), new TableField[] { LogsContext.LOGS_CONTEXT.LOG_ID }, Keys.LOGS_PKEY, new TableField[] { Logs.LOGS.ID }, true);
     public static final ForeignKey<OfflineMessagesRecord, ClientsRecord> OFFLINE_MESSAGES__OFFLINE_MESSAGES_CLIENT_FKEY = Internal.createForeignKey(OfflineMessages.OFFLINE_MESSAGES, DSL.name("offline_messages_client_fkey"), new TableField[] { OfflineMessages.OFFLINE_MESSAGES.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
     public static final ForeignKey<PunishmentsRecord, ClientsRecord> PUNISHMENTS__PUNISHMENTS_CLIENT_FKEY = Internal.createForeignKey(Punishments.PUNISHMENTS, DSL.name("punishments_client_fkey"), new TableField[] { Punishments.PUNISHMENTS.CLIENT }, Keys.CLIENTS_PKEY, new TableField[] { Clients.CLIENTS.ID }, true);
-    public static final ForeignKey<RealmsRecord, SeasonsRecord> REALMS__REALM_SEASON_FK = Internal.createForeignKey(Realms.REALMS, DSL.name("realm_season_fk"), new TableField[] { Realms.REALMS.SEASON }, Keys.SEASONS_PKEY, new TableField[] { Seasons.SEASONS.ID }, true);
+    public static final ForeignKey<RealmsRecord, SeasonsRecord> REALMS__FK_REALM_SEASON = Internal.createForeignKey(Realms.REALMS, DSL.name("fk_realm_season"), new TableField[] { Realms.REALMS.SEASON }, Keys.SEASONS_PKEY, new TableField[] { Seasons.SEASONS.ID }, true);
     public static final ForeignKey<RealmsRecord, ServersRecord> REALMS__REALMS_SERVER_FKEY = Internal.createForeignKey(Realms.REALMS, DSL.name("realms_server_fkey"), new TableField[] { Realms.REALMS.SERVER }, Keys.SERVERS_ID_UNIQUE, new TableField[] { Servers.SERVERS.ID }, true);
 }

@@ -4,6 +4,7 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
+import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients.ClientsPath;
@@ -12,6 +13,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientStatsRecord
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.JSONB;
 import org.jooq.Name;
@@ -147,6 +149,11 @@ public class ClientStats extends TableImpl<ClientStatsRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.asList(Indexes.IDX_STAT_CLIENT);
     }
 
     @Override

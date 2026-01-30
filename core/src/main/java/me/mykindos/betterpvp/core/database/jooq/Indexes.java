@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients;
 import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions;
@@ -51,6 +52,7 @@ public class Indexes {
     public static final Index IDX_OFFLINE_MESSAGES_CLIENT = Internal.createIndex(DSL.name("idx_offline_messages_client"), OfflineMessages.OFFLINE_MESSAGES, new OrderField[] { OfflineMessages.OFFLINE_MESSAGES.CLIENT }, false);
     public static final Index IDX_OFFLINE_MESSAGES_TIME = Internal.createIndex(DSL.name("idx_offline_messages_time"), OfflineMessages.OFFLINE_MESSAGES, new OrderField[] { OfflineMessages.OFFLINE_MESSAGES.TIME_SENT }, false);
     public static final Index IDX_PUNISHMENTS_CLIENT = Internal.createIndex(DSL.name("idx_punishments_client"), Punishments.PUNISHMENTS, new OrderField[] { Punishments.PUNISHMENTS.CLIENT }, false);
+    public static final Index IDX_STAT_CLIENT = Internal.createIndex(DSL.name("idx_stat_client"), ClientStats.CLIENT_STATS, new OrderField[] { ClientStats.CLIENT_STATS.CLIENT }, false);
     public static final Index IDX_TEAMS = Internal.createIndex(DSL.name("idx_teams"), GameTeams.GAME_TEAMS, new OrderField[] { GameTeams.GAME_TEAMS.ID, GameTeams.GAME_TEAMS.CLIENT }, false);
     public static final Index WORLD_LOGS_LOCATION_INDEX = Internal.createIndex(DSL.name("world_logs_location_index"), WorldLogs.WORLD_LOGS, new OrderField[] { WorldLogs.WORLD_LOGS.REALM, WorldLogs.WORLD_LOGS.WORLD, WorldLogs.WORLD_LOGS.BLOCK_X, WorldLogs.WORLD_LOGS.BLOCK_Y, WorldLogs.WORLD_LOGS.BLOCK_Z, WorldLogs.WORLD_LOGS.TIME }, false);
     public static final Index WORLD_LOGS_METADATA_KEY_VALUE_INDEX = Internal.createIndex(DSL.name("world_logs_metadata_key_value_index"), WorldLogsMetadata.WORLD_LOGS_METADATA, new OrderField[] { WorldLogsMetadata.WORLD_LOGS_METADATA.REALM, WorldLogsMetadata.WORLD_LOGS_METADATA.META_KEY, WorldLogsMetadata.WORLD_LOGS_METADATA.META_VALUE }, false);
