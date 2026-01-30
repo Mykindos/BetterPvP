@@ -26,7 +26,7 @@ public class Bloomrot extends WeaponItem implements Reloadable {
 
     @Inject
     private Bloomrot(Champions champions, NectarOfDecay nectarOfDecay, ItemFactory itemFactory) {
-        super(champions, "Bloomroot", Item.model("bloomrot"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
+        super(champions, "Bloomroot", Item.model("bloomrot"), ItemRarity.EPIC, List.of(Group.RANGED));
         this.itemFactory = itemFactory;
 
         this.nectarOfDecayAbility = nectarOfDecay;

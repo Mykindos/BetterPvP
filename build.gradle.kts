@@ -56,7 +56,7 @@ subprojects {
         maven("https://mvn.lib.co.nz/public/")
         maven("https://repo.oraxen.com/releases")
         maven {
-          url =  uri("http://mykindos.me:8081/repository/maven-public/")
+          url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }

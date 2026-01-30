@@ -140,7 +140,35 @@ public class ArmorListener implements Listener {
                     // Move clicked item to other inventory when cancelled.
                     if (armorEvent.isCancelled()) {
                         e.setCancelled(true);
-                        p.updateInventory();
+
+                        // Simulate shift click
+                        int slot = -1;
+                        if (e.getSlotType() == InventoryType.SlotType.QUICKBAR) {
+                            // If in hotbar, look for first empty slot in 9 - 35
+                            for (int i = 9; i < 36; i++) {
+                                final ItemStack item = p.getInventory().getItem(i);
+                                if (item == null || item.isEmpty()) {
+                                    slot = i;
+                                    break;
+                                }
+                            }
+                        } else {
+                            // If in main inventory, look for first empty slot in 0 - 8
+                            for (int i = 0; i < 9; i++) {
+                                final ItemStack item = p.getInventory().getItem(i);
+                                if (item == null || item.isEmpty()) {
+                                    slot = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (slot != -1) {
+                            p.getInventory().setItem(e.getSlot(), null);
+                            p.getInventory().setItem(slot, clicked);
+                        } else {
+                            p.updateInventory();
+                        }
                     }
                 }
             }

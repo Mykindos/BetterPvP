@@ -132,8 +132,8 @@ public class ItemPacketRemapper implements PacketListener {
         final Map<Integer, ItemStack> slots = slotsOpt.get();
         final Map<Integer, Optional<HashedStack>> hashed = new HashMap<>();
         for (Map.Entry<Integer, ItemStack> entry : slots.entrySet()) {
-            if (entry.getValue() == null) continue;;
-            final ItemStack slot = mapFrom(getItem(player, packet.getWindowId(), entry.getKey()));
+            if (entry.getValue() == null) continue;
+            final ItemStack slot = mapFrom(entry.getValue());
             hashed.put(entry.getKey(), Optional.of(HashedStack.fromItemStack(slot)));
         }
 
