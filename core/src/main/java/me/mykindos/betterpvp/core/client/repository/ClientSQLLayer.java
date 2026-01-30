@@ -286,6 +286,9 @@ public class ClientSQLLayer {
                         .and(CLIENTS.NAME.eq(object.getName()))
                         .execute();
             });
+        }).exceptionally(throwable -> {
+            log.error("Failed to save client " + object.getUuid(), throwable).submit();
+            return null;
         });
 
         // Gamer
