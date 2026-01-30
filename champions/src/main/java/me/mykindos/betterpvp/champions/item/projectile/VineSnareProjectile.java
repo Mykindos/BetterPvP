@@ -88,7 +88,11 @@ public class VineSnareProjectile extends Projectile {
         for (Display display : displays) {
             Vector current = display.getLocation().getDirection().normalize();
             Vector next = current.clone().rotateAroundAxis(axis, angle).normalize();
-            display.teleport(location.clone().setDirection(next));
+            final Location location = this.location.clone();
+            if (next.toVector3d().isFinite()) {
+                location.setDirection(next);
+            }
+            display.teleport(location);
         }
 
         // Play cool particles
