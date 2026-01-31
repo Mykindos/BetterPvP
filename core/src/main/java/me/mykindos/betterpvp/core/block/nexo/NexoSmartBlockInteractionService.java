@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockInteractionService;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
-import me.mykindos.betterpvp.core.item.component.impl.ability.event.PlayerItemAbilityEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;

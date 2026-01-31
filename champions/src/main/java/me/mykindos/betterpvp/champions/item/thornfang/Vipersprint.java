@@ -1,25 +1,23 @@
 package me.mykindos.betterpvp.champions.item.thornfang;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
+import me.mykindos.betterpvp.core.interaction.context.MetaKey;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -39,24 +37,34 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
 
+import static me.mykindos.betterpvp.core.interaction.context.InputMeta.FIRST_RUN;
+
+/**
+ * Vipersprint - A duration-based dash ability that uses the Running interaction result.
+ * The InteractionListener handles ticking this ability until it completes.
+ */
 @EqualsAndHashCode(callSuper = false)
 @Getter
 @Setter
-public class Vipersprint extends ItemAbility {
+public class Vipersprint extends AbstractInteraction {
 
-    private transient final CooldownManager cooldownManager;
-    private transient final ClientManager clientManager;
-    private transient final EffectManager effectManager;
-    private transient final WeakHashMap<Player, Properties> active = new WeakHashMap<>();
+    // Context keys for storing state across ticks
+    private static final MetaKey<Location> LAST_LOCATION = MetaKey.of("vipersprint_last_loc");
+    private static final MetaKey<Set<UUID>> DAMAGED_ENTITIES = MetaKey.ofSet("vipersprint_damaged");
+
+    private final CooldownManager cooldownManager;
+    private final ClientManager clientManager;
+    private final EffectManager effectManager;
+    private final NamespacedKey key;
 
     private double cooldown;
     private double duration;
@@ -65,105 +73,126 @@ public class Vipersprint extends ItemAbility {
     private double poisonSeconds;
     private int poisonAmplifier;
 
-    protected Vipersprint(Champions champions, CooldownManager cooldownManager, ClientManager clientManager, EffectManager effectManager) {
-        super(new NamespacedKey(champions, "vipersprint"),
-                "Vipersprint",
-                "Dash forward at high speed, curving your path with your aim while cutting through anything in your way. Hitting an enemy resets your cooldown.",
-                TriggerTypes.HOLD_BLOCK);
+    public Vipersprint(Champions champions, CooldownManager cooldownManager, ClientManager clientManager, EffectManager effectManager) {
+        super("Vipersprint",
+                "Dash forward at high speed, curving your path with your aim while cutting through anything in your way. Hitting an enemy resets your cooldown.");
+        this.key = new NamespacedKey(champions, "vipersprint");
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
-        UtilServer.runTaskTimer(champions, this::tick, 0, 1);
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        final Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        if (!active.containsKey(player)) {
-            if (this.cooldownManager.hasCooldown(player, getName())) {
-                return false; // Cooldown is active
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        final LivingEntity livingEntity = actor.getEntity();
+
+        // Check if this is the first execution (starting the dash)
+        if (context.has(FIRST_RUN)) {
+            // First execution - check cooldown and start the dash
+            if (livingEntity instanceof Player player && cooldownManager.hasCooldown(player, getName())) {
+                return new InteractionResult.Fail(InteractionResult.FailReason.COOLDOWN);
             }
 
-            active.put(player, new Properties());
+            // Initialize state in context
+            context.set(DAMAGED_ENTITIES, new HashSet<>());
+
+            // Apply step height modifier
+            applyStepHeight(livingEntity);
+        } else {
+            // Continue dashing
+            Location lastLocation = context.get(LAST_LOCATION).orElse(livingEntity.getLocation());
+            Set<UUID> damagedEntities = context.get(DAMAGED_ENTITIES).orElse(new HashSet<>());
+
+            dash(livingEntity, lastLocation);
+            poisonNearby(livingEntity, lastLocation, damagedEntities);
+
+            // Update state
+            context.set(LAST_LOCATION, livingEntity.getLocation());
+            context.set(DAMAGED_ENTITIES, damagedEntities);
         }
 
-        final Properties properties = active.get(player);
-        if (UtilTime.elapsed(properties.getStartTime(), (long) (duration * 1000))) {
-            stop(player);
-            return false;
-        }
-
-        dash(player, properties);
-        poisonNearby(player);
-        properties.lastLocation = player.getLocation();
-        return true;
+        // Return Running to continue being ticked
+        return new InteractionResult.Running((long) (duration * 1000), 1);
     }
 
-    private void poisonNearby(Player player) {
-        final Properties properties = active.get(player);
+    @Override
+    public void then(@NotNull InteractionActor actor, @NotNull InteractionContext context, @NotNull InteractionResult result, @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        final LivingEntity entity = actor.getEntity();
+        // Remove step height modifier
+        AttributeInstance attribute = entity.getAttribute(Attribute.STEP_HEIGHT);
+        if (attribute != null) {
+            attribute.removeModifier(key);
+        }
 
-        final Location lastLocation = properties.getLastLocation();
-        final List<LivingEntity> enemies = UtilEntity.interpolateMultiCollision(lastLocation != null ? lastLocation : player.getLocation(),
-                        player.getLocation(),
+        if (entity instanceof Player player) {
+            cooldownManager.use(player, getName(), cooldown, true);
+        }
+
+        // Sound cues are only played when completing
+        if (result.isSuccess()) {
+            stop(entity);
+        }
+    }
+
+    private void poisonNearby(LivingEntity livingEntity, Location lastLocation, Set<UUID> damagedEntities) {
+        List<LivingEntity> enemies = UtilEntity.interpolateMultiCollision(
+                        lastLocation,
+                        livingEntity.getLocation(),
                         0.9f,
-                        ent -> UtilEntity.IS_ENEMY.test(player, ent))
+                        ent -> UtilEntity.IS_ENEMY.test(livingEntity, ent))
                 .stream()
                 .flatMap(MultiRayTraceResult::stream)
                 .map(RayTraceResult::getHitEntity)
                 .filter(LivingEntity.class::isInstance)
-                .filter(ent -> !properties.getDamagedEntities().contains(ent.getUniqueId()))
+                .filter(ent -> !damagedEntities.contains(ent.getUniqueId()))
                 .map(LivingEntity.class::cast)
                 .toList();
 
         for (LivingEntity enemy : enemies) {
-            if (properties.getDamagedEntities().contains(enemy.getUniqueId())) {
-                continue; // Already damaged
+            if (damagedEntities.contains(enemy.getUniqueId())) {
+                continue;
             }
 
-            final DamageEvent event = UtilDamage.doDamage(new DamageEvent(
+            DamageEvent event = UtilDamage.doDamage(new DamageEvent(
                     enemy,
-                    player,
-                    player,
-                    new ItemAbilityDamageCause(this).withBukkitCause(EntityDamageEvent.DamageCause.POISON),
+                    livingEntity,
+                    livingEntity,
+                    new InteractionDamageCause(this).withBukkitCause(EntityDamageEvent.DamageCause.POISON),
                     damage,
                     getName()
             ));
-            if (!event.isCancelled()) {
-                // Effect
-                effectManager.addEffect(enemy, player, EffectTypes.POISON, getName(), poisonAmplifier, (long) (poisonSeconds * 1000L));
 
-                // Velocity
-                VelocityData data = new VelocityData(player.getLocation().getDirection(),
-                        1.2,
-                        false,
-                        0,
-                        0.2,
-                        1.0,
-                        true);
-                UtilVelocity.velocity(enemy, player, data);
-                properties.getDamagedEntities().add(enemy.getUniqueId());
+            if (!event.isCancelled()) {
+                effectManager.addEffect(enemy, livingEntity, EffectTypes.POISON, getName(), poisonAmplifier, (long) (poisonSeconds * 1000L));
+
+                VelocityData data = new VelocityData(livingEntity.getLocation().getDirection(),
+                        1.2, false, 0, 0.2, 1.0, true);
+                UtilVelocity.velocity(enemy, livingEntity, data);
+                damagedEntities.add(enemy.getUniqueId());
             }
         }
     }
 
-    private void dash(Player player, Properties properties) {
-        // Give step height to allow for smoother gameplay
-        final AttributeInstance attribute = Objects.requireNonNull(player.getAttribute(Attribute.STEP_HEIGHT));
-        if (attribute.getModifier(getKey()) == null) {
-            attribute.addTransientModifier(new AttributeModifier(getKey(), 0.4, AttributeModifier.Operation.ADD_NUMBER));
+    private void applyStepHeight(LivingEntity livingEntity) {
+        AttributeInstance attribute = livingEntity.getAttribute(Attribute.STEP_HEIGHT);
+        if (attribute != null && attribute.getModifier(key) == null) {
+            attribute.addTransientModifier(new AttributeModifier(key, 0.4, AttributeModifier.Operation.ADD_NUMBER));
         }
+    }
 
+    private void dash(LivingEntity livingEntity, Location lastLocation) {
         // Apply velocity
-        VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), speed, false, 0, 0, 1.0, true);
-        UtilVelocity.velocity(player, null, velocityData);
+        VelocityData velocityData = new VelocityData(livingEntity.getLocation().getDirection(), speed, false, 0, 0, 1.0, true);
+        UtilVelocity.velocity(livingEntity, null, velocityData);
 
         // Particle cues
-        final List<Location> points = new ArrayList<>();
-        if (properties.getLastLocation() != null) {
-            final Location[] calc = VectorLine.withStepSize(properties.getLastLocation(), player.getLocation(), 0.2).toLocations();
+        List<Location> points = new ArrayList<>();
+        if (lastLocation != null) {
+            Location[] calc = VectorLine.withStepSize(lastLocation, livingEntity.getLocation(), 0.2).toLocations();
             points.addAll(List.of(calc));
         } else {
-            points.add(player.getLocation());
+            points.add(livingEntity.getLocation());
         }
 
         for (Location point : points) {
@@ -176,50 +205,14 @@ public class Vipersprint extends ItemAbility {
                     .spawn();
         }
 
-        new SoundEffect(Sound.BLOCK_WET_GRASS_BREAK, 0.8f, 1f).play(player.getLocation());
+        new SoundEffect(Sound.BLOCK_WET_GRASS_BREAK, 0.8f, 1f).play(livingEntity.getLocation());
     }
 
-    private void stop(Player player) {
-        // Remove step height modifier
-        final AttributeInstance attribute = Objects.requireNonNull(player.getAttribute(Attribute.STEP_HEIGHT));
-        attribute.removeModifier(getKey());
+    private void stop(LivingEntity entity) {
+        // Stop velocity
+        entity.setVelocity(new Vector());
 
-        // Stop their velocity
-        player.setVelocity(new Vector());
-
-        // Particle cues
-        new SoundEffect(Sound.BLOCK_GRASS_PLACE, 0.8f, 1f).play(player.getLocation());
-        new SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 1.8f, 0.2f).play(player.getLocation());
-    }
-
-    private void tick() {
-        final Iterator<Map.Entry<Player, Properties>> iterator = active.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            final Map.Entry<Player, Properties> cur = iterator.next();
-            final Player player = cur.getKey();
-            final Properties properties = cur.getValue();
-
-            // Offline players
-            if (player == null || !player.isValid()) {
-                iterator.remove();
-                continue;
-            }
-
-            // Cancel their dash when they stop clicking or the time expires
-            final Gamer gamer = clientManager.search().online(player).getGamer();
-            if (!gamer.isHoldingRightClick() || UtilTime.elapsed(properties.getStartTime(), (long) (duration * 1000))) {
-                iterator.remove();
-                cooldownManager.use(player, getName(), cooldown, true);
-                stop(player);
-            }
-        }
-    }
-
-    @Data
-    private static class Properties {
-        List<UUID> damagedEntities = new ArrayList<>();
-        long startTime = System.currentTimeMillis();
-        Location lastLocation = null;
+        new SoundEffect(Sound.BLOCK_GRASS_PLACE, 0.8f, 1f).play(entity.getLocation());
+        new SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 1.8f, 0.2f).play(entity.getLocation());
     }
 }

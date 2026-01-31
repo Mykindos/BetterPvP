@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.block.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
-import me.mykindos.betterpvp.core.item.component.impl.ability.event.PlayerPreItemAbilityEvent;
+import me.mykindos.betterpvp.core.interaction.event.InteractionPreExecuteEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -26,8 +26,11 @@ public class SmartBlockInteractionListener implements Listener {
     }
 
     @EventHandler
-    public void onAbilityPreUse(PlayerPreItemAbilityEvent event) {
-        final Player player = event.getPlayer();
+    public void onInteractionPreUse(InteractionPreExecuteEvent event) {
+        if (!event.getActor().isPlayer()) {
+            return;
+        }
+        final Player player = (Player) event.getActor().getEntity();
         final double blockReach = Objects.requireNonNull(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)).getValue();
         final RayTraceResult blockResult = player.rayTraceBlocks(blockReach);
         if (blockResult != null) {

@@ -7,12 +7,13 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.TillingTremorAbility;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.MagicSeal;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
@@ -41,8 +42,8 @@ public class Rake extends WeaponItem implements Reloadable {
 
         // Create and add the tilling tremor ability
         this.ability = tillingTremorAbility;
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(ability)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, ability)
                 .build());
     }
 

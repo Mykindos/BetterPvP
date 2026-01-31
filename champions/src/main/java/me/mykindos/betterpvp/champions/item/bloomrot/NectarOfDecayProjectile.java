@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.interaction.Interaction;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
@@ -26,7 +26,7 @@ import java.util.Collection;
 @Getter
 public class NectarOfDecayProjectile extends Projectile {
 
-    private final ItemAbility ability;
+    private final Interaction ability;
     private final int poisonAmplifier;
     private final long poisonMillis;
     private final EffectManager effectManager;
@@ -37,7 +37,7 @@ public class NectarOfDecayProjectile extends Projectile {
     private final double maxCloudRadius;
     private final long cloudDuration;
 
-    public NectarOfDecayProjectile(Player caster, final Location location, double hitboxSize, long expireTime, int poisonAmplifier, long poisonMillis, double cloudRadius, long cloudDuration, ItemAbility ability, EffectManager effectManager) {
+    public NectarOfDecayProjectile(Player caster, final Location location, double hitboxSize, long expireTime, int poisonAmplifier, long poisonMillis, double cloudRadius, long cloudDuration, Interaction ability, EffectManager effectManager) {
         super(caster, hitboxSize, location, expireTime);
         this.poisonAmplifier = poisonAmplifier;
         this.poisonMillis = poisonMillis;

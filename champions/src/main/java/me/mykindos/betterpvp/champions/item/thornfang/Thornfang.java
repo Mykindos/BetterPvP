@@ -2,19 +2,25 @@ package me.mykindos.betterpvp.champions.item.thornfang;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.UseEffects;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -23,13 +29,28 @@ import java.util.List;
 @ItemKey("champions:thornfang")
 public class Thornfang extends WeaponItem implements Reloadable {
 
+    private static final ItemStack model;
+
+    static {
+        model = Item.model("thornfang");
+        model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
+                .consumeSeconds(Float.MAX_VALUE)
+                .animation(ItemUseAnimation.NONE)
+                .build());
+
+        model.setData(DataComponentTypes.USE_EFFECTS, UseEffects.useEffects()
+                .canSprint(false)
+                .speedMultiplier(1f)
+                .build());
+    }
+
     private final Vipersprint vipersprint;
     private final Needlegrasp needlegrasp;
     private final HuntersBrand huntersBrand;
 
     @Inject
     private Thornfang(Champions champions, CooldownManager cooldownManager, ClientManager clientManager, EffectManager effectManager, ItemFactory itemFactory) {
-        super(champions, "Thornfang", Item.model("thornfang"), ItemRarity.MYTHICAL, List.of(Group.MELEE));
+        super(champions, "Thornfang", model, ItemRarity.MYTHICAL, List.of(Group.MELEE));
 
         // Create Hunter's Brand first
         this.huntersBrand = new HuntersBrand(champions, itemFactory, effectManager, this);
@@ -39,10 +60,10 @@ public class Thornfang extends WeaponItem implements Reloadable {
         // Pass huntersBrand to Needlegrasp
         this.needlegrasp = new Needlegrasp(champions, cooldownManager, huntersBrand);
 
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(vipersprint)
-                .ability(needlegrasp)
-                .ability(huntersBrand)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.HOLD_RIGHT_CLICK, vipersprint)
+                .root(InteractionInputs.SWAP_HAND, needlegrasp)
+                .root(InteractionInputs.PASSIVE, huntersBrand)
                 .build());
     }
 

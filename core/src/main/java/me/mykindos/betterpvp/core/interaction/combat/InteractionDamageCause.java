@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.component.impl.ability;
+package me.mykindos.betterpvp.core.interaction.combat;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.With;
 import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.interaction.Interaction;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Collection;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
-public class ItemAbilityDamageCause implements DamageCause {
+public class InteractionDamageCause implements DamageCause {
 
     private final String name;
     private final String displayName;
@@ -34,13 +35,13 @@ public class ItemAbilityDamageCause implements DamageCause {
 
     /**
      * Creates an environmental damage cause with default settings
-     * @param ability The ability to create a damage cause for
+     * @param interaction The ability to create a damage cause for
      */
-    public ItemAbilityDamageCause(ItemAbility ability) {
-        this(ability.getKey().getKey(), ability.getName(), false, DEFAULT_DELAY, false);
+    public InteractionDamageCause(Interaction interaction) {
+        this(interaction.getName(), interaction.getName(), false, DEFAULT_DELAY, false);
     }
 
-    public ItemAbilityDamageCause withCategory(DamageCauseCategory category) {
+    public InteractionDamageCause withCategory(DamageCauseCategory category) {
         categories.add(category);
         return this;
     }

@@ -4,19 +4,19 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
@@ -26,6 +26,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,34 +39,33 @@ import java.util.Optional;
 @Singleton
 @Getter
 @Setter
-public class SharkbaitAuraAbility extends ItemAbility implements Listener {
+public class SharkbaitAuraAbility extends AbstractInteraction implements Listener {
 
     private final Progression progression;
     private final ItemFactory itemFactory;
     private final List<FishHook> activeHooks = new ArrayList<>();
-    
+
     private double catchSpeedMultiplier;
     private double radius;
-    
+
     @Inject
     private SharkbaitAuraAbility(Progression progression, ItemFactory itemFactory) {
-        super(new NamespacedKey(progression, "sharkbait_aura"),
-                "Fishing Aura",
-                "Increases fishing catch speed for all nearby fishermen",
-                TriggerTypes.PASSIVE);
-        
+        super("Fishing Aura",
+                "Increases fishing catch speed for all nearby fishermen");
+
         this.progression = progression;
         this.itemFactory = itemFactory;
-        
+
         // Default values, will be overridden by config
         this.catchSpeedMultiplier = 0.7;
         this.radius = 6.0;
     }
-    
+
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         // This is a passive ability, no active invocation needed
-        return true;
+        return InteractionResult.Success.NO_ADVANCE;
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -74,8 +75,8 @@ public class SharkbaitAuraAbility extends ItemAbility implements Listener {
         // Check if player is holding Sharkbait
         itemFactory.fromItemStack(player.getInventory().getItemInMainHand()).ifPresent(item -> {
             // Check if this ability is on the item
-            Optional<AbilityContainerComponent> abilityContainer = item.getComponent(AbilityContainerComponent.class);
-            if (abilityContainer.isPresent() && abilityContainer.get().getContainer().contains(this)) {
+            Optional<InteractionContainerComponent> abilityContainer = item.getComponent(InteractionContainerComponent.class);
+            if (abilityContainer.isPresent() && abilityContainer.get().getChain().hasRoot(this)) {
                 event.getHook().setWaitTime((int) (event.getHook().getWaitTime() * catchSpeedMultiplier));
                 activeHooks.add(event.getHook());
                 return;

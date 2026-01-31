@@ -72,7 +72,7 @@ public class UtilEntity {
      * This is typically utilized in scenarios where the game logic distinguishes between friendly and enemy entities
      * based on their type or their relationship with the player.
      */
-    public static final BiPredicate<Player, Entity> IS_ENEMY = (player, entity) -> {
+    public static final BiPredicate<LivingEntity, Entity> IS_ENEMY = (player, entity) -> {
         if (!(entity instanceof LivingEntity) || entity.equals(player) || UtilPlayer.isCreativeOrSpectator(entity)) {
             return false;
         }

@@ -7,11 +7,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.BlackHoleAbility;
 import me.mykindos.betterpvp.champions.item.ability.MeridianBeamAbility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.MeridianOrb;
@@ -37,17 +38,17 @@ public class MeridianScepter extends WeaponItem implements Listener, Reloadable 
     private final MeridianBeamAbility meridianBeamAbility;
 
     @Inject
-    private MeridianScepter(Champions champions, 
-                           BlackHoleAbility blackHoleAbility, 
+    private MeridianScepter(Champions champions,
+                           BlackHoleAbility blackHoleAbility,
                            MeridianBeamAbility meridianBeamAbility) {
         super(champions, "Meridian Scepter", Item.model("meridian_scepter"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
         this.blackHoleAbility = blackHoleAbility;
         this.meridianBeamAbility = meridianBeamAbility;
-        
+
         // Add abilities to container
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(blackHoleAbility)
-                .ability(meridianBeamAbility)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, blackHoleAbility)
+                .root(InteractionInputs.LEFT_CLICK, meridianBeamAbility)
                 .build());
     }
 
@@ -55,7 +56,7 @@ public class MeridianScepter extends WeaponItem implements Listener, Reloadable 
     public void reload() {
         super.reload();
         final Config config = Config.item(Champions.class, this);
-        
+
         // Black Hole configuration
         blackHoleAbility.setRadius(config.getConfig("blackHoleRadius", 0.5, Double.class));
         blackHoleAbility.setSpeed(config.getConfig("blackHoleSpeed", 3.0, Double.class));
@@ -66,7 +67,7 @@ public class MeridianScepter extends WeaponItem implements Listener, Reloadable 
         blackHoleAbility.setExpandSeconds(config.getConfig("blackHoleExpandSeconds", 0.75, Double.class));
         blackHoleAbility.setTravelSeconds(config.getConfig("blackHoleTravelSeconds", 2.0, Double.class));
         blackHoleAbility.setCooldown(config.getConfig("blackHoleCooldown", 10.0, Double.class));
-        
+
         // Meridian Beam configuration
         meridianBeamAbility.setCooldown(config.getConfig("beamCooldown", 1.0, Double.class));
         meridianBeamAbility.setDamage(config.getConfig("beamDamage", 4.0, Double.class));
@@ -100,4 +101,4 @@ public class MeridianScepter extends WeaponItem implements Listener, Reloadable 
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         registry.registerRecipe(new NamespacedKey("champions", "meridian_scepter"), builder.build());
     }
-} 
+}

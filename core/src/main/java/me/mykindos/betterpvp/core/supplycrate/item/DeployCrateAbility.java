@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.core.supplycrate.item;
 
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrate;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrateController;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrateType;
@@ -16,19 +18,17 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.SMALL_CAPS;
 
-public class DeployCrateAbility extends ItemAbility {
-
-    private static final NamespacedKey key = new NamespacedKey("betterpvp", "summon_supply_crate");
+public class DeployCrateAbility extends AbstractInteraction {
 
     private final SupplyCrateController controller;
     private final SupplyCrateType type;
@@ -36,10 +36,8 @@ public class DeployCrateAbility extends ItemAbility {
     private final boolean announce;
 
     DeployCrateAbility(SupplyCrateController controller, SupplyCrateType type, String locationDescriber, Function<Client, Location> locationSupplier, boolean announce) {
-        super(key,
-                "Deploy",
-                "Order a " + type.getDisplayName() + " at " + locationDescriber + ".",
-                TriggerTypes.RIGHT_CLICK);
+        super("Deploy",
+                "Order a " + type.getDisplayName() + " at " + locationDescriber + ".");
         this.controller = controller;
         this.type = type;
         this.locationSupplier = locationSupplier;
@@ -47,23 +45,28 @@ public class DeployCrateAbility extends ItemAbility {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        final Location location = locationSupplier.apply(client);
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!actor.isPlayer() || actor.getClient() == null) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
+        final Location location = locationSupplier.apply(actor.getClient());
         Preconditions.checkNotNull(location, "Location supplier returned null location");
-        final Player player = Objects.requireNonNull(client.getGamer().getPlayer());
+        final Player player = (Player) actor.getEntity();
         final Location playerLocation = player.getLocation();
 
         if (type.isUnique() && controller.getSupplyCrates().stream().anyMatch(crate -> crate.getType() == type)) {
             UtilMessage.message(player, "Server", "A <red>" + type.getDisplayName() + "</red> is already active on this server!");
             new SoundEffect(Sound.ENTITY_ITEM_BREAK, 0.5f, 0.89f).play(player);
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
 
         }
 
         final SupplyCrateDeployEvent event = UtilServer.callEvent(new SupplyCrateDeployEvent(player, type));
         if (event.isCancelled()) {
             new SoundEffect(Sound.ENTITY_ITEM_BREAK, 0.5f, 0.89f).play(player);
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         final SupplyCrate supplyCrate = this.controller.spawnSupplyCrate(type, location, player);
@@ -91,6 +94,6 @@ public class DeployCrateAbility extends ItemAbility {
             new SoundEffect(Sound.ITEM_GOAT_HORN_SOUND_1, 1.7f, 2f).play(playerLocation);
             new SoundEffect(Sound.ENTITY_EVOKER_CAST_SPELL, 1.4f, 2f).play(playerLocation);
         }
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 }

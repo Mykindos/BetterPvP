@@ -4,14 +4,14 @@ import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -23,64 +23,63 @@ import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class TillingTremorAbility extends ItemAbility {
+public class TillingTremorAbility extends CooldownInteraction {
 
     private double cooldown;
     private double damage;
-    
-    @EqualsAndHashCode.Exclude
-    private final CooldownManager cooldownManager;
+
     @EqualsAndHashCode.Exclude
     private final WorldBlockHandler worldBlockHandler;
 
     @Inject
-    private TillingTremorAbility(CooldownManager cooldownManager, WorldBlockHandler worldBlockHandler) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "tilling_tremor"), 
-              "Tilling Tremor", 
+    public TillingTremorAbility(CooldownManager cooldownManager, WorldBlockHandler worldBlockHandler) {
+        super("Tilling Tremor",
               "Harvest crops in a small radius. Enemies in the area will be damaged and knocked back.",
-              TriggerTypes.RIGHT_CLICK);
-        this.cooldownManager = cooldownManager;
+              cooldownManager);
         this.worldBlockHandler = worldBlockHandler;
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        
-        if (!UtilBlock.isGrounded(player)) {
-            UtilMessage.simpleMessage(player, "Rake", "You cannot use <alt>Tilling Tremor</alt> while airborne.");
-            return false;
-        }
-        
-        if (!cooldownManager.use(player, getName(), cooldown, true)) {
-            return false;
+    public double getCooldown() {
+        return cooldown;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        LivingEntity entity = actor.getEntity();
+
+        if (!UtilBlock.isGrounded(entity)) {
+            UtilMessage.simpleMessage(entity, "Rake", "You cannot use <alt>Tilling Tremor</alt> while airborne.");
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         // Consume durability
-        UtilItem.damageItem(player, itemStack, 1);
+        if (itemStack != null && entity instanceof Player player) {
+            UtilItem.damageItem(player, itemStack, 1);
+        }
 
-        UtilMessage.simpleMessage(player, "Rake", "You used <green>Tilling Tremor<gray>.");
+        UtilMessage.simpleMessage(entity, "Rake", "You used <green>Tilling Tremor<gray>.");
 
-        Location playerLocation = player.getLocation();
-        World world = player.getWorld();
+        Location playerLocation = entity.getLocation();
+        World world = entity.getWorld();
         Location centerBlockLocation = playerLocation.clone().add(0, -0.4, 0);
 
         int radius = 3;
@@ -105,7 +104,7 @@ public class TillingTremorAbility extends ItemAbility {
                 Block cropBlock = world.getBlockAt(blockLocation.clone().add(0, 1, 0));
                 Material cropType = cropBlock.getType();
 
-                if (allowedCrops.contains(cropType)) {
+                if (allowedCrops.contains(cropType) && entity instanceof Player player) {
                     if (cropBlock.getBlockData() instanceof Ageable crop && cropType != Material.SWEET_BERRY_BUSH) {
                         if (crop.getAge() == crop.getMaximumAge()) {
                             Collection<ItemStack> drops = cropBlock.getDrops();
@@ -154,16 +153,16 @@ public class TillingTremorAbility extends ItemAbility {
                     }
                 }
 
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, blockLocation, 1.5)) {
-                    UtilDamage.doDamage(new DamageEvent(target, player, null, 
-                            new ItemAbilityDamageCause(this), damage, getName()));
+                for (LivingEntity target : UtilEntity.getNearbyEnemies(entity, blockLocation, 1.5)) {
+                    UtilDamage.doDamage(new DamageEvent(target, entity, null,
+                            new InteractionDamageCause(this), damage, getName()));
 
-                    Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
+                    Vector trajectory = UtilVelocity.getTrajectory2d(entity.getLocation().toVector(), target.getLocation().toVector());
                     VelocityData velocityData = new VelocityData(trajectory, 1.0, true, 0, 1.0, 1.0, false);
-                    UtilVelocity.velocity(target, player, velocityData);
+                    UtilVelocity.velocity(target, entity, velocityData);
                 }
             }
         }
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
-} 
+}

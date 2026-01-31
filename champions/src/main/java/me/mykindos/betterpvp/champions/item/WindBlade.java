@@ -11,11 +11,12 @@ import me.mykindos.betterpvp.champions.item.ability.WindSlashAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.AetherCore;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -43,21 +44,20 @@ public class WindBlade extends WeaponItem implements Listener, Reloadable {
     private transient boolean registered;
 
     @Inject
-    private WindBlade(Champions champions, ChampionsManager championsManager,
-                     CooldownManager cooldownManager, EnergyService energyService,
-                     FeatherFeetAbility featherFeetAbility) {
+    private WindBlade(Champions champions, ChampionsManager championsManager, ItemFactory itemFactory,
+                     CooldownManager cooldownManager, EnergyService energyService) {
         super(champions, "Wind Blade", Item.model("windblade"), ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
-        this.featherFeetAbility = featherFeetAbility;
-        
+        this.featherFeetAbility = new FeatherFeetAbility(itemFactory);
+
         // Create abilities
         this.windDashAbility = new WindDashAbility(championsManager, champions);
         this.windSlashAbility = new WindSlashAbility(cooldownManager, energyService, this);
-        
+
         // Add ability container
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(windDashAbility)
-                .ability(windSlashAbility)
-                .ability(featherFeetAbility)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, windDashAbility)
+                .root(InteractionInputs.LEFT_CLICK, windSlashAbility)
+                .root(InteractionInputs.PASSIVE, featherFeetAbility)
                 .build());
     }
 
@@ -65,18 +65,18 @@ public class WindBlade extends WeaponItem implements Listener, Reloadable {
     public void reload() {
         super.reload();
         final Config config = Config.item(Champions.class, this);
-        
+
         // Wind Dash
         double dashVelocity = config.getConfig("dashVelocity", 1.2, Double.class);
         int dashParticleTicks = config.getConfig("dashParticleTicks", 2, Integer.class);
         int dashEnergyCost = config.getConfig("dashEnergyCost", 24, Integer.class);
         double dashImpactVelocity = config.getConfig("dashImpactVelocity", 1.0, Double.class);
-        
+
         windDashAbility.setDashVelocity(dashVelocity);
         windDashAbility.setDashParticleTicks(dashParticleTicks);
         windDashAbility.setDashEnergyCost(dashEnergyCost);
         windDashAbility.setDashImpactVelocity(dashImpactVelocity);
-        
+
         // Wind Slash
         double slashCooldown = config.getConfig("slashCooldown", 2.5, Double.class);
         double slashHitboxSize = config.getConfig("slashHitboxSize", 0.6, Double.class);
@@ -86,7 +86,7 @@ public class WindBlade extends WeaponItem implements Listener, Reloadable {
         double slashVelocity = config.getConfig("slashVelocity", 0.5, Double.class);
         int slashAliveMillis = config.getConfig("slashAliveMillis", 1000, Integer.class);
         double slashSpeed = config.getConfig("slashSpeed", 30.0, Double.class);
-        
+
         windSlashAbility.setSlashCooldown(slashCooldown);
         windSlashAbility.setSlashHitboxSize(slashHitboxSize);
         windSlashAbility.setSlashEnergyCost(slashEnergyCost);

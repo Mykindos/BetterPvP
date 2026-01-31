@@ -3,17 +3,22 @@ package me.mykindos.betterpvp.champions.item.scythe;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.UseEffects;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.LifestealAbility;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.BurntRemnant;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -34,6 +39,20 @@ import org.bukkit.inventory.ItemStack;
 @ItemKey("champions:scythe_of_the_fallen_lord")
 public class ScytheOfTheFallenLord extends WeaponItem implements Reloadable {
 
+    private static final ItemStack model;
+
+    static {
+        model = Item.model("scythe_of_the_fallen_lord", 1);
+        model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
+                .consumeSeconds(Float.MAX_VALUE)
+                .animation(ItemUseAnimation.NONE)
+                .build());
+        model.setData(DataComponentTypes.USE_EFFECTS, UseEffects.useEffects()
+                .canSprint(true)
+                .speedMultiplier(1f)
+                .build());
+    }
+
     private transient boolean registered;
 
     private final LifestealAbility lifestealAbility;
@@ -47,7 +66,7 @@ public class ScytheOfTheFallenLord extends WeaponItem implements Reloadable {
     private ScytheOfTheFallenLord(Champions champions,
                                   ItemFactory itemFactory,
                                   SoulHarvestAbility soulHarvestAbility) {
-        super(champions, "Scythe", Item.model("scythe_of_the_fallen_lord", 1), ItemRarity.LEGENDARY);
+        super(champions, "Scythe", model, ItemRarity.LEGENDARY);
         this.lifestealAbility = new LifestealAbility(champions, itemFactory, this, this::getHeal);
         this.soulHarvestAbility = soulHarvestAbility;
         this.itemFactory = itemFactory;
@@ -56,9 +75,9 @@ public class ScytheOfTheFallenLord extends WeaponItem implements Reloadable {
         // Link this scythe to the SoulHarvestAbility
         this.soulHarvestAbility.setScythe(this);
         
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(lifestealAbility)
-                .ability(soulHarvestAbility)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.PASSIVE, lifestealAbility)
+                .root(InteractionInputs.HOLD_RIGHT_CLICK, soulHarvestAbility)
                 .build());
     }
 

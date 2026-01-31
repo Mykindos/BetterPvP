@@ -6,12 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.PreCannonPlaceEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
@@ -20,62 +21,64 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Singleton
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
-public class CannonPlaceAbility extends ItemAbility {
+public class CannonPlaceAbility extends CooldownInteraction {
 
     @EqualsAndHashCode.Include
     private double cooldown;
     private final CannonManager cannonManager;
     private final Map<UUID, Location> cannonLocations = new HashMap<>();
-    private final CooldownManager cooldownManager;
 
     @Inject
     private CannonPlaceAbility(Core core, CannonManager cannonManager, CooldownManager cooldownManager) {
-        super(new NamespacedKey(core, "cannon_place"), "Cannon Placement",
-                "Place a cannon that can be loaded with cannonballs", TriggerTypes.RIGHT_CLICK);
+        super("Cannon Placement",
+                "Place a cannon that can be loaded with cannonballs", cooldownManager);
         this.cannonManager = cannonManager;
         this.cooldown = cannonManager.getSpawnCooldown();
-        this.cooldownManager = cooldownManager;
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        
-        if (!canUse(player)) {
-            return false;
+    public double getCooldown() {
+        return cooldown;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        if (!cooldownManager.use(player, getName(), cooldown, true, true)) {
-            return false;
+        if (!canUse(player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         final Location cannonLocation = cannonLocations.remove(player.getUniqueId());
 
         if(!cannonLocation.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
             UtilMessage.message(player, "Combat", "You cannot place a cannon in this world.");
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         Cannon cannon = this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
         if (cannon != null) {
             UtilMessage.message(player, "Combat", "You placed a <alt2>Cannon</alt2>!");
-            return true;
+            return InteractionResult.Success.ADVANCE;
         }
-        return false;
+        return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
     }
     
     private boolean canUse(Player player) {

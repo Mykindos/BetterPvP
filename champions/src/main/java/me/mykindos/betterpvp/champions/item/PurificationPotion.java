@@ -6,12 +6,14 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.CleanseAbility;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
@@ -31,11 +33,13 @@ public class PurificationPotion extends BaseItem implements Reloadable {
     }
 
     @Inject
-    private PurificationPotion(EffectManager effectManager) {
+    private PurificationPotion(EffectManager effectManager, CooldownManager cooldownManager) {
         super("Purification Potion", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
-        this.cleanseAbility = new CleanseAbility(effectManager);
+        this.cleanseAbility = new CleanseAbility(effectManager, cooldownManager);
         this.cleanseAbility.setConsumesItem(true);
-        addBaseComponent(AbilityContainerComponent.builder().ability(cleanseAbility).build());
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, cleanseAbility)
+                .build());
     }
 
     @Override

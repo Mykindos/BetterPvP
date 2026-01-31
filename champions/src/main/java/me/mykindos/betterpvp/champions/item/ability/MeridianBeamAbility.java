@@ -6,28 +6,29 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.projectile.MeridianBeam;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.WeakHashMap;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class MeridianBeamAbility extends ItemAbility {
+public class MeridianBeamAbility extends CooldownInteraction {
 
     private double cooldown;
     private double damage;
@@ -37,22 +38,18 @@ public class MeridianBeamAbility extends ItemAbility {
 
     @EqualsAndHashCode.Exclude
     private final Champions champions;
-    @EqualsAndHashCode.Exclude
-    private final CooldownManager cooldownManager;
-    
+
     // Track active beams
     @EqualsAndHashCode.Exclude
     private final WeakHashMap<Player, List<MeridianBeam>> beams = new WeakHashMap<>();
 
     @Inject
-    private MeridianBeamAbility(Champions champions, CooldownManager cooldownManager) {
-        super(new NamespacedKey(champions, "meridian_beam"),
-                MeridianBeam.NAME,
+    public MeridianBeamAbility(Champions champions, CooldownManager cooldownManager) {
+        super(MeridianBeam.NAME,
                 "Fires a damaging beam of energy that travels in a straight line.",
-                TriggerTypes.LEFT_CLICK);
+                cooldownManager);
         this.champions = champions;
-        this.cooldownManager = cooldownManager;
-        
+
         // Default values, will be overridden by config
         this.cooldown = 1.0;
         this.damage = 4.0;
@@ -62,11 +59,20 @@ public class MeridianBeamAbility extends ItemAbility {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        
-        if (!cooldownManager.use(player, getName(), cooldown, false, true, false)) {
-            return false;
+    public double getCooldown() {
+        return cooldown;
+    }
+
+    @Override
+    public boolean informCooldown() {
+        return false;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         final Location location = player.getEyeLocation();
@@ -78,11 +84,13 @@ public class MeridianBeamAbility extends ItemAbility {
                 damage,
                 this
         );
-        
+
         beam.redirect(player.getLocation().getDirection().multiply(speed));
         beams.computeIfAbsent(player, p -> new ArrayList<>()).add(beam);
-        UtilItem.damageItem(player, itemStack, 1);
-        return true;
+        if (itemStack != null) {
+            UtilItem.damageItem(player, itemStack, 1);
+        }
+        return InteractionResult.Success.ADVANCE;
     }
 
     public void processBeams() {
@@ -92,7 +100,7 @@ public class MeridianBeamAbility extends ItemAbility {
             final Map.Entry<Player, List<MeridianBeam>> cur = iterator.next();
             final Player player = cur.getKey();
             final List<MeridianBeam> playerBeams = cur.getValue();
-            
+
             if (player == null || !player.isOnline()) {
                 iterator.remove();
                 continue;
@@ -114,4 +122,4 @@ public class MeridianBeamAbility extends ItemAbility {
             }
         }
     }
-} 
+}

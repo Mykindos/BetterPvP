@@ -3,15 +3,20 @@ package me.mykindos.betterpvp.champions.item;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.UseEffects;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.RegenerationShieldAbility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.ColossusFragment;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -41,6 +46,20 @@ import java.util.UUID;
 @ItemKey("champions:giants_broadsword")
 public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable {
 
+    private static final ItemStack model;
+
+    static {
+        model = Item.model("giants_broadsword");
+        model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
+                .consumeSeconds(Float.MAX_VALUE)
+                .animation(ItemUseAnimation.NONE)
+                .build());
+        model.setData(DataComponentTypes.USE_EFFECTS, UseEffects.useEffects()
+                .canSprint(true)
+                .speedMultiplier(1f)
+                .build());
+    }
+
     private transient boolean registered;
     private final RegenerationShieldAbility regenerationShieldAbility;
 
@@ -53,13 +72,13 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
     private GiantsBroadsword(Champions champions,
                             RegenerationShieldAbility regenerationShieldAbility,
                             ItemFactory itemFactory) {
-        super(champions, "Giant's Broadsword", Item.model("giants_broadsword"), ItemRarity.LEGENDARY);
+        super(champions, "Giant's Broadsword", model, ItemRarity.LEGENDARY);
         this.itemFactory = itemFactory;
         this.regenerationShieldAbility = regenerationShieldAbility;
 
         // Add abilities to container
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(regenerationShieldAbility)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.HOLD_RIGHT_CLICK, regenerationShieldAbility)
                 .build());
     }
 

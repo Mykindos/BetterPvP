@@ -6,11 +6,12 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.SpeedBoostAbility;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
@@ -35,7 +36,9 @@ public class RabbitStew extends BaseItem implements Reloadable {
         super("Rabbit Stew", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.speedBoostAbility = speedBoostAbility;
         this.speedBoostAbility.setConsumesItem(true);
-        addBaseComponent(AbilityContainerComponent.builder().ability(speedBoostAbility).build());
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, speedBoostAbility)
+                .build());
     }
 
     @Override
