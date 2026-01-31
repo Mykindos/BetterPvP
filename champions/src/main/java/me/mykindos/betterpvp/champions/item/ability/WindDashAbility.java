@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -20,29 +21,28 @@ import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class WindDashAbility extends ItemAbility {
+public class WindDashAbility extends AbstractInteraction {
 
     private double dashVelocity;
     private double dashImpactVelocity;
@@ -53,31 +53,31 @@ public class WindDashAbility extends ItemAbility {
     private final ChampionsManager championsManager;
     @EqualsAndHashCode.Exclude
     private final Champions champions;
-    
+
     // Data storage for active dashes
     @EqualsAndHashCode.Exclude
     private final Map<Player, DashData> activeDashes = new HashMap<>();
 
     public WindDashAbility(ChampionsManager championsManager, Champions champions) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "wind_dash"),
-                "Wind Dash",
-                "Take a leap forward. The first enemy you hit, will be launched into the air.",
-                TriggerTypes.RIGHT_CLICK);
+        super("Wind Dash", "Take a leap forward. The first enemy you hit, will be launched into the air.");
         this.championsManager = championsManager;
         this.champions = champions;
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.simpleMessage(player, getName(), "You cannot use this ability while in liquid");
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
-        
+
         if (!championsManager.getEnergy().use(player, getName(), dashEnergyCost, true)) {
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
         // Start dash tracking
@@ -89,7 +89,9 @@ public class WindDashAbility extends ItemAbility {
         UtilVelocity.velocity(player, player, velocityData);
 
         // Consume durability
-        UtilItem.damageItem(player, itemStack, 1);
+        if (itemStack != null) {
+            UtilItem.damageItem(player, itemStack, 1);
+        }
 
         // SFX
         new SoundEffect(Sound.ITEM_TRIDENT_THROW, 0.5F, 2.0F).play(player.getLocation());
@@ -126,7 +128,7 @@ public class WindDashAbility extends ItemAbility {
                         .spawn();
             }
         }.runTaskTimer(champions, 0L, 1L);
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 
     // Call this from a scheduler in the main item class
@@ -192,4 +194,4 @@ public class WindDashAbility extends ItemAbility {
             return hitTargets;
         }
     }
-} 
+}

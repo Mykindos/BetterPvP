@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.champions.item.projectile;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
+import me.mykindos.betterpvp.core.interaction.Interaction;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
@@ -26,12 +26,12 @@ public class MeridianBeam extends Projectile {
 
     public static final String NAME = "Meridian Beam";
     private final double damage;
-    private final ItemAbility ability;
+    private final Interaction interaction;
 
-    public MeridianBeam(Player caster, final Location location, double hitboxSize, long expireTime, double damage, ItemAbility ability) {
+    public MeridianBeam(Player caster, final Location location, double hitboxSize, long expireTime, double damage, Interaction interaction) {
         super(caster, hitboxSize, location, expireTime);
         this.damage = damage;
-        this.ability = ability;
+        this.interaction = interaction;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class MeridianBeam extends Projectile {
                 target,
                 caster,
                 caster,
-                new ItemAbilityDamageCause(ability).withCategory(MAGIC).withBukkitCause(PROJECTILE),
+                new InteractionDamageCause(interaction).withCategory(MAGIC).withBukkitCause(PROJECTILE),
                 damage,
                 NAME
         );

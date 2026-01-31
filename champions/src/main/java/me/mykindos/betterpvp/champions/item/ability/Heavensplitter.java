@@ -5,33 +5,32 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.projectile.BoomerangProjectile;
-import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Heavensplitter extends ItemAbility implements Listener {
-
-    private static final String TRIDENT_METADATA_KEY = "heavensplitter_trident";
+public class Heavensplitter extends AbstractInteraction implements Listener {
 
     @EqualsAndHashCode.Include
     private float hitbox; // Hitbox radius for collision detection
@@ -45,31 +44,31 @@ public class Heavensplitter extends ItemAbility implements Listener {
     private double airTime; // Seconds
     private final BaseItem heldItem;
     private final ItemFactory itemFactory;
-    private final ClientManager clientManager;
     private final Map<Player, BoomerangProjectile> projectiles = new HashMap<>();
 
-    public Heavensplitter(BaseItem heldItem, ItemFactory itemFactory, ClientManager clientManager) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class),
-                        "heavensplitter"),
-                "Heavensplitter",
-                "Throw the weapon, summon the power of Thor, and deal damage to enemies in its path.",
-                TriggerTypes.OFF_HAND);
+    public Heavensplitter(BaseItem heldItem, ItemFactory itemFactory) {
+        super("Heavensplitter",
+                "Throw the weapon, summon the power of Thor, and deal damage to enemies in its path.");
         this.heldItem = heldItem;
         this.itemFactory = itemFactory;
-        this.clientManager = clientManager;
         Bukkit.getPluginManager().registerEvents(this, JavaPlugin.getPlugin(Champions.class));
         UtilServer.runTaskTimer(JavaPlugin.getPlugin(Champions.class), this::tickProjectiles, 0L, 1L);
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        final Player caster = Objects.requireNonNull(client.getGamer().getPlayer());
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        LivingEntity entity = actor.getEntity();
+        if (!(entity instanceof Player caster)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
         // Player already has a projectile, summon back
         if (projectiles.containsKey(caster)) {
             final BoomerangProjectile projectile = projectiles.get(caster);
             projectile.recall();
             projectile.playRedirectSound();
-            return true;
+            return InteractionResult.Success.ADVANCE;
         }
 
         // Spawn projectile
@@ -90,8 +89,10 @@ public class Heavensplitter extends ItemAbility implements Listener {
 
         // Consume durability
         // Run later because bug idk
-        UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> UtilItem.damageItem(caster, itemStack, 1));
-        return true;
+        if (itemStack != null) {
+            UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> UtilItem.damageItem(caster, itemStack, 1));
+        }
+        return InteractionResult.Success.ADVANCE;
     }
 
     public void tickProjectiles() {

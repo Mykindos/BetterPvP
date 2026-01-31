@@ -7,10 +7,11 @@ import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.entity.Dummy;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
@@ -21,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -33,6 +33,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -41,24 +43,26 @@ import java.util.function.Supplier;
 /**
  * Creates a delayed item explosion.
  */
-public class BuildersBoxAbility extends ItemAbility {
+public class BuildersBoxAbility extends AbstractInteraction {
 
     private final Supplier<LootTable> lootTableSupplier;
     private final String source;
 
     public BuildersBoxAbility(Supplier<LootTable> lootTableSupplier, String source) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Core.class), "builders_box_explosion"),
-              "Open",
-              "Unseal the box to release a trove of building items.",
-              TriggerTypes.RIGHT_CLICK);
+        super("Open",
+              "Unseal the box to release a trove of building items.");
         this.lootTableSupplier = lootTableSupplier;
         this.source = source;
         this.setConsumesItem(true);
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        final Player player = Objects.requireNonNull(client.getGamer().getPlayer());
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
         final double reach = Objects.requireNonNull(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)).getValue();
 
         // Get where to spawn it
@@ -71,8 +75,8 @@ public class BuildersBoxAbility extends ItemAbility {
         // Generate Loot
         final LootTable lootTable = lootTableSupplier.get();
         final LootSession lootSession = LootSession.newSession(lootTable, player);
-        final LootContext context = new LootContext(lootSession, location.clone().add(0, 0.9, 0), source);
-        final LootBundle bundle = lootTable.generateLoot(context);
+        final LootContext lootContext = new LootContext(lootSession, location.clone().add(0, 0.9, 0), source);
+        final LootBundle bundle = lootTable.generateLoot(lootContext);
         final Iterator<Loot<?, ?>> iterator = bundle.iterator();
 
         // Spawn the model using ModelEngine
@@ -125,7 +129,7 @@ public class BuildersBoxAbility extends ItemAbility {
 
                 final Loot<?, ?> loot = iterator.next();
                 if (loot instanceof DroppedItemLoot itemLoot) {
-                    final Item item = itemLoot.award(context);
+                    final Item item = itemLoot.award(lootContext);
                     // Shoot it out in a circle
                     final double radians = Math.toRadians(angle);
                     angle += 22.5; // controls spacing and spiral motion
@@ -143,12 +147,12 @@ public class BuildersBoxAbility extends ItemAbility {
                     // Sound
                     new SoundEffect(Sound.BLOCK_BEEHIVE_EXIT, 2f, 1f).play(location);
                 } else {
-                    loot.award(context);
+                    loot.award(lootContext);
                 }
             }
         }.runTaskTimer(JavaPlugin.getPlugin(Core.class), openDuration + fallDuration + 20L, 1L);
 
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 
     private void queueEffects(Location location, long jumpDelay) {

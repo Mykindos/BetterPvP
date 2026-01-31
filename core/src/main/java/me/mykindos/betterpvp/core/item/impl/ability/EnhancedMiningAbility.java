@@ -3,17 +3,17 @@ package me.mykindos.betterpvp.core.item.impl.ability;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.ToolComponent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides enhanced mining speed to the Runed Pickaxe.
@@ -22,22 +22,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class EnhancedMiningAbility extends ItemAbility {
+public class EnhancedMiningAbility extends AbstractInteraction {
 
     private double miningSpeed;
 
     public EnhancedMiningAbility() {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Core.class), "enhanced_mining"),
-              "Enhanced Mining",
-              "Grants enhanced mining speed for stone-based blocks. Works exactly like a pickaxe.",
-              TriggerTypes.PASSIVE); // No trigger type since it's passive
+        super("Enhanced Mining",
+              "Grants enhanced mining speed for stone-based blocks. Works exactly like a pickaxe.");
         this.miningSpeed = 30.0; // Default value, will be overridden by config
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         // This is a passive ability and doesn't need active invocation
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
     
     /**

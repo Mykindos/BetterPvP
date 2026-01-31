@@ -6,11 +6,13 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.RegenerationAbility;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
@@ -18,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @ItemKey("champions:mushroom_stew")
+@FallbackItem(Material.MUSHROOM_STEW)
 @EqualsAndHashCode(callSuper = false)
 public class MushroomStew extends BaseItem implements Reloadable {
 
@@ -35,7 +38,9 @@ public class MushroomStew extends BaseItem implements Reloadable {
         super("Mushroom Stew", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.regenerationAbility = regenerationAbility;
         regenerationAbility.setConsumesItem(true);
-        addBaseComponent(AbilityContainerComponent.builder().ability(regenerationAbility).build());
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, regenerationAbility)
+                .build());
     }
 
     @Override

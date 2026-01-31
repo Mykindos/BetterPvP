@@ -1,10 +1,11 @@
 package me.mykindos.betterpvp.progression.profession.fishing.bait;
 
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.fishing.bait.ability.BaitAbility;
@@ -33,7 +34,9 @@ public abstract class BaitItem extends BaseItem implements Reloadable {
         this.plugin = plugin;
         
         // Add the ability to the item
-        addBaseComponent(AbilityContainerComponent.builder().ability(ability).build());
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, ability)
+                .build());
     }
     
     @Override

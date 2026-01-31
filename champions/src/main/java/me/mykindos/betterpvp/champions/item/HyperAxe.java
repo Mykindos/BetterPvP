@@ -7,13 +7,14 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.HyperRushAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.RazorEdge;
@@ -63,8 +64,8 @@ public class HyperAxe extends WeaponItem implements Reloadable {
         this.attackSpeed = 1; // 100%+ attack speed by default
 
         // Add components
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(hyperRushAbility)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.SWAP_HAND, hyperRushAbility)
                 .build());
     }
 

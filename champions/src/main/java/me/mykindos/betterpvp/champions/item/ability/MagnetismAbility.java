@@ -6,12 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -19,7 +20,6 @@ import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -28,14 +28,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class MagnetismAbility extends ItemAbility {
+public class MagnetismAbility extends AbstractInteraction {
 
     private double pullRange;
     private double pullFov;
@@ -48,13 +49,10 @@ public class MagnetismAbility extends ItemAbility {
 
     @Inject
     public MagnetismAbility(Champions champions, EnergyService energyService) {
-        super(new NamespacedKey(champions, "magnetism"),
-                "Magnetism",
-                "Spawn a cone of particles in front of you that pulls entities inwards.",
-                TriggerTypes.HOLD_RIGHT_CLICK);
+        super("Magnetism", "Spawn a cone of particles in front of you that pulls entities inwards.");
         this.champions = champions;
         this.energyService = energyService;
-        
+
         // Default values, will be overridden by config
         this.pullRange = 10.0;
         this.pullFov = 80.3;
@@ -62,19 +60,22 @@ public class MagnetismAbility extends ItemAbility {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
         if (!energyService.use(player, getName(), energyPerTick, true)) {
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
         pull(player);
         playCone(player);
         new SoundEffect(Sound.BLOCK_BEACON_DEACTIVATE, 0F, 1F).play(player.getLocation());
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
-    
+
     private void playCone(Player wielder) {
         final float particleStep = 0.25f;
         final double particlePoints = pullRange / particleStep;
@@ -156,4 +157,4 @@ public class MagnetismAbility extends ItemAbility {
             playPullLine(wielder, entity);
         }
     }
-} 
+}

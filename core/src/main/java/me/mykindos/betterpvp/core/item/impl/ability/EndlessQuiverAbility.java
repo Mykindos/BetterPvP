@@ -27,15 +27,16 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
@@ -49,7 +50,6 @@ import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.component.ChargedProjectiles;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -64,7 +64,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -83,7 +83,7 @@ import java.util.function.Consumer;
 @Getter
 @Setter
 @Singleton
-public class EndlessQuiverAbility extends ItemAbility implements Listener, PacketListener {
+public class EndlessQuiverAbility extends AbstractInteraction implements Listener, PacketListener {
 
     @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
@@ -97,10 +97,8 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
 
     @Inject
     private EndlessQuiverAbility(Core plugin, ItemFactory itemFactory) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Core.class), "endless_quiver"),
-                "Endless Quiver",
-                "Automatically conjures arrows, letting any quiver fire endlessly without requiring ammunition.",
-                TriggerTypes.PASSIVE);
+        super("Endless Quiver",
+                "Automatically conjures arrows, letting any quiver fire endlessly without requiring ammunition.");
         this.itemFactory = itemFactory;
         this.core = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -109,9 +107,10 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         // This is a passive ability and doesn't need active invocation
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 
     private void givePacketArrow(Player player) {
@@ -201,11 +200,11 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         final ItemInstance oldItem = oldItemOpt.orElseThrow();
         final ItemInstance newItem = newItemOpt.orElseThrow();
 
-        final Optional<AbilityContainerComponent> oldContainerOpt = oldItem.getComponent(AbilityContainerComponent.class);
-        boolean oldHasEndlessQuiver = oldContainerOpt.isPresent() && oldContainerOpt.get().getContainer().contains(this);
+        final Optional<InteractionContainerComponent> oldContainerOpt = oldItem.getComponent(InteractionContainerComponent.class);
+        boolean oldHasEndlessQuiver = oldContainerOpt.isPresent() && oldContainerOpt.get().getChain().hasRoot(this);
 
-        final Optional<AbilityContainerComponent> newContainerOpt = newItem.getComponent(AbilityContainerComponent.class);
-        boolean newHasEndlessQuiver = newContainerOpt.isPresent() && newContainerOpt.get().getContainer().contains(this);
+        final Optional<InteractionContainerComponent> newContainerOpt = newItem.getComponent(InteractionContainerComponent.class);
+        boolean newHasEndlessQuiver = newContainerOpt.isPresent() && newContainerOpt.get().getChain().hasRoot(this);
 
         if (!oldHasEndlessQuiver && newHasEndlessQuiver) {
             takePacketArrow(event.getPlayer());
@@ -228,10 +227,10 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         final ItemStack newItem = event.getPlayer().getInventory().getItem(event.getNewSlot());
         if (newItem != null) {
             final ItemInstance itemInstance = itemFactory.fromItemStack(newItem).orElseThrow();
-            final Optional<AbilityContainerComponent> containerOpt = itemInstance.getComponent(AbilityContainerComponent.class);
+            final Optional<InteractionContainerComponent> containerOpt = itemInstance.getComponent(InteractionContainerComponent.class);
             if (containerOpt.isPresent()) {
-                final AbilityContainerComponent container = containerOpt.get();
-                if (container.getContainer().contains(this)) {
+                final InteractionContainerComponent container = containerOpt.get();
+                if (container.getChain().hasRoot(this)) {
                     takePacketArrow(event.getPlayer());
                     hideArrows(event.getPlayer());
                     activeTicks.remove(event.getPlayer());
@@ -247,10 +246,10 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         final ItemStack oldItem = event.getPlayer().getInventory().getItem(event.getPreviousSlot());
         if (oldItem != null) {
             final ItemInstance itemInstance = itemFactory.fromItemStack(oldItem).orElseThrow();
-            final Optional<AbilityContainerComponent> containerOpt = itemInstance.getComponent(AbilityContainerComponent.class);
+            final Optional<InteractionContainerComponent> containerOpt = itemInstance.getComponent(InteractionContainerComponent.class);
             if (containerOpt.isPresent()) {
-                final AbilityContainerComponent container = containerOpt.get();
-                if (container.getContainer().contains(this)) {
+                final InteractionContainerComponent container = containerOpt.get();
+                if (container.getChain().hasRoot(this)) {
                     showArrows(event.getPlayer());
                     takePacketArrow(event.getPlayer());
                 }
@@ -293,11 +292,11 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         if (instanceOpt.isEmpty()) return;
 
         final ItemInstance instance = instanceOpt.get();
-        final Optional<AbilityContainerComponent> containerOpt = instance.getComponent(AbilityContainerComponent.class);
+        final Optional<InteractionContainerComponent> containerOpt = instance.getComponent(InteractionContainerComponent.class);
         if (containerOpt.isEmpty()) return;
 
-        final AbilityContainerComponent container = containerOpt.get();
-        if (container.getContainer().contains(this)) {
+        final InteractionContainerComponent container = containerOpt.get();
+        if (container.getChain().hasRoot(this)) {
             arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
             if (useFunction != null) {
                 useFunction.accept(event.getEntity());
@@ -325,13 +324,13 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         }
 
         final ItemInstance activeInstance = instanceOpt.get();
-        final Optional<AbilityContainerComponent> containerOpt = activeInstance.getComponent(AbilityContainerComponent.class);
+        final Optional<InteractionContainerComponent> containerOpt = activeInstance.getComponent(InteractionContainerComponent.class);
         if (containerOpt.isEmpty()) {
             return;
         }
 
-        final AbilityContainerComponent container = containerOpt.get();
-        if (!container.getContainer().contains(this)) {
+        final InteractionContainerComponent container = containerOpt.get();
+        if (!container.getChain().hasRoot(this)) {
             return;
         }
 
@@ -400,13 +399,13 @@ public class EndlessQuiverAbility extends ItemAbility implements Listener, Packe
         }
 
         final ItemInstance activeInstance = instanceOpt.get();
-        final Optional<AbilityContainerComponent> containerOpt = activeInstance.getComponent(AbilityContainerComponent.class);
+        final Optional<InteractionContainerComponent> containerOpt = activeInstance.getComponent(InteractionContainerComponent.class);
         if (containerOpt.isEmpty()) {
             return;
         }
 
-        final AbilityContainerComponent container = containerOpt.get();
-        if (!container.getContainer().contains(this)) {
+        final InteractionContainerComponent container = containerOpt.get();
+        if (!container.getChain().hasRoot(this)) {
             return; // doesnt have endless quiver
         }
 

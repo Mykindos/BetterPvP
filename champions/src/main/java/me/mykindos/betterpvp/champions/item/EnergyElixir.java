@@ -6,11 +6,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.EnergyBoost;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -30,7 +31,9 @@ public class EnergyElixir extends BaseItem implements Reloadable {
         final SoundEffect soundEffect = new SoundEffect(Sound.ITEM_HONEY_BOTTLE_DRINK, 1.2f, 1f);
         this.energyBoost = new EnergyBoost(energyService, cooldownManager, soundEffect);
         energyBoost.setConsumesItem(true);
-        addBaseComponent(AbilityContainerComponent.builder().ability(energyBoost).build());
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, energyBoost)
+                .build());
     }
 
     @Override

@@ -5,26 +5,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageModifier;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageModifier;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -34,7 +36,7 @@ import java.util.WeakHashMap;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class HuntersBrand extends ItemAbility implements Listener {
+public class HuntersBrand extends AbstractInteraction implements Listener {
 
     private double poisonBonusDamage;
     private double resetCounterTimeoutSeconds;
@@ -48,10 +50,8 @@ public class HuntersBrand extends ItemAbility implements Listener {
     private transient final WeakHashMap<Player, ResetTrackingData> resetTracking = new WeakHashMap<>();
 
     protected HuntersBrand(Champions champions, ItemFactory itemFactory, EffectManager effectManager, Thornfang thornfang) {
-        super(new NamespacedKey(champions, "huntersbrand"),
-                "Hunter's Brand",
-                "Land 2 consecutive Needlegrasp resets on the same target to trigger a frenzy state. Also deals bonus damage to poisoned enemies.",
-                TriggerTypes.PASSIVE);
+        super("Hunter's Brand",
+                "Land 2 consecutive Needlegrasp resets on the same target to trigger a frenzy state. Also deals bonus damage to poisoned enemies.");
         this.champions = champions;
         this.itemFactory = itemFactory;
         this.effectManager = effectManager;
@@ -61,9 +61,10 @@ public class HuntersBrand extends ItemAbility implements Listener {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         // Passive ability - no active trigger
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -81,7 +82,7 @@ public class HuntersBrand extends ItemAbility implements Listener {
             if (!effectManager.hasEffect(target, EffectTypes.POISON)) return;
 
             // Add bonus damage
-            event.addModifier(new ItemAbilityDamageModifier.Flat(this, poisonBonusDamage));
+            event.addModifier(new InteractionDamageModifier.Flat(this, poisonBonusDamage));
         });
     }
 
