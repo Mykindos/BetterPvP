@@ -68,6 +68,7 @@ BEGIN
         ON gd.id = (cs.StatData ->> 'gameId')::bigint
     LEFT JOIN game_teams gt
         ON gt.id = gd.id
-        AND gt.client = cs.client;
+        AND gt.client = cs.client
+    WHERE cs.Client = client_param;
 END;
 $$;
