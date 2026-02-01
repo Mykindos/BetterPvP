@@ -83,8 +83,14 @@ public class AchievementCompletionRepository {
     @NotNull
     public CompletableFuture<AchievementCompletionsConcurrentHashMap> loadForContainer(final @NotNull StatContainer container) {
         final AchievementCompletionsConcurrentHashMap completions = new AchievementCompletionsConcurrentHashMap();
-        return loadCompletions(container, completions)
-                .thenCompose(v -> loadCompletionRanks(container, completions));
+        return loadCompletions(container, completions).exceptionally(throwable -> {
+            log.error("Error loading achievement completions for client {}", container.getClient().getName(), throwable).submit();
+            return completions;})
+                .thenCompose(v -> loadCompletionRanks(container, completions)).exceptionally(throwable -> {
+                            log.error("Error loading achievement completion ranks for client {}", container.getClient().getName(), throwable).submit();
+                            return completions;
+                        }
+                );
     }
 
     @Nullable
@@ -100,23 +106,28 @@ public class AchievementCompletionRepository {
 
     private CompletableFuture<AchievementCompletionsConcurrentHashMap> loadCompletions(StatContainer container, AchievementCompletionsConcurrentHashMap completions) {
         return database.getAsyncDslContext().executeAsync(context -> {
-            Tables.GET_ACHIEVEMENT_COMPLETIONS(context.configuration(), container.getClient().getId())
-                    .forEach(completion -> {
-                        final long completionId = completion.getId();
-                        final String namespace = completion.getNamespace();
-                        final String key = completion.getKeyname();
-                        final LocalDateTime timestamp = completion.getTimeachieved();
-                        final Period period = getPeriod(completion);
-                        final AchievementCompletion achievementCompletion = new AchievementCompletion(completionId,
-                                container.getClient(),
-                                new NamespacedKey(namespace, key),
-                                StatFilterType.ALL,
-                                period,
-                                timestamp
-                        );
-                        completions.addCompletion(achievementCompletion);
-                    });
-            return completions;
+            try {
+                Tables.GET_ACHIEVEMENT_COMPLETIONS(context.configuration(), container.getClient().getId())
+                        .forEach(completion -> {
+                            final long completionId = completion.getId();
+                            final String namespace = completion.getNamespace();
+                            final String key = completion.getKeyname();
+                            final LocalDateTime timestamp = completion.getTimeachieved();
+                            final Period period = getPeriod(completion);
+                            final AchievementCompletion achievementCompletion = new AchievementCompletion(completionId,
+                                    container.getClient(),
+                                    new NamespacedKey(namespace, key),
+                                    StatFilterType.ALL,
+                                    period,
+                                    timestamp
+                            );
+                            completions.addCompletion(achievementCompletion);
+                        });
+                return completions;
+            } catch (Exception e) {
+                log.error("Error loading achievement completions for client {}", container.getClient().getName(), e).submit();
+                return completions;
+            }
         });
     }
 
@@ -133,16 +144,21 @@ public class AchievementCompletionRepository {
 
     public CompletableFuture<AchievementCompletionsConcurrentHashMap> loadCompletionRanks(StatContainer statContainer, AchievementCompletionsConcurrentHashMap completions) {
         return database.getAsyncDslContext().executeAsync(context -> {
-                    Tables.GET_CLIENT_ACHIEVEMENT_RANKS(context.configuration(), statContainer.getClient().getId())
-                                    .forEach(achievementRank -> {
-                                        final String namespace = achievementRank.getNamespace();
-                                        final String keyName = achievementRank.getKeyname();
-                                        final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyName);
-                                        final Period period = getPeriod(achievementRank);
-                                        final int rank = Math.toIntExact(achievementRank.getRank());
-                                        completions.getCompletion(namespacedKey, StatFilterType.fromPeriod(period), period).orElseThrow().setCompletedRank(rank);
-                                    });
-                    return completions;
+            try {
+                Tables.GET_CLIENT_ACHIEVEMENT_RANKS(context.configuration(), statContainer.getClient().getId())
+                        .forEach(achievementRank -> {
+                            final String namespace = achievementRank.getNamespace();
+                            final String keyName = achievementRank.getKeyname();
+                            final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyName);
+                            final Period period = getPeriod(achievementRank);
+                            final int rank = Math.toIntExact(achievementRank.getRank());
+                            completions.getCompletion(namespacedKey, StatFilterType.fromPeriod(period), period).orElseThrow().setCompletedRank(rank);
+                        });
+                return completions;
+            } catch (Exception e) {
+                log.error("Error loading achievement completion ranks for client {}", statContainer.getClient().getName(), e).submit();
+                return completions;
+            }
         });
     }
 
@@ -159,24 +175,29 @@ public class AchievementCompletionRepository {
 
     public CompletableFuture<Void> updateTotalCompletions(ConcurrentMap<NamespacedKey, Integer> allMap, ConcurrentMap<Season, ConcurrentMap<NamespacedKey, Integer>> seasonMap, ConcurrentMap<Realm, ConcurrentMap<NamespacedKey, Integer>> realmMap) {
         return database.getAsyncDslContext().executeAsync(context -> {
-            Tables.GET_TOTAL_ACHIEVEMENT_COMPLETIONS(context.configuration())
-                    .forEach(achievementTotal -> {
-                        final String namespace = achievementTotal.getNamespace();
-                        final String keyName = achievementTotal.getKeyname();
-                        final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyName);
-                        final Period period = getPeriod(achievementTotal);
-                        final int total = Math.toIntExact(achievementTotal.getTotal());
-                        switch (period) {
-                            case null -> allMap.put(namespacedKey, total);
-                            case Season season ->
-                                    seasonMap.computeIfAbsent(season, (k) -> new ConcurrentHashMap<>()).put(namespacedKey, total);
-                            case Realm realm ->
-                                    realmMap.computeIfAbsent(realm, (k) -> new ConcurrentHashMap<>()).put(namespacedKey, total);
-                            default -> {
+            try {
+                Tables.GET_TOTAL_ACHIEVEMENT_COMPLETIONS(context.configuration())
+                        .forEach(achievementTotal -> {
+                            final String namespace = achievementTotal.getNamespace();
+                            final String keyName = achievementTotal.getKeyname();
+                            final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyName);
+                            final Period period = getPeriod(achievementTotal);
+                            final int total = Math.toIntExact(achievementTotal.getTotal());
+                            switch (period) {
+                                case null -> allMap.put(namespacedKey, total);
+                                case Season season ->
+                                        seasonMap.computeIfAbsent(season, (k) -> new ConcurrentHashMap<>()).put(namespacedKey, total);
+                                case Realm realm ->
+                                        realmMap.computeIfAbsent(realm, (k) -> new ConcurrentHashMap<>()).put(namespacedKey, total);
+                                default -> {
+                                }
                             }
-                        }
-                    });
-            return null;
+                        });
+                return null;
+            } catch (Exception e) {
+                log.error("Error loading total achievement completions", e).submit();
+                return null;
+            }
         });
     }
 
