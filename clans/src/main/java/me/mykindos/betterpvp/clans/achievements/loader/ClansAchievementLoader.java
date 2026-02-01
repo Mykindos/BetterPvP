@@ -31,7 +31,7 @@ public class ClansAchievementLoader extends AchievementLoader {
         loadSubCategories(subCategoryClasses);
 
         plugin.saveConfig();
-        log.error("Loaded {} categories for Core", count).submit();
+        log.info("Loaded {} categories for Clans", count).submit();
     }
 
     @Override
