@@ -129,12 +129,11 @@ AS $$
         acs.Season,
         acr.Realm
     FROM achievement_completions ac
-    JOIN achievement_completions_season acs
+    LEFT JOIN achievement_completions_season acs
         ON ac.Id = acs.Id
-    JOIN achievement_completions_realm acr
+    LEFT JOIN achievement_completions_realm acr
         ON ac.Id = acr.Id
     GROUP BY
-        ac.Id,
         ac.Namespace,
         ac.Keyname,
         acs.Season,
