@@ -36,7 +36,7 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
 
     private static final StatBuilder statBuilder = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(StatBuilder.class);
 
-    public ClanWrapperStat fromData (String statType, JSONObject data) {
+    public ClanWrapperStat fromData(String statType, JSONObject data) {
         ClanWrapperStat.ClanWrapperStatBuilder<?, ?> builder = builder();
         Preconditions.checkArgument(statType.equals(TYPE));
         builder.clanName(data.getString("clanName"));

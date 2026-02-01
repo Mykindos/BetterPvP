@@ -51,14 +51,24 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
 
 
     public CompletableFuture<Void> loadAchievementCompletionsAsync(Client client) {
-        return achievementCompletionRepository.loadForContainer(client.getStatContainer()).thenAccept(
-                completions -> {
-                    completions.forEach(completion -> {
-                        int total = getTotalCompletion(getObject(completion.getKey()).orElseThrow(), completion.getPeriod());
-                        completion.setTotalCompletions(total);
-                    });
-                    client.getStatContainer().getAchievementCompletions().fromOther(completions);
+        return achievementCompletionRepository.loadForContainer(client.getStatContainer())
+                .exceptionally(throwable -> {
+                    log.error("Failed to load achievement completions for {}", client.getName(), throwable).submit();
+                    return null;
                 }
+                ).thenAccept(
+                completions -> {
+                    try {
+                        completions.forEach(completion -> {
+                            int total = getTotalCompletion(getObject(completion.getKey()).orElseThrow(), completion.getPeriod());
+                            completion.setTotalCompletions(total);
+                        });
+                        client.getStatContainer().getAchievementCompletions().fromOther(completions);
+                    } catch (Exception e) {
+                        log.error("Failed to process loaded achievement completions for {}", client.getName(), e).submit();
+                    }
+                }
+
         );
     }
 
@@ -114,25 +124,30 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
                 totalSeasonCompletions,
                 totalRealmCompletions
         ).thenApply(n -> {
-            clientManager.getLoaded().forEach(client -> {
-                client.getStatContainer().getAchievementCompletions().getAllMap().forEach((key, completion) -> {
-                    int total = totalAllAchievementCompletions.get(key);
-                    completion.setTotalCompletions(total);
-                });
-                client.getStatContainer().getAchievementCompletions().getSeasonMap().forEach((period, map) -> {
-                    map.forEach((key, completion) -> {
-                        int total = totalSeasonCompletions.get(period).get(key);
+            try {
+                clientManager.getLoaded().forEach(client -> {
+                    client.getStatContainer().getAchievementCompletions().getAllMap().forEach((key, completion) -> {
+                        int total = totalAllAchievementCompletions.get(key);
                         completion.setTotalCompletions(total);
                     });
-                });
-                client.getStatContainer().getAchievementCompletions().getRealmMap().forEach((period, map) -> {
-                    map.forEach((key, completion) -> {
-                        int total = totalRealmCompletions.get(period).get(key);
-                        completion.setTotalCompletions(total);
+                    client.getStatContainer().getAchievementCompletions().getSeasonMap().forEach((period, map) -> {
+                        map.forEach((key, completion) -> {
+                            int total = totalSeasonCompletions.get(period).get(key);
+                            completion.setTotalCompletions(total);
+                        });
+                    });
+                    client.getStatContainer().getAchievementCompletions().getRealmMap().forEach((period, map) -> {
+                        map.forEach((key, completion) -> {
+                            int total = totalRealmCompletions.get(period).get(key);
+                            completion.setTotalCompletions(total);
+                        });
                     });
                 });
-            });
-            return null;
+                return null;
+            } catch (Exception e) {
+                log.error("Error updating achievement completion totals", e).submit();
+                return null;
+            }
         });
     }
 }
