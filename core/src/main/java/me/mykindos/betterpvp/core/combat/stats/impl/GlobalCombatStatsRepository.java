@@ -47,7 +47,7 @@ public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCom
             try {
                 GetCombatDataRecord combatRecord = GET_COMBAT_DATA(database.getDslContext().configuration(),
                         player.toString(),
-                        Core.getCurrentRealm())
+                        Core.getCurrentRealm().getId())
                         .getFirst();
 
                 if (combatRecord != null) {

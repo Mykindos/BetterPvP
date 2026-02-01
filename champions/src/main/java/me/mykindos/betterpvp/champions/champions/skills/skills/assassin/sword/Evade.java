@@ -242,9 +242,10 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
         handRaisedTime.put(player.getUniqueId(), System.currentTimeMillis());
+        return true;
     }
 
     @Override

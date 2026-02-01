@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.clans.FieldsInteractableStat;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -39,7 +41,7 @@ public class LootChest implements FieldsInteractable, Listener {
     }
 
     @Override
-    public boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
+    public boolean processInteraction(ClientManager clientManager, TerritoryInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
         if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.INTERACT)) {
             return false; // They didn't right-click the chest
         }
@@ -64,6 +66,8 @@ public class LootChest implements FieldsInteractable, Listener {
 
         // Block break particles
         event.getBlock().getWorld().playEffect(event.getBlock().getLocation(), Effect.STEP_SOUND, event.getBlock().getType().createBlockData());
+        FieldsInteractableStat stat = FieldsInteractableStat.builder().name(getName()).build();
+        clientManager.incrementStat(event.getPlayer(), stat, 1);
         return true;
     }
 

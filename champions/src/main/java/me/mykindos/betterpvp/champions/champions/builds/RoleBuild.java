@@ -9,8 +9,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -22,9 +24,13 @@ public class RoleBuild {
     private final int id;
 
     private boolean active;
+    @Nullable
     private BuildSkill swordSkill;
+    @Nullable
     private BuildSkill axeSkill;
+    @Nullable
     private BuildSkill passiveA, passiveB, global;
+    @Nullable
     private BuildSkill bow;
     private int points = 12;
 
@@ -40,25 +46,25 @@ public class RoleBuild {
         this.points -= points;
     }
 
-    public ArrayList<Skill> getActiveSkills() {
-        ArrayList<Skill> skills = new ArrayList<>();
+    public List<BuildSkill> getActiveSkills() {
+        ArrayList<BuildSkill> skills = new ArrayList<>();
         if (swordSkill != null) {
-            skills.add(swordSkill.getSkill());
+            skills.add(swordSkill);
         }
         if (axeSkill != null) {
-            skills.add(axeSkill.getSkill());
+            skills.add(axeSkill);
         }
         if (getBow() != null) {
-            skills.add(getBow().getSkill());
+            skills.add(getBow());
         }
         if (getPassiveA() != null) {
-            skills.add(getPassiveA().getSkill());
+            skills.add(getPassiveA());
         }
         if (getPassiveB() != null) {
-            skills.add(getPassiveB().getSkill());
+            skills.add(getPassiveB());
         }
         if (getGlobal() != null) {
-            skills.add(getGlobal().getSkill());
+            skills.add(getGlobal());
         }
         return skills;
     }
@@ -177,5 +183,16 @@ public class RoleBuild {
             }
         }
         return true;
+    }
+
+    public RoleBuild copy() {
+        RoleBuild other = new RoleBuild(clientId, clientUUID, role, id);
+        other.setSwordSkill(getSwordSkill() != null ? getSwordSkill().copy() : null);
+        other.setAxeSkill(getAxeSkill() != null ? getAxeSkill().copy() : null);
+        other.setBow(getBow() != null ? getBow().copy() : null);
+        other.setPassiveA(getPassiveA() != null ? getPassiveA().copy() : null);
+        other.setPassiveB(getPassiveB() != null ? getPassiveB().copy() : null);
+        other.setGlobal(getGlobal() != null ? getGlobal().copy() : null);
+        return other;
     }
 }

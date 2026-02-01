@@ -137,7 +137,7 @@ public class WebConfigLoader {
     @Nullable
     private String fetchConfigFromWeb(@NotNull String configName) {
         // Support directory structure (e.g., core/resourcepacks.yml, champions/skills/skills.yml)
-        String configUrl = baseUrl + Core.getCurrentServerName() + "/" + configName.replace('\\', '/') + ".yml";
+        String configUrl = baseUrl + Core.getCurrentRealm().getServer().getName() + "/" + configName.replace('\\', '/') + ".yml";
 
         CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
             try {
