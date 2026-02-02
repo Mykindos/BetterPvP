@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.core.EffectDurationStat;
-import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.Relation;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;

@@ -22,7 +22,7 @@ public class UndeadChestsAchievementLoader extends SingleSimpleAchievementConfig
 
     @Override
     public NamespacedKey getTypeKey() {
-        return AchievementCategories.GAME_FLAG_CAPTURES;
+        return AchievementCategories.EVENT_UNDEAD_CHESTS;
     }
 
     @Override
