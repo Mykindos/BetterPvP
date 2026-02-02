@@ -16,7 +16,7 @@ import org.bukkit.Material;
 @SubCategory(EventCategory.class)
 public class UndeadChestsCategory extends AchievementCategory {
     public UndeadChestsCategory() {
-        super(AchievementCategories.GAME_FLAG_CAPTURES);
+        super(AchievementCategories.EVENT_UNDEAD_CHESTS);
     }
 
 
