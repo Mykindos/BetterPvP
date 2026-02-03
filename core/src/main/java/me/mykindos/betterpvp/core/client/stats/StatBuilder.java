@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.server.Period;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,6 +61,16 @@ public class StatBuilder {
                 @Override
                 public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period object) {
                     return statContainer.getProperty(type, object, this);
+                }
+
+                /**
+                 * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+                 *
+                 * @return the type of stat
+                 */
+                @Override
+                public StatValueType getStatValueType() {
+                    return StatValueType.LONG;
                 }
 
                 @Override
