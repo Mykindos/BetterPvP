@@ -27,6 +27,23 @@ public interface IStat {
      */
     Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period);
 
+    //TODO override to do double and time formatting
+    /**
+     * Get the formatted stat value as a string
+     * @param statContainer the statContainer to source the value from
+     * @param type what type of period is being fetched from
+     * @param period The period being fetched from, must be {@link Realm} or {@link Season} if type is not ALL
+     * @return the formatted stat value
+     */
+    default String formattedStatValue(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
+        Long value = getStat(statContainer, type, period);
+        if (value == null) {
+            return "0";
+        }
+        return String.valueOf(value);
+    }
+
+
     /**
      * Get the name that is stored in the DB
      * @return
