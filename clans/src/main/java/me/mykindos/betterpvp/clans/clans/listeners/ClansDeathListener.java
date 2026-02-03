@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
@@ -76,7 +75,7 @@ public class ClansDeathListener extends ClanListener implements Listener {
 
         double dominance = handleKill(null, killedClan, killerClient, killerClan, true);
         clientManager.search().offline(victim).thenAccept(killedOptional -> {
-            killedOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_LOST, (long) (dominance * IStat.FP_MODIFIER)));
+            killedOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_LOST, dominance));
         });
     }
 
@@ -147,10 +146,10 @@ public class ClansDeathListener extends ClanListener implements Listener {
 
         double dominance = clanManager.applyDominance(killedClan, killerClan);
         if (killer != null) {
-            killer.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_GAINED, (long) (dominance * IStat.FP_MODIFIER));
+            killer.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_GAINED,  dominance);
         }
         if (killed != null) {
-            killed.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_LOST, (long) (dominance * IStat.FP_MODIFIER));
+            killed.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_LOST, dominance);
         }
         return dominance;
     }

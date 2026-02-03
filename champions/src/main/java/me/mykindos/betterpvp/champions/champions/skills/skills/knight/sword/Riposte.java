@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -133,7 +132,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
             double newHealth = getHealing(level);
             double actualHeal = UtilEntity.health(player, newHealth);
-            championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_RIPOSTE, (long) (actualHeal * IStat.FP_MODIFIER));
+            championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_RIPOSTE, actualHeal);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
             if (ent instanceof Player target) {

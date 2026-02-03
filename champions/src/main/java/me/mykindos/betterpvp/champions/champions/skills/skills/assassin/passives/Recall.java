@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -142,7 +141,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
         double heal = UtilPlayer.getMaxHealth(player) * getPercentHealthRecovered(level);
 
         double actualHeal = UtilEntity.health(player, heal);
-        championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_RECALL, (long) (actualHeal * IStat.FP_MODIFIER));
+        championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_RECALL, actualHeal);
 
         // Cues
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0F, 2.0F);
