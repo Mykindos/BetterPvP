@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -235,10 +234,10 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
             double actualHealth = UtilEntity.health(target, getFriendlyHealthRestoredOnHit(level));
 
             if (damagerContainer.getUniqueId().equals(targetContainer.getUniqueId())) {
-                damagerContainer.incrementStat(ClientStat.HEAL_SELF_BIOTIC_QUIVER, (long) (actualHealth * IStat.FP_MODIFIER));
+                damagerContainer.incrementStat(ClientStat.HEAL_SELF_BIOTIC_QUIVER,actualHealth);
             } else {
-                damagerContainer.incrementStat(ClientStat.HEAL_DEALT_BIOTIC_QUIVER, (long) (actualHealth * IStat.FP_MODIFIER));
-                targetContainer.incrementStat(ClientStat.HEAL_RECEIVED_BIOTIC_QUIVER, (long) (actualHealth * IStat.FP_MODIFIER));
+                damagerContainer.incrementStat(ClientStat.HEAL_DEALT_BIOTIC_QUIVER,actualHealth);
+                targetContainer.incrementStat(ClientStat.HEAL_RECEIVED_BIOTIC_QUIVER,actualHealth);
             }
 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);

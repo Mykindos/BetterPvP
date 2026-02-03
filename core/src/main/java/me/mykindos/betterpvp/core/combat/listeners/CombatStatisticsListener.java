@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.combat.listeners;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.DamageStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.Type;
@@ -66,7 +65,7 @@ public class CombatStatisticsListener implements Listener {
                 .damageCause(event.getCause());
 
         clientManager.incrementStat(damagee, builder.type(Type.COUNT).build(), 1);
-        clientManager.incrementStat(damagee, builder.type(Type.AMOUNT).build(), (long) (event.getDamage() * IStat.FP_MODIFIER));
+        clientManager.incrementStat(damagee, builder.type(Type.AMOUNT).build(), event.getDamage());
     }
     
     /**
@@ -82,7 +81,7 @@ public class CombatStatisticsListener implements Listener {
                 .damageCause(event.getCause());
 
         clientManager.incrementStat(damager, builder.type(Type.COUNT).build(), 1);
-        clientManager.incrementStat(damager, builder.type(Type.AMOUNT).build(), (long) (event.getDamage() * IStat.FP_MODIFIER));
+        clientManager.incrementStat(damager, builder.type(Type.AMOUNT).build(), event.getDamage());
     }
     
     /**

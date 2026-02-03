@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -143,7 +142,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
                 }
                 if (found) {
                     double actualHeal = UtilEntity.health(player, getHealing(level));
-                    championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_VITALITY_SPORES, (long) (actualHeal * IStat.FP_MODIFIER));
+                    championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_VITALITY_SPORES, actualHeal);
                     if (currentCharges.isEmpty()) {
                         sporeCharges.remove(target);
                     }

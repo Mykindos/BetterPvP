@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -90,11 +89,11 @@ public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu>
 
         final Duration timePlayed = Duration.of(timePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
 
-        final double dominanceGained = (double) dominanceGainedStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
-        final double dominanceLost = (double) dominanceLostStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
+        final double dominanceGained = dominanceGainedStat.getDoubleStat(statContainer, type, period);
+        final double dominanceLost = dominanceLostStat.getDoubleStat(statContainer, type, period);
         final double dominanceDelta = dominanceGained - dominanceLost;
 
-        final double clanExperience = (double) clanExperienceStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
+        final double clanExperience = clanExperienceStat.getDoubleStat(statContainer, type, period);
 
         final double energyDrop = clanEnergyDropStat.getStat(statContainer, type, period);
         final double energyCollected = clanEnergyCollectedStat.getStat(statContainer, type, period);

@@ -26,7 +26,7 @@ public class ClansStatListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onGainClanExperience(ClanAddExperienceEvent event) {
         final StatContainer container = clientManager.search().online(event.getPlayer()).getStatContainer();
-        container.incrementStat(ClientStat.CLANS_CLANS_EXPERIENCE, (long) (event.getExperience() * 1000L));
+        container.incrementStat(ClientStat.CLANS_CLANS_EXPERIENCE, event.getExperience());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

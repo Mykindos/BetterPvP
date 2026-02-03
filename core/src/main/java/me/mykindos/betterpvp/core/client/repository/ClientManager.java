@@ -474,6 +474,15 @@ public class ClientManager extends PlayerManager<Client> {
      * @param player the player
      * @param amount the amount to increment by
      */
+    public void incrementStat(Player player, IStat iStat, double amount) {
+        search().online(player).getStatContainer().incrementStat(iStat, amount);
+    }
+
+        /**
+         * Shortcut to increment the stat for a player
+         * @param player the player
+         * @param amount the amount to increment by
+         */
     public void incrementStat(Player player, IStat iStat, long amount) {
         search().online(player).getStatContainer().incrementStat(iStat, amount);
     }

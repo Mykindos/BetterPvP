@@ -27,6 +27,9 @@ public interface IStat {
      */
     Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period);
 
+    default Double getDoubleStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
+        return getStat(statContainer, type, period) == null ? null : getStat(statContainer, type, period) / (double) FP_MODIFIER;
+    }
     //TODO override to do double and time formatting
     /**
      * Get the formatted stat value as a string

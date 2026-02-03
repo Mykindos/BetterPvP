@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractClansStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
@@ -73,7 +72,7 @@ public class PillageClansStatButton extends ControlItem<IAbstractClansStatMenu> 
         final int pillagesAttacked = pillageAttackStat.getStat(statContainer, type, period).intValue();
         final int coresDestroy = coreDestroyStat.getStat(statContainer, type, period).intValue();
         final String winRate = UtilFormat.formatNumber(((double) pillagesAttacked / (coresDestroy == 0 ? 1 : coresDestroy) ) * 100, 2) + "%";
-        final double coreDamage = (double) coreDamageStat.getStat(statContainer, type, period) / IStat.FP_MODIFIER;
+        final double coreDamage = coreDamageStat.getDoubleStat(statContainer, type, period);
         final int cannonShots = cannonShotsStat.getStat(statContainer, type, period).intValue();
         final int cannonBlockDamage = cannonBlockDamageStat.getStat(statContainer, type, period).intValue();
 

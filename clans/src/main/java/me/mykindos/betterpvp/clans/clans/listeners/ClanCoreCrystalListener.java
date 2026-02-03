@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -88,7 +87,7 @@ public class ClanCoreCrystalListener extends ClanListener implements Listener {
         }
 
         core.setHealth(core.getHealth() - event.getDamage());
-        clientManager.incrementStat(damager, ClientStat.CLANS_CORE_DAMAGE, (long) (event.getDamage() * IStat.FP_MODIFIER));
+        clientManager.incrementStat(damager, ClientStat.CLANS_CORE_DAMAGE, event.getDamage());
         event.setDamage(-1); // Cancel damage application so we still get damage delay
         new SoundEffect(Sound.BLOCK_ANVIL_PLACE, 2f, 0.2f).play(event.getDamagee().getLocation());
         new SoundEffect(Sound.ENTITY_ALLAY_HURT, 1.6f, 0.4f).play(event.getDamagee().getLocation());
