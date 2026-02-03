@@ -2,13 +2,17 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.function.Predicate;
 public interface IStat {
@@ -30,7 +34,12 @@ public interface IStat {
     default Double getDoubleStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         return getStat(statContainer, type, period) == null ? null : getStat(statContainer, type, period) / (double) FP_MODIFIER;
     }
-    //TODO override to do double and time formatting
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     * @return the type of stat
+     */
+    StatValueType getStatValueType();
     /**
      * Get the formatted stat value as a string
      * @param statContainer the statContainer to source the value from
@@ -39,11 +48,11 @@ public interface IStat {
      * @return the formatted stat value
      */
     default String formattedStatValue(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
-        Long value = getStat(statContainer, type, period);
-        if (value == null) {
-            return "0";
-        }
-        return String.valueOf(value);
+        return switch (getStatValueType()) {
+            case DOUBLE -> String.valueOf(getDoubleStat(statContainer, type, period));
+            case DURATION -> UtilTime.humanReadableFormat(Duration.of(getStat(statContainer, type, period), ChronoUnit.MILLIS));
+            default -> String.valueOf(getStat(statContainer, type, period));
+        };
     }
 
 
