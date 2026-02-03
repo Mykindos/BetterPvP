@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.StatFormatterUtility;
+import me.mykindos.betterpvp.core.client.stats.display.general.GeneralStatListMenu;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -37,7 +39,7 @@ public class GenericStatButton extends ControlItem<IAbstractStatMenu> {
                 .displayName(Component.text("Generic Stats"))
                 .lore(getGenericStatsDescription())
                 .frameLore(true)
-                //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .action(ClickActions.ALL, Component.text("Show All Stats"))
                 .build();
     }
 
@@ -107,6 +109,7 @@ public class GenericStatButton extends ControlItem<IAbstractStatMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final IAbstractStatMenu gui = getGui();
-        //todo figure out how to show non-featured stats
+        new GeneralStatListMenu(gui.getClient(), gui, gui.getType(), gui.getPeriod(), gui.getRealmManager()).show(player);
+
     }
 }
