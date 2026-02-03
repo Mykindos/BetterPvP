@@ -41,7 +41,6 @@ public abstract class AbstractStatPagedMenu extends AbstractPagedGui<Item> imple
     private Period period;
 
 
-    @SuppressWarnings("unchecked")
     protected AbstractStatPagedMenu(@NotNull Client client, @Nullable Windowed previous, StatFilterType type, @Nullable Period period, RealmManager realmManager) {
         super(9, 6, false, new Structure(
                             "# # # # # # # S R",
@@ -61,7 +60,7 @@ public abstract class AbstractStatPagedMenu extends AbstractPagedGui<Item> imple
                             IAbstractStatMenu.getSeasonContexts(realmManager)))
                     .addIngredient('R', new RealmFilterButton(
                             IAbstractStatMenu.getRealmContext(type, period),
-                            IAbstractStatMenu.getRealmContexts(IAbstractStatMenu.getSeasonContext(type, period) == null ? null : Objects.requireNonNull(IAbstractStatMenu.getSeasonContext(type, period)).getSeason(), realmManager)))
+                            IAbstractStatMenu.getRealmContexts(Objects.requireNonNull(IAbstractStatMenu.getSeasonContext(type, period)).getSeason(), realmManager)))
         );
         if (!(getItem(7, 0) instanceof SeasonFilterButton seasonButton)) throw new IllegalStateException("Item in this slot must be a SeasonFilterButton");
         this.seasonFilterButton = seasonButton;
