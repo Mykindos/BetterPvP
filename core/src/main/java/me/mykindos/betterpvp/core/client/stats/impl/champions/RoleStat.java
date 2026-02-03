@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -44,6 +45,16 @@ public class RoleStat implements IBuildableStat {
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period object) {
         return statContainer.getProperty(type, object, this);
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public StatValueType getStatValueType() {
+        return action == Action.TIME_PLAYED ? StatValueType.DURATION : StatValueType.LONG;
     }
 
     @Override

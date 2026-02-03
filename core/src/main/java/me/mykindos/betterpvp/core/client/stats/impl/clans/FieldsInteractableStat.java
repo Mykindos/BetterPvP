@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,16 @@ public class FieldsInteractableStat implements IBuildableStat {
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         return statContainer.getProperty(type, period, this);
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public StatValueType getStatValueType() {
+        return StatValueType.LONG;
     }
 
     @Override

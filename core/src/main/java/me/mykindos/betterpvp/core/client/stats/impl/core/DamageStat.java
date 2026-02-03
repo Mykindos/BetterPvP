@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.Relation;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.Type;
 import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseRegistry;
@@ -62,6 +63,16 @@ public class DamageStat implements IBuildableStat {
             return getFilteredStat(statContainer, type, period, this::filterDamageCause);
         }
         return statContainer.getProperty(type, period, this);
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public StatValueType getStatValueType() {
+        return StatValueType.DOUBLE;
     }
 
     @Override

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
@@ -125,6 +126,25 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         }
         //all are specified, do stat "normally"
         return getFilteredStat(statContainer, type, period, this::filterAllStat);
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public StatValueType getStatValueType() {
+        switch (action) {
+            case CONTROL_POINT_TIME_CAPTURING:
+            case CONTROL_POINT_TIME_CONTESTED:
+            case FLAG_CARRIER_TIME:
+            case GAME_TIME_PLAYED:
+            case SPECTATE_TIME:
+                return StatValueType.DURATION;
+            default:
+                return StatValueType.LONG;
+        }
     }
 
     @Override

@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.skill.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -62,6 +63,16 @@ public class ChampionsSkillStat implements IBuildableStat {
             return getFilteredStat(statContainer, type, object, this::filterSkill);
         }
         return statContainer.getProperty(type, object, this);
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public StatValueType getStatValueType() {
+        return action == Action.TIME_PLAYED ? StatValueType.DURATION : StatValueType.LONG;
     }
 
     private boolean filterAction(Map.Entry<IStat, Long> entry) {

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.server.Period;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +33,16 @@ public class CompositeStat implements IStat {
        return stats.stream()
                .mapToLong(stat -> stat.getStat(statContainer, type, period))
                .sum();
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public StatValueType getStatValueType() {
+        return stats.stream().findAny().orElseThrow().getStatValueType();
     }
 
     /**
