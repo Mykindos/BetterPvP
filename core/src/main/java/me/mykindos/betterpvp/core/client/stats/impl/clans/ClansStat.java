@@ -57,8 +57,13 @@ public abstract class ClansStat implements IBuildableStat {
     public String getQualifiedName() {
         final StringBuilder stringBuilder = new StringBuilder();
         if (!Strings.isNullOrEmpty(clanName)) {
-            stringBuilder.append(clanName)
-                    .append(" ");
+            if (clanName.equals(NO_CLAN_NAME)) {
+                stringBuilder.append("No Clan").append(" ");
+            } else {
+                stringBuilder.append(clanName)
+                        .append(" ");
+            }
+
         }
         return stringBuilder.append(getSimpleName()).toString();
     }

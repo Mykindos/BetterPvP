@@ -134,7 +134,7 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
      * @return the type of stat
      */
     @Override
-    public StatValueType getStatValueType() {
+    public @NotNull StatValueType getStatValueType() {
         switch (action) {
             case CONTROL_POINT_TIME_CAPTURING:
             case CONTROL_POINT_TIME_CONTESTED:

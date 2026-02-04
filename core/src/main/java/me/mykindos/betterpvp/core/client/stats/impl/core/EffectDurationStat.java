@@ -66,7 +66,7 @@ public class EffectDurationStat implements IBuildableStat {
      * @return the type of stat
      */
     @Override
-    public StatValueType getStatValueType() {
+    public @NotNull StatValueType getStatValueType() {
         return StatValueType.DURATION;
     }
 

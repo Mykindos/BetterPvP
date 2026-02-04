@@ -39,6 +39,7 @@ public interface IStat {
      * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
      * @return the type of stat
      */
+    @NotNull
     StatValueType getStatValueType();
     /**
      * Get the formatted stat value as a string

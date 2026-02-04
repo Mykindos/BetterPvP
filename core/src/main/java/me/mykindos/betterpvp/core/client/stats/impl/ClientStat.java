@@ -26,6 +26,9 @@ public enum ClientStat implements IClientStat {
 
     TIME_PLAYED(StatValueType.DURATION, "Time Played", Material.CLOCK, 0, false, "Time spent playing"),
 
+    //items
+    ANVIL_SWING(StatValueType.LONG, "Anvil Swings", "Number of times you Swung on an anvil"),
+
     //champions
     HEAL_DEALT_DEFENSIVE_AURA(StatValueType.DOUBLE, "Defensive Aura Heal", "Healing done using defensive aura"),
     HEAL_RECEIVED_DEFENSIVE_AURA(StatValueType.DOUBLE, "Defensive Aura Receive Heal", "Healing received from defensive Aura"),
