@@ -41,7 +41,7 @@ public class CompositeStat implements IStat {
      * @return the type of stat
      */
     @Override
-    public StatValueType getStatValueType() {
+    public @NotNull StatValueType getStatValueType() {
         return stats.stream().findAny().orElseThrow().getStatValueType();
     }
 

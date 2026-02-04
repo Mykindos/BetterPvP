@@ -69,7 +69,7 @@ public class StatBuilder {
                  * @return the type of stat
                  */
                 @Override
-                public StatValueType getStatValueType() {
+                public @NotNull StatValueType getStatValueType() {
                     return StatValueType.LONG;
                 }
 

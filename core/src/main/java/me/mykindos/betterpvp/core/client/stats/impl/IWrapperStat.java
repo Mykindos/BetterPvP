@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.impl;
 
 import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A class used to tag stats that wrap other stats
@@ -18,7 +19,7 @@ public interface IWrapperStat extends IStat {
      * @return the type of stat
      */
     @Override
-    default StatValueType getStatValueType() {
+    default @NotNull StatValueType getStatValueType() {
         return getWrappedStat().getStatValueType();
     }
 }

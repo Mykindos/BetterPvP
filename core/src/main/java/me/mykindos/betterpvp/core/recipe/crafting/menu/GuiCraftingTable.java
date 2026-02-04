@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.recipe.crafting.menu;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -17,8 +18,8 @@ import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 public class GuiCraftingTable extends AbstractCraftingGui implements Windowed {
 
     @Inject
-    private GuiCraftingTable(CraftingManager craftingManager, ItemFactory itemFactory) {
-        super(craftingManager, itemFactory,9, 5);
+    private GuiCraftingTable(CraftingManager craftingManager, ItemFactory itemFactory, ClientManager clientManager) {
+        super(craftingManager, itemFactory,clientManager, 9, 5);
         
         applyStructure(new Structure(
                 "000000000",

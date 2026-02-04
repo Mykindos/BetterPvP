@@ -5,8 +5,8 @@ import me.mykindos.betterpvp.core.anvil.AnvilRecipeRegistry;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockData;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
@@ -21,11 +21,13 @@ public class AnvilDataSerializer implements SmartBlockDataSerializer<AnvilData> 
     private final StorageBlockDataSerializer<StorageBlockData> storageSerializer;
     private final ItemFactory itemFactory;
     private final AnvilRecipeRegistry anvilRecipeRegistry;
+    private final ClientManager clientManager;
 
-    public AnvilDataSerializer(ItemFactory itemFactory, AnvilRecipeRegistry anvilRecipeRegistry) {
+    public AnvilDataSerializer(ItemFactory itemFactory, AnvilRecipeRegistry anvilRecipeRegistry, ClientManager clientManager) {
         this.storageSerializer = new StorageBlockDataSerializer<>(StorageBlockData.class, itemFactory, StorageBlockData::new);
         this.itemFactory = itemFactory;
         this.anvilRecipeRegistry = anvilRecipeRegistry;
+        this.clientManager = clientManager;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class AnvilDataSerializer implements SmartBlockDataSerializer<AnvilData> 
             int hammerSwings = dis.readInt();
 
             // Create AnvilData with the new component structure
-            AnvilData anvilData = new AnvilData(itemFactory, anvilRecipeRegistry);
+            AnvilData anvilData = new AnvilData(itemFactory, anvilRecipeRegistry, clientManager);
             
             // Set the anvil items in the item manager
             anvilData.getItemManager().getAnvilItems().setContent(anvilItems.getContent());

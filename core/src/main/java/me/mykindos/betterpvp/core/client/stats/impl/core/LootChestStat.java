@@ -68,7 +68,7 @@ public class LootChestStat implements IBuildableStat {
      * @return the type of stat
      */
     @Override
-    public StatValueType getStatValueType() {
+    public @NotNull StatValueType getStatValueType() {
         return StatValueType.LONG;
     }
 

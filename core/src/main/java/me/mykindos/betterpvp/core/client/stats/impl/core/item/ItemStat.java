@@ -1,12 +1,10 @@
-package me.mykindos.betterpvp.core.client.stats.impl.events;
+package me.mykindos.betterpvp.core.client.stats.impl.core.item;
 
 import com.google.common.base.Preconditions;
-import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
@@ -14,7 +12,10 @@ import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Season;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -22,26 +23,24 @@ import org.json.JSONObject;
 import java.util.Map;
 
 @Builder
-@Getter
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class BossStat implements IBuildableStat {
-    public static final String TYPE = "EVENT_BOSS";
+public class ItemStat implements IBuildableStat {
+    public static final String TYPE = "ITEM_STAT";
 
-    public static BossStat fromData(String type, JSONObject data) {
-        BossStat.BossStatBuilder builder = BossStat.builder();
-        Preconditions.checkArgument(type.equals(TYPE));
+    public static ItemStat fromData(String statType, JSONObject data) {
+        ItemStat.ItemStatBuilder builder = ItemStat.builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.itemStack(ItemStack.deserialize(data.getJSONObject("itemStack").toMap()));
         builder.action(Action.valueOf(data.getString("action")));
-        builder.bossName(data.getString("bossName"));
         return builder.build();
     }
 
-    @NotNull
-    private Action action;
-
     @Nullable
-    private String bossName;
+    //TODO generic without an item
+    private ItemStack itemStack;
+    private Action action;
 
     /**
      * Copies the stat represented by this statName into this object
@@ -53,21 +52,30 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
-        BossStat other = fromData(statType, data);
+        ItemStat other = fromData(statType, data);
+        this.itemStack = other.itemStack;
         this.action = other.action;
-        this.bossName = other.bossName;
         return this;
     }
 
-    private boolean filterActionStat(Map.Entry<IStat, Long> entry) {
-        BossStat other = (BossStat) entry.getKey();
+    private boolean filterDamageCause(Map.Entry<IStat, Long> entry) {
+        ItemStat other = (ItemStat) entry.getKey();
         return action.equals(other.action);
     }
 
+    /**
+     * Get the stat represented by this object from the statContainer.
+     * period object must be the correct type as defined by the type
+     *
+     * @param statContainer the statContainer to source the value from
+     * @param type          what type of period is being fetched from
+     * @param period        The period being fetched from, must be {@link Realm} or {@link Season} if type is not ALL
+     * @return the stat value represented by this stat
+     */
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
-        if (Strings.isNullOrEmpty(bossName)) {
-            return getFilteredStat(statContainer, type, period, this::filterActionStat);
+        if (itemStack == null) {
+            return getFilteredStat(statContainer, type, period, this::filterDamageCause);
         }
         return statContainer.getProperty(type, period, this);
     }
@@ -82,6 +90,11 @@ public class BossStat implements IBuildableStat {
         return StatValueType.LONG;
     }
 
+    /**
+     * Get the name that is stored in the DB
+     *
+     * @return
+     */
     @Override
     public @NotNull String getStatType() {
         return TYPE;
@@ -95,8 +108,8 @@ public class BossStat implements IBuildableStat {
     @Override
     public @Nullable JSONObject getJsonData() {
         return new JSONObject()
-                .putOnce("action", action.name())
-                .putOnce("bossName", bossName);
+                .putOpt("itemStack", itemStack == null ? null : itemStack.serialize())
+                .putOnce("action", action.name());
     }
 
     /**
@@ -108,7 +121,7 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public String getSimpleName() {
-        return UtilFormat.cleanString(action.name());
+        return "Item " + action.name();
     }
 
     /**
@@ -121,12 +134,10 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public String getQualifiedName() {
-        StringBuilder stringBuilder = new StringBuilder();
-        if (!Strings.isNullOrEmpty(bossName)) {
-            stringBuilder.append(bossName);
-            stringBuilder.append(" ");
+        if (itemStack != null) {
+            return UtilItem.getItemIdentifier(itemStack) + " " + getSimpleName();
         }
-        return stringBuilder.append(getSimpleName()).toString();
+        return getSimpleName();
     }
 
     /**
@@ -136,15 +147,20 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public boolean isSavable() {
-        return !Strings.isNullOrEmpty(bossName);
+        return itemStack != null;
     }
 
+    /**
+     * Whether this stat contains this otherSTat
+     *
+     * @param otherStat
+     * @return
+     */
     @Override
     public boolean containsStat(IStat otherStat) {
-        if (!(otherStat instanceof BossStat other)) return false;
-        if (!action.equals(other.action)) return false;
-        if (!Strings.isNullOrEmpty(bossName) && !bossName.equals(other.bossName)) return false;
-        return true;
+        if (!(otherStat instanceof ItemStat other)) return false;
+        if ((action != other.action)) return false;
+        return (itemStack != null && itemStack.equals(other.itemStack));
     }
 
     /**
@@ -155,10 +171,20 @@ public class BossStat implements IBuildableStat {
      */
     @Override
     public @NotNull IStat getGenericStat() {
-        return BossStat.builder().action(action).build();
+        return ItemStat.builder()
+                .action(this.action)
+                .build();
     }
 
+
     public enum Action {
-        KILL,
+        CRAFT,
+        REFORGE,
+        ATTUNE,
+        ANVIL_PRIMARY,
+        ANVIL_SECONDARY,
     }
+
+
+
 }
