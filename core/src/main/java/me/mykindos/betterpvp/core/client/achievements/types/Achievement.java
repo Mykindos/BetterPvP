@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
@@ -257,6 +258,16 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         return (long) (getPercentComplete(statContainer, type, period) * IStat.FP_MODIFIER);
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public @NotNull StatValueType getStatValueType() {
+        return StatValueType.DOUBLE;
     }
 
     @Override

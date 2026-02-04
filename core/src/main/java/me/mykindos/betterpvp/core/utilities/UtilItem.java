@@ -307,13 +307,13 @@ public class UtilItem {
      * @param itemStack
      * @return
      */
+    //todo update this to use new item framework properly
     public static String getItemIdentifier(ItemStack itemStack) {
         PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
         if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
             return dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
         }
-        return itemStack.getType()
-                    + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
+        return itemStack.getType().toString();
 
     }
 

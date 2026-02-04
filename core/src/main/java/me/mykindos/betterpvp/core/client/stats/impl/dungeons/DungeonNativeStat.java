@@ -83,7 +83,7 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
      * @return the type of stat
      */
     @Override
-    public StatValueType getStatValueType() {
+    public @NotNull StatValueType getStatValueType() {
         return StatValueType.LONG;
     }
 

@@ -38,7 +38,7 @@ public class GenericStat implements IStat {
      * @return the type of stat
      */
     @Override
-    public StatValueType getStatValueType() {
+    public @NotNull StatValueType getStatValueType() {
         return stat.getStatValueType();
     }
 
