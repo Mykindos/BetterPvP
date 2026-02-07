@@ -313,8 +313,8 @@ command:
     requiredRank: PLAYER
 
 tab:
-  title: Welcome to Mineplex Clans!
-  website: https://mineplex.com
+  title: Welcome to BetterPvP Clans!
+  website: https://betterpvp.net
   server: Clans-1
   shop: /store
 energy:

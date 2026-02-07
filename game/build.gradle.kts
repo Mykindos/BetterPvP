@@ -13,7 +13,6 @@ dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
     compileOnly(libs.mapper)
-    compileOnly(libs.mineplex)
 
     compileOnly(libs.libsdisguises)
     compileOnly(project(":core"))

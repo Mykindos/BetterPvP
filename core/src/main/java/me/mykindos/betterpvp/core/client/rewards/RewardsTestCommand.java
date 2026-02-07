@@ -6,8 +6,8 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.framework.mineplex.MineplexMessage;
-import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageSentEvent;
+import me.mykindos.betterpvp.core.framework.server.ServerMessage;
+import me.mykindos.betterpvp.core.framework.server.events.ServerMessageSentEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -47,7 +47,7 @@ public class RewardsTestCommand extends Command {
         ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
         CompletableFuture.runAsync(() -> {
             if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-                UtilServer.callEvent(new MineplexMessageSentEvent("BetterPvP", MineplexMessage.builder()
+                UtilServer.callEvent(new ServerMessageSentEvent("BetterPvP", ServerMessage.builder()
                         .channel("ChampionsWinsReward").message("TEST").metadata("uuid", player.getUniqueId().toString()).build()));
             } else {
                 RewardBox rewardBox = clientSQLLayer.getRewardBox(client);

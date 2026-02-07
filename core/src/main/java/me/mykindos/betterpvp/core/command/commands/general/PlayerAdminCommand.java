@@ -8,9 +8,9 @@ import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.framework.mineplex.MineplexMessage;
-import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageReceivedEvent;
-import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageSentEvent;
+import me.mykindos.betterpvp.core.framework.server.ServerMessage;
+import me.mykindos.betterpvp.core.framework.server.events.ServerMessageReceivedEvent;
+import me.mykindos.betterpvp.core.framework.server.events.ServerMessageSentEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -56,12 +56,12 @@ public class PlayerAdminCommand extends Command {
             }
         }
 
-        MineplexMessage build = MineplexMessage.builder().channel("AdminMessage").message(String.join(" ", args))
+        ServerMessage build = ServerMessage.builder().channel("AdminMessage").message(String.join(" ", args))
                 .metadata("sender", player.getUniqueId().toString()).build();
         if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-            UtilServer.callEventAsync(core, new MineplexMessageSentEvent("BetterPvP", build));
+            UtilServer.callEventAsync(core, new ServerMessageSentEvent("BetterPvP", build));
         } else {
-            UtilServer.callEventAsync(core, new MineplexMessageReceivedEvent("BetterPvP", build));
+            UtilServer.callEventAsync(core, new ServerMessageReceivedEvent("BetterPvP", build));
         }
 
 

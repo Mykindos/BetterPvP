@@ -175,7 +175,7 @@ public class ClientCommand extends Command {
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
                             targetClient.setRank(targetRank);
-                            if (targetRank.equals(Rank.MINEPLEX)) {
+                            if (targetRank.equals(Rank.ADMIN)) {
                                 targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.NONE.name());
                             } else {
                                 targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
@@ -249,7 +249,7 @@ public class ClientCommand extends Command {
 
                 if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
                     targetClient.setRank(targetRank);
-                    if (targetRank.equals(Rank.MINEPLEX)) {
+                    if (targetRank.equals(Rank.ADMIN)) {
                         targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.NONE.name());
                     } else {
                         targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());

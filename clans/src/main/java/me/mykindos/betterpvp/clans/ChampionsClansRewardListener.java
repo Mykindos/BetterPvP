@@ -6,7 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
-import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageReceivedEvent;
+import me.mykindos.betterpvp.core.framework.server.events.ServerMessageReceivedEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -37,7 +37,7 @@ public class ChampionsClansRewardListener implements Listener {
     }
 
     @EventHandler
-    public void onChampionsClansReward(MineplexMessageReceivedEvent event) {
+    public void onChampionsClansReward(ServerMessageReceivedEvent event) {
         if (!event.getMessage().getChannel().equalsIgnoreCase("ChampionsWinsReward")) return;
         if (!event.getMessage().getMetadata().containsKey("uuid")) return;
 

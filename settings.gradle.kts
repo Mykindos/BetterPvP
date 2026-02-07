@@ -16,7 +16,6 @@ if (File("./private/").exists()) {
     include(":private:dungeons")
     include(":private:store")
     include(":private:compatability")
-    include(":private:mineplex")
 }
 
 pluginManagement {
@@ -46,7 +45,6 @@ dependencyResolutionManagement {
             version("paper", "1.21.11-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-SNAPSHOT")
             version("jackson", "2.17.2")
-            version("mineplex", "1.21.4")
             version("sidebar", "2.4.1")
             version("mockbukkit", "4.72.8")
             version("junit", "5.13.0-M2")
@@ -61,9 +59,6 @@ dependencyResolutionManagement {
             library("jooq-codegen", "org.jooq", "jooq-codegen").versionRef("jooq")
             library("jooq-meta", "org.jooq", "jooq-meta").versionRef("jooq")
             library("jooq-meta-extensions", "org.jooq", "jooq-meta-extensions").versionRef("jooq")
-
-            // Library - Mineplex SDK
-            library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
 
             // Library - reflection mapper
             library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.3")

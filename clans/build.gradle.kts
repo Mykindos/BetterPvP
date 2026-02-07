@@ -20,7 +20,6 @@ dependencies {
     compileOnly(project(":progression"))
     compileOnly(project(":champions"))
     compileOnly(project(":shops"))
-    compileOnly(libs.mineplex)
     compileOnly(libs.packetevents)
     compileOnly(libs.modelengine)
 
