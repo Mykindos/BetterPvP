@@ -25,6 +25,8 @@ core:
   exceptions:
     discord-webhook: ''
   salt: ''
+  resourcepack:
+    enabled: true
 pvp:
   enableOldPvP: true
   hitboxExpansion: 0.05

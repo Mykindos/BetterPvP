@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -30,6 +31,9 @@ public class ResourcePackListener implements Listener {
     private static final Title TITLE = Title.title(Component.text("Applying resource pack", NamedTextColor.GREEN, TextDecoration.BOLD),
             Component.text("Please wait...", NamedTextColor.GRAY), TIME);
 
+    @Config(path = "core.resourcepack.enabled", defaultValue = "true")
+    private boolean enabled;
+
 
     @Inject
     public ResourcePackListener(ResourcePackHandler resourcePackHandler) {
@@ -38,6 +42,7 @@ public class ResourcePackListener implements Listener {
 
     @EventHandler
     public void onClientLogin(ClientJoinEvent event) {
+        if (!enabled) return;
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
             Player player = event.getPlayer();
             ResourcePack mainPack = resourcePackHandler.getResourcePack("main").join();
@@ -52,6 +57,7 @@ public class ResourcePackListener implements Listener {
 
     @EventHandler
     public void onTexturepackStatus(PlayerResourcePackStatusEvent event) {
+        if (!enabled) return;
 
         ResourcePack mainPack = resourcePackHandler.getResourcePack("main").join();
         if (mainPack == null) return;
@@ -68,6 +74,7 @@ public class ResourcePackListener implements Listener {
 
     @EventHandler
     public void onMoveWhileLoading(PlayerMoveEvent event) {
+        if (!enabled) return;
         if (event.getPlayer().getResourcePackStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
             event.setCancelled(true);
         }
@@ -75,6 +82,7 @@ public class ResourcePackListener implements Listener {
 
     @UpdateEvent(delay = 300)
     public void sendResourcePackTitle() {
+        if (!enabled) return;
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getResourcePackStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
 
