@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageModifier;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class WaterDamageAbility extends AbstractInteraction implements Listener {
+public class WaterDamageAbility extends AbstractInteraction implements DisplayedInteraction, Listener {
 
     @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
@@ -35,10 +37,20 @@ public class WaterDamageAbility extends AbstractInteraction implements Listener 
     private double bonusDamage;
 
     public WaterDamageAbility(Champions champions, ItemFactory itemFactory, BaseItem heldItem) {
-        super("Water Damage", "Increases damage dealt by melee attacks while in water by a flat amount.");
+        super("water_damage");
         this.itemFactory = itemFactory;
         this.heldItem = heldItem;
         Bukkit.getPluginManager().registerEvents(this, champions);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Water Damage");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Increases damage dealt by melee attacks while in water by a flat amount.");
     }
 
     @Override

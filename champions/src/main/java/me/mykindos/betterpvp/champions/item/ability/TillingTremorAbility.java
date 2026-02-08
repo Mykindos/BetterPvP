@@ -7,6 +7,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +42,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class TillingTremorAbility extends CooldownInteraction {
+public class TillingTremorAbility extends CooldownInteraction implements DisplayedInteraction {
 
     private double cooldown;
     private double damage;
@@ -50,10 +52,18 @@ public class TillingTremorAbility extends CooldownInteraction {
 
     @Inject
     public TillingTremorAbility(CooldownManager cooldownManager, WorldBlockHandler worldBlockHandler) {
-        super("Tilling Tremor",
-              "Harvest crops in a small radius. Enemies in the area will be damaged and knocked back.",
-              cooldownManager);
+        super("tilling_tremor", cooldownManager);
         this.worldBlockHandler = worldBlockHandler;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Tilling Tremor");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Harvest crops in a small radius. Enemies in the area will be damaged and knocked back.");
     }
 
     @Override

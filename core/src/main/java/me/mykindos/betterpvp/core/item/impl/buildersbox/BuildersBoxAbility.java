@@ -8,6 +8,7 @@ import com.ticxo.modelengine.api.entity.Dummy;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.loot.item.DroppedItemLoot;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -43,17 +45,26 @@ import java.util.function.Supplier;
 /**
  * Creates a delayed item explosion.
  */
-public class BuildersBoxAbility extends AbstractInteraction {
+public class BuildersBoxAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private final Supplier<LootTable> lootTableSupplier;
     private final String source;
 
     public BuildersBoxAbility(Supplier<LootTable> lootTableSupplier, String source) {
-        super("Open",
-              "Unseal the box to release a trove of building items.");
+        super("open_builders_box");
         this.lootTableSupplier = lootTableSupplier;
         this.source = source;
         this.setConsumesItem(true);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Open");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Unseal the box to release a trove of building items.");
     }
 
     @Override

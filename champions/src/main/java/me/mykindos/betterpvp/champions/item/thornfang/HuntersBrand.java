@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageModifier;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,13 +32,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class HuntersBrand extends AbstractInteraction implements Listener {
+public class HuntersBrand extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     private double poisonBonusDamage;
     private double resetCounterTimeoutSeconds;
@@ -50,14 +53,23 @@ public class HuntersBrand extends AbstractInteraction implements Listener {
     private transient final WeakHashMap<Player, ResetTrackingData> resetTracking = new WeakHashMap<>();
 
     protected HuntersBrand(Champions champions, ItemFactory itemFactory, EffectManager effectManager, Thornfang thornfang) {
-        super("Hunter's Brand",
-                "Land 2 consecutive Needlegrasp resets on the same target to trigger a frenzy state. Also deals bonus damage to poisoned enemies.");
+        super("hunters_brand");
         this.champions = champions;
         this.itemFactory = itemFactory;
         this.effectManager = effectManager;
         this.thornfang = thornfang;
         Bukkit.getPluginManager().registerEvents(this, champions);
         UtilServer.runTaskTimer(champions, this::tick, 0, 1);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Hunter's Brand");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Land 2 consecutive Needlegrasp resets on the same target to trigger a frenzy state. Also deals bonus damage to poisoned enemies.");
     }
 
     @Override
@@ -91,6 +103,9 @@ public class HuntersBrand extends AbstractInteraction implements Listener {
      * Tracks consecutive resets on the same target.
      */
     public void onNeedlegraspReset(Player player, LivingEntity target) {
+        final Optional<ItemInstance> heldItemOpt = itemFactory.fromItemStack(player.getEquipment().getItemInMainHand());
+        if (heldItemOpt.isEmpty() || heldItemOpt.get().getBaseItem() != thornfang) return;
+
         UUID targetUuid = target.getUniqueId();
 
         ResetTrackingData data = resetTracking.computeIfAbsent(player, k -> new ResetTrackingData());

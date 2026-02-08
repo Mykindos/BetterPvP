@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.supplycrate.item;
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -28,20 +29,31 @@ import java.util.function.Function;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.SMALL_CAPS;
 
-public class DeployCrateAbility extends AbstractInteraction {
+public class DeployCrateAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private final SupplyCrateController controller;
     private final SupplyCrateType type;
+    private final String locationDescriber;
     private final Function<Client, Location> locationSupplier;
     private final boolean announce;
 
     DeployCrateAbility(SupplyCrateController controller, SupplyCrateType type, String locationDescriber, Function<Client, Location> locationSupplier, boolean announce) {
-        super("Deploy",
-                "Order a " + type.getDisplayName() + " at " + locationDescriber + ".");
+        super("deploy_crate");
         this.controller = controller;
         this.type = type;
+        this.locationDescriber = locationDescriber;
         this.locationSupplier = locationSupplier;
         this.announce = announce;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Deploy");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Order a " + type.getDisplayName() + " at " + locationDescriber + ".");
     }
 
     @Override

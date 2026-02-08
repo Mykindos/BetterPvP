@@ -14,6 +14,14 @@ import org.jetbrains.annotations.Nullable;
 public class InteractionState {
 
     /**
+     * The root node that started this chain.
+     * Used to track cooldowns per-root rather than per-chain.
+     */
+    @Setter
+    @Nullable
+    private InteractionChainNode rootNode;
+
+    /**
      * The current node in the chain (null if at root level).
      */
     @Setter
@@ -38,6 +46,7 @@ public class InteractionState {
     private final InteractionContext context;
 
     public InteractionState() {
+        this.rootNode = null;
         this.currentNode = null;
         this.inputCounter = 0;
         this.lastInteractionTime = System.currentTimeMillis();
@@ -66,11 +75,13 @@ public class InteractionState {
 
     /**
      * Reset the state to the root level.
+     * This resets the context for a new chain (clears all data and reinitializes chain start time).
      */
     public void reset() {
+        this.rootNode = null;
         this.currentNode = null;
         this.inputCounter = 0;
-        this.context.clear();
+        this.context.reset();
     }
 
     /**
@@ -91,11 +102,25 @@ public class InteractionState {
         if (currentNode == null) {
             return false;
         }
-        long timeout = currentNode.getTimeoutMillis();
+        long timeout = currentNode.getTimeoutMillis(context);
         if (timeout <= 0) {
             return false;
         }
         return System.currentTimeMillis() - lastInteractionTime > timeout;
+    }
+
+    /**
+     * Check if the minimum delay has passed since the last interaction.
+     * This is used to prevent inputs from being processed too quickly.
+     *
+     * @param minimumDelayMillis the minimum delay required in milliseconds
+     * @return true if the minimum delay has passed or if no delay is required
+     */
+    public boolean hasMinimumDelayPassed(long minimumDelayMillis) {
+        if (minimumDelayMillis <= 0) {
+            return true;
+        }
+        return System.currentTimeMillis() - lastInteractionTime >= minimumDelayMillis;
     }
 
     /**
@@ -114,7 +139,7 @@ public class InteractionState {
         if (currentNode == null) {
             return -1;
         }
-        long timeout = currentNode.getTimeoutMillis();
+        long timeout = currentNode.getTimeoutMillis(context);
         if (timeout <= 0) {
             return -1;
         }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class RegenerationAbility extends CooldownInteraction {
+public class RegenerationAbility extends CooldownInteraction implements DisplayedInteraction {
 
     @EqualsAndHashCode.Include
     private double duration;
@@ -38,10 +39,18 @@ public class RegenerationAbility extends CooldownInteraction {
 
     @Inject
     public RegenerationAbility(EffectManager effectManager, CooldownManager cooldownManager) {
-        super("Regeneration",
-                "Gain a small regeneration effect for a short duration.",
-                cooldownManager);
+        super("regeneration", cooldownManager);
         this.effectManager = effectManager;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Regeneration");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Gain a small regeneration effect for a short duration.");
     }
 
     @Override

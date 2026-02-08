@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -36,7 +38,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class MagnetismAbility extends AbstractInteraction {
+public class MagnetismAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private double pullRange;
     private double pullFov;
@@ -49,7 +51,7 @@ public class MagnetismAbility extends AbstractInteraction {
 
     @Inject
     public MagnetismAbility(Champions champions, EnergyService energyService) {
-        super("Magnetism", "Spawn a cone of particles in front of you that pulls entities inwards.");
+        super("magnetism");
         this.champions = champions;
         this.energyService = energyService;
 
@@ -57,6 +59,16 @@ public class MagnetismAbility extends AbstractInteraction {
         this.pullRange = 10.0;
         this.pullFov = 80.3;
         this.energyPerTick = 2.0;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Magnetism");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Spawn a cone of particles in front of you that pulls entities inwards.");
     }
 
     @Override

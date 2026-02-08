@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,7 +45,7 @@ import java.util.WeakHashMap;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class Needlegrasp extends CooldownInteraction implements Listener {
+public class Needlegrasp extends CooldownInteraction implements Listener, DisplayedInteraction {
 
     private double cooldown;
     private double damage;
@@ -62,14 +64,22 @@ public class Needlegrasp extends CooldownInteraction implements Listener {
     private transient final WeakHashMap<Player, PullState> activePulls = new WeakHashMap<>();
 
     protected Needlegrasp(Champions champions, CooldownManager cooldownManager, HuntersBrand huntersBrand) {
-        super("Needlegrasp",
-                "Throw a vine that pulls you and an enemy toward each other. Hit them with a melee attack to reset your cooldown.",
-                cooldownManager);
+        super("needlegrasp", cooldownManager);
         this.champions = champions;
         this.cooldownManager = cooldownManager;
         this.huntersBrand = huntersBrand;
         Bukkit.getPluginManager().registerEvents(this, champions);
         UtilServer.runTaskTimer(champions, this::tick, 0, 1);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Needlegrasp");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Throw a vine that pulls you and an enemy toward each other. Hit them with a melee attack to reset your cooldown.");
     }
 
     @Override

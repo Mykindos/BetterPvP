@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -41,7 +43,7 @@ import java.util.WeakHashMap;
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Getter
 @Setter
-public class NectarOfDecay extends CooldownInteraction implements Listener {
+public class NectarOfDecay extends CooldownInteraction implements Listener, DisplayedInteraction {
 
     private double cooldown;
     private double poisonSeconds;
@@ -62,12 +64,20 @@ public class NectarOfDecay extends CooldownInteraction implements Listener {
 
     @Inject
     private NectarOfDecay(Champions champions, EffectManager effectManager, CooldownManager cooldownManager, EffectManager effectManager1) {
-        super("Nectar of Decay",
-                "Unleash a toxic blossom that bursts into a spreading poison cloud, siphoning health from enemies to restore your own.",
-                cooldownManager);
+        super("nectar_of_decay", cooldownManager);
         this.plugin = champions;
         this.effectManager = effectManager1;
         UtilServer.runTaskTimer(champions, this::processProjectiles, 0, 1);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Nectar of Decay");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Unleash a toxic blossom that bursts into a spreading poison cloud, siphoning health from enemies to restore your own.");
     }
 
     @Override

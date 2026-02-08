@@ -4,10 +4,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,14 +24,23 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class EnhancedMiningAbility extends AbstractInteraction {
+public class EnhancedMiningAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private double miningSpeed;
 
     public EnhancedMiningAbility() {
-        super("Enhanced Mining",
-              "Grants enhanced mining speed for stone-based blocks. Works exactly like a pickaxe.");
+        super("enhanced_mining");
         this.miningSpeed = 30.0; // Default value, will be overridden by config
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Enhanced Mining");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Grants enhanced mining speed for stone-based blocks. Works exactly like a pickaxe.");
     }
 
     @Override

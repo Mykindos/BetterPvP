@@ -2,10 +2,14 @@ package me.mykindos.betterpvp.core.interaction.chain;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.interaction.AbilityDisplay;
 import me.mykindos.betterpvp.core.interaction.Interaction;
-import me.mykindos.betterpvp.core.interaction.RootInteraction;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.interaction.followup.InteractionFollowUps;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInput;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
+import me.mykindos.betterpvp.core.interaction.timing.InputCount;
+import me.mykindos.betterpvp.core.interaction.timing.Timing;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,17 +22,21 @@ import java.util.Optional;
  * A node in an interaction chain tree.
  * Each node contains an interaction and can have children triggered by different inputs.
  * <p>
- * Root nodes store a {@link RootInteraction} which provides the display name and description
- * for the chain. Non-root nodes store only an {@link Interaction}.
+ * Nodes can optionally have display info ({@link AbilityDisplay}) for rendering in item lore.
+ * Hidden nodes (no display info) are not shown in lore but still execute normally.
  */
 @Getter
 public class InteractionChainNode {
 
+    private static long nodeIdCounter = 0;
+
+    private final long id = ++nodeIdCounter;
     private final InteractionInput triggerInput;
     private final Interaction interaction;
-    private final RootInteraction rootInteraction;
-    private final long timeoutMillis;
-    private final int requiredInputCount;
+    private final @Nullable AbilityDisplay displayInfo;
+    private final Timing timeout;
+    private final Timing minimumDelay;
+    private final InputCount requiredInputCount;
     private final List<InteractionChainNode> children;
     private InteractionChainNode parent;
 
@@ -36,61 +44,103 @@ public class InteractionChainNode {
     private InteractionFollowUps followUps;
 
     /**
-     * Create a new root chain node with display metadata.
-     *
-     * @param triggerInput       the input that triggers this node
-     * @param rootInteraction    the root interaction containing name, description, and interaction
-     * @param timeoutMillis      the timeout in milliseconds before the chain resets
-     * @param requiredInputCount the number of inputs required to trigger (e.g., 3 for triple-click)
-     */
-    public InteractionChainNode(@NotNull InteractionInput triggerInput, @NotNull RootInteraction rootInteraction,
-                                 long timeoutMillis, int requiredInputCount) {
-        this.triggerInput = triggerInput;
-        this.rootInteraction = rootInteraction;
-        this.interaction = rootInteraction.interaction();
-        this.timeoutMillis = timeoutMillis;
-        this.requiredInputCount = requiredInputCount;
-        this.children = new ArrayList<>();
-    }
-
-    /**
-     * Create a new non-root chain node.
+     * Create a node with full timing control.
      *
      * @param triggerInput       the input that triggers this node
      * @param interaction        the interaction to execute
-     * @param timeoutMillis      the timeout in milliseconds before the chain resets
-     * @param requiredInputCount the number of inputs required to trigger (e.g., 3 for triple-click)
+     * @param displayInfo        the display info for lore (null for hidden nodes)
+     * @param timeout            the timeout before the chain resets
+     * @param minimumDelay       the minimum delay before this node can be triggered
+     * @param requiredInputCount the number of inputs required to trigger
      */
-    public InteractionChainNode(@NotNull InteractionInput triggerInput, @NotNull Interaction interaction,
-                                 long timeoutMillis, int requiredInputCount) {
+    public InteractionChainNode(@NotNull InteractionInput triggerInput,
+                                 @NotNull Interaction interaction,
+                                 @Nullable AbilityDisplay displayInfo,
+                                 @NotNull Timing timeout,
+                                 @NotNull Timing minimumDelay,
+                                 @NotNull InputCount requiredInputCount) {
         this.triggerInput = triggerInput;
         this.interaction = interaction;
-        this.rootInteraction = null;
-        this.timeoutMillis = timeoutMillis;
+        this.displayInfo = displayInfo;
+        this.timeout = timeout;
+        this.minimumDelay = minimumDelay;
         this.requiredInputCount = requiredInputCount;
         this.children = new ArrayList<>();
     }
 
     /**
-     * Create a new non-root chain node with single input requirement.
+     * Create a node with timeout only (no delay, single input).
      *
-     * @param triggerInput  the input that triggers this node
-     * @param interaction   the interaction to execute
-     * @param timeoutMillis the timeout in milliseconds
+     * @param triggerInput the input that triggers this node
+     * @param interaction  the interaction to execute
+     * @param displayInfo  the display info for lore (null for hidden nodes)
+     * @param timeout      the timeout before the chain resets
      */
-    public InteractionChainNode(@NotNull InteractionInput triggerInput, @NotNull Interaction interaction,
-                                 long timeoutMillis) {
-        this(triggerInput, interaction, timeoutMillis, 1);
+    public InteractionChainNode(@NotNull InteractionInput triggerInput,
+                                 @NotNull Interaction interaction,
+                                 @Nullable AbilityDisplay displayInfo,
+                                 @NotNull Timing timeout) {
+        this(triggerInput, interaction, displayInfo, timeout, Timing.ZERO, InputCount.ONE);
     }
 
     /**
-     * Create a root node with no timeout.
+     * Create a hidden node with full timing control.
      *
-     * @param triggerInput    the input that triggers this node
-     * @param rootInteraction the root interaction containing name, description, and interaction
+     * @param triggerInput       the input that triggers this node
+     * @param interaction        the interaction to execute
+     * @param timeout            the timeout before the chain resets
+     * @param minimumDelay       the minimum delay before this node can be triggered
+     * @param requiredInputCount the number of inputs required to trigger
      */
-    public InteractionChainNode(@NotNull InteractionInput triggerInput, @NotNull RootInteraction rootInteraction) {
-        this(triggerInput, rootInteraction, 0, 1);
+    public InteractionChainNode(@NotNull InteractionInput triggerInput,
+                                 @NotNull Interaction interaction,
+                                 @NotNull Timing timeout,
+                                 @NotNull Timing minimumDelay,
+                                 @NotNull InputCount requiredInputCount) {
+        this(triggerInput, interaction, null, timeout, minimumDelay, requiredInputCount);
+    }
+
+    /**
+     * Create a hidden node with timeout only (no delay, single input).
+     *
+     * @param triggerInput the input that triggers this node
+     * @param interaction  the interaction to execute
+     * @param timeout      the timeout before the chain resets
+     */
+    public InteractionChainNode(@NotNull InteractionInput triggerInput,
+                                 @NotNull Interaction interaction,
+                                 @NotNull Timing timeout) {
+        this(triggerInput, interaction, null, timeout, Timing.ZERO, InputCount.ONE);
+    }
+
+    /**
+     * Get the current timeout in milliseconds.
+     *
+     * @param context the interaction context (may be null)
+     * @return the timeout in milliseconds
+     */
+    public long getTimeoutMillis(@Nullable InteractionContext context) {
+        return timeout.getMillis(context);
+    }
+
+    /**
+     * Get the current minimum delay in milliseconds.
+     *
+     * @param context the interaction context (may be null)
+     * @return the minimum delay in milliseconds
+     */
+    public long getMinimumDelayMillis(@Nullable InteractionContext context) {
+        return minimumDelay.getMillis(context);
+    }
+
+    /**
+     * Get the current required input count.
+     *
+     * @param context the interaction context (may be null)
+     * @return the number of inputs required to trigger
+     */
+    public int getRequiredInputCount(@Nullable InteractionContext context) {
+        return requiredInputCount.get(context);
     }
 
     /**
@@ -114,14 +164,34 @@ public class InteractionChainNode {
 
     /**
      * Find a child node that matches the given input.
+     * <p>
+     * If the input is SHIFT_LEFT_CLICK or SHIFT_RIGHT_CLICK and no child exists for that input,
+     * this method will fall back to LEFT_CLICK or RIGHT_CLICK respectively for QoL.
      *
      * @param input the input to match
      * @return the matching child, if any
      */
     public Optional<InteractionChainNode> findChild(@NotNull InteractionInput input) {
-        return children.stream()
-                .filter(child -> child.getTriggerInput().equals(input))
+        Optional<InteractionChainNode> child = children.stream()
+                .filter(c -> c.getTriggerInput().equals(input))
                 .findFirst();
+
+        if (child.isPresent()) {
+            return child;
+        }
+
+        // Fallback: SHIFT variants fall back to non-SHIFT if not explicitly defined
+        if (input == InteractionInputs.SHIFT_LEFT_CLICK) {
+            return children.stream()
+                    .filter(c -> c.getTriggerInput().equals(InteractionInputs.LEFT_CLICK))
+                    .findFirst();
+        } else if (input == InteractionInputs.SHIFT_RIGHT_CLICK) {
+            return children.stream()
+                    .filter(c -> c.getTriggerInput().equals(InteractionInputs.RIGHT_CLICK))
+                    .findFirst();
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -134,41 +204,41 @@ public class InteractionChainNode {
     }
 
     /**
-     * Check if this is a root node (has a RootInteraction).
+     * Check if this is a root node (has no parent).
      *
      * @return true if this is a root node
      */
     public boolean isRoot() {
-        return rootInteraction != null;
+        return parent == null;
     }
 
     /**
-     * Get the display name for this root node.
+     * Check if this node should be displayed in lore.
      *
-     * @return the display name, or null if this is not a root node
+     * @return true if this node has display info
      */
-    @Nullable
-    public String getDisplayName() {
-        return rootInteraction != null ? rootInteraction.name() : null;
-    }
-
-    /**
-     * Get the description for this root node.
-     *
-     * @return the description, or null if this is not a root node
-     */
-    @Nullable
-    public String getDescription() {
-        return rootInteraction != null ? rootInteraction.description() : null;
+    public boolean hasDisplay() {
+        return displayInfo != null;
     }
 
     /**
      * Check if this node requires multiple inputs to trigger.
      *
+     * @param context the interaction context (may be null)
      * @return true if multiple inputs are required
      */
-    public boolean requiresMultipleInputs() {
-        return requiredInputCount > 1;
+    public boolean requiresMultipleInputs(@Nullable InteractionContext context) {
+        return requiredInputCount.requiresMultiple(context);
+    }
+
+    /**
+     * Check if this node has a minimum delay requirement.
+     *
+     * @param context the interaction context (may be null)
+     * @return true if a minimum delay is required
+     */
+    public boolean hasMinimumDelay(@Nullable InteractionContext context) {
+        return !minimumDelay.isZero() && minimumDelay.getMillis(context) > 0;
     }
 
     /**

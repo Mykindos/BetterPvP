@@ -16,11 +16,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -60,7 +59,7 @@ public class ItemInstance implements Item {
     private final @NotNull BaseItem baseItem;
     private final @NotNull ItemStack itemStack;
     private final @NotNull ComponentSerializationRegistry serializationRegistry;
-    private final @NotNull ImmutableMap<Class<?>, ItemComponent> components;
+    private final @NotNull ImmutableMap<@NotNull Class<?>, @NotNull ItemComponent> components;
     private final ItemInstanceView instanceView;
 
     ItemInstance(@NotNull BaseItem baseItem, @NotNull ItemStack itemStack, @NotNull ComponentSerializationRegistry serializationRegistry) {
@@ -159,8 +158,13 @@ public class ItemInstance implements Item {
     }
 
     @Override
-    public @NotNull Set<ItemComponent> getComponents() {
-        return new HashSet<>(components.values());
+    public <T extends ItemComponent> Optional<T> getComponent(@NotNull Class<T> componentClass) {
+        return Optional.ofNullable(componentClass.cast(components.get(componentClass)));
+    }
+
+    @Override
+    public @NotNull Collection<@NotNull ItemComponent> getComponents() {
+        return components.values();
     }
 
     @Override

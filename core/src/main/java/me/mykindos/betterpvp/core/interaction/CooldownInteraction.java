@@ -1,14 +1,17 @@
 package me.mykindos.betterpvp.core.interaction;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.cooldowns.Cooldown;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 
 /**
  * An interaction that supports cooldowns and energy costs.
@@ -17,11 +20,16 @@ import org.jetbrains.annotations.Nullable;
 public abstract class CooldownInteraction extends AbstractInteraction {
 
     protected final CooldownManager cooldownManager;
+    protected final String cooldownName;
 
-    protected CooldownInteraction(@NotNull String name, @NotNull String description,
-                                  @NotNull CooldownManager cooldownManager) {
-        super(name, description);
+    protected CooldownInteraction(@NotNull String name, @NotNull String cooldownName, @NotNull CooldownManager cooldownManager) {
+        super(name);
+        this.cooldownName = cooldownName;
         this.cooldownManager = cooldownManager;
+    }
+
+    protected CooldownInteraction(@NotNull String name, @NotNull CooldownManager cooldownManager) {
+        this(name, UtilFormat.cleanString(name), cooldownManager);
     }
 
     /**
@@ -83,25 +91,34 @@ public abstract class CooldownInteraction extends AbstractInteraction {
         double cooldown = getCooldown();
         if (cooldown > 0 && actor.isPlayer()) {
             Player player = (Player) actor.getEntity();
-            if (!cooldownManager.use(player, getName(), cooldown, informCooldown(), true, false, showActionBarCooldown())) {
+            if (cooldownManager.hasCooldown(player, this.cooldownName)) {
+                final Cooldown cd = cooldownManager.getObject(player.getUniqueId()).orElseThrow().get(this.cooldownName);
+                if (cd.isInform()) cooldownManager.informCooldown(player, this.cooldownName);
                 return new InteractionResult.Fail(InteractionResult.FailReason.COOLDOWN);
-            }
-        }
-
-        // Use energy after cooldown check passes
-        if (energyCost > 0) {
-            if (!actor.useEnergy(getName(), energyCost, informEnergy())) {
-                // Rollback cooldown if energy use fails
-                if (cooldown > 0 && actor.isPlayer()) {
-                    Player player = (Player) actor.getEntity();
-                    cooldownManager.removeCooldown(player, getName(), true);
-                }
-                return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
             }
         }
 
         // Execute the actual interaction
         return doCooldownExecute(actor, context, itemInstance, itemStack);
+    }
+
+    @Override
+    public void then(@NotNull InteractionActor actor, @NotNull InteractionContext context, @NotNull InteractionResult result, @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        super.then(actor, context, result, itemInstance, itemStack);
+        if (result.isSuccess() && actor.isPlayer()) {
+            Player player = (Player) actor.getEntity();
+
+            final double cooldown = getCooldown();
+            if (cooldown > 0) {
+                cooldownManager.use(player, this.cooldownName, cooldown, informCooldown(), true, false, showActionBarCooldown());
+            }
+
+            // Use energy after cooldown check passes
+            final double energyCost = getEnergyCost();
+            if (energyCost > 0) {
+                actor.useEnergy(this.cooldownName, energyCost, informEnergy());
+            }
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.interaction.Interaction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -165,6 +166,23 @@ public final class InteractionFollowUps {
         public InteractionFollowUps build() {
             Preconditions.checkState(!onComplete.isEmpty() || !onFail.isEmpty() || !always.isEmpty(),
                     "At least one follow-up interaction must be defined");
+            return new InteractionFollowUps(
+                    new ArrayList<>(onComplete),
+                    new ArrayList<>(onFail),
+                    new ArrayList<>(always)
+            );
+        }
+
+        /**
+         * Build the immutable {@link InteractionFollowUps} instance, or return null if empty.
+         * Useful for merging scenarios where no follow-ups may be defined.
+         *
+         * @return the built follow-ups, or null if no follow-ups were added
+         */
+        public @Nullable InteractionFollowUps buildOrNull() {
+            if (onComplete.isEmpty() && onFail.isEmpty() && always.isEmpty()) {
+                return null;
+            }
             return new InteractionFollowUps(
                     new ArrayList<>(onComplete),
                     new ArrayList<>(onFail),

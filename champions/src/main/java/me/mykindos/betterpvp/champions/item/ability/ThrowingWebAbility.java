@@ -9,12 +9,14 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -31,7 +33,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class ThrowingWebAbility extends CooldownInteraction implements ThrowableListener {
+public class ThrowingWebAbility extends CooldownInteraction implements ThrowableListener, DisplayedInteraction {
 
     @EqualsAndHashCode.Include
     private double duration;
@@ -44,11 +46,19 @@ public class ThrowingWebAbility extends CooldownInteraction implements Throwable
     private final WorldBlockHandler blockHandler;
 
     public ThrowingWebAbility(ChampionsManager championsManager, WorldBlockHandler blockHandler, CooldownManager cooldownManager) {
-        super("Throwing Web",
-                "Throw a web that temporarily places cobwebs on impact. This can be used to trap enemies.",
-                cooldownManager);
+        super("throwing_web", cooldownManager);
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Throwing Web");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Throw a web that temporarily places cobwebs on impact. This can be used to trap enemies.");
     }
 
     @Override

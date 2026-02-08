@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class EnergyBoost extends CooldownInteraction {
+public class EnergyBoost extends CooldownInteraction implements DisplayedInteraction {
 
     @EqualsAndHashCode.Include
     private double energy;
@@ -35,11 +36,19 @@ public class EnergyBoost extends CooldownInteraction {
     private final SoundEffect soundEffect;
 
     public EnergyBoost(EnergyService energyService, CooldownManager cooldownManager, SoundEffect soundEffect) {
-        super("Energy Boost",
-                "Instantly grants a flat energy boost when used.",
-                cooldownManager);
+        super("energy_boost", cooldownManager);
         this.energyService = energyService;
         this.soundEffect = soundEffect;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Energy Boost");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Instantly grants a flat energy boost when used.");
     }
 
     @Override

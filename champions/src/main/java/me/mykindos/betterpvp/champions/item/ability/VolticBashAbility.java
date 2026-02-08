@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
@@ -30,6 +31,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,7 +49,7 @@ import java.util.WeakHashMap;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class VolticBashAbility extends AbstractInteraction {
+public class VolticBashAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private double velocity;
     private int maxChargeTicks;
@@ -68,19 +70,28 @@ public class VolticBashAbility extends AbstractInteraction {
 
     @Inject
     private VolticBashAbility(Champions champions, ClientManager clientManager, EffectManager effectManager, EnergyService energyService) {
-        super("Voltic Bash",
-                "Charge up and dash forward, dealing damage to entities in your path. Higher charge increases damage and velocity.");
+        super("voltic_bash");
         this.champions = champions;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
         this.energyService = energyService;
-        
+
         // Default values, will be overridden by config
         this.velocity = 0.8;
         this.maxChargeTicks = 60;
         this.energyOnCollide = 25.0;
         this.chargeDamage = 7.0;
         this.energyPerTick = 1.0;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Voltic Bash");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Charge up and dash forward, dealing damage to entities in your path. Higher charge increases damage and velocity.");
     }
 
     @Override

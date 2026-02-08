@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.interaction.condition;
 
-import me.mykindos.betterpvp.core.interaction.context.MetaKey;
-
 /**
  * Built-in interaction conditions.
  */
@@ -102,20 +100,6 @@ public final class InteractionConditions {
                 actor.hasEnergy(amount)
                         ? ConditionResult.success()
                         : ConditionResult.fail("Not enough energy.");
-    }
-
-    /**
-     * Create a condition that requires a context value to be present.
-     *
-     * @param key the meta key
-     * @param <T> the value type
-     * @return a context value condition
-     */
-    public static <T> InteractionCondition hasContextValue(MetaKey<T> key) {
-        return (actor, context) ->
-                context.has(key)
-                        ? ConditionResult.success()
-                        : ConditionResult.fail("Missing context value: " + key.getName());
     }
 
     /**

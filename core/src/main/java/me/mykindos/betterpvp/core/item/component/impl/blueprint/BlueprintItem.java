@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
@@ -77,10 +78,20 @@ public class BlueprintItem extends BaseItem {
                 .append(Component.text(rarity.getName()).color(rarity.getColor()));
     }
 
-    private static class BlueprintAbility extends AbstractInteraction {
+    private static class BlueprintAbility extends AbstractInteraction implements DisplayedInteraction {
 
         public BlueprintAbility() {
-            super("Add Blueprint", "Use this on a Workbench to add the blueprint");
+            super("add_blueprint");
+        }
+
+        @Override
+        public @NotNull Component getDisplayName() {
+            return Component.text("Add Blueprint");
+        }
+
+        @Override
+        public @NotNull Component getDisplayDescription() {
+            return Component.text("Use this on a Workbench to add the blueprint");
         }
 
         @Override

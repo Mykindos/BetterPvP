@@ -22,25 +22,19 @@ import java.util.List;
 public abstract class AbstractInteraction implements Interaction {
 
     protected final String name;
-    protected final String description;
     protected final List<InteractionCondition> conditions;
 
     protected boolean consumesItem = false;
 
-    protected AbstractInteraction(@NotNull String name, @NotNull String description) {
+    protected AbstractInteraction(@NotNull String name) {
         Preconditions.checkArgument(!name.isEmpty(), "Name cannot be empty");
-        Preconditions.checkArgument(!description.isEmpty(), "Description cannot be empty");
         this.name = name;
-        this.description = description;
         this.conditions = new ArrayList<>();
     }
 
-    protected AbstractInteraction(@NotNull String name, @NotNull String description,
-                                  @NotNull List<InteractionCondition> conditions) {
+    protected AbstractInteraction(@NotNull String name, @NotNull List<InteractionCondition> conditions) {
         Preconditions.checkArgument(!name.isEmpty(), "Name cannot be empty");
-        Preconditions.checkArgument(!description.isEmpty(), "Description cannot be empty");
         this.name = name;
-        this.description = description;
         this.conditions = new ArrayList<>(conditions);
     }
 
@@ -53,7 +47,7 @@ public abstract class AbstractInteraction implements Interaction {
     public @NotNull InteractionResult execute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
                                                @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         // Check all conditions
-        for (InteractionCondition condition : conditions) {
+        for (InteractionCondition condition : getConditions()) {
             ConditionResult result = condition.check(actor, context);
             if (!result.passed()) {
                 return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS, result.failureMessage());

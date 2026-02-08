@@ -5,7 +5,10 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.function.IntFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilServer {
@@ -86,6 +89,23 @@ public class UtilServer {
 
     public static void runTaskTimerAsync(BPvPPlugin plugin, Runnable task, long delay, long period) {
         runTaskTimer(plugin, true, task, delay, period);
+    }
+
+    public static void repeatTask(BPvPPlugin plugin, IntFunction<Boolean> runnable, int count, long period) {
+        new BukkitRunnable() {
+            int run = 0;
+            @Override
+            public void run() {
+                if (runnable.apply(run)) {
+                    run++;
+                    if (run >= count) {
+                        this.cancel();
+                    }
+                } else {
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0, period);
     }
 
 }

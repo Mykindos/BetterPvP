@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -42,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-public class PortableClassAbility extends AbstractInteraction implements Listener {
+public class PortableClassAbility extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     @Setter
     private double castTime;
@@ -52,13 +54,22 @@ public class PortableClassAbility extends AbstractInteraction implements Listene
     private final WeakHashMap<Player, Data> tasks = new WeakHashMap<>();
 
     public PortableClassAbility(Role role) {
-        super("Equip",
-                "Instantly swaps to the " + role.getName() + " class. Does not work in combat. Armor stored on this item will be equipped.");
+        super("equip");
         this.role = role;
         this.champions = JavaPlugin.getPlugin(Champions.class);
         this.roleManager = champions.getInjector().getInstance(RoleManager.class);
         Bukkit.getPluginManager().registerEvents(this, champions);
         UtilServer.runTaskTimer(champions, this::onTick, 0L, 1L);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Equip");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Instantly swaps to the " + role.getName() + " class. Does not work in combat. Armor stored on this item will be equipped.");
     }
 
     @Override

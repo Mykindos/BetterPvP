@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import net.kyori.adventure.text.Component;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -35,7 +37,7 @@ import java.util.UUID;
 @Setter
 @Singleton
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
-public class CannonPlaceAbility extends CooldownInteraction {
+public class CannonPlaceAbility extends CooldownInteraction implements DisplayedInteraction {
 
     @EqualsAndHashCode.Include
     private double cooldown;
@@ -44,10 +46,19 @@ public class CannonPlaceAbility extends CooldownInteraction {
 
     @Inject
     private CannonPlaceAbility(Core core, CannonManager cannonManager, CooldownManager cooldownManager) {
-        super("Cannon Placement",
-                "Place a cannon that can be loaded with cannonballs", cooldownManager);
+        super("cannon_placement", cooldownManager);
         this.cannonManager = cannonManager;
         this.cooldown = cannonManager.getSpawnCooldown();
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Cannon Placement");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Place a cannon that can be loaded with cannonballs");
     }
 
     @Override

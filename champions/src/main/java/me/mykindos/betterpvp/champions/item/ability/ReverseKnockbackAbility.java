@@ -8,12 +8,14 @@ import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class ReverseKnockbackAbility extends AbstractInteraction implements Listener {
+public class ReverseKnockbackAbility extends AbstractInteraction implements DisplayedInteraction, Listener {
 
     @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
@@ -36,12 +38,22 @@ public class ReverseKnockbackAbility extends AbstractInteraction implements List
     private boolean bypassMinimum;
 
     public ReverseKnockbackAbility(Champions champions, ItemFactory itemFactory, BaseItem heldItem) {
-        super("Magnetic Pull", "Enemies hit by this weapon will be pulled inwards instead of pushed away.");
+        super("magnetic_pull");
         this.itemFactory = itemFactory;
         this.heldItem = heldItem;
         this.knockbackMultiplier = -1.0; // Default is to reverse knockback
         this.bypassMinimum = true;       // Default is to bypass minimum knockback
         Bukkit.getPluginManager().registerEvents(this, champions);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Magnetic Pull");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Enemies hit by this weapon will be pulled inwards instead of pushed away.");
     }
 
     @Override

@@ -7,6 +7,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -26,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class GatorStrokeAbility extends AbstractInteraction {
+public class GatorStrokeAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private double velocityStrength;
     private double energyPerTick;
@@ -39,7 +41,7 @@ public class GatorStrokeAbility extends AbstractInteraction {
 
     @Inject
     public GatorStrokeAbility(Champions champions, EnergyService energyService) {
-        super("Gator Stroke", "Propels the user at high speed. This ability only works in water.");
+        super("gator_stroke");
         this.champions = champions;
         this.energyService = energyService;
 
@@ -47,6 +49,16 @@ public class GatorStrokeAbility extends AbstractInteraction {
         this.velocityStrength = 0.7;
         this.energyPerTick = 1.0;
         this.skimmingEnergyMultiplier = 3.0;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Gator Stroke");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Propels the user at high speed. This ability only works in water.");
     }
 
     @Override

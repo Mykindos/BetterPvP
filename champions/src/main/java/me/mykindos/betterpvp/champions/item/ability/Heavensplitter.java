@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.projectile.BoomerangProjectile;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,7 +32,7 @@ import java.util.Map;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Heavensplitter extends AbstractInteraction implements Listener {
+public class Heavensplitter extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     @EqualsAndHashCode.Include
     private float hitbox; // Hitbox radius for collision detection
@@ -47,12 +49,21 @@ public class Heavensplitter extends AbstractInteraction implements Listener {
     private final Map<Player, BoomerangProjectile> projectiles = new HashMap<>();
 
     public Heavensplitter(BaseItem heldItem, ItemFactory itemFactory) {
-        super("Heavensplitter",
-                "Throw the weapon, summon the power of Thor, and deal damage to enemies in its path.");
+        super("heavensplitter");
         this.heldItem = heldItem;
         this.itemFactory = itemFactory;
         Bukkit.getPluginManager().registerEvents(this, JavaPlugin.getPlugin(Champions.class));
         UtilServer.runTaskTimer(JavaPlugin.getPlugin(Champions.class), this::tickProjectiles, 0L, 1L);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Heavensplitter");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Throw the weapon, summon the power of Thor, and deal damage to enemies in its path.");
     }
 
     @Override

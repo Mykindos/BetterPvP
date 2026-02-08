@@ -9,12 +9,14 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class HyperRushAbility extends CooldownInteraction {
+public class HyperRushAbility extends CooldownInteraction implements DisplayedInteraction {
 
     private double cooldown;
     private int speedAmplifier;
@@ -35,15 +37,23 @@ public class HyperRushAbility extends CooldownInteraction {
 
     @Inject
     public HyperRushAbility(Champions champions, CooldownManager cooldownManager, EffectManager effectManager) {
-        super("Hyper Rush",
-                "Gain a burst of speed at a high level for a short duration.",
-                cooldownManager);
+        super("hyper_rush", cooldownManager);
         this.effectManager = effectManager;
 
         // Default values, will be overridden by config
         this.cooldown = 16.0;
         this.speedAmplifier = 3;
         this.durationTicks = 160; // 8 seconds (160 ticks)
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Hyper Rush");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Gain a burst of speed at a high level for a short duration.");
     }
 
     @Override

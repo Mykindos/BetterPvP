@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.projectile.VineSnareProjectile;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
@@ -17,6 +18,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -36,7 +38,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class VineSnareAbility extends AbstractInteraction implements Listener {
+public class VineSnareAbility extends AbstractInteraction implements DisplayedInteraction, Listener {
 
     @EqualsAndHashCode.Exclude
     private final BaseItem baseItem;
@@ -53,12 +55,22 @@ public class VineSnareAbility extends AbstractInteraction implements Listener {
     private double entangleSeconds;
 
     public VineSnareAbility(Champions champions, ItemFactory itemFactory, BaseItem baseItem, EffectManager effectManager) {
-        super("Vine Snare", "Bolts release vines that ensnare enemies and anchor them to the ground.");
+        super("vine_snare");
         this.itemFactory = itemFactory;
         this.baseItem = baseItem;
         this.effectManager = effectManager;
         Bukkit.getPluginManager().registerEvents(this, champions);
         UtilServer.runTaskTimer(champions, this::processProjectiles, 0L, 1L);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Vine Snare");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Bolts release vines that ensnare enemies and anchor them to the ground.");
     }
 
     @Override

@@ -8,6 +8,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonReloadEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,15 +31,24 @@ import java.util.Optional;
 @Setter
 @Singleton
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
-public class CannonballReloadAbility extends AbstractInteraction {
+public class CannonballReloadAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private final CannonManager cannonManager;
 
     @Inject
     public CannonballReloadAbility(Core core, CannonManager cannonManager) {
-        super("Cannonball Reload",
-                "Load a cannon with this cannonball");
+        super("cannonball_reload");
         this.cannonManager = cannonManager;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Cannonball Reload");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Load a cannon with this cannonball");
     }
 
     @Override

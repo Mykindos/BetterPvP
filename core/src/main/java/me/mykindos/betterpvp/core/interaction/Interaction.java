@@ -17,20 +17,24 @@ import java.util.List;
 public interface Interaction {
 
     /**
-     * Get the display name of this interaction.
+     * A dummy interaction that does nothing.
+     */
+    Interaction EMPTY = new DummyInteraction() {
+        @Override
+        public @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context, @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+            return InteractionResult.Success.ADVANCE;
+        }
+    };
+
+    /**
+     * Get the internal name of this interaction.
+     * Used for logging, combat attribution, and debugging.
+     * This is NOT the user-facing display name.
      *
-     * @return the name
+     * @return the internal name
      */
     @NotNull
     String getName();
-
-    /**
-     * Get the description of this interaction.
-     *
-     * @return the description
-     */
-    @NotNull
-    String getDescription();
 
     /**
      * Get the conditions that must be met for this interaction to execute.

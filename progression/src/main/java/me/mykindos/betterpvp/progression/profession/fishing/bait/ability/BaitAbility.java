@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public abstract class BaitAbility extends CooldownInteraction {
+public abstract class BaitAbility extends CooldownInteraction implements DisplayedInteraction {
 
     protected double radius;
     protected double multiplier;
@@ -39,11 +40,10 @@ public abstract class BaitAbility extends CooldownInteraction {
      * Creates a new bait ability
      *
      * @param name The name of the ability
-     * @param description The description of the ability
      * @param cooldownManager The cooldown manager
      */
-    protected BaitAbility(String name, String description, CooldownManager cooldownManager) {
-        super(name, description, cooldownManager);
+    protected BaitAbility(String name, CooldownManager cooldownManager) {
+        super(name, cooldownManager);
     }
 
     @Override

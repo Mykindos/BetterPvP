@@ -4,32 +4,29 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -39,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class SkyforgedAscent extends CooldownInteraction implements Listener {
+public class SkyforgedAscent extends CooldownInteraction implements DisplayedInteraction, Listener {
 
     @EqualsAndHashCode.Include
     private double velocity;
@@ -50,20 +47,25 @@ public class SkyforgedAscent extends CooldownInteraction implements Listener {
     @EqualsAndHashCode.Include
     private double speedDuration; // Seconds
     private final EffectManager effectManager;
-    private final BaseItem heldItem;
     private final ItemFactory itemFactory;
     private final ClientManager clientManager;
 
-    public SkyforgedAscent(EffectManager effectManager, CooldownManager cooldownManager,
-                            BaseItem heldItem, ItemFactory itemFactory, ClientManager clientManager) {
-        super("Skyforged Ascent",
-                "Throw the weapon to ascend skyward, riding its divine force, granting you a burst of speed.",
-                cooldownManager);
+    public SkyforgedAscent(EffectManager effectManager, CooldownManager cooldownManager, ItemFactory itemFactory, ClientManager clientManager) {
+        super("skyforged_ascent", cooldownManager);
         this.effectManager = effectManager;
-        this.heldItem = heldItem;
         this.itemFactory = itemFactory;
         this.clientManager = clientManager;
         Bukkit.getPluginManager().registerEvents(this, JavaPlugin.getPlugin(Champions.class));
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Skyforged Ascent");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Throw the weapon to ascend skyward, riding its divine force, granting you a burst of speed.");
     }
 
     @Override
@@ -173,28 +175,5 @@ public class SkyforgedAscent extends CooldownInteraction implements Listener {
             UtilItem.damageItem(player, itemStack, 1);
         }
         return InteractionResult.Success.ADVANCE;
-    }
-
-    @EventHandler
-    public void onTridentThrow(ProjectileLaunchEvent event) {
-        if (!(event.getEntity() instanceof Trident trident)) return; // Not a throwable trident
-        if (!(trident.getShooter() instanceof Player player)) return; // Shooter must be a player
-
-        ItemStack itemStack = trident.getItemStack();
-        ItemInstance itemInstance = itemFactory.fromItemStack(itemStack).orElse(null);
-        if (itemInstance == null || !itemInstance.getBaseItem().equals(heldItem)) {
-            return; // Ensure the item is the one with the ability
-        }
-
-        event.setCancelled(true); // Cancel the default throw action
-        Client client = clientManager.search().online(player);
-        // Create actor and context for manual invocation
-        me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor actor =
-                new me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor(
-                        player, client,
-                        JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(me.mykindos.betterpvp.core.energy.EnergyService.class),
-                        effectManager
-                );
-        execute(actor, new InteractionContext(), itemInstance, player.getEquipment().getItem(player.getActiveItemHand()));
     }
 }

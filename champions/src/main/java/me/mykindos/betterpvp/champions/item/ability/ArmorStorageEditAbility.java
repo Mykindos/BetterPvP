@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.item.ability;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -35,10 +36,20 @@ import java.util.UUID;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
-public class ArmorStorageEditAbility extends AbstractInteraction {
+public class ArmorStorageEditAbility extends AbstractInteraction implements DisplayedInteraction {
 
     public ArmorStorageEditAbility() {
-        super("Replace Armor", "Add or remove equipment stored on this item.");
+        super("replace_armor");
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Replace Armor");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Add or remove equipment stored on this item.");
     }
 
     @Override

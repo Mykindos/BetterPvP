@@ -3,12 +3,14 @@ package me.mykindos.betterpvp.champions.item.ability;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -26,15 +28,25 @@ import java.util.Optional;
  * A reusable ability that prevents fall damage when the player is holding an item with this ability.
  */
 @EqualsAndHashCode(callSuper = false)
-public class FeatherFeetAbility extends AbstractInteraction implements Listener {
+public class FeatherFeetAbility extends AbstractInteraction implements DisplayedInteraction, Listener {
 
     @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
 
     public FeatherFeetAbility(ItemFactory itemFactory) {
-        super("Feather Feet", "Prevents all incoming damage from falling while holding this item.");
+        super("feather_feet");
         this.itemFactory = itemFactory;
         Bukkit.getPluginManager().registerEvents(this, JavaPlugin.getPlugin(Champions.class));
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Feather Feet");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Prevents all incoming damage from falling while holding this item.");
     }
 
     @Override

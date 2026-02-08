@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -42,7 +44,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class WindDashAbility extends AbstractInteraction {
+public class WindDashAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private double dashVelocity;
     private double dashImpactVelocity;
@@ -59,9 +61,19 @@ public class WindDashAbility extends AbstractInteraction {
     private final Map<Player, DashData> activeDashes = new HashMap<>();
 
     public WindDashAbility(ChampionsManager championsManager, Champions champions) {
-        super("Wind Dash", "Take a leap forward. The first enemy you hit, will be launched into the air.");
+        super("wind_dash");
         this.championsManager = championsManager;
         this.champions = champions;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Wind Dash");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Take a leap forward. The first enemy you hit, will be launched into the air.");
     }
 
     @Override

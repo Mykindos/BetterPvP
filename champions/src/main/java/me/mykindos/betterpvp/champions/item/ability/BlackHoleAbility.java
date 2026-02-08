@@ -8,11 +8,13 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.projectile.BlackHole;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +30,7 @@ import java.util.WeakHashMap;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class BlackHoleAbility extends CooldownInteraction {
+public class BlackHoleAbility extends CooldownInteraction implements DisplayedInteraction {
 
     private double radius;
     private double speed;
@@ -49,9 +51,7 @@ public class BlackHoleAbility extends CooldownInteraction {
 
     @Inject
     public BlackHoleAbility(Champions champions, CooldownManager cooldownManager) {
-        super("Black Hole",
-                "Creates a black hole that pulls nearby entities for a short period of time.",
-                cooldownManager);
+        super("black_hole", cooldownManager);
         this.champions = champions;
 
         // Default values, will be overridden by config
@@ -64,6 +64,16 @@ public class BlackHoleAbility extends CooldownInteraction {
         this.expandSeconds = 0.75;
         this.travelSeconds = 2.0;
         this.cooldown = 10.0;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Black Hole");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Creates a black hole that pulls nearby entities for a short period of time.");
     }
 
     @Override

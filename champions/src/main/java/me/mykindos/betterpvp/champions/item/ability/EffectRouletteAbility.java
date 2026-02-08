@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -29,7 +30,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class EffectRouletteAbility extends CooldownInteraction {
+public class EffectRouletteAbility extends CooldownInteraction implements DisplayedInteraction {
 
     @EqualsAndHashCode.Include
     private double duration;
@@ -40,10 +41,18 @@ public class EffectRouletteAbility extends CooldownInteraction {
 
     @Inject
     public EffectRouletteAbility(EffectManager effectManager, CooldownManager cooldownManager) {
-        super("Effect Roulette",
-                "Grants a random effect for a short duration. The effect can be a positive or negative one.",
-                cooldownManager);
+        super("effect_roulette", cooldownManager);
         this.effectManager = effectManager;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Effect Roulette");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Grants a random effect for a short duration. The effect can be a positive or negative one.");
     }
 
     @Override

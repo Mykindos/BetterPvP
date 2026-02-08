@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
@@ -21,6 +22,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -45,7 +47,7 @@ import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class WindSlashAbility extends CooldownInteraction {
+public class WindSlashAbility extends CooldownInteraction implements DisplayedInteraction {
 
     private double slashCooldown;
     private double slashHitboxSize;
@@ -66,11 +68,19 @@ public class WindSlashAbility extends CooldownInteraction {
     private final Set<Slash> slashSet = new HashSet<>();
 
     public WindSlashAbility(CooldownManager cooldownManager, EnergyService energyService, BaseItem heldItem) {
-        super("Wind Slash",
-                "Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.",
-                cooldownManager);
+        super("wind_slash", cooldownManager);
         this.heldItem = heldItem;
         this.energyService = energyService;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Wind Slash");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.");
     }
 
     @Override

@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageModifier;
@@ -72,7 +73,7 @@ import java.util.UUID;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @BPvPListener
-public class SoulHarvestAbility extends AbstractInteraction implements Listener {
+public class SoulHarvestAbility extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     private int maxSouls;
     private double soulHarvestSeconds;
@@ -112,8 +113,7 @@ public class SoulHarvestAbility extends AbstractInteraction implements Listener 
 
     @Inject
     private SoulHarvestAbility(Champions champions, DamageLogManager damageLogManager, EffectManager effectManager, ClientManager clientManager, ItemFactory itemFactory) {
-        super("Soul Harvest",
-                "Collect souls of fallen players and mobs to harvest their souls, gaining damage and speed.");
+        super("soul_harvest");
         this.champions = champions;
         this.damageLogManager = damageLogManager;
         this.effectManager = effectManager;
@@ -133,6 +133,16 @@ public class SoulHarvestAbility extends AbstractInteraction implements Listener 
         this.summonPlayerSoulChance = 1.0;
         this.summonMobSoulChance = 0.4;
         this.speedAmplifierPerSoul = 1.0;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Soul Harvest");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Collect souls of fallen players and mobs to harvest their souls, gaining damage and speed.");
     }
 
     @Override

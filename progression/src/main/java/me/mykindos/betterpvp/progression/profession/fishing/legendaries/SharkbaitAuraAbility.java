@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -39,7 +41,7 @@ import java.util.Optional;
 @Singleton
 @Getter
 @Setter
-public class SharkbaitAuraAbility extends AbstractInteraction implements Listener {
+public class SharkbaitAuraAbility extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     private final Progression progression;
     private final ItemFactory itemFactory;
@@ -50,8 +52,7 @@ public class SharkbaitAuraAbility extends AbstractInteraction implements Listene
 
     @Inject
     private SharkbaitAuraAbility(Progression progression, ItemFactory itemFactory) {
-        super("Fishing Aura",
-                "Increases fishing catch speed for all nearby fishermen");
+        super("fishing_aura");
 
         this.progression = progression;
         this.itemFactory = itemFactory;
@@ -59,6 +60,16 @@ public class SharkbaitAuraAbility extends AbstractInteraction implements Listene
         // Default values, will be overridden by config
         this.catchSpeedMultiplier = 0.7;
         this.radius = 6.0;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Fishing Aura");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Increases fishing catch speed for all nearby fishermen");
     }
 
     @Override

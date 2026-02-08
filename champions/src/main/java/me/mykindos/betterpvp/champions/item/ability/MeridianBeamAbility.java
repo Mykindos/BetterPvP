@@ -8,11 +8,13 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.projectile.MeridianBeam;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +30,7 @@ import java.util.WeakHashMap;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class MeridianBeamAbility extends CooldownInteraction {
+public class MeridianBeamAbility extends CooldownInteraction implements DisplayedInteraction {
 
     private double cooldown;
     private double damage;
@@ -45,9 +47,7 @@ public class MeridianBeamAbility extends CooldownInteraction {
 
     @Inject
     public MeridianBeamAbility(Champions champions, CooldownManager cooldownManager) {
-        super(MeridianBeam.NAME,
-                "Fires a damaging beam of energy that travels in a straight line.",
-                cooldownManager);
+        super("meridian_beam", cooldownManager);
         this.champions = champions;
 
         // Default values, will be overridden by config
@@ -56,6 +56,16 @@ public class MeridianBeamAbility extends CooldownInteraction {
         this.speed = 4.0;
         this.hitbox = 0.5;
         this.travelSeconds = 0.3;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text(MeridianBeam.NAME);
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Fires a damaging beam of energy that travels in a straight line.");
     }
 
     @Override

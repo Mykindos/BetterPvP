@@ -31,6 +31,7 @@ import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
@@ -38,6 +39,7 @@ import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -83,7 +85,7 @@ import java.util.function.Consumer;
 @Getter
 @Setter
 @Singleton
-public class EndlessQuiverAbility extends AbstractInteraction implements Listener, PacketListener {
+public class EndlessQuiverAbility extends AbstractInteraction implements Listener, PacketListener, DisplayedInteraction {
 
     @EqualsAndHashCode.Exclude
     private final ItemFactory itemFactory;
@@ -97,13 +99,22 @@ public class EndlessQuiverAbility extends AbstractInteraction implements Listene
 
     @Inject
     private EndlessQuiverAbility(Core plugin, ItemFactory itemFactory) {
-        super("Endless Quiver",
-                "Automatically conjures arrows, letting any quiver fire endlessly without requiring ammunition.");
+        super("endless_quiver");
         this.itemFactory = itemFactory;
         this.core = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
         PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.HIGHEST);
         UtilServer.runTaskTimer(plugin, this::onTick, 0, 1);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Endless Quiver");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Automatically conjures arrows, letting any quiver fire endlessly without requiring ammunition.");
     }
 
     @Override

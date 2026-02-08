@@ -8,56 +8,50 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * A type-safe key for storing and retrieving values from an {@link InteractionContext}.
- * Supports default values that are computed lazily when the key is accessed.
+ * A type-safe key for storing and retrieving execution-scoped values from an {@link InteractionContext}.
+ * Execution-scoped values are cleared before each interaction execution.
+ * <p>
+ * Use this for data that is specific to a single interaction execution,
+ * such as the target entity, damage amount, or input metadata.
  *
  * @param <T> the type of value this key represents
  */
-public final class MetaKey<T> {
+public final class ExecutionKey<T> implements ScopedKey<T> {
 
     private final String name;
     private final Supplier<T> defaultSupplier;
 
-    private MetaKey(@NotNull String name, @Nullable Supplier<T> defaultSupplier) {
+    private ExecutionKey(@NotNull String name, @Nullable Supplier<T> defaultSupplier) {
         this.name = name;
         this.defaultSupplier = defaultSupplier;
     }
 
-    /**
-     * Get the name of this key.
-     */
+    @Override
+    @NotNull
     public String getName() {
         return name;
     }
 
-    /**
-     * Check if this key has a default value supplier.
-     */
+    @Override
     public boolean hasDefault() {
         return defaultSupplier != null;
     }
 
-    /**
-     * Get the default value for this key.
-     *
-     * @return the default value, or null if no default is set
-     */
+    @Override
     @Nullable
     public T getDefault() {
         return defaultSupplier != null ? defaultSupplier.get() : null;
     }
-
-    // ==================== Factory Methods ====================
 
     /**
      * Create a key with no default value.
      *
      * @param name the unique name for this key
      * @param <T>  the value type
-     * @return a new meta key
+     * @return a new execution key
      */
-    public static <T> MetaKey<T> of(@NotNull String name) {
-        return new MetaKey<>(name, null);
+    public static <T> ExecutionKey<T> of(@NotNull String name) {
+        return new ExecutionKey<>(name, null);
     }
 
     /**
@@ -66,10 +60,10 @@ public final class MetaKey<T> {
      * @param name         the unique name for this key
      * @param defaultValue the default value
      * @param <T>          the value type
-     * @return a new meta key
+     * @return a new execution key
      */
-    public static <T> MetaKey<T> of(@NotNull String name, @NotNull T defaultValue) {
-        return new MetaKey<>(name, () -> defaultValue);
+    public static <T> ExecutionKey<T> of(@NotNull String name, @NotNull T defaultValue) {
+        return new ExecutionKey<>(name, () -> defaultValue);
     }
 
     /**
@@ -79,34 +73,31 @@ public final class MetaKey<T> {
      * @param name            the unique name for this key
      * @param defaultSupplier supplier for the default value
      * @param <T>             the value type
-     * @return a new meta key
+     * @return a new execution key
      */
-    public static <T> MetaKey<T> of(@NotNull String name, @NotNull Supplier<T> defaultSupplier) {
-        return new MetaKey<>(name, defaultSupplier);
+    public static <T> ExecutionKey<T> of(@NotNull String name, @NotNull Supplier<T> defaultSupplier) {
+        return new ExecutionKey<>(name, defaultSupplier);
     }
-
-    // ==================== Specialized Factory Methods ====================
-    // These avoid the need for casting with generic types
 
     /**
      * Create a key for a Set with an empty HashSet as default.
      *
      * @param name the unique name for this key
      * @param <E>  the element type
-     * @return a new meta key for Set
+     * @return a new execution key for Set
      */
-    public static <E> MetaKey<Set<E>> ofSet(@NotNull String name) {
-        return new MetaKey<>(name, HashSet::new);
+    public static <E> ExecutionKey<Set<E>> ofSet(@NotNull String name) {
+        return new ExecutionKey<>(name, HashSet::new);
     }
 
     /**
      * Create a key for Long with no default (returns null if not set).
      *
      * @param name the unique name for this key
-     * @return a new meta key for Long
+     * @return a new execution key for Long
      */
-    public static MetaKey<Long> ofLong(@NotNull String name) {
-        return new MetaKey<>(name, null);
+    public static ExecutionKey<Long> ofLong(@NotNull String name) {
+        return new ExecutionKey<>(name, null);
     }
 
     /**
@@ -114,20 +105,20 @@ public final class MetaKey<T> {
      *
      * @param name         the unique name for this key
      * @param defaultValue the default value
-     * @return a new meta key for Long
+     * @return a new execution key for Long
      */
-    public static MetaKey<Long> ofLong(@NotNull String name, long defaultValue) {
-        return new MetaKey<>(name, () -> defaultValue);
+    public static ExecutionKey<Long> ofLong(@NotNull String name, long defaultValue) {
+        return new ExecutionKey<>(name, () -> defaultValue);
     }
 
     /**
      * Create a key for Integer with no default (returns null if not set).
      *
      * @param name the unique name for this key
-     * @return a new meta key for Integer
+     * @return a new execution key for Integer
      */
-    public static MetaKey<Integer> ofInt(@NotNull String name) {
-        return new MetaKey<>(name, null);
+    public static ExecutionKey<Integer> ofInt(@NotNull String name) {
+        return new ExecutionKey<>(name, null);
     }
 
     /**
@@ -135,20 +126,20 @@ public final class MetaKey<T> {
      *
      * @param name         the unique name for this key
      * @param defaultValue the default value
-     * @return a new meta key for Integer
+     * @return a new execution key for Integer
      */
-    public static MetaKey<Integer> ofInt(@NotNull String name, int defaultValue) {
-        return new MetaKey<>(name, () -> defaultValue);
+    public static ExecutionKey<Integer> ofInt(@NotNull String name, int defaultValue) {
+        return new ExecutionKey<>(name, () -> defaultValue);
     }
 
     /**
      * Create a key for Double with no default (returns null if not set).
      *
      * @param name the unique name for this key
-     * @return a new meta key for Double
+     * @return a new execution key for Double
      */
-    public static MetaKey<Double> ofDouble(@NotNull String name) {
-        return new MetaKey<>(name, null);
+    public static ExecutionKey<Double> ofDouble(@NotNull String name) {
+        return new ExecutionKey<>(name, null);
     }
 
     /**
@@ -156,20 +147,20 @@ public final class MetaKey<T> {
      *
      * @param name         the unique name for this key
      * @param defaultValue the default value
-     * @return a new meta key for Double
+     * @return a new execution key for Double
      */
-    public static MetaKey<Double> ofDouble(@NotNull String name, double defaultValue) {
-        return new MetaKey<>(name, () -> defaultValue);
+    public static ExecutionKey<Double> ofDouble(@NotNull String name, double defaultValue) {
+        return new ExecutionKey<>(name, () -> defaultValue);
     }
 
     /**
      * Create a key for Boolean with no default (returns null if not set).
      *
      * @param name the unique name for this key
-     * @return a new meta key for Boolean
+     * @return a new execution key for Boolean
      */
-    public static MetaKey<Boolean> ofBoolean(@NotNull String name) {
-        return new MetaKey<>(name, null);
+    public static ExecutionKey<Boolean> ofBoolean(@NotNull String name) {
+        return new ExecutionKey<>(name, null);
     }
 
     /**
@@ -177,10 +168,10 @@ public final class MetaKey<T> {
      *
      * @param name         the unique name for this key
      * @param defaultValue the default value
-     * @return a new meta key for Boolean
+     * @return a new execution key for Boolean
      */
-    public static MetaKey<Boolean> ofBoolean(@NotNull String name, boolean defaultValue) {
-        return new MetaKey<>(name, () -> defaultValue);
+    public static ExecutionKey<Boolean> ofBoolean(@NotNull String name, boolean defaultValue) {
+        return new ExecutionKey<>(name, () -> defaultValue);
     }
 
     @Override
@@ -188,7 +179,7 @@ public final class MetaKey<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MetaKey<?> that = (MetaKey<?>) o;
+        ExecutionKey<?> that = (ExecutionKey<?>) o;
         return name.equals(that.name);
     }
 
@@ -199,6 +190,6 @@ public final class MetaKey<T> {
 
     @Override
     public String toString() {
-        return "MetaKey{" + name + "}";
+        return "ExecutionKey{" + name + "}";
     }
 }

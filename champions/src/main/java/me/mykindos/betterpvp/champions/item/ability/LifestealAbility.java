@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,7 +29,7 @@ import java.util.function.Function;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class LifestealAbility extends AbstractInteraction implements Listener {
+public class LifestealAbility extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     @EqualsAndHashCode.Exclude
     private final BaseItem baseItem;
@@ -36,12 +38,21 @@ public class LifestealAbility extends AbstractInteraction implements Listener {
     private final ItemFactory itemFactory;
 
     public LifestealAbility(Champions champions, ItemFactory itemFactory, BaseItem baseItem, Function<Player, Double> healFunction) {
-        super("Lifesteal",
-                "Heal for a portion of the damage dealt to an enemy from melee attacks.");
+        super("lifesteal");
         this.itemFactory = itemFactory;
         this.baseItem = baseItem;
         this.healFunction = healFunction;
         Bukkit.getPluginManager().registerEvents(this, champions);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Lifesteal");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Heal for a portion of the damage dealt to an enemy from melee attacks.");
     }
 
     @Override

@@ -18,6 +18,7 @@ dependencies {
     compileOnly(project(":progression"))
     compileOnly(project(":shops"))
     compileOnly(libs.packetevents)
+    compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)

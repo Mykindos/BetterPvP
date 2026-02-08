@@ -8,8 +8,8 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Interface representing an item in the game.
@@ -78,7 +78,7 @@ public interface Item {
      *
      * @return A set of all components
      */
-    @NotNull Set<@NotNull ItemComponent> getComponents();
+    @NotNull Collection<@NotNull ItemComponent> getComponents();
     /**
      * @return The lore renderer for this item, or null if none is set
      */

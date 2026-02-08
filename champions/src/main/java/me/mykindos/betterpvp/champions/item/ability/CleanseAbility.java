@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class CleanseAbility extends CooldownInteraction {
+public class CleanseAbility extends CooldownInteraction implements DisplayedInteraction {
 
     @EqualsAndHashCode.Include
     private double duration;
@@ -39,10 +40,18 @@ public class CleanseAbility extends CooldownInteraction {
 
     @Inject
     public CleanseAbility(EffectManager effectManager, CooldownManager cooldownManager) {
-        super("Cleanse",
-                "Cleanses negative effects and grants immunity for a short duration.",
-                cooldownManager);
+        super("cleanse", cooldownManager);
         this.effectManager = effectManager;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Cleanse");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Cleanses negative effects and grants immunity for a short duration.");
     }
 
     @Override

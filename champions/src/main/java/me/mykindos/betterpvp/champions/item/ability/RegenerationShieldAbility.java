@@ -10,11 +10,13 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class RegenerationShieldAbility extends AbstractInteraction {
+public class RegenerationShieldAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private double energyPerTick;
     private int regenerationAmplifier;
@@ -40,7 +42,7 @@ public class RegenerationShieldAbility extends AbstractInteraction {
 
     @Inject
     public RegenerationShieldAbility(Champions champions, EnergyService energyService, EffectManager effectManager) {
-        super("Shield", "Gain an amplified regeneration effect while using this ability.");
+        super("shield");
         this.champions = champions;
         this.energyService = energyService;
         this.effectManager = effectManager;
@@ -48,6 +50,16 @@ public class RegenerationShieldAbility extends AbstractInteraction {
         // Default values, will be overridden by config
         this.energyPerTick = 1.5;
         this.regenerationAmplifier = 5;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Shield");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Gain an amplified regeneration effect while using this ability.");
     }
 
     @Override

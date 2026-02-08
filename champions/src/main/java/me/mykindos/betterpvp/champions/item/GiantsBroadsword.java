@@ -72,7 +72,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
     private GiantsBroadsword(Champions champions,
                             RegenerationShieldAbility regenerationShieldAbility,
                             ItemFactory itemFactory) {
-        super(champions, "Giant's Broadsword", model, ItemRarity.LEGENDARY);
+        super(champions, "Giant's Broadsword", model, ItemRarity.EPIC);
         this.itemFactory = itemFactory;
         this.regenerationShieldAbility = regenerationShieldAbility;
 
@@ -88,7 +88,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
         final Config config = Config.item(Champions.class, this);
         
         // Configure RegenerationShield ability
-        regenerationShieldAbility.setRegenerationAmplifier(config.getConfig("regenAmplifier", 5, Integer.class));
+        regenerationShieldAbility.setRegenerationAmplifier(config.getConfig("regenAmplifier", 4, Integer.class));
         regenerationShieldAbility.setEnergyPerTick(config.getConfig("energyPerTick", 1.5, Double.class));
     }
 

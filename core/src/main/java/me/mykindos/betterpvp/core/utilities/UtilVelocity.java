@@ -25,14 +25,14 @@ public class UtilVelocity {
         return to.clone().subtract(from).setY(0).normalize();
     }
 
-    public static void velocity(Entity target, LivingEntity source, VelocityData data) {
-        velocity(target, source, data, VelocityType.CUSTOM);
+    public static boolean velocity(Entity target, LivingEntity source, VelocityData data) {
+        return velocity(target, source, data, VelocityType.CUSTOM);
     }
 
-    public static void velocity(Entity target, LivingEntity source, VelocityData data, VelocityType velocityType) {
+    public static boolean velocity(Entity target, LivingEntity source, VelocityData data, VelocityType velocityType) {
         Vector vec = data.getVector();
         if (Double.isNaN(vec.getX()) || Double.isNaN(vec.getY()) || Double.isNaN(data.getVector().getZ()) || data.getVector().length() == 0.0D) {
-            return;
+            return false;
         }
 
         if (data.isSetY()) {
@@ -58,10 +58,10 @@ public class UtilVelocity {
 
 
         CustomEntityVelocityEvent customEntityVelocityEvent = UtilServer.callEvent(new CustomEntityVelocityEvent(target, source, velocityType, vec));
-        if (customEntityVelocityEvent.isCancelled()) return;
+        if (customEntityVelocityEvent.isCancelled()) return false;
 
         target.setVelocity(customEntityVelocityEvent.getVector());
-
+        return true;
     }
 
     /**
