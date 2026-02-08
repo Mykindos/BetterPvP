@@ -24,7 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
@@ -49,14 +49,14 @@ public class PunishmentListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(PlayerLoginEvent event) {
-        final Client client = clientManager.search().online(event.getPlayer());
-
-        if (client.getUniqueId().equals(MYKINDOS)) {
-            event.setResult(PlayerLoginEvent.Result.ALLOWED);
+    @EventHandler(priority = EventPriority.LOW)
+    public void onLogin(AsyncPlayerPreLoginEvent event) {
+        if (event.getUniqueId().equals(MYKINDOS)) {
+            event.allow();
             return;
         }
+        //client is loaded in LOWEST
+        final Client client = clientManager.search().online(event.getUniqueId()).orElseThrow();
 
         Optional<Punishment> ban = client.getPunishment(PunishmentTypes.BAN);
         if (ban.isPresent()) {
@@ -76,7 +76,7 @@ public class PunishmentListener implements Listener {
                 banMessage = banMessage.append(Component.text("This ban will expire ", NamedTextColor.RED).append(Component.text(new PrettyTime().format(new Date(punishment.getExpiryTime())), NamedTextColor.GREEN)));
             }
 
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, banMessage);
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, banMessage);
             log.info("Player {} ({}) is banned and has been kicked.", client.getName(), client.getUniqueId()).submit();
         } else {
             log.info("Player {} ({}) is not banned and has logged in.", client.getName(), client.getUniqueId()).submit();
