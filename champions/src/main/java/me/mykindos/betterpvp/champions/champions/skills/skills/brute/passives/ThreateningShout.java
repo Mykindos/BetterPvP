@@ -18,11 +18,13 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -35,6 +37,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -43,8 +46,8 @@ import java.util.WeakHashMap;
 public class ThreateningShout extends Skill implements Listener, CooldownToggleSkill, AreaOfEffectSkill, OffensiveSkill {
     private final Map<Player, ThreateningShoutData> playerDataMap = new WeakHashMap<>();
 
-    private double damageMultiplier;
-    private double damageMultiplierIncreasePerLevel;
+    private int damageMultiplier;
+    private int damageMultiplierIncreasePerLevel;
     private double damage;
     private double damageIncreasePerLevel;
     private double radius;
@@ -61,7 +64,10 @@ public class ThreateningShout extends Skill implements Listener, CooldownToggleS
         return damage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    public double getDamageMultiplier(int level) {
+    public int getDamageMultiplier(int level) {
+        // This is an int because it's hard to format a decimal multiplier in the description, and it doesn't make much
+        // sense to have a decimal multiplier for this skill.
+
         return damageMultiplier + ((level - 1) * damageMultiplierIncreasePerLevel);
     }
 
@@ -70,10 +76,11 @@ public class ThreateningShout extends Skill implements Listener, CooldownToggleS
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Release a roar, dealing " + getValueString(this::getDamage, level) + " damage",
+                "Release a roar, dealing " + getValueString(this::getDamage, level),
+                "damage.",
                 "",
-                "Enemies below half health",
-                "take " + getValueString(this::getDamageMultiplier, level) + "x" + " more damage.",
+                "Enemies below half health take " + getValueString(this::getDamageMultiplier, level, 1, "", 0) + "x",
+                "more damage.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
         };
@@ -136,13 +143,27 @@ public class ThreateningShout extends Skill implements Listener, CooldownToggleS
             for (LivingEntity target : UtilEntity.getNearbyEnemies(player, point, radius)) {
                 if (damagedEntities.contains(target)) continue;
 
-                UtilDamage.doDamage(new DamageEvent(target,
-                        player,
-                        null,
-                        new SkillDamageCause(ThreateningShout.this),
-                        getDamage(level),
-                        getName()));
-                UtilMessage.simpleMessage(player, getName(), "You hit <yellow>%s</yellow> with <green>%s</green>", target.getName(), getName());
+                final double maxHealth = Objects.requireNonNull(target.getAttribute(Attribute.MAX_HEALTH)).getValue();
+                final double currentHealth = target.getHealth();
+                final double healthPercentage = currentHealth / maxHealth;
+
+                double damageToDeal = getDamage(level);
+                if (healthPercentage < 0.5) {
+                    damageToDeal *= getDamageMultiplier(level);
+
+                    target.getWorld().spawnParticle(Particle.DUST, target.getLocation().add(0, 1, 0), 50,
+                            0.5, 0.5, 0.5,
+                            new Particle.DustOptions(org.bukkit.Color.fromRGB(128, 0, 128), 1));
+
+                     target.getWorld().playSound(target.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 2F);
+                }
+
+                UtilDamage.doDamage(new DamageEvent(target, player, null,
+                        new SkillDamageCause(ThreateningShout.this), damageToDeal, getName()));
+
+                UtilMessage.simpleMessage(player, getName(), "You hit <yellow>%s</yellow> with <green>%s</green>",
+                        target.getName(), getName());
+
                 damagedEntities.add(target);
             }
         }, tickDelay);
@@ -160,7 +181,7 @@ public class ThreateningShout extends Skill implements Listener, CooldownToggleS
 
     @Override
     public SkillType getType() {
-        return SkillType.AXE;
+        return SkillType.PASSIVE_B;
     }
 
     @Override
@@ -170,8 +191,8 @@ public class ThreateningShout extends Skill implements Listener, CooldownToggleS
 
     @Override
     public void loadSkillConfig() {
-        damageMultiplier = getConfig("damageMultiplier", 3.0, Double.class);
-        damageMultiplierIncreasePerLevel = getConfig("damageMultiplierIncreasePerLevel", 0.0, Double.class);
+        damageMultiplier = getConfig("damageMultiplier", 3, Integer.class);
+        damageMultiplierIncreasePerLevel = getConfig("damageMultiplierIncreasePerLevel", 0, Integer.class);
         radius = getConfig("radius", 1.5, Double.class);
         tickDelay = getConfig("tickDelay", 12, Integer.class);
         damage = getConfig("damage", 5.0, Double.class);

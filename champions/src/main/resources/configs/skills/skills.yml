@@ -693,11 +693,11 @@ skills:
       maxSpeedStrength: 3
     threateningshout:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      damageMultiplier: 3.0
-      damageMultiplierIncreasePerLevel: 0.0
+      damageMultiplier: 3
+      damageMultiplierIncreasePerLevel: 0
       damage: 5.0
       damageIncreasePerLevel: 1.0
       radius: 3.0
