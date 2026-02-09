@@ -1060,7 +1060,7 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void handleOreReplacements(BlockBreakEvent event) {
         if (event.isCancelled()) return;
 
