@@ -71,7 +71,7 @@ public class CleanseAbility extends CooldownInteraction implements DisplayedInte
 
         UtilMessage.message(entity, "Item",
                 Component.text("You used ", NamedTextColor.GRAY)
-                        .append(Component.text(getName(), NamedTextColor.YELLOW))
+                        .append(getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW))
                         .append(Component.text(".", NamedTextColor.GRAY)));
         UtilSound.playSound(entity, Sound.ENTITY_GENERIC_DRINK, 1f, 1f, false);
         UtilSound.playSound(entity.getWorld(), entity.getLocation(), Sound.ENTITY_GENERIC_DRINK, 0.8f, 1.2f);

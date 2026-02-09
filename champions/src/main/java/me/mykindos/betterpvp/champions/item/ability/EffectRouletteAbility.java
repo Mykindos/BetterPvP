@@ -75,7 +75,7 @@ public class EffectRouletteAbility extends CooldownInteraction implements Displa
         effectManager.addEffect(entity, randomEffect, randomLevel, (long) (duration * 1000));
         UtilMessage.message(entity, "Item",
                 Component.text("You used ", NamedTextColor.GRAY)
-                        .append(Component.text(getName(), NamedTextColor.YELLOW))
+                        .append(getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW))
                         .append(Component.text(".", NamedTextColor.GRAY)));
         UtilMessage.message(entity, "Effect",
                 Component.text("You have been granted ", NamedTextColor.GREEN)

@@ -120,7 +120,7 @@ public class NectarOfDecay extends CooldownInteraction implements Listener, Disp
         if (!event.isDamageeLiving()) return;
         if (event.getBukkitCause() != EntityDamageEvent.DamageCause.POISON) return;
 
-        final Optional<Effect> poisonOpt = effectManager.getEffect(event.getLivingDamagee(), EffectTypes.POISON, getName());
+        final Optional<Effect> poisonOpt = effectManager.getEffect(event.getLivingDamagee(), EffectTypes.POISON, "Nectar of Decay");
         if (poisonOpt.isEmpty()) {
             return;
         }

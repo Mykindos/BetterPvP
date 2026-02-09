@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
-import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageModifier;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -171,7 +170,7 @@ public class Needlegrasp extends CooldownInteraction implements Listener, Displa
      * Called when the player successfully hits an enemy mid-air.
      */
     public void resetCooldown(Player player) {
-        cooldownManager.removeCooldown(player, getName(), false);
+        cooldownManager.removeCooldown(player, "Needlegrasp", false);
     }
 
     /**
@@ -255,13 +254,8 @@ public class Needlegrasp extends CooldownInteraction implements Listener, Displa
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMeleeAttack(DamageEvent event) {
-        if (event.getDamager() instanceof Player player) {
-            cooldownManager.removeCooldown(player, "Vipersprint", false);
-        }
-
         if (event.isCancelled()) return;
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
-        if (event.getCause() instanceof InteractionDamageCause) return;
         if (!(event.getDamager() instanceof Player caster)) return;
         if (!(event.getDamagee() instanceof LivingEntity target)) return;
 

@@ -77,7 +77,7 @@ public class GatorStrokeAbility extends AbstractInteraction implements Displayed
             energyToUse *= skimmingEnergyMultiplier;
         }
 
-        if (!energyService.use(player, getName(), energyToUse, true)) {
+        if (!energyService.use(player, "Gator Stroke", energyToUse, true)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 

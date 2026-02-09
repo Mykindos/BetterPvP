@@ -84,11 +84,11 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
         }
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, getName(), "You cannot use this ability while in liquid");
+            UtilMessage.simpleMessage(player, "Wind Dash", "You cannot use this ability while in liquid");
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        if (!championsManager.getEnergy().use(player, getName(), dashEnergyCost, true)) {
+        if (!championsManager.getEnergy().use(player, "Wind Dash", dashEnergyCost, true)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
@@ -109,7 +109,7 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
         new SoundEffect(Sound.ITEM_TRIDENT_THROW, 0.5F, 2.0F).play(player.getLocation());
 
         // VFX
-        UtilMessage.message(player, "Wind Blade", "You used <alt>" + getName() + "</alt>.");
+        UtilMessage.message(player, "Wind Blade", "You used <alt>" + "Wind Dash" + "</alt>.");
         new BukkitRunnable() {
             int ticks = 0;
 
@@ -189,8 +189,8 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
             // SFX & VFX
             new SoundEffect(Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 2).play(target.getLocation());
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
-            UtilMessage.message(player, "Wind Blade", "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
-            UtilMessage.message(target, "Wind Blade", "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + "</alt>.");
+            UtilMessage.message(player, "Wind Blade", "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + "Wind Dash" + "</alt>.");
+            UtilMessage.message(target, "Wind Blade", "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + "Wind Dash" + "</alt>.");
         }
     }
 

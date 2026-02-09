@@ -56,7 +56,6 @@ public class KatanaHinokami extends WeaponItem implements Reloadable {
     private final HardSlashInteraction hardSlashInteraction;
     private final BattoDoInteraction battoDoInteraction;
 
-    private double primaryAttackRaySize;
     private double primaryAttackReach;
 
     @Inject
@@ -117,7 +116,7 @@ public class KatanaHinokami extends WeaponItem implements Reloadable {
                 .onComplete(hardSlashFX)
 
                 // Batto-Do Ultimate (Hold Sneak)
-                .hiddenRoot(InteractionInputs.SNEAK_START, Interaction.EMPTY)
+                .root(InteractionInputs.SNEAK_START, battoDoInteraction.getDisplayName(), battoDoInteraction.getDisplayDescription(), Interaction.EMPTY)
                 .chain(InteractionInputs.NONE, Timing.seconds(8), prepareInteraction)
                 .chain(InteractionInputs.SNEAK_END, Timing.ZERO, battoDoFX)
                 .chain(InteractionInputs.NONE, Timing.ZERO, battoDoInteraction)
@@ -176,7 +175,7 @@ public class KatanaHinokami extends WeaponItem implements Reloadable {
                 ? (attribute != null ? attribute.getValue() : 3.0)
                 : primaryAttackReach;
         return ShapeEntitySelector.arc(new EntityOrigin(entity, true), reach, 90.0, 180.0)
-                .withFilter(EntityFilters.combatEnemies());
+                .withFilter(EntityFilters.combatEnemies().and(EntityFilters.lineOfSight()));
     }
 
     @Override
@@ -186,7 +185,6 @@ public class KatanaHinokami extends WeaponItem implements Reloadable {
         this.battoDoCooldown.fetch();
         this.dashDelay.fetch();
 
-        this.primaryAttackRaySize = this.config.getConfig("primary-attack.ray-size", 2.5, Double.class);
         this.primaryAttackReach = this.config.getConfig("primary-attack.reach-override", 0.0, Double.class);
 
         this.dashInteraction.loadConfig();

@@ -130,7 +130,7 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
         }
         
         // Check energy
-        if (!energyService.use(player, getName(), energyPerTick, true)) {
+        if (!energyService.use(player, "Voltic Bash", energyPerTick, true)) {
             return;
         }
         
@@ -164,7 +164,7 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
         
         // Move
         data.setLastLocation(newLocation);
-        this.effectManager.addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 100);
+        this.effectManager.addEffect(player, EffectTypes.NO_JUMP, "Voltic Bash", 1, 100);
         final double velocity = Math.min(getVelocity() + (this.velocity * getChargePercentage(charge)), this.velocity);
         final Vector direction = player.getLocation().getDirection().setY(0).normalize();
         VelocityData velocityData = new VelocityData(direction, velocity, true, -0.1, 0.0, -0.1, false);
@@ -205,7 +205,7 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
                 null,
                 new InteractionDamageCause(this),
                 chargeDamage * charge,
-                getName());
+                "Voltic Bash");
         event.setForceDamageDelay(0);
         UtilDamage.doDamage(event);
         data.getLastHit().put(hit, System.currentTimeMillis());

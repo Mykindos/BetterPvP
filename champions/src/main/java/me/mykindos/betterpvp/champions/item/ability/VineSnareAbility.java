@@ -131,7 +131,7 @@ public class VineSnareAbility extends AbstractInteraction implements DisplayedIn
                     hitboxSize,
                     event.getProjectile().getLocation(),
                     aliveTime,
-                    getName(),
+                    "Vine Snare",
                     effectManager,
                     entangleAmplifier,
                     (long) (entangleSeconds * 1000L)

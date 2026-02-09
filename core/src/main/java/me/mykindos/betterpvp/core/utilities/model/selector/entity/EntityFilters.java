@@ -143,4 +143,21 @@ public final class EntityFilters {
     public static EntityFilter combatFriendlies() {
         return combat().and(friendliesOnly());
     }
+
+    /**
+     * A filter that only accepts entities the source entity has line of sight to.
+     * Uses Bukkit's hasLineOfSight check which considers block occlusion.
+     * If the origin is not entity-based, all entities pass the filter.
+     *
+     * @return a filter that only accepts entities in line of sight
+     */
+    public static EntityFilter lineOfSight() {
+        return (origin, entity) -> {
+            if (origin instanceof EntityOrigin entityOrigin
+                    && entityOrigin.entity() instanceof org.bukkit.entity.LivingEntity living) {
+                return living.hasLineOfSight(entity);
+            }
+            return true;
+        };
+    }
 }

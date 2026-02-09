@@ -215,7 +215,8 @@ public class WindSlashAbility extends CooldownInteraction implements DisplayedIn
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
 
             // Regen energy
-            energyService.regenerateEnergy(caster, slashEnergyRefundPercent, EnergyEvent.Cause.USE);
+            final double max = energyService.getMax(caster.getUniqueId());
+            energyService.regenerateEnergy(caster, max * slashEnergyRefundPercent, EnergyEvent.Cause.USE);
         }
     }
 }

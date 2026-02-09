@@ -70,7 +70,7 @@ public class RegenerationShieldAbility extends AbstractInteraction implements Di
         }
 
         // Check energy
-        if (!energyService.use(player, getName(), energyPerTick, true)) {
+        if (!energyService.use(player, "Shield", energyPerTick, true)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
@@ -93,7 +93,7 @@ public class RegenerationShieldAbility extends AbstractInteraction implements Di
      * Apply regeneration effect to player
      */
     private void applyRegeneration(Player player, Material itemMaterial) {
-        effectManager.addEffect(player, player, EffectTypes.REGENERATION, getName(), regenerationAmplifier, 80L, true, false,
+        effectManager.addEffect(player, player, EffectTypes.REGENERATION, "Shield", regenerationAmplifier, 80L, true, false,
                 (livingEntity) -> {
                     if (livingEntity instanceof Player p) {
                         return p.getInventory().getItemInMainHand().getType() != itemMaterial;

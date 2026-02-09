@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -64,9 +63,8 @@ public class EnergyBoost extends CooldownInteraction implements DisplayedInterac
         }
 
         energyService.regenerateEnergy(player, energy, EnergyEvent.Cause.USE);
-        final TextComponent name = Component.text(getName()).color(NamedTextColor.YELLOW);
         UtilMessage.message(player, "Item", Component.text("You used ", NamedTextColor.GRAY)
-                .append(name)
+                .append(getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW))
                 .append(Component.text(".", NamedTextColor.GRAY)));
         soundEffect.play(player);
         return InteractionResult.Success.ADVANCE;

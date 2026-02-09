@@ -84,7 +84,7 @@ public class Heavensplitter extends AbstractInteraction implements Listener, Dis
 
         // Spawn projectile
         final BoomerangProjectile projectile = new BoomerangProjectile(
-                getName(),
+                "Heavensplitter",
                 caster,
                 hitbox,
                 caster.getEyeLocation().add(caster.getLocation().getDirection().multiply(0.5)),

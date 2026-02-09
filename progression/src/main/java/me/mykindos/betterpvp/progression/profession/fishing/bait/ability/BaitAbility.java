@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -68,7 +67,7 @@ public abstract class BaitAbility extends CooldownInteraction implements Display
         UtilServer.callEvent(new PlayerThrowBaitEvent(player, createBait()));
 
         // Send message
-        final TextComponent name = Component.text(getName()).color(NamedTextColor.YELLOW);
+        final Component name = getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW);
         UtilMessage.message(player, "Bait", Component.text("You used ", NamedTextColor.GRAY).append(name));
         return InteractionResult.Success.ADVANCE;
     }

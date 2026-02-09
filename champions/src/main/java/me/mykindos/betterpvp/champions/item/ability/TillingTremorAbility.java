@@ -165,7 +165,7 @@ public class TillingTremorAbility extends CooldownInteraction implements Display
 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(entity, blockLocation, 1.5)) {
                     UtilDamage.doDamage(new DamageEvent(target, entity, null,
-                            new InteractionDamageCause(this), damage, getName()));
+                            new InteractionDamageCause(this), damage, "Tilling Tremor"));
 
                     Vector trajectory = UtilVelocity.getTrajectory2d(entity.getLocation().toVector(), target.getLocation().toVector());
                     VelocityData velocityData = new VelocityData(trajectory, 1.0, true, 0, 1.0, 1.0, false);

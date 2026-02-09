@@ -59,7 +59,7 @@ public class DashInteraction extends CooldownInteraction implements DisplayedInt
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Move horizontally");
+        return Component.text("Quickly dash horizontally to dodge incoming attacks.");
     }
 
     @Override

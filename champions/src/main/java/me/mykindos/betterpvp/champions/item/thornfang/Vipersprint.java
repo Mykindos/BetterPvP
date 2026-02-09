@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -36,6 +37,9 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
@@ -60,7 +64,7 @@ import static me.mykindos.betterpvp.core.interaction.context.InteractionContext.
 @EqualsAndHashCode(callSuper = false)
 @Getter
 @Setter
-public class Vipersprint extends AbstractInteraction implements DisplayedInteraction {
+public class Vipersprint extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     // Context keys for storing state across ticks
     private static final ExecutionKey<Location> LAST_LOCATION = ExecutionKey.of("vipersprint_last_loc");
@@ -83,6 +87,7 @@ public class Vipersprint extends AbstractInteraction implements DisplayedInterac
         this.cooldownManager = cooldownManager;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
+        Bukkit.getPluginManager().registerEvents(this, champions);
     }
 
     @Override
@@ -97,10 +102,10 @@ public class Vipersprint extends AbstractInteraction implements DisplayedInterac
 
     @Override
     protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
-                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+                                                   @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         final LivingEntity livingEntity = actor.getEntity();
         // Check cooldown
-        if (livingEntity instanceof Player player && cooldownManager.hasCooldown(player, getName())) {
+        if (livingEntity instanceof Player player && cooldownManager.hasCooldown(player, "Vipersprint")) {
             return new InteractionResult.Fail(InteractionResult.FailReason.COOLDOWN);
         }
 
@@ -151,11 +156,11 @@ public class Vipersprint extends AbstractInteraction implements DisplayedInterac
                     livingEntity,
                     new InteractionDamageCause(this).withBukkitCause(EntityDamageEvent.DamageCause.POISON),
                     damage,
-                    getName()
+                    "Vipersprint"
             ));
 
             if (!event.isCancelled()) {
-                effectManager.addEffect(enemy, livingEntity, EffectTypes.POISON, getName(), poisonAmplifier, (long) (poisonSeconds * 1000L));
+                effectManager.addEffect(enemy, livingEntity, EffectTypes.POISON, "Vipersprint", poisonAmplifier, (long) (poisonSeconds * 1000L));
 
                 VelocityData data = new VelocityData(livingEntity.getLocation().getDirection(),
                         1.2, false, 0, 0.2, 1.0, true);
@@ -207,7 +212,7 @@ public class Vipersprint extends AbstractInteraction implements DisplayedInterac
         }
 
         if (entity instanceof Player player) {
-            cooldownManager.use(player, getName(), cooldown, true);
+            cooldownManager.use(player, "Vipersprint", cooldown, true);
         }
 
         // Stop velocity
@@ -215,5 +220,12 @@ public class Vipersprint extends AbstractInteraction implements DisplayedInterac
 
         new SoundEffect(Sound.BLOCK_GRASS_PLACE, 0.8f, 1f).play(entity.getLocation());
         new SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 1.8f, 0.2f).play(entity.getLocation());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onMeleeAttack(DamageEvent event) {
+        if (event.getDamager() instanceof Player player) {
+            cooldownManager.removeCooldown(player, "Vipersprint", false);
+        }
     }
 }

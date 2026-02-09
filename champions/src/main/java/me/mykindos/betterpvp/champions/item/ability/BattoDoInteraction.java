@@ -87,7 +87,7 @@ public class BattoDoInteraction extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Dash and strike targets in your path");
+        return Component.text("Dash forward and strike targets in your path, dealing damage, knocking them back, and setting them on fire.");
     }
 
     private void onSelect(@NotNull InteractionActor actor, @NotNull InteractionContext context, LivingEntity livingEntity) {

@@ -72,7 +72,7 @@ public class HardSlashInteraction extends CooldownInteraction implements Display
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Deal damage to and knockback enemies around you");
+        return Component.text("Deal damage to nearby enemies and knock them back with a fiery slash.");
     }
 
     @Override

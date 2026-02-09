@@ -78,7 +78,7 @@ public class MagnetismAbility extends AbstractInteraction implements DisplayedIn
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        if (!energyService.use(player, getName(), energyPerTick, true)) {
+        if (!energyService.use(player, "Magnetism", energyPerTick, true)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 

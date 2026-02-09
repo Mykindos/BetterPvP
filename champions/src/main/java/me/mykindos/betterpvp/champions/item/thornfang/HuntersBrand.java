@@ -137,7 +137,7 @@ public class HuntersBrand extends AbstractInteraction implements Listener, Displ
      * Currently uses broadcast for debugging - replace with actual effect later.
      */
     private void triggerFrenzy(Player player, LivingEntity target) {
-        effectManager.addEffect(target, player, EffectTypes.FRENZY, getName(), frenzyLevel, (long) (frenzyDurationSeconds * 1000L));
+        effectManager.addEffect(target, player, EffectTypes.FRENZY, "Hunter's Brand", frenzyLevel, (long) (frenzyDurationSeconds * 1000L));
     }
 
     /**
