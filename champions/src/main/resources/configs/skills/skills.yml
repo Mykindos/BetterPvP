@@ -695,14 +695,13 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 1.5
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 3.0
-      durationIncreasePerLevel: 1.0
-      vulnerabilityStrength: 2
-      tickDelay: 12
+      damageMultiplier: 3.0
+      damageMultiplierIncreasePerLevel: 0.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
+      radius: 3.0
+      tickDelay: 12
       startDistance: 1.0
       distance: 15
     bloodlust:
