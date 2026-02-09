@@ -7,11 +7,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.item.ability.ThrowingWebAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
@@ -30,7 +31,9 @@ public class ThrowingWeb extends BaseItem implements Reloadable {
         super("Throwing Web", ItemStack.of(Material.COBWEB), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
         this.throwingWebAbility = new ThrowingWebAbility(championsManager, blockHandler, cooldownManager);
         throwingWebAbility.setConsumesItem(true);
-        addBaseComponent(AbilityContainerComponent.builder().ability(throwingWebAbility).build());
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.LEFT_CLICK, throwingWebAbility)
+                .build());
     }
 
     @Override

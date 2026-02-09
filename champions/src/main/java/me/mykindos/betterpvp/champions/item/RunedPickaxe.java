@@ -6,13 +6,14 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.MagicSeal;
@@ -48,8 +49,8 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
         // Create and add the mining speed ability
         this.ability = new EnhancedMiningAbility();
         addSerializableComponent(new RuneContainerComponent(0, 0));
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(ability)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.PASSIVE, ability)
                 .build());
     }
 

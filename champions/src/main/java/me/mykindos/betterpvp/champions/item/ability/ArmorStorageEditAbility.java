@@ -2,7 +2,11 @@ package me.mykindos.betterpvp.champions.item.ability;
 
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponent;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
@@ -11,8 +15,6 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SuppliedItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -22,35 +24,47 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
-public class ArmorStorageEditAbility extends ItemAbility {
-
-    private static final NamespacedKey KEY = new NamespacedKey("betterpvp", "armor_storage_edit");
+public class ArmorStorageEditAbility extends AbstractInteraction implements DisplayedInteraction {
 
     public ArmorStorageEditAbility() {
-        super(KEY, "Replace Armor", "Add or remove equipment stored on this item.", TriggerTypes.SHIFT_RIGHT_CLICK);
+        super("replace_armor");
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
+    public @NotNull Component getDisplayName() {
+        return Component.text("Replace Armor");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Add or remove equipment stored on this item.");
+    }
+
+    @Override
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!actor.isPlayer() || itemInstance == null) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
         final ArmorStorageComponent component = itemInstance.getComponent(ArmorStorageComponent.class)
                 .orElseThrow(() -> new IllegalStateException("Item does not have armor storage component"));
 
-        final Player player = Objects.requireNonNull(client.getGamer().getPlayer());
+        final Player player = (Player) actor.getEntity();
         new Editor(component, itemInstance).show(player);
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 
     private static class Editor extends AbstractGui implements Windowed {

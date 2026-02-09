@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.cause.DamageCause;
@@ -20,11 +19,14 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageModifier;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageModifier;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -35,7 +37,6 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
@@ -55,6 +56,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Transformation;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -62,7 +65,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,7 +73,7 @@ import java.util.UUID;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @BPvPListener
-public class SoulHarvestAbility extends ItemAbility implements Listener {
+public class SoulHarvestAbility extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     private int maxSouls;
     private double soulHarvestSeconds;
@@ -111,16 +113,13 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
 
     @Inject
     private SoulHarvestAbility(Champions champions, DamageLogManager damageLogManager, EffectManager effectManager, ClientManager clientManager, ItemFactory itemFactory) {
-        super(new NamespacedKey(champions, "soul_harvest"),
-                "Soul Harvest",
-                "Collect souls of fallen players and mobs to harvest their souls, gaining damage and speed.",
-                TriggerTypes.HOLD_BLOCK);
+        super("soul_harvest");
         this.champions = champions;
         this.damageLogManager = damageLogManager;
         this.effectManager = effectManager;
         this.clientManager = clientManager;
         this.itemFactory = itemFactory;
-        
+
         // Default values, will be overridden by config
         this.maxSouls = 3;
         this.soulHarvestSeconds = 1.5;
@@ -137,11 +136,25 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
+    public @NotNull Component getDisplayName() {
+        return Component.text("Soul Harvest");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Collect souls of fallen players and mobs to harvest their souls, gaining damage and speed.");
+    }
+
+    @Override
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
         final ScytheData data = playerData.get(player.getUniqueId());
         if (data == null) {
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         final Soul target = getTargetSoul(player).orElse(null);
@@ -152,7 +165,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
             UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
             playerData.remove(player.getUniqueId());
             pause(player, data);
-            return false;
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         // Play particles if they're harvesting or just finished harvesting
@@ -166,14 +179,14 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
                 souls.remove(soul.getUniqueId());
                 Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(Champions.class), soul.getDisplay()::remove, 2);
             }
-            return true;
+            return InteractionResult.Success.ADVANCE;
         } else if (target != null && !target.isHarvesting()) {
             // If they're not harvesting, but they are clicking in the direction of a soul, start harvesting
             data.startHarvesting();
             data.playHarvestStart();
-            return true;
+            return InteractionResult.Success.ADVANCE;
         }
-        return false;
+        return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
     }
     
     /**
@@ -486,7 +499,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
             // Calculate and apply bonus damage
             double bonusDamage = getMaxSoulsDamage() * soulCount / maxSouls;
             if (bonusDamage > 0) {
-                event.addModifier(new ItemAbilityDamageModifier.Flat(this, bonusDamage));
+                event.addModifier(new InteractionDamageModifier.Flat(this, bonusDamage));
             }
         });
     }

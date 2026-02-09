@@ -6,20 +6,19 @@ import net.kyori.adventure.sound.Sound;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilSound {
 
-    public static void playSound(Player player, org.bukkit.Sound sound, float volume, float pitch, boolean followPlayer) {
-        playSound(player, sound, Sound.Source.MASTER, volume, pitch, followPlayer);
+    public static void playSound(Entity entity, org.bukkit.Sound sound, float volume, float pitch, boolean followPlayer) {
+        playSound(entity, sound, Sound.Source.MASTER, volume, pitch, followPlayer);
     }
 
-    public static void playSound(Player player, org.bukkit.Sound sound, Sound.Source source, float volume, float pitch, boolean followPlayer) {
+    public static void playSound(Entity entity, org.bukkit.Sound sound, Sound.Source source, float volume, float pitch, boolean followPlayer) {
         if (followPlayer) {
-            player.playSound(Sound.sound(sound, source, volume, pitch), Sound.Emitter.self());
+            entity.playSound(Sound.sound(sound, source, volume, pitch), Sound.Emitter.self());
         } else {
-            player.playSound(Sound.sound(sound, source, volume, pitch));
+            entity.playSound(Sound.sound(sound, source, volume, pitch));
         }
     }
 

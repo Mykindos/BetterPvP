@@ -76,7 +76,8 @@ public class DamageEventFinalizer {
         durabilityProcessor.processDurability(event);
 
         // Process delay
-        delayManager.addDelay(event.getDamager(), event.getDamagee(), event.getCause(), event.getDamageDelay());
+        long damageDelay = event.getForceDamageDelay() > 0 ? event.getForceDamageDelay() : event.getDamageDelay();
+        delayManager.addDelay(event.getDamager(), event.getDamagee(), event.getCause(), damageDelay);
         
         // Play hit sounds
         playHitSounds(event);

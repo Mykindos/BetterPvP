@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,8 +47,9 @@ public class BaseItem implements Item {
     @Setter(AccessLevel.PROTECTED)
     private @NotNull ItemNameRenderer itemNameRenderer;
     private final List<ItemStackRenderer> itemStackRenderers = new ArrayList<>();
-    private final Multimap<Class<?>, ItemComponent> serializableComponents = MultimapBuilder.hashKeys().hashSetValues().build();
-    private final Multimap<Class<?>, ItemComponent> components = MultimapBuilder.hashKeys().hashSetValues().build();
+    private final Multimap<Class<?>, @NotNull ItemComponent> serializableComponents = MultimapBuilder.hashKeys().hashSetValues().build();
+    private final Multimap<Class<?>, @NotNull ItemComponent> components = MultimapBuilder.hashKeys().hashSetValues().build();
+    private final Collection<@NotNull ItemComponent> componentsView = Collections.unmodifiableCollection(components.values());
 
     public BaseItem(String name, ItemStack model, ItemGroup group, ItemRarity rarity) {
         this(model, group, itemInstance -> rarity, new LoreComponentRenderer(), new NameRarityRenderer(name));
@@ -111,8 +113,15 @@ public class BaseItem implements Item {
     }
 
     @Override
-    public @NotNull Set<ItemComponent> getComponents() {
-        return Set.copyOf(components.values());
+    public <T extends ItemComponent> Optional<T> getComponent(@NotNull Class<T> componentClass) {
+        return components.get(componentClass).stream()
+                .findFirst()
+                .map(componentClass::cast);
+    }
+
+    @Override
+    public @NotNull Collection<@NotNull ItemComponent> getComponents() {
+        return componentsView;
     }
 
     /**

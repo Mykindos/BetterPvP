@@ -4,40 +4,39 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-
-import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class SkyforgedAscent extends ItemAbility implements Listener {
+public class SkyforgedAscent extends CooldownInteraction implements DisplayedInteraction, Listener {
 
     @EqualsAndHashCode.Include
     private double velocity;
@@ -48,63 +47,67 @@ public class SkyforgedAscent extends ItemAbility implements Listener {
     @EqualsAndHashCode.Include
     private double speedDuration; // Seconds
     private final EffectManager effectManager;
-    private final CooldownManager cooldownManager;
-    private final BaseItem heldItem;
     private final ItemFactory itemFactory;
     private final ClientManager clientManager;
 
-    public SkyforgedAscent(EffectManager effectManager, CooldownManager cooldownManager,
-                            BaseItem heldItem, ItemFactory itemFactory, ClientManager clientManager) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class),
-                        "skyforged_ascent"),
-                "Skyforged Ascent",
-                "Throw the weapon to ascend skyward, riding its divine force, granting you a burst of speed.",
-                TriggerType.dummy("Throw"));
+    public SkyforgedAscent(EffectManager effectManager, CooldownManager cooldownManager, ItemFactory itemFactory, ClientManager clientManager) {
+        super("skyforged_ascent", cooldownManager);
         this.effectManager = effectManager;
-        this.cooldownManager = cooldownManager;
-        this.heldItem = heldItem;
         this.itemFactory = itemFactory;
         this.clientManager = clientManager;
         Bukkit.getPluginManager().registerEvents(this, JavaPlugin.getPlugin(Champions.class));
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        final Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        if (!cooldownManager.use(player, getName(), cooldown, true, true, true, (BaseItem) null)) {
-            return false;
-        }
+    public @NotNull Component getDisplayName() {
+        return Component.text("Skyforged Ascent");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Throw the weapon to ascend skyward, riding its divine force, granting you a burst of speed.");
+    }
+
+    @Override
+    public double getCooldown() {
+        return cooldown;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        LivingEntity entity = actor.getEntity();
 
         // Set them to riptide mode
-        UtilVelocity.velocity(player, player, new VelocityData(
-                player.getLocation().getDirection(),
+        UtilVelocity.velocity(entity, entity, new VelocityData(
+                entity.getLocation().getDirection(),
                 velocity,
                 0,
                 10.0,
                 true
         ));
-        effectManager.addEffect(player, EffectTypes.NO_FALL, 5_000L);
+        effectManager.addEffect(entity, EffectTypes.NO_FALL, 5_000L);
 
         // Give speed effect
-        effectManager.addEffect(player, EffectTypes.SPEED, speedAmplifier, (long) (speedDuration * 1000L));
+        effectManager.addEffect(entity, EffectTypes.SPEED, speedAmplifier, (long) (speedDuration * 1000L));
 
         // Cues
-        new SoundEffect(Sound.ITEM_TRIDENT_THUNDER, 2f, 0.5f).play(player.getLocation());
-        new SoundEffect(Sound.ITEM_TRIDENT_RIPTIDE_2, 0f, 1f).broadcast(player);
+        new SoundEffect(Sound.ITEM_TRIDENT_THUNDER, 2f, 0.5f).play(entity.getLocation());
+        new SoundEffect(Sound.ITEM_TRIDENT_RIPTIDE_2, 0f, 1f).broadcast(entity);
         Particle.CLOUD.builder()
                 .extra(0.2)
                 .count(20)
-                .location(player.getLocation())
+                .location(entity.getLocation())
                 .receivers(60)
                 .spawn();
 
         // Spawn circle with star of DUST particles under the player
         // Create circle particles
-        Location center = player.getEyeLocation().add(player.getLocation().getDirection().multiply(2.5));
+        Location center = entity.getEyeLocation().add(entity.getLocation().getDirection().multiply(2.5));
         Particle particle = Particle.END_ROD;
         final double radius = 2.5; // Radius of the circle
-        final double pitch = Math.toRadians(player.getLocation().getPitch() + 90);
-        final double yaw = Math.toRadians(-player.getLocation().getYaw());
+        final double pitch = Math.toRadians(entity.getLocation().getPitch() + 90);
+        final double yaw = Math.toRadians(-entity.getLocation().getYaw());
 
         for (int i = 0; i < 360; i += 10) {
             double angle = Math.toRadians(i);
@@ -168,23 +171,9 @@ public class SkyforgedAscent extends ItemAbility implements Listener {
         }
 
         // Consume durability
-        UtilItem.damageItem(player, itemStack, 1);
-        return true;
-    }
-
-    @EventHandler
-    public void onTridentThrow(ProjectileLaunchEvent event) {
-        if (!(event.getEntity() instanceof Trident trident)) return; // Not a throwable trident
-        if (!(trident.getShooter() instanceof Player player)) return; // Shooter must be a player
-
-        ItemStack itemStack = trident.getItemStack();
-        ItemInstance itemInstance = itemFactory.fromItemStack(itemStack).orElse(null);
-        if (itemInstance == null || !itemInstance.getBaseItem().equals(heldItem)) {
-            return; // Ensure the item is the one with the ability
+        if (itemStack != null && entity instanceof Player player) {
+            UtilItem.damageItem(player, itemStack, 1);
         }
-
-        event.setCancelled(true); // Cancel the default throw action
-        Client client = clientManager.search().online(player);
-        invoke(client, itemInstance, player.getEquipment().getItem(player.getActiveItemHand()));
+        return InteractionResult.Success.ADVANCE;
     }
 }

@@ -3,26 +3,27 @@ package me.mykindos.betterpvp.champions.item.ability;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -30,9 +31,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -46,7 +47,7 @@ import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class WindSlashAbility extends ItemAbility {
+public class WindSlashAbility extends CooldownInteraction implements DisplayedInteraction {
 
     private double slashCooldown;
     private double slashHitboxSize;
@@ -60,8 +61,6 @@ public class WindSlashAbility extends ItemAbility {
     @EqualsAndHashCode.Exclude
     private final EnergyService energyService;
     @EqualsAndHashCode.Exclude
-    private final CooldownManager cooldownManager;
-    @EqualsAndHashCode.Exclude
     private final BaseItem heldItem;
 
     // Active slashes
@@ -69,29 +68,42 @@ public class WindSlashAbility extends ItemAbility {
     private final Set<Slash> slashSet = new HashSet<>();
 
     public WindSlashAbility(CooldownManager cooldownManager, EnergyService energyService, BaseItem heldItem) {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "wind_slash"),
-                "Wind Slash",
-                "Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.",
-                TriggerTypes.LEFT_CLICK);
-        this.cooldownManager = cooldownManager;
+        super("wind_slash", cooldownManager);
         this.heldItem = heldItem;
         this.energyService = energyService;
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        
-        if (!cooldownManager.use(player, getName(), slashCooldown, true, true, false, (BaseItem) null)) {
-            return false;
-        }
+    public @NotNull Component getDisplayName() {
+        return Component.text("Wind Slash");
+    }
 
-        if (!energyService.use(player, getName(), slashEnergyCost, true)) {
-            return false;
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.");
+    }
+
+    @Override
+    public double getCooldown() {
+        return slashCooldown;
+    }
+
+    @Override
+    public double getEnergyCost() {
+        return slashEnergyCost;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         // Consume durability
-        UtilItem.damageItem(player, itemStack, 1);
+        if (itemStack != null) {
+            UtilItem.damageItem(player, itemStack, 1);
+        }
 
         // SFX
         new SoundEffect(Sound.ENTITY_PHANTOM_FLAP, 1.2F, 2.0F).play(player.getLocation());
@@ -114,9 +126,9 @@ public class WindSlashAbility extends ItemAbility {
         slashSet.add(mainSlash);
         slashSet.add(leftSlash);
         slashSet.add(rightSlash);
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
-    
+
     // Call this from a scheduler in the main item class
     public void processSlashes() {
         final Iterator<Slash> slashIterator = slashSet.iterator();
@@ -180,7 +192,7 @@ public class WindSlashAbility extends ItemAbility {
             DamageEvent event = new DamageEvent(target,
                     caster,
                     null,
-                    new ItemAbilityDamageCause(WindSlashAbility.this).withCategory(RANGED),
+                    new InteractionDamageCause(WindSlashAbility.this).withCategory(RANGED),
                     slashDamage,
                     "Wind Slash");
             UtilDamage.doDamage(event);
@@ -203,7 +215,8 @@ public class WindSlashAbility extends ItemAbility {
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
 
             // Regen energy
-            energyService.regenerateEnergy(caster, slashEnergyRefundPercent, EnergyEvent.Cause.USE);
+            final double max = energyService.getMax(caster.getUniqueId());
+            energyService.regenerateEnergy(caster, max * slashEnergyRefundPercent, EnergyEvent.Cause.USE);
         }
     }
-} 
+}

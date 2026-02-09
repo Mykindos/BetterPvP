@@ -9,12 +9,13 @@ import me.mykindos.betterpvp.champions.item.ability.SkyforgedAscent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.Rope;
@@ -49,13 +50,13 @@ public class Mjolnir extends WeaponItem implements Reloadable, NexoItem {
     private Mjolnir(Champions champions, CooldownManager cooldownManager, ItemFactory itemFactory, EffectManager effectManager, ClientManager clientManager) {
         super(champions, "Mjolnir", Item.model(Material.TRIDENT, "mjolnir"), ItemRarity.MYTHICAL, List.of(Group.MELEE, Group.RANGED));
         this.champions = champions;
-        this.skyforgedAscent = new SkyforgedAscent(effectManager, cooldownManager, this, itemFactory, clientManager);
-        this.heavensplitter = new Heavensplitter(this, itemFactory, clientManager);
+        this.skyforgedAscent = new SkyforgedAscent(effectManager, cooldownManager, itemFactory, clientManager);
+        this.heavensplitter = new Heavensplitter(this, itemFactory);
 
         // Create and add the tilling tremor ability
-        addBaseComponent(AbilityContainerComponent.builder()
-                .ability(skyforgedAscent)
-                .ability(heavensplitter)
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.THROW, skyforgedAscent)
+                .root(InteractionInputs.SWAP_HAND, heavensplitter)
                 .build());
     }
 

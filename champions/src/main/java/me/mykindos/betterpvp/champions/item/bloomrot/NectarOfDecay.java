@@ -5,21 +5,23 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -28,19 +30,20 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Getter
 @Setter
-public class NectarOfDecay extends ItemAbility implements Listener {
+public class NectarOfDecay extends CooldownInteraction implements Listener, DisplayedInteraction {
 
     private double cooldown;
     private double poisonSeconds;
@@ -55,30 +58,38 @@ public class NectarOfDecay extends ItemAbility implements Listener {
     @EqualsAndHashCode.Exclude
     private final WeakHashMap<Player, List<NectarOfDecayProjectile>> projectiles = new WeakHashMap<>();
     @EqualsAndHashCode.Exclude
-    private final CooldownManager cooldownManager;
-    @EqualsAndHashCode.Exclude
     private final EffectManager effectManager;
     @EqualsAndHashCode.Exclude
     private final Champions plugin;
 
     @Inject
     private NectarOfDecay(Champions champions, EffectManager effectManager, CooldownManager cooldownManager, EffectManager effectManager1) {
-        super(new NamespacedKey(champions, "nectar_of_decay"),
-                "Nectar of Decay",
-                "Unleash a toxic blossom that bursts into a spreading poison cloud, siphoning health from enemies to restore your own.",
-                TriggerTypes.RIGHT_CLICK);
+        super("nectar_of_decay", cooldownManager);
         this.plugin = champions;
-        this.cooldownManager = cooldownManager;
         this.effectManager = effectManager1;
         UtilServer.runTaskTimer(champions, this::processProjectiles, 0, 1);
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
+    public @NotNull Component getDisplayName() {
+        return Component.text("Nectar of Decay");
+    }
 
-        if (!cooldownManager.use(player, getName(), cooldown, true, true, false, true)) {
-            return false;
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Unleash a toxic blossom that bursts into a spreading poison cloud, siphoning health from enemies to restore your own.");
+    }
+
+    @Override
+    public double getCooldown() {
+        return cooldown;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         final Location location = player.getEyeLocation();
@@ -98,8 +109,10 @@ public class NectarOfDecay extends ItemAbility implements Listener {
         new SoundEffect(Sound.ENTITY_EVOKER_CAST_SPELL, 1f, 2.0f).play(player.getLocation());
         projectile.redirect(player.getLocation().getDirection().multiply(speed));
         projectiles.computeIfAbsent(player, p -> new ArrayList<>()).add(projectile);
-        UtilItem.damageItem(player, itemStack, 1);
-        return true;
+        if (itemStack != null) {
+            UtilItem.damageItem(player, itemStack, 1);
+        }
+        return InteractionResult.Success.ADVANCE;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -107,7 +120,7 @@ public class NectarOfDecay extends ItemAbility implements Listener {
         if (!event.isDamageeLiving()) return;
         if (event.getBukkitCause() != EntityDamageEvent.DamageCause.POISON) return;
 
-        final Optional<Effect> poisonOpt = effectManager.getEffect(event.getLivingDamagee(), EffectTypes.POISON, getName());
+        final Optional<Effect> poisonOpt = effectManager.getEffect(event.getLivingDamagee(), EffectTypes.POISON, "Nectar of Decay");
         if (poisonOpt.isEmpty()) {
             return;
         }

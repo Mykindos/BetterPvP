@@ -5,24 +5,25 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageModifier;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageModifier;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -32,17 +33,18 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class Needlegrasp extends ItemAbility implements Listener {
+public class Needlegrasp extends CooldownInteraction implements Listener, DisplayedInteraction {
 
     private double cooldown;
     private double damage;
@@ -61,10 +63,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
     private transient final WeakHashMap<Player, PullState> activePulls = new WeakHashMap<>();
 
     protected Needlegrasp(Champions champions, CooldownManager cooldownManager, HuntersBrand huntersBrand) {
-        super(new NamespacedKey(champions, "needlegrasp"),
-                "Needlegrasp",
-                "Throw a vine that pulls you and an enemy toward each other. Hit them with a melee attack to reset your cooldown.",
-                TriggerTypes.OFF_HAND);
+        super("needlegrasp", cooldownManager);
         this.champions = champions;
         this.cooldownManager = cooldownManager;
         this.huntersBrand = huntersBrand;
@@ -73,11 +72,25 @@ public class Needlegrasp extends ItemAbility implements Listener {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
+    public @NotNull Component getDisplayName() {
+        return Component.text("Needlegrasp");
+    }
 
-        if (!cooldownManager.use(player, getName(), (float) cooldown, true, true)) {
-            return true;
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Throw a vine that pulls you and an enemy toward each other. Hit them with a melee attack to reset your cooldown.");
+    }
+
+    @Override
+    public double getCooldown() {
+        return cooldown;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         // Play throw sound
@@ -104,7 +117,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
         projectile.redirect(player.getLocation().getDirection().multiply(speed));
 
         activeProjectiles.put(player, projectile);
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 
     public void tick() {
@@ -157,7 +170,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
      * Called when the player successfully hits an enemy mid-air.
      */
     public void resetCooldown(Player player) {
-        cooldownManager.removeCooldown(player, getName(), false);
+        cooldownManager.removeCooldown(player, "Needlegrasp", false);
     }
 
     /**
@@ -241,13 +254,8 @@ public class Needlegrasp extends ItemAbility implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMeleeAttack(DamageEvent event) {
-        if (event.getDamager() instanceof Player player) {
-            cooldownManager.removeCooldown(player, "Vipersprint", false);
-        }
-
         if (event.isCancelled()) return;
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
-        if (event.getCause() instanceof ItemAbilityDamageCause) return;
         if (!(event.getDamager() instanceof Player caster)) return;
         if (!(event.getDamagee() instanceof LivingEntity target)) return;
 
@@ -271,7 +279,7 @@ public class Needlegrasp extends ItemAbility implements Listener {
         if (state.isEffectsApplied()) return;
 
         // Cancel the melee damage
-        event.addModifier(new ItemAbilityDamageModifier.Flat(this, damage));
+        event.addModifier(new InteractionDamageModifier.Flat(this, damage));
         event.setKnockback(false);
 
         // Trigger collision effects

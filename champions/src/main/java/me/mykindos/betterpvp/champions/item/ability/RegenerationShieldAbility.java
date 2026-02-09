@@ -6,27 +6,29 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class RegenerationShieldAbility extends ItemAbility {
+public class RegenerationShieldAbility extends AbstractInteraction implements DisplayedInteraction {
 
     private double energyPerTick;
     private int regenerationAmplifier;
@@ -40,31 +42,42 @@ public class RegenerationShieldAbility extends ItemAbility {
 
     @Inject
     public RegenerationShieldAbility(Champions champions, EnergyService energyService, EffectManager effectManager) {
-        super(new NamespacedKey(champions, "regeneration_shield"),
-                "Shield",
-                "Gain an amplified regeneration effect while using this ability.",
-                TriggerTypes.HOLD_RIGHT_CLICK);
+        super("shield");
         this.champions = champions;
         this.energyService = energyService;
         this.effectManager = effectManager;
-        
+
         // Default values, will be overridden by config
         this.energyPerTick = 1.5;
         this.regenerationAmplifier = 5;
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        Player player = Objects.requireNonNull(client.getGamer().getPlayer());
-        
+    public @NotNull Component getDisplayName() {
+        return Component.text("Shield");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Gain an amplified regeneration effect while using this ability.");
+    }
+
+    @Override
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
         // Check energy
-        if (!energyService.use(player, getName(), energyPerTick, true)) {
-            return false;
+        if (!energyService.use(player, "Shield", energyPerTick, true)) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
         // Apply regeneration effect with condition to remove when no longer holding item
-        applyRegeneration(player, itemStack.getType());
-        
+        Material itemMaterial = itemStack != null ? itemStack.getType() : Material.AIR;
+        applyRegeneration(player, itemMaterial);
+
         // Play particles and sound
         new SoundEffect(Sound.BLOCK_LAVA_POP, 1f, 2f).play(player.getLocation());
         new ParticleBuilder(Particle.HEART)
@@ -73,14 +86,14 @@ public class RegenerationShieldAbility extends ItemAbility {
                 .extra(0.2f)
                 .receivers(60)
                 .spawn();
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
-    
+
     /**
      * Apply regeneration effect to player
      */
     private void applyRegeneration(Player player, Material itemMaterial) {
-        effectManager.addEffect(player, player, EffectTypes.REGENERATION, getName(), regenerationAmplifier, 80L, true, false,
+        effectManager.addEffect(player, player, EffectTypes.REGENERATION, "Shield", regenerationAmplifier, 80L, true, false,
                 (livingEntity) -> {
                     if (livingEntity instanceof Player p) {
                         return p.getInventory().getItemInMainHand().getType() != itemMaterial;
@@ -88,4 +101,4 @@ public class RegenerationShieldAbility extends ItemAbility {
                     return false;
                 });
     }
-} 
+}

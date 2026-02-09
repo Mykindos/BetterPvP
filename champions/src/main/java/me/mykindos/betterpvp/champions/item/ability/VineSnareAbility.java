@@ -5,19 +5,21 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.projectile.VineSnareProjectile;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +27,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +38,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class VineSnareAbility extends ItemAbility implements Listener {
+public class VineSnareAbility extends AbstractInteraction implements DisplayedInteraction, Listener {
 
     @EqualsAndHashCode.Exclude
     private final BaseItem baseItem;
@@ -51,10 +55,7 @@ public class VineSnareAbility extends ItemAbility implements Listener {
     private double entangleSeconds;
 
     public VineSnareAbility(Champions champions, ItemFactory itemFactory, BaseItem baseItem, EffectManager effectManager) {
-        super(new NamespacedKey(champions, "vine_snare"),
-                "Vine Snare",
-                "Bolts release vines that ensnare enemies and anchor them to the ground.",
-                TriggerTypes.PASSIVE);
+        super("vine_snare");
         this.itemFactory = itemFactory;
         this.baseItem = baseItem;
         this.effectManager = effectManager;
@@ -63,8 +64,20 @@ public class VineSnareAbility extends ItemAbility implements Listener {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        return true;
+    public @NotNull Component getDisplayName() {
+        return Component.text("Vine Snare");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Bolts release vines that ensnare enemies and anchor them to the ground.");
+    }
+
+    @Override
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        // This is a passive ability triggered by bow shooting
+        return InteractionResult.Success.ADVANCE;
     }
 
     private void processProjectiles() {
@@ -98,11 +111,14 @@ public class VineSnareAbility extends ItemAbility implements Listener {
         if (!itemFactory.isItemOfType(event.getBow(), baseItem)) return;
 
         final ItemInstance instance = itemFactory.fromItemStack(event.getBow()).orElseThrow();
-        final Optional<AbilityContainerComponent> containerOpt = instance.getComponent(AbilityContainerComponent.class);
+        final Optional<InteractionContainerComponent> containerOpt = instance.getComponent(InteractionContainerComponent.class);
         if (containerOpt.isEmpty()) return;
-        final AbilityContainerComponent container = containerOpt.get();
+        final InteractionContainerComponent container = containerOpt.get();
 
-        if (container.getContainer().contains(this)) {
+        // Check if this ability is in the chain
+        boolean hasAbility = container.getChain().hasRoot(this);
+
+        if (hasAbility) {
             event.setCancelled(true);
 
             if (event.getEntity() instanceof Player player) {
@@ -115,7 +131,7 @@ public class VineSnareAbility extends ItemAbility implements Listener {
                     hitboxSize,
                     event.getProjectile().getLocation(),
                     aliveTime,
-                    getName(),
+                    "Vine Snare",
                     effectManager,
                     entangleAmplifier,
                     (long) (entangleSeconds * 1000L)

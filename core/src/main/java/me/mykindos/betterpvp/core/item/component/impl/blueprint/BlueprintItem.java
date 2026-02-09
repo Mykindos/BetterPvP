@@ -4,28 +4,29 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.experimental.Delegate;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -45,7 +46,9 @@ public class BlueprintItem extends BaseItem {
         super(Item.model("blueprint"), ItemGroup.MISC, BlueprintItem::getRarity, new LoreComponentRenderer(), BlueprintItem::createBlueprintName);
         this.blueprint = new BlueprintComponent(new ArrayList<>());
         addSerializableComponent(blueprint);
-        addBaseComponent(new AbilityContainerComponent(List.of(new BlueprintAbility())));
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.NONE, new BlueprintAbility())
+                .build());
     }
 
     private static Optional<ItemInstance> getHighestRarityResult(ItemInstance blueprint) {
@@ -75,17 +78,26 @@ public class BlueprintItem extends BaseItem {
                 .append(Component.text(rarity.getName()).color(rarity.getColor()));
     }
 
-    private static class BlueprintAbility extends ItemAbility {
-
-        private static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "add_blueprint");
+    private static class BlueprintAbility extends AbstractInteraction implements DisplayedInteraction {
 
         public BlueprintAbility() {
-            super(KEY, "Add Blueprint", "Use this on a Workbench to add the blueprint", TriggerTypes.RIGHT_CLICK);
+            super("add_blueprint");
         }
 
         @Override
-        public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-            return false; // Ignore, this is just a marker ability
+        public @NotNull Component getDisplayName() {
+            return Component.text("Add Blueprint");
+        }
+
+        @Override
+        public @NotNull Component getDisplayDescription() {
+            return Component.text("Use this on a Workbench to add the blueprint");
+        }
+
+        @Override
+        protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                        @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS); // Ignore, this is just a marker ability
         }
     }
 

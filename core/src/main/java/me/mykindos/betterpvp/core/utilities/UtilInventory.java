@@ -25,9 +25,10 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -158,12 +159,13 @@ public class UtilInventory {
         }
     }
 
-    public static void consumeHand(Player player) {
-        final PlayerInventory inventory = player.getInventory();
-        final ItemStack item = player.getEquipment().getItemInMainHand();
+    public static void consumeHand(LivingEntity entity) {
+        final EntityEquipment equipment = entity.getEquipment();
+        if (equipment == null) return;
+        final ItemStack item = equipment.getItemInMainHand();
         if (item.getType() == Material.AIR) return;
         item.subtract();
-        inventory.setItemInMainHand(item);
+        equipment.setItemInMainHand(item);
     }
 
     public static boolean remove(Player player, ItemStack itemStack) {

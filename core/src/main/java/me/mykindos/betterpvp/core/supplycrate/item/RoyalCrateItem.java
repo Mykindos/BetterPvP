@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrateController;
 import me.mykindos.betterpvp.core.supplycrate.impl.RoyalCrateType;
 import org.bukkit.Location;
@@ -27,7 +28,9 @@ public class RoyalCrateItem extends BaseItem {
         super("Royal Crate Deployment", Item.model("supply_crate", 1), ItemGroup.MISC, ItemRarity.LEGENDARY);
         final DeployCrateAbility ability = new DeployCrateAbility(controller, type, "the center of the map", this::getLocation, true);
         ability.setConsumesItem(true);
-        addBaseComponent(AbilityContainerComponent.builder().ability(ability).build());
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, ability)
+                .build());
     }
 
     private Location getLocation(Client client) {

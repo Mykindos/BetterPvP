@@ -3,11 +3,12 @@ package me.mykindos.betterpvp.progression.profession.fishing.bait.ability;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.FishHook;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Ability for the Speedy Bait item.
@@ -24,7 +25,17 @@ public class SpeedyBaitAbility extends BaitAbility {
      */
     @Inject
     public SpeedyBaitAbility(CooldownManager cooldownManager) {
-        super("Speedy Bait", "Reduces the waiting time for fish to bite", cooldownManager);
+        super("speedy_bait", cooldownManager);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Speedy Bait");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Reduces the waiting time for fish to bite");
     }
 
     @Override

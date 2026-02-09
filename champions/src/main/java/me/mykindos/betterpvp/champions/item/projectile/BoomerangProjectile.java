@@ -3,9 +3,9 @@ package me.mykindos.betterpvp.champions.item.projectile;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
+import me.mykindos.betterpvp.core.interaction.Interaction;
+import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -37,7 +37,7 @@ public class BoomerangProjectile extends Projectile {
     private final double damage;
     private final double impactVelocity;
     private final ItemDisplay itemDisplay;
-    private final ItemAbility ability;
+    private final Interaction ability;
     private long recallTime = 0;
 
     public BoomerangProjectile(
@@ -49,7 +49,7 @@ public class BoomerangProjectile extends Projectile {
             double damage,
             double impactVelocity,
             ItemInstance hammer,
-            ItemAbility ability) {
+            Interaction ability) {
         super(caster, hitboxSize, location, aliveTime);
         this.name = name;
         this.damage = damage;
@@ -159,7 +159,7 @@ public class BoomerangProjectile extends Projectile {
                 target,
                 caster,
                 itemDisplay,
-                new ItemAbilityDamageCause(ability).withBukkitCause(PROJECTILE),
+                new InteractionDamageCause(ability).withBukkitCause(PROJECTILE),
                 damage,
                 name
         );

@@ -5,23 +5,25 @@ import lombok.Value;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponent;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
+import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
+import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -36,14 +38,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-public class PortableClassAbility extends ItemAbility implements Listener {
-
-    private static final NamespacedKey KEY = new NamespacedKey("betterpvp", "portable_class");
+public class PortableClassAbility extends AbstractInteraction implements Listener, DisplayedInteraction {
 
     @Setter
     private double castTime;
@@ -53,10 +54,7 @@ public class PortableClassAbility extends ItemAbility implements Listener {
     private final WeakHashMap<Player, Data> tasks = new WeakHashMap<>();
 
     public PortableClassAbility(Role role) {
-        super(KEY,
-                "Equip",
-                "Instantly swaps to the " + role.getName() + " class. Does not work in combat. Armor stored on this item will be equipped.",
-                TriggerTypes.RIGHT_CLICK);
+        super("equip");
         this.role = role;
         this.champions = JavaPlugin.getPlugin(Champions.class);
         this.roleManager = champions.getInjector().getInstance(RoleManager.class);
@@ -65,16 +63,31 @@ public class PortableClassAbility extends ItemAbility implements Listener {
     }
 
     @Override
-    public boolean invoke(Client client, ItemInstance itemInstance, ItemStack itemStack) {
-        final Gamer gamer = client.getGamer();
-        final Player player = Objects.requireNonNull(gamer.getPlayer());
+    public @NotNull Component getDisplayName() {
+        return Component.text("Equip");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Instantly swaps to the " + role.getName() + " class. Does not work in combat. Armor stored on this item will be equipped.");
+    }
+
+    @Override
+    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!actor.isPlayer() || actor.getClient() == null) {
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
+        final Gamer gamer = actor.getClient().getGamer();
+        final Player player = (Player) actor.getEntity();
         if (gamer.isInCombat() || roleManager.getRole(player) == role) {
             new SoundEffect(Sound.ENTITY_BEE_STING, 0f, 1f).play(player);
-            return false; // They're already the role or they're in combat
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS); // They're already the role or they're in combat
         }
 
         schedule(player, itemInstance);
-        return true;
+        return InteractionResult.Success.ADVANCE;
     }
 
     private void cancel(Player player) {

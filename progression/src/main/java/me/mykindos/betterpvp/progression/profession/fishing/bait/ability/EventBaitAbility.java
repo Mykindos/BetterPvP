@@ -3,16 +3,16 @@ package me.mykindos.betterpvp.progression.profession.fishing.bait.ability;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.FishHook;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -34,8 +34,18 @@ public class EventBaitAbility extends BaitAbility {
      */
     @Inject
     public EventBaitAbility(CooldownManager cooldownManager, Progression plugin) {
-        super("Event Bait", "Reduces the waiting time for fish to bite. This bait has a bigger radius than usual.", cooldownManager);
+        super("event_bait", cooldownManager);
         this.plugin = plugin;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Event Bait");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Reduces the waiting time for fish to bite. This bait has a bigger radius than usual.");
     }
 
     @Override

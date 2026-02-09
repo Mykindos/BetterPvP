@@ -38,9 +38,9 @@ public class UtilPlayer {
      * This modifies the player's local world border settings to customize its warning behavior.
      *
      * @param player the player whose world border is to be modified
-     * @param warningDelaySeconds the duration in seconds for the warning time delay
+     * @param ticks the duration in ticks for the warning time delay
      */
-    public static void setWarningEffect(Player player, int warningDelaySeconds) {
+    public static void setWarningEffect(Player player, int ticks) {
         final WorldBorder curBorder = player.getWorld().getWorldBorder();
         final WorldBorder newWorldBorder = Bukkit.getServer().createWorldBorder();
         newWorldBorder.setCenter(curBorder.getCenter());
@@ -48,7 +48,7 @@ public class UtilPlayer {
         newWorldBorder.setWarningDistance((int) curBorder.getMaxSize());
         newWorldBorder.setDamageAmount(0);
         newWorldBorder.setDamageBuffer(0);
-        newWorldBorder.setWarningTime(warningDelaySeconds);
+        newWorldBorder.setWarningTimeTicks(ticks);
         player.setWorldBorder(newWorldBorder);
     }
 
