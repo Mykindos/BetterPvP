@@ -37,7 +37,7 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
 
     public DamageLog getLastDamage(LivingEntity damagee) {
         ConcurrentLinkedDeque<DamageLog> logQueue = objects.get(damagee.getUniqueId().toString());
-        if (logQueue.isEmpty()) {
+        if (logQueue == null || logQueue.isEmpty()) {
             return null;
         } else {
             return logQueue.getLast();
