@@ -245,8 +245,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
             if (i == points) {
                 Player target = world.getPlayers().stream().filter(p -> p.getLocation().equals(end)).findFirst().orElse(null);
                 if (target != null) {
-                    final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), maxDistance + maxDistanceIncreasePerLevel);
-                    show(player, nearbyAllies, target);
+                    UtilPlayer.setGlowingForPlayerAndAllies(player, target, true, maxDistance + maxDistanceIncreasePerLevel);
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
                     UtilMessage.message(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + "</alt>.");
@@ -255,25 +254,11 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            hide(player, nearbyAllies, target);
+                            UtilPlayer.setGlowingForPlayerAndAllies(player, target, false, maxDistance + maxDistanceIncreasePerLevel);
                         }
                     }.runTaskLater(champions, 20L * getEffectDuration(level));
                 }
             }
-        }
-    }
-
-    private void show(Player player, List<Player> allies, Player target) {
-        UtilPlayer.setGlowing(player, target, true);
-        for (Player ally : allies) {
-            UtilPlayer.setGlowing(ally, target, true);
-        }
-    }
-
-    private void hide(Player player, List<Player> allies, Player target) {
-        UtilPlayer.setGlowing(player, target, false);
-        for (Player ally : allies) {
-            UtilPlayer.setGlowing(ally, target, false);
         }
     }
 
