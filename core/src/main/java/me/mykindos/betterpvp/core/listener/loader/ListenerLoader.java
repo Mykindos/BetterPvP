@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.listener.loader;
 
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
@@ -8,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
 @CustomLog
+@Singleton
 public class ListenerLoader extends Loader {
 
     /**
@@ -34,10 +36,17 @@ public class ListenerLoader extends Loader {
      *
      * @param listener the listener to be registered
      */
-    public void register(Listener listener) {
+    public static boolean register(BPvPPlugin plugin, Listener listener) {
         if (!plugin.getListeners().contains(listener)) {
             plugin.getListeners().add(listener);
             Bukkit.getPluginManager().registerEvents(listener, plugin);
+            return true;
+        }
+        return false;
+    }
+
+    public void register(Listener listener) {
+        if (register(plugin, listener)) {
             count++;
         }
     }

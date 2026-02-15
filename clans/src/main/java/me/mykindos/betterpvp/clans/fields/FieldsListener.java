@@ -105,7 +105,7 @@ public class FieldsListener extends ClanListener {
             return; // If the block isn't active yet, ignore
         }
 
-        final boolean allow = type.processInteraction(event, block, itemFactory);
+        final boolean allow = type.processInteraction(clientManager, event, block, itemFactory);
 
         if (allow) {
             event.setInform(false); // Block the message that they cant break

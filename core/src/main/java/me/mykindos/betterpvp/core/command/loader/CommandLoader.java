@@ -59,7 +59,6 @@ public class CommandLoader extends Loader {
             Command command = (Command) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(command);
 
-
             SpigotCommandWrapper commandWrapper = new SpigotCommandWrapper(command, command.getName(),
                     command.getDescription(), "", command.getAliases());
             plugin.getInjector().injectMembers(commandWrapper);

@@ -5,11 +5,12 @@ import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.anvil.AnvilRecipeRegistry;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
-import me.mykindos.betterpvp.core.block.data.RemovalHandler;
 import me.mykindos.betterpvp.core.block.data.LoadHandler;
+import me.mykindos.betterpvp.core.block.data.RemovalHandler;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ public class AnvilData implements RemovalHandler, LoadHandler {
 
     private final ItemFactory itemFactory;
     private final AnvilRecipeRegistry anvilRecipeRegistry;
+    private final ClientManager clientManager;
 
     // Component managers
     private final AnvilItemManager itemManager;
@@ -35,14 +37,16 @@ public class AnvilData implements RemovalHandler, LoadHandler {
 
     // Constructor for dependency injection
     public AnvilData(@NotNull ItemFactory itemFactory,
-                     @NotNull AnvilRecipeRegistry anvilRecipeRegistry) {
+                     @NotNull AnvilRecipeRegistry anvilRecipeRegistry, ClientManager clientManager) {
         this.itemFactory = itemFactory;
         this.anvilRecipeRegistry = anvilRecipeRegistry;
+        this.clientManager = clientManager;
 
         // Initialize component managers
         this.itemManager = new AnvilItemManager(anvilRecipeRegistry);
+
         this.displayManager = new AnvilDisplayManager();
-        this.hammerExecutor = new AnvilHammerExecutor(itemFactory);
+        this.hammerExecutor = new AnvilHammerExecutor(itemFactory, clientManager);
     }
 
     /**
@@ -58,6 +62,7 @@ public class AnvilData implements RemovalHandler, LoadHandler {
 
         // Update progress display
         updateHammerProgressDisplay();
+        clientManager.incrementStat(player, ClientStat.ANVIL_SWING, 1L);
 
         // Check if we have a current recipe and enough swings
         if (itemManager.getCurrentRecipe() != null &&
@@ -125,11 +130,12 @@ public class AnvilData implements RemovalHandler, LoadHandler {
 
         // Execute recipe and get remaining items
         List<ItemInstance> remainingItems = hammerExecutor.executeRecipe(
-                itemManager.getCurrentRecipe(), itemsMap, location
+                player, itemManager.getCurrentRecipe(), itemsMap, location
         );
 
         // Update anvil items with remaining items
         itemManager.updateItemsAfterRecipe(remainingItems);
+        //todo stat with remaining items
 
         // Update display entities to match remaining items
         displayManager.updateDisplayEntitiesAfterRecipe(remainingItems);

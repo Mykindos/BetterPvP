@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.anvil.AnvilRecipe;
 import me.mykindos.betterpvp.core.anvil.AnvilRecipeResult;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.core.item.ItemStat;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -27,11 +30,13 @@ import static me.mykindos.betterpvp.core.block.impl.anvil.AnvilConstants.SWING_C
 public class AnvilHammerExecutor {
 
     private final ItemFactory itemFactory;
+    private final ClientManager clientManager;
     private int hammerSwings = 0;
     private long lastSwingTime = 0L; // System.currentTimeMillis()
 
-    public AnvilHammerExecutor(@NotNull ItemFactory itemFactory) {
+    public AnvilHammerExecutor(@NotNull ItemFactory itemFactory, ClientManager clientManager) {
         this.itemFactory = itemFactory;
+        this.clientManager = clientManager;
     }
 
     /**
@@ -79,12 +84,14 @@ public class AnvilHammerExecutor {
     /**
      * Executes the recipe, consuming ingredients and producing results.
      *
+     * @param player  The player executing the recipe
      * @param recipe   The recipe to execute
      * @param itemsMap The items currently on the anvil
      * @param location The location to drop results at
      * @return The items remaining after recipe execution
      */
-    public List<ItemInstance> executeRecipe(@NotNull AnvilRecipe recipe,
+    public List<ItemInstance> executeRecipe(@NotNull Player player,
+                                            @NotNull AnvilRecipe recipe,
                                             @NotNull Map<Integer, ItemInstance> itemsMap,
                                             @NotNull Location location) {
 
@@ -99,14 +106,27 @@ public class AnvilHammerExecutor {
         // Get the recipe result
         AnvilRecipeResult result = recipe.getResult();
 
+        //todo stats for this
+
         // Drop the primary result
         ItemStack primaryResult = itemFactory.create(result.getPrimaryResult()).createItemStack();
         location.getWorld().dropItemNaturally(location, primaryResult);
 
+        final ItemStat primaryStat = ItemStat.builder()
+                .itemStack(primaryResult)
+                .action(ItemStat.Action.ANVIL_PRIMARY)
+                .build();
+        clientManager.incrementStat(player, primaryStat, 1L);
+
         // Drop secondary results
-        for (var secondaryResult : result.getSecondaryResults()) {
+        for (BaseItem secondaryResult : result.getSecondaryResults()) {
             ItemStack secondaryStack = itemFactory.create(secondaryResult).createItemStack();
             location.getWorld().dropItemNaturally(location, secondaryStack);
+            final ItemStat secondaryStat = ItemStat.builder()
+                    .itemStack(secondaryStack)
+                    .action(ItemStat.Action.ANVIL_SECONDARY)
+                    .build();
+            clientManager.incrementStat(player, secondaryStat, 1L);
         }
 
         // Play completion effects
