@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.manager;
 
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.search.SearchEngineBase;
@@ -11,6 +12,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 @CustomLog
@@ -41,7 +43,7 @@ public abstract class PlayerManager<T extends Unique> {
      */
     protected abstract void load(T entity);
 
-    protected abstract Optional<T> loadOnline(UUID uuid, String name);
+    protected abstract CompletableFuture<Optional<Client>> loadOnline(UUID uuid, String name);
 
     protected abstract Optional<T> loadOffline(@Nullable final String name);
 

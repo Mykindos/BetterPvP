@@ -23,7 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.List;
@@ -131,11 +131,7 @@ public class CombatLogListener implements Listener {
     }
 
     @EventHandler
-    public void onLoggerReturn(PlayerLoginEvent event) {
-        if(event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
-            return;
-        }
-
+    public void onLoggerReturn(PlayerJoinEvent event) {
         combatLogManager.getObject(event.getPlayer().getUniqueId().toString()).ifPresent(combatLog -> {
             combatLog.getCombatLogSheep().remove();
         });

@@ -136,9 +136,9 @@ public class ClientManager extends PlayerManager<Client> {
      * The client information is persisted in storage, and relevant events
      * are dispatched to notify other parts of the system about both the pre
      */
-    private void storeNewClient(Client client, final boolean online) {
+    private CompletableFuture<Void> storeNewClient(Client client, final boolean online) {
 
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
             //
             // If there is another client loaded previously for the same UUID, the new client
@@ -193,29 +193,36 @@ public class ClientManager extends PlayerManager<Client> {
         this.store.invalidate(client.getUniqueId());
     }
 
+    /**
+     * Loads a Client to be online and stores it if it is not already loaded.
+     * After function completes, the client will be stored in the cache.
+     * @param uuid the unique identifier of the client to load
+     * @param name the name of the client to load
+     * @return a CompletableFuture that will complete with an Optional containing the loaded Client, or empty if loading failed
+     */
     @Override
-    protected Optional<Client> loadOnline(final UUID uuid, final String name) {
+    protected CompletableFuture<Optional<Client>> loadOnline(final UUID uuid, final String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            final Optional<Client> storedUser = this.getStoredExact(uuid);
+            if (storedUser.isPresent()) {
+                return storedUser;
+            }
 
-        final Optional<Client> storedUser = this.getStoredExact(uuid);
-        if (storedUser.isPresent()) {
-            return storedUser;
-        }
+            Optional<Client> loaded;
+            if (this.redis.isEnabled()) {
+                loaded = this.getRedisLayer().getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
+            } else {
+                loaded = this.sqlLayer.getAndUpdate(uuid);
+            }
 
-        Optional<Client> loaded;
-        if (this.redis.isEnabled()) {
-            loaded = this.getRedisLayer().getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
-        } else {
-            loaded = this.sqlLayer.getAndUpdate(uuid);
-        }
+            if (loaded.isEmpty()) {
+                loaded = Optional.of(this.sqlLayer.create(uuid, name));
+            }
 
-        if (loaded.isEmpty()) {
-            loaded = Optional.of(this.sqlLayer.create(uuid, name));
-        }
-
-        final Client client = loaded.get();
-        this.storeNewClient(client, true);
-        return Optional.of(client);
-
+            final Client client = loaded.get();
+            this.storeNewClient(client, true).join();
+            return Optional.of(client);
+        });
     }
 
     /**

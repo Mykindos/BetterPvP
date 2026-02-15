@@ -29,7 +29,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -80,9 +79,12 @@ public class ClientListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(final ServerLoadEvent event) {
         // Loading all clients that are in the server while loading
-        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName()).ifPresent(client -> {
-            client.setOnline(true);
-            Bukkit.getPluginManager().callEvent(new ClientJoinEvent(client, player));
+        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName()).thenApply(clientOptional -> {
+            clientOptional.ifPresent(client -> {
+                client.setOnline(true);
+                Bukkit.getPluginManager().callEvent(new ClientJoinEvent(client, player));
+            });
+            return null;
         }));
 
         this.serverLoaded = true;
@@ -126,7 +128,7 @@ public class ClientListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLoad(final AsyncPlayerPreLoginEvent event) throws InterruptedException {
         if (!this.serverLoaded) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(SERVER_STILL_LOADING_ERROR));
@@ -140,7 +142,7 @@ public class ClientListener implements Listener {
             Optional<Client> client = this.clientManager.loadOnline(
                     event.getUniqueId(),
                     event.getName()
-            );
+            ).join();
 
             if (client.isEmpty()) {
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
@@ -153,12 +155,18 @@ public class ClientListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerJoin(PlayerJoinEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
-        if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
-            event.getPlayer().setMetadata("clientId", new FixedMetadataValue(core, client.getId()));
+        event.getPlayer().setMetadata("clientId", new FixedMetadataValue(core, client.getId()));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
+
+        final Client client = clientManager.search().online(event.getUniqueId()).orElseThrow();
+        if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_FULL || event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST) {
+
 
             if (client.hasRank(Rank.TRIAL_MOD)) {
                 event.allow();
@@ -166,25 +174,25 @@ public class ClientListener implements Listener {
             }
         }
 
-        if (event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
+        if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_BANNED) {
             if (client.hasRank(Rank.DEVELOPER)) {
                 event.allow();
             }
             return;
         }
 
-        if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
+        if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.ALLOWED) {
             if (Bukkit.getOnlinePlayers().size() >= maxPlayers && !client.hasRank(Rank.TRIAL_MOD)) {
-                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!"));
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_FULL, Component.text("The server is full!"));
                 return;
             }
         }
 
         String hostAddress = event.getAddress().getHostAddress();
         String saltedAddress = UtilFormat.hashWithSalt(hostAddress, salt);
-        log.info("{} ({}) logged in", event.getPlayer().getName(), event.getPlayer().getUniqueId())
+        log.info("{} ({}) logged in", event.getName(), event.getUniqueId())
                 .setAction("CLIENT_LOGIN")
-                .addClientContext(event.getPlayer()).addContext("Address", saltedAddress)
+                .addClientContext(client, false).addContext("Address", saltedAddress)
                 .submit();
 
     }
