@@ -39,7 +39,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -128,9 +127,10 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
                 championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 100, true);
 
                 final Location newLocation = UtilPlayer.getMidpoint(player).clone();
-                final Vector chargeDirection = getChargeDirection(player);
+                final double lookY = player.getLocation().getDirection().getY();
 
-                VelocityData velocityData = new VelocityData(chargeDirection, 0.5, false, 0.0, 0.0, 0.0, false);
+                // Keep forward speed pitch-independent while applying a downward Y cap to avoid bounce.
+                VelocityData velocityData = new VelocityData(player.getLocation().getDirection().clone().setY(0.0D), 0.5, false, 0.0, lookY, -0.08D, false);
                 UtilVelocity.velocity(player, null, velocityData);
 
                 final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(newLocation,
@@ -161,16 +161,6 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
                 UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_PLAYER_SMALL_FALL, 0.5f, 0.7f);
             }
         }
-    }
-
-    private Vector getChargeDirection(Player player) {
-        // Build horizontal movement from yaw, then use Location#getDirection() for a small downward floor.
-        // This avoids upward bounce while keeping charge grounded enough to step slabs reliably.
-        final double yawRadians = Math.toRadians(player.getLocation().getYaw());
-        final Vector direction = new Vector(-Math.sin(yawRadians), 0, Math.cos(yawRadians));
-        final double lookY = player.getLocation().getDirection().getY();
-        direction.setY(Math.min(lookY, -0.08D));
-        return direction;
     }
 
     private void finishUnstoppableForce(Player player) {
