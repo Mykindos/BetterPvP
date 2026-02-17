@@ -867,11 +867,20 @@ skills:
       maxDistance: 64.0
       deathMessageThreshold: 32.0
     heavyarrows:
-      enabled: false
+      enabled: true
       maxlevel: 3
-      energy: 24
+      energy: 20
       basePushBack: 1.0
-      energyDecreasePerLevel: 2.0
+      energyDecreasePerLevel: 0.0
+      baseMaxDamage: 3.0
+      maxDamageIncreasePerLevel: 0.5
+      baseCharge: 0.25
+      chargeIncreasePerLevel: 0.25
+      baseArrowSpeed: 0.8
+      arrowSpeedIncreasePerLevel: 0.0
+      baseMaxArrowSpeed: 1.0
+      maxArrowSpeedIncreasePerLevel: 0.0
+      pushBackIncreasePerLevel: 0.0
     huntersthrill:
       enabled: true
       maxlevel: 3
