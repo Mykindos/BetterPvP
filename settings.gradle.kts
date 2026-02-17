@@ -94,7 +94,7 @@ dependencyResolutionManagement {
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
 
             // Libraries - Data Management
-            library("jedis", "redis.clients:jedis:7.2.1")
+            library("jedis", "redis.clients:jedis:7.3.0")
             library("flyway-core", "org.flywaydb", "flyway-core").version("11.20.1")
             library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.20.1")
             library("flyway-postgres", "org.flywaydb", "flyway-database-postgresql").version("11.20.1")
