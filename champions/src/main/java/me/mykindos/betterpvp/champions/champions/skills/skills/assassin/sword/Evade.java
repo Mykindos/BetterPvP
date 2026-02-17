@@ -21,10 +21,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -34,10 +36,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -206,24 +206,14 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     public void spawnParticles(Player player) {
-        final Location location = player.getEyeLocation().clone();
-        //get where player is facing
-        Vector vector = location.getDirection()
-                .clone()
-                .normalize();
-
-        //move along the vector in the opposite direction of facing
-        vector.multiply(0.75);
-
-        List<Player> viewers = new ArrayList<>(player.getWorld().getNearbyPlayers(player.getLocation(), 16));
-        viewers.remove(player);
-
-        final Location particleLocation = location.add(vector).add(0, -0.3, 0);
-        Particle.DUST.builder()
-                .location(particleLocation)
-                .offset(0, 0, 0)
-                .receivers(viewers)
-                .color(Color.BLACK, 0.5f)
+        final Location location = UtilPlayer.getMidpoint(player);
+        new SoundEffect(Sound.ENTITY_PLAYER_SMALL_FALL, 1.0f, 0.2f).play(location);
+        Particle.BLOCK.builder()
+                .count(10)
+                .location(location)
+                .offset(0.3, 0.3, 0.3)
+                .data(Material.BEDROCK.createBlockData())
+                .receivers(60)
                 .spawn();
     }
 
