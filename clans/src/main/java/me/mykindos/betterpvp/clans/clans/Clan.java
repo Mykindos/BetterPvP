@@ -34,9 +34,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @CustomLog
@@ -61,23 +63,61 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private IChatChannel allianceChatChannel = new AllianceChatChannel(this);
 
     /**
-     * Calculates the amount of experience required for a specific level.
-     *
-     * @param level the level for which the required experience is to be calculated
-     * @return the experience required to reach the given level
+     * Per-member XP contribution tracking. Keys are UUID strings; values are total XP contributed.
+     * Populated by {@link me.mykindos.betterpvp.clans.clans.leveling.contribution.ClanXpContributionRepository}
+     * at load time and updated in-memory on each XP gain.
      */
-    public static double getExperienceForLevel(final long level) {
-        return Math.pow(level, 2) - 1;
+    private final Map<String, Double> xpContributions = new ConcurrentHashMap<>();
+
+    /**
+     * Records an XP contribution for the given member.
+     */
+    public void addContribution(UUID memberUuid, double amount) {
+        xpContributions.merge(memberUuid.toString(), amount, Double::sum);
     }
 
     /**
-     * Calculates the level based on the given experience points.
-     *
-     * @param experience the amount of experience points to determine the level from
-     * @return the calculated level corresponding to the provided experience
+     * Returns the total XP contributed by the given member, or 0 if none recorded.
+     */
+    public double getContribution(UUID memberUuid) {
+        return xpContributions.getOrDefault(memberUuid.toString(), 0.0);
+    }
+
+    /**
+     * Returns an unmodifiable view of all per-member XP contributions.
+     */
+    public Map<String, Double> getXpContributions() {
+        return Collections.unmodifiableMap(xpContributions);
+    }
+
+    /**
+     * Bulk-loads contribution data (called once by the repository during startup).
+     */
+    public void loadXpContributions(Map<String, Double> data) {
+        xpContributions.putAll(data);
+    }
+
+    /**
+     * Returns the total cumulative XP required to reach the given level.
+     * Formula: {@code level^3 / 1000}
+     * <ul>
+     *   <li>Level 100  =      1,000 XP</li>
+     *   <li>Level 500  =    125,000 XP</li>
+     *   <li>Level 1000 =  1,000,000 XP</li>
+     * </ul>
+     * The scale constant matches {@link me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula}.
+     */
+    public static double getExperienceForLevel(final long level) {
+        return Math.pow(level, 3) / 1000.0;
+    }
+
+    /**
+     * Calculates the level based on the given cumulative experience points.
+     * Formula: {@code floor(cbrt(xp * 1000))}
      */
     public static long getLevelFromExperience(final double experience) {
-        return (long) Math.sqrt(experience + 1d);
+        if (experience <= 0) return 0;
+        return (long) Math.cbrt(experience * 1000.0);
     }
 
     /**

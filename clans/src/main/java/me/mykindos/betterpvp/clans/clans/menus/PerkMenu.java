@@ -3,65 +3,134 @@ package me.mykindos.betterpvp.clans.clans.menus;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerk;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.PerkMilestoneButton;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
+import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PerkMenu extends AbstractGui implements Windowed {
+/**
+ * Paginated clan perk roadmap.
+ *
+ * <p>Layout (9 × 5 = 45 slots):
+ * <pre>
+ * Row 0 (header):  # # # # P # # # #   (P = XP progress item)
+ * Row 1 (content): # x x x x x x x #
+ * Row 2 (content): # x x x x x x x #
+ * Row 3 (content): # x x x x x x x #
+ * Row 4 (nav):     # # # < - > # # #
+ * </pre>
+ * 7 perk items per content row × 3 content rows = 21 perks per page.
+ */
+public class PerkMenu extends AbstractPagedGui<Item> implements Windowed {
 
     private final @NotNull Clan clan;
-    private final @Nullable Windowed previous;
+    private final ClanXpFormula formula;
 
-    public PerkMenu(@NotNull Clan clan, @Nullable Windowed previous) {
-        super(9, 3);
+    public PerkMenu(@NotNull Clan clan, @Nullable Windowed previous, ClanXpFormula formula) {
+        super(9, 5, false, new Structure(
+                "# # # # P # # # #",
+                "# x x x x x x x #",
+                "# x x x x x x x #",
+                "# x x x x x x x #",
+                "# # # < - > # # #")
+                .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                .addIngredient('#', Menu.BACKGROUND_ITEM)
+                .addIngredient('P', buildProgressItem(clan, formula))
+                .addIngredient('<', PageBackwardButton.defaultTexture().withDisabledInvisible(true))
+                .addIngredient('-', new BackButton(previous))
+                .addIngredient('>', PageForwardButton.defaultTexture().withDisabledInvisible(true)));
         this.clan = clan;
-        this.previous = previous;
-        populate();
+        this.formula = formula;
+        setContent(buildPerkItems(clan));
     }
 
-    private void populate() {
-        final Iterator<ClanPerk> iterator = ClanPerkManager.getInstance().getPerksSortedByLevel().iterator();
-        int slot = 0;
-        while (iterator.hasNext()) {
-            final ClanPerk perk = iterator.next();
-            final boolean owns = perk.hasPerk(clan);
-            final Component name = Component.text(perk.getName(), owns ? NamedTextColor.GREEN : NamedTextColor.RED)
-                    .append(Component.text(" (Level ", NamedTextColor.GRAY))
-                    .append(Component.text(perk.getMinimumLevel(), NamedTextColor.YELLOW))
-                    .append(Component.text(")", NamedTextColor.GRAY));
+    private static Item buildProgressItem(Clan clan, ClanXpFormula formula) {
+        long level = formula.levelFromXp(clan.getExperience());
+        double xpIn = formula.xpInCurrentLevel(level, clan.getExperience());
+        double xpNeeded = formula.xpRequiredForNextLevel(level);
+        float progress = (xpNeeded > 0) ? (float) Math.min(1.0, xpIn / xpNeeded) : 1f;
 
-            final ItemView perkItem = ItemView.builder()
-                    .material(owns ? perk.getIcon().getMaterial() : Material.BARRIER)
-                    .displayName(name)
-                    .lore(Arrays.stream(perk.getDescription()).toList())
-                    .frameLore(true)
-                    .build();
+        TextComponent progressBar = ProgressBar.withLength(progress, 20)
+                .withCharacter(' ')
+                .build()
+                .decoration(TextDecoration.STRIKETHROUGH, true);
 
-            setItem(slot, new SimpleItem(perkItem));
-            slot++;
+        Component progressLine = Component.text(level, NamedTextColor.YELLOW)
+                .appendSpace()
+                .append(progressBar)
+                .appendSpace()
+                .append(Component.text(level + 1, NamedTextColor.YELLOW))
+                .appendSpace()
+                .append(Component.text(String.format("(%d%%)", (int) (progress * 100)),
+                        NamedTextColor.GRAY));
+
+        return ItemView.builder()
+                .material(Material.EXPERIENCE_BOTTLE)
+                .displayName(Component.text("Clan Level " + level, NamedTextColor.AQUA))
+                .lore(progressLine)
+                .lore(Component.empty())
+                .lore(Component.text("Progress: ", NamedTextColor.GRAY)
+                        .append(Component.text(
+                                String.format("%,.1f / %,.1f XP", xpIn, xpNeeded),
+                                NamedTextColor.YELLOW)))
+                .frameLore(true)
+                .build()
+                .toSimpleItem();
+    }
+
+    private static List<Item> buildPerkItems(Clan clan) {
+        return ClanPerkManager.getInstance().getPerksSortedByLevel().stream()
+                .map(perk -> (Item) new PerkMilestoneButton(perk, clan))
+                .toList();
+    }
+
+    @Override
+    public void bake() {
+        int contentSize = getContentListSlots().length;
+        List<List<SlotElement>> pages = new ArrayList<>();
+        List<SlotElement> page = new ArrayList<>(contentSize);
+
+        for (Item item : content) {
+            page.add(new SlotElement.ItemSlotElement(item));
+            if (page.size() >= contentSize) {
+                pages.add(page);
+                page = new ArrayList<>(contentSize);
+            }
         }
 
-        if (previous != null) {
-            setItem(26, new BackButton(previous));
+        if (!page.isEmpty()) {
+            pages.add(page);
         }
 
-        setBackground(Menu.BACKGROUND_ITEM);
+        this.pages = pages;
+        update();
     }
 
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Perks for " + clan.getName());
+        return Component.text("Clan Perks — Level " + formula.levelFromXp(clan.getExperience()),
+                NamedTextColor.AQUA);
     }
+
 }

@@ -7,36 +7,54 @@ import net.kyori.adventure.text.Component;
 public interface ClanPerk {
 
     /**
-     * Get the name of the perk
-     * @return The name of the perk
+     * A unique, stable string identifier for this perk instance.
+     * Used as the key in {@link ClanPerkManager}. Must be unique across all registered perks.
+     */
+    String getPerkId();
+
+    /**
+     * Get the name of the perk.
      */
     String getName();
 
     /**
-     * Get the minimum level required to unlock the perk
-     * @return The minimum level required to unlock the perk
+     * Get the minimum level required to unlock the perk.
      */
     int getMinimumLevel();
 
     /**
-     * Get the description of the perk
-     * @return The description of the perk
+     * Get the description of the perk.
      */
     Component[] getDescription();
 
     /**
-     * Get the icon of the perk
-     * @return The icon of the perk in menus
+     * Get the icon of the perk shown in menus.
      */
     ItemView getIcon();
 
     /**
-     * Check if the clan has the perk
-     * @param clan The clan to check
-     * @return True if the clan has the perk
+     * The category this perk belongs to, used for UI grouping and filtering.
+     */
+    ClanPerkCategory getCategory();
+
+    /**
+     * Check if the clan has this perk unlocked.
      */
     default boolean hasPerk(Clan clan) {
         return clan.getLevel() >= getMinimumLevel();
     }
+
+    /**
+     * Called once when a clan first reaches this perk's level threshold.
+     * Override for perks that need one-time side effects on unlock (e.g. unlocking a warp slot).
+     * Default: no-op.
+     */
+    default void onUnlock(Clan clan) {}
+
+    /**
+     * Called once when a clan drops below this perk's level threshold.
+     * Default: no-op.
+     */
+    default void onLock(Clan clan) {}
 
 }

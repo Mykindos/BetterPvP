@@ -68,7 +68,7 @@ public class ClansDeathListener implements Listener {
         Clan killedClan = clanManager.getClanByPlayer(victim).orElse(null);
         Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
-        UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.2));
+        UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.2, "Killing Enemy"));
 
         handleKill(killedClan, killerClan, true);
     }
@@ -84,7 +84,7 @@ public class ClansDeathListener implements Listener {
             Clan killedClan = clanManager.getClanByPlayer(killed).orElse(null);
             Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
-            UtilServer.callEvent(new ClanAddExperienceEvent(killer, 0.2));
+            UtilServer.callEvent(new ClanAddExperienceEvent(killer, 0.2, "Killing Enemy"));
 
             handleKill(killedClan, killerClan, true);
         }

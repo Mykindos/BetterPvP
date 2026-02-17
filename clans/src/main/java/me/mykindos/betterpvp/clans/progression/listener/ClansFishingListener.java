@@ -103,7 +103,7 @@ public class ClansFishingListener implements Listener {
                 UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
             }
         } else {
-            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
+            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1, "Fishing"));
         }
     }
 }

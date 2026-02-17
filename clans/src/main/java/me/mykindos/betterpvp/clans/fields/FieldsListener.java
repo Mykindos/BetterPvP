@@ -114,7 +114,7 @@ public class FieldsListener extends ClanListener {
             UtilServer.callEvent(new FieldsInteractableUseEvent(fields, type, block, event.getPlayer()));
             event.getBlock().setType(type.getReplacement().getMaterial()); // Then replace the block
             event.getBlock().setBlockData(type.getReplacement());
-            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
+            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1, "Mining Ore"));
             UtilItem.damageItem(event.getPlayer(), event.getPlayer().getInventory().getItemInMainHand(), 1);
         }
     }

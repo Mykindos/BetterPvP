@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus;
 
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanCoreButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanDetailsButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanMemberButton;
@@ -68,7 +69,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
 
         // Top row global buttons
         setItem(0, new ViewEnemiesButton(clan, this, viewerClan));
-        setItem(2, new ClanProgressionButton(clan));
+        setItem(2, new ClanProgressionButton(clan, JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClanXpFormula.class)));
         setItem(4, new TerritoryButton(admin, clan));
         setItem(6, new EnergyButton(clan, false, this));
         setItem(8, new ViewAlliancesButton(clan, this, viewerClan));
