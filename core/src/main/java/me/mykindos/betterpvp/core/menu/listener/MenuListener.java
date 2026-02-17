@@ -151,7 +151,7 @@ public class MenuListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerQuitEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
         for (Window window : WindowManager.getInstance().getWindows()) {
             if (window instanceof AbstractSingleWindow abstractSingleWindow) {
