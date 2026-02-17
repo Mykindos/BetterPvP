@@ -21,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -85,8 +86,9 @@ public class FlagInteractionListener implements Listener {
         // Restock player on flag capture
         try {
             layoutManager.applyPlayerLayout(player);
-        } catch (Exception e) {
-            log.warn("Failed to restock player {} on flag capture", player.getName(), e);
+        } catch (NullPointerException | NoSuchElementException e) {
+            // Player may not have an active build or items may not be registered
+            log.warn("Failed to restock player {} on flag capture: {}", player.getName(), e.getMessage());
         }
     }
     
