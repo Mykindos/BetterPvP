@@ -109,7 +109,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     @UpdateEvent(delay = 200)
     public void updateSpeed() {
         for(Player player : Bukkit.getOnlinePlayers()) {
-            if(player.isSprinting() && !playerData.containsKey(player)) {
+            if(player.isSprinting() && !player.hasActiveItem() && !playerData.containsKey(player)) {
                 if(getLevel(player) > 0) {
                     startStampede(player);
                 }
@@ -129,7 +129,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                 continue;
             }
 
-            boolean isSprintingNow = player.isSprinting() && !player.isInWater();
+            boolean isSprintingNow = player.isSprinting() && !player.isInWater() && !player.hasActiveItem();
 
             if (data == null) {
                 data = new StampedeData(System.currentTimeMillis(), 0);
