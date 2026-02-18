@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.clans.leveling;
 
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 
@@ -38,10 +37,11 @@ public interface ClanPerk {
     ClanPerkCategory getCategory();
 
     /**
-     * Check if the clan has this perk unlocked.
+     * Check if a clan at the given level has this perk unlocked.
+     * Callers should compute the level via {@link ClanExperience}.
      */
-    default boolean hasPerk(Clan clan) {
-        return clan.getLevel() >= getMinimumLevel();
+    default boolean hasPerk(long clanLevel) {
+        return clanLevel >= getMinimumLevel();
     }
 
     /**
@@ -49,12 +49,12 @@ public interface ClanPerk {
      * Override for perks that need one-time side effects on unlock (e.g. unlocking a warp slot).
      * Default: no-op.
      */
-    default void onUnlock(Clan clan) {}
+    default void onUnlock(me.mykindos.betterpvp.clans.clans.Clan clan) {}
 
     /**
      * Called once when a clan drops below this perk's level threshold.
      * Default: no-op.
      */
-    default void onLock(Clan clan) {}
+    default void onLock(me.mykindos.betterpvp.clans.clans.Clan clan) {}
 
 }

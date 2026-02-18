@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.leaderboard.ClanLeaderboard;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
-import me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula;
 import me.mykindos.betterpvp.clans.clans.leveling.contribution.ClanXpContributionRepository;
 import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
@@ -70,9 +69,6 @@ public class ClanManager extends Manager<Long, Clan> {
     private final ClanRepository repository;
 
     @Getter
-    private final ClanXpFormula xpFormula;
-
-    @Getter
     private final ClanXpContributionRepository xpContributionRepository;
 
     private final ClientManager clientManager;
@@ -127,14 +123,12 @@ public class ClanManager extends Manager<Long, Clan> {
     @Inject
     public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager,
                        PillageHandler pillageHandler, LeaderboardManager leaderboardManager,
-                       ClanXpFormula xpFormula, ClanXpContributionRepository xpContributionRepository,
-                       ClanPerkManager clanPerkManager) {
+                       ClanXpContributionRepository xpContributionRepository, ClanPerkManager clanPerkManager) {
         this.clans = clans;
         this.repository = repository;
         this.clientManager = clientManager;
         this.pillageHandler = pillageHandler;
         this.leaderboardManager = leaderboardManager;
-        this.xpFormula = xpFormula;
         this.xpContributionRepository = xpContributionRepository;
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
@@ -974,7 +968,7 @@ public class ClanManager extends Manager<Long, Clan> {
             clan.setEnemies(repository.getEnemies(this, clan));
             clan.setMembers(repository.getMembers(clan));
             clan.setInsurance(repository.getInsurance(clan));
-            clan.loadXpContributions(xpContributionRepository.getContributions(clan));
+            clan.getExperience().loadContributions(xpContributionRepository.getContributions(clan));
         });
 
         log.info("Loaded {} clans", objects.size()).submit();

@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 public class ClanLeaderboard extends Leaderboard<Long, Clan> implements Sorted {
@@ -72,12 +73,9 @@ public class ClanLeaderboard extends Leaderboard<Long, Clan> implements Sorted {
     public Comparator<Clan> getSorter(SearchOptions searchOptions) {
         final ClanSort sort = (ClanSort) Objects.requireNonNull(searchOptions.getSort());
         return switch (sort) {
-            case LEVEL:
-                yield Comparator.comparingLong(Clan::getLevel).reversed();
-            case BALANCE:
-                yield Comparator.comparingLong(Clan::getBalance).reversed();
-            case POINTS:
-                yield Comparator.comparingLong(Clan::getPoints).reversed();
+            case LEVEL -> Comparator.comparingLong((ToLongFunction<Clan>) clan -> clan.getExperience().getLevel()).reversed();
+            case BALANCE -> Comparator.comparingLong(Clan::getBalance).reversed();
+            case POINTS -> Comparator.comparingLong(Clan::getPoints).reversed();
         };
     }
 
@@ -136,7 +134,7 @@ public class ClanLeaderboard extends Leaderboard<Long, Clan> implements Sorted {
         pool.removeIf(Clan::isAdmin);
         return switch (sort) {
             case LEVEL -> pool.stream()
-                    .sorted(Comparator.comparingLong(Clan::getLevel).reversed())
+                    .sorted(Comparator.comparingLong((ToLongFunction<Clan>) clan -> clan.getExperience().getLevel()).reversed())
                     .limit(10)
                     .collect(Collectors.toMap(Clan::getId, Function.identity()));
             case BALANCE -> pool.stream()

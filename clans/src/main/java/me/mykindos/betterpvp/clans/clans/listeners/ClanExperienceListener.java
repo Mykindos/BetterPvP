@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula;
 import me.mykindos.betterpvp.clans.clans.leveling.contribution.ClanXpContributionRepository;
 import me.mykindos.betterpvp.clans.clans.leveling.events.ClanLevelUpEvent;
 import me.mykindos.betterpvp.clans.clans.leveling.xpbar.ClanXpBossBarService;
@@ -22,17 +21,14 @@ import java.util.Optional;
 @Singleton
 public class ClanExperienceListener extends ClanListener {
 
-    private final ClanXpFormula formula;
     private final ClanXpContributionRepository contributionRepository;
     private final ClanXpBossBarService bossBarService;
 
     @Inject
     public ClanExperienceListener(ClanManager clanManager, ClientManager clientManager,
-                                  ClanXpFormula formula,
                                   ClanXpContributionRepository contributionRepository,
                                   ClanXpBossBarService bossBarService) {
         super(clanManager, clientManager);
-        this.formula = formula;
         this.contributionRepository = contributionRepository;
         this.bossBarService = bossBarService;
     }
@@ -47,14 +43,14 @@ public class ClanExperienceListener extends ClanListener {
         }
 
         Clan clan = clanOptional.get();
-        long levelBefore = formula.levelFromXp(clan.getExperience());
+        long levelBefore = clan.getExperience().getLevel();
 
         // Grant XP to clan (persisted via the existing PropertyContainer batch-flush pipeline)
-        clan.grantExperience(event.getExperience());
+        clan.getExperience().grantXp(event.getExperience());
 
         // Track per-member contribution (in-memory + async DB write)
         if (event.getContributor() != null) {
-            clan.addContribution(event.getContributor(), event.getExperience());
+            clan.getExperience().addContribution(event.getContributor(), event.getExperience());
             contributionRepository.saveContribution(clan, event.getContributor(), event.getExperience());
         }
 
@@ -62,7 +58,7 @@ public class ClanExperienceListener extends ClanListener {
         bossBarService.notifyXpGain(clan, event.getExperience(), event.getReason());
 
         // Check for level-up and fire dedicated event
-        long levelAfter = formula.levelFromXp(clan.getExperience());
+        long levelAfter = clan.getExperience().getLevel();
         if (levelAfter > levelBefore) {
             UtilServer.callEvent(new ClanLevelUpEvent(clan, levelBefore, levelAfter));
         }

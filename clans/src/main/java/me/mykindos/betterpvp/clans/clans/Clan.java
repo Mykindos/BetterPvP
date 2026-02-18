@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.clans;
 
-import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
@@ -8,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.chat.ClanChatChannel;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
+import me.mykindos.betterpvp.clans.clans.leveling.ClanExperience;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
@@ -34,11 +34,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @CustomLog
@@ -47,6 +45,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     private final long id;
     private final ClanCore core = new ClanCore(this);
+    private final ClanExperience experience = new ClanExperience(this);
     private String name;
     private boolean admin;
     private boolean safe;
@@ -61,64 +60,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     private IChatChannel clanChatChannel = new ClanChatChannel(this);
     private IChatChannel allianceChatChannel = new AllianceChatChannel(this);
-
-    /**
-     * Per-member XP contribution tracking. Keys are UUID strings; values are total XP contributed.
-     * Populated by {@link me.mykindos.betterpvp.clans.clans.leveling.contribution.ClanXpContributionRepository}
-     * at load time and updated in-memory on each XP gain.
-     */
-    private final Map<String, Double> xpContributions = new ConcurrentHashMap<>();
-
-    /**
-     * Records an XP contribution for the given member.
-     */
-    public void addContribution(UUID memberUuid, double amount) {
-        xpContributions.merge(memberUuid.toString(), amount, Double::sum);
-    }
-
-    /**
-     * Returns the total XP contributed by the given member, or 0 if none recorded.
-     */
-    public double getContribution(UUID memberUuid) {
-        return xpContributions.getOrDefault(memberUuid.toString(), 0.0);
-    }
-
-    /**
-     * Returns an unmodifiable view of all per-member XP contributions.
-     */
-    public Map<String, Double> getXpContributions() {
-        return Collections.unmodifiableMap(xpContributions);
-    }
-
-    /**
-     * Bulk-loads contribution data (called once by the repository during startup).
-     */
-    public void loadXpContributions(Map<String, Double> data) {
-        xpContributions.putAll(data);
-    }
-
-    /**
-     * Returns the total cumulative XP required to reach the given level.
-     * Formula: {@code level^3 / 1000}
-     * <ul>
-     *   <li>Level 100  =      1,000 XP</li>
-     *   <li>Level 500  =    125,000 XP</li>
-     *   <li>Level 1000 =  1,000,000 XP</li>
-     * </ul>
-     * The scale constant matches {@link me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula}.
-     */
-    public static double getExperienceForLevel(final long level) {
-        return Math.pow(level, 3) / 1000.0;
-    }
-
-    /**
-     * Calculates the level based on the given cumulative experience points.
-     * Formula: {@code floor(cbrt(xp * 1000))}
-     */
-    public static long getLevelFromExperience(final double experience) {
-        if (experience <= 0) return 0;
-        return (long) Math.cbrt(experience * 1000.0);
-    }
 
     /**
      * Retrieves the time when the clan was created.
@@ -300,47 +241,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         }
 
         return count;
-    }
-
-    /**
-     * Retrieves the current experience of the clan.
-     * If the experience property is not set, this method returns 0 as the default value.
-     *
-     * @return the experience value of the clan as a double. If not defined, returns 0.
-     */
-    public double getExperience() {
-        return (double) this.getProperty(ClanProperty.EXPERIENCE).orElse(0d);
-    }
-
-    /**
-     * Sets the experience value for the clan.
-     *
-     * @param experience the new experience value to assign to the clan
-     */
-    public void setExperience(final double experience) {
-        this.saveProperty(ClanProperty.EXPERIENCE.name(), experience);
-    }
-
-    /**
-     * Grants additional experience to the clan by adding the specified amount
-     * to the current experience value.
-     *
-     * @param experience the amount of experience to be granted to the clan.
-     *                   Must be a positive value greater than 0.
-     * @throws IllegalArgumentException if the provided experience value is less than or equal to 0.
-     */
-    public void grantExperience(final double experience) {
-        Preconditions.checkArgument(experience > 0, "Experience must be greater than 0");
-        this.saveProperty(ClanProperty.EXPERIENCE.name(), this.getExperience() + experience);
-    }
-
-    /**
-     * Retrieves the level of the clan based on its current experience points.
-     *
-     * @return the calculated level of the clan as a long value
-     */
-    public long getLevel() {
-        return getLevelFromExperience(this.getExperience());
     }
 
     /**

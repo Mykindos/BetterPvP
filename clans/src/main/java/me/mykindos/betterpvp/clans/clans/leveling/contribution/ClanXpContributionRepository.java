@@ -14,9 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static org.jooq.impl.DSL.field;
-import static org.jooq.impl.DSL.name;
-import static org.jooq.impl.DSL.table;
+import static org.jooq.impl.DSL.*;
 
 /**
  * Persists per-member XP contribution data to the {@code clan_xp_contributions} DB table.
@@ -41,16 +39,16 @@ public class ClanXpContributionRepository {
      *
      * @return map of UUID-string -> total XP contributed
      */
-    public Map<String, Double> getContributions(Clan clan) {
-        Map<String, Double> result = new HashMap<>();
+    public Map<UUID, Double> getContributions(Clan clan) {
+        Map<UUID, Double> result = new HashMap<>();
         try {
-            Result<Record2<String, Double>> records = database.getDslContext()
-                    .select(field(name("member"), String.class), field(name("contribution"), Double.class))
+            Result<Record2<UUID, Double>> records = database.getDslContext()
+                    .select(field(name("member"), UUID.class), field(name("contribution"), Double.class))
                     .from(table(name("clan_xp_contributions")))
                     .where(field(name("clan")).eq(clan.getId()))
                     .fetch();
 
-            for (Record2<String, Double> record : records) {
+            for (Record2<UUID, Double> record : records) {
                 result.put(record.value1(), record.value2());
             }
         } catch (DataAccessException ex) {

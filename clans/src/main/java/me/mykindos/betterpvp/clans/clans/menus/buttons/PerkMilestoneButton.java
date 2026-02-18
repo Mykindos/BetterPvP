@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerk;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -18,12 +17,12 @@ import java.util.List;
  */
 public class PerkMilestoneButton extends SimpleItem {
 
-    public PerkMilestoneButton(ClanPerk perk, Clan clan) {
-        super(build(perk, clan));
+    public PerkMilestoneButton(ClanPerk perk, long clanLevel) {
+        super(build(perk, clanLevel));
     }
 
-    private static ItemView build(ClanPerk perk, Clan clan) {
-        boolean unlocked = perk.hasPerk(clan);
+    private static ItemView build(ClanPerk perk, long clanLevel) {
+        boolean unlocked = perk.hasPerk(clanLevel);
 
         Component name = Component.text(perk.getName(), unlocked ? NamedTextColor.GREEN : NamedTextColor.RED)
                 .append(Component.text(" [Lvl " + perk.getMinimumLevel() + "]", NamedTextColor.DARK_GRAY));

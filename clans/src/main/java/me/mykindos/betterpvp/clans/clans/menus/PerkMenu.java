@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.menus;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.leveling.ClanPerk;
+import me.mykindos.betterpvp.clans.clans.leveling.ClanExperience;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
-import me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.PerkMilestoneButton;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -44,9 +43,8 @@ import java.util.List;
 public class PerkMenu extends AbstractPagedGui<Item> implements Windowed {
 
     private final @NotNull Clan clan;
-    private final ClanXpFormula formula;
 
-    public PerkMenu(@NotNull Clan clan, @Nullable Windowed previous, ClanXpFormula formula) {
+    public PerkMenu(@NotNull Clan clan, @Nullable Windowed previous) {
         super(9, 5, false, new Structure(
                 "# # # # P # # # #",
                 "# x x x x x x x #",
@@ -55,19 +53,18 @@ public class PerkMenu extends AbstractPagedGui<Item> implements Windowed {
                 "# # # < - > # # #")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('P', buildProgressItem(clan, formula))
+                .addIngredient('P', buildProgressItem(clan))
                 .addIngredient('<', PageBackwardButton.defaultTexture().withDisabledInvisible(true))
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', PageForwardButton.defaultTexture().withDisabledInvisible(true)));
         this.clan = clan;
-        this.formula = formula;
         setContent(buildPerkItems(clan));
     }
 
-    private static Item buildProgressItem(Clan clan, ClanXpFormula formula) {
-        long level = formula.levelFromXp(clan.getExperience());
-        double xpIn = formula.xpInCurrentLevel(level, clan.getExperience());
-        double xpNeeded = formula.xpRequiredForNextLevel(level);
+    private static Item buildProgressItem(Clan clan) {
+        long level = clan.getExperience().getLevel();
+        double xpIn = ClanExperience.xpInCurrentLevel(level, clan.getExperience().getXp());
+        double xpNeeded = ClanExperience.xpRequiredForNextLevel(level);
         float progress = (xpNeeded > 0) ? (float) Math.min(1.0, xpIn / xpNeeded) : 1f;
 
         TextComponent progressBar = ProgressBar.withLength(progress, 20)
@@ -98,9 +95,10 @@ public class PerkMenu extends AbstractPagedGui<Item> implements Windowed {
                 .toSimpleItem();
     }
 
-    private static List<Item> buildPerkItems(Clan clan) {
+    private List<Item> buildPerkItems(Clan clan) {
+        long level = clan.getExperience().getLevel();
         return ClanPerkManager.getInstance().getPerksSortedByLevel().stream()
-                .map(perk -> (Item) new PerkMilestoneButton(perk, clan))
+                .map(perk -> (Item) new PerkMilestoneButton(perk, level))
                 .toList();
     }
 
@@ -129,8 +127,7 @@ public class PerkMenu extends AbstractPagedGui<Item> implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Clan Perks — Level " + formula.levelFromXp(clan.getExperience()),
-                NamedTextColor.AQUA);
+        return Component.text("Clan Perks — Level " + clan.getExperience().getLevel(), NamedTextColor.AQUA);
     }
 
 }

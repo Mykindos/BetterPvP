@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 @SubCommand(ClanCommand.class)
 public class SetExpSubCommand extends ClanSubCommand {
 
+
     @Inject
     public SetExpSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
@@ -60,11 +61,11 @@ public class SetExpSubCommand extends ClanSubCommand {
 
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
 
-        double prevExperience = playerClan.getExperience();
-        long prevLevel = playerClan.getLevel();
-        playerClan.setExperience(experience);
-        double newExperience = playerClan.getExperience();
-        long newLevel = playerClan.getLevel();
+        double prevExperience = playerClan.getExperience().getXp();
+        long prevLevel = playerClan.getExperience().getLevel();
+        playerClan.getExperience().setXp(experience);
+        double newExperience = playerClan.getExperience().getXp();
+        long newLevel = playerClan.getExperience().getLevel();
 
         UtilMessage.message(player,
                 "Clans",

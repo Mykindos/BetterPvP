@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanFarmingLevels;
-import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultLegend;
 import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultSlot;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 
@@ -21,7 +20,7 @@ public class ClanPerkManager extends Manager<String, ClanPerk> {
     private static ClanPerkManager instance;
 
     @Inject
-    public ClanPerkManager() {
+    public ClanPerkManager(ClanExperience formula) {
         instance = this;
     }
 
@@ -60,7 +59,8 @@ public class ClanPerkManager extends Manager<String, ClanPerk> {
     }
 
     public Collection<ClanPerk> getPerks(Clan clan) {
-        return objects.values().stream().filter(perk -> perk.hasPerk(clan)).toList();
+        long level = clan.getExperience().getLevel();
+        return objects.values().stream().filter(perk -> perk.hasPerk(level)).toList();
     }
 
     public List<ClanPerk> getPerksSortedByLevel() {

@@ -11,7 +11,7 @@ import java.util.function.Function;
 @Getter
 public enum ClanSort implements SortType {
 
-    LEVEL("Level", Clan::getLevel),
+    LEVEL("Level", clan -> clan.getExperience().getLevel()),
     BALANCE("Balance", Clan::getBalance),
     POINTS("Points", Clan::getPoints);
 

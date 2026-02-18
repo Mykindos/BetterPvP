@@ -7,12 +7,11 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
-import me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula;
+import me.mykindos.betterpvp.clans.clans.leveling.ClanExperience;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -41,16 +40,14 @@ public class ClanXpBossBarService implements Listener {
     private final ConcurrentHashMap<Long, ClanXpBossBarEntry> entries = new ConcurrentHashMap<>();
 
     private final ClanManager clanManager;
-    private final ClanXpFormula formula;
 
     @Inject
     @Config(path = "clans.leveling.xpbar.fadeDelayMs", defaultValue = "5000")
     private long fadeDelayMs;
 
     @Inject
-    public ClanXpBossBarService(ClanManager clanManager, ClanXpFormula formula) {
+    public ClanXpBossBarService(ClanManager clanManager) {
         this.clanManager = clanManager;
-        this.formula = formula;
     }
 
     /**
@@ -95,9 +92,9 @@ public class ClanXpBossBarService implements Listener {
     }
 
     private void updateBarDisplay(Clan clan, ClanXpBossBarEntry entry) {
-        long level = formula.levelFromXp(clan.getExperience());
-        double xpIn = formula.xpInCurrentLevel(level, clan.getExperience());
-        double xpNeeded = formula.xpRequiredForNextLevel(level);
+        long level = clan.getExperience().getLevel();
+        double xpIn = ClanExperience.xpInCurrentLevel(level, clan.getExperience().getXp());
+        double xpNeeded = ClanExperience.xpRequiredForNextLevel(level);
         float progress = (float) Math.min(1.0, xpIn / Math.max(1, xpNeeded));
 
         Component name = Component.text("Level ", NamedTextColor.GRAY)

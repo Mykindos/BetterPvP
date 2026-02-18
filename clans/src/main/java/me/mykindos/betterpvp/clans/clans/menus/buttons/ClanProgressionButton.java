@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.leveling.ClanXpFormula;
+import me.mykindos.betterpvp.clans.clans.leveling.ClanExperience;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.clans.menus.PerkMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -24,16 +24,14 @@ import org.jetbrains.annotations.NotNull;
 public class ClanProgressionButton extends ControlItem<ClanMenu> {
 
     private final Clan clan;
-    private final ClanXpFormula formula;
     private final ItemProvider itemProvider;
 
-    public ClanProgressionButton(Clan clan, ClanXpFormula formula) {
+    public ClanProgressionButton(Clan clan) {
         this.clan = clan;
-        this.formula = formula;
 
-        final long currentLevel = formula.levelFromXp(clan.getExperience());
-        final double xpIn = formula.xpInCurrentLevel(currentLevel, clan.getExperience());
-        final double xpNeeded = formula.xpRequiredForNextLevel(currentLevel);
+        final long currentLevel = clan.getExperience().getLevel();
+        final double xpIn = ClanExperience.xpInCurrentLevel(currentLevel, clan.getExperience().getXp());
+        final double xpNeeded = ClanExperience.xpRequiredForNextLevel(currentLevel);
         final double progress = (xpNeeded > 0) ? xpIn / xpNeeded : 1.0;
 
         final TextComponent progressBar = ProgressBar.withLength((float) progress, 20)
@@ -73,7 +71,7 @@ public class ClanProgressionButton extends ControlItem<ClanMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player,
                             @NotNull InventoryClickEvent event) {
-        new PerkMenu(clan, getGui(), formula).show(player);
+        new PerkMenu(clan, getGui()).show(player);
         SoundEffect.HIGH_PITCH_PLING.play(player);
     }
 
