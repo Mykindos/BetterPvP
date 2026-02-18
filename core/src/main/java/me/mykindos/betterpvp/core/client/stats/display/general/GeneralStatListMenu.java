@@ -30,7 +30,7 @@ public class GeneralStatListMenu extends AbstractStatPagedMenu {
                 .sorted(Comparator.comparing(IStat::getQualifiedName))
                 .collect(Collectors.toList());
         List<Item> items = new ArrayList<>(stats.size()/numPerItem);
-        for (int i = 0; i < stats.size()/numPerItem; i++) {
+        for (int i = 0; i <= stats.size()/numPerItem; i++) {
             items.add(new QualifiedStatListButton(stats, numPerItem, i));
         }
 

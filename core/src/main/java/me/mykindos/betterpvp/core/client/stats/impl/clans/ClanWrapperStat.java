@@ -143,4 +143,17 @@ public class ClanWrapperStat extends ClansStat implements IWrapperStat {
                         .putOnce("statType", wrappedStat.getStatType())
                 );
     }
+
+    /**
+     * Get the qualified name of the stat, if one exists.
+     * Should usually end with the {@link IStat#getSimpleName()}
+     * <p>
+     * i.e. Domination Time Played, Capture the Flag CTF_Oakvale Flags Captured
+     *
+     * @return the qualified name
+     */
+    @Override
+    public String getQualifiedName() {
+        return getClanInformation() + wrappedStat.getQualifiedName();
+    }
 }

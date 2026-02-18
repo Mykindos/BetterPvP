@@ -34,8 +34,5 @@ public class TestStatsCommand extends Command implements IStringName {
     @Override
     public void execute(Player player, Client client, String... args) {
         new StartStatMenu(client, null, StatFilterType.ALL, null, realmManager).show(player);
-        client.getStatContainer().getStats().iterator().forEachRemaining(statData -> {
-            log.info(statData.toString()).submit();
-        });
     }
 }

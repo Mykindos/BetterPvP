@@ -58,7 +58,7 @@ public class ItemStat implements IBuildableStat {
         return this;
     }
 
-    private boolean filterDamageCause(Map.Entry<IStat, Long> entry) {
+    private boolean filterAction(Map.Entry<IStat, Long> entry) {
         ItemStat other = (ItemStat) entry.getKey();
         return action.equals(other.action);
     }
@@ -75,7 +75,7 @@ public class ItemStat implements IBuildableStat {
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         if (itemStack == null) {
-            return getFilteredStat(statContainer, type, period, this::filterDamageCause);
+            return getFilteredStat(statContainer, type, period, this::filterAction);
         }
         return statContainer.getProperty(type, period, this);
     }
@@ -135,7 +135,7 @@ public class ItemStat implements IBuildableStat {
     @Override
     public String getQualifiedName() {
         if (itemStack != null) {
-            return UtilItem.getItemIdentifier(itemStack) + " " + getSimpleName();
+            return getSimpleName() + " " + UtilItem.getItemIdentifier(itemStack);
         }
         return getSimpleName();
     }
@@ -160,7 +160,8 @@ public class ItemStat implements IBuildableStat {
     public boolean containsStat(IStat otherStat) {
         if (!(otherStat instanceof ItemStat other)) return false;
         if ((action != other.action)) return false;
-        return (itemStack != null && itemStack.equals(other.itemStack));
+        if (itemStack == null) return true;
+        return itemStack.equals(other.itemStack);
     }
 
     /**
@@ -184,7 +185,5 @@ public class ItemStat implements IBuildableStat {
         ANVIL_PRIMARY,
         ANVIL_SECONDARY,
     }
-
-
 
 }
