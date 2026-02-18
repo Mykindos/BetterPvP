@@ -24,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -218,6 +219,12 @@ public class UtilPlayer {
         );
 
         PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
+    }
+
+    @SneakyThrows
+    public static void setGlowingForPlayerAndAllies(@NotNull Player player, @NotNull Entity target, boolean glowing, double radius) {
+        setGlowing(player, target, glowing);
+        getNearbyAllies(player, player.getLocation(), radius).forEach(ally -> setGlowing(ally, target, glowing));
     }
 
     /**
