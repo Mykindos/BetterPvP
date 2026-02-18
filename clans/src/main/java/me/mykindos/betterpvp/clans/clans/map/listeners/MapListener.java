@@ -22,7 +22,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.component.TimedCompone
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -74,7 +74,7 @@ public class MapListener implements Listener {
 
     @EventHandler
     public void onSpawn(PlayerRespawnEvent event) {
-        Boolean keepInventory = event.getPlayer().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
+        Boolean keepInventory = event.getPlayer().getWorld().getGameRuleValue(GameRules.KEEP_INVENTORY);
         if (keepInventory == Boolean.FALSE) {
             ItemStack mapItem = clanMapService.createMapItem();
             event.getPlayer().getInventory().setItem(8, itemFactory.convertItemStack(mapItem).orElse(mapItem));
