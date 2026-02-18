@@ -23,6 +23,8 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBar;
+import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarOverlay;
+import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarQueue;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceBar;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceLevel;
 import me.mykindos.betterpvp.core.utilities.model.display.playerlist.PlayerList;
@@ -53,6 +55,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private PlayerList playerList = new PlayerList();
     private ExperienceBar experienceBar = new ExperienceBar();
     private ExperienceLevel experienceLevel = new ExperienceLevel();
+    private BossBarQueue bossBarQueue = new BossBarQueue();
+    private BossBarOverlay bossBarOverlay = new BossBarOverlay();
     private Sidebar sidebar = null;
     private @NotNull IChatChannel chatChannel = ServerChatChannel.getInstance();
     private OffhandExecutor offhandExecutor = null;
