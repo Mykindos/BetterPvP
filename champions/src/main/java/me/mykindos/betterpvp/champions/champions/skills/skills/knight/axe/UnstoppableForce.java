@@ -127,8 +127,10 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
                 championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 100, true);
 
                 final Location newLocation = UtilPlayer.getMidpoint(player).clone();
+                final double lookY = player.getLocation().getDirection().getY();
 
-                VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0, 0, 0.0, false);
+                // Keep forward speed pitch-independent while applying a downward Y cap to avoid bounce.
+                VelocityData velocityData = new VelocityData(player.getLocation().getDirection().clone().setY(0.0D), 0.5, false, 0.0, lookY, -0.08D, false);
                 UtilVelocity.velocity(player, null, velocityData);
 
                 final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(newLocation,
