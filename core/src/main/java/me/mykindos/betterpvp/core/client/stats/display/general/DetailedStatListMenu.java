@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.stats.display.general;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.stats.RealmManager;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
@@ -16,18 +17,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@CustomLog
 public class DetailedStatListMenu extends AbstractStatPagedMenu {
     private static final int numPerItem = 6;
-    private List<IStat> stats;
+
     public DetailedStatListMenu(@NotNull Client client, @Nullable Windowed previous, StatFilterType type, @Nullable Period period, RealmManager realmManager) {
         super(client, previous, type, period, realmManager);
-        stats = client.getStatContainer().getStats().getMyMap().values().stream()
+        List<IStat> stats = client.getStatContainer().getStats().getMyMap().values().stream()
                 .flatMap(iStatLongConcurrentMap -> iStatLongConcurrentMap.keySet()
                         .stream())
                 .sorted(Comparator.comparing(IStat::getQualifiedName))
                 .collect(Collectors.toList());
         List<Item> items = new ArrayList<>(stats.size()/numPerItem);
-        for (int i = 0; i < stats.size()/numPerItem; i++) {
+        for (int i = 0; i <= stats.size()/numPerItem; i++) {
             items.add(new QualifiedStatListButton(stats, numPerItem, i));
         }
 

@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
-import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -45,16 +44,7 @@ public abstract class ClansStat implements IBuildableStat {
                 .putOpt("clanId", clanId);
     }
 
-    /**
-     * Get the qualified name of the stat, if one exists.
-     * Should usually end with the {@link IStat#getSimpleName()}
-     * <p>
-     * i.e. Domination Time Played, Capture the Flag CTF_Oakvale Flags Captured
-     *
-     * @return the qualified name
-     */
-    @Override
-    public String getQualifiedName() {
+    protected String getClanInformation() {
         final StringBuilder stringBuilder = new StringBuilder();
         if (!Strings.isNullOrEmpty(clanName)) {
             if (clanName.equals(NO_CLAN_NAME)) {
@@ -65,6 +55,6 @@ public abstract class ClansStat implements IBuildableStat {
             }
 
         }
-        return stringBuilder.append(getSimpleName()).toString();
+        return stringBuilder.toString();
     }
 }
