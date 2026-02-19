@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -114,7 +113,11 @@ public class FieldsListener extends ClanListener {
             UtilServer.callEvent(new FieldsInteractableUseEvent(fields, type, block, event.getPlayer()));
             event.getBlock().setType(type.getReplacement().getMaterial()); // Then replace the block
             event.getBlock().setBlockData(type.getReplacement());
-            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1, "Mining Ore"));
+
+            clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
+                clan.getExperience().grantXp(event.getPlayer(), 50, "Mining Ore");
+            });
+
             UtilItem.damageItem(event.getPlayer(), event.getPlayer().getInventory().getItemInMainHand(), 1);
         }
     }

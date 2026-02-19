@@ -5,8 +5,8 @@ package me.mykindos.betterpvp.clans.database.jooq;
 
 
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanInsurance;
+import me.mykindos.betterpvp.clans.database.jooq.tables.ClanXpContributions;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansKills;
-
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;
@@ -27,4 +27,5 @@ public class Indexes {
     public static final Index CLAN_INSURANCE_TIME_INDEX = Internal.createIndex(DSL.name("clan_insurance_time_index"), ClanInsurance.CLAN_INSURANCE, new OrderField[] { ClanInsurance.CLAN_INSURANCE.TIME.desc() }, false);
     public static final Index CLANS_KILLS_KILLER_CLAN_INDEX = Internal.createIndex(DSL.name("clans_kills_killer_clan_index"), ClansKills.CLANS_KILLS, new OrderField[] { ClansKills.CLANS_KILLS.KILLER_CLAN }, false);
     public static final Index CLANS_KILLS_VICTIM_CLAN_INDEX = Internal.createIndex(DSL.name("clans_kills_victim_clan_index"), ClansKills.CLANS_KILLS, new OrderField[] { ClansKills.CLANS_KILLS.VICTIM_CLAN }, false);
+    public static final Index IDX_CLAN_XP_CONTRIBUTIONS_CLAN = Internal.createIndex(DSL.name("idx_clan_xp_contributions_clan"), ClanXpContributions.CLAN_XP_CONTRIBUTIONS, new OrderField[] { ClanXpContributions.CLAN_XP_CONTRIBUTIONS.CLAN }, false);
 }

@@ -96,7 +96,7 @@ public class EnergyButton extends AbstractItem {
         //noinspection deprecation
         event.setCursor(null);
         final int energy = energyAmount;
-        clan.grantEnergy(energy);
+        clan.grantEnergy(player, energy, "Deposit");
         new SoundEffect(Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 1f, 2f).play(player);
         notifyWindows();
     }

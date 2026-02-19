@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -13,7 +12,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
@@ -102,8 +100,8 @@ public class ClansFishingListener implements Listener {
             if (UtilMath.randomInt(20) < 2) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
             }
-        } else {
-            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1, "Fishing"));
         }
+
+        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> clan.getExperience().grantXp(event.getPlayer(), 50, "Fishing"));
     }
 }

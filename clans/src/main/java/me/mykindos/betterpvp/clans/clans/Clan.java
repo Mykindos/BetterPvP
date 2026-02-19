@@ -5,6 +5,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
 import me.mykindos.betterpvp.clans.clans.chat.ClanChatChannel;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
+import me.mykindos.betterpvp.clans.clans.events.ClanGainEnergyEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanExperience;
@@ -24,6 +25,8 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,7 +44,7 @@ import java.util.stream.Collectors;
 
 @CustomLog
 @Data
-public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
+public class Clan extends PropertyContainer implements ForwardingAudience, IClan, Invitable, IMapListener {
 
     private final long id;
     private final ClanCore core = new ClanCore(this);
@@ -151,11 +154,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     /**
      * Grants the specified amount of energy to the clan, with a maximum cap of 100,000.
      *
+     * @param player the player who is granting the energy. Can be null, in which case the energy is granted to the clan.
      * @param energy the amount of energy to be granted to the clan. The resulting energy value will be the
      *               current energy plus the specified energy, capped at 100,000.
      */
-    public void grantEnergy(final int energy) {
+    public void grantEnergy(@Nullable final Player player, final int energy, final String reason) {
         this.saveProperty(ClanProperty.ENERGY.name(), Math.min(100_000, this.getEnergy() + energy));
+        new ClanGainEnergyEvent(this, player, energy, reason).callEvent();
     }
 
     /**
@@ -292,6 +297,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return onlineCount;
     }
 
+    @Override
+    public @NotNull Iterable<? extends Audience> audiences() {
+        return getMembersAsPlayers();
+    }
 
     /**
      * Sends a message to all members of the clan except the specified ignored member.

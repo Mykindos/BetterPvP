@@ -11,13 +11,13 @@ import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMembers;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMetadata;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanProperties;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanTerritory;
+import me.mykindos.betterpvp.clans.database.jooq.tables.ClanXpContributions;
 import me.mykindos.betterpvp.clans.database.jooq.tables.Clans;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansDominanceScale;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansFieldsOres;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansKills;
 import me.mykindos.betterpvp.clans.database.jooq.tables.GetClanKillLogs;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.GetClanKillLogsRecord;
-
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -63,6 +63,11 @@ public class Tables {
      * The table <code>public.clan_territory</code>.
      */
     public static final ClanTerritory CLAN_TERRITORY = ClanTerritory.CLAN_TERRITORY;
+
+    /**
+     * The table <code>public.clan_xp_contributions</code>.
+     */
+    public static final ClanXpContributions CLAN_XP_CONTRIBUTIONS = ClanXpContributions.CLAN_XP_CONTRIBUTIONS;
 
     /**
      * The table <code>public.clans</code>.

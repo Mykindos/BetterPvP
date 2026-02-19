@@ -20,7 +20,7 @@ public class ClanPerkManager extends Manager<String, ClanPerk> {
     private static ClanPerkManager instance;
 
     @Inject
-    public ClanPerkManager(ClanExperience formula) {
+    public ClanPerkManager() {
         instance = this;
     }
 

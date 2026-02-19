@@ -6,7 +6,10 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
+import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
+import me.mykindos.betterpvp.clans.clans.loot.ClanExperienceLoot;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
@@ -30,6 +33,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
+import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -55,6 +59,31 @@ public class Clans extends BPvPPlugin {
     private UpdateEventExecutor updateEventExecutor;
 
     private ClanManager clanManager;
+
+    @Override
+    public void onLoad() {
+        LootEntryRegistry.register("given_clan_energy", (obj, strategy) -> {
+            EnergyItem energyType = EnergyItem.valueOf(obj.get("energyType").getAsString());
+            int minAmount = obj.get("minAmount").getAsInt();
+            int maxAmount = obj.get("maxAmount").getAsInt();
+            boolean autoDeposit = obj.has("autoDeposit") && obj.get("autoDeposit").getAsBoolean();
+            return ClanEnergyLoot.given(energyType, strategy, minAmount, maxAmount, autoDeposit);
+        });
+
+        LootEntryRegistry.register("dropped_clan_energy", (obj, strategy) -> {
+            EnergyItem energyType = EnergyItem.valueOf(obj.get("energyType").getAsString());
+            int minAmount = obj.get("minAmount").getAsInt();
+            int maxAmount = obj.get("maxAmount").getAsInt();
+            boolean autoDeposit = obj.has("autoDeposit") && obj.get("autoDeposit").getAsBoolean();
+            return ClanEnergyLoot.dropped(energyType, strategy, minAmount, maxAmount, autoDeposit);
+        });
+
+        LootEntryRegistry.register("clan_experience", (obj, strategy) -> {
+            long minXp = obj.get("minXp").getAsLong();
+            long maxXp = obj.get("maxXp").getAsLong();
+            return new ClanExperienceLoot(strategy, context -> true, minXp, maxXp);
+        });
+    }
 
     @Override
     public void onEnable() {

@@ -30,9 +30,9 @@ public class ClanProgressionButton extends ControlItem<ClanMenu> {
         this.clan = clan;
 
         final long currentLevel = clan.getExperience().getLevel();
-        final double xpIn = ClanExperience.xpInCurrentLevel(currentLevel, clan.getExperience().getXp());
-        final double xpNeeded = ClanExperience.xpRequiredForNextLevel(currentLevel);
-        final double progress = (xpNeeded > 0) ? xpIn / xpNeeded : 1.0;
+        final long xpIn = ClanExperience.xpInCurrentLevel(currentLevel, clan.getExperience().getXp());
+        final long xpNeeded = ClanExperience.xpRequiredForNextLevel(currentLevel);
+        final double progress = (xpNeeded > 0) ? (double) xpIn / xpNeeded : 1.0;
 
         final TextComponent progressBar = ProgressBar.withLength((float) progress, 20)
                 .withCharacter(' ')
@@ -56,7 +56,7 @@ public class ClanProgressionButton extends ControlItem<ClanMenu> {
                         .append(Component.text(currentLevel, NamedTextColor.YELLOW)))
                 .lore(Component.text("Progress: ", NamedTextColor.GRAY)
                         .append(Component.text(
-                                String.format("%,.1f / %,.1f XP", xpIn, xpNeeded),
+                                String.format("%d / %d XP", xpIn, xpNeeded),
                                 NamedTextColor.YELLOW)))
                 .frameLore(true)
                 .action(ClickActions.ALL, Component.text("View Perks"))

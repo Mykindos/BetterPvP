@@ -10,10 +10,8 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
-import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -68,7 +66,9 @@ public class ClansDeathListener implements Listener {
         Clan killedClan = clanManager.getClanByPlayer(victim).orElse(null);
         Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
-        UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.2, "Killing Enemy"));
+        if (killerClan != null) {
+            killerClan.getExperience().grantXp(event.getPlayer(), 100, "Killing Enemy");
+        }
 
         handleKill(killedClan, killerClan, true);
     }
@@ -84,7 +84,9 @@ public class ClansDeathListener implements Listener {
             Clan killedClan = clanManager.getClanByPlayer(killed).orElse(null);
             Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
-            UtilServer.callEvent(new ClanAddExperienceEvent(killer, 0.2, "Killing Enemy"));
+            if (killerClan != null) {
+                killerClan.getExperience().grantXp(event.getPlayer(), 100, "Killing Enemy");
+            }
 
             handleKill(killedClan, killerClan, true);
         }

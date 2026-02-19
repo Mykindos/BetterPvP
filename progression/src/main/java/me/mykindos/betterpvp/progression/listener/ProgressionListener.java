@@ -9,7 +9,9 @@ import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperi
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.TimedDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarColor;
+import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarData;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -24,6 +26,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.function.Function;
+
+import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 @BPvPListener
 @Singleton
@@ -57,17 +61,33 @@ public class ProgressionListener implements Listener {
         final String tree = event.getProfession();
         final TextComponent actionBarText;
         if (amount > 0) {
-            actionBarText = Component.text("+" + UtilFormat.formatNumber(amount, 1) + " " + tree + " XP", NamedTextColor.DARK_AQUA);
+            final String number = UtilFormat.formatNumber(amount, 1);
+            actionBarText = Component.empty()
+                    .append(Component.text("+", NamedTextColor.DARK_AQUA))
+                    .append(Component.text(number, NamedTextColor.DARK_AQUA))
+                    .append(miniMessage.deserialize("<exp></exp>"))
+                    .appendSpace()
+                    .append(Component.text(tree, NamedTextColor.DARK_AQUA))
+                    .appendSpace()
+                    .append(Component.text("XP", NamedTextColor.DARK_AQUA));
         } else {
             String amountString = UtilFormat.formatNumber(amount);
             if (amount == 0) {
                 amountString = "+" + amountString;
             }
-            actionBarText = Component.text(amountString + " " + tree + " XP", NamedTextColor.RED);
+            actionBarText = Component.empty()
+                    .append(Component.text(amountString, NamedTextColor.RED))
+                    .append(miniMessage.deserialize("<exp></exp>"))
+                    .appendSpace()
+                    .append(Component.text(tree, NamedTextColor.RED))
+                    .appendSpace()
+                    .append(Component.text("XP", NamedTextColor.RED));
         }
 
-        final TimedComponent component = new TimedComponent(1.0, false, gmr -> actionBarText);
-        gamer.getActionBar().add(250, component);
+        final TimedDisplayObject<BossBarData> component = new TimedDisplayObject<>(2.0, true, gmr -> {
+            return new BossBarData(actionBarText, 1f);
+        });
+        gamer.getBossBarQueue().add(250, BossBarColor.TRANSPARENT, component);
 
         // Title levelup
         if (!event.isLevelUp()) {

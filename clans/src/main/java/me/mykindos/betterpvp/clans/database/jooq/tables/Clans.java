@@ -4,10 +4,6 @@
 package me.mykindos.betterpvp.clans.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.clans.database.jooq.Keys;
 import me.mykindos.betterpvp.clans.database.jooq.Public;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanAlliances.ClanAlliancesPath;
@@ -17,9 +13,9 @@ import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMembers.ClanMembersP
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMetadata.ClanMetadataPath;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanProperties.ClanPropertiesPath;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanTerritory.ClanTerritoryPath;
+import me.mykindos.betterpvp.clans.database.jooq.tables.ClanXpContributions.ClanXpContributionsPath;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansKills.ClansKillsPath;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClansRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -40,6 +36,10 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -289,6 +289,19 @@ public class Clans extends TableImpl<ClansRecord> {
             _clanTerritory = new ClanTerritoryPath(this, null, Keys.CLAN_TERRITORY__CLAN_TERRITORY_CLAN_FKEY.getInverseKey());
 
         return _clanTerritory;
+    }
+
+    private transient ClanXpContributionsPath _clanXpContributions;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.clan_xp_contributions</code> table
+     */
+    public ClanXpContributionsPath clanXpContributions() {
+        if (_clanXpContributions == null)
+            _clanXpContributions = new ClanXpContributionsPath(this, null, Keys.CLAN_XP_CONTRIBUTIONS__CLAN_XP_CONTRIBUTIONS_CLAN_FKEY.getInverseKey());
+
+        return _clanXpContributions;
     }
 
     private transient ClansKillsPath _clansKillsKillerClanFkey;

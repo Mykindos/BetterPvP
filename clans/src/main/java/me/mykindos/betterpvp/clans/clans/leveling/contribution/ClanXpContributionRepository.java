@@ -39,16 +39,16 @@ public class ClanXpContributionRepository {
      *
      * @return map of UUID-string -> total XP contributed
      */
-    public Map<UUID, Double> getContributions(Clan clan) {
-        Map<UUID, Double> result = new HashMap<>();
+    public Map<UUID, Long> getContributions(Clan clan) {
+        Map<UUID, Long> result = new HashMap<>();
         try {
-            Result<Record2<UUID, Double>> records = database.getDslContext()
-                    .select(field(name("member"), UUID.class), field(name("contribution"), Double.class))
+            Result<Record2<UUID, Long>> records = database.getDslContext()
+                    .select(field(name("member"), UUID.class), field(name("contribution"), Long.class))
                     .from(table(name("clan_xp_contributions")))
                     .where(field(name("clan")).eq(clan.getId()))
                     .fetch();
 
-            for (Record2<UUID, Double> record : records) {
+            for (Record2<UUID, Long> record : records) {
                 result.put(record.value1(), record.value2());
             }
         } catch (DataAccessException ex) {
@@ -70,9 +70,9 @@ public class ClanXpContributionRepository {
                         .set(field(name("clan")), clan.getId())
                         .set(field(name("member")), member.toString())
                         .set(field(name("contribution")), amount)
-                        .onDuplicateKeyUpdate()
+                        .onConflict(field(name("clan")), field(name("member"))).doUpdate()
                         .set(field(name("contribution"), Double.class),
-                                field(name("clan_xp_contributions.contribution"), Double.class).plus(amount))
+                                field(name("clan_xp_contributions", "contribution"), Double.class).plus(amount))
                         .execute();
             } catch (DataAccessException ex) {
                 log.error("Failed to save XP contribution for clan {} member {}", clan.getId(), member, ex).submit();

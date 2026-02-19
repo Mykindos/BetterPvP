@@ -4,9 +4,6 @@
 package me.mykindos.betterpvp.clans.database.jooq;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanAlliances;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanEnemies;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanInsurance;
@@ -14,19 +11,22 @@ import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMembers;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMetadata;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanProperties;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanTerritory;
+import me.mykindos.betterpvp.clans.database.jooq.tables.ClanXpContributions;
 import me.mykindos.betterpvp.clans.database.jooq.tables.Clans;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansDominanceScale;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansFieldsOres;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansKills;
 import me.mykindos.betterpvp.clans.database.jooq.tables.GetClanKillLogs;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.GetClanKillLogsRecord;
-
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -76,6 +76,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.clan_territory</code>.
      */
     public final ClanTerritory CLAN_TERRITORY = ClanTerritory.CLAN_TERRITORY;
+
+    /**
+     * The table <code>public.clan_xp_contributions</code>.
+     */
+    public final ClanXpContributions CLAN_XP_CONTRIBUTIONS = ClanXpContributions.CLAN_XP_CONTRIBUTIONS;
 
     /**
      * The table <code>public.clans</code>.
@@ -159,6 +164,7 @@ public class Public extends SchemaImpl {
             ClanMetadata.CLAN_METADATA,
             ClanProperties.CLAN_PROPERTIES,
             ClanTerritory.CLAN_TERRITORY,
+            ClanXpContributions.CLAN_XP_CONTRIBUTIONS,
             Clans.CLANS,
             ClansDominanceScale.CLANS_DOMINANCE_SCALE,
             ClansFieldsOres.CLANS_FIELDS_ORES,

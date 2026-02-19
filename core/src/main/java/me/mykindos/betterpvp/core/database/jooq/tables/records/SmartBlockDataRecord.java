@@ -5,8 +5,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.core.database.jooq.tables.SmartBlockData;
-
-import org.jooq.Record4;
+import org.jooq.Record3;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -34,25 +33,10 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
     }
 
     /**
-     * Setter for <code>public.smart_block_data.world</code>.
-     */
-    public SmartBlockDataRecord setWorld(String value) {
-        set(1, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.smart_block_data.world</code>.
-     */
-    public String getWorld() {
-        return (String) get(1);
-    }
-
-    /**
      * Setter for <code>public.smart_block_data.chunk_key</code>.
      */
     public SmartBlockDataRecord setChunkKey(Long value) {
-        set(2, value);
+        set(1, value);
         return this;
     }
 
@@ -60,14 +44,14 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
      * Getter for <code>public.smart_block_data.chunk_key</code>.
      */
     public Long getChunkKey() {
-        return (Long) get(2);
+        return (Long) get(1);
     }
 
     /**
      * Setter for <code>public.smart_block_data.block_key</code>.
      */
     public SmartBlockDataRecord setBlockKey(Long value) {
-        set(3, value);
+        set(2, value);
         return this;
     }
 
@@ -75,14 +59,14 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
      * Getter for <code>public.smart_block_data.block_key</code>.
      */
     public Long getBlockKey() {
-        return (Long) get(3);
+        return (Long) get(2);
     }
 
     /**
      * Setter for <code>public.smart_block_data.block_type</code>.
      */
     public SmartBlockDataRecord setBlockType(String value) {
-        set(4, value);
+        set(3, value);
         return this;
     }
 
@@ -90,14 +74,14 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
      * Getter for <code>public.smart_block_data.block_type</code>.
      */
     public String getBlockType() {
-        return (String) get(4);
+        return (String) get(3);
     }
 
     /**
      * Setter for <code>public.smart_block_data.data_type_class</code>.
      */
     public SmartBlockDataRecord setDataTypeClass(String value) {
-        set(5, value);
+        set(4, value);
         return this;
     }
 
@@ -105,14 +89,14 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
      * Getter for <code>public.smart_block_data.data_type_class</code>.
      */
     public String getDataTypeClass() {
-        return (String) get(5);
+        return (String) get(4);
     }
 
     /**
      * Setter for <code>public.smart_block_data.data</code>.
      */
     public SmartBlockDataRecord setData(byte[] value) {
-        set(6, value);
+        set(5, value);
         return this;
     }
 
@@ -120,7 +104,22 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
      * Getter for <code>public.smart_block_data.data</code>.
      */
     public byte[] getData() {
-        return (byte[]) get(6);
+        return (byte[]) get(5);
+    }
+
+    /**
+     * Setter for <code>public.smart_block_data.world</code>.
+     */
+    public SmartBlockDataRecord setWorld(String value) {
+        set(6, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.smart_block_data.world</code>.
+     */
+    public String getWorld() {
+        return (String) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -128,8 +127,8 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
     // -------------------------------------------------------------------------
 
     @Override
-    public Record4<Integer, String, Long, Long> key() {
-        return (Record4) super.key();
+    public Record3<Integer, Long, Long> key() {
+        return (Record3) super.key();
     }
 
     // -------------------------------------------------------------------------
@@ -146,16 +145,16 @@ public class SmartBlockDataRecord extends UpdatableRecordImpl<SmartBlockDataReco
     /**
      * Create a detached, initialised SmartBlockDataRecord
      */
-    public SmartBlockDataRecord(Integer realm, String world, Long chunkKey, Long blockKey, String blockType, String dataTypeClass, byte[] data) {
+    public SmartBlockDataRecord(Integer realm, Long chunkKey, Long blockKey, String blockType, String dataTypeClass, byte[] data, String world) {
         super(SmartBlockData.SMART_BLOCK_DATA);
 
         setRealm(realm);
-        setWorld(world);
         setChunkKey(chunkKey);
         setBlockKey(blockKey);
         setBlockType(blockType);
         setDataTypeClass(dataTypeClass);
         setData(data);
+        setWorld(world);
         resetChangedOnNotNull();
     }
 }

@@ -50,7 +50,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.SmartBlockDataRec
 import me.mykindos.betterpvp.core.database.jooq.tables.records.UuiditemsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsMetadataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -92,7 +91,7 @@ public class Keys {
     public static final UniqueKey<RealmsRecord> REALMS_SERVER_SEASON_NAME_UNIQUE = Internal.createUniqueKey(Realms.REALMS, DSL.name("realms_server_season_name_unique"), new TableField[] { Realms.REALMS.SERVER, Realms.REALMS.SEASON }, true);
     public static final UniqueKey<ServersRecord> SERVERS_ID_UNIQUE = Internal.createUniqueKey(Servers.SERVERS, DSL.name("servers_id_unique"), new TableField[] { Servers.SERVERS.ID }, true);
     public static final UniqueKey<ServersRecord> SERVERS_PKEY = Internal.createUniqueKey(Servers.SERVERS, DSL.name("servers_pkey"), new TableField[] { Servers.SERVERS.NAME }, true);
-    public static final UniqueKey<SmartBlockDataRecord> SMART_BLOCK_DATA_PKEY = Internal.createUniqueKey(SmartBlockData.SMART_BLOCK_DATA, DSL.name("smart_block_data_pkey"), new TableField[] { SmartBlockData.SMART_BLOCK_DATA.REALM, SmartBlockData.SMART_BLOCK_DATA.WORLD, SmartBlockData.SMART_BLOCK_DATA.CHUNK_KEY, SmartBlockData.SMART_BLOCK_DATA.BLOCK_KEY }, true);
+    public static final UniqueKey<SmartBlockDataRecord> SMART_BLOCK_DATA_PKEY = Internal.createUniqueKey(SmartBlockData.SMART_BLOCK_DATA, DSL.name("smart_block_data_pkey"), new TableField[] { SmartBlockData.SMART_BLOCK_DATA.REALM, SmartBlockData.SMART_BLOCK_DATA.CHUNK_KEY, SmartBlockData.SMART_BLOCK_DATA.BLOCK_KEY }, true);
     public static final UniqueKey<UuiditemsRecord> UUIDITEMS_PKEY = Internal.createUniqueKey(Uuiditems.UUIDITEMS, DSL.name("uuiditems_pkey"), new TableField[] { Uuiditems.UUIDITEMS.UUID }, true);
     public static final UniqueKey<WorldLogsRecord> WORLD_LOGS_PKEY = Internal.createUniqueKey(WorldLogs.WORLD_LOGS, DSL.name("world_logs_pkey"), new TableField[] { WorldLogs.WORLD_LOGS.ID, WorldLogs.WORLD_LOGS.REALM }, true);
     public static final UniqueKey<WorldLogsMetadataRecord> WORLD_LOGS_METADATA_PKEY = Internal.createUniqueKey(WorldLogsMetadata.WORLD_LOGS_METADATA, DSL.name("world_logs_metadata_pkey"), new TableField[] { WorldLogsMetadata.WORLD_LOGS_METADATA.LOG_ID, WorldLogsMetadata.WORLD_LOGS_METADATA.REALM, WorldLogsMetadata.WORLD_LOGS_METADATA.META_KEY }, true);

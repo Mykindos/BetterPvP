@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.core.loot.WeightDistributionStrategy;
 import me.mykindos.betterpvp.core.loot.chest.BigLootChest;
 import me.mykindos.betterpvp.core.loot.chest.LootChest;
 import me.mykindos.betterpvp.core.loot.chest.SmallLootChest;
-import me.mykindos.betterpvp.core.loot.item.ItemLoot;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.NamespacedKey;
@@ -36,6 +35,10 @@ import java.util.Optional;
 
 /**
  * Deserializes loot tables from JSON format.
+ * <p>
+ * Loot entry types are resolved via {@link LootEntryRegistry}. The built-in types
+ * ("dropped_item", "given_item") are registered statically. Additional types can be
+ * registered by other modules in their {@code onLoad()} method.
  */
 @CustomLog
 public class LootTableDeserializer implements JsonDeserializer<LootTable> {
@@ -207,26 +210,11 @@ public class LootTableDeserializer implements JsonDeserializer<LootTable> {
             replacementStrategy = ReplacementStrategy.valueOf(entryObj.get("replacementStrategy").getAsString());
         }
 
-        return Optional.of(switch (type) {
-            case "dropped_item" -> {
-                String itemId = entryObj.get("itemId").getAsString();
-                int minYield = entryObj.get("minYield").getAsInt();
-                int maxYield = entryObj.get("maxYield").getAsInt();
-
-                NamespacedKey key = NamespacedKey.fromString(itemId);
-                Preconditions.checkNotNull(key, "Invalid item ID: " + itemId);
-                yield ItemLoot.dropped(key, replacementStrategy, minYield, maxYield);
-            }
-            case "given_item" -> {
-                String itemId = entryObj.get("itemId").getAsString();
-                int minYield = entryObj.get("minYield").getAsInt();
-                int maxYield = entryObj.get("maxYield").getAsInt();
-
-                NamespacedKey key = NamespacedKey.fromString(itemId);
-                Preconditions.checkNotNull(key, "Invalid item ID: " + itemId);
-                yield ItemLoot.given(key, replacementStrategy, minYield, maxYield);
-            }
-            default -> throw new JsonParseException("Unknown loot entry type: " + type);
-        });
+        Optional<LootEntryParser> parser = LootEntryRegistry.get(type);
+        if (parser.isEmpty()) {
+            log.warn("Unknown loot entry type '{}' - skipping entry. Did you register it in onLoad()?", type);
+            return Optional.empty();
+        }
+        return Optional.of(parser.get().parse(entryObj, replacementStrategy));
     }
 }

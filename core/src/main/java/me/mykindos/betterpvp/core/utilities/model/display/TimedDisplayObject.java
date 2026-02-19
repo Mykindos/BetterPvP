@@ -1,10 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -38,6 +35,17 @@ public class TimedDisplayObject<T> extends DisplayObject<T> implements ITimedDis
         return startTime != -1;
     }
 
+    /**
+     * Returns {@code true} if this object has been explicitly invalidated, or if its
+     * display duration has elapsed. The time-based check ensures correctness when this
+     * object is read from a different thread than the one that started the timer — the
+     * Bukkit-scheduler-set {@code invalid} flag has no cross-thread visibility guarantee.
+     */
+    @Override
+    public boolean isInvalid() {
+        return super.isInvalid() || (hasStarted() && getRemaining() <= 0);
+    }
+
     @Override
     public void startTime() {
         if (hasStarted()) {
@@ -45,9 +53,6 @@ public class TimedDisplayObject<T> extends DisplayObject<T> implements ITimedDis
         }
 
         startTime = System.currentTimeMillis();
-        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
-            setInvalid(true);
-        }, (long) (seconds * 20L));
     }
 
 }

@@ -45,6 +45,7 @@ public final class GivenItemLoot extends ItemLoot<List<ItemStack>> {
             }
             reward.getItemStack().setAmount(count);
             final ItemStack given = reward.createItemStack();
+            results.add(given);
             UtilItem.insert(player, given);
             UtilServer.callEvent(new SpecialItemLootEvent(context, reward, context.getSource()));
         });

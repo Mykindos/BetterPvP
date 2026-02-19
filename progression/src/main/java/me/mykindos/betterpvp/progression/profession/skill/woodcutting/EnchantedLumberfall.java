@@ -4,11 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
+import me.mykindos.betterpvp.core.loot.item.GivenItemLoot;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -22,20 +22,18 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.world.entity.item.ItemEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -141,8 +139,9 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 final Object award = loot.award(bundle.getContext());
                 if (award instanceof Item item) {
                     processItemStack(player, locationToActivatePerk, item.getItemStack());
-                } else if (award instanceof ItemStack itemStack) {
-                    processItemStack(player, locationToActivatePerk, itemStack);
+                } else if (loot instanceof GivenItemLoot) {
+                    @SuppressWarnings("unchecked") List<ItemStack> itemStacks = (List<ItemStack>) award;
+                    itemStacks.forEach(itemStack -> processItemStack(player, locationToActivatePerk, itemStack));
                 }
             }
         }, 20L);

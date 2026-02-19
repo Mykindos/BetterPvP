@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMembers;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanMetadata;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanProperties;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClanTerritory;
+import me.mykindos.betterpvp.clans.database.jooq.tables.ClanXpContributions;
 import me.mykindos.betterpvp.clans.database.jooq.tables.Clans;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansDominanceScale;
 import me.mykindos.betterpvp.clans.database.jooq.tables.ClansFieldsOres;
@@ -22,11 +23,11 @@ import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanMembersRecor
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanMetadataRecord;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanPropertiesRecord;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanTerritoryRecord;
+import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanXpContributionsRecord;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClansDominanceScaleRecord;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClansFieldsOresRecord;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClansKillsRecord;
 import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClansRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -55,6 +56,7 @@ public class Keys {
     public static final UniqueKey<ClanPropertiesRecord> CLAN_PROPERTIES_PKEY = Internal.createUniqueKey(ClanProperties.CLAN_PROPERTIES, DSL.name("clan_properties_pkey"), new TableField[] { ClanProperties.CLAN_PROPERTIES.CLAN, ClanProperties.CLAN_PROPERTIES.PROPERTY }, true);
     public static final UniqueKey<ClanTerritoryRecord> CLAN_TERRITORY_CLAN_CHUNK_KEY = Internal.createUniqueKey(ClanTerritory.CLAN_TERRITORY, DSL.name("clan_territory_clan_chunk_key"), new TableField[] { ClanTerritory.CLAN_TERRITORY.CLAN, ClanTerritory.CLAN_TERRITORY.CHUNK }, true);
     public static final UniqueKey<ClanTerritoryRecord> CLAN_TERRITORY_PKEY = Internal.createUniqueKey(ClanTerritory.CLAN_TERRITORY, DSL.name("clan_territory_pkey"), new TableField[] { ClanTerritory.CLAN_TERRITORY.ID }, true);
+    public static final UniqueKey<ClanXpContributionsRecord> CLAN_XP_CONTRIBUTIONS_PKEY = Internal.createUniqueKey(ClanXpContributions.CLAN_XP_CONTRIBUTIONS, DSL.name("clan_xp_contributions_pkey"), new TableField[] { ClanXpContributions.CLAN_XP_CONTRIBUTIONS.CLAN, ClanXpContributions.CLAN_XP_CONTRIBUTIONS.MEMBER }, true);
     public static final UniqueKey<ClansRecord> CLANS_PKEY = Internal.createUniqueKey(Clans.CLANS, DSL.name("clans_pkey"), new TableField[] { Clans.CLANS.ID }, true);
     public static final UniqueKey<ClansRecord> CLANS_REALM_NAME_KEY = Internal.createUniqueKey(Clans.CLANS, DSL.name("clans_realm_name_key"), new TableField[] { Clans.CLANS.REALM, Clans.CLANS.NAME }, true);
     public static final UniqueKey<ClansDominanceScaleRecord> CLANS_DOMINANCE_SCALE_PKEY = Internal.createUniqueKey(ClansDominanceScale.CLANS_DOMINANCE_SCALE, DSL.name("clans_dominance_scale_pkey"), new TableField[] { ClansDominanceScale.CLANS_DOMINANCE_SCALE.CLAN_SIZE }, true);
@@ -74,6 +76,7 @@ public class Keys {
     public static final ForeignKey<ClanMetadataRecord, ClansRecord> CLAN_METADATA__CLAN_METADATA_CLAN_FKEY = Internal.createForeignKey(ClanMetadata.CLAN_METADATA, DSL.name("clan_metadata_clan_fkey"), new TableField[] { ClanMetadata.CLAN_METADATA.CLAN }, Keys.CLANS_PKEY, new TableField[] { Clans.CLANS.ID }, true);
     public static final ForeignKey<ClanPropertiesRecord, ClansRecord> CLAN_PROPERTIES__CLAN_PROPERTIES_CLAN_FKEY = Internal.createForeignKey(ClanProperties.CLAN_PROPERTIES, DSL.name("clan_properties_clan_fkey"), new TableField[] { ClanProperties.CLAN_PROPERTIES.CLAN }, Keys.CLANS_PKEY, new TableField[] { Clans.CLANS.ID }, true);
     public static final ForeignKey<ClanTerritoryRecord, ClansRecord> CLAN_TERRITORY__CLAN_TERRITORY_CLAN_FKEY = Internal.createForeignKey(ClanTerritory.CLAN_TERRITORY, DSL.name("clan_territory_clan_fkey"), new TableField[] { ClanTerritory.CLAN_TERRITORY.CLAN }, Keys.CLANS_PKEY, new TableField[] { Clans.CLANS.ID }, true);
+    public static final ForeignKey<ClanXpContributionsRecord, ClansRecord> CLAN_XP_CONTRIBUTIONS__CLAN_XP_CONTRIBUTIONS_CLAN_FKEY = Internal.createForeignKey(ClanXpContributions.CLAN_XP_CONTRIBUTIONS, DSL.name("clan_xp_contributions_clan_fkey"), new TableField[] { ClanXpContributions.CLAN_XP_CONTRIBUTIONS.CLAN }, Keys.CLANS_PKEY, new TableField[] { Clans.CLANS.ID }, true);
     public static final ForeignKey<ClansKillsRecord, ClansRecord> CLANS_KILLS__CLANS_KILLS_KILLER_CLAN_FKEY = Internal.createForeignKey(ClansKills.CLANS_KILLS, DSL.name("clans_kills_killer_clan_fkey"), new TableField[] { ClansKills.CLANS_KILLS.KILLER_CLAN }, Keys.CLANS_PKEY, new TableField[] { Clans.CLANS.ID }, true);
     public static final ForeignKey<ClansKillsRecord, ClansRecord> CLANS_KILLS__CLANS_KILLS_VICTIM_CLAN_FKEY = Internal.createForeignKey(ClansKills.CLANS_KILLS, DSL.name("clans_kills_victim_clan_fkey"), new TableField[] { ClansKills.CLANS_KILLS.VICTIM_CLAN }, Keys.CLANS_PKEY, new TableField[] { Clans.CLANS.ID }, true);
 }

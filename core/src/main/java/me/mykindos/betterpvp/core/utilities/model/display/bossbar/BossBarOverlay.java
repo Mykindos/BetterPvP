@@ -117,11 +117,11 @@ public class BossBarOverlay {
         }
 
         if (combined == null) {
-            bar.removeViewer(player);
-        } else {
-            bar.name(combined);
-            bar.addViewer(player);
+            combined = Component.empty();
         }
+
+        bar.name(combined);
+        bar.addViewer(player);
     }
 
     /** Removes expired/invalid overlays from the list. */

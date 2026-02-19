@@ -54,11 +54,6 @@ public class SmartBlockData extends TableImpl<SmartBlockDataRecord> {
     public final TableField<SmartBlockDataRecord, Integer> REALM = createField(DSL.name("realm"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>public.smart_block_data.world</code>.
-     */
-    public final TableField<SmartBlockDataRecord, String> WORLD = createField(DSL.name("world"), SQLDataType.VARCHAR(255).nullable(false), this, "");
-
-    /**
      * The column <code>public.smart_block_data.chunk_key</code>.
      */
     public final TableField<SmartBlockDataRecord, Long> CHUNK_KEY = createField(DSL.name("chunk_key"), SQLDataType.BIGINT.nullable(false), this, "");
@@ -82,6 +77,11 @@ public class SmartBlockData extends TableImpl<SmartBlockDataRecord> {
      * The column <code>public.smart_block_data.data</code>.
      */
     public final TableField<SmartBlockDataRecord, byte[]> DATA = createField(DSL.name("data"), SQLDataType.BLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.smart_block_data.world</code>.
+     */
+    public final TableField<SmartBlockDataRecord, String> WORLD = createField(DSL.name("world"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     private SmartBlockData(Name alias, Table<SmartBlockDataRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
