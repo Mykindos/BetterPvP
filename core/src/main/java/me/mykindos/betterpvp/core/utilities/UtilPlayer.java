@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -284,5 +286,9 @@ public class UtilPlayer {
         compound.put("Pos", posList);
         UtilNBT.savePlayerData(id, compound);
 
+    }
+
+    public static boolean isPlayerInCombat(@NotNull ClientManager clientManager, @NotNull Player player) {
+        return clientManager.search().online(player).getGamer().isInCombat();
     }
 }
