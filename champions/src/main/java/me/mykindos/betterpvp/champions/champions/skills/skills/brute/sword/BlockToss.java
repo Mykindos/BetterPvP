@@ -38,6 +38,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -232,17 +234,40 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             }
 
             iterator.remove();
-            final float charge = chargeData.getCharge(); // 0 - 1
+            final float charge = chargeData.getCharge(); // 0 -> 1
             chargeData.boulder.throwBoulder(getSpeed(level) * charge, getRadius(level), getDamage(level) * charge);
-            championsManager.getCooldowns().removeCooldown(player, getName(), true);
-            championsManager.getCooldowns().use(player,
-                    getName(),
-                    getCooldown(level),
-                    showCooldownFinished(),
-                    true,
-                    isCancellable(),
-                    this::shouldDisplayActionBar);
         }
+    }
+
+    @Override
+    public boolean isDelayedSkill() {
+        return true;
+    }
+
+    @Override
+    public boolean isUsingSkill(final @NotNull Player player) {
+        if (charging.containsKey(player)) return true;
+        if (player.isHandRaised()) return true;
+
+        // if any boulder exists and is still in-flight/valid, consider skill still used
+        final @Nullable List<BlockTossObject> list = boulders.get(player);
+        if (list == null || list.isEmpty()) return false;
+
+        for (final BlockTossObject boulder : list) {
+            if (boulder == null) continue;
+            if (!boulder.isThrown()) {
+                // not thrown yet
+                return true;
+            }
+
+            final @Nullable Arrow ref = boulder.getReferenceEntity();
+            if (ref != null && ref.isValid()) {  // still flying
+                return true;
+            }
+        }
+
+        // no active charge and no valid thrown boulder -> not using
+        return false;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
