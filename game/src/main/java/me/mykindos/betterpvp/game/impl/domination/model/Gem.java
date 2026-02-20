@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.module.powerup.Powerup;
 import me.mykindos.betterpvp.game.impl.domination.Domination;
 import me.mykindos.betterpvp.game.impl.domination.controller.GameController;
+import me.mykindos.betterpvp.game.impl.event.PlayerContributePointsEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -158,6 +159,7 @@ public class Gem implements Powerup {
         final Team team = Objects.requireNonNull(game.getPlayerTeam(player));
         int score = game.getConfiguration().getGemScoreAttribute().getValue();
         controller.addPoints(team, score);
+        new PlayerContributePointsEvent(player, score).callEvent();
 
         // Put the gem on cooldown
         startCooldown();

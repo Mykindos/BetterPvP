@@ -7,12 +7,16 @@ import me.mykindos.betterpvp.game.framework.model.Lifecycled;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.impl.domination.Domination;
 import me.mykindos.betterpvp.game.impl.domination.controller.GameController;
+import me.mykindos.betterpvp.game.impl.event.PlayerContributePointsEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Getter
@@ -43,6 +47,7 @@ public class CapturePoint implements Lifecycled {
 
     // Map of players on the point
     private final Map<Player, Team> playersOnPoint = new WeakHashMap<>();
+    private final Set<Player> playersWhoCapturedThisPoint = new HashSet<>();
 
     public enum State {
         NEUTRAL,     // No team owns the point (captureProgress = 0.0 when idle)
@@ -99,7 +104,17 @@ public class CapturePoint implements Lifecycled {
 
         // Award points if the point is fully captured.
         if (owningTeam != null && Bukkit.getCurrentTick() % 10 == 0) {
-            controller.addPoints(owningTeam, (int) Math.ceil(configuration.getCapturePointScoreAttribute().getValue() / 2d)); // 2 because it's every 10 ticks out of 20
+
+            // 2 because it's every 10 ticks out of 20
+            final int pointsContributedOverall = (int) Math.ceil(configuration.getCapturePointScoreAttribute().getValue() / 2d);
+
+            // Ensure at least 1 point per player
+            final int pointsContributedPerPlayer = Math.max(1, pointsContributedOverall / playersWhoCapturedThisPoint.size());
+
+            controller.addPoints(owningTeam, pointsContributedOverall);
+            for (Player player : playersWhoCapturedThisPoint) {
+                new PlayerContributePointsEvent(player, pointsContributedPerPlayer).callEvent();
+            }
         }
     }
 
@@ -128,6 +143,12 @@ public class CapturePoint implements Lifecycled {
                 capturingTeam = null;
                 blocks.capture(owningTeam);
                 fx.capture(owningTeam);
+
+                // perform set intersection to find players who were on the point and are on the owning team
+                final @NotNull Set<Player> playersOnOwningTeam = new HashSet<>(owningTeam.getPlayers());
+                playersOnOwningTeam.retainAll(playersOnPoint.keySet());
+                playersWhoCapturedThisPoint.addAll(playersOnOwningTeam);
+
                 return;
             }
             state = State.CAPTURING;
@@ -144,6 +165,7 @@ public class CapturePoint implements Lifecycled {
                 if (captureProgress <= 0.0) {
                     captureProgress = 0.0;
                     // Point is now neutral.
+                    playersWhoCapturedThisPoint.clear();
                     owningTeam = null;
                     blocks.uncapture();
                 }
