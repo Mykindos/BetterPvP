@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 /**
@@ -78,6 +79,10 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
 
         // Add to new team
         team.getParticipants().add(participant);
+
+        if (getGameInfo() != null) {
+            getGameInfo().getPlayerTeams().put(participant.getPlayer().getUniqueId(), team.getProperties().name());
+        }
 
         // Update player tab color
         GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
@@ -142,6 +147,23 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         return null;
     }
 
+
+    /**
+     * Gets the team a player is in
+     *
+     * @param id The player id
+     * @return The team, or null if not in a team
+     */
+    @Nullable
+    public Team getPlayerTeam(UUID id) {
+        for (Team team : teams.values()) {
+            if (team.getPlayers().stream().anyMatch(player -> player.getUniqueId().equals(id))) {
+                return team;
+            }
+        }
+        return null;
+    }
+
     /**
      * Gets a team by their properties
      *
@@ -151,6 +173,17 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
     @Nullable
     public Team getTeam(TeamProperties properties) {
         return teams.get(properties);
+    }
+
+    @Nullable
+    public Team getTeam(@Nullable String teamName) {
+        return teams.entrySet().stream()
+                .filter(entry -> {
+                    return entry.getKey().name().equals(teamName);
+                })
+                .map(Map.Entry::getValue)
+                .findAny()
+                .orElse(null);
     }
 
     @Override

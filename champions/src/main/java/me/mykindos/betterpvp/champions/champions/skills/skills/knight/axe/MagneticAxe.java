@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -25,7 +24,6 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -126,8 +124,8 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @Override
-    public void activate(Player player, int level) {
-        if (!isHolding(player)) return;
+    public boolean activate(Player player, int level) {
+        if (!isHolding(player)) return false;
 
         ItemStack axeItem = player.getInventory().getItemInMainHand();
         int slot = player.getInventory().getHeldItemSlot();
@@ -155,6 +153,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         projectile.redirect(direction);
 
         data.computeIfAbsent(player, key -> new ArrayList<>()).add(projectile);
+        return true;
     }
 
     @UpdateEvent

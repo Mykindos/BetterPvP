@@ -114,7 +114,7 @@ public class DatabaseAppender implements LogAppender {
                         // Create log record
                         LogsRecord logRecord = ctx.newRecord(LOGS);
                         logRecord.setId(pl.getId());
-                        logRecord.setRealm(Core.getCurrentRealm());
+                        logRecord.setRealm(Core.getCurrentRealm().getId());
                         logRecord.setLevel(level);
                         logRecord.setAction(action);
                         logRecord.setMessage(message);
@@ -127,7 +127,7 @@ public class DatabaseAppender implements LogAppender {
                             ctx_map.forEach((key, value) -> {
                                 LogsContextRecord contextRecord = ctx.newRecord(LOGS_CONTEXT);
                                 contextRecord.setLogId(pl.getId());
-                                contextRecord.setRealm(Core.getCurrentRealm());
+                                contextRecord.setRealm(Core.getCurrentRealm().getId());
                                 contextRecord.setContext(key != null ? key : "");
                                 contextRecord.setValue(value != null ? value : "");
                                 contextRecords.add(contextRecord);

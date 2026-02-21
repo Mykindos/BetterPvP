@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * - Handling game state-specific transitions related to maps and worlds.
  * - Registering and responding to map-related attribute changes.
  * - Listening to server events such as weather changes to apply game-specific logic.
- *
+ * <p>
  * Annotations:
  * - {@code @Singleton}: Indicates that this class should follow the singleton pattern.
  * - {@code @BPvPListener}: Marks this class as a listener specific to certain events or logic in BPvP.

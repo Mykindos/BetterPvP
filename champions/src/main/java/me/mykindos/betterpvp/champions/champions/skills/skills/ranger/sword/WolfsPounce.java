@@ -142,9 +142,10 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         final ChargeData chargeData = new ChargeData((float) getChargePerSecond(level) / 100);
         charging.put(player, chargeData);
+        return true;
     }
 
     private void pounce(Player player, ChargeData chargeData, int level) {

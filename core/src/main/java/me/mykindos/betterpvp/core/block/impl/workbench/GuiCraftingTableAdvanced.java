@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.block.impl.workbench;
 
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -35,8 +36,8 @@ public class GuiCraftingTableAdvanced extends AbstractCraftingGui {
     private final VirtualInventory blueprintInventory;
 
     @SneakyThrows
-    GuiCraftingTableAdvanced(GuiWorkbench parent, CraftingManager craftingManager, ItemFactory itemFactory) {
-        super(craftingManager, itemFactory, 9, 6);
+    GuiCraftingTableAdvanced(GuiWorkbench parent, CraftingManager craftingManager, ItemFactory itemFactory, ClientManager clientManager) {
+        super(craftingManager, itemFactory, clientManager, 9, 6);
         this.parent = parent;
         this.blueprintInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
 

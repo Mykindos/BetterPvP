@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetChampionsDataRecord;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetChampionsDataRecord;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -22,8 +22,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_COMBAT_STATS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.COMBAT_STATS;
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.GET_CHAMPIONS_DATA;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.COMBAT_STATS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.KILLS;
 
 @Singleton
@@ -45,7 +45,7 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
         final RoleStatistics roleStatistics = new RoleStatistics(combatDataMap, roleManager, player);
         return database.getAsyncDslContext().executeAsync(ctx -> {
 
-            Result<GetChampionsDataRecord> dataRecords = GET_CHAMPIONS_DATA(ctx.configuration(), player.toString(), Core.getCurrentRealm());
+            Result<GetChampionsDataRecord> dataRecords = GET_CHAMPIONS_DATA(ctx.configuration(), player.toString(), Core.getCurrentRealm().getId());
             dataRecords.forEach(result -> {
                 String className = result.getClass_();
                 Role role = className.isEmpty() ? null : Role.valueOf(className);

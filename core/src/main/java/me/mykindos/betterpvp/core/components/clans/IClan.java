@@ -41,7 +41,7 @@ public interface IClan {
      *
      * @param message The message string to be sent to all members of the clan.
      * @param ignore The UUID of a member to exclude from receiving the message; can be null to include everyone.
-     * @param prefix Indicates whether the message should include a prefix. If true, a prefix will be added.
+     * @param prefix Indicates whether the message should include a PREFIX. If true, a PREFIX will be added.
      */
     void messageClan(String message, UUID ignore, boolean prefix);
 
@@ -80,7 +80,7 @@ public interface IClan {
      */
     default List<Player> getMembersAsPlayers() {
         return getMembers().stream()
-                .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
+                .map(member -> Bukkit.getPlayer(member.getUuid()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -161,7 +161,7 @@ public interface IClan {
      * @return the total count of online members in the clan.
      */
     default int getOnlineMemberCount() {
-        return (int) getMembers().stream().filter(clanMember -> Bukkit.getPlayer(UUID.fromString(clanMember.getUuid()))!= null).count();
+        return (int) getMembers().stream().filter(clanMember -> Bukkit.getPlayer(clanMember.getUuid())!= null).count();
     }
 
     /**

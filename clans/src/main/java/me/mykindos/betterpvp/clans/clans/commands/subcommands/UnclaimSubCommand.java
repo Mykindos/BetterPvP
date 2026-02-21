@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -91,7 +90,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
             }
 
             for (ClanMember clanMember : locationClan.getMembers()) {
-                final Optional<Client> clientOpt = clientManager.search().online(UUID.fromString(clanMember.getUuid()));
+                final Optional<Client> clientOpt = clientManager.search().online(clanMember.getUuid());
                 if (clientOpt.isPresent()) {
                     final Client online = clientOpt.get();
                     if (online.isAdministrating()) {

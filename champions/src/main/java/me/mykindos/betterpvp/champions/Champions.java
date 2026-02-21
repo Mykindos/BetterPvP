@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.champions.achievements.loader.ChampionsAchievementLoader;
 import me.mykindos.betterpvp.champions.champions.leaderboards.ChampionsLeaderboardLoader;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
@@ -92,6 +93,9 @@ public class Champions extends BPvPPlugin {
 
             var leaderboardLoader = injector.getInstance(ChampionsLeaderboardLoader.class);
             leaderboardLoader.registerLeaderboards(PACKAGE);
+
+            var championsAchievementLoader = injector.getInstance(ChampionsAchievementLoader.class);
+            championsAchievementLoader.loadAll(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 

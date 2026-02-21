@@ -1,0 +1,141 @@
+package me.mykindos.betterpvp.core.client.stats.impl.champions;
+
+import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
+import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.server.Period;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
+
+@Builder
+@EqualsAndHashCode
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+public class RoleStat implements IBuildableStat {
+    public static final String TYPE = "CHAMPIONS_ROLE";
+
+    public static RoleStat fromData(String statType, JSONObject data) {
+        RoleStat.RoleStatBuilder builder = builder();
+        Preconditions.checkArgument(statType.equals(TYPE));
+        builder.action(Action.valueOf(data.getString("action")));
+        String dataRole = data.optString("role", null);
+        Role roleEnum = dataRole == null ? null : Role.valueOf(dataRole);
+        builder.role(roleEnum);
+
+        return builder.build();
+    }
+
+
+    @NotNull
+    private Action action;
+    @Nullable(value = "When player does not have a role")
+    private Role role;
+
+    @Override
+    public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period object) {
+        return statContainer.getProperty(type, object, this);
+    }
+
+    /**
+     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
+     *
+     * @return the type of stat
+     */
+    @Override
+    public @NotNull StatValueType getStatValueType() {
+        return action == Action.TIME_PLAYED ? StatValueType.DURATION : StatValueType.LONG;
+    }
+
+    @Override
+    public @NotNull String getStatType() {
+        return TYPE;
+    }
+
+    /**
+     * Get the jsonb data in string format for this object
+     *
+     * @return
+     */
+    @Override
+    public @Nullable JSONObject getJsonData() {
+        return new JSONObject()
+                .put("action", action.name())
+                .putOpt("role", role);
+    }
+
+    /**
+     * Get the simple name of this stat, without qualifications (if present)
+     * <p>
+     * i.e. Time Played, Flags Captured
+     *
+     * @return the simple name
+     */
+    @Override
+    public String getSimpleName() {
+        return UtilFormat.cleanString(action.name()) + " " + (role == null ? "No Role" : UtilFormat.cleanString(role.name()));
+    }
+
+    /**
+     * Whether this stat is directly savable to the database
+     *
+     * @return {@code true} if it is, {@code false} otherwise
+     */
+    @Override
+    public boolean isSavable() {
+        return true;
+    }
+
+    /**
+     * Whether this stat contains this otherSTat
+     *
+     * @param otherStat
+     * @return
+     */
+    @Override
+    public boolean containsStat(IStat otherStat) {
+        return this.equals(otherStat);
+    }
+
+    /**
+     * <p>Get the generic stat that includes this stat.</p>
+     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
+     *
+     * @return the generic stat
+     */
+    @Override
+    public @NotNull IStat getGenericStat() {
+        return this;
+    }
+
+    /**
+     * Copies the stat represented by this statName into this object
+     *
+     * @param statType the statname
+     * @param data
+     * @return this stat
+     * @throws IllegalArgumentException if this statName does not represent this stat
+     */
+    @Override
+    public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
+        final RoleStat other = fromData(statType, data);
+        this.action = other.action;
+        this.role = other.role;
+        return this;
+    }
+
+    public enum Action {
+        TIME_PLAYED,
+        EQUIP
+    }
+}

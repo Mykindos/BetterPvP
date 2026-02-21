@@ -15,14 +15,15 @@ import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterValueButton;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
-import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterButton;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.filter.IContextFilterButton;
+import me.mykindos.betterpvp.core.menu.button.filter.StringContext;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -67,8 +68,8 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
     private final @Nullable String actionFilter;
     private final BPvPPlugin plugin;
     private final LogRepository logRepository;
-    private IStringFilterButton actionButton;
-    private IStringFilterButton categoryButton;
+    private IContextFilterButton<StringContext> actionButton;
+    private IContextFilterButton<StringContext> categoryButton;
     private IStringFilterValueButton valueButton;
 
     public CachedLogMenu(@NotNull String title, String key, String value, @Nullable String actionFilter, List<String> contexts, BPvPPlugin plugin, LogRepository logRepository, Windowed previous) {
@@ -94,13 +95,13 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
             refreshButton.setRefresh(this::refresh);
         }
 
-        if (getItem(6, 0) instanceof IStringFilterButton filterButton) {
-            this.actionButton = filterButton;
+        if (getItem(6, 0) instanceof IContextFilterButton<?> filterButton) {
+            this.actionButton = (IContextFilterButton<StringContext>) filterButton;
             filterButton.setRefresh(this::refresh);
         }
 
-        if (getItem(7, 0) instanceof IStringFilterButton filterButton) {
-            this.categoryButton = filterButton;
+        if (getItem(7, 0) instanceof IContextFilterButton<?> filterButton) {
+            this.categoryButton = (IContextFilterButton<StringContext>) filterButton;
             filterButton.setRefresh(this::refresh);
         }
 
@@ -126,7 +127,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
 
     private CompletableFuture<Boolean> refresh() {
         CompletableFuture<List<Item>> future = new CompletableFuture<>();
-        valueButton.setSelectedContext(categoryButton.getSelectedFilter());
+        valueButton.setSelectedContext(categoryButton.getSelectedFilter().getContext());
         valueButton.getContextValues().clear();
         future.completeAsync(() -> {
             List<CachedLog> logs = logRepository.getLogsWithContextAndAction(key, value, actionFilter);
@@ -142,18 +143,18 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                     }
                     valueButton.addValue(k, v);
 
-                    actionButton.add(cachedLog.getAction());
+                    actionButton.add(new StringContext(cachedLog.getAction()));
                 });
             });
             return logs.stream()
                     .filter(cachedLog -> {
-                        if (actionButton.getSelectedFilter().equals("All")) {
+                        if (actionButton.getSelectedFilter().getContext().equals("All")) {
                             return true;
                         }
-                        return Objects.equals(cachedLog.getAction(), actionButton.getSelectedFilter());
+                        return Objects.equals(cachedLog.getAction(), actionButton.getSelectedFilter().getContext());
                     })
                     .filter(cachedLog -> {
-                        String context = categoryButton.getSelectedFilter();
+                        String context = categoryButton.getSelectedFilter().getContext();
                         String altContext = LogContext.getAltContext(context);
                         String selectedValue = valueButton.getSelected();
 

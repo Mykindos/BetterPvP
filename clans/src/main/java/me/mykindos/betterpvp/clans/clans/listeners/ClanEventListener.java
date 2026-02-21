@@ -37,6 +37,8 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -80,7 +82,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
@@ -146,6 +147,7 @@ public class ClanEventListener extends ClanListener {
                         stringChunk, clan.getName(), clan.getId())
                 .setAction("CLAN_CLAIM").addClientContext(event.getPlayer()).addClanContext(clan)
                 .addContext(LogContext.CHUNK, stringChunk).submit();
+        clientManager.incrementStat(player, ClientStat.CLANS_CLAIM_TERRITORY, 1);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -233,6 +235,13 @@ public class ClanEventListener extends ClanListener {
                 .setAction("CLAN_UNCLAIM").addClientContext(event.getPlayer()).addClanContext(targetClan).
                 addContext(LogContext.CHUNK, chunkToPrettyString).submit();
 
+        final StatContainer container = clientManager.search().online(player).getStatContainer();
+        if (targetClan.getMemberByUUID(player.getUniqueId()).isEmpty()) {
+            container.incrementStat(ClientStat.CLANS_UNCLAIM_OTHER_TERRITORY, 1);
+        } else {
+            container.incrementStat(ClientStat.CLANS_UNCLAIM_TERRITORY, 1);
+        }
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -254,7 +263,7 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
-        clan.getMembers().add(new ClanMember(player.getUniqueId().toString(), ClanMember.MemberRank.LEADER, player.getName()));
+        clan.getMembers().add(new ClanMember(player.getUniqueId(), ClanMember.MemberRank.LEADER, player.getName()));
         player.setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
 
         this.clanManager.addObject(clan.getId(), clan);
@@ -281,6 +290,7 @@ public class ClanEventListener extends ClanListener {
                     .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
 
         }
+        clientManager.incrementStat(player, ClientStat.CLANS_CLAN_CREATE, 1);
 
     }
 
@@ -360,7 +370,7 @@ public class ClanEventListener extends ClanListener {
         if (event.getPlayer() != null) {
             clan.getMembers().forEach(clanMember -> {
                 if (!clanMember.isOnline()) {
-                    offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+                    offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                             OfflineMessage.Action.CLAN_DISBAND,
                             "Your clan <aqua>%s</aqua> was disbanded by <yellow>%s</yellow>.",
                             clan.getName(), event.getPlayer().getName());
@@ -371,7 +381,7 @@ public class ClanEventListener extends ClanListener {
         } else {
             clan.getMembers().forEach(clanMember -> {
                 if (!clanMember.isOnline()) {
-                    offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+                    offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                             OfflineMessage.Action.CLAN_DISBAND,
                             "Your clan <aqua>%s</aqua> was disbanded due to running out of energy.",
                             clan.getName());
@@ -399,7 +409,7 @@ public class ClanEventListener extends ClanListener {
 
         final var memberCache = new ArrayList<>(event.getClan().getMembers());
         memberCache.forEach(member -> {
-            final Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            final Player player = Bukkit.getPlayer(member.getUuid());
             if (player != null) {
                 player.removeMetadata("clan", this.clans);
             }
@@ -481,7 +491,7 @@ public class ClanEventListener extends ClanListener {
             this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.TRIAL_MOD);
         }
 
-        final ClanMember member = new ClanMember(player.getUniqueId().toString(), client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT, player.getName());
+        final ClanMember member = new ClanMember(player.getUniqueId(), client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT, player.getName());
         clan.getMembers().add(member);
         player.setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
 
@@ -499,6 +509,8 @@ public class ClanEventListener extends ClanListener {
                 .addClientContext(player)
                 .addClanContext(clan)
                 .submit();
+
+        client.getStatContainer().incrementStat(ClientStat.CLANS_CLAN_JOIN, 1);
 
     }
 
@@ -523,7 +535,7 @@ public class ClanEventListener extends ClanListener {
 
             boolean isOnline = false;
             for (final ClanMember member : clan.getMembers()) {
-                final Player playerMember = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+                final Player playerMember = Bukkit.getPlayer(member.getUuid());
                 if (playerMember != null) {
                     UtilMessage.message(playerMember, "Clans", "<yellow>%s<gray> left your Clan.", player.getName());
                     isOnline = true;
@@ -534,6 +546,8 @@ public class ClanEventListener extends ClanListener {
 
         log.info("{} ({}) left {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
                 .setAction("CLAN_LEAVE").addClientContext(player).addClanContext(clan).submit();
+
+        clientManager.incrementStat(player, ClientStat.CLANS_CLAN_LEAVE, 1);
 
     }
 
@@ -901,6 +915,8 @@ public class ClanEventListener extends ClanListener {
                         UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
 
+        clientManager.search().online(player).getStatContainer().incrementStat(ClientStat.CLANS_SET_CORE, 1);
+
         this.clanManager.getRepository().updateClanCore(clan);
     }
 
@@ -918,7 +934,7 @@ public class ClanEventListener extends ClanListener {
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.min(ClanMember.MemberRank.LEADER.getPrivilege(), member.getRank().getPrivilege() + 1)));
         this.clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        this.clientManager.search().offline(UUID.fromString(member.getUuid())).thenAcceptAsync(result -> {
+        this.clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
             result.ifPresent(client -> {
                 UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
 
@@ -931,7 +947,7 @@ public class ClanEventListener extends ClanListener {
         });
 
 
-        final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
         if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were promoted to <yellow>%s<gray>.", member.getName());
         }
@@ -952,7 +968,7 @@ public class ClanEventListener extends ClanListener {
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.max(1, member.getRank().getPrivilege() - 1)));
         this.clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        this.clientManager.search().offline(UUID.fromString(member.getUuid())).thenAcceptAsync(result -> {
+        this.clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
             result.ifPresent(client -> {
                 UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
                 log.info("{} ({}) was demoted by {} ({}) to {} in {} ({})", client.getName(), member.getUuid(),
@@ -963,7 +979,7 @@ public class ClanEventListener extends ClanListener {
             });
         });
 
-        final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
         if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were demoted to <yellow>%s<gray>.", member.getName());
         }
@@ -973,7 +989,7 @@ public class ClanEventListener extends ClanListener {
     public void onPlayerJoinLoadClanClients(PlayerJoinEvent event) {
         clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
             for (ClanMember member : clan.getMembers()) {
-                clientManager.search().offline(UUID.fromString(member.getUuid())).thenAcceptAsync(result -> {
+                clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
                     result.ifPresent(client -> {
                         log.info("Loaded {} ({}) as they are a member of an online clan", client.getName(), client.getUniqueId().toString()).submit();
                     });

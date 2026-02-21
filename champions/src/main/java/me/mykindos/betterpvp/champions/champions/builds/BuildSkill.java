@@ -32,4 +32,8 @@ public class BuildSkill {
         }
         return UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), displayLevel);
     }
+
+    public BuildSkill copy() {
+        return new BuildSkill(getSkill(), getLevel());
+    }
 }

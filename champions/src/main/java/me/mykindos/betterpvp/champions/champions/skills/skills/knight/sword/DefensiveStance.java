@@ -186,8 +186,9 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
+        return true;
     }
 
     @Override

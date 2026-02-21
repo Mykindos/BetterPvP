@@ -9,8 +9,9 @@ import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.EnergyCheckEvent;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.components.clans.events.ClansDropEnergyEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -173,18 +174,19 @@ public class ClanEnergyListener extends ClanListener {
             return; // Let them pick up the item, but don't give them energy, they can cash it in later
         }
 
-        final Gamer gamer = this.clientManager.search().online(player).getGamer();
+        final Client client = this.clientManager.search().online(player);
         final int energy = energyOpt.getAsInt();
 
         // Success
         event.getItem().remove();
         event.setCancelled(true);
         clan.grantEnergy(energy);
+        client.getStatContainer().incrementStat(ClientStat.CLANS_ENERGY_COLLECTED, energy);
 
         // Cues
         new SoundEffect(Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 0.4f, 2f).play(player);
         final TextComponent text = Component.text("+" + energy + " Clan Energy", TextColor.color(173, 123, 212));
-        gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
+        client.getGamer().getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

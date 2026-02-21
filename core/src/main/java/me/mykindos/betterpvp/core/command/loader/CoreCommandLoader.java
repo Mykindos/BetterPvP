@@ -11,7 +11,7 @@ import org.reflections.Reflections;
 import java.util.Set;
 
 @CustomLog
-public class CoreCommandLoader extends CommandLoader{
+public class CoreCommandLoader extends CommandLoader {
 
     @Inject
     public CoreCommandLoader(Core plugin, CommandManager commandManager) {

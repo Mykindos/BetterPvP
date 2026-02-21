@@ -34,8 +34,6 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
     private int radius;
     private int slownessStrength;
 
-
-
     private final AtomicInteger soundTicks = new AtomicInteger(0);
     private final WeakHashMap<Player, Set<Player>> trackedEnemies = new WeakHashMap<>();
 

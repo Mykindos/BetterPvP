@@ -20,7 +20,7 @@ public class ClanPropertyListener extends ClanListener{
 
     @EventHandler
     public void onSettingsUpdated(ClanPropertyUpdateEvent event) {
-        clanManager.getRepository().saveProperty(event.getClan(), event.getProperty(), event.getValue());
+        clanManager.getRepository().saveProperty(event.getContainer(), event.getProperty(), event.getNewValue());
     }
 
     @UpdateEvent(delay = 120_000)

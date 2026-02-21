@@ -108,7 +108,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0F, 2.0F);
 
         Location start = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(startDistance));
@@ -125,6 +125,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
         ThreateningShoutData data = new ThreateningShoutData(points, 0, new HashSet<>(), new HashSet<>());
         playerDataMap.put(player, data);
+        return true;
     }
 
     @UpdateEvent

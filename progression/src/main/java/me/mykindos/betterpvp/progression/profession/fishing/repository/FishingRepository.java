@@ -49,7 +49,7 @@ public class FishingRepository {
     }
 
     public void createPartitions() {
-        int season = Core.getCurrentSeason();
+        int season = Core.getCurrentRealm().getSeason().getId();
         String partitionTableName = "progression_fishing_season_" + season;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
@@ -115,7 +115,7 @@ public class FishingRepository {
                 if (clientId == null) return null;
 
                 GetBiggestFishCaughtByClientRecord result = ctxl.selectFrom(GET_BIGGEST_FISH_CAUGHT_BY_CLIENT.call(
-                        clientId, Core.getCurrentSeason(), days, 1)).fetchOne();
+                        clientId, Core.getCurrentRealm().getSeason().getId(), days, 1)).fetchOne();
 
                 return result != null
                         ? new CaughtFish(player, result.getType(), result.getWeight())
@@ -134,7 +134,7 @@ public class FishingRepository {
             HashMap<UUID, CaughtFish> leaderboard = new HashMap<>();
             try {
                 Result<GetBiggestFishCaughtRecord> results = ctx.selectFrom(GET_BIGGEST_FISH_CAUGHT.call(
-                        Core.getCurrentSeason(), days, 10)).fetch();
+                        Core.getCurrentRealm().getSeason().getId(), days, 10)).fetch();
 
                 results.forEach(fishRecord -> {
                     leaderboard.put(
@@ -159,7 +159,7 @@ public class FishingRepository {
             HashMap<UUID, Long> leaderboard = new HashMap<>();
             try {
                 ctx.selectFrom(GET_TOP_FISHING_BY_COUNT.call(
-                                Core.getCurrentSeason(),
+                                Core.getCurrentRealm().getSeason().getId(),
                                 days,
                                 10))
                         .fetch()
@@ -181,7 +181,7 @@ public class FishingRepository {
             HashMap<UUID, Long> leaderboard = new HashMap<>();
             try {
                 ctx.selectFrom(GET_TOP_FISHING_BY_WEIGHT.call(
-                                Core.getCurrentSeason(),
+                                Core.getCurrentRealm().getSeason().getId(),
                                 days,
                                 10))
                         .fetch()

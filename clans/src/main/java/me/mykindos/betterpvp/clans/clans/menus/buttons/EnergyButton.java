@@ -1,8 +1,12 @@
 package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -20,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.NumberFormat;
@@ -97,6 +102,10 @@ public class EnergyButton extends AbstractItem {
         event.setCursor(null);
         final int energy = energyAmount;
         clan.grantEnergy(energy);
+
+        final Client client = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClientManager.class).search().online(player);
+        client.getStatContainer().incrementStat(ClientStat.CLANS_ENERGY_COLLECTED, energy);
+
         new SoundEffect(Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 1f, 2f).play(player);
         notifyWindows();
     }

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.redis.CacheObject;
@@ -36,6 +37,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
 
     private final long id;
     private final transient @NotNull Gamer gamer;
+    private final StatContainer statContainer;
     private final @NotNull String uuid;
     private @NotNull String name;
     private @NotNull Rank rank;
@@ -50,6 +52,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     public Client(long id, @NotNull Gamer gamer, @NotNull String uuid, @NotNull String name, @NotNull Rank rank) {
         this.id = id;
         this.gamer = gamer;
+        this.statContainer = new StatContainer(this);
         this.uuid = uuid;
         this.name = name;
         this.rank = rank;
@@ -84,8 +87,8 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     }
 
     @Override
-    public void onMapValueChanged(String key, Object value) {
-        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClientPropertyUpdateEvent(this, key, value)));
+    public void onMapValueChanged(String key, Object newValue, Object oldValue) {
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClientPropertyUpdateEvent(this, key, newValue, oldValue)));
     }
 
     public boolean hasPunishment(String punishmentType) {
@@ -129,6 +132,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.newClient = other.newClient;
         this.properties.getMap().clear();
         this.properties.getMap().putAll(other.properties.getMap());
+        this.statContainer.getStats().copyFrom(other.getStatContainer().getStats());
         this.punishments.clear();
         this.punishments.addAll(other.punishments);
         this.ignores.clear();

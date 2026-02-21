@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.game.framework.listener.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 @BPvPListener
 @Singleton
@@ -60,7 +60,7 @@ public class ParticipantStateListener implements Listener {
 
     // Set people to spectator when they join the game after it has started
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onJoin(PlayerJoinEvent event) {
+    public void onJoin(ClientJoinEvent event) {
         final Participant participant = playerController.getParticipant(event.getPlayer());
         if(participant == null) {
             log.warn("Null participant, somehow...").submit();

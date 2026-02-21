@@ -9,13 +9,14 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -140,7 +141,8 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
                     }
                 }
                 if (found) {
-                    UtilPlayer.health(player, getHealing(level));
+                    double actualHeal = UtilEntity.health(player, getHealing(level));
+                    championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_VITALITY_SPORES, actualHeal);
                     if (currentCharges.isEmpty()) {
                         sporeCharges.remove(target);
                     }

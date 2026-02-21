@@ -9,6 +9,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.block.SmartBlockModule;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
+import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
@@ -40,6 +41,9 @@ import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.metal.MetalRecipeBootstrap;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldBootstrap;
 import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Season;
+import me.mykindos.betterpvp.core.server.Server;
 import me.mykindos.betterpvp.core.sound.SoundManager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.OrientedVector;
@@ -52,6 +56,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.Set;
 
 @CustomLog
@@ -82,19 +87,7 @@ public class Core extends BPvPPlugin {
 
     @Getter
     @Setter
-    private static int currentServer;
-
-    @Getter
-    @Setter
-    private static String currentServerName;
-
-    @Getter
-    @Setter
-    private static int currentSeason;
-
-    @Getter
-    @Setter
-    private static int currentRealm;
+    private static Realm currentRealm = new Realm(-1,new Server(-1, "Uninitialized"), new Season(-1, "Uninitialized", LocalDate.now()));
 
     @Override
     public void onEnable() {
@@ -147,6 +140,9 @@ public class Core extends BPvPPlugin {
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
 
+        var coreAchievementLoader = injector.getInstance(CoreAchievementLoader.class);
+        coreAchievementLoader.loadAll(PACKAGE);
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
@@ -168,7 +164,7 @@ public class Core extends BPvPPlugin {
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }
-    
+
     private void registerItems() {
         StatTypes.registerAll(this.injector.getInstance(StatTypeRegistry.class));
 
@@ -182,6 +178,7 @@ public class Core extends BPvPPlugin {
     }
 
     private void setupServerAndSeason() {
+        Server server;
         if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
             String serverName = getCommonNameViaReflection();
             if (serverName == null) {
@@ -192,15 +189,19 @@ public class Core extends BPvPPlugin {
                 serverName = "Champions";
             }
 
-            setCurrentServer(database.getServerId(serverName));
+            int id = database.getServerId(serverName);
+            server = new Server(id, serverName);
         } else {
             String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
-            setCurrentServerName(serverName);
-            setCurrentServer(database.getServerId(serverName));
+            int id = database.getServerId(serverName);
+            server = new Server(id, serverName);
         }
 
-        setCurrentSeason(getConfig().getOrSaveInt("core.info.season", 0));
-        setCurrentRealm(database.getRealmId(getCurrentServer(), getCurrentSeason()));
+        final int currentSeason = getConfig().getOrSaveInt("core.info.season", 1);
+        final String seasonName = getConfig().getOrSaveString("core.info.seasonName", "Season 1");
+        final Season season = database.getOrCreateSeason(currentSeason, seasonName);
+        int realmId = database.getRealmId(server.getId(), currentSeason);
+        setCurrentRealm(new Realm(realmId, server, season));
     }
 
     @Override
@@ -213,7 +214,7 @@ public class Core extends BPvPPlugin {
         injector.getInstance(SmartBlockDataManager.class).saveWorlds().join();
         log.info("Saved all cust0om blocks").submit();
 
-        clientManager.processStatUpdates(false);
+        clientManager.processPropertyUpdates(false);
         clientManager.shutdown();
         log.info("Processed all pending stat updates and shut down client manager").submit();
 

@@ -2,14 +2,13 @@ package me.mykindos.betterpvp.champions.properties;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
-import java.util.Optional;
 
 
 @Singleton
@@ -21,11 +20,6 @@ public class ChampionsPropertyListener implements Listener {
     @Inject
     public ChampionsPropertyListener(ClientManager clientManager) {
         this.clientManager = clientManager;
-    }
-
-    @EventHandler
-    public void onPropertyUpdated(ChampionsPropertyUpdateEvent event) {
-        clientManager.saveGamerProperty(event.getGamer(), event.getProperty(), event.getValue());
     }
 
     @EventHandler

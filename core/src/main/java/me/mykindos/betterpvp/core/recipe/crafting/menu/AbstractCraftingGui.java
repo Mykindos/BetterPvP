@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.recipe.crafting.menu;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.core.item.ItemStat;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
@@ -42,16 +44,18 @@ public abstract class AbstractCraftingGui extends AbstractGui {
 
     protected final CraftingManager craftingManager;
     protected final ItemFactory itemFactory;
+    protected final ClientManager clientManager;
     protected final VirtualInventory craftingMatrix;
     protected final VirtualInventory resultInventory;
     protected boolean blocked = false;
     private BukkitTask pendingUpdateTask = null;
 
     @Inject
-    protected AbstractCraftingGui(CraftingManager craftingManager, ItemFactory itemFactory, int width, int height) {
+    protected AbstractCraftingGui(CraftingManager craftingManager, ItemFactory itemFactory, ClientManager clientManager, int width, int height) {
         super(width, height);
         this.craftingManager = craftingManager;
         this.itemFactory = itemFactory;
+        this.clientManager = clientManager;
         this.craftingMatrix = new VirtualInventory(UUID.randomUUID(), new ItemStack[3 * 3]);
         this.resultInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
 
@@ -268,12 +272,18 @@ public abstract class AbstractCraftingGui extends AbstractGui {
         if (result == null) {
             return false;
         }
+        final ItemStat itemStat = ItemStat.builder()
+                        .action(ItemStat.Action.CRAFT)
+                        .itemStack(result.result().getItemStack())
+                        .build();
+        clientManager.incrementStat(player, itemStat, 1);
 
         final Map<Integer, ItemInstance> newMatrix = result.newCraftingMatrix();
         for (int i = 0; i < craftingMatrix.getSize(); i++) {
             ItemInstance instance = newMatrix.get(i);
             craftingMatrix.setItemSilently(i, instance != null ? instance.createItemStack() : null);
         }
+
         return true;
     }
 

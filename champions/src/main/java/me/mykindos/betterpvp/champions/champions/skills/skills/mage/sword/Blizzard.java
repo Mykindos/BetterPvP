@@ -196,10 +196,13 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
+        //todo, does this double the initial energy cost?
         if (championsManager.getEnergy().use(player, getName(), initialEnergyCost, true)) {
             active.add(player.getUniqueId());
+            return true;
         }
+        return false;
     }
 
     @Override

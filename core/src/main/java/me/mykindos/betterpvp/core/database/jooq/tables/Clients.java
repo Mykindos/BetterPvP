@@ -4,18 +4,17 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory.ClientNameHistoryPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties.ClientPropertiesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards.ClientRewardsPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.ClientStatsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.CombatStats.CombatStatsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.FilteredWords.FilteredWordsPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameData.GameDataPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams.GameTeamsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.GamerProperties.GamerPropertiesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores.IgnoresPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions.KillContributionsPath;
@@ -23,7 +22,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills.KillsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages.OfflineMessagesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments.PunishmentsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -45,6 +43,10 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -209,6 +211,19 @@ public class Clients extends TableImpl<ClientsRecord> {
         return _clientRewards;
     }
 
+    private transient ClientStatsPath _clientStats;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.client_stats</code> table
+     */
+    public ClientStatsPath clientStats() {
+        if (_clientStats == null)
+            _clientStats = new ClientStatsPath(this, null, Keys.CLIENT_STATS__CLIENT_STATS_CLIENT_FKEY.getInverseKey());
+
+        return _clientStats;
+    }
+
     private transient CombatStatsPath _combatStats;
 
     /**
@@ -233,6 +248,19 @@ public class Clients extends TableImpl<ClientsRecord> {
             _filteredWords = new FilteredWordsPath(this, null, Keys.FILTERED_WORDS__FILTERED_WORDS_CREATED_BY_FKEY.getInverseKey());
 
         return _filteredWords;
+    }
+
+    private transient GameTeamsPath _gameTeams;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.game_teams</code>
+     * table
+     */
+    public GameTeamsPath gameTeams() {
+        if (_gameTeams == null)
+            _gameTeams = new GameTeamsPath(this, null, Keys.GAME_TEAMS__GAME_TEAMS_CLIENT_FKEY.getInverseKey());
+
+        return _gameTeams;
     }
 
     private transient GamerPropertiesPath _gamerProperties;
@@ -311,6 +339,14 @@ public class Clients extends TableImpl<ClientsRecord> {
             _punishments = new PunishmentsPath(this, null, Keys.PUNISHMENTS__PUNISHMENTS_CLIENT_FKEY.getInverseKey());
 
         return _punishments;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.game_data</code> table
+     */
+    public GameDataPath gameData() {
+        return gameTeams().gameData();
     }
 
     /**

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.inventory.window.WindowManager;
@@ -32,13 +33,15 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
 
     private final CraftingManager craftingManager;
     private final ItemFactory itemFactory;
+    private final ClientManager clientManager;
     private final SmartBlockDataSerializer<WorkbenchData> serializer;
     private final Core core;
 
     @Inject
-    private Workbench(CraftingManager craftingManager, ItemFactory itemFactory, Core core) {
+    private Workbench(CraftingManager craftingManager, ClientManager clientManager, ItemFactory itemFactory, Core core) {
         super("workbench", "Workbench");
         this.craftingManager = craftingManager;
+        this.clientManager = clientManager;
         this.serializer = new StorageBlockDataSerializer<>(WorkbenchData.class, itemFactory, WorkbenchData::new);
         this.itemFactory = itemFactory;
         this.core = core;
@@ -67,7 +70,7 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
         }
 
         // Open the workbench GUI
-        final GuiWorkbench gui = new GuiWorkbench(player, craftingManager, itemFactory);
+        final GuiWorkbench gui = new GuiWorkbench(player, craftingManager, itemFactory, clientManager);
         gui.show(player);
         return true;
     }

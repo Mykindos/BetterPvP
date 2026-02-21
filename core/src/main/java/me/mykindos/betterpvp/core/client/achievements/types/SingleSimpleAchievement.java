@@ -1,0 +1,50 @@
+package me.mykindos.betterpvp.core.client.achievements.types;
+
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.server.Period;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.NoReflection;
+import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Tracks a single property when it is updated, completing at the goal
+ * <p>Intermediate Constructors that are for {@link NoReflection}
+ * are expected to have a constructor that can be used with {@link SingleSimpleAchievementConfigLoader#instanstiateAchievement(NamespacedKey, Number)}</p>
+ * @param <T> the container type
+ * @param <E> the event type
+ * @param <C> the {@link SingleSimpleAchievement#goal} type
+ */
+public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchievement {
+
+    protected SingleSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, StatFilterType achievementType, Long goal, IStat watchedStat) {
+        super(name, namespacedKey, achievementCategory, achievementType, goal, watchedStat);
+    }
+
+    protected IStat getKey() {
+        return getWatchedStats().stream().findAny().orElseThrow();
+    }
+
+    protected Long getGoal() {
+        return statGoals.get(getKey());
+    }
+
+    protected Long getProperty(StatContainer container) {
+        return getValue(container, getKey());
+    }
+
+    @Override
+    public List<Component> getProgressComponent(StatContainer container, StatFilterType type, Period period) {
+        Long value = getValue(container, getKey(), type, period);
+        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, type, period));
+        Component bar = progressComponent.getFirst();
+        progressComponent.removeFirst();
+        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", value, getGoal())));
+        return progressComponent;
+    }
+}

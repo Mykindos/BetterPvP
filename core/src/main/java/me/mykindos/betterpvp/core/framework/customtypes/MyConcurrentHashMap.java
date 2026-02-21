@@ -6,32 +6,32 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MyConcurrentHashMap<K, V> {
 
-    private final ConcurrentHashMap<K, V> myMap = new ConcurrentHashMap<>();
-    private final List<IMapListener> listeners = new ArrayList<>();
+    protected final ConcurrentHashMap<K, V> myMap = new ConcurrentHashMap<>();
+    protected final List<IMapListener> listeners = new ArrayList<>();
 
     public ConcurrentHashMap<K, V> getMap() {
         return myMap;
     }
 
     public void put(K key, V value) {
-        myMap.put(key, value);
-        listeners.forEach(l -> l.onMapValueChanged(key.toString(), value));
+        V oldValue = getMap().put(key, value);
+        listeners.forEach(l -> l.onMapValueChanged(key.toString(), value, oldValue));
     }
 
     public void putSilent(K key, V value) {
-        myMap.put(key, value);
+        getMap().put(key, value);
     }
 
     public V get(K key) {
-        return myMap.get(key);
+        return getMap().get(key);
     }
 
     public V getOrDefault(K key, V defaultValue) {
-        return myMap.getOrDefault(key, defaultValue);
+        return getMap().getOrDefault(key, defaultValue);
     }
 
     public void remove(K key) {
-        myMap.remove(key);
+        getMap().remove(key);
     }
 
     public void registerListener(IMapListener listener) {

@@ -198,6 +198,10 @@ public class UtilTime {
         };
     }
 
+    public static String getDateTime(LocalDateTime time) {
+        return dateTimeFormatter.format(time);
+    }
+
     public static String getDateTime(long time) {
         LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
 

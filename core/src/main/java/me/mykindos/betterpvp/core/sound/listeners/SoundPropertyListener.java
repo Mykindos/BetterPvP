@@ -33,11 +33,11 @@ public class SoundPropertyListener implements Listener {
     @EventHandler
     public void onClientPropertyUpdate(ClientPropertyUpdateEvent event) {
         String propertyName = event.getProperty();
-        Object value = event.getValue();
+        Object value = event.getNewValue();
 
         // Check if sound category property was changed to false
         if (value instanceof Boolean && !(Boolean) value) {
-            Player player = Bukkit.getPlayer(event.getClient().getUniqueId());
+            Player player = Bukkit.getPlayer(event.getContainer().getUniqueId());
             if (player != null && player.isOnline()) {
                 SoundCategory category = null;
 

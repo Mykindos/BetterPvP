@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -29,6 +26,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -93,8 +94,8 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
     }
 
     @Override
-    public void activate(Player player, int level) {
-        if (!isHolding(player)) return;
+    public boolean activate(Player player, int level) {
+        if (!isHolding(player)) return false;
 
         SkullsplitterProjectile existing = data.remove(player);
         if (existing != null) {
@@ -123,6 +124,7 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
         projectile.redirect(direction);
 
         data.put(player, projectile);
+        return true;
     }
 
     @UpdateEvent

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -42,6 +43,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Optional;
 import java.util.function.Function;
 
+@Singleton
 @BPvPListener
 public class RoleListener implements Listener {
 
@@ -93,11 +95,6 @@ public class RoleListener implements Listener {
         } else {
             UtilMessage.simpleMessage(player, "Class", "You equipped <green>%s", role.getName());
             UtilMessage.message(player, equipMessage(player, role));
-
-            final Gamer gamer = clientManager.search().online(player).getGamer();
-            String roleProperty = role.name() + "_EQUIPPED";
-            int timesEquipped = (int) gamer.getProperty(roleProperty).orElse(0) + 1;
-            gamer.saveProperty(roleProperty, timesEquipped);
         }
     }
 

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.menu.button;
 
+import lombok.Setter;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -14,15 +15,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BackButton extends FlashingButton<Gui> {
 
+    @Nullable
     private final Windowed previousMenu;
+    @Nullable
     private Key itemModel;
+    @Nullable
+    @Setter
     private Runnable onBack;
     protected SoundEffect soundEffect = new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1.4f, 0.6f);
 
-    public BackButton(Windowed previousMenu, Key itemModel, Runnable onBack) {
+    public BackButton(@Nullable Windowed previousMenu, @Nullable Key itemModel, @Nullable Runnable onBack) {
         this.previousMenu = previousMenu;
         this.itemModel = itemModel;
         this.onBack = onBack;
@@ -32,7 +38,7 @@ public class BackButton extends FlashingButton<Gui> {
         this(previousMenu, null, onBack);
     }
 
-    public BackButton(Windowed previousMenu) {
+    public BackButton(@Nullable Windowed previousMenu) {
         this.previousMenu = previousMenu;
     }
 

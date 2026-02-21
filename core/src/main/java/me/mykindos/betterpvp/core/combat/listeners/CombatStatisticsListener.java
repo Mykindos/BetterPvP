@@ -2,9 +2,10 @@ package me.mykindos.betterpvp.core.combat.listeners;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.core.DamageStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.Relation;
+import me.mykindos.betterpvp.core.client.stats.impl.utility.Type;
 import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
@@ -59,18 +60,12 @@ public class CombatStatisticsListener implements Listener {
             return;
         }
         
-        clientManager.search().offline(damagee.getUniqueId()).thenAcceptAsync(client -> {
-            if (client.isPresent()) {
-                Gamer gamer = client.get().getGamer();
-                
-                // Update damage taken statistic
-                double currentDamageTaken = (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0.0);
-                gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, currentDamageTaken + event.getDamage());
-                
-                log.debug("Updated damage taken for {}: +{} (total: {})", 
-                         damagee.getName(), event.getDamage(), currentDamageTaken + event.getDamage()).submit();
-            }
-        });
+        final DamageStat.DamageStatBuilder builder = DamageStat.builder()
+                .relation(Relation.RECEIVED)
+                .damageCause(event.getCause());
+
+        clientManager.incrementStat(damagee, builder.type(Type.COUNT).build(), 1);
+        clientManager.incrementStat(damagee, builder.type(Type.AMOUNT).build(), event.getDamage());
     }
     
     /**
@@ -80,19 +75,13 @@ public class CombatStatisticsListener implements Listener {
         if (!(event.getDamager() instanceof Player damager)) {
             return;
         }
-        
-        clientManager.search().offline(damager.getUniqueId()).thenAcceptAsync(client -> {
-            if (client.isPresent()) {
-                Gamer gamer = client.get().getGamer();
-                
-                // Update damage dealt statistic
-                double currentDamageDealt = (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0.0);
-                gamer.saveProperty(GamerProperty.DAMAGE_DEALT, currentDamageDealt + event.getDamage());
-                
-                log.debug("Updated damage dealt for {}: +{} (total: {})", 
-                         damager.getName(), event.getDamage(), currentDamageDealt + event.getDamage()).submit();
-            }
-        });
+
+        final DamageStat.DamageStatBuilder builder = DamageStat.builder()
+                .relation(Relation.DEALT)
+                .damageCause(event.getCause());
+
+        clientManager.incrementStat(damager, builder.type(Type.COUNT).build(), 1);
+        clientManager.incrementStat(damager, builder.type(Type.AMOUNT).build(), event.getDamage());
     }
     
     /**

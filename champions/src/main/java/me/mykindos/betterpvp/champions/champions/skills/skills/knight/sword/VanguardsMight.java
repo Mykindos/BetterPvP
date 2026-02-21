@@ -197,9 +197,10 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
     // entry pt
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
         data.put(player, new VanguardsMightData(0f, VanguardsMightAbilityPhase.CHANNELING));
+        return true;
     }
 
     @Override

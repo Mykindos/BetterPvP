@@ -4,15 +4,11 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms.RealmsPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.Seasons.SeasonsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ServersRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -33,6 +29,10 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -154,6 +154,14 @@ public class Servers extends TableImpl<ServersRecord> {
             _realms = new RealmsPath(this, null, Keys.REALMS__REALMS_SERVER_FKEY.getInverseKey());
 
         return _realms;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.seasons</code> table
+     */
+    public SeasonsPath seasons() {
+        return realms().seasons();
     }
 
     @Override

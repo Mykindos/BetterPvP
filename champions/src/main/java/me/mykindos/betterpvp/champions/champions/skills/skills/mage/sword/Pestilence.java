@@ -187,8 +187,9 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         charging.put(player, new ChargeData((float) (0.1 + (level - 1) * 0.05) * 5));
+        return true;
     }
 
     @Override

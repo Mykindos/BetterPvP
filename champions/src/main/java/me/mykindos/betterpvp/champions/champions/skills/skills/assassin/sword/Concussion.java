@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
@@ -110,8 +109,9 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
+        return true;
     }
 
 

@@ -44,7 +44,7 @@ public final class Lunar extends BPvPPlugin {
     private UpdateEventExecutor updateEventExecutor;
 
     @Inject
-    @Config(path = "lunar.database.prefix", defaultValue = "lunar_")
+    @Config(path = "lunar.database.PREFIX", defaultValue = "lunar_")
     @Getter
     private String databasePrefix;
 

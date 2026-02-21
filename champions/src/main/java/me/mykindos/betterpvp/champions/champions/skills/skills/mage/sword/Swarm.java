@@ -221,11 +221,13 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
         if (!batData.containsKey(player)) {
             batData.put(player, new ArrayList<>());
+            return true;
         }
+        return false;
     }
 
     @Override
