@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -229,5 +230,29 @@ public class UtilFormat {
         } else {
             return "a";
         }
+    }
+
+    /**
+     * <p>Given the string of words, format them according to length with correct punctuation</p>
+     * <p>1 -> String1</p>
+     * <p>2 -> String1 and String2</p>
+     * <p>3 -> String1, String2, and String3</p>
+     * <p>4+ -> String1, String2, ..., and StringN</p>
+     * @param words a list of words to join (i.e. names)
+     * @return the formatted string
+     */
+    public static String getConjunctiveString(List<String> words) {
+        if (words.size() == 1) {
+            return words.getFirst();
+        }
+        if (words.size() == 2) {
+            return words.getFirst() + " and " + words.getLast();
+        }
+        StringBuilder conjunctiveString = new StringBuilder();
+        for (int i = 0; i < words.size() - 1; i++) {
+            conjunctiveString.append(words.get(i)).append(", ");
+        }
+        conjunctiveString.append(", and ").append(words.getLast());
+        return conjunctiveString.toString();
     }
 }

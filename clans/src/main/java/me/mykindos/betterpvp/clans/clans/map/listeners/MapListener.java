@@ -38,8 +38,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
-
 @BPvPListener
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -103,11 +101,11 @@ public class MapListener implements Listener {
     public void onClanAlly(ClanRelationshipEvent event) {
         UtilServer.runTaskLater(clans, () -> {
             for (ClanMember member : event.getClan().getMembers()) {
-                clanMapService.updateClanChunks(UUID.fromString(member.getUuid()));
+                clanMapService.updateClanChunks(member.getUuid());
             }
 
             for (ClanMember member : event.getTargetClan().getMembers()) {
-                clanMapService.updateClanChunks(UUID.fromString(member.getUuid()));
+                clanMapService.updateClanChunks(member.getUuid());
             }
         }, 1);
     }
