@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -48,7 +48,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
+public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
@@ -56,8 +56,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             charging,
             gamer -> true);
 
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double baseSlowDuration;
@@ -102,10 +100,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    private double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1)); // Increment of 10% per level
-    }
-
     @Override
     public Role getClassType() {
         return Role.RANGER;
@@ -141,13 +135,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         gamer.getActionBar().remove(actionBarComponent);
     }
 
-    @Override
-    public void activate(Player player, int level) {
-        final ChargeData chargeData = new ChargeData((float) getChargePerSecond(level) / 100);
-        charging.put(player, chargeData);
-    }
-
-    private void pounce(Player player, ChargeData chargeData, int level) {
+    public boolean use(Player player, ChargeData chargeData, int level) {
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
 
         // Velocity
@@ -169,6 +157,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 true,
                 isCancellable(),
                 this::shouldDisplayActionBar);
+        return true;
     }
 
     private void collide(Player damager, LivingEntity damagee, Pounce pounce) {
@@ -252,44 +241,20 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         }
     }
 
-    @UpdateEvent
-    public void updateCharge() {
-        // Charge check
-        Iterator<Player> iterator = charging.keySet().iterator();
-        while (iterator.hasNext()) {
-            Player player = iterator.next();
-            ChargeData charge = charging.get(player);
-            if (player == null || !player.isOnline()) {
-                iterator.remove();
-                continue;
-            }
 
-            // Remove if they no longer have the skill
-            int level = getLevel(player);
-            if (level <= 0) {
-                iterator.remove();
-                continue;
-            }
-
-            // Check if they still are blocking and charge
-            if (isHolding(player) && player.isHandRaised()) {
-                // Check if the player is grounded or the block directly beneath them is solid
-                if (!UtilBlock.isGrounded(player, 2)){
-                    if (charge.canSendMessage()) {
-                        UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
-                        charge.messageSent();
-                    }
-                    continue;
+    public TickBehavior getTickBehavior(Player player, ChargeData data, int level) {
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        if (!(isHolding(player) && gamer.isHoldingRightClick())) {
+            if (!UtilBlock.isGrounded(player, 2)){
+                if (data.canSendMessage()) {
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
+                    data.messageSent();
                 }
-
-                charge.tick();
-                charge.tickSound(player);
-                continue;
+                return TickBehavior.PAUSE;
             }
-
-            iterator.remove();
-            pounce(player, charge, level);
+            return TickBehavior.USE;
         }
+        return TickBehavior.TICK;
     }
 
     @Override

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.types.BowChargeSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
@@ -33,7 +34,7 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 @CustomLog
-public class HeavyArrows extends BowChargeSkill implements PassiveSkill, EnergySkill, MovementSkill {
+public class HeavyArrows extends BowChargeSkill implements DamageSkill, PassiveSkill, EnergySkill, MovementSkill {
     private final Map<Arrow, ChargeData> arrows = new WeakHashMap<>();
 
     private double baseMaxDamage;
@@ -110,7 +111,7 @@ public class HeavyArrows extends BowChargeSkill implements PassiveSkill, EnergyS
             return TickBehavior.PAUSE;
         }
         if (championsManager.getEnergy().use(player, getName(), getEnergy(level)/20, false)) {
-            return TickBehavior.NORMAL;
+            return TickBehavior.TICK;
         }
         return TickBehavior.PAUSE;
     }

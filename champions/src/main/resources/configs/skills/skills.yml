@@ -352,8 +352,8 @@ skills:
       enabled: false
       maxlevel: 5
       cooldown: 10.0
-      baseCharge: 40.0
-      chargeIncreasePerLevel: 10.0
+      baseCharge: 0.40
+      chargeIncreasePerLevel: 0.10
       baseDamage: 2.0
       damageIncreasePerLevel: 1.0
       baseRange: 20.0
@@ -647,13 +647,15 @@ skills:
       cooldownDecreasePerLevel: 1.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
+      baseCharge: 0.10
+      chargeIncreasePerLevel: 0.05
     blocktoss:
       enabled: true
       maxlevel: 5
       cooldown: 10.0
       cooldownDecreasePerLevel: 1.0
-      baseCharge: 55.0
-      chargeIncreasePerLevel: 15.0
+      baseCharge: 0.55
+      chargeIncreasePerLevel: 0.15
       baseDamage: 4.0
       damageIncreasePerLevel: 1.0
       baseRadius: 3.0
@@ -915,7 +917,7 @@ skills:
     barrage:
       enabled: false
       maxlevel: 3
-      baseCharge: 40.0
+      baseCharge: 0.40
       chargeIncreasePerLevel: 0.0
       arrowDamage: 1.0
       numArrows: 3

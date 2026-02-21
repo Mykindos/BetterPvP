@@ -23,7 +23,6 @@ public abstract class ChargeSkill extends ChannelSkill {
     }
 
     public void activate(Player player, int level) {
-        log.info("Charging").submit();
         charging.put(player, new ChargeData((float) getChargePerSecond(level)));
         active.add(player.getUniqueId());
     }
@@ -53,12 +52,12 @@ public abstract class ChargeSkill extends ChannelSkill {
                 iterator.remove();
             }
             switch (getTickBehavior(player, charge, level)) {
-                case NORMAL -> {
+                case TICK -> {
                     charge.tick();
                     charge.tickSound(player);
                     onTick(player, charge, level);
                 }
-                case FORCE -> {
+                case USE -> {
                     use(player, charge, level);
                     iterator.remove();
                 }
@@ -113,7 +112,7 @@ public abstract class ChargeSkill extends ChannelSkill {
      * @return
      */
     public TickBehavior getTickBehavior(Player player, ChargeData chargeData, int level) {
-        return TickBehavior.NORMAL;
+        return TickBehavior.TICK;
     }
 
     /**
@@ -126,8 +125,17 @@ public abstract class ChargeSkill extends ChannelSkill {
     }
 
     public enum TickBehavior {
-        NORMAL,
+        /**
+         * Attempt to tick up
+         */
+        TICK,
+        /**
+         * Don't attempt to tick the skill
+         */
         PAUSE,
-        FORCE,
+        /**
+         * Use the skill
+         */
+        USE,
     }
 }
