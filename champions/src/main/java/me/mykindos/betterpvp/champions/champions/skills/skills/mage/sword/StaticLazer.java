@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -42,19 +41,15 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CooldownSkill, OffensiveSkill, AreaOfEffectSkill {
+public class StaticLazer extends ChargeSkill implements InteractSkill, EnergyChannelSkill, CooldownSkill, OffensiveSkill, AreaOfEffectSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
-
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double baseRange;
@@ -80,7 +75,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
                 "Charge static electricity and",
                 "release right click to fire a lazer",
                 "",
-                "Charges " + getValueString(this::getChargePerSecond, level, 1, "%", 0) + " per second,",
+                "Charges " + getValueString(this::getChargePerSecond, level, 100, "%", 0) + " per second,",
                 "dealing up to " + getValueString(this::getDamage, level) + " damage and",
                 "traveling up to " + getValueString(this::getRange, level) + " blocks",
                 "",
@@ -99,10 +94,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
 
     private double getDamage(int level) {
         return baseDamage + damageIncreasePerLevel * (level - 1);
-    }
-
-    private float getChargePerSecond(int level) {
-        return (float) (baseCharge + (chargeIncreasePerLevel * (level - 1))); // Increment of 10% per level
     }
 
     @Override
@@ -137,8 +128,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
         baseRange = getConfig("baseRange", 15.0, Double.class);
@@ -159,11 +148,12 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
 
     @Override
     public void activate(Player player, int level) {
-        charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
+        charging.put(player, new ChargeData((float) getChargePerSecond(level)));
     }
 
-    private void shoot(Player player, float charge, int level) {
+    public boolean use(Player player, ChargeData charge, int level) {
         // Cooldown
+        final float chargePercent = charge.getCharge();
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
@@ -191,19 +181,20 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
 
             // Cheap fix
             if(block.getBlockData() instanceof Openable openable && !openable.isOpen()) {
-                return;
+                return true;
             }
 
             if (collideEnt || collideBlock ) {
-                impact(player, point, level, charge);
-                return;
+                impact(player, point, level, chargePercent);
+                return true;
             }
 
             // Particle
             Particle.FIREWORK.builder().extra(0).location(point).receivers(60, true).spawn();
         }
 
-        impact(player, start.add(direction.clone().multiply(range)), level, charge);
+        impact(player, start.add(direction.clone().multiply(range)), level, chargePercent);
+        return true;
     }
 
     private void impact(Player player, Location point, int level, float charge) {
@@ -244,36 +235,13 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.5f + player.getExp(), 1.75f - charge);
     }
 
-    @UpdateEvent
-    public void updateCharge() {
-        // Charge check
-        Iterator<Player> iterator = charging.keySet().iterator();
-        while (iterator.hasNext()) {
-            Player player = iterator.next();
-            ChargeData charge = charging.get(player);
-            if (player == null || !player.isOnline()) {
-                iterator.remove();
-                continue;
-            }
 
-            // Remove if they no longer have the skill
-            int level = getLevel(player);
-            if (level <= 0) {
-                iterator.remove();
-                continue;
-            }
-
-            // Check if they still are blocking and charge
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
-                charge.tick();
-                charge.tickSound(player);
-                continue;
-            }
-
-            shoot(player, charge.getCharge(), level);
-            iterator.remove();
+    public TickBehavior getTickBehavior(Player player, ChargeData chargeData, int level) {
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
+            return TickBehavior.TICK;
         }
+        return TickBehavior.USE;
     }
 
 }

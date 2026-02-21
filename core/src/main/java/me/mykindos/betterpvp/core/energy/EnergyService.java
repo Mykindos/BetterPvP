@@ -97,6 +97,14 @@ public class EnergyService {
         return energyMap.get(id).getMax();
     }
 
+    /**
+     * Attempts to use the specified amount of energy for the player. If the player does not have enough energy, it will return false and optionally inform the player.
+     * @param player the player using the energy
+     * @param ability the name of the ability being used (for messaging purposes)
+     * @param amount the amount of energy to use
+     * @param inform whether to inform the player if they do not have enough energy
+     * @return {@code true} if the energy was successfully used, {@code false} if the player did not have enough energy
+     */
     public boolean use(Player player, String ability, double amount, boolean inform) {
         if (player.isOp() && player.getGameMode() == GameMode.CREATIVE) {
             return true;

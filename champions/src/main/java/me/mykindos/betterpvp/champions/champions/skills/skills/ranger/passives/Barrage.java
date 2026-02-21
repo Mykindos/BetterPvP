@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BowChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
@@ -26,15 +25,11 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -49,7 +44,7 @@ import static org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED;
 
 @Singleton
 @BPvPListener
-public class Barrage extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
+public class Barrage extends BowChargeSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
@@ -77,7 +72,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Draw back your bow to charge " + getValueString(this::getChargePerSecond, level, 1, "%", 0) + " per second",
+                "Draw back your bow to charge " + getValueString(this::getChargePerSecond, level, 100, "%", 0) + " per second",
                 "",
                 "The more charge, the more arrows you will fire",
                 "up to a maximum of " + getValueString(this::getNumArrows, level) + " and they will deal " + getValueString(this::getArrowDamage, level),
@@ -120,7 +115,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     }
 
     @EventHandler
-    public void onPlayerShoot(EntityShootBowEvent event) {
+    public void onShootBow(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
@@ -180,7 +175,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     }
 
     @UpdateEvent
-    public void updateBarrage() {
+    @Override
+    public void updateCharge() {
         final Iterator<Player> iterator = charging.keySet().iterator();
         while (iterator.hasNext()) {
             final Player player = iterator.next();
@@ -230,25 +226,6 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         return SkillType.PASSIVE_A;
     }
 
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        if (event.useItemInHand() == Event.Result.DENY) return;
-        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        Player player = event.getPlayer();
-
-        if (!UtilItem.isRanged(player.getInventory().getItemInMainHand())) return;
-
-        int level = getLevel(player);
-        if (!UtilInventory.contains(player, Material.ARROW, 1)) {
-            return;
-        }
-
-        if (level > 0) {
-            charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond(level) / 100));
-        }
-    }
-
     @Override
     public boolean isHolding(Player player) {
         return hasSkill(player) && UtilItem.isRanged(player.getInventory().getItemInMainHand());
@@ -261,8 +238,6 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
         arrowDamage = getConfig("arrowDamage", 1.0, Double.class);
         numArrows = getConfig("numArrows", 3, Integer.class);
         numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);
