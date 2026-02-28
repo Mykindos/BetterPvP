@@ -24,7 +24,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +142,6 @@ public class CannonManager extends Manager<String, Cannon> {
         golem.setCollidable(false);
         Objects.requireNonNull(golem.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0D);
         Objects.requireNonNull(golem.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(cannonHealth);
-        golem.setMetadata("PlayerSpawned", new FixedMetadataValue(core, true));
     }
 
     public Optional<Cannon> of(@NotNull Entity entity) {
@@ -200,6 +198,7 @@ public class CannonManager extends Manager<String, Cannon> {
             if (placedBy != null) {
                 ent.getPersistentDataContainer().set(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID, placedBy);
             }
+            ent.getPersistentDataContainer().set(CoreNamespaceKeys.PLAYER_SPAWNED, CustomDataType.UUID, placedBy == null ? UUID.randomUUID() : placedBy);
             // Save properties to PDC
             ent.getPersistentDataContainer().set(CoreNamespaceKeys.CANNON_PROPERTIES, PersistentDataType.STRING, properties.toJson());
             setupEntity(properties, ent);

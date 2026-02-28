@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -49,7 +50,7 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
     @EventHandler
     public void onDamage(DamageEvent event) {
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
-        if (event.getDamagee().hasMetadata("PlayerSpawned")) return;
+        if (UtilEntity.isPlayerSpawned(event.getDamagee())) return;
 
         if (!(event.getDamager() instanceof Player dam)) return;
 

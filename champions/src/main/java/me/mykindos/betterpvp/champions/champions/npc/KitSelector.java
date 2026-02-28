@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -62,7 +63,7 @@ public final class KitSelector {
             zombie.setCanPickupItems(false);
             zombie.setCanBreakDoors(false);
             zombie.lockFreezeTicks(true);
-            zombie.setVisualFire(false);
+            zombie.setVisualFire(TriState.FALSE);
             zombie.setAdult();
             zombie.setPersistent(false);
 

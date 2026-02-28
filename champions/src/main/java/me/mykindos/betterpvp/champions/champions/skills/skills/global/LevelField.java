@@ -15,12 +15,14 @@ import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -154,7 +156,7 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
 
     private void processLevelFieldSkill(Player relevantPlayer, DamageEvent event, boolean isAttacker, int level) {
         List<LivingEntity> nearbyEnemiesList = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius);
-        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned") || e.hasMetadata("owner"));
+        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || UtilEntity.isPlayerSpawned(e) || e.getPersistentDataContainer().has(CoreNamespaceKeys.OWNER, CustomDataType.UUID));
         int nearbyEnemies = nearbyEnemiesList.size();
         int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size() + 1;
         int nearbyDifference = nearbyEnemies - nearbyAllies;
@@ -186,7 +188,7 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
                 List<KeyValue<LivingEntity, EntityProperty>> nearbyEntities = UtilEntity.getNearbyEntities(player, radius);
                 nearbyEntities.removeIf((livingEnt) -> {
                     LivingEntity e = livingEnt.get();
-                    return e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned") || e.hasMetadata("owner");
+                    return e instanceof Chicken || e.hasMetadata("AlmPet") || UtilEntity.isPlayerSpawned(e) || e.getPersistentDataContainer().has(CoreNamespaceKeys.OWNER, CustomDataType.UUID);
                 });
                 int nearbyEnemies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).count();
                 int nearbyAllies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.FRIENDLY).count() + 1;

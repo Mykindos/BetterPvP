@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -38,6 +39,7 @@ import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -51,7 +53,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +62,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -303,9 +304,9 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private void setCloneProperties(Vindicator clone, Player player) {
-        FixedMetadataValue newMetadataValue = new FixedMetadataValue(champions, player.getUniqueId());
-        clone.setMetadata("owner", newMetadataValue);
-        clone.setMetadata("PlayerSpawned", newMetadataValue);
+        final PersistentDataContainer pdc = clone.getPersistentDataContainer();
+        pdc.set(CoreNamespaceKeys.OWNER, CustomDataType.UUID, player.getUniqueId());
+        pdc.set(CoreNamespaceKeys.PLAYER_SPAWNED, CustomDataType.UUID, player.getUniqueId());
         PlayerInventory playerInventory = player.getInventory();
         clone.setAI(true);
         clone.setHealth(baseHealth);
@@ -337,11 +338,11 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
             return null;
         }
 
-        if (!clone.hasMetadata("owner")) {
+        if (!clone.getPersistentDataContainer().has(CoreNamespaceKeys.OWNER, CustomDataType.UUID)) {
             return null;
         }
 
-        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("owner").getFirst().value()));
+        return Bukkit.getPlayer(Objects.requireNonNull(clone.getPersistentDataContainer().get(CoreNamespaceKeys.OWNER, CustomDataType.UUID)));
     }
 
     @Override
