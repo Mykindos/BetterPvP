@@ -8,17 +8,19 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -34,39 +36,51 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Longshot extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
+public class Farshot extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Projectile, Location> projectiles = new WeakHashMap<>();
 
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double baseDistance;
-    private double distanceDecreasePerLevel;
+    private double baseMaxDamage;
+    private double maxDamageIncreasePerLevel;
+    private double minDamage;
+    private double maxDistance;
+    private double deathMessageThreshold;
 
     @Inject
-    public Longshot(Champions champions, ChampionsManager championsManager) {
+    @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
+    private double baseArrowDamage;
+
+    @Inject
+    public Farshot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Longshot";
+        return "Farshot";
     }
 
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Arrows that travel further than " + getValueString(this::getDistance, level),
-                "Deal " + getValueString(this::getDamage, level) + " extra damage."
-        };
+                "Your arrows start at " + getValueString(this::getMinDamage, level) + " damage but",
+                "they gain extra damage the further",
+                "they travel up to a maximum of " + getValueString(this::getMaxDamage, level),
+                "damage at " + getValueString(this::getMaxDistance, level) + " blocks",
+                "",
+                "Cannot be used in own territory"};
     }
 
-    public double getDamage(int level) {
-        return baseDamage + (damageIncreasePerLevel * (level - 1));
+    public double getMaxDamage(int level) {
+        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
     }
 
-    public double getDistance(int level) {
-        return baseDistance - (distanceDecreasePerLevel * (level - 1));
+    public double getMinDamage(int level) {
+        return minDamage;
+    }
+
+    public double getMaxDistance(int level){
+        return maxDistance;
     }
 
     private boolean isValidProjectile(Projectile projectile) {
@@ -108,26 +122,44 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onDamage(final DamageEvent event) {
-        if (event.getProjectile() == null) return;
-        final Projectile projectile = event.getProjectile();
+    public static double horizontalOffset(Location loc1, Location loc2) {
+        double deltaX = loc1.getX() - loc2.getX();
+        double deltaZ = loc1.getZ() - loc2.getZ();
+        return Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDamage(DamageEvent event) {
+        if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!isValidProjectile(projectile)) return;
         if (!projectiles.containsKey(projectile)) return;
 
-        final Location loc = projectiles.remove(projectile);
-        final int level = getLevel(damager);
-        final double distance = UtilMath.offset(loc, event.getDamagee().getLocation());
-        if (distance < getDistance(level)) return;
-        event.addModifier(new SkillDamageModifier.Flat(this, getDamage(level)));
+        Location loc = projectiles.remove(projectile);
+        int level = getLevel(damager);
+        double distance = UtilMath.offset(loc, event.getDamagee().getLocation());
+        double maxDamage = getMaxDamage(level);
+
+        double distanceFactor = Math.min(distance / maxDistance, 1.0);
+        double damageMultiplier = Math.pow(distanceFactor, 2);
+        double scaledDamage = minDamage + (damageMultiplier * (maxDamage));
+
+        if (scaledDamage > baseArrowDamage){
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>%s</alt> did <alt2>%.1f</alt2> damage.", getName(), scaledDamage);
+        }
+
+        event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_BREEZE_JUMP, (float)(2.0F * damageMultiplier), 1.5f);
+
+        event.setDamage(scaledDamage);
+        event.addReason(getName() + (distance > deathMessageThreshold ? " (" + (int) distance + " blocks)" : ""));
     }
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
-        Projectile projectile = event.getEntity();
-        if (event.getHitBlock() != null || event.getHitEntity() == null) {
-            projectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
+        if (event.getEntity() instanceof Projectile projectile) {
+            if (event.getHitBlock() != null || event.getHitEntity() == null) {
+                projectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
+            }
         }
     }
 
@@ -138,9 +170,10 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 3.0, Number.class).doubleValue();
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Number.class).doubleValue();
-        baseDistance = getConfig("baseDistance", 20.0, Number.class).doubleValue();
-        distanceDecreasePerLevel = getConfig("distanceDecreasePerLevel", 0.0, Number.class).doubleValue();
+        baseMaxDamage = getConfig("baseMaxDamage", 11.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 2.0, Double.class);
+        minDamage = getConfig("minDamage", 2.0, Double.class);
+        maxDistance = getConfig("maxDistance", 40.0, Double.class);
+        deathMessageThreshold = getConfig("deathMessageThreshold", 24.0, Double.class);
     }
 }
