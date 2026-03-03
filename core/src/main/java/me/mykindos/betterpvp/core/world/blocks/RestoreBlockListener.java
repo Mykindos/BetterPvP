@@ -48,6 +48,15 @@ public class RestoreBlockListener implements Listener {
         Block block = event.getBlock();
 
         if (blockHandler.isRestoreBlock(block)) {
+            Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(block);
+            if (restoreBlockOptional.isPresent()) {
+                DestroyStrategy strategy = restoreBlockOptional.get().getDestroyStrategy();
+                if (strategy != null && strategy.breakable()) {
+                    event.setDropItems(strategy.allowDrops());
+                    blockHandler.getRestoreBlocks().remove(block);
+                    return;
+                }
+            }
             event.setCancelled(true);
         }
     }
