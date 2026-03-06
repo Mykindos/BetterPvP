@@ -44,7 +44,7 @@ dependencyResolutionManagement {
             // Versions
             version("kotlin", "2.1.0")
             version("paper", "1.21.11-R0.1-SNAPSHOT")
-            version("paperweight", "2.0.0-SNAPSHOT")
+            version("paperweight", "2.0.0-beta.19")
             version("jackson", "2.17.2")
             version("mineplex", "1.21.4")
             version("sidebar", "2.4.1")
