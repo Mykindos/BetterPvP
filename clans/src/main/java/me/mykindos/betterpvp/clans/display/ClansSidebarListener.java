@@ -65,25 +65,31 @@ public class ClansSidebarListener implements Listener {
                     Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
                     // Clan
-                    lineDrawable.drawLine(empty().append(Component.text(clan.getName(), TextColor.color(255, 193, 79), TextDecoration.BOLD)));
+                    lineDrawable.drawLine(empty().append(Component.text("Clan", TextColor.color(0xFAB95B), TextDecoration.BOLD)));
+                    lineDrawable.drawLine(empty()
+                            .append(Component.text("<glyph:shield_icon_2>", NamedTextColor.GRAY))
+                            .appendSpace()
+                            .append(Component.text("Clan:", TextColor.color(0xFAEB92)))
+                            .appendSpace()
+                            .append(Component.text(clan.getName(), ClanRelation.SELF.getPrimary())));
 
                     // Energy
                     lineDrawable.drawLine(empty()
                             .append(Component.text("<glyph:hourglass_icon>", NamedTextColor.GRAY))
                             .appendSpace()
-                            .append(Component.text("Energy:", TextColor.color(252, 242, 167)))
+                            .append(Component.text("Energy:", TextColor.color(0xFAEB92)))
                             .appendSpace()
                             .append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN)));
                     lineDrawable.drawLine(empty());
                 })
-                .addStaticLine(Component.text("Info", TextColor.color(255, 193, 79), TextDecoration.BOLD))
+                .addStaticLine(Component.text("Info", TextColor.color(0xFAB95B), TextDecoration.BOLD))
                 .addDynamicLine(() -> {
                     final int coins = (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0);
                     final TextComponent coinsText = Component.text(UtilFormat.formatNumber(coins), NamedTextColor.GOLD);
                     return empty()
                             .append(Component.text("<glyph:coins_icon>"))
                             .appendSpace()
-                            .append(Component.text("Coins:", TextColor.color(252, 242, 167)))
+                            .append(Component.text("Coins:", TextColor.color(0xFAEB92)))
                             .appendSpace()
                             .append(coinsText);
                 })
@@ -114,12 +120,11 @@ public class ClansSidebarListener implements Listener {
                     return empty()
                             .append(emoji)
                             .appendSpace()
-                            .append(Component.text("Territory:", TextColor.color(252, 242, 1671)))
+                            .append(Component.text("Territory:", TextColor.color(0xFAEB92)))
                             .appendSpace()
                             .append(territory);
-                });
-
-
+                })
+                .addBlankLine();
     }
 
     public boolean isEnabled() {
