@@ -15,10 +15,14 @@ import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.world.blocks.DestroyStrategy;
+import me.mykindos.betterpvp.core.world.blocks.RestoreBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -97,14 +101,30 @@ public class ThrowingWebAbility extends CooldownInteraction implements Throwable
     }
 
     private void handleWebCollision(ThrowableItem throwableItem) {
-        for (Block block : UtilBlock.getInRadius(throwableItem.getItem().getLocation().getBlock(), 1).keySet()) {
-            if (UtilBlock.airFoliage(block)) {
-                if (!block.getType().name().contains("GATE") && !block.getType().name().contains("DOOR")) {
-                    blockHandler.addRestoreBlock(block, Material.COBWEB, (long) (duration * 1000L));
-                    Particle.BLOCK.builder().data(Material.COBWEB.createBlockData())
-                            .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();
-                }
+        Block block = throwableItem.getItem().getLocation().getBlock();
+        if (UtilBlock.airFoliage(block) && block.isPassable()) {
+            final LivingEntity thrower = throwableItem.getThrower();
+            if (thrower != null && thrower.isValid()) {
+                new SoundEffect(Sound.BLOCK_NOTE_BLOCK_HARP, 2f, 1f).play(thrower);
             }
+
+            final RestoreBlock throwingWeb = blockHandler.addRestoreBlock(thrower,
+                    block,
+                    Material.COBWEB,
+                    (long) (duration * 1000L),
+                    true,
+                    "throwing_web");
+            throwingWeb.setDestroyStrategy(DestroyStrategy.BREAKABLE);
+            Particle.BLOCK.builder().data(Material.COBWEB.createBlockData())
+                    .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();
+            new SoundEffect(Sound.ENTITY_TURTLE_EGG_BREAK, 0.7f, 1f).play(block.getLocation());
+            Particle.ITEM_SNOWBALL.builder()
+                    .count(30)
+                    .offset(0.5, 0.5, 0.5)
+                    .extra(0.1)
+                    .location(block.getLocation().toCenterLocation())
+                    .receivers(60)
+                    .spawn();
         }
         throwableItem.getItem().remove();
     }
