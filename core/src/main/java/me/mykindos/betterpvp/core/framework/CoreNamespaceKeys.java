@@ -14,6 +14,9 @@ public class CoreNamespaceKeys {
     public static final NamespacedKey BLOCK_TAG_KEY = new NamespacedKey("core", "block-key");
     public static final NamespacedKey PLAYER_PLACED_KEY = new NamespacedKey("core", "player-placed");
 
+    public static final NamespacedKey PLAYER_SPAWNED = new NamespacedKey("core", "player_spawned");
+    public static final NamespacedKey OWNER = new NamespacedKey("core", "owner");
+
     public static final NamespacedKey UNDROPPABLE_KEY = new NamespacedKey("core", "undroppable");
 
     public static final NamespacedKey CUSTOM_ITEM_KEY = new NamespacedKey("core", "custom-item");

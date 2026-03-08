@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -10,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -346,5 +348,14 @@ public class UtilEntity {
             health = UtilPlayer.getMaxHealth(ent);
         }
         ent.setHealth(health);
+    }
+
+    /**
+     * Checks if the given entity has been spawned by a player
+     * @param entity the entity to check, must not be null
+     * @return {@code true} if the entity has been spawned by a player, {@code false} otherwise
+     */
+    public static boolean isPlayerSpawned(@NotNull Entity entity) {
+        return entity.getPersistentDataContainer().has(CoreNamespaceKeys.PLAYER_SPAWNED, CustomDataType.UUID);
     }
 }

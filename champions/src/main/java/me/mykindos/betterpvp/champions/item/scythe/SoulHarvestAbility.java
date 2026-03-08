@@ -441,7 +441,7 @@ public class SoulHarvestAbility extends AbstractInteraction implements Listener,
             return;
         }
 
-        if(event.getEntity().hasMetadata("PlayerSpawned")) {
+        if (UtilEntity.isPlayerSpawned(event.getEntity())) {
             return;
         }
 
