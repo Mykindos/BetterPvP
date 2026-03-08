@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent;
 import org.bukkit.entity.Player;
@@ -55,42 +56,75 @@ public class ClansSidebarListener implements Listener {
         }
 
         SidebarComponent.Builder builder = event.getBuilder();
-        builder.addComponent(lineDrawable -> {
-                    if (hasClan(player)) {
-                        lineDrawable.drawLine(Component.text("Clan", NamedTextColor.YELLOW, TextDecoration.BOLD));
-                        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
-                        lineDrawable.drawLine(Component.text(clan.getName(), ClanRelation.SELF.getPrimary()));
-                        lineDrawable.drawLine(empty());
-                        lineDrawable.drawLine(Component.text("Energy", NamedTextColor.YELLOW, TextDecoration.BOLD));
-                        lineDrawable.drawLine(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN));
-                        lineDrawable.drawLine(empty());
+        builder.addBlankLine()
+                .addComponent(lineDrawable -> {
+                    if (!hasClan(player)) {
+                        return;
                     }
+
+                    Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
+
+                    // Clan
+                    lineDrawable.drawLine(empty().append(Component.text("Clan", TextColor.color(0xFAB95B), TextDecoration.BOLD)));
+                    lineDrawable.drawLine(empty()
+                            .append(Component.text("<glyph:shield_icon_2>", NamedTextColor.GRAY))
+                            .appendSpace()
+                            .append(Component.text("Clan:", TextColor.color(0xFAEB92)))
+                            .appendSpace()
+                            .append(Component.text(clan.getName(), ClanRelation.SELF.getPrimary())));
+
+                    // Energy
+                    lineDrawable.drawLine(empty()
+                            .append(Component.text("<glyph:hourglass_icon>", NamedTextColor.GRAY))
+                            .appendSpace()
+                            .append(Component.text("Energy:", TextColor.color(0xFAEB92)))
+                            .appendSpace()
+                            .append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN)));
+                    lineDrawable.drawLine(empty());
                 })
-                .addStaticLine(Component.text("Coins", NamedTextColor.YELLOW, TextDecoration.BOLD))
+                .addStaticLine(Component.text("Info", TextColor.color(0xFAB95B), TextDecoration.BOLD))
                 .addDynamicLine(() -> {
                     final int coins = (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0);
-                    return Component.text(UtilFormat.formatNumber(coins), NamedTextColor.GOLD);
+                    final TextComponent coinsText = Component.text(UtilFormat.formatNumber(coins), NamedTextColor.GOLD);
+                    return empty()
+                            .append(Component.text("<glyph:coins_icon>"))
+                            .appendSpace()
+                            .append(Component.text("Coins:", TextColor.color(0xFAEB92)))
+                            .appendSpace()
+                            .append(coinsText);
                 })
-                .addBlankLine()
-                .addStaticLine(Component.text("Territory", NamedTextColor.YELLOW, TextDecoration.BOLD))
                 .addDynamicLine(() -> {
                     final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(player.getLocation());
 
+                    final Component emoji;
+                    final Component territory;
                     if (clanOptional.isEmpty() || clanOptional.get().getTerritory().isEmpty()) {
-                        return Component.text("Wilderness", NamedTextColor.GRAY);
+                        emoji = Component.text("<glyph:floating_island_icon>", NamedTextColor.WHITE);
+                        territory = Component.text("Wilderness", NamedTextColor.GRAY);
                     } else {
                         final Clan self = this.clanManager.getClanByPlayer(player).orElse(null);
                         Clan clan = clanOptional.get();
-                        TextComponent text = Component.text(clan.getName(), clanManager.getRelation(self, clan).getPrimary());
+                        ClanRelation relation = clanManager.getRelation(self, clan);
+
                         if (clan.isAdmin() && clan.isSafe()) {
-                            text = text.append(Component.text(" (", NamedTextColor.WHITE).append(Component.text("Safe", NamedTextColor.AQUA).append(Component.text(")", NamedTextColor.WHITE))));
+                            emoji = Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
+                        } else {
+                            emoji = switch (relation) {
+                                case PILLAGE, ENEMY, NEUTRAL -> Component.text("<glyph:sword_icon>", NamedTextColor.WHITE);
+                                case SAFE, SELF, ALLY, ALLY_TRUST -> Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
+                            };
                         }
-
-                        return text;
+                        territory = Component.text(clan.getName(), clanManager.getRelation(self, clan).getPrimary());
                     }
-                });
 
-
+                    return empty()
+                            .append(emoji)
+                            .appendSpace()
+                            .append(Component.text("Territory:", TextColor.color(0xFAEB92)))
+                            .appendSpace()
+                            .append(territory);
+                })
+                .addBlankLine();
     }
 
     public boolean isEnabled() {
