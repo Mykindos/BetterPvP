@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -90,7 +89,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
         final Optional<ClanMember.MemberRank> optRank = clan.getMemberByUUID(viewer.getUniqueId()).map(ClanMember::getRank);
         final boolean admin = optRank.isPresent() && optRank.map(rank -> rank.hasRank(ClanMember.MemberRank.ADMIN)).orElse(false);
         final Map<ClanMember, OfflinePlayer> members = clan.getMembers().stream().collect(Collectors.toMap(
-                Function.identity(), member -> Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid())),
+                Function.identity(), member -> Bukkit.getOfflinePlayer(member.getUuid()),
                 (existing, replacement) -> existing));
 
         final Iterator<ClanMember> iterator = getClanMemberIterator(members);

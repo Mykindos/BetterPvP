@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
+import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanMetadataRecord;
+import me.mykindos.betterpvp.clans.database.jooq.tables.records.GetClanKillLogsRecord;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
@@ -16,8 +18,6 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.clans.database.jooq.tables.records.ClanMetadataRecord;
-import me.mykindos.betterpvp.clans.database.jooq.tables.records.GetClanKillLogsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.logging.CachedLog;
@@ -62,8 +62,8 @@ import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_MEMBERS;
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_METADATA;
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_PROPERTIES;
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_TERRITORY;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.GET_CLAN_KILL_LOGS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 @CustomLog
 @Singleton
@@ -336,7 +336,7 @@ public class ClanRepository implements IRepository<Clan> {
         database.getAsyncDslContext()
                 .executeAsyncVoid(ctx -> ctx.insertInto(CLAN_MEMBERS)
                         .set(CLAN_MEMBERS.CLAN, clan.getId())
-                        .set(CLAN_MEMBERS.MEMBER, member.getUuid())
+                        .set(CLAN_MEMBERS.MEMBER, member.getUuid().toString())
                         .set(CLAN_MEMBERS.RANK, member.getRank().name())
                         .execute());
     }
@@ -345,7 +345,7 @@ public class ClanRepository implements IRepository<Clan> {
         database.getAsyncDslContext()
                 .executeAsyncVoid(ctx -> ctx.deleteFrom(CLAN_MEMBERS)
                         .where(CLAN_MEMBERS.CLAN.eq(clan.getId()))
-                        .and(CLAN_MEMBERS.MEMBER.eq(member.getUuid()))
+                        .and(CLAN_MEMBERS.MEMBER.eq(member.getUuid().toString()))
                         .execute());
     }
 
@@ -366,7 +366,7 @@ public class ClanRepository implements IRepository<Clan> {
                 ClanMember.MemberRank rank = ClanMember.MemberRank.valueOf(memberRecord.get(CLAN_MEMBERS.RANK));
                 String name = memberRecord.get(CLIENTS.NAME);
 
-                members.add(new ClanMember(uuid, rank, name));
+                members.add(new ClanMember(UUID.fromString(uuid), rank, name));
             }
         } catch (Exception ex) {
             log.error("Failed to load clan members for {}", clan.getId(), ex).submit();
@@ -380,7 +380,7 @@ public class ClanRepository implements IRepository<Clan> {
             ctx.update(CLAN_MEMBERS)
                     .set(CLAN_MEMBERS.RANK, member.getRank().name())
                     .where(CLAN_MEMBERS.CLAN.eq(clan.getId()))
-                    .and(CLAN_MEMBERS.MEMBER.eq(member.getUuid()))
+                    .and(CLAN_MEMBERS.MEMBER.eq(member.getUuid().toString()))
                     .execute();
         });
     }

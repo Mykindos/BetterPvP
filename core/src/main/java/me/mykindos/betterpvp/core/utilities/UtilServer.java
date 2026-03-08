@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.function.IntFunction;
 
+@CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilServer {
 
@@ -19,6 +21,9 @@ public class UtilServer {
      * @param event The event to call
      */
     public static <T extends Event> T callEvent(T event) {
+        if (!event.isAsynchronous() && !Bukkit.getServer().isPrimaryThread()) {
+            log.error("Event {} is not async and is not on the primary thread", event.getEventName()).submit();
+        }
         Bukkit.getPluginManager().callEvent(event);
         return event;
     }
