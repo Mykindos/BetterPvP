@@ -74,13 +74,7 @@ public class BrigadierSkillsCommand extends BrigadierCommand {
                     if (gamerBuildsOptional.isPresent()) {
                         final GamerBuilds builds = gamerBuildsOptional.get();
 
-                        final Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
-                        if (roleOptional.isEmpty()) {
-                            UtilMessage.message(player, "Skills", "You do not have a set equipped!");
-                            return Command.SINGLE_SUCCESS;
-                        }
-
-                        final Role role = roleOptional.get();
+                        final Role role = roleManager.getRole(player);
                         final RoleBuild build = builds.getActiveBuilds().get(role.getName());
                         if (build != null) {
                             UtilMessage.message(player, "Skills", UtilMessage.deserialize("Your Build:").appendNewline().append(build.getBuildComponent()));
@@ -97,13 +91,8 @@ public class BrigadierSkillsCommand extends BrigadierCommand {
                                 UtilMessage.message(sender, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have any builds", target.getName()));
                                 return Command.SINGLE_SUCCESS;
                             }
-                            final Optional<Role> roleOptional = roleManager.getObject(target.getUniqueId());
-                            if (roleOptional.isEmpty()) {
-                                UtilMessage.message(sender, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have a set equipped", target.getName()));
-                                return Command.SINGLE_SUCCESS;
-                            }
                             final GamerBuilds builds = gamerBuildsOptional.get();
-                            final Role role = roleOptional.get();
+                            final Role role = roleManager.getRole(target);
                             final RoleBuild build = builds.getActiveBuilds().get(role.getName());
                             if (build != null) {
                                 UtilMessage.message(sender, "Skills", UtilMessage.deserialize("<yellow>%s</yellow>'s Build:", target.getName()).appendNewline().append(build.getBuildComponent()));
