@@ -26,7 +26,7 @@ public class MiningRepository {
     }
 
     public void createPartitions() {
-        int season = Core.getCurrentSeason();
+        int season = Core.getCurrentRealm().getSeason().getId();
         String partitionTableName = "progression_mining_season_" + season;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
@@ -43,7 +43,7 @@ public class MiningRepository {
             try {
                 String totalOresMined = ctx.select(PROGRESSION_PROPERTIES.VALUE).from(PROGRESSION_PROPERTIES)
                         .where(PROGRESSION_PROPERTIES.CLIENT.eq(ctx.select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(player.toString()))))
-                        .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentSeason()))
+                        .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentRealm().getSeason().getId()))
                         .and(PROGRESSION_PROPERTIES.PROPERTY.eq("TOTAL_ORES_MINED")).fetchOne(PROGRESSION_PROPERTIES.VALUE);
                 if (totalOresMined == null) return 0;
 

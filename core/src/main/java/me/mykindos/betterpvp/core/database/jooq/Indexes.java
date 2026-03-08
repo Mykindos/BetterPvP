@@ -4,8 +4,13 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
+import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients;
+import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
@@ -14,7 +19,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
-
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;
@@ -32,6 +36,10 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index CLIENTS_NAME_INDEX = Internal.createIndex(DSL.name("clients_name_index"), Clients.CLIENTS, new OrderField[] { Clients.CLIENTS.NAME }, false);
+    public static final Index IDX_ACHIEVEMENT_COMPLETIONS = Internal.createIndex(DSL.name("idx_achievement_completions"), AchievementCompletions.ACHIEVEMENT_COMPLETIONS, new OrderField[] { AchievementCompletions.ACHIEVEMENT_COMPLETIONS.CLIENT }, false);
+    public static final Index IDX_ACHIEVEMENT_COMPLETIONS_REALM = Internal.createIndex(DSL.name("idx_achievement_completions_realm"), AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM, new OrderField[] { AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM.ID }, false);
+    public static final Index IDX_ACHIEVEMENT_COMPLETIONS_SEASON = Internal.createIndex(DSL.name("idx_achievement_completions_season"), AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON, new OrderField[] { AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON.ID }, false);
+    public static final Index IDX_ACHIEVEMENT_COMPLETIONS_TOTAL = Internal.createIndex(DSL.name("idx_achievement_completions_total"), AchievementCompletions.ACHIEVEMENT_COMPLETIONS, new OrderField[] { AchievementCompletions.ACHIEVEMENT_COMPLETIONS.NAMESPACE, AchievementCompletions.ACHIEVEMENT_COMPLETIONS.KEYNAME }, false);
     public static final Index IDX_CLIENT_PROPERTIES_PROPERTY = Internal.createIndex(DSL.name("idx_client_properties_property"), ClientProperties.CLIENT_PROPERTIES, new OrderField[] { ClientProperties.CLIENT_PROPERTIES.PROPERTY }, false);
     public static final Index IDX_KILL_CONTRIBUTIONS_CONTRIBUTOR = Internal.createIndex(DSL.name("idx_kill_contributions_contributor"), KillContributions.KILL_CONTRIBUTIONS, new OrderField[] { KillContributions.KILL_CONTRIBUTIONS.CONTRIBUTOR }, false);
     public static final Index IDX_KILLS_KILLER = Internal.createIndex(DSL.name("idx_kills_killer"), Kills.KILLS, new OrderField[] { Kills.KILLS.REALM, Kills.KILLS.KILLER }, false);
@@ -44,6 +52,8 @@ public class Indexes {
     public static final Index IDX_OFFLINE_MESSAGES_CLIENT = Internal.createIndex(DSL.name("idx_offline_messages_client"), OfflineMessages.OFFLINE_MESSAGES, new OrderField[] { OfflineMessages.OFFLINE_MESSAGES.CLIENT }, false);
     public static final Index IDX_OFFLINE_MESSAGES_TIME = Internal.createIndex(DSL.name("idx_offline_messages_time"), OfflineMessages.OFFLINE_MESSAGES, new OrderField[] { OfflineMessages.OFFLINE_MESSAGES.TIME_SENT }, false);
     public static final Index IDX_PUNISHMENTS_CLIENT = Internal.createIndex(DSL.name("idx_punishments_client"), Punishments.PUNISHMENTS, new OrderField[] { Punishments.PUNISHMENTS.CLIENT }, false);
+    public static final Index IDX_STAT_CLIENT = Internal.createIndex(DSL.name("idx_stat_client"), ClientStats.CLIENT_STATS, new OrderField[] { ClientStats.CLIENT_STATS.CLIENT }, false);
+    public static final Index IDX_TEAMS = Internal.createIndex(DSL.name("idx_teams"), GameTeams.GAME_TEAMS, new OrderField[] { GameTeams.GAME_TEAMS.ID, GameTeams.GAME_TEAMS.CLIENT }, false);
     public static final Index WORLD_LOGS_LOCATION_INDEX = Internal.createIndex(DSL.name("world_logs_location_index"), WorldLogs.WORLD_LOGS, new OrderField[] { WorldLogs.WORLD_LOGS.REALM, WorldLogs.WORLD_LOGS.WORLD, WorldLogs.WORLD_LOGS.BLOCK_X, WorldLogs.WORLD_LOGS.BLOCK_Y, WorldLogs.WORLD_LOGS.BLOCK_Z, WorldLogs.WORLD_LOGS.TIME }, false);
     public static final Index WORLD_LOGS_METADATA_KEY_VALUE_INDEX = Internal.createIndex(DSL.name("world_logs_metadata_key_value_index"), WorldLogsMetadata.WORLD_LOGS_METADATA, new OrderField[] { WorldLogsMetadata.WORLD_LOGS_METADATA.REALM, WorldLogsMetadata.WORLD_LOGS_METADATA.META_KEY, WorldLogsMetadata.WORLD_LOGS_METADATA.META_VALUE }, false);
     public static final Index WORLD_LOGS_METADATA_VALUE_INDEX = Internal.createIndex(DSL.name("world_logs_metadata_value_index"), WorldLogsMetadata.WORLD_LOGS_METADATA, new OrderField[] { WorldLogsMetadata.WORLD_LOGS_METADATA.REALM, WorldLogsMetadata.WORLD_LOGS_METADATA.META_VALUE }, false);

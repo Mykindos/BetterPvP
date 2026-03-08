@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.block.impl.workbench;
 import lombok.CustomLog;
 import lombok.NonNull;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractTabGui;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -17,7 +18,6 @@ import me.mykindos.betterpvp.core.recipe.resolver.HasIngredientsParameter;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,6 +36,7 @@ public class GuiWorkbench extends AbstractTabGui implements Windowed {
     protected final GuiCraftingTableAdvanced craftingGui;
     protected final GuiQuickCraftViewer quickCraftGui;
     private final List<List<SlotElement>> linkingElements;
+    private final ClientManager clientManager;
     private final CraftingManager craftingManager;
     protected final ItemFactory itemFactory;
     protected LinkedList<CraftingRecipe> quickCrafts = new LinkedList<>();
@@ -43,7 +44,7 @@ public class GuiWorkbench extends AbstractTabGui implements Windowed {
     private Window window;
     private final WeakReference<Player> playerRef;
 
-    public GuiWorkbench(Player player, CraftingManager craftingManager, ItemFactory itemFactory) {
+    public GuiWorkbench(Player player, CraftingManager craftingManager, ItemFactory itemFactory, ClientManager clientManager) {
         super(9, 6, 2, new Structure(
                 "xxxxxxxxx",
                 "xxxxxxxxx",
@@ -52,11 +53,12 @@ public class GuiWorkbench extends AbstractTabGui implements Windowed {
                 "xxxxxxxxx",
                 "xxxxxxxxx"
         ).addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL));
+        this.clientManager = clientManager;
 
         this.playerRef = new WeakReference<>(player);
         this.craftingManager = craftingManager;
         this.itemFactory = itemFactory;
-        this.craftingGui = new GuiCraftingTableAdvanced(this, craftingManager, itemFactory);
+        this.craftingGui = new GuiCraftingTableAdvanced(this, craftingManager, itemFactory, clientManager);
         this.quickCraftGui = new GuiQuickCraftViewer(this);
         this.linkingElements = List.of(
                 getLinkingElements(craftingGui),

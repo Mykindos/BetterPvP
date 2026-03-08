@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.clans.ClansStat;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -797,11 +798,11 @@ public class ClanManager extends Manager<Long, Clan> {
      * @param killed the clan that was defeated in the kill event; must not be null.
      * @param killer the clan that initiated the kill and gains dominance; must not be null.
      */
-    public void applyDominance(IClan killed, IClan killer) {
-        if (!dominanceEnabled) return;
-        if (killed == null || killer == null) return;
-        if (killed.equals(killer)) return;
-        if (!killed.isEnemy(killer)) return;
+    public double applyDominance(IClan killed, IClan killer) {
+        if (!dominanceEnabled) return 0;
+        if (killed == null || killer == null) return 0;
+        if (killed.equals(killer)) return 0;
+        if (!killed.isEnemy(killer)) return 0;
 
         ClanEnemy killedEnemy = killed.getEnemy(killer).orElseThrow();
         ClanEnemy killerEnemy = killer.getEnemy(killed).orElseThrow();
@@ -813,7 +814,7 @@ public class ClanManager extends Manager<Long, Clan> {
 
         if (!pillageEnabled && (killerEnemy.getDominance() + dominance) >= 100) {
             //pillaging is disabled, so stop a pillage from happening
-            return;
+            return dominance;
         }
 
         // If the killed players clan has no dominance on the killer players clan, then give dominance to the killer
@@ -834,6 +835,7 @@ public class ClanManager extends Manager<Long, Clan> {
         if (killerEnemy.getDominance() == 100) {
             UtilServer.callEvent(new PillageStartEvent(new Pillage(killer, killed)));
         }
+        return dominance;
     }
 
     /**
@@ -1032,6 +1034,18 @@ public class ClanManager extends Manager<Long, Clan> {
     public ClanLeaderboard getLeaderboard() {
         Optional<Leaderboard<?, ?>> clans = leaderboardManager.getObject("Clans");
         return (ClanLeaderboard) clans.orElse(null);
+    }
+
+    public ClansStat.ClansStatBuilder<?, ?> addClanInfo(UUID id, ClansStat.ClansStatBuilder<?, ?> builder) {
+        this.getClanByPlayer(id).ifPresentOrElse((clan) -> {
+            builder.clanName(clan.getName());
+            builder.clanId(clan.getId());
+        },
+                () -> {
+            builder.clanName(ClansStat.NO_CLAN_NAME);
+            builder.clanId(null);
+                });
+        return builder;
     }
 
 }

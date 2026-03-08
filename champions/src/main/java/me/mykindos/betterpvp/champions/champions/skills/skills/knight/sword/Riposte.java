@@ -15,14 +15,15 @@ import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -130,7 +131,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
 
             double newHealth = getHealing(level);
-            UtilPlayer.health(player, newHealth);
+            double actualHeal = UtilEntity.health(player, newHealth);
+            championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_RIPOSTE, actualHeal);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
             if (ent instanceof Player target) {
@@ -158,11 +160,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
 
         Particle.LARGE_SMOKE.builder().location(player.getLocation().add(0, 0.25, 0)).receivers(20).extra(0).spawn();
+        return true;
     }
 
     @UpdateEvent
