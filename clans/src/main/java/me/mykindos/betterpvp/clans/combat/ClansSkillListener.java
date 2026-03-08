@@ -84,12 +84,12 @@ public class ClansSkillListener implements Listener {
     }
 
     @EventHandler
-    public void disableLongshot(PlayerCanUseSkillEvent event) {
-        if (!event.getSkill().getName().equals("Longshot")) return;
+    public void disableFarshot(PlayerCanUseSkillEvent event) {
+        if (!event.getSkill().getName().equals("Farshot")) return;
         Player player = event.getPlayer();
 
         if(player.getLocation().getBlockY() > 100) {
-            event.cancel("Cannot use Longshot above 100Y");
+            event.cancel("Cannot use Farshot above 100Y");
             return;
         }
 
@@ -100,7 +100,7 @@ public class ClansSkillListener implements Listener {
             Clan locationClan = locationClanOptional.get();
 
             if (playerClan.equals(locationClan) || playerClan.isAllied(locationClan)) {
-                event.cancel("Cannot use Longshot in own or allied territory");
+                event.cancel("Cannot use Farshot in own or allied territory");
             }
         }
     }

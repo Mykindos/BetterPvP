@@ -861,11 +861,18 @@ skills:
     longshot:
       enabled: true
       maxlevel: 3
-      baseMaxDamage: 13.0
-      maxDamageIncreasePerLevel: 3.0
-      minDamage: 1.0
-      maxDistance: 64.0
-      deathMessageThreshold: 32.0
+      baseDamage: 2.5
+      damageIncreasePerLevel: 0.75
+      baseDistance: 24.0
+      distanceDecreasePerLevel: 0.0
+    farshot:
+      enabled: false
+      maxlevel: 3
+      baseMaxDamage: 11.0
+      maxDamageIncreasePerLevel: 2.0
+      minDamage: 2.0
+      maxDistance: 40.0
+      deathMessageThreshold: 24.0
     heavyarrows:
       enabled: false
       maxlevel: 3
@@ -881,7 +888,7 @@ skills:
       baseDuration: 6.0
       durationIncreasePerLevel: 0.0
     precision:
-      enabled: true
+      enabled: false
       maxlevel: 3
       baseDamage: 0.5
       damageIncreasePerLevel: 0.5
