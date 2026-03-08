@@ -177,18 +177,9 @@ public class Core extends BPvPPlugin {
     }
 
     private void setupServerAndSeason() {
-
-            if (serverName.toLowerCase().startsWith("champions")) {
-                serverName = "Champions";
-            }
-
-            int id = database.getServerId(serverName);
-            server = new Server(id, serverName);
-        } else {
-            String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
-            int id = database.getServerId(serverName);
-            server = new Server(id, serverName);
-        }
+        String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
+        int id = database.getServerId(serverName);
+        Server server = new Server(id, serverName);
 
         final int currentSeason = getConfig().getOrSaveInt("core.info.season", 1);
         final String seasonName = getConfig().getOrSaveString("core.info.seasonName", "Season 1");
