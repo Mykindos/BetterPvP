@@ -58,13 +58,9 @@ public class SkillsCommand extends Command {
                 UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have any builds", target.getName()));
                 return;
             }
-            Optional<Role> roleOptional = roleManager.getObject(target.getUniqueId());
-            if (roleOptional.isEmpty()) {
-                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have a set equipped", target.getName()));;
-                return;
-            }
+
+            Role role = roleManager.getRole(target);
             GamerBuilds builds = gamerBuildsOptional.get();
-            Role role = roleOptional.get();
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
                 UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow>'s Build:", target.getName()).appendNewline().append(build.getBuildComponent()));
@@ -77,13 +73,7 @@ public class SkillsCommand extends Command {
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
-            if (roleOptional.isEmpty()) {
-                UtilMessage.message(player, "Skills", "You do not have a set equipped!");
-                return;
-            }
-
-            Role role = roleOptional.get();
+            Role role = roleManager.getRole(player);
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
                 UtilMessage.message(player, "Skills", UtilMessage.deserialize("Your Build:").appendNewline().append(build.getBuildComponent()));

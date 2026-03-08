@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.builds.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
@@ -10,22 +11,21 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.exception.DataAccessException;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import static java.util.UUID.fromString;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_BUILDS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
 @Singleton
 @CustomLog
@@ -46,34 +46,38 @@ public class BuildRepository implements IRepository<RoleBuild> {
     }
 
     public void loadBuilds(GamerBuilds builds) {
-        String query = "SELECT * FROM champions_builds WHERE Gamer = ?";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(builds.getUuid())), TargetDatabase.GLOBAL).join()) {
-            while (result.next()) {
-                String uuid = result.getString(1);
-                String role = result.getString(2);
-                int id = result.getInt(3);
-                RoleBuild build = new RoleBuild(uuid, Role.valueOf(role.toUpperCase()), id);
+        try {
+            DSLContext ctx = database.getDslContext();
+            Result<Record> results = ctx.select(CHAMPIONS_BUILDS.asterisk(), CLIENTS.UUID)
+                    .from(CHAMPIONS_BUILDS).join(CLIENTS).on(CHAMPIONS_BUILDS.CLIENT.eq(CLIENTS.ID))
+                    .where(CHAMPIONS_BUILDS.CLIENT.eq(builds.getClient().getId())).fetch();
+            results.forEach(buildRecord -> {
+                long clientId = buildRecord.getValue(CHAMPIONS_BUILDS.CLIENT);
+                String clientUUID = buildRecord.getValue(CLIENTS.UUID);
+                String role = buildRecord.getValue(CHAMPIONS_BUILDS.ROLE);
+                int id = buildRecord.getValue(CHAMPIONS_BUILDS.ID);
+                RoleBuild build = new RoleBuild(clientId, UUID.fromString(clientUUID), Role.valueOf(role.toUpperCase()), id);
 
-                boolean active = result.getBoolean(10);
+                boolean active = buildRecord.getValue(CHAMPIONS_BUILDS.ACTIVE) == 1;
                 build.setActive(active);
 
-                String sword = result.getString(4);
+                String sword = buildRecord.getValue(CHAMPIONS_BUILDS.SWORD);
                 setSkill(build, SkillType.SWORD, sword);
 
-                String axe = result.getString(5);
+                String axe = buildRecord.getValue(CHAMPIONS_BUILDS.AXE);
                 setSkill(build, SkillType.AXE, axe);
 
-                String bow = result.getString(6);
+                String bow = buildRecord.getValue(CHAMPIONS_BUILDS.BOW);
                 setSkill(build, SkillType.BOW, bow);
 
-                String passiveA = result.getString(7);
+                String passiveA = buildRecord.getValue(CHAMPIONS_BUILDS.PASSIVE_A);
                 setSkill(build, SkillType.PASSIVE_A, passiveA);
 
-                String passiveB = result.getString(8);
+                String passiveB = buildRecord.getValue(CHAMPIONS_BUILDS.PASSIVE_B);
                 setSkill(build, SkillType.PASSIVE_B, passiveB);
 
-                String global = result.getString(9);
+                String global = buildRecord.getValue(CHAMPIONS_BUILDS.GLOBAL);
                 setSkill(build, SkillType.GLOBAL, global);
 
                 if (active) {
@@ -81,9 +85,10 @@ public class BuildRepository implements IRepository<RoleBuild> {
                 }
 
                 builds.getBuilds().add(build);
+            });
 
-            }
-        } catch (SQLException ex) {
+
+        } catch (DataAccessException ex) {
             log.error("Failed to load builds", ex).submit();
         }
 
@@ -102,7 +107,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
         if (skill == null) return;
         if (!skill.isEnabled()) {
             if (!build.isActive()) return;
-            Player player = Bukkit.getPlayer(fromString(build.getUuid()));
+            Player player = Bukkit.getPlayer(build.getClientUUID());
             if (player == null) return;
             UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, refunding <green>%s</green> skill point(s) and removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), level, build.getRole().toString(), build.getId()));
             return;
@@ -122,84 +127,97 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     @Override
     public void save(RoleBuild build) {
-        String query = "INSERT IGNORE INTO champions_builds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.insertInto(CHAMPIONS_BUILDS)
+                    .set(CHAMPIONS_BUILDS.CLIENT, build.getClientId())
+                    .set(CHAMPIONS_BUILDS.ROLE, build.getRole().getName())
+                    .set(CHAMPIONS_BUILDS.ID, build.getId())
+                    .set(CHAMPIONS_BUILDS.SWORD, getSkillDatabaseValue(build.getSwordSkill()))
+                    .set(CHAMPIONS_BUILDS.AXE, getSkillDatabaseValue(build.getAxeSkill()))
+                    .set(CHAMPIONS_BUILDS.BOW, getSkillDatabaseValue(build.getBow()))
+                    .set(CHAMPIONS_BUILDS.PASSIVE_A, getSkillDatabaseValue(build.getPassiveA()))
+                    .set(CHAMPIONS_BUILDS.PASSIVE_B, getSkillDatabaseValue(build.getPassiveB()))
+                    .set(CHAMPIONS_BUILDS.GLOBAL, getSkillDatabaseValue(build.getGlobal()))
+                    .set(CHAMPIONS_BUILDS.ACTIVE, build.isActive() ? 1 : 0)
+                    .onConflict(CHAMPIONS_BUILDS.CLIENT, CHAMPIONS_BUILDS.ROLE, CHAMPIONS_BUILDS.ID).doNothing()
+                    .execute();
+        });
+    }
 
-        var swordStatement = new SkillStatementValue(build.getSwordSkill());
-        var axeStatement = new SkillStatementValue(build.getAxeSkill());
-        var bowStatement = new SkillStatementValue(build.getBow());
-        var passiveAStatement = new SkillStatementValue(build.getPassiveA());
-        var passiveBStatement = new SkillStatementValue(build.getPassiveB());
-        var globalStatement = new SkillStatementValue(build.getGlobal());
-
-        database.executeUpdateAsync(new Statement(query, new StringStatementValue(build.getUuid()), new StringStatementValue(build.getRole().getName()),
-                new IntegerStatementValue(build.getId()),
-                swordStatement, axeStatement, bowStatement,
-                passiveAStatement, passiveBStatement, globalStatement,
-                new BooleanStatementValue(build.isActive())), TargetDatabase.GLOBAL);
+    private String getSkillDatabaseValue(BuildSkill skill) {
+        return skill == null ? null : skill.getSkill().getName() + "," + skill.getLevel();
     }
 
     public void update(RoleBuild build) {
-        String query = "INSERT INTO champions_builds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE Sword = ?, Axe = ?, Bow = ?, PassiveA = ?, PassiveB = ?, Global = ?, Active = ?";
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.insertInto(CHAMPIONS_BUILDS)
+                    .set(CHAMPIONS_BUILDS.CLIENT, build.getClientId())
+                    .set(CHAMPIONS_BUILDS.ROLE, build.getRole().getName())
+                    .set(CHAMPIONS_BUILDS.ID, build.getId())
+                    .set(CHAMPIONS_BUILDS.SWORD, getSkillDatabaseValue(build.getSwordSkill()))
+                    .set(CHAMPIONS_BUILDS.AXE, getSkillDatabaseValue(build.getAxeSkill()))
+                    .set(CHAMPIONS_BUILDS.BOW, getSkillDatabaseValue(build.getBow()))
+                    .set(CHAMPIONS_BUILDS.PASSIVE_A, getSkillDatabaseValue(build.getPassiveA()))
+                    .set(CHAMPIONS_BUILDS.PASSIVE_B, getSkillDatabaseValue(build.getPassiveB()))
+                    .set(CHAMPIONS_BUILDS.GLOBAL, getSkillDatabaseValue(build.getGlobal()))
+                    .set(CHAMPIONS_BUILDS.ACTIVE, build.isActive() ? 1 : 0 )
+                    .onConflict(CHAMPIONS_BUILDS.CLIENT, CHAMPIONS_BUILDS.ROLE, CHAMPIONS_BUILDS.ID)
+                    .doUpdate()
+                    .set(CHAMPIONS_BUILDS.SWORD, getSkillDatabaseValue(build.getSwordSkill()))
+                    .set(CHAMPIONS_BUILDS.AXE, getSkillDatabaseValue(build.getAxeSkill()))
+                    .set(CHAMPIONS_BUILDS.BOW, getSkillDatabaseValue(build.getBow()))
+                    .set(CHAMPIONS_BUILDS.PASSIVE_A, getSkillDatabaseValue(build.getPassiveA()))
+                    .set(CHAMPIONS_BUILDS.PASSIVE_B, getSkillDatabaseValue(build.getPassiveB()))
+                    .set(CHAMPIONS_BUILDS.GLOBAL, getSkillDatabaseValue(build.getGlobal()))
+                    .set(CHAMPIONS_BUILDS.ACTIVE, build.isActive() ? 1 : 0)
+                    .execute();
 
-        var swordStatement = new SkillStatementValue(build.getSwordSkill());
-        var axeStatement = new SkillStatementValue(build.getAxeSkill());
-        var bowStatement = new SkillStatementValue(build.getBow());
-        var passiveAStatement = new SkillStatementValue(build.getPassiveA());
-        var passiveBStatement = new SkillStatementValue(build.getPassiveB());
-        var globalStatement = new SkillStatementValue(build.getGlobal());
-
-        database.executeUpdateAsync(new Statement(query, new StringStatementValue(build.getUuid()), new StringStatementValue(build.getRole().getName()),
-                new IntegerStatementValue(build.getId()),
-                swordStatement, axeStatement, bowStatement,
-                passiveAStatement, passiveBStatement, globalStatement,
-                new BooleanStatementValue(build.isActive()),
-                swordStatement, axeStatement, bowStatement,
-                passiveAStatement, passiveBStatement, globalStatement,
-                new BooleanStatementValue(build.isActive())), TargetDatabase.GLOBAL);
+            log.info("Saved build for {} role {}", build.getClientId(), build.getRole().getName()).submit();
+        });
     }
 
     public void loadDefaultBuilds(GamerBuilds gamerBuilds) {
 
         if (!gamerBuilds.getBuilds().isEmpty()) return;
 
-        String uuid = gamerBuilds.getUuid();
+        long clientId = gamerBuilds.getClient().getId();
+        UUID uuid = UUID.fromString(gamerBuilds.getClient().getUuid());
 
         List<RoleBuild> builds = new ArrayList<>();
         for (int d = 1; d < 5; d++) {
 
-            RoleBuild assassin = new RoleBuild(uuid, Role.valueOf("ASSASSIN"), d);
+            RoleBuild assassin = new RoleBuild(clientId, uuid, Role.valueOf("ASSASSIN"), d);
             setSkill(assassin, SkillType.SWORD, "Sever", 3);
             setSkill(assassin, SkillType.AXE, "Leap", 5);
             setSkill(assassin, SkillType.PASSIVE_A, "Smoke Bomb", 3);
             setSkill(assassin, SkillType.PASSIVE_B, "Backstab", 1);
 
-            RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
+            RoleBuild brute = new RoleBuild(clientId, uuid, Role.valueOf("BRUTE"), d);
             setSkill(brute, SkillType.SWORD, "Flesh Hook", 3);
             setSkill(brute, SkillType.AXE, "Seismic Slam", 5);
             setSkill(brute, SkillType.PASSIVE_A, "Stampede", 3);
             setSkill(brute, SkillType.PASSIVE_B, "Colossus", 1);
 
-            RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
+            RoleBuild ranger = new RoleBuild(clientId, uuid, Role.valueOf("RANGER"), d);
             setSkill(ranger, SkillType.SWORD, "Disengage", 3);
             setSkill(ranger, SkillType.AXE, "Wind Burst", 1);
             setSkill(ranger, SkillType.BOW, "Napalm Shot", 4);
             setSkill(ranger, SkillType.PASSIVE_B, "Sharpshooter", 3);
             setSkill(ranger, SkillType.PASSIVE_A, "Hunters Thrill", 1);
 
-            RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
+            RoleBuild mage = new RoleBuild(clientId, uuid, Role.valueOf("MAGE"), d);
             setSkill(mage, SkillType.SWORD, "Inferno", 5);
             setSkill(mage, SkillType.AXE, "Fire Blast", 3);
             setSkill(mage, SkillType.PASSIVE_A, "Immolate", 2);
             setSkill(mage, SkillType.PASSIVE_B, "Holy Light", 2);
 
-            RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
+            RoleBuild knight = new RoleBuild(clientId, uuid, Role.valueOf("KNIGHT"), d);
             setSkill(knight, SkillType.SWORD, "Riposte", 3);
             setSkill(knight, SkillType.AXE, "Bulls Charge", 5);
             setSkill(knight, SkillType.PASSIVE_A, "Swordsmanship", 1);
             setSkill(knight, SkillType.PASSIVE_B, "Vengeance", 3);
 
-            RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);
+            RoleBuild warlock = new RoleBuild(clientId, uuid, Role.valueOf("WARLOCK"), d);
             setSkill(warlock, SkillType.SWORD, "Leech", 4);
             setSkill(warlock, SkillType.AXE, "Bloodshed", 5);
             setSkill(warlock, SkillType.PASSIVE_A, "Frailty", 1);

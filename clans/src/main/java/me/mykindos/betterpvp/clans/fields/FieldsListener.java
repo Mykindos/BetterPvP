@@ -13,15 +13,12 @@ import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
-import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.block.Block;
@@ -42,13 +39,13 @@ public class FieldsListener extends ClanListener {
 
     private final WeakHashMap<Player, Map<Block, FieldsInteractable>> profiles = new WeakHashMap<>();
     private Fields fields;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public FieldsListener(ClanManager clanManager, ClientManager clientManager, Fields fields, ItemHandler itemHandler) {
+    public FieldsListener(ClanManager clanManager, ClientManager clientManager, Fields fields, ItemFactory itemFactory) {
         super(clanManager, clientManager);
         this.fields = fields;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     private boolean isFields(Block block) {
@@ -108,7 +105,7 @@ public class FieldsListener extends ClanListener {
             return; // If the block isn't active yet, ignore
         }
 
-        final boolean allow = type.processInteraction(event, block, itemHandler);
+        final boolean allow = type.processInteraction(event, block, itemFactory);
 
         if (allow) {
             event.setInform(false); // Block the message that they cant break
@@ -179,24 +176,6 @@ public class FieldsListener extends ClanListener {
             block.setBlockData(interactable.getBlockData() == null ? type.getType() : interactable.getBlockData());
             interactable.setActive(true);
         });
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onCatchFish(PlayerCaughtFishEvent event) {
-        if (!(event.getLoot() instanceof Fish fish)) return;
-        if (!isFields(event.getHook().getLocation().getBlock())) {
-
-            if (event.isBaseFishingUnlocked()) {
-                return;
-            }
-
-            fish.setWeight((int) (fish.getWeight() * 0.50));
-            if (UtilMath.randomInt(20) < 2) {
-                UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
-            }
-        } else {
-            UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
-        }
     }
 
 }

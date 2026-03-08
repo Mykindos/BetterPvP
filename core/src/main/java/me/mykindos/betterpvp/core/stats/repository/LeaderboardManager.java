@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Singleton
-public final class LeaderboardManager extends Manager<Leaderboard<?, ?>> {
+public final class LeaderboardManager extends Manager<String, Leaderboard<?, ?>> {
 
     @Override
     public Optional<Leaderboard<?, ?>> getObject(String identifier) {

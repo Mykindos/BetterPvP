@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -193,7 +194,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         int level = getLevel(player);
 
         if (target instanceof Player playerTarget) {
-            championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)) / 10.0f);
+            championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)), EnergyEvent.Cause.CUSTOM);
         }
 
         new BukkitRunnable() {
@@ -247,7 +248,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         speedDuration = getConfig("speedDuration", 2.5, Double.class);
         elapsedTimeToProcAbility = getConfig("elapsedTimeToProcAbility", 2.0, Double.class);
 
-        healthGainedOnRandomSiphon = getConfig("healthGainedOnRandomSiphon", 1.0D, Double.class);
+        healthGainedOnRandomSiphon = getConfig("healthGainedOnRandomSiphon", 2.0D, Double.class);
         randomSiphonHealthGainChance = getConfig("randomSiphonHealthGainChance", 0.1, Double.class);
     }
 }

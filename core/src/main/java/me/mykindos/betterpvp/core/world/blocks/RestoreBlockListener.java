@@ -4,7 +4,7 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.inject.Inject;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -27,6 +27,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -47,6 +48,15 @@ public class RestoreBlockListener implements Listener {
         Block block = event.getBlock();
 
         if (blockHandler.isRestoreBlock(block)) {
+            Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(block);
+            if (restoreBlockOptional.isPresent()) {
+                DestroyStrategy strategy = restoreBlockOptional.get().getDestroyStrategy();
+                if (strategy != null && strategy.breakable()) {
+                    event.setDropItems(strategy.allowDrops());
+                    blockHandler.getRestoreBlocks().remove(block);
+                    return;
+                }
+            }
             event.setCancelled(true);
         }
     }
@@ -139,18 +149,23 @@ public class RestoreBlockListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onSuffocationDamage(PreCustomDamageEvent event) {
-        if (event.getCustomDamageEvent().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
-            Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(event.getCustomDamageEvent().getDamagee().getEyeLocation().getBlock());
-            if (restoreBlockOptional.isPresent()) {
-                LivingEntity newDamager = restoreBlockOptional.get().getSummoner();
-                if (newDamager != null && event.getCustomDamageEvent().getDamager() == null) {
-                    event.getCustomDamageEvent().setDamager(newDamager);
-                    if (newDamager.equals(event.getCustomDamageEvent().getDamagee())) {
-                        event.setCancelled(true);
-                        event.setCancelReason("Damager is the same as damagee");
-                    }
-                }
+    public void onSuffocationDamage(DamageEvent event) {
+        if (!event.isDamageeLiving() || event.getBukkitCause() != EntityDamageEvent.DamageCause.SUFFOCATION) {
+            return;
+        }
+
+        final LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
+        Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(damagee.getEyeLocation().getBlock());
+        if (restoreBlockOptional.isEmpty()) {
+            return;
+        }
+
+        LivingEntity newDamager = restoreBlockOptional.get().getSummoner();
+        if (newDamager != null && event.getDamager() == null) {
+            event.setDamager(newDamager);
+            if (newDamager.equals(event.getDamagee())) {
+                event.setCancelled(true);
+                event.setCancelReason("Damager is the same as damagee");
             }
         }
     }

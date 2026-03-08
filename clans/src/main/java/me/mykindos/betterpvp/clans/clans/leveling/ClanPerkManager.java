@@ -10,9 +10,10 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
-public class ClanPerkManager extends Manager<ClanPerk> {
+public class ClanPerkManager extends Manager<String, ClanPerk> {
 
     private static ClanPerkManager instance;
 
@@ -34,7 +35,10 @@ public class ClanPerkManager extends Manager<ClanPerk> {
         registerSlots(1, 5);
         registerSlots(2, 15);
         registerSlots(3, 25);
-        registerSlots(4, 35);
+        registerSlots(3, 35);
+        registerSlots(3, 50);
+        registerSlots(3, 65);
+        registerSlots(4, 80);
 
         //registerLegends(1, 15);
         //registerLegends(2, 35);
@@ -67,17 +71,17 @@ public class ClanPerkManager extends Manager<ClanPerk> {
 
     private void registerLegends(int legends, int minReq) {
         final ClanVaultLegend perk = new ClanVaultLegend(legends, minReq);
-        addObject(perk.getName(), perk);
+        addObject(UUID.randomUUID().toString(), perk);
     }
 
     private void registerSlots(int slots, int minReq) {
         final ClanVaultSlot perk = new ClanVaultSlot(slots, minReq);
-        addObject(perk.getName(), perk);
+        addObject(UUID.randomUUID().toString(), perk);
     }
 
     private void registerFarmingLevels(int levels, int minReq) {
         final ClanFarmingLevels perk = new ClanFarmingLevels(levels, minReq);
-        addObject(perk.getPerkUUID(), perk);
+        addObject(perk.getPerkUUID().toString(), perk);
     }
 
     public int getTotalFarmingLevels(Clan clan) {

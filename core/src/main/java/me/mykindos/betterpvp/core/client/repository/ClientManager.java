@@ -59,32 +59,29 @@ public class ClientManager extends PlayerManager<Client> {
     @Getter
     private final ClientSQLLayer sqlLayer;
 
-    private final ClientRedisLayer redisLayer;
     private final Redis redis;
+    private ClientRedisLayer redisLayer;
+
+    public ClientRedisLayer getRedisLayer() {
+        if (redisLayer == null && redis.isEnabled()) {
+            this.redisLayer = plugin.getInjector().getInstance(ClientRedisLayer.class);
+            this.redisLayer.getObserver().register(this::receiveUpdate);
+        }
+        return redisLayer;
+    }
 
     /**
      *
      */
     @Inject
-    public ClientManager(Core plugin, Redis redis) {
+    public ClientManager(Core plugin, Redis redis, ClientSQLLayer sqlLayer) {
         super(plugin);
-        this.sqlLayer = plugin.getInjector().getInstance(ClientSQLLayer.class);
+        this.sqlLayer = sqlLayer;
         this.redis = redis;
-        if (redis.isEnabled()) {
-            this.redisLayer = plugin.getInjector().getInstance(ClientRedisLayer.class);
-            this.redisLayer.getObserver().register(this::receiveUpdate);
-        } else {
-            this.redisLayer = null;
-        }
-
         this.store = Caffeine.newBuilder()
                 .scheduler(Scheduler.systemScheduler())
                 .expireAfter(new ClientExpiry<>())
                 .removalListener((final UUID uuid, final Client client, final RemovalCause cause) -> {
-                    if (uuid == null || client == null) {
-                        return;
-                    }
-
                     Bukkit.getScheduler().runTask(plugin, () -> UtilServer.callEvent(new ClientUnloadEvent(client)));
 
                     // Only announce the client was unloaded if it expired or was removed forcefully, not replaced.
@@ -108,7 +105,7 @@ public class ClientManager extends PlayerManager<Client> {
      */
     public void shutdown() {
         if (this.redis.isEnabled()) {
-            this.redisLayer.getObserver().shutdown();
+            this.getRedisLayer().getObserver().shutdown();
         }
     }
 
@@ -139,9 +136,9 @@ public class ClientManager extends PlayerManager<Client> {
      * The client information is persisted in storage, and relevant events
      * are dispatched to notify other parts of the system about both the pre
      */
-    private void storeNewClient(Client client, final boolean online) {
+    private CompletableFuture<Void> storeNewClient(Client client, final boolean online) {
 
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
             //
             // If there is another client loaded previously for the same UUID, the new client
@@ -156,7 +153,7 @@ public class ClientManager extends PlayerManager<Client> {
             UtilServer.callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
             load(client);
             if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
+                this.getRedisLayer().save(client);
             }
 
             // Executing our success callback
@@ -191,34 +188,41 @@ public class ClientManager extends PlayerManager<Client> {
     @Override
     protected void unload(final Client client) {
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
         this.store.invalidate(client.getUniqueId());
     }
 
+    /**
+     * Loads a Client to be online and stores it if it is not already loaded.
+     * After function completes, the client will be stored in the cache.
+     * @param uuid the unique identifier of the client to load
+     * @param name the name of the client to load
+     * @return a CompletableFuture that will complete with an Optional containing the loaded Client, or empty if loading failed
+     */
     @Override
-    protected Optional<Client> loadOnline(final UUID uuid, final String name) {
+    protected CompletableFuture<Optional<Client>> loadOnline(final UUID uuid, final String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            final Optional<Client> storedUser = this.getStoredExact(uuid);
+            if (storedUser.isPresent()) {
+                return storedUser;
+            }
 
-        final Optional<Client> storedUser = this.getStoredExact(uuid);
-        if (storedUser.isPresent()) {
-            return storedUser;
-        }
+            Optional<Client> loaded;
+            if (this.redis.isEnabled()) {
+                loaded = this.getRedisLayer().getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
+            } else {
+                loaded = this.sqlLayer.getAndUpdate(uuid);
+            }
 
-        Optional<Client> loaded;
-        if (this.redis.isEnabled()) {
-            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
-        } else {
-            loaded = this.sqlLayer.getAndUpdate(uuid);
-        }
+            if (loaded.isEmpty()) {
+                loaded = Optional.of(this.sqlLayer.create(uuid, name));
+            }
 
-        if (loaded.isEmpty()) {
-            loaded = Optional.of(this.sqlLayer.create(uuid, name));
-        }
-
-        final Client client = loaded.get();
-        this.storeNewClient(client, true);
-        return Optional.of(client);
-
+            final Client client = loaded.get();
+            this.storeNewClient(client, true).join();
+            return Optional.of(client);
+        });
     }
 
     /**
@@ -259,7 +263,7 @@ public class ClientManager extends PlayerManager<Client> {
     protected Optional<Client> loadOffline(@Nullable String name) {
         if (this.redis.isEnabled()) {
             return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
-                    () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name))
+                    () -> this.getRedisLayer().getClient(name).or(() -> this.sqlLayer.getClient(name))
             );
         } else {
             return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
@@ -279,7 +283,7 @@ public class ClientManager extends PlayerManager<Client> {
     protected Optional<Client> loadOffline(@Nullable UUID uuid) {
         if (this.redis.isEnabled()) {
             return this.loadOffline(() -> getStoredExact(uuid),
-                    () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid))
+                    () -> this.getRedisLayer().getClient(uuid).or(() -> this.sqlLayer.getClient(uuid))
             );
         } else {
             return this.loadOffline(() -> getStoredExact(uuid),
@@ -378,7 +382,7 @@ public class ClientManager extends PlayerManager<Client> {
     public void save(Client client) {
 
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
         this.sqlLayer.save(client);
 
@@ -396,7 +400,7 @@ public class ClientManager extends PlayerManager<Client> {
         client.getIgnores().add(target.getUniqueId());
 
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
         this.sqlLayer.saveIgnore(client, target);
 
@@ -414,7 +418,7 @@ public class ClientManager extends PlayerManager<Client> {
         client.getIgnores().remove(target.getUniqueId());
 
         if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
+            this.getRedisLayer().save(client);
         }
 
         this.sqlLayer.removeIgnore(client, target);
@@ -475,7 +479,7 @@ public class ClientManager extends PlayerManager<Client> {
 
         // Otherwise, update
         final Client stored = client.get();
-        this.redisLayer.getClient(uuid).ifPresent(stored::copy);
+        this.getRedisLayer().getClient(uuid).ifPresent(stored::copy);
     }
 
 }

@@ -1,6 +1,10 @@
+project.ext["jooqPackageName"] = "me.mykindos.betterpvp.clans.database.jooq"
+project.ext["jooqOutputDir"] = "src/main/java"
+
 plugins {
     id("org.flywaydb.flyway")
     id("io.papermc.paperweight.userdev")
+    id("jooqdynamic")
 }
 
 version = "1.0.0"
@@ -16,8 +20,7 @@ dependencies {
     compileOnly(project(":progression"))
     compileOnly(project(":champions"))
     compileOnly(project(":shops"))
-    compileOnly(libs.mineplex)
-    compileOnly(libs.protocollib)
+    compileOnly(libs.packetevents)
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)

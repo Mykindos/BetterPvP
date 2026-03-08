@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,8 +23,14 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @BPvPListener
 public class KillEventListener implements Listener {
 
+    private final DamageLogManager logManager;
+
+    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
+
     @Inject
-    private DamageLogManager logManager;
+    public KillEventListener(DamageLogManager logManager) {
+        this.logManager = logManager;
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
@@ -34,9 +41,9 @@ public class KillEventListener implements Listener {
 
         // Get involved players
         final Player victim = event.getPlayer();
-        final ConcurrentLinkedDeque<DamageLog> assistLog = logManager.getObject(victim.getUniqueId()).orElse(new ConcurrentLinkedDeque<>());
+        final ConcurrentLinkedDeque<DamageLog> assistLog = logManager.getObject(victim.getUniqueId().toString()).orElse(new ConcurrentLinkedDeque<>());
         final Map<Player, Contribution> contributions = getContributions(assistLog);
-        final KillContributionEvent ke = new KillContributionEvent(victim, killer, Collections.unmodifiableMap(contributions));
+        final KillContributionEvent ke = new KillContributionEvent(ID_GENERATOR.nextId(), victim, killer, Collections.unmodifiableMap(contributions));
         UtilServer.callEvent(ke);
     }
 
@@ -58,7 +65,7 @@ public class KillEventListener implements Listener {
             final Player attacker = entry.getKey();
             final float damage = entry.getValue();
             final float percent = damage / totalDamage; // 0.0 - 1.0
-            contributions.put(attacker, new Contribution(attacker.getUniqueId(), damage, percent));
+            contributions.put(attacker, new Contribution(ID_GENERATOR.nextId(), attacker.getUniqueId(), damage, percent));
         }
 
         return contributions;

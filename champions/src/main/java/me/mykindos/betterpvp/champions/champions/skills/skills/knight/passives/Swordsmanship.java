@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -11,11 +10,10 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -26,7 +24,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -89,9 +88,9 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!charges.containsKey(player)) return;
         if (!SkillWeapons.isHolding(player, SkillType.SWORD)) return;
@@ -99,9 +98,7 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
         int level = getLevel(player);
         if (level > 0) {
             int charge = charges.get(player);
-            // Add a flat damage modifier based on charges
-            double damageToAdd = getDamage(charge, level);
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+            event.addModifier(new SkillDamageModifier.Flat(this, getDamage(charge, level)));
             charges.remove(player);
         }
     }

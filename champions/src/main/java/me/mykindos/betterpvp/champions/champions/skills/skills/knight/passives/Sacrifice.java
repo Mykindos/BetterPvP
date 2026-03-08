@@ -8,10 +8,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -63,24 +62,21 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
 
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onHit(CustomDamageEvent event) {
+    public void onHit(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (event.getBukkitCause() != DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() instanceof Player damager) {
             int level = getLevel(damager);
             if (level > 0) {
-                // Add a percentage-based damage increase modifier for attackers
-                double percentageIncrease = getPercentage(level) * 100; // Convert to percentage
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, percentageIncrease, getName(), ModifierValue.PERCENTAGE, ModifierOperation.INCREASE);
+                event.addModifier(new SkillDamageModifier.Multiplier(this, (1.0 + getPercentage(level))));
             }
+
         }
 
         if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
-                // Add a percentage-based damage increase modifier for defenders
-                double percentageIncrease = getPercentage(level) * 100; // Convert to percentage
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, percentageIncrease, getName(), ModifierValue.PERCENTAGE, ModifierOperation.INCREASE);
+                event.addModifier(new SkillDamageModifier.Multiplier(this, (1.0 + getPercentage(level))));
             }
         }
     }

@@ -52,12 +52,12 @@ public class Fish implements FishingLoot {
             while (currentWeight > 0) {
                 int dropWeight = Math.min(currentWeight, 64);
                 currentWeight -= dropWeight;
-                ItemStack drop = new ItemStack(fishType.getMaterial(), dropWeight);
-                drop.editMeta(meta -> meta.setCustomModelData((fishType.getModelData())));
+                ItemStack drop = fishType.generateItem(dropWeight);
                 Item item = entity.getWorld().dropItem(entity.getLocation(), drop);
                 UtilItem.reserveItem(item, event.getPlayer(), 10);
                 // For some reason the entity doesnt have the correct velocity at the time of execution, wait 1 tick.
                 UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> item.setVelocity(entity.getVelocity()), 1);
+                UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), item::remove, 20L * 30L); // Despawn fish after 30 seconds
 
             }
 

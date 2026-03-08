@@ -32,8 +32,8 @@ public class ClanKillLogButton extends AbstractItem {
     public ClanKillLogButton(Clan clan, KillClanLog killClanLog, ClanManager clanManager) {
         this.killClanLog = killClanLog;
 
-        Clan killerClan = clanManager.getClanById(killClanLog.getKillerClan()).orElse(null);
-        Clan victimClan = clanManager.getClanById(killClanLog.getVictimClan()).orElse(null);
+        Clan killerClan = clanManager.getClanById(killClanLog.getKillerClan().getId()).orElse(null);
+        Clan victimClan = clanManager.getClanById(killClanLog.getVictimClan().getId()).orElse(null);
 
         killerRelation = clan.getRelation(killerClan);
         victimRelation = clan.getRelation(victimClan);
@@ -54,7 +54,7 @@ public class ClanKillLogButton extends AbstractItem {
                 .material(Material.TIPPED_ARROW)
                 .baseMeta(itemMeta)
                 .displayName(name)
-                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .hideAdditionalTooltip(true)
                 .lore(lore)
                 .build();
     }

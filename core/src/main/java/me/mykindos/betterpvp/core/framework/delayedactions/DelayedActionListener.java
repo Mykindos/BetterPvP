@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -90,7 +90,7 @@ public class DelayedActionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.getDamagee() instanceof Player player) {
             if (delayedActionMap.containsKey(player)) {
                 DelayedAction delayedAction = delayedActionMap.remove(player);

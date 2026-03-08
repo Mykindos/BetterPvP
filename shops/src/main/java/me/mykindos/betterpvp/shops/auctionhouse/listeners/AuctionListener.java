@@ -102,7 +102,7 @@ public class AuctionListener implements Listener {
         if (!(event.getRightClicked() instanceof LivingEntity target)) return;
 
 
-        Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId());
+        Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId().toString());
         shopkeeperOptional.ifPresent(shopkeeper -> {
             if (shopkeeper.getShopkeeperName().toLowerCase().contains("auction")) {
                 new AuctionHouseMenu(auctionManager).show(event.getPlayer());

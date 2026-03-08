@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.shops.auctionhouse.data.ListingDuration;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,7 +12,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class Auction {
 
-    private final UUID auctionID;
+    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
+
+    private final long auctionID;
     private final UUID seller;
     private final ItemStack itemStack;
     private int sellPrice;
@@ -23,7 +26,7 @@ public class Auction {
     private AuctionTransaction transaction;
 
     public Auction(UUID seller, ItemStack itemStack) {
-        this(UUID.randomUUID(), seller, itemStack);
+        this(ID_GENERATOR.nextId(), seller, itemStack);
     }
 
     public boolean hasExpired() {

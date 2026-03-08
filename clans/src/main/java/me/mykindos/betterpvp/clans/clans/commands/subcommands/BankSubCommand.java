@@ -124,7 +124,7 @@ public class BankSubCommand extends ClanSubCommand {
                 gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() + amountToWithdraw);
 
                 clan.messageClan("<yellow>" + player.getName() + " <gray>withdrew <green>$" + amountToWithdraw + " <gray>from the clan bank.", null, true);
-                log.info("{} withdrew ${} from clan {}", player.getName(), amountToWithdraw, clan.getId().toString()).submit();
+                log.info("{} withdrew ${} from clan {}", player.getName(), amountToWithdraw, clan.getId()).submit();
             }catch(NumberFormatException ex) {
                 UtilMessage.message(player, "Clans", "Value provided is not a valid number.");
             }
@@ -193,7 +193,7 @@ public class BankSubCommand extends ClanSubCommand {
                 gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - amountToWithdraw);
 
                 clan.messageClan("<yellow>" + player.getName() + " <gray>deposited <green>$" + amountToWithdraw + " <gray>into the clan bank.", null, true);
-                log.info("{} deposited ${} into clan {}", player.getName(), amountToWithdraw, clan.getId().toString()).submit();
+                log.info("{} deposited ${} into clan {}", player.getName(), amountToWithdraw, clan.getId()).submit();
             }catch(NumberFormatException ex) {
                 UtilMessage.message(player, "Clans", "Value provided is not a valid number.");
             }

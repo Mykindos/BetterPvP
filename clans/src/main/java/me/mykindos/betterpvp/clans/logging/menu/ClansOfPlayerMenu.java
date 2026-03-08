@@ -16,8 +16,8 @@ import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
@@ -45,9 +44,9 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
                 "# # # < - > # # R")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(previous))
-                .addIngredient('>', new ForwardButton())
+                .addIngredient('>', new PageForwardButton())
                 .addIngredient('R', new RefreshButton<>())
         );
         this.client = client;
@@ -69,7 +68,7 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
     private CompletableFuture<Boolean> refresh() {
         CompletableFuture<List<Item>> future = new CompletableFuture<>();
         future.completeAsync(() -> {
-            Map<UUID, String> clans = clanManager.getRepository().getClansByPlayer(client.getUniqueId());
+            Map<Long, String> clans = clanManager.getRepository().getClansByPlayer(client.getUniqueId());
             return clans.keySet().stream()
                     .map(clanID -> new ClanButton(clans.get(clanID), clanID,
                             clanManager, clientManager, this))

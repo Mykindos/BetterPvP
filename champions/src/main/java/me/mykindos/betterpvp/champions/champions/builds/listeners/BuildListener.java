@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
-import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
@@ -35,9 +34,6 @@ public class BuildListener implements Listener {
     @Inject
     private ChampionsSkillManager skillManager;
 
-    @Inject
-    private ArmourManager armourManager;
-
     @EventHandler
     public void onClientJoin(ClientJoinEvent event) {
         UtilServer.runTaskAsync(champions, () -> {
@@ -57,9 +53,9 @@ public class BuildListener implements Listener {
             Block block = event.getClickedBlock();
             if (block == null) return;
             if (block.getType() == Material.ENCHANTING_TABLE) {
-                Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
+                Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId().toString());
                 gamerBuildsOptional.ifPresent(builds -> {
-                    new ClassSelectionMenu(buildManager, skillManager, armourManager, null, false).show(event.getPlayer());
+                    new ClassSelectionMenu(buildManager, skillManager, null, false).show(event.getPlayer());
                     event.setCancelled(true);
                 });
             }
@@ -68,7 +64,7 @@ public class BuildListener implements Listener {
 
     @EventHandler
     public void onDeleteBuild(DeleteBuildEvent event) {
-        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             buildManager.getBuildRepository().update(event.getRoleBuild());
         }
@@ -76,7 +72,7 @@ public class BuildListener implements Listener {
 
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {
-        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             buildManager.getBuildRepository().update(event.getNewBuild());
             buildManager.getBuildRepository().update(event.getOldBuild());

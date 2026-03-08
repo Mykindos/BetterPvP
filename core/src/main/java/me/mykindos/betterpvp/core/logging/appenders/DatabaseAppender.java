@@ -4,16 +4,14 @@ import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.StatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.LogsContextRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.LogsRecord;
 import me.mykindos.betterpvp.core.logging.LogAppender;
 import me.mykindos.betterpvp.core.logging.PendingLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,6 +21,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.LOGS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.LOGS_CONTEXT;
 
 @CustomLog
 public class DatabaseAppender implements LogAppender {
@@ -95,67 +96,60 @@ public class DatabaseAppender implements LogAppender {
     }
 
     private void insertBatchedLogs(List<PendingLogEntry> logEntries) {
-        List<List<StatementValue<?>>> logRows = new ArrayList<>();
-        List<List<StatementValue<?>>> contextRows = new ArrayList<>();
+        CompletableFuture.runAsync(() -> {
+            try {
+                database.getDslContext().transaction(config -> {
+                    DSLContext ctx = DSL.using(config);
 
-        // Prepare all rows
-        for (PendingLogEntry entry : logEntries) {
-            final PendingLog pl = entry.pendingLog;
-            final String level = pl.getLevel() != null ? pl.getLevel() : "INFO";
-            final String action = pl.getAction() != null ? pl.getAction() : "";
-            final String message = entry.finalMessage != null ? entry.finalMessage : "";
+                    // Prepare log records
+                    List<LogsRecord> logRecords = new ArrayList<>();
+                    List<LogsContextRecord> contextRecords = new ArrayList<>();
 
-            // Main log row
-            logRows.add(List.of(
-                    new LongStatementValue(pl.getId()),
-                    new IntegerStatementValue(Core.getCurrentServer()),
-                    new IntegerStatementValue(Core.getCurrentSeason()),
-                    new StringStatementValue(level),
-                    new StringStatementValue(action),
-                    new StringStatementValue(message),
-                    new LongStatementValue(pl.getTime())
-            ));
+                    for (PendingLogEntry entry : logEntries) {
+                        final PendingLog pl = entry.pendingLog;
+                        final String level = pl.getLevel() != null ? pl.getLevel() : "INFO";
+                        final String action = pl.getAction() != null ? pl.getAction() : "";
+                        final String message = entry.finalMessage != null ? entry.finalMessage : "";
 
-            // Context rows
-            final java.util.Map<String, String> ctx = pl.getContext();
-            if (ctx != null && !ctx.isEmpty()) {
-                ctx.forEach((key, value) -> {
-                    contextRows.add(List.of(
-                            new LongStatementValue(pl.getId()),
-                            new IntegerStatementValue(Core.getCurrentServer()),
-                            new IntegerStatementValue(Core.getCurrentSeason()),
-                            new StringStatementValue(key != null ? key : ""),
-                            new StringStatementValue(value != null ? value : "")
-                    ));
+                        // Create log record
+                        LogsRecord logRecord = ctx.newRecord(LOGS);
+                        logRecord.setId(pl.getId());
+                        logRecord.setRealm(Core.getCurrentRealm());
+                        logRecord.setLevel(level);
+                        logRecord.setAction(action);
+                        logRecord.setMessage(message);
+                        logRecord.setLogTime(pl.getTime());
+                        logRecords.add(logRecord);
+
+                        // Create context records
+                        final java.util.Map<String, String> ctx_map = pl.getContext();
+                        if (ctx_map != null && !ctx_map.isEmpty()) {
+                            ctx_map.forEach((key, value) -> {
+                                LogsContextRecord contextRecord = ctx.newRecord(LOGS_CONTEXT);
+                                contextRecord.setLogId(pl.getId());
+                                contextRecord.setRealm(Core.getCurrentRealm());
+                                contextRecord.setContext(key != null ? key : "");
+                                contextRecord.setValue(value != null ? value : "");
+                                contextRecords.add(contextRecord);
+                            });
+                        }
+                    }
+
+                    // Batch insert logs
+                    if (!logRecords.isEmpty()) {
+
+                        ctx.batchInsert(logRecords).execute();
+                    }
+
+                    // Batch insert contexts
+                    if (!contextRecords.isEmpty()) {
+                        ctx.batchInsert(contextRecords).execute();
+                    }
                 });
+            } catch (Exception ex) {
+                log.error("Failed to insert batched logs", ex).submit();
             }
-        }
-
-        List<Statement> statements = new ArrayList<>();
-
-        // Create bulk insert for logs
-        if (!logRows.isEmpty()) {
-            statements.add(Statement.builder()
-                    .insertInto("logs", "id", "Server", "Season", "Level", "Action", "Message", "Time")
-                    .valuesBulk(logRows)
-                    .build());
-        }
-
-        // Create bulk insert for context
-        if (!contextRows.isEmpty()) {
-            statements.add(Statement.builder()
-                    .insertInto("logs_context", "LogID", "Server", "Season", "Context", "Value")
-                    .valuesBulk(contextRows)
-                    .build());
-        }
-
-        // Execute as a transaction
-        database.executeTransaction(statements, TargetDatabase.GLOBAL, LOG_EXECUTOR, true)
-                .exceptionally(throwable -> {
-                    log.error("Failed to insert batched logs", throwable).submit();
-                    return null;
-                });
-
+        }, LOG_EXECUTOR);
     }
 
     /**

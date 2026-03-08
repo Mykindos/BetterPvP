@@ -21,10 +21,26 @@ public class Compatibility {
      */
     public static boolean MODEL_ENGINE = Bukkit.getPluginManager().getPlugin("ModelEngine") != null;
 
+
     /**
-     * Whether the server is running Mineplex StudioEngine
+     * Whether the server is running Nexo
      */
-    public static boolean MINEPLEX = Bukkit.getPluginManager().getPlugin("StudioEngine") != null;
+    public static boolean NEXO = Bukkit.getPluginManager().getPlugin("Nexo") != null;
+
+    /**
+     * Whether the server is running Oraxen
+     */
+    public static boolean ORAXEN = Bukkit.getPluginManager().getPlugin("Oraxen") != null;
+
+    /**
+     * Whether the server is running a texture provider (Nexo or Oraxen)
+     */
+    public static boolean TEXTURE_PROVIDER = NEXO || ORAXEN;
+
+    /**
+     * Whether the server is running WorldEdit
+     */
+    public static boolean WORLD_EDIT = Bukkit.getPluginManager().getPlugin("WorldEdit") != null;
 
     /**
      * Whether the server is running Sword Blocking mixin

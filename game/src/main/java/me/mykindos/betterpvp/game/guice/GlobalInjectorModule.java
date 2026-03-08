@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.game.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.GameRegistry;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -14,7 +13,6 @@ import me.mykindos.betterpvp.game.framework.model.attribute.GlobalAttributeModul
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.guice.platform.DefaultPlatformProvider;
-import me.mykindos.betterpvp.game.guice.platform.MineplexPlatformProvider;
 import me.mykindos.betterpvp.game.guice.platform.PlatformProvider;
 import me.mykindos.betterpvp.game.guice.provider.CurrentMapProvider;
 import me.mykindos.betterpvp.game.guice.provider.WaitingLobbyProvider;
@@ -51,12 +49,7 @@ public class GlobalInjectorModule extends AbstractModule {
         bind(TeamBalancerHandler.class).asEagerSingleton();
 
         // Install platform-specific bindings
-        PlatformProvider platformProvider;
-        if (Compatibility.MINEPLEX) {
-            platformProvider = new MineplexPlatformProvider();
-        } else {
-            platformProvider = new DefaultPlatformProvider();
-        }
+        PlatformProvider platformProvider = new DefaultPlatformProvider();
 
         install(platformProvider);
         bind(PlatformProvider.class).toInstance(platformProvider);

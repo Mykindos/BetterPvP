@@ -2,11 +2,13 @@ package me.mykindos.betterpvp.core.combat.damagelog;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -16,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.ref.WeakReference;
 import java.time.Duration;
@@ -52,7 +55,7 @@ public class DamageLogListener implements Listener {
         }
 
         final long deathTime = System.currentTimeMillis();
-        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId())
+        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId().toString())
                 .orElse(new ConcurrentLinkedDeque<>()));
         final WeakReference<Player> killerRef = new WeakReference<>(event.getKiller());
         final ClickEvent clickEvent = ClickEvent.callback(
@@ -72,14 +75,14 @@ public class DamageLogListener implements Listener {
                 .appendSpace()
                 .append(Component.text("why."))
                 .clickEvent(clickEvent);
-        final Component message = UtilMessage.getMiniMessage("<alt2>%s</alt2> has <red>%.1f\u2764</red> remaining.", event.getKiller().getName(), event.getKiller().getHealth() / 2);
+        final Component message = UtilMessage.getMiniMessage("<alt2>%s</alt2> has <red>%.1f\u2764</red> remaining.", event.getKiller().getName(), event.getKiller().getHealth());
         UtilMessage.simpleMessage(event.getVictim(), "Death", message.appendSpace().append(component));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
         final long deathTime = System.currentTimeMillis();
-        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getPlayer().getUniqueId())
+        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getPlayer().getUniqueId().toString())
                 .orElse(new ConcurrentLinkedDeque<>()));
         final WeakReference<Player> playerRef = new WeakReference<>(event.getPlayer());
         final ClickEvent clickEvent = ClickEvent.callback(
@@ -102,7 +105,9 @@ public class DamageLogListener implements Listener {
         final Component hover = Component.text("What killed you?");
         UtilMessage.simpleMessage(event.getPlayer(), "Death", component, hover);
 
-        // Clear the damage logs for this player
-        damageLogManager.getObjects().remove(event.getPlayer().getUniqueId().toString());
+        // Clear the damage logs for this player after this death
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+            damageLogManager.getObjects().remove(event.getPlayer().getUniqueId().toString());
+        }, 1L);
     }
 }

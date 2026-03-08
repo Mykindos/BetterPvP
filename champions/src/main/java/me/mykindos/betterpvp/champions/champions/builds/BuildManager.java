@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoad
 import me.mykindos.betterpvp.champions.champions.builds.repository.BuildRepository;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -19,21 +21,23 @@ import java.util.List;
 
 @Singleton
 @Getter
-public class BuildManager extends Manager<GamerBuilds> {
+public class BuildManager extends Manager<String, GamerBuilds> {
 
+    private final ClientManager clientManager;
     private final BuildRepository buildRepository;
     private final Champions champions;
     private final ChampionsSkillManager championsSkillManager;
 
     @Inject
-    public BuildManager(BuildRepository buildRepository, Champions champions, ChampionsSkillManager championsSkillManager) {
+    public BuildManager(ClientManager clientManager, BuildRepository buildRepository, Champions champions, ChampionsSkillManager championsSkillManager) {
+        this.clientManager = clientManager;
         this.buildRepository = buildRepository;
         this.champions = champions;
         this.championsSkillManager = championsSkillManager;
     }
 
     public void loadBuilds(Player player) {
-        GamerBuilds builds = new GamerBuilds(player.getUniqueId().toString());
+        GamerBuilds builds = new GamerBuilds(clientManager.search().online(player));
         getBuildRepository().loadBuilds(builds);
         getBuildRepository().loadDefaultBuilds(builds);
         addObject(player.getUniqueId().toString(), builds);
@@ -54,8 +58,9 @@ public class BuildManager extends Manager<GamerBuilds> {
         //First, generate a set of valid skills
         List<Skill> eligibleSkills = new java.util.ArrayList<>(championsSkillManager.getSkillsForRole(role).stream().filter(Skill::isEnabled).toList());
 
+        Client client = clientManager.search().online(player);
         //player should already have a valid build
-        RoleBuild build = new RoleBuild(player.getUniqueId().toString(), role, id);
+        RoleBuild build = new RoleBuild(client.getId(), player.getUniqueId(), role, id);
         for (int i = build.getPoints(); i > 0; i--) {
             //choose an eligible skill
             Skill skill = eligibleSkills.get(UtilMath.randomInt(0, eligibleSkills.size()));
@@ -96,7 +101,7 @@ public class BuildManager extends Manager<GamerBuilds> {
      */
     public RoleBuild generateRandomBuild(Player player, Role role, int id) {
         RoleBuild newRoleBuild = getRandomBuild(player, role, id);
-        this.getObject(player.getUniqueId()).orElseThrow().setBuild(newRoleBuild, role, id);
+        this.getObject(player.getUniqueId().toString()).orElseThrow().setBuild(newRoleBuild, role, id);
         getBuildRepository().update(newRoleBuild);
         return newRoleBuild;
     }

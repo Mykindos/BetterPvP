@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.shops.shops.shopkeepers.types;
 
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton;
 import org.bukkit.Location;
 
 public class SkeletonShopkeeper extends StandardShopkeeper {

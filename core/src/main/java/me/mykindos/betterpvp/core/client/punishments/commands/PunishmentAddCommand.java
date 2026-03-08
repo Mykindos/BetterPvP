@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @CustomLog
@@ -129,7 +128,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         String formattedTime = UtilTime.getTime(time, 1);
 
         Punishment punishment = new Punishment(
-                UUID.randomUUID(),
+                target.getId(),
                 target.getUniqueId(),
                 type,
                 rule,

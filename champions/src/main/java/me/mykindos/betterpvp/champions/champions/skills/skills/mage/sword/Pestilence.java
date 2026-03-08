@@ -23,7 +23,8 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -38,7 +39,7 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, PestilenceProjectile> projectiles = new WeakHashMap<>();
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private final EffectManager effectManager;
     private double poisonDuration;

@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageIndicatorEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -34,12 +34,13 @@ import org.joml.Vector3f;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 @PluginAdapter("ModelEngine")
 @PluginAdapter("MythicMobs")
-@PluginAdapter("ProtocolLib")
+@PluginAdapter("PacketEvents")
 @BPvPListener
 @Singleton
 public class DamageIndicatorAdapter implements Listener {
@@ -62,8 +63,12 @@ public class DamageIndicatorAdapter implements Listener {
     private double duration;
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDamage(final CustomDamageEvent event) {
+    public void onDamage(final DamageEvent event) {
         if (!enabled || !(event.getDamager() instanceof Player player) || event.getDamagee() instanceof Player) {
+            return;
+        }
+
+        if (event.getDamage() <= 0) {
             return;
         }
 
@@ -75,12 +80,13 @@ public class DamageIndicatorAdapter implements Listener {
         DamageIndicatorEvent damageIndicatorEvent = UtilServer.callEvent(new DamageIndicatorEvent(player, event.getDamagee(), event.getDamage()));
         if(damageIndicatorEvent.isCancelled()) return;
 
+
         final Vector direction = player.getEyeLocation().getDirection();
         final Location spawnPoint;
         if (event.getProjectile() != null) {
             spawnPoint = event.getProjectile().getLocation();
-        } else {
-            spawnPoint = event.getDamagee().getEyeLocation().toVector()
+        } else if (event.isDamageeLiving()) {
+            spawnPoint = Objects.requireNonNull(event.getLivingDamagee()).getEyeLocation().toVector()
                     .subtract(player.getEyeLocation().toVector())
                     .multiply(0.7)
                     .toLocation(player.getWorld())
@@ -90,9 +96,11 @@ public class DamageIndicatorAdapter implements Listener {
                     Math.random() * 0.5 - 0.5,
                     Math.random() * 0.5 - 0.5
             );
+        } else {
+            return;
         }
 
-        final Component text = formatDamage(event.getDamage());
+        final Component text = formatDamage(event.getModifiedDamage());
         final TextDisplay shadow = spawn(spawnPoint, player);
         final Location shadowLocation = spawnPoint.subtract(direction.multiply(0.01).add(new Vector(0, -0.02, 0)));
         final TextDisplay display = spawn(shadowLocation, player);

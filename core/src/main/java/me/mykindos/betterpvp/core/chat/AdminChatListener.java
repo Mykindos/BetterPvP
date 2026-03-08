@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageReceivedEvent;
+import me.mykindos.betterpvp.core.framework.server.events.ServerMessageReceivedEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -36,7 +36,7 @@ public class AdminChatListener implements Listener {
     }
 
     @EventHandler
-    public void onMessageReceived(MineplexMessageReceivedEvent event) {
+    public void onMessageReceived(ServerMessageReceivedEvent event) {
         if (!event.getMessage().getChannel().equalsIgnoreCase("AdminMessage")) return;
 
         HashMap<String, String> metadata = event.getMessage().getMetadata();

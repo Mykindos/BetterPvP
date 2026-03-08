@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class CommandManager extends Manager<ICommand> {
+public class CommandManager extends Manager<String, ICommand> {
 
     public Optional<ICommand> getCommand(String name) {
         return objects.values().stream()
@@ -49,7 +49,7 @@ public class CommandManager extends Manager<ICommand> {
         return objects.values().stream().filter(command -> command.getAliases().contains(search)).findFirst();
     }
 
-    @Override
+
     public void loadFromList(List<ICommand> objects) {
         objects.forEach(command -> addObject(command.getName(), command));
     }

@@ -6,11 +6,14 @@ plugins {
     `java-gradle-plugin` apply true
     `version-catalog` apply true
     kotlin("jvm") version libs.versions.kotlin apply true
-    id("com.gradleup.shadow") version "9.2.2" apply false // Building fat jar
-    id("org.inferred.processors") version "3.7.0" apply false  // Annotation processing
+    id("com.gradleup.shadow") version "9.3.2" apply false // Building fat jar
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
-    id("org.flywaydb.flyway") version "11.15.0" apply false // Flyway
-    id("org.sonarqube") version "7.0.1.6134" apply true
+    id("org.flywaydb.flyway") version "12.0.3" apply false // Flyway
+    id("org.sonarqube") version "7.2.3.7755" apply true
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 java {
@@ -39,7 +42,10 @@ subprojects {
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.spongepowered.org/maven/")
         maven("https://repo.opencollab.dev/maven-releases/")
-        maven("https://repo.md-5.net/repository/public/")
+        maven("https://repo.nexomc.com/releases")
+        maven("https://repo.nexomc.com/snapshots")
+        maven("https://repo.md-5.net/content/groups/public/")
+        maven("https://mvn.lib.co.nz/public")
         maven("https://jitpack.io")
         maven("https://repo.viaversion.com")
         maven("https://repo.opencollab.dev/main/")
@@ -47,15 +53,16 @@ subprojects {
         maven("https://repo.codemc.io/repository/maven-snapshots/")
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.polar.top/repository/polar/")
+        maven("https://mvn.lib.co.nz/public/")
+        maven("https://repo.oraxen.com/releases")
         maven {
-          url =  uri("http://mykindos.me:8081/repository/maven-public/")
+          url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }
 
     // Set java language version
     plugins.apply("java")
-    plugins.apply("org.inferred.processors")
     plugins.apply("com.gradleup.shadow")
     plugins.apply("org.jetbrains.kotlin.jvm")
     java {
@@ -65,6 +72,7 @@ subprojects {
     // Shadow
     tasks.withType<ShadowJar>().configureEach {
         relocate("com.github.benmanes.caffeine", "me.mykindos.betterpvp.caffeine")
+        relocate("com.jeff_media.morepersistentdatatypes", "me.mykindos.morepersistentdatatypes")
         archiveBaseName.set(project.name)
         archiveVersion.set("")
         archiveClassifier.set("")
@@ -96,14 +104,13 @@ subprojects {
 
     }
 
-
-
 }
 
 sonar {
     properties {
         property("sonar.projectKey", "Mykindos_BetterPvP")
         property("sonar.organization", "mykindos")
+        property("sonar.exclusions", "*.sql")
     }
 }
 

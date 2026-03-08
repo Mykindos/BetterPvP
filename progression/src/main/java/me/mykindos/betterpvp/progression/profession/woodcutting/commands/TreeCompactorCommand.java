@@ -6,14 +6,17 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeCompactor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,8 +30,10 @@ import java.util.Objects;
 @CustomLog
 @Singleton
 public class TreeCompactorCommand extends Command {
+
     private final TreeCompactor treeCompactor;
-    private final ItemHandler itemHandler;
+    private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
     private final CooldownManager cooldownManager;
 
     public static String TREE_COMPACTOR = "Tree Compactor";
@@ -39,9 +44,10 @@ public class TreeCompactorCommand extends Command {
     );
 
     @Inject
-    public TreeCompactorCommand(TreeCompactor treeCompactor, ItemHandler itemHandler, CooldownManager cooldownManager) {
+    public TreeCompactorCommand(TreeCompactor treeCompactor, ItemRegistry itemRegistry, ItemFactory itemFactory, CooldownManager cooldownManager) {
         this.treeCompactor = treeCompactor;
-        this.itemHandler = itemHandler;
+        this.itemRegistry = itemRegistry;
+        this.itemFactory = itemFactory;
         this.cooldownManager = cooldownManager;
     }
 
@@ -101,10 +107,10 @@ public class TreeCompactorCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (player.getGameMode() == GameMode.CREATIVE) {
-            BPvPItem item = itemHandler.getItem("progression:compacted_log");
-            ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
-            itemStack.setAmount(64);
-            player.getInventory().addItem(itemStack);
+            final BaseItem compactedLog = getCompactedLog();
+            final @NotNull ItemStack result = itemFactory.create(compactedLog).createItemStack();
+            result.setAmount(64);
+            player.getInventory().addItem(result);
             feedbackMessage(player, "Because you are in creative, you get 64 compacted logs");
             return;
         }
@@ -149,11 +155,9 @@ public class TreeCompactorCommand extends Command {
         for (Material logMaterial : logTypesToCompact) {
             while (UtilInventory.contains(player, logMaterial, 64)) {
                 if (UtilInventory.remove(player, logMaterial, 64)) {
-
-                    BPvPItem item = itemHandler.getItem("progression:compacted_log");
-                    ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
-
-                    player.getInventory().addItem(itemStack);
+                    final BaseItem compactedLog = getCompactedLog();
+                    final ItemInstance itemInstance = itemFactory.create(compactedLog);
+                    player.getInventory().addItem(itemInstance.createItemStack());
                     logsAfterCompaction++;
                 }
             }
@@ -165,5 +169,10 @@ public class TreeCompactorCommand extends Command {
 
         log.info("{} compacted {}x logs.", player.getName(), logsAfterCompaction)
                 .addClientContext(player).addLocationContext(player.getLocation()).submit();
+    }
+
+    private @NotNull BaseItem getCompactedLog() {
+        final NamespacedKey key = new NamespacedKey("progression", "compacted_log");
+        return Objects.requireNonNull(itemRegistry.getItem(key));
     }
 }

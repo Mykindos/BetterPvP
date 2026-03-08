@@ -28,6 +28,8 @@ public class RestoreBlock {
     private final String label;
 
     private boolean restored;
+    @Nullable
+    private DestroyStrategy destroyStrategy;
 
     public RestoreBlock(Block block, BlockData blockData, Material newMaterial, long expire, @Nullable LivingEntity summoner, @Nullable String label) {
         this.block = block;

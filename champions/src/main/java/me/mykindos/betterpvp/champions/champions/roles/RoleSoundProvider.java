@@ -3,10 +3,10 @@ package me.mykindos.betterpvp.champions.champions.roles;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import net.kyori.adventure.sound.Sound;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,19 +22,19 @@ public class RoleSoundProvider implements SoundProvider {
     private RoleManager roleManager;
 
     @Override
-    public @Nullable Sound apply(@NotNull CustomDamageEvent event) {
-        if (!(event.getDamagee() instanceof Player player)) {
+    public @Nullable Sound apply(@NotNull DamageEvent event) {
+        if (!(event.getDamagee() instanceof LivingEntity livingEntity)) {
             return SoundProvider.DEFAULT.apply(event);
         }
 
-        final Optional<Role> roleOpt = roleManager.getObject(player.getUniqueId());
+        final @NotNull Optional<Role> roleOpt = roleManager.getRole(livingEntity);
         if (roleOpt.isEmpty()) {
             return SoundProvider.DEFAULT.apply(event);
         }
 
         final Role role = roleOpt.get();
         final net.kyori.adventure.sound.Sound.Builder sound = net.kyori.adventure.sound.Sound.sound();
-        sound.source(SoundProvider.getSource(event.getDamagee()));
+        sound.source(SoundProvider.getSource(livingEntity));
         sound.volume(1f);
 
         switch (role) {

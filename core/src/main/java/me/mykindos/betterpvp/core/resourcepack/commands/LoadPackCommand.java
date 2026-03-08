@@ -2,14 +2,17 @@ package me.mykindos.betterpvp.core.resourcepack.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePack;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +47,16 @@ public class LoadPackCommand extends Command {
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) return;
 
-        ResourcePack pack = resourcePackHandler.getResourcePack(args[1]);
-        if (pack == null) {
-            UtilMessage.simpleMessage(player, "Resource pack not found");
-            return;
-        }
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+            ResourcePack pack = resourcePackHandler.getResourcePack(args[1]).join();
+            if (pack == null) {
+                UtilMessage.simpleMessage(player, "Resource pack not found");
+                return;
+            }
 
-        target.addResourcePack(pack.getUuid(), pack.getUrl(), pack.getHashBytes(), null, true);
+            target.addResourcePack(pack.getUuid(), pack.getUrl(), pack.getHashBytes(), null, true);
+        });
+
 
     }
 

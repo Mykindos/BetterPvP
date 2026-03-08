@@ -37,13 +37,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -476,24 +477,27 @@ public abstract class AbstractGui implements Gui, GuiParent {
      * @return A map of all {@link Inventory Inventories} and their slots that are visible.
      */
     public Map<Inventory, Set<Integer>> getAllInventorySlots(Inventory... ignored) {
-        TreeMap<Inventory, Set<Integer>> slots = new TreeMap<>(Comparator.comparingInt(Inventory::getGuiPriority).reversed());
+        HashMap<Inventory, Set<Integer>> slots = new HashMap<>();
         Set<Inventory> ignoredSet = Arrays.stream(ignored).collect(Collectors.toSet());
-        
-        for (me.mykindos.betterpvp.core.inventory.gui.SlotElement element : slotElements) {
+
+        for (SlotElement element : slotElements) {
             if (element == null)
                 continue;
-            
+
             element = element.getHoldingElement();
-            if (element instanceof SlotElement.InventorySlotElement invElement) {
+            if (element instanceof SlotElement.InventorySlotElement) {
+                SlotElement.InventorySlotElement invElement = (SlotElement.InventorySlotElement) element;
                 Inventory inventory = invElement.getInventory();
                 if (ignoredSet.contains(inventory))
                     continue;
-                
+
                 slots.computeIfAbsent(inventory, i -> new HashSet<>()).add(invElement.getSlot());
             }
         }
-        
-        return slots;
+
+        return slots.entrySet().stream()
+                .sorted(Comparator.<Map.Entry<Inventory, Set<Integer>>>comparingInt(entry -> entry.getKey().getGuiPriority()).reversed())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
     }
     
     /**

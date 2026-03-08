@@ -11,8 +11,8 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
-import me.mykindos.betterpvp.core.utilities.model.display.PlayerListType;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.playerlist.PlayerListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.EventHandler;
@@ -45,7 +45,7 @@ public class GamerListener implements Listener {
     private double defaultPvPProtection;
 
     @Inject
-    @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
+    @Config(path = "tab.shop", defaultValue = "shop.betterpvp.net")
     private String shop;
 
     private final ClientManager manager;
@@ -54,7 +54,7 @@ public class GamerListener implements Listener {
     public GamerListener(Core core, ClientManager manager) {
         this.manager = manager;
 
-        this.header = new PermanentComponent(gamer -> Component.text("Mineplex ", NamedTextColor.GOLD)
+        this.header = new PermanentComponent(gamer -> Component.text("BetterPvP ", NamedTextColor.GOLD)
                 .append(Component.text("Network ", NamedTextColor.WHITE))
                 .append(Component.text(core.getConfig().getOrSaveString("core.info.server", "unknown"), NamedTextColor.GREEN)));
 
@@ -71,6 +71,10 @@ public class GamerListener implements Listener {
                 gamer.getActionBar().show(gamer);
                 gamer.getTitleQueue().show(gamer);
                 gamer.getPlayerList().show(gamer);
+                gamer.getExperienceBar().show(gamer);
+                gamer.getExperienceLevel().show(gamer);
+                gamer.getBossBarQueue().show(gamer);
+                gamer.getBossBarOverlay().show(gamer);
             });
         }catch(Exception ex) {
             log.error("Error with gamer async onUpdate", ex).submit();

@@ -10,18 +10,18 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 public enum HotBarItem {
 
     //<editor-fold desc="Swords">
-    STANDARD_SWORD("champions:standard_sword",  2),
-    BOOSTER_SWORD("champions:booster_sword", 4),
-    POWER_SWORD("champions:power_sword", 4),
+    STANDARD_SWORD("core:standard_sword",  2),
+    BOOSTER_SWORD("core:booster_sword", 4),
+    POWER_SWORD("core:power_sword", 4),
     //</editor-fold>
     //<editor-fold desc="Axes">
-    STANDARD_AXE("champions:standard_axe", 2),
-    BOOSTER_AXE("champions:booster_axe", 4),
-    POWER_AXE("champions:power_axe", 4),
+    STANDARD_AXE("core:standard_axe", 2),
+    BOOSTER_AXE("core:booster_axe", 4),
+    POWER_AXE("core:power_axe", 4),
     //</editor-fold>
     //<editor-fold desc="Bows (Assassin, Ranger)">
-    BOW("champions:bow", 1, 1, Role.ASSASSIN, Role.RANGER),
-    ARROWS("champions:arrow", 1, 32, Role.ASSASSIN, Role.RANGER),
+    BOW("core:bow", 1, 1, Role.ASSASSIN, Role.RANGER),
+    ARROWS("minecraft:arrow", 1, 32, Role.ASSASSIN, Role.RANGER),
     //</editor-fold>
     //<editor-fold desc="Consumables">
     MUSHROOM_STEW("champions:mushroom_stew", 1, 1),

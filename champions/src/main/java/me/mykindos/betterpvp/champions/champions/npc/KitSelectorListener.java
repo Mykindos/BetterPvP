@@ -5,11 +5,12 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -33,13 +34,15 @@ import java.util.WeakHashMap;
 public class KitSelectorListener implements Listener {
 
     protected final WeakHashMap<Entity, KitSelector> selectors = new WeakHashMap<>();
-    private final ItemHandler itemHandler;
+    private final RoleManager roleManager;
+    private final ItemFactory itemFactory;
     private final BuildManager buildManager;
     private final ChampionsSkillManager skillManager;
 
     @Inject
-    private KitSelectorListener(ItemHandler itemHandler, BuildManager buildManager, ChampionsSkillManager skillManager) {
-        this.itemHandler = itemHandler;
+    private KitSelectorListener(RoleManager roleManager, ItemFactory itemFactory, BuildManager buildManager, ChampionsSkillManager skillManager) {
+        this.roleManager = roleManager;
+        this.itemFactory = itemFactory;
         this.buildManager = buildManager;
         this.skillManager = skillManager;
     }
@@ -72,7 +75,8 @@ public class KitSelectorListener implements Listener {
 
         if (selector.isEquip()) {
             // Equip them
-            role.equip(itemHandler, player, true);
+            roleManager.equipRole(player, role);
+            roleManager.equipWeapons(player);
             new SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f).play(player);
         }
 

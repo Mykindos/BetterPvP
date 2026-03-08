@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
@@ -49,18 +51,20 @@ public class FishingHandler extends ProfessionHandler {
     @Getter
     private final WeighedList<FishingLootType> lootTypes = new WeighedList<>();
 
-    private final FishingConfigLoader<?>[] lootLoaders = new FishingConfigLoader<?>[]{
-            new SwimmerLoader(),
-            new FishTypeLoader(),
-            new TreasureLoader()
-    };
+    private final FishingConfigLoader<?>[] lootLoaders;
 
 
     @Inject
-    protected FishingHandler(Progression progression, ProfessionProfileManager professionProfileManager, FishingRepository fishingRepository, LeaderboardManager leaderboardManager) {
-        super(progression, professionProfileManager, "Fishing");
+    protected FishingHandler(Progression progression, ItemFactory itemFactory, ClientManager clientManager,
+                             ProfessionProfileManager professionProfileManager, FishingRepository fishingRepository, LeaderboardManager leaderboardManager) {
+        super(progression, clientManager, professionProfileManager, "Fishing");
         this.fishingRepository = fishingRepository;
         this.leaderboardManager = leaderboardManager;
+        this.lootLoaders = new FishingConfigLoader<?>[]{
+                new SwimmerLoader(),
+                new FishTypeLoader(itemFactory),
+                new TreasureLoader(itemFactory)
+        };
     }
 
     public void addFish(Player player, Fish fish) {
@@ -77,7 +81,7 @@ public class FishingHandler extends ProfessionHandler {
                 .addClientContext(player).addLocationContext(player.getLocation())
                 .addContext("Experience", xp + "").addContext("Fish Weight", fish.getWeight() + "").submit();
 
-        fishingRepository.saveFish(player.getUniqueId(), fish);
+        fishingRepository.saveFish(clientManager.search().online(player), fish);
 
         long fishCaught = (long) professionData.getProperties().getOrDefault("TOTAL_FISH_CAUGHT", 0L);
         professionData.getProperties().put("TOTAL_FISH_CAUGHT", fishCaught + 1);

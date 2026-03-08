@@ -1,0 +1,271 @@
+package me.mykindos.betterpvp.core.item.impl.cannon.model;
+
+import com.ticxo.modelengine.api.ModelEngineAPI;
+import com.ticxo.modelengine.api.model.ActiveModel;
+import com.ticxo.modelengine.api.model.ModeledEntity;
+import lombok.CustomLog;
+import lombok.Getter;
+import lombok.Setter;
+import me.mykindos.betterpvp.core.combat.data.SoundProvider;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+@Getter
+@CustomLog
+public final class Cannon implements SoundProvider {
+
+    private static TextDisplay getOrCreateDisplay(final Cannon cannon, @NotNull final Location location, float viewBlocks, final NamespacedKey key) {
+        final Entity backingEntity = cannon.getBackingEntity();
+        final PersistentDataContainer pdc = backingEntity.getPersistentDataContainer();
+        // If the entity already has a display, return it
+        if (pdc.has(key)) {
+            final UUID entId = pdc.get(key, CustomDataType.UUID);
+            final Entity found = Bukkit.getEntity(Objects.requireNonNull(entId));
+            if (found instanceof TextDisplay display && display.isValid()) {
+                return display;
+            }
+        }
+
+        // Otherwise, create a new display
+        final TextDisplay display = location.getWorld().spawn(location, TextDisplay.class, ent -> {
+            ent.setBackgroundColor(Color.fromARGB(0, 1, 1, 1));
+            ent.setBrightness(new Display.Brightness(15, 15));
+            ent.setAlignment(TextDisplay.TextAlignment.CENTER);
+            ent.setBillboard(Display.Billboard.CENTER);
+            ent.setPersistent(true);
+        });
+        display.setTransformation(new Transformation(
+                new Vector3f(0, (float) -(cannon.getProperties().getSize() - 1), 0),
+                new AxisAngle4f(),
+                new Vector3f((float) cannon.getProperties().getSize()),
+                new AxisAngle4f()
+        ));
+        UtilEntity.setViewRangeBlocks(display, viewBlocks);
+        pdc.set(key, CustomDataType.UUID, display.getUniqueId());
+        return display;
+    }
+
+    public static final long COOLDOWN_LERP_OUT = 5_000L;
+    @Setter private long lastFuseTime = 0L;
+    @Setter private long lastShotTime = 0L;
+    private final @NotNull CannonManager cannonManager;
+    private final @NotNull UUID uuid;
+    private final @Nullable UUID placedBy;
+    private @NotNull IronGolem backingEntity;
+    private final @NotNull ModeledEntity modeledEntity;
+    private @NotNull ActiveModel activeModel;
+    private TextDisplay healthBar;
+    private TextDisplay instructions;
+    private final @NotNull CannonProperties properties;
+
+    public Cannon(@NotNull CannonManager cannonManager,
+                  @NotNull UUID uuid,
+                  @Nullable UUID placedBy,
+                  @NotNull IronGolem backingEntity,
+                  @NotNull ModeledEntity modeledEntity,
+                  @NotNull ActiveModel activeModel,
+                  boolean loaded,
+                  @NotNull CannonProperties properties) {
+        this.cannonManager = cannonManager;
+        this.placedBy = placedBy;
+        this.uuid = uuid;
+        this.backingEntity = backingEntity;
+        this.modeledEntity = modeledEntity;
+        this.activeModel = activeModel;
+        this.properties = properties;
+        if (loaded) {
+            setLoaded(true);
+        }
+        updateTag();
+    }
+
+    @Override
+    public @Nullable Sound apply(@NotNull DamageEvent event) {
+        return SoundProvider.DEFAULT.apply(event);
+    }
+
+    @Override
+    public boolean fromEntity() {
+        return false;
+    }
+
+    public @NotNull Location getLocation() {
+        return this.backingEntity.getLocation();
+    }
+
+    public double getHealth() {
+        return this.backingEntity.getHealth();
+    }
+
+    public void setHealth(double health) {
+        this.backingEntity.setHealth(health);
+    }
+
+    public void rotate(final @NotNull Vector vector) {
+        final Location location = this.backingEntity.getLocation();
+        location.setDirection(vector);
+        this.backingEntity.setRotation(location.getYaw(), location.getPitch());
+    }
+
+    public void setLoaded(boolean loaded) {
+        this.backingEntity.getPersistentDataContainer().set(CoreNamespaceKeys.CANNON_LOADED, PersistentDataType.BOOLEAN, loaded);
+    }
+
+    public boolean isLoaded() {
+        return this.backingEntity.getPersistentDataContainer().getOrDefault(CoreNamespaceKeys.CANNON_LOADED, PersistentDataType.BOOLEAN, false);
+    }
+
+    public @Nullable TextDisplay getHealthBar() {
+        if ((this.healthBar == null || this.healthBar.isDead() || !this.healthBar.isValid())) {
+            this.healthBar = getOrCreateDisplay(this, backingEntity.getLocation(), (float) properties.getHealthBarViewDistance(), CoreNamespaceKeys.CANNON_HEALTHBAR);
+            this.healthBar.setTextOpacity((byte) 160);
+        }
+        return this.healthBar;
+    }
+
+    public @Nullable TextDisplay getInstructions() {
+        if ((this.instructions == null || this.instructions.isDead() || !this.instructions.isValid())) {
+            this.instructions = getOrCreateDisplay(this, backingEntity.getLocation(), (float) properties.getInstructionsViewDistance(), CoreNamespaceKeys.CANNON_LEGEND);
+        }
+        return this.instructions;
+    }
+
+    public void updateTag() {
+        if (this.backingEntity.isDead() || !this.backingEntity.isValid()) {
+            final Entity entity = Bukkit.getEntity(backingEntity.getUniqueId());
+            if (entity == null) {
+                return;
+            }
+
+            this.backingEntity = (IronGolem) entity;
+            ModeledEntity modelledEnt = ModelEngineAPI.getModeledEntity(backingEntity);
+            if(modelledEnt == null){
+                log.warn("Could not find modelled entity for cannon").submit();
+                return;
+            }
+
+            final Optional<ActiveModel> modelOpt = modelledEnt.getModel("cannon");
+            if (modelOpt.isEmpty()) {
+                return;
+            }
+            this.activeModel = modelOpt.orElseThrow();
+            return;
+        }
+
+        if (properties.isShowHealthBar()) {
+            final TextDisplay health = Objects.requireNonNull(getHealthBar());
+            health.teleport(getLocation().add(0, activeModel.getHitboxScale().y() + 0.5, 0));
+            health.text(healthBar());
+        }
+
+        // Only show instructions if enabled OR if there's a custom override
+        if (properties.isEnabled() || properties.getCustomInstructionsOverride() != null) {
+            final TextDisplay instructions = Objects.requireNonNull(getInstructions());
+
+            instructions.teleport(getLocation().add(0, activeModel.getHitboxScale().y() + 2.5, 0));
+            instructions.text(instructions());
+        }
+    }
+
+    private TextComponent healthBar() {
+        final double health = getHealth();
+        final double maxHealth = Objects.requireNonNull(backingEntity.getAttribute(Attribute.MAX_HEALTH)).getValue();
+        final ProgressBar progressBar = new ProgressBar((float) (health / maxHealth), 15);
+        return progressBar.build();
+    }
+
+    public TextComponent instructions() {
+        // Check for custom override first
+        if (properties.getCustomInstructionsOverride() != null) {
+            return (TextComponent) properties.getCustomInstructionsOverride();
+        }
+
+        final TextComponent.Builder component = Component.text();
+
+        if (properties.isAllowRotation()) {
+            component.append(Component.text("Hold ", NamedTextColor.AQUA)
+                    .append(Component.text("Right Click", NamedTextColor.WHITE, TextDecoration.BOLD))
+                    .append(Component.text(" to ", NamedTextColor.AQUA))
+                    .append(Component.text("Aim", NamedTextColor.WHITE, TextDecoration.BOLD)))
+                    .appendNewline();
+        }
+
+        final long fuseTime = (long) (cannonManager.getFuseSeconds() * 1000L);
+        if (isLoaded() && UtilTime.elapsed(lastFuseTime, fuseTime)) {
+            component.append(Component.text("Shift-Right-Click", NamedTextColor.WHITE, TextDecoration.BOLD))
+                    .append(Component.text(" to ", NamedTextColor.AQUA))
+                    .append(Component.text("Fire", NamedTextColor.DARK_RED, TextDecoration.BOLD));
+        } else if (!isLoaded()) {
+            component.append(Component.text("Right-Click", NamedTextColor.WHITE, TextDecoration.BOLD))
+                    .append(Component.text(" to ", NamedTextColor.AQUA))
+                    .append(Component.text("Load", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        }
+
+        final long useCooldown = (long) (cannonManager.getShootCooldownSeconds() * 1000L);
+        if (properties.isAllowFuse() && lastShotTime < lastFuseTime) {
+            // If the cannon is fusing, display the fuse time
+            final double secondsLeft = (lastFuseTime + fuseTime - System.currentTimeMillis()) / 1000d;
+            final ProgressBar fuseBar = new ProgressBar((float) (secondsLeft / (fuseTime / 1000d)), 25)
+                    .inverted()
+                    .withCharacter(' ');
+            component.appendNewline()
+                    .appendNewline()
+                    .append(fuseBar.build().decoration(TextDecoration.STRIKETHROUGH, true));
+        } else if (!UtilTime.elapsed(lastShotTime, useCooldown)) {
+            // If the cannon is on cooldown, display the cooldown
+            final double secondsLeft = (lastShotTime + useCooldown - System.currentTimeMillis()) / 1000d;
+            final TextColor color = ProgressColor.of((float) (secondsLeft / (useCooldown / 1000d))).inverted().getTextColor();
+            final String timeText = UtilFormat.formatNumber(secondsLeft, 1);
+            component.appendNewline()
+                    .appendNewline()
+                    .append(Component.text(timeText + "s", color, TextDecoration.BOLD));
+        } else if (isLoaded()) {
+            component.appendNewline()
+                    .appendNewline()
+                    .append(Component.text("LOADED", NamedTextColor.GOLD, TextDecoration.BOLD));
+        } else if (!UtilTime.elapsed(lastShotTime, useCooldown + COOLDOWN_LERP_OUT)) {
+            component.appendNewline()
+                    .appendNewline()
+                    .append(Component.text("READY", NamedTextColor.GREEN, TextDecoration.BOLD));
+        } else {
+            component.appendNewline()
+                    .appendNewline()
+                    .appendNewline();
+        }
+
+        return component.build();
+    }
+}

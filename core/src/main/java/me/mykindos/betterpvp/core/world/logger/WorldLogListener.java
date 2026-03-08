@@ -75,7 +75,7 @@ public class WorldLogListener implements Listener {
 
         // Lookups
         WorldLogSession session = worldLogHandler.getSession(player.getUniqueId());
-        session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(event.getBlock()));
+        session.setBlock(event.getBlock());
 
         worldLogHandler.displayResults(player, session, 1);
     }
@@ -94,7 +94,7 @@ public class WorldLogListener implements Listener {
 
         // Lookups
         WorldLogSession session = worldLogHandler.getSession(player.getUniqueId());
-        session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(block));
+        session.setBlock(block);
 
         worldLogHandler.displayResults(player, session, 1);
     }

@@ -5,7 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
+import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -16,13 +19,12 @@ import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -77,9 +79,9 @@ public class AssassinListener implements Listener, ConfigAccessor {
      * Surgical Precision Passive & Speedlock Passive
      */
     @EventHandler
-    public void onAssassinKnockback(CustomDamageEvent event) {
+    public void onAssassinKnockback(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
 
         if (event.getDamager() instanceof Player damager) {
             if (meleeDealsNoKnockbackIsEnabled) {
@@ -100,11 +102,11 @@ public class AssassinListener implements Listener, ConfigAccessor {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onAssassinArrowDamage(CustomDamageEvent event) {
+    public void onAssassinArrowDamage(DamageEvent event) {
         if (!(event.getProjectile() instanceof AbstractArrow)) return;
         if (event.getProjectile().getShooter() instanceof Player player) {
             if (roleManager.hasRole(player, Role.ASSASSIN)) {
-                event.setDamage(0);
+                event.addModifier(new GenericModifier("Assassin Arrows", DamageOperator.MULTIPLIER, 0));
             }
         }
     }
@@ -118,12 +120,12 @@ public class AssassinListener implements Listener, ConfigAccessor {
             return;
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Role role = roleManager.getObject(player.getUniqueId()).orElse(null);
+        for (LivingEntity livingEntity : roleManager.getLivingEntities()) {
+            Role role = roleManager.getRole(livingEntity).orElse(null);
             if (role == Role.ASSASSIN) {
-                effectManager.addEffect(player, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true, false, null);
+                effectManager.addEffect(livingEntity, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true, false, null);
             } else {
-                effectManager.removeEffect(player, EffectTypes.SPEED, "Assassin", false);
+                effectManager.removeEffect(livingEntity, EffectTypes.SPEED, "Assassin", false);
             }
         }
     }

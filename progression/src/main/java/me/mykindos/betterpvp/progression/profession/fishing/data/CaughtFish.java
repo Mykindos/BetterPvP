@@ -7,7 +7,7 @@ import java.util.UUID;
 @Data
 public class CaughtFish {
 
-    private final UUID gamer;
+    private final UUID client;
     private final String type;
     private final int weight;
 

@@ -1,6 +1,7 @@
 plugins {
     id("org.flywaydb.flyway")
     id("io.papermc.paperweight.userdev")
+    id("jooqdynamic")
 }
 
 version = "1.0.0"
@@ -12,12 +13,11 @@ dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
     compileOnly(libs.mapper)
-    compileOnly(libs.mineplex)
 
     compileOnly(libs.libsdisguises)
     compileOnly(project(":core"))
     compileOnly(project(":champions"))
-    compileOnly(libs.protocollib)
+    compileOnly(libs.packetevents)
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)

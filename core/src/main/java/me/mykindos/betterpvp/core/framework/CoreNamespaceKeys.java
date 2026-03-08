@@ -14,6 +14,9 @@ public class CoreNamespaceKeys {
     public static final NamespacedKey BLOCK_TAG_KEY = new NamespacedKey("core", "block-key");
     public static final NamespacedKey PLAYER_PLACED_KEY = new NamespacedKey("core", "player-placed");
 
+    public static final NamespacedKey PLAYER_SPAWNED = new NamespacedKey("core", "player_spawned");
+    public static final NamespacedKey OWNER = new NamespacedKey("core", "owner");
+
     public static final NamespacedKey UNDROPPABLE_KEY = new NamespacedKey("core", "undroppable");
 
     public static final NamespacedKey CUSTOM_ITEM_KEY = new NamespacedKey("core", "custom-item");
@@ -23,5 +26,12 @@ public class CoreNamespaceKeys {
     public static final NamespacedKey SHOP_NOT_SELLABLE = new NamespacedKey("core", "shop_not_sellable");
     public static final NamespacedKey HATS_IS_HAT = new NamespacedKey("hats", "hat_name");
     public static final NamespacedKey NO_DAMAGE = new NamespacedKey("core", "no-damage");
+
+    public static final NamespacedKey BASEITEM_HASHCODE_KEY = new NamespacedKey("core", "version");
+
+    public static final NamespacedKey CANNON_LOADED = new NamespacedKey("clans", "cannon_loaded");
+    public static final NamespacedKey CANNON_HEALTHBAR = new NamespacedKey("clans", "cannon_healthbar");
+    public static final NamespacedKey CANNON_LEGEND = new NamespacedKey("clans", "cannon_legend");
+    public static final NamespacedKey CANNON_PROPERTIES = new NamespacedKey("core", "cannon_properties");
 
 }

@@ -47,7 +47,7 @@ public class AdminOfflineMessagesCommand extends Command {
                 return;
             }
             Client target = targetOptional.get();
-            offlineMessagesHandler.showMenuForMessagesForClientAfterTime(player, target.getName(), target.getUniqueId(), UtilTime.parseTimeString(Arrays.copyOfRange(args, 1, 3)));
+            offlineMessagesHandler.showMenuForMessagesForClientAfterTime(player, target, UtilTime.parseTimeString(Arrays.copyOfRange(args, 1, 3)));
         });
 
     }

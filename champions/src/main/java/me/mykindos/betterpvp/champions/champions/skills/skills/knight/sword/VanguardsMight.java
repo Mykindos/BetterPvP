@@ -14,25 +14,21 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
-import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -74,7 +70,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      * While the player is channeling (i.e. blocking with a sword), they will see a number percentage in the action bar.
      * This is intended to look similar to what Zarya from ow sees.
      */
-    private final DisplayComponent channelPhaseActionBar = new PermanentComponent(
+    private final PermanentComponent channelPhaseActionBar = new PermanentComponent(
             gamer -> {
                 final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.CHANNELING);
                 if (abilityData == null) return null;
@@ -90,7 +86,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      * While the player is in the transference phase, they will see a long and fast charging progress bar.
      * Purely cosmetic, this is intended to look like the player is transferring their charge into a strength effect.
      */
-    private final DisplayComponent transferencePhaseActionBar = new PermanentComponent(
+    private final PermanentComponent transferencePhaseActionBar = new PermanentComponent(
             gamer -> {
                 final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.TRANSFERENCE);
                 if (abilityData == null) return null;
@@ -103,7 +99,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     /**
      * Simply displays the time left for the strength effect in seconds.
      */
-    private final DisplayComponent strengthEffectActionBar = new PermanentComponent(
+    private final PermanentComponent strengthEffectActionBar = new PermanentComponent(
             gamer -> {
                 final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.STRENGTH_EFFECT);
                 if (abilityData == null) return null;
@@ -227,7 +223,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     }
 
     @Override
-    public void doWhenAbilityCancelled(Player player) {
+    public void onCancel(Player player) {
         final @Nullable VanguardsMightData abilityData = data.get(player);
         if (abilityData == null) return;  // unreachable
 
@@ -336,7 +332,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      * thus, "absorbing" the damage.
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamageTaken(CustomDamageEvent event) {
+    public void onDamageTaken(DamageEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player player)) return;
 
@@ -358,7 +354,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         abilityData.setCharge(newCharge);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.8F, 2.0F);
 
-        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, 100, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+        // executes last
+        event.addModifier(new SkillDamageModifier.Multiplier(this, 0.0, -Integer.MAX_VALUE));
         event.setKnockback(false);
     }
 

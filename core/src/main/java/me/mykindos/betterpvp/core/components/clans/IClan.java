@@ -21,7 +21,7 @@ public interface IClan {
      *
      * @return the UUID representing the clan's unique identifier
      */
-    UUID getId();
+    long getId();
     /**
      * Retrieves the name of the clan.
      *

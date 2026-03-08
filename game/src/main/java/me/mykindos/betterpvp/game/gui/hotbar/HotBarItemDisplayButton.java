@@ -1,8 +1,12 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
+import com.google.common.base.Preconditions;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemInstanceView;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -28,11 +32,15 @@ public class HotBarItemDisplayButton extends ControlItem<HotBarEditor> {
 
     @Override
     public ItemProvider getItemProvider(HotBarEditor gui) {
-        final BPvPItem item = getGui().getItemHandler().getItem(hotBarItem.getNamespacedKey());
-        final ItemView.ItemViewBuilder builder = ItemView.of(item.getItemStack()).toBuilder();
+        final BaseItem item = getGui().getItemFactory().getItemRegistry().getItem(hotBarItem.getNamespacedKey());
+        Preconditions.checkNotNull(item, "Item for HotBarItemDisplayButton cannot be null");
+        final ItemInstance instance = getGui().getItemFactory().create(item);
+        final ItemInstanceView view = instance.getView();
+        final ItemView.ItemViewBuilder builder = ItemView.of(view.get()).toBuilder();
 
         // Display name
-        builder.displayName(item.getName()
+        //noinspection UnstableApiUsage
+        builder.displayName(item.getItemNameRenderer().createName(instance)
                 .appendSpace()
                 .append(Component.text("●", NamedTextColor.GRAY))
                 .appendSpace()

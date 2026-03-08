@@ -8,14 +8,15 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -29,7 +30,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -37,7 +39,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.RayTraceResult;
 
 import java.util.Iterator;
@@ -47,16 +48,12 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
-
-    private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
+public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
     private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this,
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
             charging,
             gamer -> true);
 
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double baseSlowDuration;
@@ -101,10 +98,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    private double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1)); // Increment of 10% per level
-    }
-
     @Override
     public Role getClassType() {
         return Role.RANGER;
@@ -140,13 +133,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         gamer.getActionBar().remove(actionBarComponent);
     }
 
-    @Override
-    public void activate(Player player, int level) {
-        final ChargeData chargeData = new ChargeData((float) getChargePerSecond(level) / 100);
-        charging.put(player, chargeData);
-    }
-
-    private void pounce(Player player, ChargeData chargeData, int level) {
+    public boolean use(Player player, ChargeData chargeData, int level) {
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
 
         // Velocity
@@ -168,6 +155,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 true,
                 isCancellable(),
                 this::shouldDisplayActionBar);
+        return true;
     }
 
     private void collide(Player damager, LivingEntity damagee, Pounce pounce) {
@@ -175,7 +163,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         double damage = getDamage(level) * pounce.getData().getCharge();
 
         // Effects & Damage
-        UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
+        UtilDamage.doDamage(new DamageEvent(damagee, damager, null, new SkillDamageCause(this), damage, getName()));
         championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
         // Cues
@@ -185,7 +173,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @EventHandler
-    public void onDamageReceived(CustomDamageEvent event) {
+    public void onDamageReceived(DamageEvent event) {
         if (event.isCancelled() || !(event.getDamagee() instanceof Player player)) {
             return;
         }
@@ -251,50 +239,24 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         }
     }
 
-    @UpdateEvent
-    public void updateCharge() {
-        // Charge check
-        Iterator<Player> iterator = charging.keySet().iterator();
-        while (iterator.hasNext()) {
-            Player player = iterator.next();
-            ChargeData charge = charging.get(player);
-            if (player == null || !player.isOnline()) {
-                iterator.remove();
-                continue;
-            }
 
-            // Remove if they no longer have the skill
-            int level = getLevel(player);
-            if (level <= 0) {
-                iterator.remove();
-                continue;
-            }
-
-            // Check if they still are blocking and charge
-            if (isHolding(player) && player.isHandRaised()) {
-                // Check if the player is grounded or the block directly beneath them is solid
-                if (!UtilBlock.isGrounded(player, 2)){
-                    if (charge.canSendMessage()) {
-                        UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
-                        charge.messageSent();
-                    }
-                    continue;
+    public TickBehavior getTickBehavior(Player player, ChargeData data, int level) {
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        if (!(isHolding(player) && gamer.isHoldingRightClick())) {
+            if (!UtilBlock.isGrounded(player, 2)){
+                if (data.canSendMessage()) {
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
+                    data.messageSent();
                 }
-
-                charge.tick();
-                charge.tickSound(player);
-                continue;
+                return TickBehavior.PAUSE;
             }
-
-            iterator.remove();
-            pounce(player, charge, level);
+            return TickBehavior.USE;
         }
+        return TickBehavior.TICK;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 3.0, Double.class);

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -80,7 +81,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        if(event.getEntity().hasMetadata("PlayerSpawned")) return;
+        if(UtilEntity.isPlayerSpawned(event.getEntity())) return;
         souls.add(new SoulData(event.getEntity().getUniqueId(), event.getEntity().getLocation(), System.currentTimeMillis() + 120_000));
     }
 
@@ -108,7 +109,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
             }
         }
 
-        souls.removeIf(soul -> soul.getExpiry() - System.currentTimeMillis() <= 0);
+        souls.removeIf(soul -> soul.getExpiry() - System.currentTimeMillis() <= 0 || !soul.getLocation().isWorldLoaded());
         souls.forEach(soul -> {
             List<Player> newActives = new ArrayList<>(active);
             newActives.removeIf(p -> p.getUniqueId().equals(soul.getUuid()));

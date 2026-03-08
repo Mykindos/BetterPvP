@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 @CustomLog
 @Singleton
-public class RuleManager extends Manager<Rule> {
+public class RuleManager extends Manager<String, Rule> {
     public void load(Core core) {
         ExtendedYamlConfiguration config = core.getConfig("rules");
 

@@ -44,7 +44,7 @@ public class UnloadPackCommand extends Command {
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) return;
 
-        ResourcePack pack = resourcePackHandler.getResourcePack(args[1]);
+        ResourcePack pack = resourcePackHandler.getResourcePack(args[1]).join();
         if (pack == null) {
             UtilMessage.simpleMessage(player, "Resource pack not found");
             return;

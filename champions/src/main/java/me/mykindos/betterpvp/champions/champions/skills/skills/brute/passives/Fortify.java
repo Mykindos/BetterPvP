@@ -7,10 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -75,14 +73,14 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
                 doParticles(damagee);
                 double modifier = getPercent(level);
-                // Add a percentage-based damage reduction modifier
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+                final double multiplier = 1.0 - (modifier / 100);
+                event.addModifier(new SkillDamageModifier.Multiplier(this, multiplier));
             }
         }
 
@@ -91,8 +89,8 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             int level = getLevel(damager);
             if (level > 0) {
                 double modifier = getPercent(level);
-                // Add a percentage-based damage reduction modifier
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+                final double multiplier = 1.0 - (modifier / 100);
+                event.addModifier(new SkillDamageModifier.Multiplier(this, multiplier));
             }
 
         }

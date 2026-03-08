@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 
 @Singleton
-public class LightManager extends Manager<BPvPLight> {
+public class LightManager extends Manager<String, BPvPLight> {
     private final int waterDecrease = 1;
 
     public void addObject(BPvPLight light) {
-        addObject(light.getId(), light);
+        addObject(light.getId().toString(), light);
     }
 
     public List<BPvPLight> getLightsOfPlayer(UUID playerID) {

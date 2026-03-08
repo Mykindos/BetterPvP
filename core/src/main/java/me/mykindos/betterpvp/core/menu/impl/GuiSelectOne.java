@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -22,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed.Textured {
+public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed {
 
     public GuiSelectOne(List<Item> pool) {
         super(9, 1, false, new Structure("<.......>")
@@ -51,11 +53,13 @@ public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed.Te
     }
 
     @Override
-    public char getMappedTexture() {
-        return Resources.MenuFontCharacter.SELECT_ONE;
+    public @NotNull Component getTitle() {
+        return Component.translatable("space.-8", NamedTextColor.WHITE).font(Resources.Font.SPACE)
+                .append(Component.text("<glyph:menu_select_one>").font(Resources.Font.NEXO))
+                .append(Component.translatable("space.8", NamedTextColor.WHITE).font(Resources.Font.SPACE));
     }
 
-    private static class ScrollLeftItem extends ScrollItem {
+    public static class ScrollLeftItem extends ScrollItem {
         public ScrollLeftItem() {
             super(-1);
         }
@@ -79,7 +83,7 @@ public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed.Te
         }
     }
 
-    private static class ScrollRightItem extends ScrollItem {
+    public static class ScrollRightItem extends ScrollItem {
         public ScrollRightItem() {
             super(1);
         }

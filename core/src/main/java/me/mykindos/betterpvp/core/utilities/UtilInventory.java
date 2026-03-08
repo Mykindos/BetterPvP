@@ -3,7 +3,11 @@ package me.mykindos.betterpvp.core.utilities;
 import com.mojang.authlib.GameProfile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
@@ -13,6 +17,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -20,11 +25,14 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 import java.util.UUID;
@@ -96,6 +104,31 @@ public class UtilInventory {
         return count >= required || player.getGameMode() == GameMode.CREATIVE;
     }
 
+    public static void remove(Player player, BaseItem baseItem, int amount) {
+        if (player.getGameMode() == GameMode.CREATIVE) return;
+
+        ItemFactory itemFactory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
+        int amountToRemove = amount;
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType().isAir()) continue;
+
+            final ItemInstance content = itemFactory.fromItemStack(item).orElseThrow();
+            if (content.getBaseItem().equals(baseItem)) {
+                if (item.getAmount() > amountToRemove) {
+                    item.setAmount(item.getAmount() - amountToRemove);
+                    return;
+                } else {
+                    amountToRemove -= item.getAmount();
+                    item.setAmount(0);
+                }
+            }
+
+            if (amountToRemove <= 0) {
+                return;
+            }
+        }
+    }
+
     public static void remove(Player player, String namespacedKey, int amount) {
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
@@ -124,6 +157,15 @@ public class UtilInventory {
 
             if (amountToRemove <= 0) return;
         }
+    }
+
+    public static void consumeHand(LivingEntity entity) {
+        final EntityEquipment equipment = entity.getEquipment();
+        if (equipment == null) return;
+        final ItemStack item = equipment.getItemInMainHand();
+        if (item.getType() == Material.AIR) return;
+        item.subtract();
+        equipment.setItemInMainHand(item);
     }
 
     public static boolean remove(Player player, ItemStack itemStack) {
@@ -272,8 +314,11 @@ public class UtilInventory {
         ClientInformation clientOptions= ClientInformation.createDefault();
         ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, gameProfile, clientOptions);
 
-        ValueInput loadedData = server.getPlayerList().playerIo.load(serverPlayer, ProblemReporter.DISCARDING).orElse(null);
-        if(loadedData == null) return null;
+        CompoundTag compound = server.getPlayerList().playerIo.load(serverPlayer.nameAndId()).orElse(null);
+        if(compound == null) return null;
+
+        // Wrap CompoundTag with TagValueInput to use codec-based loading
+        ValueInput loadedData = TagValueInput.createGlobal(ProblemReporter.DISCARDING, compound);
 
         //create Minecraft Inventory
         Inventory inventory = serverPlayer.getInventory();

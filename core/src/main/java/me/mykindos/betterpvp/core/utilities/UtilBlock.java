@@ -1,19 +1,14 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Predicate;
+import com.jeff_media.morepersistentdatatypes.DataType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SoundCategory;
@@ -31,10 +26,21 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * Utility class providing various methods for working with blocks, entities, and materials
@@ -155,6 +161,17 @@ public class UtilBlock {
                 || block.getType() == Material.TALL_SEAGRASS
                 || block.getType() == Material.KELP
                 || block.getType() == Material.KELP_PLANT;
+    }
+
+    /**
+     * Checks if the specified block is interactable.
+     * @param block the block to check, must not be null
+     * @return {@code true} if the block is interactable, otherwise {@code false}
+     */
+    public static boolean isInteractable(Block block) {
+        BlockData data = block.getBlockData();
+        return data instanceof Openable || data instanceof Powerable || data instanceof AnaloguePowerable
+                || data instanceof Lightable;
     }
 
     /**
@@ -749,19 +766,31 @@ public class UtilBlock {
     }
 
     /**
-     * Computes a unique key for the given block based on its coordinates.
+     * Computes a unique key for the given block based on its coordinates inside a chunk.
      * The key represents a combination of the block's X, Y, and Z coordinates.
      *
      * @param block the block for which the unique key is to be computed, must not be null
      * @return an integer representing the unique key for the specified block
      */
-    public static int getBlockKey(Block block) {
-        final int x = block.getX() % 16;
-        final int y = block.getY();
-        final int z = block.getZ() % 16;
+    public static long getBlockKey(Block block) {
+        final long x = block.getX() % 16;
+        final long y = block.getY();
+        final long z = block.getZ() % 16;
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
     }
 
+    /**
+     * Retrieves a block from the world using a unique key.
+     * @param key the unique key representing the block's coordinates, must not be negative
+     * @param chunk the chunk in which the block is located, must not be null
+     * @return the block corresponding to the given key, or null if the key is invalid
+     */
+    public static Block getBlockByKey(long key, Chunk chunk) {
+        final long y = key & 0xFFFF;
+        final long x = (key >> 16) & 0xFF;
+        final long z = (key >> 24) & 0xFF;
+        return chunk.getBlock((int) x, (int) y, (int) z);
+    }
 
     /**
      * Breaks a block naturally as if a player mined it, dropping its appropriate items and playing
@@ -789,6 +818,62 @@ public class UtilBlock {
 
     public static boolean isPressurePlate(Block block) {
         return block.getType().name().endsWith("_PLATE");
+    }
+
+    /**
+     * Get the persistent data container for a block
+     *
+     * @param block The block to get the container for
+     * @return The persistent data container for the block
+     */
+    public static PersistentDataContainer getPersistentDataContainer(Block block) {
+        final Chunk chunk = block.getChunk();
+        final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
+
+        // We have no data for this chunk, just make a new one
+        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER))) {
+            return chunkPdc.getAdapterContext().newPersistentDataContainer();
+        }
+
+        final HashMap<Long, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER));
+        if (blockPdcs == null) {
+            throw new RuntimeException("Block PDCs are null");
+        }
+
+        final long blockKey = getBlockKey(block);
+        PersistentDataContainer blockPdc = blockPdcs.get(blockKey);
+        if(blockPdc != null) {
+            return blockPdc;
+        }
+
+        // If none was found for this block, just make a new one
+        return chunkPdc.getAdapterContext().newPersistentDataContainer();
+    }
+
+    /**
+     * Set the persistent data container for a block
+     *
+     * @param block     The block to set the container for
+     * @param container The container to set
+     */
+    public static void setPersistentDataContainer(Block block, PersistentDataContainer container) {
+        final Chunk chunk = block.getChunk();
+        final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
+        // We have no data for this chunk, just make a new one
+        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER))) {
+            HashMap<Long, PersistentDataContainer> blockPdcs = new HashMap<>();
+            blockPdcs.put(getBlockKey(block), container);
+            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER), blockPdcs);
+            return;
+        }
+
+        HashMap<Long, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER));
+        if (blockPdcs == null) {
+            throw new RuntimeException("Block PDCs are null");
+        }
+
+        blockPdcs.put(getBlockKey(block), container);
+        chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER), blockPdcs);
     }
 
 }

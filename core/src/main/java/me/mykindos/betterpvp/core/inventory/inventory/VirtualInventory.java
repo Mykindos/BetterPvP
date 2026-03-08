@@ -25,7 +25,6 @@ import java.util.logging.Level;
 
 /**
  * A serializable {@link Inventory} implementation that is identified by a {@link UUID} and backed by a simple {@link ItemStack} array.
- *
  */
 public class VirtualInventory extends Inventory {
     
@@ -52,7 +51,7 @@ public class VirtualInventory extends Inventory {
         
         if (maxStackSizes == null) {
             this.maxStackSizes = new int[size];
-            Arrays.fill(this.maxStackSizes, 64);
+            Arrays.fill(this.maxStackSizes, 99);
         } else {
             this.maxStackSizes = maxStackSizes;
         }
@@ -72,6 +71,38 @@ public class VirtualInventory extends Inventory {
     /**
      * Constructs a new {@link VirtualInventory}
      *
+     * @param size          The amount of slots this {@link VirtualInventory} has.
+     * @param items         A predefined array of content. Can be null. Will not get copied!
+     * @param maxStackSizes An array of maximum allowed stack sizes for each slot in the {@link VirtualInventory}. Can be null for 64.
+     */
+    public VirtualInventory(int size, @Nullable ItemStack @Nullable [] items, int @Nullable [] maxStackSizes) {
+        this(null, size, items, maxStackSizes);
+    }
+
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
+     * @param uuid          The {@link UUID} of this {@link VirtualInventory}. Can be null, only used for serialization.
+     * @param items         A predefined array of content. Will not get copied!
+     * @param maxStackSizes An array of maximum allowed stack sizes for each slot in the {@link VirtualInventory}. Can be null for 64.
+     */
+    public VirtualInventory(@Nullable UUID uuid, @Nullable ItemStack @NotNull [] items, int @Nullable [] maxStackSizes) {
+        this(uuid, items.length, items, maxStackSizes);
+    }
+
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
+     * @param items         A predefined array of content. Will not get copied!
+     * @param maxStackSizes An array of maximum allowed stack sizes for each slot in the {@link VirtualInventory}. Can be null for 64.
+     */
+    public VirtualInventory(@Nullable ItemStack @NotNull [] items, int @Nullable [] maxStackSizes) {
+        this(null, items.length, items, maxStackSizes);
+    }
+
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
      * @param uuid  The {@link UUID} of this {@link VirtualInventory}. Can be null, only used for serialization.
      * @param items A predefined array of content. Will not get copied!
      */
@@ -79,7 +110,66 @@ public class VirtualInventory extends Inventory {
         this(uuid, items.length, items, null);
     }
 
-    
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
+     * @param items A predefined array of content. Will not get copied!
+     */
+    public VirtualInventory(@Nullable ItemStack @NotNull [] items) {
+        this(null, items.length, items, null);
+    }
+
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
+     * @param uuid          The {@link UUID} of this {@link VirtualInventory}. Can be null, only used for serialization.
+     * @param maxStackSizes An array of maximum allowed stack sizes for each slot in the {@link VirtualInventory}.
+     */
+    public VirtualInventory(@Nullable UUID uuid, int @NotNull [] maxStackSizes) {
+        this(uuid, maxStackSizes.length, null, maxStackSizes);
+    }
+
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
+     * @param maxStackSizes An array of maximum allowed stack sizes for each slot in the {@link VirtualInventory}.
+     */
+    public VirtualInventory(int @NotNull [] maxStackSizes) {
+        this(null, maxStackSizes.length, null, maxStackSizes);
+    }
+
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
+     * @param uuid The {@link UUID} of this {@link VirtualInventory}. Can be null, only used for serialization.
+     * @param size The amount of slots this {@link VirtualInventory} has.
+     */
+    public VirtualInventory(@Nullable UUID uuid, int size) {
+        this(uuid, size, null, null);
+    }
+
+    /**
+     * Constructs a new {@link VirtualInventory}
+     *
+     * @param size The amount of slots this {@link VirtualInventory} has.
+     */
+    public VirtualInventory(int size) {
+        this(null, size, null, null);
+    }
+
+    /**
+     * Creates a copy of the given {@link VirtualInventory}.
+     *
+     * @param inventory The {@link VirtualInventory} to copy.
+     */
+    public VirtualInventory(VirtualInventory inventory) {
+        this(inventory.uuid, inventory.size, ItemUtils.clone(inventory.items), inventory.maxStackSizes.clone());
+        setGuiPriority(inventory.getGuiPriority());
+        setPreUpdateHandler(inventory.getPreUpdateHandler());
+        setPostUpdateHandler(inventory.getPostUpdateHandler());
+        setResizeHandlers(inventory.getResizeHandlers());
+    }
+
     /**
      * Deserializes a {@link VirtualInventory} from a byte array.
      *
@@ -148,16 +238,16 @@ public class VirtualInventory extends Inventory {
             dos.writeLong(uuid.getMostSignificantBits());
             dos.writeLong(uuid.getLeastSignificantBits());
             dos.writeByte((byte) 4); // id, pre v1.0: 3, v1.0: 4
-            
-            byte[][] itemBytes = Arrays.stream(this.items).map(itemStack -> {
-                    if (itemStack != null) {
-                        return InventoryAccess.getItemUtils().serializeItemStack(itemStack, true);
-                    } else return new byte[0];
-                }
+
+            byte[][] items = Arrays.stream(this.items).map(itemStack -> {
+                        if (itemStack != null) {
+                            return InventoryAccess.getItemUtils().serializeItemStack(itemStack, true);
+                        } else return new byte[0];
+                    }
             ).toArray(byte[][]::new);
-            
-            DataUtils.write2DByteArray(dos, itemBytes);
-            
+
+            DataUtils.write2DByteArray(dos, items);
+
             dos.flush();
         } catch (IOException e) {
             InvUI.getInstance().getLogger().log(Level.SEVERE, "Failed to serialize VirtualInventory", e);
@@ -236,7 +326,15 @@ public class VirtualInventory extends Inventory {
         }
     }
 
-    
+    /**
+     * Sets the array of max stack sizes for this {@link Inventory}.
+     *
+     * @param stackSizes The array defining the max stack sizes for this {@link Inventory}.
+     */
+    public void setMaxStackSizes(int @NotNull [] stackSizes) {
+        this.maxStackSizes = stackSizes;
+    }
+
     /**
      * Sets the maximum allowed stack size on a specific slot.
      *

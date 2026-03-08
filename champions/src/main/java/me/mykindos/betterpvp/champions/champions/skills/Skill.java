@@ -2,19 +2,18 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Optional;
-import java.util.function.IntToDoubleFunction;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
-import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
@@ -42,9 +41,14 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.IntToDoubleFunction;
+
+import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 @Singleton
 @CustomLog
@@ -61,6 +65,8 @@ public abstract class Skill implements IChampionsSkill {
     protected double energyDecreasePerLevel;
     protected double energyStartCost;
     protected double energyStartCostDecreasePerLevel;
+    protected double baseCharge;
+    protected double chargeIncreasePerLevel;
 
     private boolean canUseWhileSlowed;
 
@@ -113,7 +119,7 @@ public abstract class Skill implements IChampionsSkill {
         final String[] description = getDescription(level);
         final Component[] components = new Component[description.length];
         for (int i = 0; i < description.length; i++) {
-            components[i] = MiniMessage.miniMessage().deserialize("<gray>" + description[i], SkillMenu.TAG_RESOLVER)
+            components[i] = miniMessage.deserialize("<gray>" + description[i])
                     .decoration(TextDecoration.ITALIC, false);
         }
         return components;
@@ -122,6 +128,9 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public Component getTags() {
         Component component = Component.empty();
+        if (this instanceof ChargeSkill) {
+            component = component.append(Component.text("Charge", NamedTextColor.AQUA).appendSpace());
+        }
         if (this instanceof PrepareArrowSkill) {
             component = component.append(Component.text("Arrow", NamedTextColor.DARK_BLUE).appendSpace());
         }
@@ -235,21 +244,26 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public final void loadConfig() {
         enabled = getConfig("enabled", true, Boolean.class);
-        maxLevel = getConfig("maxlevel", 5, Integer.class);
+        maxLevel = getConfig("maxlevel", 5, Number.class).intValue();
 
         if (this instanceof CooldownSkill) {
-            cooldown = getConfig("cooldown", 1.0, Double.class);
-            cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+            cooldown = getConfig("cooldown", 1.0, Number.class).doubleValue();
+            cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Number.class).doubleValue();
         }
 
         if (this instanceof EnergySkill || this instanceof EnergyChannelSkill) {
-            energy = getConfig("energy", 0, Integer.class);
-            energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
+            energy = getConfig("energy", 0, Number.class).intValue();
+            energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Number.class).doubleValue();
         }
 
         if (this instanceof ActiveToggleSkill) {
-            energyStartCost = getConfig("energyStartCost", 10.0, Double.class);
-            energyStartCostDecreasePerLevel = getConfig("energyStartCostDecreasePerLevel", 0.0, Double.class);
+            energyStartCost = getConfig("energyStartCost", 10.0, Number.class).doubleValue();
+            energyStartCostDecreasePerLevel = getConfig("energyStartCostDecreasePerLevel", 0.0, Number.class).doubleValue();
+        }
+
+        if (this instanceof ChargeSkill) {
+            baseCharge = getConfig("baseCharge", 0.40, Number.class).doubleValue();
+            chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.10, Number.class).doubleValue();
         }
 
         canUseWhileSlowed = getConfigObject("canUseWhileSlowed", true, Boolean.class);
@@ -324,11 +338,20 @@ public abstract class Skill implements IChampionsSkill {
     public void invalidatePlayer(Player player, Gamer gamer) {
     }
 
+    /**
+     * Called when a skill is updated via {@link SkillUpdateEvent event}
+     * @param player
+     * @param gamer
+     */
+    public void updatePlayer(Player player, Gamer gamer) {
+
+    }
+
     public void loadSkillConfig() {
     }
 
     public boolean hasSkill(Player player) {
-        Optional<GamerBuilds> gamerBuildsOptional = championsManager.getBuilds().getObject(player.getUniqueId());
+        Optional<GamerBuilds> gamerBuildsOptional = championsManager.getBuilds().getObject(player.getUniqueId().toString());
         return gamerBuildsOptional.filter(this::hasSkill).isPresent();
     }
 
@@ -343,7 +366,7 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     protected Optional<BuildSkill> getSkill(Player player) {
-        Optional<GamerBuilds> gamerBuildOptional = championsManager.getBuilds().getObject(player.getUniqueId());
+        Optional<GamerBuilds> gamerBuildOptional = championsManager.getBuilds().getObject(player.getUniqueId().toString());
         if (gamerBuildOptional.isPresent()) {
             return getSkill(gamerBuildOptional.get());
         }
@@ -351,16 +374,14 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     protected Optional<BuildSkill> getSkill(GamerBuilds gamerBuilds) {
-        Optional<Role> roleOptional = championsManager.getRoles().getObject(gamerBuilds.getUuid());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
-            if (role == getClassType() || getClassType() == null) {
-                RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
-                BuildSkill buildSkill = roleBuild.getBuildSkill(getType());
-                if (buildSkill != null && buildSkill.getSkill() != null) {
-                    if (buildSkill.getSkill().equals(this)) {
-                        return Optional.of(buildSkill);
-                    }
+        final Player player = Objects.requireNonNull(gamerBuilds.getClient().getGamer().getPlayer());
+        Role role = championsManager.getRoles().getRole(player);
+        if (role == getClassType() || getClassType() == null) {
+            RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
+            BuildSkill buildSkill = roleBuild.getBuildSkill(getType());
+            if (buildSkill != null && buildSkill.getSkill() != null) {
+                if (buildSkill.getSkill().equals(this)) {
+                    return Optional.of(buildSkill);
                 }
             }
         }

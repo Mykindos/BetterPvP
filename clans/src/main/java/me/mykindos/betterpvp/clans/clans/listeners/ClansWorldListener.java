@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -26,10 +22,12 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -37,7 +35,6 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.core.world.events.PlayerUseStonecutterEvent;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -47,6 +44,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -92,6 +90,12 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
 @BPvPListener
@@ -100,10 +104,11 @@ public class ClansWorldListener extends ClanListener {
 
     private final Clans clans;
     private final EffectManager effectManager;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final CooldownManager cooldownManager;
     private final WorldBlockHandler worldBlockHandler;
-    private final ItemHandler itemHandler;
+    private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
 
     @Inject
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
@@ -116,14 +121,17 @@ public class ClansWorldListener extends ClanListener {
     private boolean allowBubbleColumns;
 
     @Inject
-    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyHandler energyHandler, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler, ItemHandler itemHandler) {
+    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans,
+                              final EffectManager effectManager, final EnergyService energyService, final CooldownManager cooldownManager,
+                              final WorldBlockHandler worldBlockHandler, ItemRegistry itemRegistry, ItemFactory itemFactory) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.cooldownManager = cooldownManager;
         this.worldBlockHandler = worldBlockHandler;
-        this.itemHandler = itemHandler;
+        this.itemRegistry = itemRegistry;
+        this.itemFactory = itemFactory;
     }
 
     @EventHandler
@@ -261,7 +269,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemFactory).show(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -417,29 +425,26 @@ public class ClansWorldListener extends ClanListener {
                     return;
                 }
 
-                if (UtilBlock.usable(block)) {
-
-                    if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                        if (material == Material.ENDER_CHEST) {
-                            return;
-                        }
-                    }
-
-                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.INTERACT);
-                    tie.callEvent();
-                    if (tie.getResult() != Event.Result.DENY) {
+                if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    if (material == Material.ENDER_CHEST) {
                         return;
                     }
+                }
 
-                    event.setCancelled(true);
-                    event.setUseInteractedBlock(Event.Result.DENY);
+                final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.INTERACT);
+                tie.callEvent();
+                if (tie.getResult() != Event.Result.DENY) {
+                    return;
+                }
 
-                    if (tie.isInform()) {
-                        UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
-                                UtilFormat.cleanString(material.toString()),
-                                relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
-                        );
-                    }
+                event.setCancelled(true);
+                event.setUseInteractedBlock(Event.Result.DENY);
+
+                if (UtilBlock.usable(block) && tie.isInform()) {
+                    UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
+                            UtilFormat.cleanString(material.toString()),
+                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                    );
                 }
             } else {
                 if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
@@ -647,37 +652,39 @@ public class ClansWorldListener extends ClanListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLapisPlace(final BlockPlaceEvent event) {
+        BaseItem waterBlock = itemRegistry.getItem(new NamespacedKey(clans, "water_block"));
+        final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(event.getItemInHand());
+        if (itemOpt.isEmpty() || !itemOpt.get().getBaseItem().equals(waterBlock)) {
+            return;
+        }
 
-        BPvPItem waterBlock = itemHandler.getItem("clans:water_block");
-        if (waterBlock.matches(event.getItemInHand())) {
-            final Client client = this.clientManager.search().online(event.getPlayer());
-            if (client.isAdministrating()) {
-                return;
-            }
+        final Client client = this.clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating()) {
+            return;
+        }
 
-            final Optional<Clan> locationClanOptional = this.clanManager.getClanByLocation(event.getBlock().getLocation());
-            final Optional<Clan> playerClanOptional = this.clanManager.getClanByPlayer(event.getPlayer());
+        final Optional<Clan> locationClanOptional = this.clanManager.getClanByLocation(event.getBlock().getLocation());
+        final Optional<Clan> playerClanOptional = this.clanManager.getClanByPlayer(event.getPlayer());
 
-            if (locationClanOptional.isEmpty() || playerClanOptional.isEmpty() || !locationClanOptional.equals(playerClanOptional)) {
-                if (event.getBlock().getLocation().getY() > 32) {
-                    UtilMessage.message(event.getPlayer(), "Clans", "You can only place water in your own territory.");
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (event.getBlock().getY() > 150) {
-                UtilMessage.message(event.getPlayer(), "Clans", "You can only place water below 150Y");
+        if (locationClanOptional.isEmpty() || playerClanOptional.isEmpty() || !locationClanOptional.equals(playerClanOptional)) {
+            if (event.getBlock().getLocation().getY() > 32) {
+                UtilMessage.message(event.getPlayer(), "Clans", "You can only place water in your own territory.");
                 event.setCancelled(true);
                 return;
             }
-            final Block block = event.getBlock();
-            block.setType(Material.WATER);
-            block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 1.0F, 1.0F);
-            block.getState().update();
-
-
         }
+
+        if (event.getBlock().getY() > 150) {
+            UtilMessage.message(event.getPlayer(), "Clans", "You can only place water below 150Y");
+            event.setCancelled(true);
+            return;
+        }
+        final Block block = event.getBlock();
+        block.setType(Material.WATER);
+        block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 1.0F, 1.0F);
+        block.getState().update();
+
+
     }
 
     /*
@@ -744,7 +751,7 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChunkClaim(final ChunkClaimEvent event) {
         event.getChunk().getPersistentDataContainer().set(ClansNamespacedKeys.CLAN,
-                CustomDataType.UUID,
+                PersistentDataType.LONG,
                 event.getClan().getId());
     }
 
@@ -778,7 +785,8 @@ public class ClansWorldListener extends ClanListener {
             }
 
             if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
-                if (player.getGameMode() == GameMode.SURVIVAL) {
+                final Client client = this.clientManager.search().online(player);
+                if (!client.isAdministrating() && player.getGameMode() == GameMode.SURVIVAL) {
                     player.setGameMode(GameMode.ADVENTURE);
                 }
                 continue;
@@ -828,7 +836,7 @@ public class ClansWorldListener extends ClanListener {
     public void onFishMechanics(final PlayerFishEvent event) {
 
         if (event.getCaught() instanceof final Player player) {
-            if (!this.energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
+            if (!this.energyService.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
                 event.setCancelled(true);
                 return;
             }
@@ -988,7 +996,7 @@ public class ClansWorldListener extends ClanListener {
 
         clan.getTerritory().forEach(clanTerritory -> {
             Chunk chunk = clanTerritory.getWorldChunk();
-            chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
+            chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, PersistentDataType.LONG, clan.getId());
         });
     }
 
@@ -1052,7 +1060,7 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void handleOreReplacements(BlockBreakEvent event) {
         if (event.isCancelled()) return;
 

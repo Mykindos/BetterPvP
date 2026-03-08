@@ -15,14 +15,14 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,7 +48,7 @@ public class MapListener implements Listener {
     private final Clans clans;
     private final CooldownManager cooldownManager;
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final ClanMapService clanMapService;
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -74,10 +74,10 @@ public class MapListener implements Listener {
 
     @EventHandler
     public void onSpawn(PlayerRespawnEvent event) {
-        Boolean keepInventory = event.getPlayer().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
+        Boolean keepInventory = event.getPlayer().getWorld().getGameRuleValue(GameRules.KEEP_INVENTORY);
         if (keepInventory == Boolean.FALSE) {
             ItemStack mapItem = clanMapService.createMapItem();
-            event.getPlayer().getInventory().setItem(8, itemHandler.updateNames(mapItem));
+            event.getPlayer().getInventory().setItem(8, itemFactory.convertItemStack(mapItem).orElse(mapItem));
         }
     }
 

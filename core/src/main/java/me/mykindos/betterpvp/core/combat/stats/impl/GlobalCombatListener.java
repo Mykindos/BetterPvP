@@ -29,12 +29,12 @@ public class GlobalCombatListener extends CombatStatsListener<GlobalCombatData> 
     }
 
     @Override
-    protected StatsRepository<GlobalCombatData> getAssignedRepository(Player player) {
+    protected StatsRepository<GlobalCombatData> getAssignedRepository() {
         return repository;
     }
 
     @Override
     protected CompletableFuture<GlobalCombatData> getCombatData(Player player) {
-        return getAssignedRepository(player).getDataAsync(player.getUniqueId());
+        return getAssignedRepository().getDataAsync(player.getUniqueId());
     }
 }

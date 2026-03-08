@@ -10,11 +10,10 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.Stampe
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -36,7 +35,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -111,7 +109,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     @UpdateEvent(delay = 200)
     public void updateSpeed() {
         for(Player player : Bukkit.getOnlinePlayers()) {
-            if(player.isSprinting() && !playerData.containsKey(player)) {
+            if(player.isSprinting() && !player.hasActiveItem() && !playerData.containsKey(player)) {
                 if(getLevel(player) > 0) {
                     startStampede(player);
                 }
@@ -131,7 +129,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                 continue;
             }
 
-            boolean isSprintingNow = player.isSprinting() && !player.isInWater();
+            boolean isSprintingNow = player.isSprinting() && !player.isInWater() && !player.hasActiveItem();
 
             if (data == null) {
                 data = new StampedeData(System.currentTimeMillis(), 0);
@@ -183,7 +181,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
         playerData.remove(damagee);
         removeSpeed(damagee);
@@ -191,9 +189,9 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     }
 
     @EventHandler
-    public void onHit(CustomDamageEvent event) {
+    public void onHit(DamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (damager.isSneaking()) return;
 
         StampedeData data = playerData.get(damager);
@@ -210,8 +208,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
         VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), knockbackMultiplier, true, 0.0D, 0.4D, 1.0D, false);
         UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
         double additionalDamage = getDamage(level) * str;
-        // Add a flat damage modifier based on speed stacks
-        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, additionalDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+        event.addModifier(new SkillDamageModifier.Flat(this, additionalDamage));
 
         playerData.remove(damager);
         removeSpeed(damager);

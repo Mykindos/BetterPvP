@@ -27,7 +27,7 @@ public class BlockTagManager {
 
     public static final Executor TAG_EXECUTOR = Executors.newSingleThreadExecutor();
 
-    public static final Cache<String, Map<Integer, Map<String, BlockTag>>> BLOCKTAG_CACHE = Caffeine.newBuilder()
+    public static final Cache<String, Map<Long, Map<String, BlockTag>>> BLOCKTAG_CACHE = Caffeine.newBuilder()
             .scheduler(Scheduler.systemScheduler())
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
@@ -39,10 +39,10 @@ public class BlockTagManager {
         this.blockTagRepository = blockTagRepository;
     }
 
-    public CompletableFuture<Map<Integer, Map<String, BlockTag>>> getBlockTags(Chunk chunk) {
+    public CompletableFuture<Map<Long, Map<String, BlockTag>>> getBlockTags(Chunk chunk) {
         return CompletableFuture.supplyAsync(() -> {
             String chunkIdentifier = UtilWorld.chunkToFile(chunk);
-            Map<Integer, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
+            Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
             if (blockTags != null) {
                 // Manually update the entry to refresh the expiry
                 BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
@@ -57,7 +57,7 @@ public class BlockTagManager {
 
     public CompletableFuture<Boolean> isPlayerManipulated(Block block) {
         return CompletableFuture.supplyAsync(() -> {
-            Map<Integer, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
+            Map<Long, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
             return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey("PlayerManipulated");
         }).exceptionally(e -> {
             log.error("Failed to check if block is player manipulated", e).submit();
@@ -75,10 +75,10 @@ public class BlockTagManager {
     public boolean isPlayerPlaced(Block block) {
 
             String chunk = UtilWorld.chunkToFile(block.getChunk());
-        Map<Integer, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
+        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
             if (blockTags == null) {
                 CompletableFuture.runAsync(() -> {
-                    Map<Integer, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
+                    Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
                     BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
                 });
 
@@ -98,10 +98,10 @@ public class BlockTagManager {
      */
     public UUID getPlayerPlaced(Block block) {
         String chunk = UtilWorld.chunkToFile(block.getChunk());
-        Map<Integer, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
+        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
         if (blockTags == null) {
             CompletableFuture.runAsync(() -> {
-                Map<Integer, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
+                Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
                 BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
             });
 
@@ -128,7 +128,7 @@ public class BlockTagManager {
         String chunkIdentifier = UtilWorld.chunkToFile(chunk);
         if (BLOCKTAG_CACHE.getIfPresent(chunkIdentifier) == null) {
             CompletableFuture.runAsync(() -> {
-                Map<Integer, Map<String, BlockTag>> blockTags = blockTagRepository.getBlockTagsForChunk(chunk);
+                Map<Long, Map<String, BlockTag>> blockTags = blockTagRepository.getBlockTagsForChunk(chunk);
                 BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
             });
         }
@@ -143,7 +143,7 @@ public class BlockTagManager {
      */
     public void addBlockTag(Block block, BlockTag blockTag) {
         CompletableFuture.runAsync(() -> {
-            Map<Integer, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
+            Map<Long, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
             blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).put(blockTag.getTag(), blockTag);
 
              blockTagRepository.addBlockTag(block, blockTag);
@@ -163,7 +163,7 @@ public class BlockTagManager {
      */
     public void removeBlockTag(Block block, String tag) {
         CompletableFuture.runAsync(() -> {
-            Map<Integer, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
+            Map<Long, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
             blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).remove(tag);
             blockTagRepository.removeBlockTag(block, tag);
         }, TAG_EXECUTOR).exceptionally(ex -> {

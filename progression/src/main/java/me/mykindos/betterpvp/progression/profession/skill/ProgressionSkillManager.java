@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Singleton
 @CustomLog
-public class ProgressionSkillManager extends Manager<ProgressionSkill> {
+public class ProgressionSkillManager extends Manager<String, ProgressionSkill> {
 
     private final Progression progression;
 

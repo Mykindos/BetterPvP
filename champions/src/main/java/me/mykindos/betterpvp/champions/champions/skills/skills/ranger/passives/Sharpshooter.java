@@ -8,10 +8,8 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.StackingHitData;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
@@ -119,7 +117,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @EventHandler (ignoreCancelled = true)
-    public void onProjectileDamage(CustomDamageEvent event) {
+    public void onProjectileDamage(DamageEvent event) {
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!isValidProjectile(projectile)) return;
@@ -128,8 +126,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
         if (level > 0 && data.containsKey(damager)) {
             StackingHitData hitData = data.get(damager);
             double bonusDamage = Math.min(hitData.getCharge(), getMaxConsecutiveHits(level) + 1) * getDamage(level) - getDamage(level);
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, bonusDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
-            event.addReason("Sharpshooter");
+            event.addModifier(new SkillDamageModifier.Flat(this, bonusDamage));
             if(bonusDamage > 0) {
                 UtilMessage.simpleMessage(damager, getClassType().getName(), "<yellow>%d<gray> consecutive hits (<green>+%.2f damage<gray>)", hitData.getCharge(), bonusDamage);
                 damager.playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, (0.8f + (float) (hitData.getCharge() * 0.2)));

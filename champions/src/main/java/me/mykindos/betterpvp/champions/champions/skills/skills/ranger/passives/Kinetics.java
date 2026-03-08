@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -21,7 +21,7 @@ import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -122,7 +122,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     }
 
     @EventHandler
-    public void onProjectileHit(CustomDamageEvent event) {
+    public void onProjectileHit(DamageEvent event) {
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!isValidProjectile(projectile)) return;
         if (!(event.getDamager() instanceof Player player)) return;

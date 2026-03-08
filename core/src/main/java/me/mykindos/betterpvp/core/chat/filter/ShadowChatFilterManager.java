@@ -3,23 +3,21 @@ package me.mykindos.betterpvp.core.chat.filter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import org.jooq.exception.DataAccessException;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static me.mykindos.betterpvp.core.database.jooq.Tables.FILTERED_WORDS;
+
 @CustomLog
 @Singleton
-public class ShadowChatFilterManager extends Manager<String> {
+public class ShadowChatFilterManager extends Manager<String, String> {
 
     private final Database database;
     private final Set<String> filteredWords = ConcurrentHashMap.newKeySet();
@@ -34,31 +32,29 @@ public class ShadowChatFilterManager extends Manager<String> {
      * Loads all filtered words from the database into memory
      */
     public void loadFilteredWords() {
-        log.info("Loading filtered words...");
+        log.info("Loading filtered words...").submit();
         filteredWords.clear();
 
-        Statement statement = new Statement("SELECT word FROM filtered_words");
-        database.executeQuery(statement, TargetDatabase.GLOBAL).thenAccept(result -> {
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             try {
-                while (result.next()) {
-                    String word = result.getString("word");
-                    filteredWords.add(word.toLowerCase());
-                }
-                log.info("Loaded {} filtered words", filteredWords.size());
-            } catch (SQLException e) {
-                log.error("Error loading filtered words", e);
+                ctx.select(FILTERED_WORDS.WORD).from(FILTERED_WORDS).fetch().forEach(filterRecord -> {
+                    filteredWords.add(filterRecord.get(FILTERED_WORDS.WORD).toLowerCase());
+                });
+            } catch (DataAccessException e) {
+                log.error("Error loading filtered words", e).submit();
             }
         });
+
     }
 
     /**
      * Adds a word to the filter list
      *
      * @param word    The word to add
-     * @param addedBy UUID of the staff member who added the word
+     * @param addedBy Client who added the word
      * @return CompletableFuture that completes when the word is added
      */
-    public CompletableFuture<Boolean> addFilteredWord(String word, UUID addedBy) {
+    public CompletableFuture<Boolean> addFilteredWord(String word, Client addedBy) {
         if (word == null || word.isEmpty()) {
             return CompletableFuture.completedFuture(false);
         }
@@ -70,18 +66,18 @@ public class ShadowChatFilterManager extends Manager<String> {
             return CompletableFuture.completedFuture(false);
         }
 
-        // Add to database
-        Statement statement = new Statement("INSERT INTO filtered_words (word, created_by) VALUES (?, ?)",
-                new StringStatementValue(lowercaseWord),
-                addedBy != null ? new UuidStatementValue(addedBy) : new StringStatementValue(null));
+        return database.getAsyncDslContext().executeAsync(ctx -> {
+            try {
+                ctx.insertInto(FILTERED_WORDS)
+                        .set(FILTERED_WORDS.WORD, lowercaseWord)
+                        .set(FILTERED_WORDS.CREATED_BY, addedBy.getId())
+                        .execute();
 
-        return database.executeUpdate(statement, TargetDatabase.GLOBAL).thenApply(v -> {
-            // Add to in-memory cache
-            filteredWords.add(lowercaseWord);
-            log.info("Added filtered word: {} by {}", lowercaseWord, addedBy);
-            return true;
-        }).exceptionally(ex -> {
-            log.error("Error adding filtered word: {}", lowercaseWord, ex);
+                return true;
+            } catch (DataAccessException ex) {
+                log.error("Failed to save filtered word: {}", word, ex).submit();
+            }
+
             return false;
         });
     }
@@ -105,18 +101,19 @@ public class ShadowChatFilterManager extends Manager<String> {
         }
 
         // Remove from database
-        Statement statement = new Statement("DELETE FROM filtered_words WHERE word = ?",
-                new StringStatementValue(lowercaseWord));
+        return database.getAsyncDslContext().executeAsync(ctx -> {
 
-        return database.executeUpdate(statement, TargetDatabase.GLOBAL).thenApply(v -> {
-            // Remove from in-memory cache
-            filteredWords.remove(lowercaseWord);
-            log.info("Removed filtered word: {}", lowercaseWord);
-            return true;
-        }).exceptionally(ex -> {
-            log.error("Error removing filtered word: {}", lowercaseWord, ex);
+            try {
+                int deleted = ctx.deleteFrom(FILTERED_WORDS).where(FILTERED_WORDS.WORD.eq(lowercaseWord)).execute();
+                log.info("Deleted {} filtered words matching: {}", deleted, lowercaseWord).submit();
+                return true;
+            } catch (DataAccessException ex) {
+                log.error("Failed to delete filtered words matching: {}", lowercaseWord, ex).submit();
+            }
+
             return false;
         });
+
     }
 
     /**

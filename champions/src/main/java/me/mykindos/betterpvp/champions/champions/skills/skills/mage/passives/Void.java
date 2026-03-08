@@ -8,10 +8,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -119,7 +121,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee) || !active.contains(damagee.getUniqueId())) {
             return;
         }
@@ -130,8 +132,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
         }
 
         double energyReduced = event.getDamage() * getEnergyReduction(level);
-        event.setDamage(event.getDamage() - getDamageReduction(level));
-        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced / 100);
+        event.addModifier(new SkillDamageModifier.Flat(this, -getDamageReduction(level)));
+        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced, EnergyEvent.Cause.USE);
 
         event.setKnockback(false);
     }

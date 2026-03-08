@@ -5,8 +5,9 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.progression.profession.skill.CooldownProgressionSki
 import me.mykindos.betterpvp.progression.profession.skill.PerkActivator;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -26,8 +28,8 @@ import java.util.UUID;
 @Singleton
 public class TreeFellerSkill extends WoodcuttingProgressionSkill implements CooldownProgressionSkill {
 
-
-    private final ItemHandler itemHandler;
+    private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
     @Getter
     private final CooldownManager cooldownManager;
     private double cooldown;
@@ -42,9 +44,10 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     public Map<UUID, Integer> blocksFelledByPlayer = new HashMap<>();
 
     @Inject
-    public TreeFellerSkill(Progression progression, ItemHandler itemHandler, CooldownManager cooldownManager) {
+    public TreeFellerSkill(Progression progression, ItemRegistry itemRegistry, ItemFactory itemFactory, CooldownManager cooldownManager) {
         super(progression);
-        this.itemHandler = itemHandler;
+        this.itemRegistry = itemRegistry;
+        this.itemFactory = itemFactory;
         this.cooldownManager = cooldownManager;
     }
 
@@ -98,9 +101,10 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
                 return true;
             }
 
-            BPvPItem hyperaxe = itemHandler.getItem("champions:hyper_axe");
-            if (hyperaxe != null) {
-                return hyperaxe.matches(hand);
+            final NamespacedKey key = new NamespacedKey("champions", "hyper_axe");
+            final BaseItem hyperAxe = itemRegistry.getItem(key);
+            if (hyperAxe != null) {
+                return itemFactory.isItemOfType(hand, hyperAxe);
             }
         }
 

@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -84,7 +84,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
@@ -109,7 +109,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         championsManager.getEffects().addEffect(player, player, EffectTypes.NO_SPRINT, duration);
         player.setSprinting(false);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 0.5F);
-        
+
         long durationTicks = (long) (getDuration(level) * 20);
         new BukkitRunnable() {
             long ticksRun = 0;

@@ -3,21 +3,26 @@ package me.mykindos.betterpvp.champions.champions.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.commands.menu.KitMenu;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import org.bukkit.entity.Player;
 
 @Singleton
 public class KitCommand extends Command {
 
     @Inject
-    private KitMenu kitMenu;
+    private CooldownManager cooldownManager;
 
     @Inject
-    private CooldownManager cooldownManager;
+    private RoleManager roleManager;
+
+    @Inject
+    private ItemFactory itemFactory;
 
     @Inject
     @Config(path = "command.kit.kitCooldown", defaultValue = "true")
@@ -41,6 +46,7 @@ public class KitCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        final KitMenu kitMenu = new KitMenu(roleManager, itemFactory, true);
         if (client.hasRank(Rank.ADMIN)) {
             kitMenu.show(player);
             return;

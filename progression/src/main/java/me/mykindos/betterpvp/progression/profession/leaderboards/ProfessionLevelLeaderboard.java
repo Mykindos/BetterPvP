@@ -92,7 +92,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
     @Override
     protected Long fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull UUID entry) {
         final ProfessionFilter filter = (ProfessionFilter) options.getFilter();
-        return professionRepository.getMostExperiencePerProfessionForGamer(entry, Objects.requireNonNull(filter).getProfession()).join();
+        return professionRepository.getMostExperiencePerProfessionForClient(entry, Objects.requireNonNull(filter).getProfession()).join();
     }
 
     @SneakyThrows

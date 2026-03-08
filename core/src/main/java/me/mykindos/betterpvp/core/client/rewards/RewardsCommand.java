@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
@@ -22,15 +22,16 @@ public class RewardsCommand extends Command {
 
     private final Core core;
     private final ClientSQLLayer clientSQLLayer;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final CooldownManager cooldownManager;
 
     @Inject
-    public RewardsCommand(Core core, ClientSQLLayer clientSQLLayer, ItemHandler itemHandler, CooldownManager cooldownManager) {
+    public RewardsCommand(Core core, ClientSQLLayer clientSQLLayer, ItemFactory itemFactory, CooldownManager cooldownManager) {
         this.core = core;
         this.clientSQLLayer = clientSQLLayer;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
         this.cooldownManager = cooldownManager;
+        this.aliases.add("inventory");
     }
 
     @Override
@@ -45,12 +46,12 @@ public class RewardsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(cooldownManager.use(player, "Rewards", 60 * 5, true, false)) {
+        if (cooldownManager.use(player, "Rewards", 1, true, false)) {
             CompletableFuture.runAsync(() -> {
                 RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
 
                 UtilServer.runTask(core, () -> {
-                    new GuiRewardBox(rewardBox, itemHandler, null).show(player).addCloseHandler(() -> {
+                    new GuiRewardBox(rewardBox, itemFactory, null).show(player).addCloseHandler(() -> {
                         JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class).updateClientRewards(client, rewardBox)
                                 .whenComplete((unused, throwable) -> {
                                     if (throwable != null) {

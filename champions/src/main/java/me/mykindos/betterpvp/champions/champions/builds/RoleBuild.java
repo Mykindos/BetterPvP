@@ -11,11 +11,13 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Data
 public class RoleBuild {
 
-    private final String uuid;
+    private final long clientId;
+    private final UUID clientUUID;
     private final Role role;
     private final int id;
 

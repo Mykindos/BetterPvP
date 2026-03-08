@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data;
 
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -11,8 +13,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -20,7 +22,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -34,6 +35,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.MAGIC;
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
 public final class BloodSphereProjectile extends Projectile {
 
@@ -50,6 +54,7 @@ public final class BloodSphereProjectile extends Projectile {
     private final double applySpeed;
     private final double healthSeconds;
     private final double mobHealthModifier;
+    private final Skill skill;
 
     private final ChargeData charge;
     private double damageDealt;
@@ -65,7 +70,9 @@ public final class BloodSphereProjectile extends Projectile {
                                  double impactHealthMultiplier,
                                  double passiveSpeed,
                                  double applySpeed,
-                                 double healthSeconds, double mobHealthModifier) {
+                                 double healthSeconds,
+                                 double mobHealthModifier,
+                                 Skill skill) {
         super(caster, hitboxSize, location, expireTime);
         this.damagePerApply = (APPLY_INTERVAL / 1000d) * damagePerSecond;
         this.maxDamage = maxDamage;
@@ -77,6 +84,7 @@ public final class BloodSphereProjectile extends Projectile {
         this.mobHealthModifier = mobHealthModifier;
 
         this.charge = new ChargeData(growthPerSecond);
+        this.skill = skill;
         charge.setSoundInterval(APPLY_INTERVAL);
     }
 
@@ -194,17 +202,16 @@ public final class BloodSphereProjectile extends Projectile {
                     toDamage *= this.mobHealthModifier;
                 }
 
-                final CustomDamageEvent event = new CustomDamageEvent(entity,
+                final DamageEvent event = new DamageEvent(entity,
                         this.caster,
                         null,
-                        EntityDamageEvent.DamageCause.PROJECTILE,
+                        new SkillDamageCause(skill).withCategory(MAGIC).withBukkitCause(PROJECTILE),
                         toDamage,
-                        false,
                         NAME);
 
                 event.setForceDamageDelay(0);
-                event.setDoDurability(false);
-                UtilDamage.doCustomDamage(event);
+                event.getDurabilityParameters().disableAttackerDurability();
+                UtilDamage.doDamage(event);
 
                 if (!event.isCancelled()) {
                     damageParticles.add(entity.getLocation().add(0, entity.getHeight() / 2d, 0));

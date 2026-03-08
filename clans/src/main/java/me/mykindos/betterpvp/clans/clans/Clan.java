@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
-    private final UUID id;
+    private final long id;
     private final ClanCore core = new ClanCore(this);
     private String name;
     private boolean admin;
@@ -201,7 +201,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      *
      * @param uuid the UUID of the member to retrieve
      * @return the {@link ClanMember} associated with the provided UUID
-     * @throws NoSuchElementException if no member is found for the given UUID
      */
     @NotNull
     public ClanMember getMember(final UUID uuid) {

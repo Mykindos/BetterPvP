@@ -2,10 +2,11 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
+import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
+import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -14,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Optional;
 
@@ -31,10 +31,21 @@ public class StrengthListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onStrengthDamage(DamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (event.getDamager() instanceof Player player) {
-            Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.STRENGTH);
-            effectOptional.ifPresent(effect -> event.getDamageModifiers().addModifier(ModifierType.DAMAGE, effect.getAmplifier(), "Strength", ModifierValue.FLAT, ModifierOperation.INCREASE));
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
+            return;
         }
+
+        if (!(event.getDamager() instanceof Player player)) {
+            return;
+        }
+
+        Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.STRENGTH);
+        if (effectOptional.isEmpty()) {
+            return;
+        }
+
+        final Effect effect = effectOptional.get();
+        final double increment = (1.5 * effect.getAmplifier());
+        event.addModifier(new GenericModifier("Strength", DamageOperator.FLAT, increment).withType(ModifierType.EFFECT));
     }
 }

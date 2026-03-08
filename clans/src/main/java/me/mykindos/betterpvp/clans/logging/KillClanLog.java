@@ -1,27 +1,26 @@
 package me.mykindos.betterpvp.clans.logging;
 
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
-
 @Data
 public class KillClanLog {
 
     private final String killerName;
-    private final UUID killer;
+    private final long killer;
     private final String killerClanName;
     @Nullable
-    private final UUID killerClan;
+    private final Clan killerClan;
 
     private final String victimName;
-    private final UUID victim;
+    private final long victim;
     private final String victimClanName;
     @Nullable
-    private final UUID victimClan;
+    private final Clan victimClan;
 
     private final double dominance;
     private final long time;

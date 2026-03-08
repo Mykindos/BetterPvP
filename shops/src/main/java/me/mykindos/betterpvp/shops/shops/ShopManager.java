@@ -9,11 +9,11 @@ import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.ForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.impl.PagedSingleWindow;
 import me.mykindos.betterpvp.shops.shops.items.ShopItemRepository;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 @Getter
@@ -32,7 +33,7 @@ public class ShopManager {
     private final ShopItemRepository shopItemRepository;
     private final ShopItemSellService shopItemSellService;
 
-    private HashMap<String, List<IShopItem>> shopItems = new HashMap<>();
+    private Map<String, List<IShopItem>> shopItems = new HashMap<>();
 
     @Inject
     public ShopManager(ShopItemRepository shopItemRepository, ShopItemSellService shopItemSellService) {
@@ -54,10 +55,10 @@ public class ShopManager {
      * Shows the specified Shop GUI to the player
      * @param player the player to show
      * @param shopkeeper the name of the shopkeeper
-     * @param itemHandler the itemHandler, to pass to ShopMenu
+     * @param itemFactory the itemFactory, to pass to ShopMenu
      * @param clientManager the clientManager, to pass to ShopMenu
      */
-    public void showShopMenu(Player player, String shopkeeper, ItemHandler itemHandler, ClientManager clientManager) {
+    public void showShopMenu(Player player, String shopkeeper, ItemFactory itemFactory, ClientManager clientManager) {
         List<IShopItem> shopkeeperItems = getShopItems(shopkeeper);
         if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
@@ -75,14 +76,14 @@ public class ShopManager {
                         "x x x < - > x x s")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
+                .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(null))
-                .addIngredient('>', new ForwardButton())
-                .addIngredient('s', new SellAllButton(shopkeeperItems, clientManager, itemHandler, shopItemSellService));
+                .addIngredient('>', new PageForwardButton())
+                .addIngredient('s', new SellAllButton(shopkeeperItems, shopItemSellService));
         for (int i = 1; i <= maxPages; i++) {
             builder.addContent(new ShopMenu(i,
                     shopkeeperItems,
-                    itemHandler,
+                    itemFactory,
                     clientManager)
             );
         }

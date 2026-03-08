@@ -60,16 +60,9 @@ public class SendSkillsCommand extends Command {
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId());
-            if (roleOptional.isEmpty()) {
-                UtilMessage.message(player, "Skills", "You do not have a set equipped!");
-                return;
-            }
-
-            Role role = roleOptional.get();
+            Role role = roleManager.getRole(player);
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-
                 Component messageComponent = UtilMessage.deserialize("<white>My current %s build", role.getName()).decoration(TextDecoration.UNDERLINED, true)
                         .hoverEvent(HoverEvent.showText(build.getBuildComponent()));
                 UtilServer.runTaskAsync(champions, () -> UtilServer.callEvent(new ChatSentEvent(player, client.getGamer().getChatChannel(), Component.empty(), messageComponent)));

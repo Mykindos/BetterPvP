@@ -11,7 +11,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -34,7 +35,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
 @Singleton
 @BPvPListener
@@ -344,8 +346,13 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
     public void doHitEffects(Player player, LivingEntity enemy, int level){
-        CustomDamageEvent cde = new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Tether");
-        UtilDamage.doCustomDamage(cde);
+        DamageEvent cde = new DamageEvent(enemy,
+                player,
+                null,
+                new SkillDamageCause(this).withBukkitCause(PROJECTILE),
+                getDamage(level),
+                "Tether");
+        UtilDamage.doDamage(cde);
         championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
         player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
 
@@ -420,7 +427,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
     @EventHandler
-    public void preventBatDamage(CustomDamageEvent event) {
+    public void preventBatDamage(DamageEvent event) {
         if (!(event.getDamagee() instanceof Bat bat)) return;
 
         if (bat.hasMetadata("isTetherBat")) {

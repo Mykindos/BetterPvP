@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoad
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
@@ -30,8 +31,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
-import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
-import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -39,21 +38,24 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillE
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
-import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -91,27 +93,27 @@ public class SkillListener implements Listener {
     private final BuildManager buildManager;
     private final RoleManager roleManager;
     private final CooldownManager cooldownManager;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final EffectManager effectManager;
     private final ClientManager clientManager;
     private final ChampionsSkillManager skillManager;
-    private final WeaponManager weaponManager;
+    private final ItemFactory itemFactory;
 
     private final HashSet<UUID> inventoryDrop = new HashSet<>();
     private final Map<UUID, DelayedEntry> delayedCooldowns = new WeakHashMap<>();
 
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
-                         EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, ChampionsSkillManager skillManager, WeaponManager weaponManager) {
+                         EnergyService energyService, EffectManager effectManager, ClientManager clientManager,
+                         ChampionsSkillManager skillManager, ItemFactory itemFactory) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.effectManager = effectManager;
         this.clientManager = clientManager;
         this.skillManager = skillManager;
-        this.weaponManager = weaponManager;
-
+        this.itemFactory = itemFactory;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -138,7 +140,7 @@ public class SkillListener implements Listener {
                         return;
                     }
                 }
-                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
+                if (!energyService.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -229,37 +231,38 @@ public class SkillListener implements Listener {
         }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
         if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
-            Optional<IWeapon> iWeaponOptional = weaponManager.getWeaponByItemStack(droppedItem);
-            if (iWeaponOptional.isEmpty() || !(iWeaponOptional.get() instanceof LegendaryWeapon)) {
+
+            final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(droppedItem);
+            if (itemOpt.isEmpty()) {
+                return; // Not a valid item
+            }
+
+            ItemInstance itemInstance = itemOpt.get();
+            if (!(itemInstance.getBaseItem() instanceof WeaponItem)) {
                 return;
             }
         }
 
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        Role role = roleManager.getRole(player);
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build == null) return;
 
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
+            for (Skill skill : build.getActiveSkills()) {
+                // Skip if not a toggle skill
+                if (!(skill instanceof ToggleSkill)) continue;
 
-                for (Skill skill : build.getActiveSkills()) {
-                    // Skip if not a toggle skill
-                    if (!(skill instanceof ToggleSkill)) continue;
+                // Check if they have booster
+                BuildSkill buildSkill = build.getBuildSkill(skill.getType());
+                int level = getLevel(player, buildSkill);
 
-                    // Check if they have booster
-                    BuildSkill buildSkill = build.getBuildSkill(skill.getType());
-                    int level = getLevel(player, buildSkill);
-
-                    UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
-                    event.setCancelled(true);
-                }
+                UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
+                event.setCancelled(true);
             }
         }
-
     }
 
     // Show shield for channel skills
@@ -277,28 +280,23 @@ public class SkillListener implements Listener {
             return;
         }
 
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        Role role = roleManager.getRole(player);
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build == null) return;
 
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
+            Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                    .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
-                Optional<Skill> skillOptional = build.getActiveSkills().stream()
-                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
+            if (skillOptional.isPresent()) {
+                Skill skill = skillOptional.get();
 
-                if (skillOptional.isPresent()) {
-                    Skill skill = skillOptional.get();
-
-                    if (skill instanceof ChannelSkill channelSkill) {
-                        if (channelSkill.shouldShowShield(player)) {
-                            event.setUseShield(true);
-                            event.setShieldModelData(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_SHIELD : RightClickEvent.DEFAULT_SHIELD);
-                        }
+                if (skill instanceof ChannelSkill channelSkill) {
+                    if (channelSkill.shouldShowShield(player)) {
+                        event.setBlockingItem(channelSkill.isShieldInvisible() ? RightClickEvent.INVISIBLE_BLOCKING_ITEM : ItemStack.of(Material.SHIELD));
                     }
                 }
             }
@@ -367,38 +365,32 @@ public class SkillListener implements Listener {
             return;
         }
 
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        Role role = roleManager.getRole(player);
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build == null) return;
 
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
+            Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                    .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
-                Optional<Skill> skillOptional = build.getActiveSkills().stream()
-                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
+            if (skillOptional.isPresent()) {
+                Skill skill = skillOptional.get();
 
-                if (skillOptional.isPresent()) {
-                    Skill skill = skillOptional.get();
-
-                    if (skill instanceof InteractSkill interactSkill) {
-                        if (!Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
-                            return;
-                        }
+                if (skill instanceof InteractSkill interactSkill) {
+                    if (!Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
+                        return;
                     }
-
-                    int level = getLevel(player, build.getBuildSkill(skillType));
-                    UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
-
                 }
+
+                int level = getLevel(player, build.getBuildSkill(skillType));
+                UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
 
             }
 
         }
-
     }
 
     private void sendSkillUsed(Player player, IChampionsSkill skill, int level) {
@@ -500,11 +492,11 @@ public class SkillListener implements Listener {
     public void onLoadBuilds(ChampionsBuildLoadedEvent event) {
         final Player player = event.getPlayer();
 
-        Role role = roleManager.getObject(player.getUniqueId().toString()).orElse(null);
+        Role role = roleManager.getRole(player);
         GamerBuilds builds = event.getGamerBuilds();
 
         // Track new skills
-        String name = role == null ? null : role.getName();
+        String name = role.getName();
         RoleBuild build = builds.getActiveBuilds().get(name);
         if (build != null) {
             final Gamer gamer = this.clientManager.search().online(player).getGamer();
@@ -521,9 +513,11 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onRoleChange(RoleChangeEvent event) {
+        if (!(event.getLivingEntity() instanceof Player player)) {
+            return;
+        }
         final Role newRole = event.getRole();
         final Role previousRole = event.getPrevious();
-        final Player player = event.getPlayer();
 
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
@@ -544,6 +538,12 @@ public class SkillListener implements Listener {
                 build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.trackPlayer(player, gamer));
             }
         }
+    }
+
+    @EventHandler
+    public void onSkillUpdate(SkillUpdateEvent event) {
+        final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
+        event.getSkill().updatePlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler

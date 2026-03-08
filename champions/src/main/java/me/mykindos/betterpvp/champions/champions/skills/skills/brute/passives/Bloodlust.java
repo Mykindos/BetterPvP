@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
@@ -90,7 +91,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
         final LivingEntity entity = event.getEntity();
-        if (entity.hasMetadata("PlayerSpawned")) return;
+        if (UtilEntity.isPlayerSpawned(entity)) return;
         if (entity instanceof Animals) return;
 
         DamageLog lastDamager = damageLogManager.getLastDamager(entity);
@@ -146,6 +147,6 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
         baseDuration = getConfig("baseDuration", 5.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         maxStacks = getConfig("maxStacks", 3, Integer.class);
-        health = getConfig("health", 4.0, Double.class);
+        health = getConfig("health", 10.0, Double.class);
     }
 }

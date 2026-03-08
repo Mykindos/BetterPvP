@@ -8,13 +8,14 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
@@ -29,7 +30,8 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -38,7 +40,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -47,14 +48,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.WeakHashMap;
 
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
+
 @Singleton
 @BPvPListener
 @CustomLog
-public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill, ThrowableListener, DamageSkill, CrowdControlSkill {
-
-    private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
+public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSkill, ThrowableListener, DamageSkill, CrowdControlSkill {
     private final WeakHashMap<Player, Hook> hooks = new WeakHashMap<>();
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double damage;
     private double damageIncreasePerLevel;
@@ -73,8 +74,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public String[] getDescription(int level) {
         return new String[] {
                 "Hold right click with a Sword to channel",
-                "",
-                "Charge a hook that latches onto",
+                "Charging a hook at ", getValueString(this::getChargePerSecond, level, 100, "%", 0), " per second",
+                "that latches onto",
                 "enemies pulling them towards you" ,
                 "and dealing " + getValueString(this::getDamage, level) + " damage.",
                 "",
@@ -117,47 +118,12 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     @Override
-    public void activate(Player player, int level) {
-        charging.put(player, new ChargeData((float) (0.1 + (level - 1) * 0.05) * 5));
-    }
-
-    @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
         return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
     }
 
     @UpdateEvent
     public void updateFleshHook() {
-        final Iterator<Player> iterator = charging.keySet().iterator();
-        while (iterator.hasNext()) {
-            final Player player = iterator.next();
-            final ChargeData data = charging.get(player);
-            if (player == null) {
-                iterator.remove();
-                continue;
-            }
-
-            // Remove if they no longer have the skill
-            final int level = getLevel(player);
-            if (level <= 0) {
-                iterator.remove();
-                continue;
-            }
-
-            // Check if they still are blocking and charge
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (isHolding(player) && gamer.isHoldingRightClick()) {
-                data.tick();
-                data.tickSound(player);
-                continue;
-            }
-
-            shoot(player, data, level);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
-            new SoundEffect(Sound.ENTITY_SPLASH_POTION_THROW, 2F, 0.8F).play(player.getLocation());
-            iterator.remove();
-        }
-
         // Hook particles
         final Iterator<Player> hookIterator = hooks.keySet().iterator();
         while (hookIterator.hasNext()) {
@@ -188,7 +154,18 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         }
     }
 
-    private void shoot(Player player, ChargeData data, int level) {
+    public TickBehavior getTickBehavior(Player player, ChargeData data, int level) {
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        if (!(isHolding(player) && gamer.isHoldingRightClick())) {
+            return TickBehavior.USE;
+        }
+        return TickBehavior.TICK;
+    }
+
+    public boolean use(Player player, ChargeData data, int level) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+        new SoundEffect(Sound.ENTITY_SPLASH_POTION_THROW, 2F, 0.8F).play(player.getLocation());
+
         final Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
         final ThrowableItem throwable = new ThrowableItem(this, item, player, getName(), 10_000L, true);
         throwable.setCollideGround(true);
@@ -199,6 +176,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         UtilVelocity.velocity(item, player, velocityData);
 
         hooks.put(player, new Hook(throwable, data, level));
+        return true;
     }
 
     @Override
@@ -226,8 +204,13 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
         // Damage
         final double damage = getDamage(level) * hookData.getData().getCharge();
-        CustomDamageEvent ev = new CustomDamageEvent(hit, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName());
-        UtilDamage.doCustomDamage(ev);
+        DamageEvent ev = new DamageEvent(hit,
+                player,
+                null,
+                new SkillDamageCause(this).withBukkitCause(PROJECTILE),
+                damage,
+                getName());
+        UtilDamage.doDamage(ev);
 
         // Cues
         UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + " " + level + "</alt>.");

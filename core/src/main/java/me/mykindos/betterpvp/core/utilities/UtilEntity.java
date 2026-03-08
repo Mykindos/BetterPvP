@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -10,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -49,7 +51,7 @@ public class UtilEntity {
      */
     public static EntityRemovalReason getRemovalReason(@NotNull Entity entity) {
         final net.minecraft.world.entity.Entity handle = ((CraftEntity) entity).getHandle();
-        Preconditions.checkArgument(handle.isRemoved(), "Entity must be removed");
+        Preconditions.checkArgument(isRemoved(entity), "Entity must be removed");
         return switch(Objects.requireNonNull(handle.getRemovalReason())) {
             case KILLED -> EntityRemovalReason.KILLED;
             case DISCARDED -> EntityRemovalReason.DISCARDED;
@@ -72,7 +74,7 @@ public class UtilEntity {
      * This is typically utilized in scenarios where the game logic distinguishes between friendly and enemy entities
      * based on their type or their relationship with the player.
      */
-    public static final BiPredicate<Player, Entity> IS_ENEMY = (player, entity) -> {
+    public static final BiPredicate<LivingEntity, Entity> IS_ENEMY = (player, entity) -> {
         if (!(entity instanceof LivingEntity) || entity.equals(player) || UtilPlayer.isCreativeOrSpectator(entity)) {
             return false;
         }
@@ -170,6 +172,13 @@ public class UtilEntity {
         final Vector directionRaw = destination.toVector().subtract(lastLocation.toVector());
         final double distance = directionRaw.length();
         final Vector direction = distance < 1e-6 ? lastLocation.getDirection() : directionRaw.normalize();
+        if (!direction.toVector3d().isFinite()) {
+            return destination.getNearbyEntities(raySize, raySize, raySize).stream()
+                    .filter(entityFilter == null ? entity -> true : entityFilter)
+                    .findFirst()
+                    .map(entity -> new RayTraceResult(destination.toVector(), entity));
+        }
+
         return Optional.ofNullable(lastLocation.getWorld().rayTraceEntities(lastLocation,
                 direction,
                 distance,
@@ -324,8 +333,7 @@ public class UtilEntity {
      * @return true if the entity is removed or marked as pluginRemoved, otherwise false
      */
     public static boolean isRemoved(@NotNull Entity ent) {
-        net.minecraft.world.entity.Entity craftEntity = ((CraftEntity) ent).getHandle();
-        return craftEntity.isRemoved() || craftEntity.pluginRemoved;
+        return ((CraftEntity) ent).getHandle().isRemoved();
     }
 
     public static void health(LivingEntity ent, double mod) {
@@ -340,5 +348,14 @@ public class UtilEntity {
             health = UtilPlayer.getMaxHealth(ent);
         }
         ent.setHealth(health);
+    }
+
+    /**
+     * Checks if the given entity has been spawned by a player
+     * @param entity the entity to check, must not be null
+     * @return {@code true} if the entity has been spawned by a player, {@code false} otherwise
+     */
+    public static boolean isPlayerSpawned(@NotNull Entity entity) {
+        return entity.getPersistentDataContainer().has(CoreNamespaceKeys.PLAYER_SPAWNED, CustomDataType.UUID);
     }
 }

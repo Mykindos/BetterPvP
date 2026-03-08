@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.inventory;
 
-import lombok.CustomLog;
-import lombok.Getter;
+import me.mykindos.betterpvp.core.inventory.InvUI;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
@@ -26,6 +25,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 
 /**
  * An inventory that can be embedded in InvUI's {@link Gui Guis}.
@@ -51,8 +51,6 @@ import java.util.function.Predicate;
  *     </li>
  * </ul>
  */
-@CustomLog
-@Getter
 public abstract class Inventory {
     
     private Set<AbstractWindow> windows;
@@ -192,19 +190,19 @@ public abstract class Inventory {
     public void notifyWindows() {
         if (windows == null)
             return;
-        
+
         windows.forEach(window -> window.handleInventoryUpdate(this));
     }
-    
+
     /**
      * Gets the configured pre update handler.
      *
      * @return The pre update handler
      */
-    public @Nullable Consumer<ItemPreUpdateEvent> getPreUpdateHandler() {
+    public @Nullable Consumer<@NotNull ItemPreUpdateEvent> getPreUpdateHandler() {
         return preUpdateHandler;
     }
-    
+
     /**
      * Sets a handler which is called every time something gets updated in the {@link Inventory}.
      *
@@ -213,7 +211,7 @@ public abstract class Inventory {
     public void setPreUpdateHandler(@Nullable Consumer<@NotNull ItemPreUpdateEvent> preUpdateHandler) {
         this.preUpdateHandler = preUpdateHandler;
     }
-    
+
     /**
      * Gets the configured post update handler.
      *
@@ -222,7 +220,7 @@ public abstract class Inventory {
     public @Nullable Consumer<@NotNull ItemPostUpdateEvent> getPostUpdateHandler() {
         return postUpdateHandler;
     }
-    
+
     /**
      * Sets a handler which is called every time after something has been updated in the {@link Inventory}.
      *
@@ -231,7 +229,7 @@ public abstract class Inventory {
     public void setPostUpdateHandler(@Nullable Consumer<@NotNull ItemPostUpdateEvent> inventoryUpdatedHandler) {
         this.postUpdateHandler = inventoryUpdatedHandler;
     }
-    
+
     /**
      * Whether this {@link Inventory} has any event handlers.
      *
@@ -240,7 +238,7 @@ public abstract class Inventory {
     public boolean hasEventHandlers() {
         return preUpdateHandler != null || postUpdateHandler != null;
     }
-    
+
     /**
      * Whether events should be called for this {@link Inventory}.
      *
@@ -250,7 +248,7 @@ public abstract class Inventory {
     private boolean shouldCallEvents(@Nullable UpdateReason updateReason) {
         return hasEventHandlers() && updateReason != UpdateReason.SUPPRESSED;
     }
-    
+
     /**
      * Creates an {@link ItemPreUpdateEvent} and calls the {@link #preUpdateHandler} to handle it.
      *
@@ -263,18 +261,18 @@ public abstract class Inventory {
     public ItemPreUpdateEvent callPreUpdateEvent(@Nullable UpdateReason updateReason, int slot, @Nullable ItemStack previousItemStack, @Nullable ItemStack newItemStack) {
         if (updateReason == UpdateReason.SUPPRESSED)
             throw new IllegalArgumentException("Cannot call ItemUpdateEvent with UpdateReason.SUPPRESSED");
-        
+
         ItemPreUpdateEvent event = new ItemPreUpdateEvent(this, slot, updateReason, previousItemStack, newItemStack);
         if (preUpdateHandler != null) {
             try {
                 preUpdateHandler.accept(event);
-            } catch (Exception ex) {
-                log.error("An exception occurred while handling an inventory event", ex).submit();
+            } catch (Throwable t) {
+                InvUI.getInstance().getLogger().log(Level.SEVERE, "An exception occurred while handling an inventory event", t);
             }
         }
         return event;
     }
-    
+
     /**
      * Creates an {@link ItemPostUpdateEvent} and calls the {@link #postUpdateHandler} to handle it.
      *
@@ -286,17 +284,39 @@ public abstract class Inventory {
     public void callPostUpdateEvent(@Nullable UpdateReason updateReason, int slot, @Nullable ItemStack previousItemStack, @Nullable ItemStack newItemStack) {
         if (updateReason == UpdateReason.SUPPRESSED)
             throw new IllegalArgumentException("Cannot call InventoryUpdatedEvent with UpdateReason.SUPPRESSED");
-        
+
         ItemPostUpdateEvent event = new ItemPostUpdateEvent(this, slot, updateReason, previousItemStack, newItemStack);
         if (postUpdateHandler != null) {
             try {
                 postUpdateHandler.accept(event);
-            } catch (Exception ex) {
-                log.error("An exception occurred while handling an inventory event", ex).submit();
+            } catch (Throwable t) {
+                InvUI.getInstance().getLogger().log(Level.SEVERE, "An exception occurred while handling an inventory event", t);
             }
         }
     }
-    
+
+    /**
+     * Gets the priority for click actions in a {@link Gui}, such as shift clicking or cursor collection
+     * with multiple {@link Inventory VirtualInventories}.
+     *
+     * @return The priority for click actions, {@link Inventory VirtualInventories} with
+     * a higher priority get prioritized.
+     */
+    public int getGuiPriority() {
+        return guiPriority;
+    }
+
+    /**
+     * Sets the priority for click actions in a {@link Gui}, such as shift-clicking or cursor collection
+     * with multiple {@link Inventory VirtualInventories}.
+     *
+     * @param guiPriority The priority for click actions, {@link Inventory VirtualInventories} with
+     *                    a higher priority get prioritized.
+     */
+    public void setGuiPriority(int guiPriority) {
+        this.guiPriority = guiPriority;
+    }
+
     /**
      * Gets the maximum stack size for a specific slot.
      * <p>
@@ -315,7 +335,7 @@ public abstract class Inventory {
             return slotMaxStackSize;
         }
     }
-    
+
     /**
      * Gets the maximum stack size for a specific slot.
      * <p>
@@ -334,7 +354,7 @@ public abstract class Inventory {
         int slotMaxStackSize = getMaxSlotStackSize(slot);
         return Math.min(currentItem != null ? InventoryUtils.stackSizeProvider.getMaxStackSize(currentItem) : alternative, slotMaxStackSize);
     }
-    
+
     /**
      * Gets the maximum stack size for a specific slot. If there is an {@link ItemStack} on that slot,
      * the returned value will be the minimum of both the slot's and the {@link ItemStack ItemStack's} max stack size retrieved
@@ -349,7 +369,7 @@ public abstract class Inventory {
         int itemMaxStackSize = alternativeFrom == null ? 64 : InventoryUtils.stackSizeProvider.getMaxStackSize(alternativeFrom);
         return getMaxStackSize(slot, itemMaxStackSize);
     }
-    
+
     /**
      * Gets the maximum stack size for a specific slot while ignoring the {@link ItemStack} on it.
      * The returned value will be a minimum of the slot's maximum stack size and the alternative parameter.
@@ -361,7 +381,7 @@ public abstract class Inventory {
     public int getMaxSlotStackSize(int slot, int alternative) {
         return Math.min(alternative, getMaxSlotStackSize(slot));
     }
-    
+
     /**
      * Gets the maximum stack size for a specific slot while ignoring the {@link ItemStack} on it.
      * The returned value will be a minimum of the maximum stack size of both the slot and the alternativeFrom parameter.
@@ -374,7 +394,7 @@ public abstract class Inventory {
         int itemMaxStackSize = alternativeFrom == null ? 64 : InventoryUtils.stackSizeProvider.getMaxStackSize(alternativeFrom);
         return getMaxSlotStackSize(slot, itemMaxStackSize);
     }
-    
+
     /**
      * Checks if the {@link ItemStack} on that slot is the same
      * as the assumed {@link ItemStack} provided as parameter.
@@ -387,7 +407,7 @@ public abstract class Inventory {
         ItemStack actualStack = getUnsafeItem(slot);
         return Objects.equals(actualStack, assumedStack);
     }
-    
+
     /**
      * Checks if all slots have an {@link ItemStack} with their max stack size on them.
      *
@@ -400,10 +420,10 @@ public abstract class Inventory {
             if (item == null || item.getAmount() < getMaxStackSize(slot))
                 return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Checks if there are no {@link ItemStack ItemStacks} in this {@link Inventory}.
      *
@@ -412,10 +432,10 @@ public abstract class Inventory {
     public boolean isEmpty() {
         for (ItemStack item : getUnsafeItems())
             if (item != null) return false;
-        
+
         return true;
     }
-    
+
     /**
      * Checks whether this {@link Inventory} has at least one empty slot.
      *
@@ -424,10 +444,10 @@ public abstract class Inventory {
     public boolean hasEmptySlot() {
         for (ItemStack item : getUnsafeItems())
             if (item == null) return true;
-        
+
         return false;
     }
-    
+
     /**
      * Checks if there is any {@link ItemStack} in this {@link Inventory} matching the given {@link Predicate}.
      *
@@ -439,10 +459,10 @@ public abstract class Inventory {
             if (item != null && predicate.test(item.clone()))
                 return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Checks if there is any {@link ItemStack} in this {@link Inventory} similar to the given {@link ItemStack}.
      *
@@ -454,10 +474,10 @@ public abstract class Inventory {
             if (item != null && item.isSimilar(itemStack))
                 return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Counts the amount of {@link ItemStack ItemStacks} in this {@link Inventory} matching the given {@link Predicate}.
      *
@@ -470,10 +490,10 @@ public abstract class Inventory {
             if (item != null && predicate.test(item.clone()))
                 count++;
         }
-        
+
         return count;
     }
-    
+
     /**
      * Counts the amount of {@link ItemStack ItemStacks} in this {@link Inventory} similar to the given {@link ItemStack}.
      *
@@ -486,10 +506,10 @@ public abstract class Inventory {
             if (item != null && item.isSimilar(itemStack))
                 count++;
         }
-        
+
         return count;
     }
-    
+
     /**
      * Checks if there is an {@link ItemStack} on that slot.
      *
@@ -499,7 +519,7 @@ public abstract class Inventory {
     public boolean hasItem(int slot) {
         return getUnsafeItem(slot) != null;
     }
-    
+
     /**
      * Gets the {@link ItemStack#getAmount() ItemStack amount} of the {@link ItemStack} on the given slot.
      *
@@ -510,7 +530,7 @@ public abstract class Inventory {
         ItemStack currentStack = getUnsafeItem(slot);
         return currentStack != null ? currentStack.getAmount() : 0;
     }
-    
+
     /**
      * Changes the {@link ItemStack} on a specific slot to that one, regardless of what was
      * previously on that slot.
@@ -526,11 +546,11 @@ public abstract class Inventory {
     public void setItemSilently(int slot, @Nullable ItemStack itemStack) {
         if (ItemUtils.isEmpty(itemStack))
             itemStack = null;
-        
+
         setCloneBackingItem(slot, itemStack);
         notifyWindows();
     }
-    
+
     /**
      * Changes the {@link ItemStack} on a specific slot to that one, regardless of what was
      * previously on that slot.
@@ -558,7 +578,7 @@ public abstract class Inventory {
             return false;
         }
     }
-    
+
     /**
      * Changes the {@link ItemStack} on a specific slot to the given one, regardless of what previously was on
      * that slot.
@@ -574,14 +594,14 @@ public abstract class Inventory {
     public boolean setItem(@Nullable UpdateReason updateReason, int slot, @Nullable ItemStack itemStack) {
         if (ItemUtils.isEmpty(itemStack))
             return forceSetItem(updateReason, slot, null);
-        
+
         int maxStackSize = getMaxSlotStackSize(slot, itemStack);
         if (itemStack.getAmount() > maxStackSize)
             return false;
-        
+
         return forceSetItem(updateReason, slot, itemStack);
     }
-    
+
     /**
      * Changes the {@link ItemStack} on a specific slot based on the current {@link ItemStack} on that slot,
      * using a modifier consumer.
@@ -596,7 +616,7 @@ public abstract class Inventory {
         modifier.accept(itemStack);
         return setItem(updateReason, slot, itemStack);
     }
-    
+
     /**
      * Replaces the {@link ItemStack} on a specific slot based on the current {@link ItemStack} on that slot,
      * using a replace function.
@@ -612,7 +632,7 @@ public abstract class Inventory {
         ItemStack newStack = function.apply(currentStack);
         return setItem(updateReason, slot, newStack);
     }
-    
+
     /**
      * Adds an {@link ItemStack} on a specific slot and returns the amount of items that did not fit on that slot.
      * <p>
@@ -626,7 +646,7 @@ public abstract class Inventory {
     public int putItem(@Nullable UpdateReason updateReason, int slot, @NotNull ItemStack itemStack) {
         if (ItemUtils.isEmpty(itemStack))
             return 0;
-        
+
         ItemStack currentStack = getUnsafeItem(slot);
         if (currentStack == null || currentStack.isSimilar(itemStack)) {
             int currentAmount = currentStack == null ? 0 : currentStack.getAmount();
@@ -634,10 +654,10 @@ public abstract class Inventory {
             if (currentAmount < maxStackSize) {
                 int additionalAmount = itemStack.getAmount();
                 int newAmount = Math.min(currentAmount + additionalAmount, maxStackSize);
-                
+
                 ItemStack newItemStack = itemStack.clone();
                 newItemStack.setAmount(newAmount);
-                
+
                 if (shouldCallEvents(updateReason)) {
                     ItemStack currentStackC = currentStack != null ? currentStack.clone() : null;
                     ItemPreUpdateEvent event = callPreUpdateEvent(updateReason, slot, currentStackC, newItemStack);
@@ -645,12 +665,12 @@ public abstract class Inventory {
                         newItemStack = event.getNewItem();
                         setCloneBackingItem(slot, newItemStack);
                         notifyWindows();
-                        
+
                         int newAmountEvent = newItemStack != null ? newItemStack.getAmount() : 0;
                         int remaining = itemStack.getAmount() - (newAmountEvent - currentAmount);
-                        
+
                         callPostUpdateEvent(updateReason, slot, currentStackC, newItemStack);
-                        
+
                         return remaining;
                     }
                 } else {
@@ -660,10 +680,10 @@ public abstract class Inventory {
                 }
             }
         }
-        
+
         return itemStack.getAmount();
     }
-    
+
     /**
      * Sets the amount of an {@link ItemStack} on a slot to the given value
      * while respecting the max allowed stack size on that slot.
@@ -678,9 +698,9 @@ public abstract class Inventory {
         ItemStack currentStack = getUnsafeItem(slot);
         if (currentStack == null)
             throw new IllegalStateException("There is no ItemStack on that slot");
-        
+
         int maxStackSize = getMaxStackSize(slot);
-        
+
         ItemStack newItemStack;
         if (amount > 0) {
             newItemStack = currentStack.clone();
@@ -688,7 +708,7 @@ public abstract class Inventory {
         } else {
             newItemStack = null;
         }
-        
+
         if (shouldCallEvents(updateReason)) {
             ItemStack currentStackC = currentStack != null ? currentStack.clone() : null;
             ItemPreUpdateEvent event = callPreUpdateEvent(updateReason, slot, currentStackC, newItemStack);
@@ -696,11 +716,11 @@ public abstract class Inventory {
                 newItemStack = event.getNewItem();
                 setCloneBackingItem(slot, newItemStack);
                 notifyWindows();
-                
+
                 int actualAmount = newItemStack != null ? newItemStack.getAmount() : 0;
-                
+
                 callPostUpdateEvent(updateReason, slot, currentStackC, newItemStack);
-                
+
                 return actualAmount;
             }
         } else {
@@ -708,10 +728,10 @@ public abstract class Inventory {
             notifyWindows();
             return amount;
         }
-        
+
         return currentStack.getAmount();
     }
-    
+
     /**
      * Adds a specific amount to an {@link ItemStack} on a slot while respecting
      * the maximum allowed stack size on that slot.
@@ -726,11 +746,11 @@ public abstract class Inventory {
         ItemStack currentStack = getUnsafeItem(slot);
         if (currentStack == null)
             return 0;
-        
+
         int currentAmount = currentStack.getAmount();
         return setItemAmount(updateReason, slot, currentAmount + amount) - currentAmount;
     }
-    
+
     /**
      * Adds an {@link ItemStack} to the {@link Inventory}.
      * This method does not work the same way as Bukkit's addItem method
@@ -744,31 +764,31 @@ public abstract class Inventory {
     public int addItem(@Nullable UpdateReason updateReason, @NotNull ItemStack itemStack) {
         if (ItemUtils.isEmpty(itemStack))
             return 0;
-        
+
         ItemStack[] items = getUnsafeItems();
-        
+
         int originalAmount = itemStack.getAmount();
         int amountLeft = originalAmount;
-        
+
         amountLeft = addToPartialSlots(updateReason, itemStack, amountLeft, items);
         amountLeft = addToEmptySlots(updateReason, itemStack, amountLeft, items);
-        
+
         if (originalAmount != amountLeft)
             notifyWindows();
-        
+
         return amountLeft;
     }
-    
+
     private int addToPartialSlots(
-        @Nullable UpdateReason updateReason,
-        @NotNull ItemStack itemStack,
-        int amountLeft,
-        @Nullable ItemStack @NotNull [] items
+            @Nullable UpdateReason updateReason,
+            @NotNull ItemStack itemStack,
+            int amountLeft,
+            @Nullable ItemStack @NotNull [] items
     ) {
         for (int slot = 0; slot < items.length; slot++) {
             if (amountLeft <= 0)
                 break;
-            
+
             ItemStack currentStack = items[slot];
             if (currentStack == null)
                 continue;
@@ -777,7 +797,7 @@ public abstract class Inventory {
                 continue;
             if (!itemStack.isSimilar(currentStack))
                 continue;
-            
+
             // partial stack found, put items
             ItemStack newStack = itemStack.clone();
             newStack.setAmount(Math.min(currentStack.getAmount() + amountLeft, maxStackSize));
@@ -787,7 +807,7 @@ public abstract class Inventory {
                     newStack = event.getNewItem();
                     setCloneBackingItem(slot, newStack);
                     callPostUpdateEvent(updateReason, slot, currentStack.clone(), newStack);
-                    
+
                     int newStackAmount = newStack != null ? newStack.getAmount() : 0;
                     amountLeft -= newStackAmount - currentStack.getAmount();
                 }
@@ -796,23 +816,23 @@ public abstract class Inventory {
                 amountLeft -= newStack.getAmount() - currentStack.getAmount();
             }
         }
-        
+
         return amountLeft;
     }
-    
+
     private int addToEmptySlots(
-        @Nullable UpdateReason updateReason,
-        @NotNull ItemStack itemStack,
-        int amountLeft,
-        @Nullable ItemStack @NotNull [] items
+            @Nullable UpdateReason updateReason,
+            @NotNull ItemStack itemStack,
+            int amountLeft,
+            @Nullable ItemStack @NotNull [] items
     ) {
         for (int slot = 0; slot < items.length; slot++) {
             if (amountLeft <= 0)
                 break;
-            
+
             if (items[slot] != null)
                 continue;
-            
+
             // empty slot found, put items
             ItemStack newStack = itemStack.clone();
             newStack.setAmount(Math.min(amountLeft, getMaxSlotStackSize(slot, itemStack)));
@@ -822,7 +842,7 @@ public abstract class Inventory {
                     newStack = event.getNewItem();
                     setCloneBackingItem(slot, newStack);
                     callPostUpdateEvent(updateReason, slot, null, newStack);
-                    
+
                     int newStackAmount = newStack != null ? newStack.getAmount() : 0;
                     amountLeft -= newStackAmount;
                 }
@@ -831,10 +851,10 @@ public abstract class Inventory {
                 amountLeft -= newStack.getAmount();
             }
         }
-        
+
         return amountLeft;
     }
-    
+
     /**
      * Simulates adding {@link ItemStack}s to this {@link Inventory}
      * and returns the amount of {@link ItemStack}s that did not fit.
@@ -852,7 +872,7 @@ public abstract class Inventory {
             return simulateMultiAdd(Arrays.asList(allStacks));
         }
     }
-    
+
     /**
      * Simulates adding {@link ItemStack}s to this {@link Inventory}
      * and returns the amount of {@link ItemStack}s that did not fit.
@@ -864,14 +884,14 @@ public abstract class Inventory {
     public int[] simulateAdd(@NotNull List<@NotNull ItemStack> itemStacks) {
         if (itemStacks.isEmpty())
             return new int[0];
-        
+
         if (itemStacks.size() == 1) {
             return new int[] {simulateSingleAdd(itemStacks.get(0))};
         } else {
             return simulateMultiAdd(itemStacks);
         }
     }
-    
+
     /**
      * Simulates adding {@link ItemStack}s to this {@link Inventory}
      * and then returns if all {@link ItemStack}s would fit.
@@ -888,7 +908,7 @@ public abstract class Inventory {
             return Arrays.stream(simulateMultiAdd(Arrays.asList(allStacks))).allMatch(i -> i == 0);
         }
     }
-    
+
     /**
      * Simulates adding {@link ItemStack}s to this {@link Inventory}
      * and then returns if all {@link ItemStack}s would fit.
@@ -898,14 +918,14 @@ public abstract class Inventory {
      */
     public boolean canHold(@NotNull List<@NotNull ItemStack> itemStacks) {
         if (itemStacks.isEmpty()) return true;
-        
+
         if (itemStacks.size() == 1) {
             return simulateSingleAdd(itemStacks.get(0)) == 0;
         } else {
             return Arrays.stream(simulateMultiAdd(itemStacks)).allMatch(i -> i == 0);
         }
     }
-    
+
     /**
      * Returns the amount of items that wouldn't fit in the inventory when added.
      * <br>
@@ -917,15 +937,15 @@ public abstract class Inventory {
     public int simulateSingleAdd(@NotNull ItemStack itemStack) {
         if (ItemUtils.isEmpty(itemStack))
             return 0;
-        
+
         ItemStack[] items = getUnsafeItems();
         int amountLeft = itemStack.getAmount();
-        
+
         // find all slots where the item partially fits
         for (int slot = 0; slot < items.length; slot++) {
             if (amountLeft == 0)
                 break;
-            
+
             ItemStack currentStack = items[slot];
             if (currentStack == null)
                 continue;
@@ -934,25 +954,25 @@ public abstract class Inventory {
                 continue;
             if (!itemStack.isSimilar(currentStack))
                 continue;
-            
+
             amountLeft = Math.max(0, amountLeft - (maxStackSize - currentStack.getAmount()));
         }
-        
+
         // remaining items would be added to empty slots
         for (int slot = 0; slot < items.length; slot++) {
             if (amountLeft == 0)
                 break;
-            
+
             if (items[slot] != null)
                 continue;
-            
+
             int maxStackSize = getMaxStackSize(slot, itemStack);
             amountLeft -= Math.min(amountLeft, maxStackSize);
         }
-        
+
         return amountLeft;
     }
-    
+
     /**
      * Simulates adding multiple {@link ItemStack}s to this {@link Inventory}
      * and returns the amount of {@link ItemStack}s that did not fit.<br>
@@ -967,10 +987,10 @@ public abstract class Inventory {
         for (int index = 0; index != itemStacks.size(); index++) {
             result[index] = copy.addItem(UpdateReason.SUPPRESSED, itemStacks.get(index));
         }
-        
+
         return result;
     }
-    
+
     /**
      * Finds all {@link ItemStack}s similar to the provided {@link ItemStack} and removes them from
      * their slot until the amount of the given {@link ItemStack} reaches its maximum stack size.
@@ -983,7 +1003,7 @@ public abstract class Inventory {
     public int collectSimilar(@Nullable UpdateReason updateReason, @NotNull ItemStack itemStack) {
         return collectSimilar(updateReason, itemStack, itemStack.getAmount());
     }
-    
+
     /**
      * Finds all {@link ItemStack}s similar to the provided {@link ItemStack} and removes them from
      * their slot until the maximum stack size of the {@link Material} is reached.
@@ -999,33 +1019,33 @@ public abstract class Inventory {
         int maxStackSize = InventoryUtils.stackSizeProvider.getMaxStackSize(template);
         if (amount < maxStackSize) {
             ItemStack[] items = getUnsafeItems();
-            
+
             // find partial slots and take items from there
             for (int slot = 0; slot < items.length; slot++) {
                 ItemStack currentStack = items[slot];
                 if (currentStack == null || currentStack.getAmount() >= maxStackSize || !template.isSimilar(currentStack))
                     continue;
-                
+
                 amount += takeFrom(updateReason, slot, maxStackSize - amount);
                 if (amount == maxStackSize)
                     return amount;
             }
-            
+
             // only taking from partial stacks wasn't enough, take from a full slot
             for (int slot = 0; slot < items.length; slot++) {
                 ItemStack currentStack = items[slot];
                 if (currentStack == null || currentStack.getAmount() <= maxStackSize || !template.isSimilar(currentStack))
                     continue;
-                
+
                 amount += takeFrom(updateReason, slot, maxStackSize - amount);
                 if (amount == maxStackSize)
                     return amount;
             }
         }
-        
+
         return amount;
     }
-    
+
     /**
      * Removes all {@link ItemStack ItemStacks} matching the given {@link Predicate}.
      *
@@ -1035,7 +1055,7 @@ public abstract class Inventory {
      */
     public int removeIf(@Nullable UpdateReason updateReason, @NotNull Predicate<@NotNull ItemStack> predicate) {
         ItemStack[] items = getUnsafeItems();
-        
+
         int removed = 0;
         for (int slot = 0; slot < items.length; slot++) {
             ItemStack item = items[slot];
@@ -1043,10 +1063,10 @@ public abstract class Inventory {
                 removed += item.getAmount();
             }
         }
-        
+
         return removed;
     }
-    
+
     /**
      * Removes the first n {@link ItemStack ItemStacks} matching the given {@link Predicate}.
      *
@@ -1057,7 +1077,7 @@ public abstract class Inventory {
      */
     public int removeFirst(@Nullable UpdateReason updateReason, int amount, @NotNull Predicate<@NotNull ItemStack> predicate) {
         ItemStack[] items = getUnsafeItems();
-        
+
         int leftOver = amount;
         for (int slot = 0; slot < items.length; slot++) {
             ItemStack item = items[slot];
@@ -1066,10 +1086,10 @@ public abstract class Inventory {
                 if (leftOver == 0) return 0;
             }
         }
-        
+
         return amount - leftOver;
     }
-    
+
     /**
      * Removes all {@link ItemStack ItemStacks} that are similar to the specified {@link ItemStack}.
      *
@@ -1079,7 +1099,7 @@ public abstract class Inventory {
      */
     public int removeSimilar(@Nullable UpdateReason updateReason, @NotNull ItemStack itemStack) {
         ItemStack[] items = getUnsafeItems();
-        
+
         int removed = 0;
         for (int slot = 0; slot < items.length; slot++) {
             ItemStack item = items[slot];
@@ -1087,10 +1107,10 @@ public abstract class Inventory {
                 removed += item.getAmount();
             }
         }
-        
+
         return removed;
     }
-    
+
     /**
      * Removes the first n {@link ItemStack ItemStacks} that are similar to the specified {@link ItemStack}.
      *
@@ -1101,7 +1121,7 @@ public abstract class Inventory {
      */
     public int removeFirstSimilar(@Nullable UpdateReason updateReason, int amount, @NotNull ItemStack itemStack) {
         ItemStack[] items = getUnsafeItems();
-        
+
         int leftOver = amount;
         for (int slot = 0; slot < items.length; slot++) {
             ItemStack item = items[slot];
@@ -1110,10 +1130,10 @@ public abstract class Inventory {
                 if (leftOver == 0) return 0;
             }
         }
-        
+
         return amount - leftOver;
     }
-    
+
     /**
      * Tries to take the specified amount of items from the specified slot.
      *
@@ -1126,13 +1146,13 @@ public abstract class Inventory {
         ItemStack currentItemStack = getUnsafeItem(slot);
         int amount = currentItemStack.getAmount();
         int take = Math.min(amount, maxTake);
-        
+
         ItemStack newItemStack;
         if (take != amount) {
             newItemStack = currentItemStack.clone();
             newItemStack.setAmount(amount - take);
         } else newItemStack = null;
-        
+
         if (shouldCallEvents(updateReason)) {
             ItemStack currentItemStackC = currentItemStack.clone();
             ItemPreUpdateEvent event = callPreUpdateEvent(updateReason, slot, currentItemStackC, newItemStack);

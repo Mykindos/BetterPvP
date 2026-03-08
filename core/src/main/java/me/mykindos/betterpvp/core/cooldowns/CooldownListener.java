@@ -33,7 +33,7 @@ public class CooldownListener implements Listener {
     @EventHandler
     public void onDeath(CustomDeathMessageEvent event) {
         if (!(event.getKilled() instanceof Player player)) return;
-        cooldownManager.getObject(player.getUniqueId()).ifPresent(cooldowns -> {
+        cooldownManager.getObject(player.getUniqueId().toString()).ifPresent(cooldowns -> {
             cooldowns.entrySet().removeIf(cooldown -> cooldown.getValue().isRemoveOnDeath());
         });
     }

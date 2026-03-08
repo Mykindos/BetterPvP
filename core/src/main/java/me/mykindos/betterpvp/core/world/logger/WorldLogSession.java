@@ -1,14 +1,14 @@
 package me.mykindos.betterpvp.core.world.logger;
 
 import lombok.Data;
-import me.mykindos.betterpvp.core.database.query.Statement;
+import org.bukkit.block.Block;
 
 import java.util.List;
 
 @Data
 public class WorldLogSession {
 
-    public Statement statement;
+    public Block block;
     public WorldLogQueryType queryType = WorldLogQueryType.BLOCK;
     public int pages;
     public int currentPage = 1;

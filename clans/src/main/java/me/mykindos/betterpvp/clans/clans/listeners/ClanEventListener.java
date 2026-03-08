@@ -257,7 +257,7 @@ public class ClanEventListener extends ClanListener {
         clan.getMembers().add(new ClanMember(player.getUniqueId().toString(), ClanMember.MemberRank.LEADER, player.getName()));
         player.setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
 
-        this.clanManager.addObject(clan.getId().toString(), clan);
+        this.clanManager.addObject(clan.getId(), clan);
         this.clanManager.getRepository().save(clan);
         this.clanManager.getLeaderboard().forceUpdate();
 
@@ -386,7 +386,7 @@ public class ClanEventListener extends ClanListener {
         clan.getAlliances().clear();
 
         this.clanManager.getRepository().delete(clan);
-        this.clanManager.getObjects().remove(clan.getId().toString());
+        this.clanManager.getObjects().remove(clan.getId());
         this.clanManager.getLeaderboard().forceUpdate();
 
         if (event.getPlayer() != null) {

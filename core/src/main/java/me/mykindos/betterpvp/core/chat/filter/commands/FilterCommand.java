@@ -69,7 +69,7 @@ public class FilterCommand extends Command {
 
             String word = String.join(" ", args).toLowerCase();
 
-            filterManager.addFilteredWord(word, player.getUniqueId()).thenAccept(success -> {
+            filterManager.addFilteredWord(word, client).thenAccept(success -> {
                 if (success) {
                     UtilMessage.message(player, "Filter", UtilMessage.deserialize("Added <yellow>%s</yellow> to the filter list", word));
                 } else {

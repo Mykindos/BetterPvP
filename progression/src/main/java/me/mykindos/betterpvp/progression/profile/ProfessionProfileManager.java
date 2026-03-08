@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRep
 import java.util.UUID;
 
 @Singleton
-public class ProfessionProfileManager extends Manager<ProfessionProfile> {
+public class ProfessionProfileManager extends Manager<String, ProfessionProfile> {
 
     @Getter
     private final ProfessionProfileRepository repository;

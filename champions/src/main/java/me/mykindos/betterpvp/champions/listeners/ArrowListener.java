@@ -4,16 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpectralArrow;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -62,16 +59,16 @@ public class ArrowListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onProjectileDelay(PreDamageEvent event) {
-        if (event.getDamageEvent().getProjectile() == null) {
+    public void onProjectileDelay(DamageEvent event) {
+        if (event.getProjectile() == null) {
             return;
         }
 
-        event.getDamageEvent().setForceDamageDelay(0);
-        event.getDamageEvent().setDamageDelay(0);
+        event.setForceDamageDelay(0);
+        event.setDamageDelay(0);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onArrowDamage(DamageEvent event) {
         if (event.getProjectile() instanceof Arrow arrow) {
             if (arrows.containsKey(arrow)) {
@@ -86,20 +83,12 @@ public class ArrowListener implements Listener {
 
     }
 
-    @EventHandler
-    public void onUpdateLore(ItemUpdateLoreEvent event) {
-        if(event.getItemStack().getType() == Material.ARROW) {
-            event.getItemLore().clear();
-            event.getItemLore().add(UtilMessage.deserialize("<reset>Damage: <green>%s", baseArrowDamage));
-        }
-    }
-
     /*
      * Removes arrows when they hit the ground, or a player
      */
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Arrow arrow) {
+        if (event.getEntity() instanceof Arrow arrow && !(arrow instanceof Trident)) {
             UtilServer.runTaskLater(champions, () -> {
                 arrow.remove();
                 arrows.remove(arrow);

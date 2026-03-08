@@ -16,7 +16,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
@@ -292,7 +292,7 @@ public class FishingListener implements Listener {
                 if (event.getItemDrop().isValid()) {
                     event.getItemDrop().remove();
                 }
-            }, 20L * 60L);
+            }, 20L * 30L);
         }
     }
 

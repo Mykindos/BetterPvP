@@ -3,18 +3,15 @@ core:
     server: Clans-1
     season: Season 1
   database:
-    local:
+    supabase:
+      url: "https://wenrbemzbvclukhgmbgz.supabase.co"
+      anon-key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlbnJiZW16YnZjbHVraGdtYmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNzA2MjEsImV4cCI6MjA3NDc0NjYyMX0.Pup-qcJLl7MNPy7DbW3SOyNoYAODc7XB5AvP5Yo8n4M"
+    global:
       databaseName: betterpvp
       username: user
       password: BetterPvP123!
-      ip: 127.0.0.1:5000
-      maxPoolSize: 7
-    global:
-      databaseName: betterpvp_global
-      username: user
-      password: BetterPvP123!
-      ip: 127.0.0.1:5000
-      maxPoolSize: 2
+      ip: 127.0.0.1:5002
+      maxPoolSize: 10
     mineplex:
       localDatabaseName:
       globalDatabaseName:
@@ -28,17 +25,19 @@ core:
   exceptions:
     discord-webhook: ''
   salt: ''
+  resourcepack:
+    enabled: true
 pvp:
   enableOldPvP: true
-  mythic-health-bars:
-    enabled: true
-  showKillerHealth: false
+  hitboxExpansion: 0.05
   hitboxCooldown: 0.1
-  hitboxExpansion: 0.1
   mythic-damage-indicators:
     duration: 1.5
     enabled: true
-    scale: 3.0
+    scale: 1.1
+  mythic-health-bars:
+    enabled: true
+  showKillerHealth: true
 gamer:
   default:
     coins: 5000
@@ -53,6 +52,9 @@ weather:
 items:
   hideAttributes: true
   hideEnchants: true
+  drop-protection:
+    required-drops: 5
+    expiry-seconds: 2.0
 command:
   list:
     enabled: true
@@ -311,12 +313,18 @@ command:
     requiredRank: PLAYER
 
 tab:
-  title: Welcome to Mineplex Clans!
-  website: https://mineplex.com
+  title: Welcome to BetterPvP Clans!
+  website: https://betterpvp.net
   server: Clans-1
   shop: /store
 energy:
   nerf-energy-regen: false
+  consumption-regen-delay: 1.0
+  max-energy: 150.0
+  energy-per-tick: 10.0
+  energy-per-tick-nerfed: 4.0
+  update-rate: 50
+  energy-per-second: 10.0
 combat:
   crit-arrows: false
 server:

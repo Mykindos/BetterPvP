@@ -9,7 +9,7 @@ import java.util.Collection;
 
 @CustomLog
 @Singleton
-public class TipManager extends Manager<Tip> {
+public class TipManager extends Manager<String, Tip> {
 
     public void registerTip(BPvPPlugin plugin, Tip tip) {
         addObject(tip.getName(), tip);

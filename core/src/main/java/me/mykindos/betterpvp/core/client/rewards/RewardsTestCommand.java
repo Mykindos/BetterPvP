@@ -6,14 +6,16 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.framework.mineplex.MineplexMessage;
-import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageSentEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.framework.server.ServerMessage;
+import me.mykindos.betterpvp.core.framework.server.events.ServerMessageSentEvent;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
@@ -21,12 +23,12 @@ import java.util.concurrent.CompletableFuture;
 public class RewardsTestCommand extends Command {
 
     private final ClientSQLLayer clientSQLLayer;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public RewardsTestCommand(ClientSQLLayer clientSQLLayer, ItemHandler itemHandler) {
+    public RewardsTestCommand(ClientSQLLayer clientSQLLayer, ItemFactory itemFactory) {
         this.clientSQLLayer = clientSQLLayer;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     @Override
@@ -41,10 +43,11 @@ public class RewardsTestCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        ItemStack itemStack = itemHandler.getItem("dungeons:dungeon_token").getItemStack();
+        final BaseItem baseItem = Objects.requireNonNull(itemFactory.getItemRegistry().getItem("dungeons:dungeon_token"));
+        ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
         CompletableFuture.runAsync(() -> {
             if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-                UtilServer.callEvent(new MineplexMessageSentEvent("BetterPvP", MineplexMessage.builder()
+                UtilServer.callEvent(new ServerMessageSentEvent("BetterPvP", ServerMessage.builder()
                         .channel("ChampionsWinsReward").message("TEST").metadata("uuid", player.getUniqueId().toString()).build()));
             } else {
                 RewardBox rewardBox = clientSQLLayer.getRewardBox(client);

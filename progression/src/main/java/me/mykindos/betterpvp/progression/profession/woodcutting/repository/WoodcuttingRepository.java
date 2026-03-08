@@ -3,94 +3,117 @@ package me.mykindos.betterpvp.progression.profession.woodcutting.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicLong;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_WOODCUTTING;
 
 @CustomLog
 @Singleton
 public class WoodcuttingRepository {
+
     private final Database database;
+    private final ClientManager clientManager;
     private final ProfessionProfileManager profileManager;
 
     @Inject
-    public WoodcuttingRepository(Database database, ProfessionProfileManager profileManager) {
+    public WoodcuttingRepository(Database database, ClientManager clientManager, ProfessionProfileManager profileManager) {
         this.database = database;
+        this.clientManager = clientManager;
         this.profileManager = profileManager;
+        createPartitions();
+    }
+
+    public void createPartitions() {
+        int season = Core.getCurrentSeason();
+        String partitionTableName = "progression_woodcutting_season_" + season;
+        try {
+            database.getDslContext().execute(DSL.sql(String.format(
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF progression_woodcutting FOR VALUES IN (%d)",
+                    partitionTableName, season
+            )));
+            log.info("Created partition {} for season {}", partitionTableName, season).submit();
+        } catch (Exception e) {
+            log.info("Partition {} may already exist", partitionTableName).submit();
+        }
     }
 
     public void saveChoppedLog(UUID playerUUID, Material material, Location location, int amount) {
-        String query = "INSERT INTO progression_woodcutting (id, Gamer, Material, Location, Amount) VALUES (?, ?, ?, ?, ?);";
-        Statement statement = new Statement(query,
-                new UuidStatementValue(UUID.randomUUID()),
-                new UuidStatementValue(playerUUID),
-                new StringStatementValue(material.name()),
-                new StringStatementValue(UtilWorld.locationToString(location)),
-                new IntegerStatementValue(amount));
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            Client client = clientManager.search().offline(playerUUID).join().orElseThrow();
 
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Progression.class), () -> database.executeUpdate(statement));
+            ctx.insertInto(PROGRESSION_WOODCUTTING)
+                    .set(PROGRESSION_WOODCUTTING.CLIENT, client.getId())
+                    .set(PROGRESSION_WOODCUTTING.SEASON, Core.getCurrentSeason())
+                    .set(PROGRESSION_WOODCUTTING.MATERIAL, material.name())
+                    .set(PROGRESSION_WOODCUTTING.LOCATION, UtilWorld.locationToString(location))
+                    .set(PROGRESSION_WOODCUTTING.AMOUNT, amount)
+                    .execute();
+        });
+
     }
 
     /**
      * Gets the total chopped logs for a player given a unique ID
      */
     public Long getTotalChoppedLogsForPlayer(UUID playerUUID) {
-        String query = "SELECT SUM(Amount) FROM progression_woodcutting WHERE Gamer = ?";
-        Statement statement = new Statement(query, new UuidStatementValue(playerUUID));
+        return database.getAsyncDslContext().executeAsync(ctx -> {
+            Client client = clientManager.search().offline(playerUUID).join().orElse(null);
 
-        AtomicLong atomicLong = new AtomicLong(0L);
-        try (CachedRowSet result = database.executeQuery(statement).join()) {
-
-            if (result.next()) {
-                final long amount = result.getLong(1);
-                atomicLong.set(amount);
+            if (client == null) {
+                return 0L;
             }
-        } catch (SQLException e) {
-            log.error("Error fetching woodcutting leaderboard data", e).submit();
-        }
 
-        return atomicLong.get();
+            Long totalAmount = ctx.select(DSL.coalesce(DSL.sum(PROGRESSION_WOODCUTTING.AMOUNT), 0L))
+                    .from(PROGRESSION_WOODCUTTING)
+                    .where(PROGRESSION_WOODCUTTING.CLIENT.eq(client.getId()))
+                    .fetchOne(0, Long.class);
+
+            return totalAmount != null ? totalAmount : 0L;
+        }).join();
     }
 
     /**
      * docs tbd
      */
     public CompletableFuture<HashMap<UUID, Long>> getTopLogsChoppedByCount(double days) {
-        return CompletableFuture.supplyAsync(() -> {
+        return database.getAsyncDslContext().executeAsync(ctx -> {
             HashMap<UUID, Long> leaderboard = new HashMap<>();
-            String query = "SELECT Gamer, SUM(Amount) as total_amount FROM progression_woodcutting WHERE timestamp > NOW() - INTERVAL ? DAY GROUP BY Gamer ORDER BY SUM(Amount) DESC LIMIT 10";
-            Statement statement = new Statement(query, new DoubleStatementValue(days));
+            try {
 
-            try (CachedRowSet result = database.executeQuery(statement).join()) {
-
-                while (result.next()) {
-                    final String gamer = result.getString(1);
-                    final long count = result.getLong(2);
-                    leaderboard.put(UUID.fromString(gamer), count);
-                }
-            } catch (SQLException e) {
-                log.error("Error fetching woodcutting leaderboard data", e).submit();
+                ctx.select(CLIENTS.UUID, DSL.sum(PROGRESSION_WOODCUTTING.AMOUNT).as("total_amount"))
+                        .from(PROGRESSION_WOODCUTTING)
+                        .join(CLIENTS).on(PROGRESSION_WOODCUTTING.CLIENT.eq(CLIENTS.ID))
+                        .where(PROGRESSION_WOODCUTTING.TIMESTAMP.gt(Instant.now().minus(Duration.ofDays((int) days)).toEpochMilli()))
+                        .groupBy(CLIENTS.UUID)
+                        .orderBy(DSL.sum(PROGRESSION_WOODCUTTING.AMOUNT).desc())
+                        .limit(10)
+                        .fetch()
+                        .forEach(record -> {
+                            leaderboard.put(
+                                    UUID.fromString(record.get(CLIENTS.UUID)),
+                                    record.get("total_amount", Long.class)
+                            );
+                        });
+            } catch (DataAccessException ex) {
+                log.error("Error fetching woodcutting leaderboard data", ex).submit();
             }
-
             return leaderboard;
-
         });
     }
 

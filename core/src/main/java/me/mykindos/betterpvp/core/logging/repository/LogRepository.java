@@ -5,21 +5,22 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
 
 import javax.annotation.Nullable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_LOG_MESSAGES_BY_CONTEXT_AND_ACTION;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_LOG_MESSAGES_BY_CONTEXT_AND_VALUE;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.LOGS;
 
 @Singleton
 @CustomLog
@@ -42,51 +43,39 @@ public class LogRepository {
 
     public List<CachedLog> getLogsWithContextAndAction(String key, String value, @Nullable String actionFilter) {
         List<CachedLog> logs = new ArrayList<>();
-        Statement statement1;
 
-        if (actionFilter != null) {
-            statement1 = new Statement("CALL GetLogMessagesByContextAndAction(?, ?, ?, ?, ?)",
-                    new StringStatementValue(key),
-                    new StringStatementValue(value),
-                    new StringStatementValue(actionFilter),
-                    new IntegerStatementValue(Core.getCurrentServer()),
-                    new IntegerStatementValue(Core.getCurrentSeason())
-            );
-        } else {
-            statement1 = new Statement("CALL GetLogMessagesByContextAndValue(?, ?, ?, ?)",
-                    new StringStatementValue(key),
-                    new StringStatementValue(value),
-                    new IntegerStatementValue(Core.getCurrentServer()),
-                    new IntegerStatementValue(Core.getCurrentSeason())
-            );
-        }
-
-        database.executeProcedure(statement1, -1, result -> {
-            try {
-                while (result.next()) {
-                    String message = result.getString(1);
-                    String action = result.getString(2);
-                    long timestamp = result.getLong(3);
-                    String contextRaw = result.getString(4);
-
-                    HashMap<String, String> contextMap = new HashMap<>();
-                    String[] contexts = contextRaw.split("\\|");
-                    for (String context : contexts) {
-                        String[] split = context.split("::");
-                        contextMap.put(split[0], split[1]);
-                    }
-
-                    if (action == null) {
-                        log.warn("Fetching a log with no action, excluding. {}", contextRaw).submit();
-                        continue;
-                    }
-                    CachedLog log = new CachedLog(message, action, timestamp, contextMap);
-                    logs.add(log);
-                }
-            } catch (SQLException e) {
-                log.error("Error fetching log data", e).submit();
+        try {
+            DSLContext ctx = database.getDslContext();
+            Result<? extends Record> result;
+            if (actionFilter != null) {
+                result = GET_LOG_MESSAGES_BY_CONTEXT_AND_ACTION(ctx.configuration(), key, value, actionFilter, Core.getCurrentRealm());
+            } else {
+                result = GET_LOG_MESSAGES_BY_CONTEXT_AND_VALUE(ctx.configuration(), key, value, Core.getCurrentRealm());
             }
-        }, TargetDatabase.GLOBAL).join();
+
+            result.forEach(logRecord -> {
+                String message = logRecord.get(0, String.class);
+                String action = logRecord.get(1, String.class);
+                long timestamp = logRecord.get(2, Long.class);
+                String contextRaw = logRecord.get(3, String.class);
+
+                HashMap<String, String> contextMap = new HashMap<>();
+                String[] contexts = contextRaw.split("\\|");
+                for (String context : contexts) {
+                    String[] split = context.split("::");
+                    contextMap.put(split[0], split[1]);
+                }
+
+                if (action == null) {
+                    log.warn("Fetching a log with no action, excluding. {}", contextRaw).submit();
+                    return;
+                }
+                CachedLog log = new CachedLog(message, action, timestamp, contextMap);
+                logs.add(log);
+            });
+        } catch (Exception e) {
+            log.error("Error fetching log data", e).submit();
+        }
 
         return logs;
     }
@@ -101,17 +90,16 @@ public class LogRepository {
 
             for (int attempt = 0; attempt < maxRetries; attempt++) {
                 try {
-                    Statement statement = new Statement(
-                            "DELETE FROM logs WHERE Server = ? AND Season = ? AND Action = ? AND Time <= ? LIMIT ?",
-                            IntegerStatementValue.of(Core.getCurrentServer()),
-                            IntegerStatementValue.of(Core.getCurrentSeason()),
-                            StringStatementValue.of(""),
-                            new LongStatementValue(System.currentTimeMillis() - daysToMillis),
-                            IntegerStatementValue.of(batchSize)
-                    );
+                    DSLContext ctx = database.getDslContext();
 
-                    database.executeUpdateNoTimeout(statement, TargetDatabase.GLOBAL).join();
-                    log.info("Successfully purged batch of {} logs", batchSize).submit();
+                    int deletedRows = ctx.deleteFrom(LOGS)
+                            .where(LOGS.REALM.eq(Core.getCurrentRealm()))
+                            .and(LOGS.ACTION.eq(""))
+                            .and(LOGS.LOG_TIME.le(System.currentTimeMillis() - daysToMillis))
+                            .limit(batchSize)
+                            .execute();
+
+                    log.info("Successfully purged batch of {} logs", deletedRows).submit();
 
                     // Add delay between batches to reduce lock contention
                     Thread.sleep(5000); // 5 second delay

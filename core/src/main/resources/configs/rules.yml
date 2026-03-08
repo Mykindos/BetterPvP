@@ -35,7 +35,7 @@ hacking:
       - BAN 30 d
     description:
       - Using a mod that's unapproved
-      - for use on the Mineplex network
+      - for use on the network
     material: DIAMOND_BLOCK
     customModelData: 1
 gameplay:

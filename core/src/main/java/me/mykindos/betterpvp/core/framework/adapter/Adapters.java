@@ -48,7 +48,6 @@ public final class Adapters {
 
             final String pluginName = Arrays.stream(adapterAnnotation).map(PluginAdapter::value).collect(Collectors.joining(", "));
             final Object adapter = plugin.getInjector().getInstance(clazz);
-            plugin.getInjector().injectMembers(adapter);
 
             // Attempt to call the onLoad method
             try {

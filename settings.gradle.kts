@@ -16,7 +16,6 @@ if (File("./private/").exists()) {
     include(":private:dungeons")
     include(":private:store")
     include(":private:compatability")
-    include(":private:mineplex")
 }
 
 pluginManagement {
@@ -28,10 +27,11 @@ pluginManagement {
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://mvn.lumine.io/repository/maven-public/")
         maven("https://repo.xenondevs.xyz/releases")
-        maven("https://repo.md-5.net/repository/public/")
+        maven("https://repo.md-5.net/content/groups/public/")
+        maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://jitpack.io")
         maven {
-            url =  uri("http://mykindos.me:8081/repository/maven-public/")
+            url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }
@@ -41,17 +41,24 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            version("kotlin", "1.9.20")
-            version("paper", "1.21.8-R0.1-SNAPSHOT")
-            version("paperweight", "2.0.0-beta.18")
+            version("kotlin", "2.1.0")
+            version("paper", "1.21.11-R0.1-SNAPSHOT")
+            version("paperweight", "2.0.0-beta.19")
             version("jackson", "2.17.2")
-            version("mineplex", "1.21.4")
-            version("sidebar", "2.2.2")
-            version("mockbukkit", "4.45.0")
+            version("sidebar", "2.4.1")
+            version("mockbukkit", "4.72.8")
             version("junit", "5.13.0-M2")
+            version("jooq", "3.19.3")
+            version("postgres", "42.7.4")
 
-            // Library - Mineplex SDK
-            library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
+            // Library - PostgreSQL
+            library("postgres", "org.postgresql", "postgresql").versionRef("postgres")
+
+            // Library - jOOQ
+            library("jooq", "org.jooq", "jooq").versionRef("jooq")
+            library("jooq-codegen", "org.jooq", "jooq-codegen").versionRef("jooq")
+            library("jooq-meta", "org.jooq", "jooq-meta").versionRef("jooq")
+            library("jooq-meta-extensions", "org.jooq", "jooq-meta-extensions").versionRef("jooq")
 
             // Library - reflection mapper
             library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.3")
@@ -82,12 +89,15 @@ dependencyResolutionManagement {
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
 
             // Libraries - Data Management
-            library("jedis", "redis.clients:jedis:7.0.0")
-            library("flyway-core", "org.flywaydb", "flyway-core").version("11.13.0")
-            library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.13.0")
+            library("jedis", "redis.clients:jedis:7.3.0")
+            library("flyway-core", "org.flywaydb", "flyway-core").version("11.20.1")
+            library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.20.1")
+            library("flyway-postgres", "org.flywaydb", "flyway-database-postgresql").version("11.20.1")
             library("hikari-cp", "com.zaxxer", "HikariCP").version("5.1.0")
 
             // Libraries - Utilities
+            library("persistent-data-types", "com.jeff-media", "MorePersistentDataTypes").version("2.4.0")
+            library("glowapi", "fr.skytasul", "glowingentities").version("1.4.8")
             library("commons-text", "org.apache.commons", "commons-text").version("1.10.0")
             library("commons-lang3", "org.apache.commons", "commons-lang3").version("3.12.0")
             library("commons-math3", "org.apache.commons", "commons-math3").version("3.6.1")
@@ -107,24 +117,29 @@ dependencyResolutionManagement {
             library("sidebar-packetevents", "net.megavex", "scoreboard-library-packetevents").versionRef("sidebar")
 
             // Library - WorldEdit
-            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")
-            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
+            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.14.2")
+            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.14.2")
 
             // Library - Mythic
-            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.0-SNAPSHOT")
+            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.5")
 
-            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
+            // Library - Nexo
+            library("nexo", "com.nexomc", "nexo").version("1.7.1")
+
+            // Library - Oraxen
+            library("oraxen", "io.th0rgal", "oraxen").version("1.200.0")
+
+            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.9")
 
             // Library - McPets
-            library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
+            library("mcpets", "fr.nocsy", "mcpets").version("4.1.10")
 
             // Library - Protocol
-            library("protocollib", "net.dmulloy2", "ProtocolLib").version("5.4.0")
-            library("libsdisguises", "LibsDisguises", "LibsDisguises").version("10.0.44")
+            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.13")
+            library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.11.0")
 
             // Library - Mixins
-            library("ignite", "space.vectrix.ignite", "ignite-api").version("0.8.1")
-            library("mixin", "org.spongepowered", "mixin").version("0.8.5")
+            library("mixin", "org.spongepowered", "mixin").version("0.8.7")
 
             // Library - Guice
             library("guice", "com.google.inject", "guice").version("7.0.0")
@@ -135,6 +150,8 @@ dependencyResolutionManagement {
             bundle("paper", listOf("paper-api"))
             bundle("utils",
                 listOf("commons-text",
+                    "persistent-data-types",
+                    "glowapi",
                     "commons-lang3",
                     "commons-math3",
                     "annotations",
@@ -146,8 +163,8 @@ dependencyResolutionManagement {
                     "reflections",
                     "okhttp",
                     "zip4j"))
-            bundle("data", listOf("jedis", "flyway-core", "flyway-mysql"))
-            bundle("mixins", listOf("ignite", "mixin"))
+            bundle("data", listOf("jedis", "flyway-core", "flyway-mysql", "flyway-postgres"))
+            bundle("mixins", listOf("mixin"))
         }
     }
 }

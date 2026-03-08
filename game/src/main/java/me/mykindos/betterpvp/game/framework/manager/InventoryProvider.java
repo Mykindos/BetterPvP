@@ -2,8 +2,9 @@ package me.mykindos.betterpvp.game.framework.manager;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
@@ -22,17 +23,20 @@ public class InventoryProvider {
 
     private final ServerController serverController;
     private final RoleSelectorManager roleSelectorManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final PlayerController playerController;
     private final HotBarLayoutManager layoutManager;
+    private final RoleManager roleManager;
 
     @Inject
-    public InventoryProvider(ServerController serverController, RoleSelectorManager roleSelectorManager, ItemHandler itemHandler, PlayerController playerController, HotBarLayoutManager layoutManager) {
+    public InventoryProvider(ServerController serverController, RoleSelectorManager roleSelectorManager, ItemFactory itemFactory,
+                             PlayerController playerController, HotBarLayoutManager layoutManager, RoleManager roleManager) {
         this.serverController = serverController;
         this.roleSelectorManager = roleSelectorManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
         this.playerController = playerController;
         this.layoutManager = layoutManager;
+        this.roleManager = roleManager;
     }
 
     public void refreshInventory(Player player) {
@@ -51,7 +55,7 @@ public class InventoryProvider {
         if (waiting || participant.isAlive()) {
             // Equip their kit
             Role role = roleSelectorManager.getRole(player);
-            role.equip(itemHandler, player, true); // Only armor
+            roleManager.equipRole(player, role); // Only armor
 
             // Update hotbar
             layoutManager.applyPlayerLayout(player);
@@ -60,7 +64,7 @@ public class InventoryProvider {
         //if a player is dead and not spectating, equip their armor to allow their skills and energy to recharge
         if (!participant.isAlive() && !participant.isSpectating()) {
             Role role = roleSelectorManager.getRole(player);
-            role.equip(itemHandler, player, true);
+            roleManager.equipRole(player, role);
         }
 
         // todo: Then set their hot bar buttons ONLY in waiting state

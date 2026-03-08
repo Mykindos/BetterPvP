@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
@@ -37,11 +38,11 @@ public class ClansAuctionListener implements Listener {
     private final AuctionManager auctionManager;
 
     @Inject
-    public ClansAuctionListener(ClanManager clanManager, ClientManager clientManager) {
+    public ClansAuctionListener(ClanManager clanManager, ClientManager clientManager, ItemFactory itemFactory) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.auctionManager = JavaPlugin.getPlugin(Shops.class).getInjector().getInstance(AuctionManager.class);
-        this.auctionManager.setDeliveryService(new ClansAuctionDeliveryService(clanManager));
+        this.auctionManager.setDeliveryService(new ClansAuctionDeliveryService(clanManager, itemFactory));
     }
 
     @EventHandler
@@ -88,7 +89,7 @@ public class ClansAuctionListener implements Listener {
         Optional<Clan> sellerClanOptional = clanManager.getClanByPlayer(event.getAuction().getSeller());
         if(sellerClanOptional.isEmpty()) {
             event.cancel("The seller must be in a clan to purchase this auction."); // This should never happen
-            log.warn("Seller of auction " + event.getAuction().getAuctionID().toString() + " is not in a clan.").submit();
+            log.warn("Seller of auction " + event.getAuction().getAuctionID() + " is not in a clan.").submit();
             return;
         }
 

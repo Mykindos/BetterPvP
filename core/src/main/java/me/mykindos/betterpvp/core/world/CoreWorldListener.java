@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -51,7 +51,7 @@ public class CoreWorldListener implements Listener {
     public CoreWorldListener(ClientManager clientManager, WorldHandler worldHandler) {
         this.clientManager = clientManager;
         this.worldHandler = worldHandler;
-        ((CraftServer) Bukkit.getServer()).getServer().setFlightAllowed(true);
+        ((CraftServer) Bukkit.getServer()).getServer().setAllowFlight(true);
 
 
         GlobalConfiguration paperConfig = GlobalConfiguration.get();
@@ -72,7 +72,7 @@ public class CoreWorldListener implements Listener {
             worldHandler.loadSpawnLocations();
         }
 
-        world.setGameRule(GameRule.LOCATOR_BAR, false);
+        world.setGameRule(GameRules.LOCATOR_BAR, false);
 
         var paperConfig = ((CraftWorld) world).getHandle().getLevel().paperConfig();
         paperConfig.misc.disableRelativeProjectileVelocity = true;
