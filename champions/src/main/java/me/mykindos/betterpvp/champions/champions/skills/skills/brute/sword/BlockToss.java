@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.BlockTossObject;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -48,16 +48,14 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class BlockToss extends ChannelSkill implements Listener, InteractSkill, CooldownSkill, DamageSkill {
+public class BlockToss extends ChargeSkill implements Listener, InteractSkill, CooldownSkill, DamageSkill {
 
-    private final WeakHashMap<Player, BoulderChargeData> charging = new WeakHashMap<>();
+    private final WeakHashMap<Player, BoulderChargeData> chargingMap = new WeakHashMap<>();
     private final WeakHashMap<Player, List<BlockTossObject>> boulders = new WeakHashMap<>();
     private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this,
-            charging,
+            chargingMap,
             gamer -> true);
 
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double baseRadius;
@@ -110,10 +108,6 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         return level * sizePerLevel;
     }
 
-    private double getChargePerSecond(int level) {
-        return baseCharge + (level - 1) * chargeIncreasePerLevel;
-    }
-
     @Override
     public double getCooldown(int level) {
         return cooldown - (level - 1d) * cooldownDecreasePerLevel;
@@ -145,7 +139,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
-        return !charging.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
+        return !chargingMap.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
     }
 
     @Override
@@ -169,15 +163,15 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             clonedBlocks.add(Bukkit.createBlockData(Material.STONE));
         }
 
-        if (charging.containsKey(player)) {
+        if (chargingMap.containsKey(player)) {
             return;
         }
 
         final BlockTossObject boulder = new BlockTossObject(clonedBlocks, this, player);
         boulder.spawn(size);
 
-        final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond(level) / 100, boulder);
-        charging.put(player, chargeData);
+        final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond(level), boulder);
+        chargingMap.put(player, chargeData);
         boulders.computeIfAbsent(player, key -> new ArrayList<>()).add(boulder);
     }
 
@@ -188,8 +182,6 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 55.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         baseRadius = getConfig("baseRadius", 3.0, Double.class);
@@ -201,13 +193,14 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         hitBoxSize = getConfig("hitBoxSize", 1.0, Double.class);
     }
 
+    @Override
     @UpdateEvent
     public void updateCharge() {
         // Charge check
-        Iterator<Player> iterator = charging.keySet().iterator();
+        Iterator<Player> iterator = chargingMap.keySet().iterator();
         while (iterator.hasNext()) {
             Player player = iterator.next();
-            BoulderChargeData chargeData = charging.get(player);
+            BoulderChargeData chargeData = chargingMap.get(player);
             if (player == null || !player.isOnline()) {
                 iterator.remove();
                 continue;
