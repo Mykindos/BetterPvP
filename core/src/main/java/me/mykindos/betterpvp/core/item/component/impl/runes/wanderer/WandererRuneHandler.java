@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -88,7 +89,7 @@ public class WandererRuneHandler implements Listener {
 
             // Check if they're in combat
             final DamageLog lastDamager = damageLogManager.getLastDamager(entity);
-            final boolean combat = entity instanceof Player player && clientManager.search().online(player).getGamer().isInCombat();
+            final boolean combat = entity instanceof Player player && UtilPlayer.isPlayerInCombat(clientManager, player);
             if ((lastDamager == null || lastDamager.getDamager() == null) && !combat) {
                 // They haven't taken damage by an enemy
                 // Give them the effect
