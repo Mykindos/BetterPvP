@@ -39,7 +39,6 @@ dependencies {
     compileOnly(libs.nexo)
     compileOnly(libs.oraxen)
 
-    compileOnly(libs.mineplex)
     compileOnly(libs.lombok)
     compileOnly(libs.mythic)
     compileOnly(libs.modelengine)

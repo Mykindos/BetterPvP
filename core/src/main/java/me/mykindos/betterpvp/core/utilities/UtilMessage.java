@@ -53,7 +53,6 @@ public class UtilMessage {
 
 
     public static final Component StudioPrefix = Component.empty().append(Component.text("BPvP", NamedTextColor.RED));
-    public static final Component MineplexPrefix = Component.empty().append(Component.text("MP", NamedTextColor.GOLD));
 
     /**
      * Sends a message to a player with appropriate formatting

@@ -45,7 +45,7 @@ public class GamerListener implements Listener {
     private double defaultPvPProtection;
 
     @Inject
-    @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
+    @Config(path = "tab.shop", defaultValue = "shop.betterpvp.net")
     private String shop;
 
     private final ClientManager manager;
@@ -54,7 +54,7 @@ public class GamerListener implements Listener {
     public GamerListener(Core core, ClientManager manager) {
         this.manager = manager;
 
-        this.header = new PermanentComponent(gamer -> Component.text("Mineplex ", NamedTextColor.GOLD)
+        this.header = new PermanentComponent(gamer -> Component.text("BetterPvP ", NamedTextColor.GOLD)
                 .append(Component.text("Network ", NamedTextColor.WHITE))
                 .append(Component.text(core.getConfig().getOrSaveString("core.info.server", "unknown"), NamedTextColor.GREEN)));
 

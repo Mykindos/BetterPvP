@@ -57,14 +57,6 @@ public enum Rank {
                     "and to help players!"),
             4
     ),
-    MINEPLEX("Mineplex",
-            NamedTextColor.GOLD,
-            UtilMessage.MineplexPrefix,
-            UtilMessage.MineplexPrefix,
-            List.of("<white>A Mineplex Staff Member",
-                    "This is a Mineplex Staff member"),
-            5
-    ),
     ADMIN("Admin",
             NamedTextColor.RED,
             Component.text("Admin", NamedTextColor.RED),
@@ -83,7 +75,7 @@ public enum Rank {
             List.of("<white>A BetterPvP Developer",
                     "This person is a BetterPvP Developer.",
                     "They create and maintain the games",
-                    "BetterPvP offers on Mineplex"),
+                    "BetterPvP offers."),
             7);
 
     @Getter

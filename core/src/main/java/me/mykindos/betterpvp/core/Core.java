@@ -46,7 +46,6 @@ import me.mykindos.betterpvp.core.utilities.model.OrientedVector;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -168,7 +167,7 @@ public class Core extends BPvPPlugin {
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }
-    
+
     private void registerItems() {
         StatTypes.registerAll(this.injector.getInstance(StatTypeRegistry.class));
 
@@ -182,22 +181,10 @@ public class Core extends BPvPPlugin {
     }
 
     private void setupServerAndSeason() {
-        if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-            String serverName = getCommonNameViaReflection();
-            if (serverName == null) {
-                serverName = "unknown";
-            }
 
-            if (serverName.toLowerCase().startsWith("champions")) {
-                serverName = "Champions";
-            }
-
-            setCurrentServer(database.getServerId(serverName));
-        } else {
-            String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
-            setCurrentServerName(serverName);
-            setCurrentServer(database.getServerId(serverName));
-        }
+        String serverName = getConfig().getOrSaveString("core.info.server", "unknown");
+        setCurrentServerName(serverName);
+        setCurrentServer(database.getServerId(serverName));
 
         setCurrentSeason(getConfig().getOrSaveInt("core.info.season", 0));
         setCurrentRealm(database.getRealmId(getCurrentServer(), getCurrentSeason()));
@@ -230,15 +217,4 @@ public class Core extends BPvPPlugin {
         LoggerFactory.getInstance().close();
     }
 
-    private String getCommonNameViaReflection() {
-        try {
-            Class<?> namespaceUtilClass = Class.forName("com.mineplex.studio.sdk.util.NamespaceUtil");
-            java.lang.reflect.Method getCommonNameMethod = namespaceUtilClass.getMethod("getCommonName");
-            return (String) getCommonNameMethod.invoke(null);
-        } catch (Exception e) {
-            log.error("Failed to get server common name", e).submit();
-        }
-
-        return "unknown";
-    }
 }

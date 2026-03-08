@@ -56,7 +56,7 @@ public class MapManager {
     @Inject
     public MapManager(GamePlugin plugin, Provider<CurrentMapAttribute> currentMapAttribute, ServerController serverController) {
         this.currentMapAttribute = currentMapAttribute;
-        this.mapsFolder = Compatibility.MINEPLEX ? new File(System.getProperty("user.dir"), "/assets/maps") : new File(plugin.getDataFolder(), "maps");
+        this.mapsFolder = new File(plugin.getDataFolder(), "maps");
         this.serverController = serverController;
         if (!mapsFolder.exists()) {
             mapsFolder.mkdirs();

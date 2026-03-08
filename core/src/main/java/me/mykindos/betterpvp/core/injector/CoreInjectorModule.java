@@ -5,11 +5,8 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.filter.IFilterService;
 import me.mykindos.betterpvp.core.chat.filter.impl.DefaultFilterService;
-import me.mykindos.betterpvp.core.chat.filter.impl.MineplexFilterService;
 import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
-import me.mykindos.betterpvp.core.chat.ignore.impl.MineplexIgnoreService;
-import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
 import org.bukkit.Bukkit;
@@ -27,17 +24,12 @@ public class CoreInjectorModule extends AbstractModule {
     protected void configure() {
         bind(Core.class).toInstance(plugin);
 
-        if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-            bind(IDatabaseConnection.class).to(MineplexDatabaseConnection.class);
-            bind(IFilterService.class).to(MineplexFilterService.class);
-            bind(IIgnoreService.class).to(MineplexIgnoreService.class);
-            log.info("Using mineplex studio integrations").submit();
-        } else {
-            bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
-            bind(IFilterService.class).to(DefaultFilterService.class);
-            bind(IIgnoreService.class).to(DefaultIgnoreService.class);
-            log.info("Using default integrations").submit();
-        }
+
+        bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
+        bind(IFilterService.class).to(DefaultFilterService.class);
+        bind(IIgnoreService.class).to(DefaultIgnoreService.class);
+        log.info("Using default integrations").submit();
+
     }
 
 }

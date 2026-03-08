@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.framework.mineplex;
+package me.mykindos.betterpvp.core.framework.server;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,21 +9,21 @@ import java.util.HashMap;
 @Jacksonized
 @Data
 @Builder
-public class MineplexMessage {
+public class ServerMessage {
 
     private String channel;
     private String server;
     private String message;
     private HashMap<String, String> metadata;
 
-    public static class MineplexMessageBuilder {
+    public static class ServerMessageBuilder {
 
-        public MineplexMessageBuilder metadata(HashMap<String, String> metadata) {
+        public ServerMessageBuilder metadata(HashMap<String, String> metadata) {
             this.metadata = metadata;
             return this;
         }
 
-        public MineplexMessageBuilder metadata(String key, String value) {
+        public ServerMessageBuilder metadata(String key, String value) {
             if (this.metadata == null) {
                 this.metadata = new HashMap<>();
             }
