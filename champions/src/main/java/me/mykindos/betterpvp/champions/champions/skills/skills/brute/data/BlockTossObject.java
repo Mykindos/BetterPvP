@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -146,7 +147,7 @@ public final class BlockTossObject {
             arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
             arrow.setPortalCooldown(Integer.MAX_VALUE);
             arrow.setInvulnerable(true);
-            arrow.setVisualFire(false);
+            arrow.setVisualFire(TriState.FALSE);
             arrow.setPersistent(false);
             arrow.setVisibleByDefault(false);
             arrow.setShooter(caster);
