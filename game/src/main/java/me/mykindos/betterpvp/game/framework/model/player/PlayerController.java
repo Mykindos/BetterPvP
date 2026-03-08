@@ -23,6 +23,9 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Controls all players and their states within the game.
+ */
 @Singleton
 public class PlayerController {
 

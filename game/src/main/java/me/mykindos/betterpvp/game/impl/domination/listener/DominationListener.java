@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.game.impl.domination.Domination;
 import me.mykindos.betterpvp.game.impl.domination.controller.GameController;
 import me.mykindos.betterpvp.game.impl.domination.model.CapturePoint;
 import me.mykindos.betterpvp.game.impl.domination.model.attribute.KillScoreAttribute;
+import me.mykindos.betterpvp.game.impl.event.PlayerContributePointsEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -85,12 +86,13 @@ public class DominationListener implements Listener {
     
     @EventHandler
     public void onPlayerDeath(CustomDeathEvent event) {
-        if (!(event.getKilled() instanceof Player killed) || !(event.getKiller() instanceof Player killer)) {
+        if (!(event.getKilled() instanceof Player) || !(event.getKiller() instanceof Player killer)) {
             return;
         }
         
         // Award points for kill
         final Team team = Objects.requireNonNull(game.getPlayerTeam(killer));
         gameController.addPoints(team, killScoreAttribute.getValue());
+        new PlayerContributePointsEvent(killer, killScoreAttribute.getValue()).callEvent();
     }
 }
