@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
@@ -64,6 +65,8 @@ public abstract class Skill implements IChampionsSkill {
     protected double energyDecreasePerLevel;
     protected double energyStartCost;
     protected double energyStartCostDecreasePerLevel;
+    protected double baseCharge;
+    protected double chargeIncreasePerLevel;
 
     private boolean canUseWhileSlowed;
 
@@ -125,6 +128,9 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public Component getTags() {
         Component component = Component.empty();
+        if (this instanceof ChargeSkill) {
+            component = component.append(Component.text("Charge", NamedTextColor.AQUA).appendSpace());
+        }
         if (this instanceof PrepareArrowSkill) {
             component = component.append(Component.text("Arrow", NamedTextColor.DARK_BLUE).appendSpace());
         }
@@ -238,21 +244,26 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public final void loadConfig() {
         enabled = getConfig("enabled", true, Boolean.class);
-        maxLevel = getConfig("maxlevel", 5, Integer.class);
+        maxLevel = getConfig("maxlevel", 5, Number.class).intValue();
 
         if (this instanceof CooldownSkill) {
-            cooldown = getConfig("cooldown", 1.0, Double.class);
-            cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+            cooldown = getConfig("cooldown", 1.0, Number.class).doubleValue();
+            cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Number.class).doubleValue();
         }
 
         if (this instanceof EnergySkill || this instanceof EnergyChannelSkill) {
-            energy = getConfig("energy", 0, Integer.class);
-            energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
+            energy = getConfig("energy", 0, Number.class).intValue();
+            energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Number.class).doubleValue();
         }
 
         if (this instanceof ActiveToggleSkill) {
-            energyStartCost = getConfig("energyStartCost", 10.0, Double.class);
-            energyStartCostDecreasePerLevel = getConfig("energyStartCostDecreasePerLevel", 0.0, Double.class);
+            energyStartCost = getConfig("energyStartCost", 10.0, Number.class).doubleValue();
+            energyStartCostDecreasePerLevel = getConfig("energyStartCostDecreasePerLevel", 0.0, Number.class).doubleValue();
+        }
+
+        if (this instanceof ChargeSkill) {
+            baseCharge = getConfig("baseCharge", 0.40, Number.class).doubleValue();
+            chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.10, Number.class).doubleValue();
         }
 
         canUseWhileSlowed = getConfigObject("canUseWhileSlowed", true, Boolean.class);

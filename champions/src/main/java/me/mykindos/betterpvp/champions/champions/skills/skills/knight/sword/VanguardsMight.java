@@ -223,7 +223,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     }
 
     @Override
-    public void doWhenAbilityCancelled(Player player) {
+    public void onCancel(Player player) {
         final @Nullable VanguardsMightData abilityData = data.get(player);
         if (abilityData == null) return;  // unreachable
 
