@@ -64,7 +64,7 @@ public class ProfileMenu extends AbstractGui implements Windowed {
     }
 
     private void refreshRecentAchievements(List<AchievementCompletion> recentAchievements) {
-        int x = 3;
+        int x = 2;
         for (AchievementCompletion completion : recentAchievements) {
             IAchievement achievement = achievementManager.getObject(completion.getKey()).orElse(null);
             if (achievement != null) {
