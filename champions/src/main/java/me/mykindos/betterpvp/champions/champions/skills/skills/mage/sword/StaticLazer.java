@@ -144,8 +144,9 @@ public class StaticLazer extends ChargeSkill implements InteractSkill, EnergyCha
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         charging.put(player, new ChargeData((float) getChargePerSecond(level)));
+        return true;
     }
 
     public boolean use(Player player, ChargeData charge, int level) {

@@ -1,18 +1,18 @@
 package me.mykindos.betterpvp.core.utilities.model.description;
 
+import java.util.Map;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
 import me.mykindos.betterpvp.core.inventory.item.Click;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Represents a description of something that can be displayed in a UI.
@@ -41,6 +41,10 @@ public class Description {
      */
     @Nullable
     Consumer<Click> clickFunction;
+
+    public SimpleItem toSimpleItem() {
+        return new SimpleItem(getIcon(), getClickFunction());
+    }
 
     public static class DescriptionBuilder {
 

@@ -205,7 +205,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         Vector vec = new Vector(0, 1.3, 0);
         VelocityData velocityData = new VelocityData(vec, 1, false, 0, 1.0, 1, true);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
@@ -230,6 +230,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
         }.runTaskLater(champions, 15);
         jumps.put(player, task);
+        return true;
     }
 
     @Override

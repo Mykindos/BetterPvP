@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.Hammer;
@@ -27,15 +28,17 @@ import java.util.Optional;
 public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData> {
 
     private final ItemFactory itemFactory;
+    private final ClientManager clientManager;
     private final AnvilRecipeRegistry anvilRecipeRegistry;
     private final AnvilDataSerializer dataSerializer;
 
     @Inject
-    private Anvil(ItemFactory itemFactory, AnvilRecipeRegistry anvilRecipeRegistry) {
+    private Anvil(ItemFactory itemFactory, AnvilRecipeRegistry anvilRecipeRegistry, ClientManager clientManager) {
         super("anvil", "Anvil");
         this.itemFactory = itemFactory;
+        this.clientManager = clientManager;
         this.anvilRecipeRegistry = anvilRecipeRegistry;
-        this.dataSerializer = new AnvilDataSerializer(itemFactory, anvilRecipeRegistry);
+        this.dataSerializer = new AnvilDataSerializer(itemFactory, anvilRecipeRegistry, clientManager);
     }
 
     @Override
@@ -50,7 +53,7 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
 
     @Override
     public AnvilData createDefaultData() {
-        return new AnvilData(itemFactory, anvilRecipeRegistry);
+        return new AnvilData(itemFactory, anvilRecipeRegistry, clientManager);
     }
 
     @Override

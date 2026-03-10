@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -90,7 +92,7 @@ public final class ClanCore {
         return scanned.map(Block::getLocation).orElse(location);
     }
 
-    public void teleport(final Player player, final boolean feedback) {
+    public void teleport(final Player player, final Client client, final boolean feedback) {
         if (this.position == null) {
             throw new IllegalStateException("Core location is not set");
         }
@@ -117,6 +119,8 @@ public final class ClanCore {
             if (feedback) {
                 UtilMessage.message(player, "Clans", "Teleported to clan core");
             }
+
+            client.getStatContainer().incrementStat(ClientStat.CLANS_TELEPORT_CORE, 1);
 
             new SoundEffect(Sound.BLOCK_BEACON_POWER_SELECT, 1.3F, 1f).play(this.position);
             final RespawnAnchor data = (RespawnAnchor) this.position.getBlock().getBlockData();
