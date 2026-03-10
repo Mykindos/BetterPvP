@@ -74,9 +74,10 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
     public String[] getDescription(int level) {
         return new String[] {
                 "Hold right click with a Sword to channel",
-                "Charging a hook at ", getValueString(this::getChargePerSecond, level, 100, "%", 0), " per second",
-                "that latches onto",
-                "enemies pulling them towards you" ,
+                "",
+                "Charge a hook at " + getValueString(this::getChargePerSecond, level, 100, "%", 0) + " per second",
+                "that latches onto enemies,",
+                "pulling them towards you" ,
                 "and dealing " + getValueString(this::getDamage, level) + " damage.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
@@ -170,6 +171,8 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
         final ThrowableItem throwable = new ThrowableItem(this, item, player, getName(), 10_000L, true);
         throwable.setCollideGround(true);
         throwable.setCanHitFriendlies(true);
+        //default is 0.4
+        throwable.setCollisionRadius(0.6);
         championsManager.getThrowables().addThrowable(throwable);
 
         VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 1 + data.getCharge(), false, 0, 0.2, 20, false);
@@ -198,9 +201,8 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
         // Velocity
         final Vector direction = player.getLocation().toVector().subtract(hit.getLocation().toVector()).normalize();
         final double strength = hookData.getThrowable().getItem().getVelocity().length();
-        VelocityData velocityData = new VelocityData(direction, strength, false, 0, 0.7, 1.2, true);
+        VelocityData velocityData = new VelocityData(direction, strength, false, 0, 0.6, 1, true, true);
         UtilVelocity.velocity(hit, thrower, velocityData, VelocityType.CUSTOM);
-        hit.setFallDistance(0); // Reset their fall distance
 
         // Damage
         final double damage = getDamage(level) * hookData.getData().getCharge();
@@ -245,8 +247,8 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
 
     @Override
     public void loadSkillConfig() {
-        damage = getConfig("damage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damage = getConfig("damage", 5.0, Number.class).doubleValue();
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Number.class).doubleValue();
     }
 
     @Value
