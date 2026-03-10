@@ -31,6 +31,7 @@ public class ResourcePackListener implements Listener {
     private static final Title TITLE = Title.title(Component.text("Applying resource pack", NamedTextColor.GREEN, TextDecoration.BOLD),
             Component.text("Please wait...", NamedTextColor.GRAY), TIME);
 
+    @Inject
     @Config(path = "core.resourcepack.enabled", defaultValue = "true")
     private boolean enabled;
 
