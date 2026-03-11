@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * Shows a prompt message that this is a ClanName. Enforces that the returned name contains valid characters and is correct length
  */
 @Singleton
-public class ClanNameArgument extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<String, String> {
+public class ClanNameArgument extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<@NotNull String, @NotNull String> {
 
     private final ClanManager clanManager;
 
@@ -45,7 +45,6 @@ public class ClanNameArgument extends BPvPArgumentType<String, String> implement
      */
     @Override
     public @NotNull String convert(String nativeType) throws CommandSyntaxException {
-        //todo split up error message
         if (!nativeType.matches("^[a-zA-Z0-9_]{" + clanManager.getMinCharactersInClanName() + "," + clanManager.getMaxCharactersInClanName() + "}$")) {
             throw ClanArgumentException.INVALID_CLAN_NAME.create(nativeType, clanManager.getMinCharactersInClanName(), clanManager.getMaxCharactersInClanName());
         }
