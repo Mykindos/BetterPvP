@@ -9,13 +9,24 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-public class BooleanArgumentType extends BPvPArgumentType<Boolean, String> implements CustomArgumentType.Converted<Boolean, String> {
+public class BooleanArgumentType extends BPvPArgumentType<Boolean, String> implements CustomArgumentType.Converted<@NotNull Boolean, @NotNull String> {
+
+    private static boolean booleanTrue(String input) {
+        return input.equalsIgnoreCase("true") || input.equalsIgnoreCase("yes") || input.equalsIgnoreCase("1");
+    }
+
+    private static boolean booleanFalse(String input) {
+        return input.equalsIgnoreCase("false") || input.equalsIgnoreCase("no") || input.equalsIgnoreCase("0");
+    }
+
     @Inject
     protected BooleanArgumentType() {
         super("Boolean");
@@ -31,7 +42,12 @@ public class BooleanArgumentType extends BPvPArgumentType<Boolean, String> imple
      */
     @Override
     public @NotNull Boolean convert(@NotNull String nativeType) throws CommandSyntaxException {
-        return Boolean.parseBoolean(nativeType);
+        if (booleanTrue(nativeType)) {
+            return true;
+        } else if (booleanFalse(nativeType)) {
+            return false;
+        }
+         throw ArgumentException.INVALID_BOOLEAN.create(Component.text(nativeType));
     }
 
     /**

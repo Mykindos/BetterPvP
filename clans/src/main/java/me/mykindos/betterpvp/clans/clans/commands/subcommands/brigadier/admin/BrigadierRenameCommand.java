@@ -80,7 +80,7 @@ public class BrigadierRenameCommand extends ClanBrigadierCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                         //dont let administrating senders use this argument, they use the other argument, which does not check for filter or correct clan name
-                        .requires((source) -> !this.executorHasAClan(source) && !this.senderIsAdministrating(source))
+                        .requires((source) -> this.executorHasAClan(source) && !this.senderIsAdministrating(source))
                 )
                 .then(Commands.argument("Admin Clan Name", StringArgumentType.string())
                         .executes(context -> {
@@ -93,7 +93,7 @@ public class BrigadierRenameCommand extends ClanBrigadierCommand {
                             renameClan(executor, executorClan, name);
                             return Command.SINGLE_SUCCESS;
                         })
-                        .requires(source -> !this.executorHasAClan(source) && this.senderIsAdministrating(source))
+                        .requires(source -> this.executorHasAClan(source) && this.senderIsAdministrating(source))
                 );
     }
 

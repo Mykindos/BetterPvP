@@ -379,7 +379,7 @@ public class UtilFormat {
         for (int i = 0; i < words.size() - 1; i++) {
             conjunctiveString.append(words.get(i)).append(", ");
         }
-        conjunctiveString.append(", and ").append(words.getLast());
+        conjunctiveString.append(" and ").append(words.getLast());
         return conjunctiveString.toString();
     }
 }
