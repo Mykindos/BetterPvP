@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
@@ -19,6 +18,8 @@ import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
@@ -58,21 +59,19 @@ public class BrigadierUnclaimCommand extends ClanBrigadierCommand {
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return IBrigadierCommand.literal(getName())
                 .executes(context -> {
+
                     final Player executor = getPlayerFromExecutor(context);
-                    final Clan executorClan = getClanByExecutor(context);
                     final Optional<Clan> locationClanOptional = clanManager.getClanByLocation(executor.getLocation());
                     if (locationClanOptional.isEmpty()) {
                         throw ClanArgumentException.NOT_ON_CLAIMED_TERRITORY.create();
                     }
                     final Clan locationClan = locationClanOptional.get();
-
                     //administrating clients can always unclaim territory
                     if (senderIsAdministrating(context.getSource())) {
                         UtilServer.callEvent(new ChunkUnclaimEvent(executor, locationClan));
                         return Command.SINGLE_SUCCESS;
                     }
-
-
+                    final Clan executorClan = getClanByExecutor(context);
                     //non-standard unclaim
                     if (!executorClan.equals(locationClan)) {
                         clanManager.canUnclaimOtherThrow(executor, locationClan);
