@@ -78,27 +78,27 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
         }
 
         if (type == Double.class) {
-            return (T) Double.valueOf(getDouble(path, defaultValue instanceof String ? Double.valueOf((String) defaultValue) : ((Double) defaultValue)));
+            return (T) Double.valueOf(getDouble(path, defaultValue instanceof String string ? Double.valueOf(string) : ((Double) defaultValue)));
         }
 
         if (type == Integer.class) {
-            return (T) Integer.valueOf(getInt(path, defaultValue instanceof String ? Integer.valueOf((String) defaultValue) : ((Integer) defaultValue)));
+            return (T) Integer.valueOf(getInt(path, defaultValue instanceof String string ? Integer.valueOf(string) : ((Integer) defaultValue)));
         }
 
         if (type == Byte.class) {
-            return (T) Byte.valueOf((byte) getInt(path, defaultValue instanceof String ? Byte.valueOf((String) defaultValue) : ((Byte) defaultValue)));
+            return (T) Byte.valueOf((byte) getInt(path, defaultValue instanceof String string ? Byte.valueOf(string) : ((Byte) defaultValue)));
         }
 
         if (type == Float.class) {
-            return (T) Float.valueOf(Double.valueOf(getDouble(path, defaultValue instanceof String ? Double.parseDouble((String) defaultValue) : ((Float) defaultValue).doubleValue())).floatValue());
+            return (T) Float.valueOf(Double.valueOf(getDouble(path, defaultValue instanceof String string ? Double.parseDouble(string) : ((Float) defaultValue).doubleValue())).floatValue());
         }
 
         if (type == Long.class) {
-            return (T) Long.valueOf(getLong(path, defaultValue instanceof String ? Long.valueOf((String) defaultValue) : ((Long) defaultValue)));
+            return (T) Long.valueOf(getLong(path, defaultValue instanceof String string ? Long.valueOf(string) : ((Long) defaultValue)));
         }
 
         if (type == Short.class) {
-            return (T) Short.valueOf((short) getInt(path, defaultValue instanceof String ? Short.valueOf((String) defaultValue) : ((Short) defaultValue)));
+            return (T) Short.valueOf((short) getInt(path, defaultValue instanceof String string ? Short.valueOf(string) : ((Short) defaultValue)));
         }
 
         var result = getObject(path, type);
