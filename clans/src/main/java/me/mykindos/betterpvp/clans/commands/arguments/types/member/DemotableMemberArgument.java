@@ -22,7 +22,7 @@ public class DemotableMemberArgument extends ClanMemberArgument {
 
     @Override
     public String getName() {
-        return "Lower Rank Clan Member";
+        return "Demotable Clan Member";
     }
 
     /**

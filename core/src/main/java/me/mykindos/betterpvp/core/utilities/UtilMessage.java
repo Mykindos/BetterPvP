@@ -375,7 +375,7 @@ public class UtilMessage {
     }
 
     public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
-        sender.sendMessage(UtilMessage.deserialize("<red>" + exception.getMessage()));
+        sender.sendMessage(Component.text(exception.getMessage(), NamedTextColor.RED));
     }
 
     /**

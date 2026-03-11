@@ -86,14 +86,11 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
         final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
         Bukkit.getOnlinePlayers().stream()
                 .filter(target -> executor == null ||
-                        !clientManager.search().online(executor).hasRank(Rank.HELPER) ||
+                        clientManager.search().online(executor).hasRank(Rank.HELPER) ||
                         !effectManager.hasEffect(target, EffectTypes.VANISH, "commandVanish"))
                 .map(Player::getName)
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
-                .forEach(name -> {
-                    log.info(name).submit();
-                    builder.suggest(name);
-                });
+                .forEach(builder::suggest);
         return builder.buildFuture();
     }
 }
