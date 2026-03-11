@@ -86,7 +86,6 @@ public class BrigadierCustomGiveCommand extends BrigadierCommand {
     }
 
     private void doGive(final @NotNull Player giver, final @NotNull List<Player> targets, final @NotNull BaseItem baseItem, final int amount) {
-        //todo handle more than 1 stack per player
         for (Player target : targets) {
             int toGive = amount;
             while (toGive > 0) {
