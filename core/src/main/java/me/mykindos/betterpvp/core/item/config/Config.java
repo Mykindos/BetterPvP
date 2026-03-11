@@ -79,7 +79,7 @@ public class Config {
      * @param <T>          The type of default value
      * @return returns the config value if exists, or the default value if it does not. Saves the default value if no value exists
      */
-    public <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+    public <T> T getConfig(String name, T defaultValue, Class<T> type) {
         return plugin.getConfig(path).getOrSaveObject(getPath(prefix + name), defaultValue, type);
     }
 

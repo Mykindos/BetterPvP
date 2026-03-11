@@ -138,7 +138,7 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
-        timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombat", 0, Double.class);
+        timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombat", 0d, Double.class);
         baseDamagePerCharge = getConfig("baseDamagePerCharge", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }

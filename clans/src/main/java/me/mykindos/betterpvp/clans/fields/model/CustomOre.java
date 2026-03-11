@@ -24,7 +24,7 @@ public abstract class CustomOre implements FieldsOre {
         this.respawnDelay = delay;
     }
 
-    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+    protected <T> T getConfig(String name, T defaultValue, Class<T> type) {
         final String key = "fields.blocks." + getName().toLowerCase().replace(" ", "") + "." + name;
         return clans.getConfig().getOrSaveObject(key, defaultValue, type);
     }

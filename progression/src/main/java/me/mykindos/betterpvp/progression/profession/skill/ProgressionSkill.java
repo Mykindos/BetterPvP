@@ -44,7 +44,7 @@ public abstract class ProgressionSkill implements IProgressionSkill {
         }
     }
 
-    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+    protected <T> T getConfig(String name, T defaultValue, Class<T> type) {
         String path = "skills." + getName().toLowerCase().replace(" ", "_") + "." + name;
         return progression.getConfig("professions/" + getProgressionTree().toLowerCase()).getOrSaveObject(path, defaultValue, type);
     }
