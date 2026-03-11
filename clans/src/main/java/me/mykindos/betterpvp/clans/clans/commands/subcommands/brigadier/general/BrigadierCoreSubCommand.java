@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.Brigadie
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
@@ -67,6 +68,7 @@ public class BrigadierCoreSubCommand extends BrigadierClanSubCommand {
                 .executes(context -> {
 
                     final Player executor = getPlayerFromExecutor(context);
+                    final Client client = getClientFromExecutor(context);
                     final Clan executorClan = getClanByExecutor(context);
 
                     ClanCore core = executorClan.getCore();
@@ -74,18 +76,19 @@ public class BrigadierCoreSubCommand extends BrigadierClanSubCommand {
                         throw ClanArgumentException.NO_CORE_SET.create(executorClan);
                     }
 
-                    UtilServer.callEvent(new ClanCoreTeleportEvent(executor, () -> core.teleport(executor, true)));
+                    UtilServer.callEvent(new ClanCoreTeleportEvent(executor, () -> core.teleport(executor, client, true)));
                     return Command.SINGLE_SUCCESS;
                 })
                 .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
                         .executes(context -> {
                             final Player executor = getPlayerFromExecutor(context);
+                            final Client client = getClientFromExecutor(context);
                             final Clan targetClan = context.getArgument("Clan", Clan.class);
                             ClanCore core = targetClan.getCore();
                             if (!core.isSet()) {
                                 throw ClanArgumentException.NO_CORE_SET.create(targetClan);
                             }
-                            core.teleport(executor, false);
+                            core.teleport(executor, client, false);
                             return Command.SINGLE_SUCCESS;
                         })
 
