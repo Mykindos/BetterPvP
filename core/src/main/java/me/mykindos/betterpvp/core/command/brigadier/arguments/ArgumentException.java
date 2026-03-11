@@ -39,4 +39,7 @@ public class ArgumentException {
     public static final DynamicCommandExceptionType UNKNOWN_BPVPITEM = new DynamicCommandExceptionType(
             (name) -> new LiteralMessage("Unknown BPvPItem with name: " + name)
     );
+    public static final DynamicCommandExceptionType INVALID_BOOLEAN = new DynamicCommandExceptionType(
+            (input) -> new LiteralMessage("Invalid boolean value: " + input + ", Expected true or false")
+    );
 }

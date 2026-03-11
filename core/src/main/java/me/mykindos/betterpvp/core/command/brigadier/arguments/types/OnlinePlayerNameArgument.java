@@ -78,7 +78,7 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
         final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
 
         if (executor != null &&
-                clientManager.search().online(executor).hasRank(Rank.HELPER)
+                !clientManager.search().online(executor).hasRank(Rank.HELPER)
                 && effectManager.hasEffect(player, EffectTypes.VANISH, "commandVanish"))
         {
             throw ArgumentException.UNKNOWN_PLAYER.create(nativeType);
@@ -97,7 +97,7 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(target -> executor == null ||
-                        !clientManager.search().online(executor).hasRank(Rank.HELPER) ||
+                        clientManager.search().online(executor).hasRank(Rank.HELPER) ||
                         !effectManager.hasEffect(target, EffectTypes.VANISH, "commandVanish"))
                 .filter(player -> {
                     try {
