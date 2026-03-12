@@ -146,7 +146,6 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
         long oldLong = (long) (oldPercent * FP_MODIFIER);
         long newLong = (long) (newPercent * FP_MODIFIER);
-        log.info("achievement change {}", getName()).submit();
         new StatPropertyUpdateEvent(container, this, newLong,oldLong).callEvent();
     }
 
