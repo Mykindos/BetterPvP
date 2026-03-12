@@ -52,8 +52,8 @@ dependencies {
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)
-    testImplementation("org.mockito:mockito-core:5.22.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.22.0")
+    testImplementation("org.mockito:mockito-core:5.23.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
