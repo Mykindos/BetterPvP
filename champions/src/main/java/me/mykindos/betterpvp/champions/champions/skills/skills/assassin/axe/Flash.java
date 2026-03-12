@@ -199,7 +199,8 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
             activatedFuture.complete(true);
 
         });
-        return activatedFuture.join();
+        //TODO fix properly
+        return true;
     }
 
     @UpdateEvent(delay = 100)
