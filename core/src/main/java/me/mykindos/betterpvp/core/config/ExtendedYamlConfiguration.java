@@ -1,15 +1,16 @@
 package me.mykindos.betterpvp.core.config;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
 import lombok.CustomLog;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 @CustomLog
 public class ExtendedYamlConfiguration extends YamlConfiguration {
@@ -72,8 +73,32 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
             set(path, defaultValue);
         }
 
-        if(type == List.class) {
+        if (type == List.class) {
             return (T) Objects.requireNonNull(getList(path));
+        }
+
+        if (type == Double.class) {
+            return (T) Double.valueOf(getDouble(path, defaultValue instanceof String string ? Double.valueOf(string) : ((Double) defaultValue)));
+        }
+
+        if (type == Integer.class) {
+            return (T) Integer.valueOf(getInt(path, defaultValue instanceof String string ? Integer.valueOf(string) : ((Integer) defaultValue)));
+        }
+
+        if (type == Byte.class) {
+            return (T) Byte.valueOf((byte) getInt(path, defaultValue instanceof String string ? Byte.valueOf(string) : ((Byte) defaultValue)));
+        }
+
+        if (type == Float.class) {
+            return (T) Float.valueOf(Double.valueOf(getDouble(path, defaultValue instanceof String string ? Double.parseDouble(string) : ((Float) defaultValue).doubleValue())).floatValue());
+        }
+
+        if (type == Long.class) {
+            return (T) Long.valueOf(getLong(path, defaultValue instanceof String string ? Long.valueOf(string) : ((Long) defaultValue)));
+        }
+
+        if (type == Short.class) {
+            return (T) Short.valueOf((short) getInt(path, defaultValue instanceof String string ? Short.valueOf(string) : ((Short) defaultValue)));
         }
 
         var result = getObject(path, type);

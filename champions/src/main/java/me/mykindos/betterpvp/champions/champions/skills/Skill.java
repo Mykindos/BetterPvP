@@ -225,7 +225,7 @@ public abstract class Skill implements IChampionsSkill {
         return path;
     }
 
-    protected <T> T getConfig(String name, Object defaultValue, Class<T> type) {
+    protected <T> T getConfig(String name, T defaultValue, Class<T> type) {
         return champions.getConfig("skills/skills").getOrSaveObject(getPath(name), defaultValue, type);
     }
 
