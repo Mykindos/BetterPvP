@@ -15,11 +15,6 @@ core:
     mineplex:
       localDatabaseName:
       globalDatabaseName:
-  redis:
-    enabled: false
-    password: BetterPvPAdmin123!
-    host: 127.0.0.1
-    port: 5001
   tips:
     timeBetweenTips: 150.0
   exceptions:

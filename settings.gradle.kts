@@ -89,7 +89,6 @@ dependencyResolutionManagement {
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
 
             // Libraries - Data Management
-            library("jedis", "redis.clients:jedis:7.3.0")
             library("flyway-core", "org.flywaydb", "flyway-core").version("11.20.1")
             library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.20.1")
             library("flyway-postgres", "org.flywaydb", "flyway-database-postgresql").version("11.20.1")
@@ -107,6 +106,7 @@ dependencyResolutionManagement {
             library("okhttp", "com.squareup.okhttp3", "okhttp").version("4.10.0")
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
             library("zip4j", "net.lingala.zip4j", "zip4j").version("2.11.5")
+            library("json", "org.json", "json").version("20250107")
 
             // Library - Mapper
             library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.7")
@@ -162,8 +162,9 @@ dependencyResolutionManagement {
                     "guice",
                     "reflections",
                     "okhttp",
-                    "zip4j"))
-            bundle("data", listOf("jedis", "flyway-core", "flyway-mysql", "flyway-postgres"))
+                    "zip4j",
+                    "json"))
+            bundle("data", listOf("flyway-core", "flyway-mysql", "flyway-postgres"))
             bundle("mixins", listOf("mixin"))
         }
     }

@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
-import me.mykindos.betterpvp.core.redis.CacheObject;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import net.kyori.adventure.text.Component;
@@ -33,7 +32,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @EqualsAndHashCode(callSuper = false, of = {"uuid"})
-public class Client extends PropertyContainer implements IMapListener, CacheObject, Unique {
+public class Client extends PropertyContainer implements IMapListener, Unique {
 
     private final long id;
     private final transient @NotNull Gamer gamer;
@@ -112,11 +111,6 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
                     .filter(punishment -> punishment.isActive() && punishment.getType() == punishmentType)
                     .max(Comparator.comparingLong(Punishment::getExpiryTime));
         }
-    }
-
-    @Override
-    public String getKey() {
-        return uuid;
     }
 
     @Override

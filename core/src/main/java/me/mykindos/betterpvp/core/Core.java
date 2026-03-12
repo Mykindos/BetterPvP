@@ -40,7 +40,6 @@ import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.metal.MetalRecipeBootstrap;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldBootstrap;
-import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.server.Server;
@@ -68,9 +67,6 @@ public class Core extends BPvPPlugin {
     private Injector injector;
 
     private Database database;
-
-    @Inject
-    private Redis redis;
 
     private ClientManager clientManager;
 
@@ -117,8 +113,6 @@ public class Core extends BPvPPlugin {
         this.registerItems();
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
-
-        redis.credentials(this.getConfig());
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);
@@ -199,11 +193,7 @@ public class Core extends BPvPPlugin {
         log.info("Saved all cust0om blocks").submit();
 
         clientManager.processPropertyUpdates(false);
-        clientManager.shutdown();
         log.info("Processed all pending stat updates and shut down client manager").submit();
-
-        redis.shutdown();
-        log.info("Redis connection closed").submit();
 
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
         log.info("Global combat stats repository shut down").submit();
