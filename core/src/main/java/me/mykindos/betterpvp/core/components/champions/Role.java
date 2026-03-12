@@ -10,7 +10,7 @@ import org.bukkit.inventory.EquipmentSlot;
 @Getter
 public enum Role {
 
-    ASSASSIN("Assassin", 36, "Assassin is a quick and agile class. With relatively low health and strong counters, this is not an easy class to be caught out in. Primarily suited for attacking distracted or otherwise occupied enemies, it will struggle against enemies that are prepared.",
+    ASSASSIN("Assassin", 36, "Assassin is a quick and agile class. With relatively low health and strong counters, this is not an easy class to be caught out in. Best suited for attacking distracted or otherwise occupied enemies, it will struggle against enemies that are prepared.",
             TextColor.color(224, 112, 0), Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS),
     KNIGHT("Knight", 50, "Knight is a strong, aggressive class. It thrives being on the attack, having options to increase damage, while also having a few that can keep them alive long enough to kill their opponent.",
             TextColor.color(227, 227, 227), Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS),
