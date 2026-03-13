@@ -378,4 +378,11 @@ public class EffectManager extends Manager<String, ConcurrentHashMap<String, Lis
         return 0L;
     }
 
+    public List<Effect> getAllEffects(UUID id) {
+        final Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = getObject(id.toString());
+        if (effectsOptional.isEmpty()) return Collections.synchronizedList(List.of());
+        final ConcurrentHashMap<String, List<Effect>> effects = effectsOptional.get();
+        return Collections.synchronizedList(effects.values().stream().flatMap(List::stream).collect(Collectors.toList()));
+    }
+
 }
