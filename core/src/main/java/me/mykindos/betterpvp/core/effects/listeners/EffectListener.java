@@ -4,8 +4,6 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.impl.core.EffectDurationStat;
-import me.mykindos.betterpvp.core.client.stats.impl.utility.Relation;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -97,31 +95,8 @@ public class EffectListener implements Listener {
                 } else {
                     if (!hasTicked) {
                         updateActiveEffect(livingEntity, effect);
-
                         // Perform effect tick on the highest amplifier
                         effect.getEffectType().onTick(livingEntity, effect);
-
-                        final EffectDurationStat receiveStat = EffectDurationStat.builder()
-                                .relation(Relation.RECEIVED)
-                                .effectType(effect.getEffectType().getName())
-                                .effectName(effect.getName())
-                                .build();
-
-                        final EffectDurationStat dealStat = EffectDurationStat.builder()
-                                .relation(Relation.DEALT)
-                                .effectType(effect.getEffectType().getName())
-                                .effectName(effect.getName())
-                                .build();
-
-                        targetClientOptional.ifPresent(client -> client.getStatContainer().incrementStat(receiveStat, 50));
-                        LivingEntity applier = effect.getApplier().get();
-                        if (applier != null) {
-                            clientManager.search().offline(applier.getUniqueId()).thenAccept(applierClientOptional -> {
-                                applierClientOptional.ifPresent(client -> client.getStatContainer().incrementStat(dealStat, 50));
-                            });
-                        }
-
-
                         hasTicked = true;
                     }
                 }
