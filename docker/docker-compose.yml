@@ -16,10 +16,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  redis:
-    image: redis
-    container_name: redis
-    command: redis-server --requirepass BetterPvPAdmin123!
-    ports:
-      - "5001:6379"
