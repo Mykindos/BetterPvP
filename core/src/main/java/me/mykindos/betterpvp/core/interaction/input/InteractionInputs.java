@@ -15,6 +15,10 @@ public enum InteractionInputs implements InteractionInput {
     SHIFT_RIGHT_CLICK("SHIFT RIGHT-CLICK"),
     SHIFT_LEFT_CLICK("SHIFT LEFT-CLICK"),
 
+    // Inventory
+    INVENTORY_LEFT_CLICK("LEFT-CLICK"),
+    INVENTORY_RIGHT_CLICK("RIGHT-CLICK"),
+
     // Hold inputs
     HOLD_RIGHT_CLICK("HOLD RIGHT-CLICK"),
     HOLD("HOLD"),
