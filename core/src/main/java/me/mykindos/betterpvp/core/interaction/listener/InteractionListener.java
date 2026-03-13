@@ -46,6 +46,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -388,6 +390,25 @@ public class InteractionListener implements Listener, PacketListener {
         InteractionItemContext ctx = contextOpt.get();
         processInput(player, InteractionInputs.THROW, ctx.itemInstance(), ctx.itemStack(), null);
         event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInventoryLeftClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (event.getClick() != ClickType.LEFT && event.getClick() != ClickType.SHIFT_LEFT) return;
+
+        ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || clicked.getType().isAir()) return;
+
+        Optional<InteractionItemContext> contextOpt = InteractionItemContext.from(clicked, itemFactory);
+        if (contextOpt.isEmpty()) return;
+
+        InteractionItemContext ctx = contextOpt.get();
+        InteractionInput input = InteractionInputs.INVENTORY_LEFT_CLICK;
+
+        if (processInput(player, input, ctx.itemInstance(), ctx.itemStack(), null)) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
