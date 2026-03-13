@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -197,10 +198,10 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
     // entry pt
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         active.add(player.getUniqueId());
         data.put(player, new VanguardsMightData(0f, VanguardsMightAbilityPhase.CHANNELING));
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

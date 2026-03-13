@@ -42,6 +42,7 @@ import java.util.ListIterator;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
@@ -222,13 +223,13 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         active.add(player.getUniqueId());
         if (!batData.containsKey(player)) {
             batData.put(player, new ArrayList<>());
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
-        return false;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

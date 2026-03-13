@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -180,14 +181,14 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         if (!active.containsKey(player.getUniqueId())) {
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getDuration(level) * 1000));
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
             active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
-        return false;
+        return CompletableFuture.completedFuture(false);
     }
 
     public void deactivate(Player player) {

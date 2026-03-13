@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -77,13 +78,13 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         if (!active.contains(player.getUniqueId())) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
             active.add(player.getUniqueId());
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
-        return false;
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override

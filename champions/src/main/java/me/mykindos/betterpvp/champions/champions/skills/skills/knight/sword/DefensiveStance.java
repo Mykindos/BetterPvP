@@ -35,6 +35,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -186,9 +187,9 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         active.add(player.getUniqueId());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

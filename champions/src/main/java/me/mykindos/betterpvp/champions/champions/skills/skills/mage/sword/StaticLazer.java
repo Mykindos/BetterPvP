@@ -42,6 +42,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -144,9 +145,9 @@ public class StaticLazer extends ChargeSkill implements InteractSkill, EnergyCha
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         charging.put(player, new ChargeData((float) getChargePerSecond(level)));
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     public boolean use(Player player, ChargeData charge, int level) {

@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -108,7 +109,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0F, 2.0F);
 
         Location start = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(startDistance));
@@ -125,7 +126,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
         ThreateningShoutData data = new ThreateningShoutData(points, 0, new HashSet<>(), new HashSet<>());
         playerDataMap.put(player, data);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent

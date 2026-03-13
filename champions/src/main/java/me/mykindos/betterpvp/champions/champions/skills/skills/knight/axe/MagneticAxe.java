@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.ItemModel.INVISIBLE;
 
@@ -124,8 +125,8 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @Override
-    public boolean activate(Player player, int level) {
-        if (!isHolding(player)) return false;
+    public CompletableFuture<Boolean> activate(Player player, int level) {
+        if (!isHolding(player)) return CompletableFuture.completedFuture(false);
 
         ItemStack axeItem = player.getInventory().getItemInMainHand();
         int slot = player.getInventory().getHeldItemSlot();
@@ -153,7 +154,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         projectile.redirect(direction);
 
         data.computeIfAbsent(player, key -> new ArrayList<>()).add(projectile);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent

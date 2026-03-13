@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.FIRE;
@@ -231,14 +232,14 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         LargeFireball fireball = player.launchProjectile(LargeFireball.class, player.getLocation().getDirection().multiply(speed));
         fireball.setYield(0);
         fireball.setIsIncendiary(false);
 
         fireballs.add(fireball);
         fireball.getWorld().playSound(fireball.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.5f);
-        return true;
+        return CompletableFuture.completedFuture(true);
 
     }
 

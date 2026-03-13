@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -264,10 +265,10 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         WreathData wreathData = charges.get(player);
         if (wreathData == null) {
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
         final int curCharges = wreathData.getCharges();
@@ -280,7 +281,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
 
         final int newCharges = curCharges - 1;
         wreathData.setCharges(newCharges);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

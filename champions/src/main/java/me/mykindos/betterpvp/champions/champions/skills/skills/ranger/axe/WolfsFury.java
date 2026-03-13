@@ -33,6 +33,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -180,11 +181,11 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
         active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
         championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), getStrengthLevel(level), (long) (getDuration(level) * 1000L));
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     public void deactivate(Player player) {

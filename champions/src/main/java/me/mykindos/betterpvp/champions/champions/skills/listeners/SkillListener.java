@@ -79,10 +79,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -198,9 +198,7 @@ public class SkillListener implements Listener {
         int level = event.getLevel();
 
         if (skill instanceof InteractSkill interactSkill) {
-            if (!interactSkill.activate(player, level)) {
-                event.setCancelled(true);
-            }
+            event.setActivated(interactSkill.activate(player, level));
         } else if (skill instanceof ToggleSkill toggleSkill) {
             toggleSkill.toggle(player, level);
         }

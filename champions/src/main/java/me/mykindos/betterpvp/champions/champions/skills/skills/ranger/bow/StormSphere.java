@@ -40,6 +40,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 
 @Singleton
@@ -113,10 +114,10 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent(delay = 100)

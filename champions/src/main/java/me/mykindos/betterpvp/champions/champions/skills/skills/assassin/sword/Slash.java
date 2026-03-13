@@ -86,10 +86,9 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         final Location originalLocation = player.getLocation();
-        CompletableFuture<Boolean> activatedFuture = new CompletableFuture<>();
-        UtilLocation.teleportForward(player, getDistance(level), false, success -> {
+        return UtilLocation.teleportForward(player, getDistance(level), false).thenApply(success -> {
             final Location lineStart = originalLocation.add(0.0, player.getHeight() / 2, 0.0);
             Particle.SWEEP_ATTACK.builder()
                     .location(lineStart.clone().add(player.getLocation().getDirection()))
@@ -100,8 +99,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.6F);
 
             if (Boolean.FALSE.equals(success)) {
-                activatedFuture.complete(false);
-                return;
+                return false;
             }
 
             final Location teleportLocation = player.getLocation();
@@ -127,9 +125,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                                     .map(LivingEntity.class::cast)
                                     .forEach(hit -> hit(player, level, hit)),
                             () -> UtilMessage.message(player, getClassType().getName(), "You missed <alt>%s</alt>.", getName()));
-            activatedFuture.complete(true);
+            return true;
         });
-        return activatedFuture.join();
     }
 
     private void hit(Player caster, int level, LivingEntity hit) {

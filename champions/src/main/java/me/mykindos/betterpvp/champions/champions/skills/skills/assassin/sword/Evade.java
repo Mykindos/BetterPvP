@@ -39,6 +39,7 @@ import org.bukkit.util.Vector;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -124,7 +125,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             direction.multiply(new Vector(-1, 1, -1)); // flip horizontal
         }
 
-        UtilLocation.teleportToward(player, direction, distance, false, success -> {
+        UtilLocation.teleportToward(player, direction, distance, false).thenAccept(success -> {
             if (!Boolean.TRUE.equals(success)) {
                 return;
             }
@@ -232,10 +233,10 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         active.add(player.getUniqueId());
         handRaisedTime.put(player.getUniqueId(), System.currentTimeMillis());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

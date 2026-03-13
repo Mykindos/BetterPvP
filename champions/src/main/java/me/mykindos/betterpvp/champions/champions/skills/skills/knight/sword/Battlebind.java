@@ -26,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -89,7 +90,7 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 2.0F);
 
         BattlebindProjectile existing = data.remove(player);
@@ -113,7 +114,7 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
         data.redirect(player.getLocation().getDirection().multiply(getSpeed()));
 
         this.data.put(player, data);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent

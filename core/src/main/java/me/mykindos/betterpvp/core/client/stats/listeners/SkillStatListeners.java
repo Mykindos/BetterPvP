@@ -36,6 +36,16 @@ public class SkillStatListeners implements Listener {
                 .skill(event.getSkill())
                 .level(event.getLevel())
                 .build();
+        //only increment active skill if it was used
+        if (event.getActivated() != null) {
+            event.getActivated().thenApply(success -> {
+                if (success) {
+                    statContainer.incrementStat(skillStat, 1);
+                }
+                return null;
+            });
+            return;
+        }
         statContainer.incrementStat(skillStat, 1);
 
     }

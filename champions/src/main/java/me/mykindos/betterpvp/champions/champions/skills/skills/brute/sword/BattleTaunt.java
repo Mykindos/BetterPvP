@@ -31,6 +31,7 @@ import org.bukkit.event.block.Action;
 
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -136,8 +137,8 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public boolean activate(Player player, int level) {
-        return active.add(player.getUniqueId());
+    public CompletableFuture<Boolean> activate(Player player, int level) {
+        return CompletableFuture.completedFuture(active.add(player.getUniqueId()));
     }
 
     @Override

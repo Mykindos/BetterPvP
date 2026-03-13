@@ -25,6 +25,7 @@ import org.bukkit.event.block.Action;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -119,7 +120,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         BloodSphereProjectile projectile = new BloodSphereProjectile(player,
                 0.6,
                 player.getEyeLocation(),
@@ -137,7 +138,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
         projectile.redirect(player.getLocation().getDirection());
         projectiles.put(player, projectile);
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>%s %d</alt>.", getName(), level);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     private float getGrowthPerSecond(int level) {

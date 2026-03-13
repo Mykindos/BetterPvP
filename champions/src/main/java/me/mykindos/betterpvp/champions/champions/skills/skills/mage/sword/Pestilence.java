@@ -31,6 +31,7 @@ import org.bukkit.event.block.Action;
 
 import java.util.Iterator;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Singleton
@@ -187,9 +188,9 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         charging.put(player, new ChargeData((float) (0.1 + (level - 1) * 0.05) * 5));
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

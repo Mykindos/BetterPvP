@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
@@ -129,10 +130,10 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

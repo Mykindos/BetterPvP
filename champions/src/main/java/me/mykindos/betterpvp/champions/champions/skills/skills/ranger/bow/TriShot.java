@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -127,7 +128,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         UUID playerId = player.getUniqueId();
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         dataMap.put(playerId, new TriShotData(0, System.currentTimeMillis(), 0L));
@@ -136,7 +137,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         gamer.getActionBar().add(50, actionBarComponent);
-        return true;
+        return CompletableFuture.completedFuture(true);
 
     }
 

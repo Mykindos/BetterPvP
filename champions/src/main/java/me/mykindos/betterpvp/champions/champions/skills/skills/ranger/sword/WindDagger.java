@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -103,7 +104,7 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 2.0F);
 
         DaggerProjectile existingData = daggerDataMap.remove(player);
@@ -125,7 +126,7 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
         data.redirect(player.getLocation().getDirection().multiply(getSpeed()));
 
         daggerDataMap.put(player, data);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent

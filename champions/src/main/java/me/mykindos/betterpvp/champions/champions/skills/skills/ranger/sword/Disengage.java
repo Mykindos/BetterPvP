@@ -36,6 +36,7 @@ import org.bukkit.util.Vector;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -165,11 +166,11 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     }
 
     @Override
-    public boolean activate(Player player, int level) {
-        UUID playerId = player.getUniqueId();
+    public CompletableFuture<Boolean> activate(Player player, int level) {
+        final UUID playerId = player.getUniqueId();
         active.add(playerId);
         handRaisedTime.put(playerId, System.currentTimeMillis());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

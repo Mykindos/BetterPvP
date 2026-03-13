@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 
 import java.util.Iterator;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
+
 @CustomLog
 public abstract class ChargeSkill extends ChannelSkill {
     protected final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
@@ -22,10 +24,10 @@ public abstract class ChargeSkill extends ChannelSkill {
         charging.remove(player);
     }
 
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         charging.put(player, new ChargeData((float) getChargePerSecond(level)));
         active.add(player.getUniqueId());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent

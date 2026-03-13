@@ -41,6 +41,7 @@ import org.bukkit.util.Vector;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -115,9 +116,9 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         active.add(player.getUniqueId());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent(delay = 125)

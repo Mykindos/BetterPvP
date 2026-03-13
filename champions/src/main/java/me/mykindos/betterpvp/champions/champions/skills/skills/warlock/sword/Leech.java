@@ -37,6 +37,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.MAGIC;
 
@@ -182,9 +183,9 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         active.add(player.getUniqueId());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

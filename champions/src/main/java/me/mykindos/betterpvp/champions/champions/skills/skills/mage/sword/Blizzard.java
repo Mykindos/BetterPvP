@@ -31,6 +31,7 @@ import org.bukkit.util.Vector;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -196,13 +197,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     }
 
     @Override
-    public boolean activate(Player player, int level) {
-        //todo, does this double the initial energy cost?
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         if (championsManager.getEnergy().use(player, getName(), initialEnergyCost, true)) {
             active.add(player.getUniqueId());
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
-        return false;
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override

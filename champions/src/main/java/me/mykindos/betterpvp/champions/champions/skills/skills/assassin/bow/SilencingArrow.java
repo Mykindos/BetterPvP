@@ -20,6 +20,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
+import java.util.concurrent.CompletableFuture;
+
 @Singleton
 @BPvPListener
 public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
@@ -99,10 +101,10 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

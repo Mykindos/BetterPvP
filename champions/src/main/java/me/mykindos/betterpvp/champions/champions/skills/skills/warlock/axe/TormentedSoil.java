@@ -36,6 +36,7 @@ import org.bukkit.event.block.Action;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -168,7 +169,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
 
         double healthReduction = getHealthReduction(level);
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
@@ -184,7 +185,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         }
         tormentList.add(new Torment(player, loc.add(0, 0.5, 0), level));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 2f, 1.3f);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

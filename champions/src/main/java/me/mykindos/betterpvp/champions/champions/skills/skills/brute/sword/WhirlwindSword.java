@@ -28,6 +28,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.concurrent.CompletableFuture;
+
 @Singleton
 public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkill, CrowdControlSkill, DamageSkill {
 
@@ -86,7 +88,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         Vector vector = player.getLocation().toVector();
         vector.setY(vector.getY() + 2);
 
@@ -105,7 +107,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
             }
         }
         createWhirlwind(player, level);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     private void createWhirlwind(Player player, int level) {

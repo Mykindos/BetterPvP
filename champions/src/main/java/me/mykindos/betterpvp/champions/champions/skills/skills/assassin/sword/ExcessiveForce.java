@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -114,14 +115,14 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     // entrypoint
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
 
         // current time + duration in milliseconds = time in future when ability expires
         final long expirationTimeInMillis = System.currentTimeMillis() + (long) (getDuration(level) * 1000L);
         active.put(player, expirationTimeInMillis);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1f, 1.7f);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

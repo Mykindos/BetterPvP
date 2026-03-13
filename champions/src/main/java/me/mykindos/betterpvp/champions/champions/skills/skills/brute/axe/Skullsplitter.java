@@ -30,6 +30,7 @@ import org.bukkit.util.Vector;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -94,8 +95,8 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
     }
 
     @Override
-    public boolean activate(Player player, int level) {
-        if (!isHolding(player)) return false;
+    public CompletableFuture<Boolean> activate(Player player, int level) {
+        if (!isHolding(player)) return CompletableFuture.completedFuture(false);
 
         SkullsplitterProjectile existing = data.remove(player);
         if (existing != null) {
@@ -124,7 +125,7 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
         projectile.redirect(direction);
 
         data.put(player, projectile);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent

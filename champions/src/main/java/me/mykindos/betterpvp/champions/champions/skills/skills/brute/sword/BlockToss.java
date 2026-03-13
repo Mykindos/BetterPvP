@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -145,7 +146,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         final Location feetLocation = player.getLocation();
 
         // Clone the blocks under the player to add realism
@@ -166,7 +167,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
         }
 
         if (chargingMap.containsKey(player)) {
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
         final BlockTossObject boulder = new BlockTossObject(clonedBlocks, this, player);
@@ -175,7 +176,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
         final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond(level), boulder);
         chargingMap.put(player, chargeData);
         boulders.computeIfAbsent(player, key -> new ArrayList<>()).add(boulder);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

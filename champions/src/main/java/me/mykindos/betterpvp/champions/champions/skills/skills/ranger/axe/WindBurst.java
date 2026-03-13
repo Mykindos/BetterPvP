@@ -39,6 +39,7 @@ import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -117,9 +118,9 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         windBurst(player, level);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     private void windBurst(Player player, int level) {

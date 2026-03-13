@@ -20,7 +20,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -67,11 +66,9 @@ public class UtilLocation {
      * @param entity           the {@link LivingEntity} to be teleported. Must not be null.
      * @param teleportDistance the distance (in blocks) to teleport the entity forward.
      * @param fallDamage       whether the entity should take fall damage as a result of the teleport.
-     * @param then             an optional {@link Consumer} that receives a boolean indicating whether the teleportation
-     *                         was successful. Can be null.
      */
-    public static void teleportForward(final @NotNull LivingEntity entity, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
-        teleportToward(entity, entity.getEyeLocation().getDirection(), teleportDistance, fallDamage, then);
+    public static CompletableFuture<Boolean> teleportForward(final @NotNull LivingEntity entity, double teleportDistance, boolean fallDamage) {
+        return teleportToward(entity, entity.getEyeLocation().getDirection(), teleportDistance, fallDamage);
     }
 
     /**
@@ -83,18 +80,14 @@ public class UtilLocation {
      * @param direction        The direction vector determining the teleportation direction. Must not be null.
      * @param teleportDistance The maximum distance the entity can be teleported.
      * @param fallDamage       Whether the entity should take fall damage upon teleportation.
-     * @param then             An optional callback to handle the result of the teleportation operation (true if successful, false otherwise).
      */
-    public static void teleportToward(final @NotNull LivingEntity entity, final @NotNull Vector direction, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
+    public static CompletableFuture<Boolean> teleportToward(final @NotNull LivingEntity entity, final @NotNull Vector direction, double teleportDistance, boolean fallDamage) {
         // Stop raying if we don't have line of sight
         Optional<Location> teleportLocationOpt = gracefulRayTrace(entity.getLocation(), direction, teleportDistance, entity.getBoundingBox(), entity::hasLineOfSight);
 
         if (teleportLocationOpt.isEmpty()) {
             // prevent teleport at all
-            if (then != null) {
-                then.accept(Boolean.FALSE);
-            }
-            return;
+            return CompletableFuture.completedFuture(false);
         }
 
         Location teleportLocation = teleportLocationOpt.get();
@@ -110,14 +103,15 @@ public class UtilLocation {
         // Asynchronously because, for some reason, spigot fires PlayerInteractEvent twice if the entity looks at a block
         // causing them to use the skill again after being teleported
         // teleportAsync somehow fixes that
-        entity.teleportAsync(teleportLocation).thenAccept(result -> {
+        return entity.teleportAsync(teleportLocation).thenApply(result -> {
             if (!fallDamage) {
                 entity.setFallDistance(0);
             }
 
-            if (then != null) {
-                then.accept(result);
-            }
+            return result;
+        }).exceptionally(ex -> {
+            log.warn("Failed to teleport entity to location: " + teleportLocation, ex).submit();
+            return false;
         });
     }
 

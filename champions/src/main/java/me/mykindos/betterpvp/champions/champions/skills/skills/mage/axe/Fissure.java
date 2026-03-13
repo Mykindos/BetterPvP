@@ -44,6 +44,7 @@ import org.bukkit.event.block.Action;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 @Singleton
@@ -128,9 +129,9 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return true;
     }
 
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         activeCasts.add(createFissure(player, level));
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
 

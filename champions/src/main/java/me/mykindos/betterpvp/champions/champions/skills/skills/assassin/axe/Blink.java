@@ -154,14 +154,12 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         double maxDistance = getMaxTravelDistance(level);
         final Location origin = player.getLocation();
-        CompletableFuture<Boolean> activateFuture = new CompletableFuture<>();
-        UtilLocation.teleportForward(player, maxDistance, false, success -> {
+        return UtilLocation.teleportForward(player, maxDistance, false).thenApply(success -> {
             if (!Boolean.TRUE.equals(success)) {
-                activateFuture.complete(false);
-                return;
+                return false;
             }
 
             final Location lineStart = origin.add(0.0, player.getHeight() / 2, 0.0);
@@ -174,9 +172,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             championsManager.getCooldowns().use(player, "Deblink", 0.25, false);
             player.getWorld().playEffect(origin, Effect.BLAZE_SHOOT, 0);
             player.getWorld().playEffect(lineEnd, Effect.BLAZE_SHOOT, 0);
-            activateFuture.complete(true);
+            return true;
         });
-        return activateFuture.join();
     }
 
 

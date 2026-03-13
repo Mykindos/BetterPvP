@@ -65,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -139,14 +140,14 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
 
         if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
             UtilMessage.message(player, "Clone", "You cannot use this skill with protection");
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
         //Check if player already has a clone - mainly to prevent op'd players from spamming clones
-        if (clones.containsKey(player)) return false;
+        if (clones.containsKey(player)) return CompletableFuture.completedFuture(false);
 
 
         double healthReduction = getHealthReduction(level);
@@ -178,7 +179,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         MobPathfinder mobPathfinder = new MobPathfinder(champions, clone, initTarget);
         clones.put(player, new CloneData(clone, mobPathfinder, System.currentTimeMillis()));
         Bukkit.getMobGoals().addGoal(clone, 0, mobPathfinder);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent(delay = 100)

@@ -42,6 +42,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -120,7 +121,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
@@ -193,7 +194,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         } else {
             UtilMessage.simpleMessage(player, "Skill", "You missed <alt>%s</alt>.", getName());
         }
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @EventHandler

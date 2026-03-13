@@ -39,6 +39,7 @@ import org.bukkit.util.Vector;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -193,7 +194,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         double healthReduction = getHealthReduction(level);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
@@ -234,7 +235,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 }
             }
         }
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

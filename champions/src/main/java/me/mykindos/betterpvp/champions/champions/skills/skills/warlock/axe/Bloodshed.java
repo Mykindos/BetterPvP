@@ -29,6 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, HealthSkill, OffensiveSkill, TeamSkill, BuffSkill {
@@ -102,7 +103,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         double healthReduction = getHealthReduction(level);
 
 
@@ -145,7 +146,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
                     this.cancel();
             }
         }.runTaskTimer(champions, 0, 1);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -117,7 +118,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         double healthReduction = getHealthReduction(level);
 
 
@@ -165,7 +166,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             }
         }
 
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

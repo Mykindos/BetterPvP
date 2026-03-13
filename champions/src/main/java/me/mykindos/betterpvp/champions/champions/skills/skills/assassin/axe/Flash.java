@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -36,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class Flash extends Skill implements InteractSkill, Listener, MovementSkill {
 
     private final WeakHashMap<Player, FlashData> charges = new WeakHashMap<>();
@@ -161,20 +163,17 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         final Location origin = player.getLocation();
-        CompletableFuture<Boolean> activatedFuture = new CompletableFuture<>();
-        UtilLocation.teleportForward(player, teleportDistance, false, success -> {
+        return UtilLocation.teleportForward(player, teleportDistance, false).thenApply(success -> {
             if (!Boolean.TRUE.equals(success)) {
-                activatedFuture.complete(false);
-                return;
+                return false;
             }
 
             // Lessen charges and add cooldown to prevent from instantly getting a flash charge if they're full
             FlashData flashData = charges.get(player);
             if (flashData == null) {
-                activatedFuture.complete(false);
-                return;
+                return false;
             }
 
             final int curCharges = flashData.getCharges();
@@ -196,10 +195,9 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
 
             player.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.4F, 1.2F);
             player.getWorld().playSound(origin, Sound.ENTITY_SILVERFISH_DEATH, 1.0F, 1.6F);
-            activatedFuture.complete(true);
+            return true;
 
         });
-        return activatedFuture.join();
     }
 
     @UpdateEvent(delay = 100)

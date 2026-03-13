@@ -36,6 +36,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 @Singleton
@@ -152,7 +153,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
         ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(), 10000, true);
@@ -160,7 +161,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         throwableItem.setCanHitFriendlies(true);
         championsManager.getThrowables().addThrowable(throwableItem);
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override

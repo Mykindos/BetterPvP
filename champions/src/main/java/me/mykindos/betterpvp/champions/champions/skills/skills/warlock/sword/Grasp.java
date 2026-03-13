@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
 
@@ -157,7 +158,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         Block block = player.getTargetBlock(null, (int) getDistance(level));
         Location startPos = player.getLocation();
 
@@ -231,7 +232,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
             }
 
         }.runTaskLater(champions, 40);
-        return true;
+        return CompletableFuture.completedFuture(true);
 
 
     }

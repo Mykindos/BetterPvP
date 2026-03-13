@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -68,7 +69,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         };
     }
 
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 2.0f, 1f);
 
@@ -88,7 +89,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         long calculatedLifespan = (long) (lifespan + (level - 1)) * 1000;
         HorseData data = new HorseData(horse, System.currentTimeMillis(), calculatedLifespan);
         horseData.put(player, data);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent(delay = 500)

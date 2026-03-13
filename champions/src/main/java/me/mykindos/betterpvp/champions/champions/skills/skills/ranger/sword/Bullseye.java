@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 
 
 @Singleton
@@ -123,12 +124,12 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     }
 
     @Override
-    public boolean activate(Player player, int level) {
+    public CompletableFuture<Boolean> activate(Player player, int level) {
         UUID playerUUID = player.getUniqueId();
         active.add(playerUUID);
         BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData((float) (0.01)), null, null, null);
         bullsEyeData.put(playerUUID, playerBullsEyeData);
-        return true;
+        return CompletableFuture.completedFuture(true);
     }
 
     @UpdateEvent
