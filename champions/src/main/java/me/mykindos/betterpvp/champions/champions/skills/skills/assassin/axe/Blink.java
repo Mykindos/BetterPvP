@@ -29,7 +29,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
-import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -157,10 +156,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     public boolean activate(Player player, int level) {
         double maxDistance = getMaxTravelDistance(level);
         final Location origin = player.getLocation();
-        CompletableFuture<Boolean> activateFuture = new CompletableFuture<>();
         UtilLocation.teleportForward(player, maxDistance, false, success -> {
             if (!Boolean.TRUE.equals(success)) {
-                activateFuture.complete(false);
                 return;
             }
 
@@ -174,9 +171,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             championsManager.getCooldowns().use(player, "Deblink", 0.25, false);
             player.getWorld().playEffect(origin, Effect.BLAZE_SHOOT, 0);
             player.getWorld().playEffect(lineEnd, Effect.BLAZE_SHOOT, 0);
-            activateFuture.complete(true);
         });
-        return activateFuture.join();
+        return true;
     }
 
 
