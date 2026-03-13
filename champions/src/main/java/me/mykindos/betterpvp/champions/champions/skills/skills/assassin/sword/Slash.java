@@ -37,7 +37,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.util.RayTraceResult;
 
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @BPvPListener
@@ -88,7 +87,6 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public boolean activate(Player player, int level) {
         final Location originalLocation = player.getLocation();
-        CompletableFuture<Boolean> activatedFuture = new CompletableFuture<>();
         UtilLocation.teleportForward(player, getDistance(level), false, success -> {
             final Location lineStart = originalLocation.add(0.0, player.getHeight() / 2, 0.0);
             Particle.SWEEP_ATTACK.builder()
@@ -100,7 +98,6 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.6F);
 
             if (Boolean.FALSE.equals(success)) {
-                activatedFuture.complete(false);
                 return;
             }
 
@@ -127,9 +124,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                                     .map(LivingEntity.class::cast)
                                     .forEach(hit -> hit(player, level, hit)),
                             () -> UtilMessage.message(player, getClassType().getName(), "You missed <alt>%s</alt>.", getName()));
-            activatedFuture.complete(true);
         });
-        return activatedFuture.join();
+        return true;
     }
 
     private void hit(Player caster, int level, LivingEntity hit) {
