@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -86,9 +85,6 @@ public class EffectListener implements Listener {
         while (iterator.hasNext()) {
             Effect effect = iterator.next();
             Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
-            if (entity instanceof Player player) {
-                targetClientOptional = Optional.of(clientManager.search().online(player));
-            }
             if (entity instanceof LivingEntity livingEntity) {
                 if (isExpiredEffect(effect)) {
                     handleExpiredEffect(livingEntity, effect, iterator);

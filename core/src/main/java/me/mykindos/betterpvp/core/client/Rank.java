@@ -67,7 +67,7 @@ public enum Rank {
                     "problems within BetterPvP",
                     "and typically have more",
                     "responsibilities within the studio"),
-            6),
+            5),
     DEVELOPER("Developer",
             NamedTextColor.WHITE,
             Component.text("Dev", NamedTextColor.WHITE),
@@ -76,7 +76,7 @@ public enum Rank {
                     "This person is a BetterPvP Developer.",
                     "They create and maintain the games",
                     "BetterPvP offers."),
-            7);
+            6);
 
     @Getter
     private final String name;

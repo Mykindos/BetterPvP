@@ -149,6 +149,10 @@ public class EnergyService {
             }
             final Energy energy = entry.getValue();
 
+            if(energy.getCurrent() == energy.getMax()) {
+                continue;
+            }
+
             if (player.isDead()) {
                 continue;
             }

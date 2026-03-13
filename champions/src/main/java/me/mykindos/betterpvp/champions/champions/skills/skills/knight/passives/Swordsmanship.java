@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
@@ -20,7 +21,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -106,7 +106,10 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     @UpdateEvent(delay = 250)
     public void addCharge() {
 
-        for (Player cur : Bukkit.getOnlinePlayers()) {
+        for(Client client : championsManager.getClientManager().getLoaded()) {
+            Player cur = client.getGamer().getPlayer();
+            if(cur == null) continue;
+
             int level = getLevel(cur);
             if (level > 0) {
                 if (charges.containsKey(cur)) {
@@ -125,7 +128,6 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
                 }
             }
         }
-
     }
 
     @Override
