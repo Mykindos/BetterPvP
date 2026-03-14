@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
-import net.kyori.adventure.audience.Audience;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.ExperienceTag;
@@ -338,6 +337,16 @@ public class UtilMessage {
      */
     public static void broadcast(Component message) {
         Bukkit.getServer().broadcast(message);
+    }
+
+    /**
+     * Broadcasts a pre-built component to all players on the server with a formatted prefix
+     *
+     * @param prefix  The PREFIX of the message
+     * @param message The component to be broadcasted
+     */
+    public static void broadcast(String prefix, Component message) {
+        Bukkit.getServer().broadcast(getPrefix(prefix).append(normalize(message)));
     }
 
 }
