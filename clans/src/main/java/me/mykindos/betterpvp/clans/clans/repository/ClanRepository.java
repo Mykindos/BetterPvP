@@ -234,11 +234,15 @@ public class ClanRepository implements IRepository<Clan> {
     public void updateClanCore(Clan clan) {
         ClanCore core = clan.getCore();
 
-        database.getAsyncDslContext()
-                .executeAsyncVoid(ctx -> ctx.update(CLANS)
-                        .set(CLANS.HOME, core.getPosition() == null ? "" : UtilWorld.locationToString(core.getPosition(), false))
-                        .where(CLANS.ID.eq(clan.getId()))
-                        .execute());
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+                    ctx.update(CLANS).set(CLANS.HOME, core.getPosition() == null ? "" : UtilWorld.locationToString(core.getPosition(), false))
+                            .where(CLANS.ID.eq(clan.getId()))
+                            .execute();
+                })
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan core for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void updateClanName(Clan clan) {
@@ -246,7 +250,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.update(CLANS)
                         .set(CLANS.NAME, clan.getName())
                         .where(CLANS.ID.eq(clan.getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan name for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void updateClanSafe(Clan clan) {
@@ -254,7 +262,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.update(CLANS)
                         .set(CLANS.SAFE, clan.isSafe() ? 1 : 0)
                         .where(CLANS.ID.eq(clan.getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan safe status for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void updateClanAdmin(Clan clan) {
@@ -262,7 +274,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.update(CLANS)
                         .set(CLANS.ADMIN, clan.isAdmin() ? 1 : 0)
                         .where(CLANS.ID.eq(clan.getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan admin status for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void updateClanBanner(Clan clan) {
@@ -270,17 +286,23 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.update(CLAN_METADATA)
                         .set(CLAN_METADATA.BANNER, Base64.getEncoder().encodeToString(clan.getBanner().get().serializeAsBytes()))
                         .where(CLAN_METADATA.CLAN.eq(clan.getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan banner for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void updateClanVault(Clan clan) {
-        database.getAsyncDslContext()
-                .executeAsyncVoid(ctx -> {
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
                     ctx.update(CLAN_METADATA)
                             .set(CLAN_METADATA.VAULT, clan.getCore().getVault().serialize())
                             .where(CLAN_METADATA.CLAN.eq(clan.getId()))
                             .execute();
 
+                }).exceptionally(ex -> {
+                    log.error("Failed to update clan vault for clan: {}", clan.getName(), ex).submit();
+                    return null;
                 });
     }
 
@@ -289,7 +311,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.update(CLAN_METADATA)
                         .set(CLAN_METADATA.MAILBOX, clan.getCore().getMailbox().serialize())
                         .where(CLAN_METADATA.CLAN.eq(clan.getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan mailbox for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     //region Clan territory
@@ -298,7 +324,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.insertInto(CLAN_TERRITORY)
                         .set(CLAN_TERRITORY.CLAN, clan.getId())
                         .set(CLAN_TERRITORY.CHUNK, chunk)
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to save clan territory for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void deleteClanTerritory(IClan clan, String chunk) {
@@ -306,7 +336,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.deleteFrom(CLAN_TERRITORY)
                         .where(CLAN_TERRITORY.CLAN.eq(clan.getId()))
                         .and(CLAN_TERRITORY.CHUNK.eq(chunk))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to delete clan territory for clan: {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public List<ClanTerritory> getTerritory(Clan clan) {
@@ -337,7 +371,8 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLAN_MEMBERS.CLAN, clan.getId())
                         .set(CLAN_MEMBERS.MEMBER, member.getUuid().toString())
                         .set(CLAN_MEMBERS.RANK, member.getRank().name())
-                        .execute()).exceptionally(ex -> {
+                        .execute())
+                .exceptionally(ex -> {
                     log.error("Failed to save clan member {} for clan {}", member.getUuid(), clan.getId(), ex).submit();
                     return null;
                 });
@@ -348,7 +383,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.deleteFrom(CLAN_MEMBERS)
                         .where(CLAN_MEMBERS.CLAN.eq(clan.getId()))
                         .and(CLAN_MEMBERS.MEMBER.eq(member.getUuid().toString()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to delete clan member {} for clan {}", member.getUuid(), clan.getId(), ex).submit();
+                    return null;
+                });
     }
 
     public List<ClanMember> getMembers(Clan clan) {
@@ -379,12 +418,16 @@ public class ClanRepository implements IRepository<Clan> {
 
     public void updateClanMemberRank(Clan clan, ClanMember member) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            ctx.update(CLAN_MEMBERS)
-                    .set(CLAN_MEMBERS.RANK, member.getRank().name())
-                    .where(CLAN_MEMBERS.CLAN.eq(clan.getId()))
-                    .and(CLAN_MEMBERS.MEMBER.eq(member.getUuid().toString()))
-                    .execute();
-        });
+                    ctx.update(CLAN_MEMBERS)
+                            .set(CLAN_MEMBERS.RANK, member.getRank().name())
+                            .where(CLAN_MEMBERS.CLAN.eq(clan.getId()))
+                            .and(CLAN_MEMBERS.MEMBER.eq(member.getUuid().toString()))
+                            .execute();
+                })
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan member rank for {} in clan {}", member.getUuid(), clan.getId(), ex).submit();
+                    return null;
+                });
     }
 
     //endregion
@@ -396,7 +439,11 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLAN_ALLIANCES.CLAN, clan.getId())
                         .set(CLAN_ALLIANCES.ALLY_CLAN, alliance.getClan().getId())
                         .set(CLAN_ALLIANCES.TRUSTED, alliance.isTrusted() ? 1 : 0)
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to save clan alliance for {} and {}", clan.getName(), alliance.getClan().getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void deleteClanAlliance(IClan clan, ClanAlliance alliance) {
@@ -404,7 +451,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.deleteFrom(CLAN_ALLIANCES)
                         .where(CLAN_ALLIANCES.CLAN.eq(clan.getId()))
                         .and(CLAN_ALLIANCES.ALLY_CLAN.eq(alliance.getClan().getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to delete clan alliance for {} and {}", clan.getName(), alliance.getClan().getName(), ex).submit();
+                    return null;
+                });
     }
 
     public List<ClanAlliance> getAlliances(ClanManager clanManager, Clan clan) {
@@ -440,7 +491,11 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLAN_ALLIANCES.TRUSTED, alliance.isTrusted() ? 1 : 0)
                         .where(CLAN_ALLIANCES.CLAN.eq(clan.getId()))
                         .and(CLAN_ALLIANCES.ALLY_CLAN.eq(alliance.getClan().getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to save clan alliance trust for {} and {}", clan.getName(), alliance.getClan().getName(), ex).submit();
+                    return null;
+                })
     }
     //endregion
 
@@ -451,7 +506,11 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLAN_ENEMIES.CLAN, clan.getId())
                         .set(CLAN_ENEMIES.ENEMY_CLAN, enemy.getClan().getId())
                         .set(CLAN_ENEMIES.DOMINANCE, (int) enemy.getDominance())
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to save clan enemy for {} and {}", clan.getName(), enemy.getClan().getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void deleteClanEnemy(IClan clan, ClanEnemy enemy) {
@@ -459,7 +518,11 @@ public class ClanRepository implements IRepository<Clan> {
                 .executeAsyncVoid(ctx -> ctx.deleteFrom(CLAN_ENEMIES)
                         .where(CLAN_ENEMIES.CLAN.eq(clan.getId()))
                         .and(CLAN_ENEMIES.ENEMY_CLAN.eq(enemy.getClan().getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to delete clan enemy for {} and {}", clan.getName(), enemy.getClan().getName(), ex).submit();
+                    return null;
+                });
     }
 
     public void updateDominance(IClan clan, ClanEnemy enemy) {
@@ -468,7 +531,11 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLAN_ENEMIES.DOMINANCE, (int) enemy.getDominance())
                         .where(CLAN_ENEMIES.CLAN.eq(clan.getId()))
                         .and(CLAN_ENEMIES.ENEMY_CLAN.eq(enemy.getClan().getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to update clan enemy dominance for {} and {}", clan.getName(), enemy.getClan().getName(), ex).submit();
+                    return null;
+                });
     }
 
     public List<ClanEnemy> getEnemies(ClanManager clanManager, Clan clan) {
@@ -523,6 +590,9 @@ public class ClanRepository implements IRepository<Clan> {
             ctx.deleteFrom(CLAN_INSURANCE)
                     .where(CLAN_INSURANCE.TIME.add(duration).le(currentTime))
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to delete expired insurance", ex).submit();
+            return null;
         });
     }
 
@@ -531,6 +601,9 @@ public class ClanRepository implements IRepository<Clan> {
             ctx.deleteFrom(CLAN_INSURANCE)
                     .where(CLAN_INSURANCE.CLAN.eq(clan.getId()))
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to delete insurance for clan {}", clan.getName(), ex).submit();
+            return null;
         });
     }
 
@@ -547,7 +620,11 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLAN_INSURANCE.X, location.getBlockX())
                         .set(CLAN_INSURANCE.Y, location.getBlockY())
                         .set(CLAN_INSURANCE.Z, location.getBlockZ())
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to save insurance for clan {}", clan.getName(), ex).submit();
+                    return null;
+                });
     }
 
     public List<Insurance> getInsurance(Clan clan) {
@@ -618,7 +695,11 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLANS_KILLS.KILLER_CLAN, killerClan != null ? killerClan.getId() : null)
                         .set(CLANS_KILLS.VICTIM_CLAN, victimClan != null ? victimClan.getId() : null)
                         .set(CLANS_KILLS.DOMINANCE, dominance)
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to add clan kill log for kill ID {}", killID, ex).submit();
+                    return null;
+                });
     }
 
 
