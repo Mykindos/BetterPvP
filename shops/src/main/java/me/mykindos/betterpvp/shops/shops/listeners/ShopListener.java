@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
+import me.mykindos.betterpvp.core.components.shops.events.FinalPlayerBuyItemEvent;
+import me.mykindos.betterpvp.core.components.shops.events.FinalPlayerSellItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -210,6 +212,8 @@ public class ShopListener implements Listener {
                     .addLocationContext(location)
                     .submit();
         });
+
+        new FinalPlayerBuyItemEvent(event.getPlayer(), event.getGamer(), event.getShopItem(), event.getItem(), event.getCurrency(), amount, cost).callEvent();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -258,6 +262,8 @@ public class ShopListener implements Listener {
                                     .setAction("SHOP_SELL").addClientContext(event.getPlayer())
                                     .addContext("ShopItem", result.itemName).addContext("Amount", result.amountSold + "")
                                     .addContext("Price", result.totalEarned + "").submit();
+
+                            new FinalPlayerSellItemEvent(player, event.getGamer(), event.getShopItem(), event.getItem(), event.getCurrency(), result.amountSold, result.totalEarned).callEvent();
                         }
                         return;
                     }

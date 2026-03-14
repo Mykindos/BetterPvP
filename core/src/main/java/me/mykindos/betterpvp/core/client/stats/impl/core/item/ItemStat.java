@@ -87,6 +87,9 @@ public class ItemStat implements IBuildableStat {
      */
     @Override
     public @NotNull StatValueType getStatValueType() {
+        if (action == Action.BUY_AMOUNT || action == Action.SELL_AMOUNT) {
+            return StatValueType.DOUBLE;
+        }
         return StatValueType.LONG;
     }
 
@@ -177,13 +180,52 @@ public class ItemStat implements IBuildableStat {
                 .build();
     }
 
-
     public enum Action {
         CRAFT,
         REFORGE,
         ATTUNE,
         ANVIL_PRIMARY,
         ANVIL_SECONDARY,
+        /**
+         * The total amount of currency spent on buying this item
+         */
+        BUY_AMOUNT,
+        /**
+         * The total count of this item bought
+         */
+        BUY_COUNT,
+        /**
+         * The total amount of currency gained from selling this item
+         */
+        SELL_AMOUNT,
+        /**
+         * The total count of this item sold
+         */
+        SELL_COUNT,
+        /**
+         * The total amount of currency gained from creating this auction
+         */
+        AUCTION_BUY_AMOUNT,
+        /**
+         * The total count of this item created in auctions
+         */
+        AUCTION_BUY_COUNT,
+        /**
+         * The total amount of currency gained from creating this auction
+         */
+        AUCTION_SELL_AMOUNT,
+        /**
+         * The total count of this item created in auctions
+         */
+        AUCTION_SELL_COUNT,
+        /**
+         * The total amount of currency gained from creating this auction
+         */
+        AUCTION_CREATE_AMOUNT,
+        /**
+         * The total count of this item created in auctions
+         */
+        AUCTION_CREATE_COUNT,
     }
 
 }
