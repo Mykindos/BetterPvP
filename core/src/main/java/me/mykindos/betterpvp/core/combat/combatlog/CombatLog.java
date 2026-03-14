@@ -61,7 +61,7 @@ public class CombatLog {
         CraftInventoryPlayer inventory = UtilInventory.getOfflineInventory(playerName, owner);
 
         for (ItemStack stack : inventory.getContents()) {
-            if (stack == null || stack.getType() == Material.AIR) {
+            if (stack == null || stack.getType() == Material.AIR || stack.getType() == Material.IRON_HORSE_ARMOR) {
                 continue;
             }
 
