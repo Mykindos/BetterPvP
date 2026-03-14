@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
