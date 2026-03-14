@@ -9,7 +9,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.components.clans.events.ClansDropEnergyEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -279,8 +278,6 @@ public class FishingListener implements Listener {
 
         caught.processCatch(event);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
-
-        UtilServer.callEvent(new ClansDropEnergyEvent(player, player.getLocation(), 10));
 
         UtilServer.callEvent(new PlayerStopFishingEvent(player, caught, PlayerStopFishingEvent.FishingResult.CATCH));
     }

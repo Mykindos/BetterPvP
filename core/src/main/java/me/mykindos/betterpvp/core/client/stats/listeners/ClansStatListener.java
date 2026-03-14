@@ -6,9 +6,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
-import me.mykindos.betterpvp.core.components.clans.events.ClansDropEnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,11 +27,4 @@ public class ClansStatListener implements Listener {
         container.incrementStat(ClientStat.CLANS_CLANS_EXPERIENCE, event.getExperience());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onIncrementEnergy(ClansDropEnergyEvent event) {
-        if (event.getLivingEntity() instanceof Player player) {
-            final StatContainer container = clientManager.search().online(player).getStatContainer();
-            container.incrementStat(ClientStat.CLANS_ENERGY_DROPPED, event.getAmount());
-        }
-    }
 }

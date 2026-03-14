@@ -6,6 +6,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
 import me.mykindos.betterpvp.clans.clans.chat.ClanChatChannel;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
+import me.mykindos.betterpvp.clans.clans.events.ClanGainEnergyEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
@@ -175,6 +176,20 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      */
     public void grantEnergy(final int energy) {
         this.saveProperty(ClanProperty.ENERGY.name(), Math.min(100_000, this.getEnergy() + energy));
+        new ClanGainEnergyEvent(this, null, energy, "Energy").callEvent();
+    }
+
+    /**
+     * Grants energy to this clan, saves it, and fires {@link ClanGainEnergyEvent} so listeners
+     * can react (e.g. show a boss-bar notification to the player).
+     *
+     * @param player the player responsible for the gain, or {@code null} for non-player sources
+     * @param energy the amount of energy to grant (capped at 100,000 total)
+     * @param reason human-readable source label shown in notifications
+     */
+    public void grantEnergy(@Nullable final Player player, final int energy, final String reason) {
+        this.saveProperty(ClanProperty.ENERGY.name(), Math.min(100_000, this.getEnergy() + energy));
+        new ClanGainEnergyEvent(this, player, energy, reason).callEvent();
     }
 
     /**

@@ -101,7 +101,7 @@ public class EnergyButton extends AbstractItem {
         //noinspection deprecation
         event.setCursor(null);
         final int energy = energyAmount;
-        clan.grantEnergy(energy);
+        clan.grantEnergy(player, energy, "Deposit");
 
         final Client client = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClientManager.class).search().online(player);
         client.getStatContainer().incrementStat(ClientStat.CLANS_ENERGY_COLLECTED, energy);

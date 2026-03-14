@@ -93,6 +93,21 @@ public class UtilItem {
         return result;
     }
 
+    public static boolean isMergeable(Item item) {
+        final ItemStack itemStack = item.getItemStack();
+        return itemStack.hasItemMeta()
+                && itemStack.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.UNMERGEABLE_KEY, PersistentDataType.BOOLEAN)
+                && Boolean.TRUE.equals(itemStack.getItemMeta().getPersistentDataContainer().get(CoreNamespaceKeys.UNMERGEABLE_KEY, PersistentDataType.BOOLEAN));
+    }
+
+    public static Item makeUnmergeable(Item item) {
+        ItemStack result = item.getItemStack();
+        final ItemMeta meta = result.getItemMeta();
+        meta.getPersistentDataContainer().set(CoreNamespaceKeys.UNMERGEABLE_KEY, PersistentDataType.BOOLEAN, true);
+        result.setItemMeta(meta);
+        return item;
+    }
+
     /**
      * Updates an ItemStack, giving it a custom name and lore
      *

@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nexomc.nexo.api.NexoBlocks;
 import com.nexomc.nexo.api.NexoFurniture;
-import com.nexomc.nexo.api.events.furniture.NexoFurnitureInteractEvent;
 import com.nexomc.nexo.mechanics.Mechanic;
 import com.nexomc.nexo.mechanics.furniture.FurnitureMechanic;
 import me.mykindos.betterpvp.core.block.SmartBlock;
@@ -14,6 +13,7 @@ import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.jetbrains.annotations.NotNull;
@@ -132,5 +132,13 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
     @Override
     public boolean isSmartBlock(Location location) {
         return from(location).isPresent();
+    }
+
+    @Override
+    public BlockData createBlockData(SmartBlock type) {
+        if (!(type instanceof NexoBlock block)) {
+            throw new IllegalArgumentException("Type must be an instance of NexoBlock");
+        }
+        return NexoBlocks.blockData(block.getId());
     }
 }

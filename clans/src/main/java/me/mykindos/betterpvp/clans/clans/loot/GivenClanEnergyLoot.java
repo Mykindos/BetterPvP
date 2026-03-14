@@ -32,7 +32,7 @@ public final class GivenClanEnergyLoot extends ClanEnergyLoot<Map<Clan, Integer>
             }
             clanManager.getClanByPlayer(player).ifPresent(clan -> {
                 int amount = (minAmount == maxAmount) ? minAmount : ThreadLocalRandom.current().nextInt(minAmount, maxAmount + 1);
-                clan.grantEnergy(amount);
+                clan.grantEnergy(player, amount, context.getSource());
                 results.merge(clan, amount, Integer::sum);
             });
         });

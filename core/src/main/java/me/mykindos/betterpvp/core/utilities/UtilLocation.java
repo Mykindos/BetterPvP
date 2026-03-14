@@ -331,7 +331,11 @@ public class UtilLocation {
      * @return true if the location is within the specified angle in front of the entity, false otherwise
      */
     public static boolean isInFront(final LivingEntity entity, final Location other, final float angle) {
-        if (!entity.hasLineOfSight(other)) {
+        return isInFront(entity, other, angle, true);
+    }
+
+    public static boolean isInFront(final LivingEntity entity, final Location other, final double angle, final boolean lineOfSight) {
+        if (lineOfSight && !entity.hasLineOfSight(other)) {
             return false;
         }
 
