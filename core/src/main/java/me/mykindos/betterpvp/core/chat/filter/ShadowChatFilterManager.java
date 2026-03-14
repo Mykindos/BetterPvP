@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jooq.exception.DataAccessException;
 
 import java.util.HashSet;
@@ -137,10 +138,12 @@ public class ShadowChatFilterManager extends Manager<String, String> {
         }
 
         String lowercaseMessage = message.toLowerCase();
+        String normalizedMessage = UtilFormat.normalize(message);
 
         // Check for partial matches (word is contained within the message)
         for (String word : filteredWords) {
-            if (lowercaseMessage.contains(word)) {
+            String normalizedWord = UtilFormat.normalize(word);
+            if (lowercaseMessage.contains(word) || (normalizedWord != null && !normalizedWord.isEmpty() && normalizedMessage.contains(normalizedWord))) {
                 return true;
             }
         }

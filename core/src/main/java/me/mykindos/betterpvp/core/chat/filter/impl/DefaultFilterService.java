@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.chat.filter.IFilterService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class DefaultFilterService implements IFilterService {
@@ -11,6 +12,16 @@ public class DefaultFilterService implements IFilterService {
     @Override
     public CompletableFuture<Boolean> isFiltered(String message) {
         return CompletableFuture.supplyAsync(() -> false);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> addFilteredWord(String word) {
+        return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> removeFilteredWord(String word) {
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override
@@ -31,5 +42,10 @@ public class DefaultFilterService implements IFilterService {
             }
             return message;
         });
+    }
+
+    @Override
+    public Set<String> getFilteredWords() {
+        return Set.of();
     }
 }

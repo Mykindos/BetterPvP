@@ -17,16 +17,23 @@ import java.util.List;
 import java.util.Set;
 
 @Singleton
-public class FilterCommand extends Command {
+public class ShadowFilterCommand extends Command {
+
+    private final ShadowChatFilterManager filterManager;
+
+    @Inject
+    public ShadowFilterCommand(ShadowChatFilterManager filterManager) {
+        this.filterManager = filterManager;
+    }
 
     @Override
     public String getName() {
-        return "chatfilter";
+        return "shadowfilter";
     }
 
     @Override
     public String getDescription() {
-        return "Manage chat filter words";
+        return "Manage shadow chat filter words";
     }
 
     @Override
@@ -41,12 +48,12 @@ public class FilterCommand extends Command {
 
 
     @Singleton
-    @SubCommand(FilterCommand.class)
-    public static class FilterAddCommand extends Command {
+    @SubCommand(ShadowFilterCommand.class)
+    public static class ShadowFilterAddCommand extends Command {
         private final ShadowChatFilterManager filterManager;
 
         @Inject
-        public FilterAddCommand(ShadowChatFilterManager filterManager) {
+        public ShadowFilterAddCommand(ShadowChatFilterManager filterManager) {
             this.filterManager = filterManager;
         }
 
@@ -57,7 +64,7 @@ public class FilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Add a word to the filter list";
+            return "Add a word to the shadow filter list";
         }
 
         @Override
@@ -71,21 +78,21 @@ public class FilterCommand extends Command {
 
             filterManager.addFilteredWord(word, client).thenAccept(success -> {
                 if (success) {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Added <yellow>%s</yellow> to the filter list", word));
+                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Added <yellow>%s</yellow> to the shadow filter list", word));
                 } else {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is already in the filter list", word));
+                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is already in the shadow filter list", word));
                 }
             });
         }
     }
 
     @Singleton
-    @SubCommand(FilterCommand.class)
-    public static class FilterRemoveCommand extends Command {
+    @SubCommand(ShadowFilterCommand.class)
+    public static class ShadowFilterRemoveCommand extends Command {
         private final ShadowChatFilterManager filterManager;
 
         @Inject
-        public FilterRemoveCommand(ShadowChatFilterManager filterManager) {
+        public ShadowFilterRemoveCommand(ShadowChatFilterManager filterManager) {
             this.filterManager = filterManager;
         }
 
@@ -96,7 +103,7 @@ public class FilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Remove a word from the filter list";
+            return "Remove a word from the shadow filter list";
         }
 
         @Override
@@ -110,39 +117,21 @@ public class FilterCommand extends Command {
 
             filterManager.removeFilteredWord(word).thenAccept(success -> {
                 if (success) {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Removed <yellow>%s</yellow> from the filter list", word));
+                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Removed <yellow>%s</yellow> from the shadow filter list", word));
                 } else {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is not in the filter list", word));
+                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is not in the shadow filter list", word));
                 }
             });
         }
-
-       // @Override
-       // public List<String> processTabComplete(CommandSender sender, String[] args) {
-       //     List<String> tabCompletions = new ArrayList<>();
-//
-       //     //if (args.length == 0) return tabCompletions ;
-////
-       //     //String lowercaseArg = args[args.length - 1].toLowerCase();
-       //     //Set<String> filteredWords = filterManager.getFilteredWor ds();
-////
-       //     //for (String word : filteredWords) {
-       //     //    if (word.toLowerCase().startsWith(lowercaseArg)) {
-       //     //        tabCompletions.add(word);
-       //     //    }
-       //     //}
-//
-       //     return tabCompletions;
-       // }
     }
 
     @Singleton
-    @SubCommand(FilterCommand.class)
-    public static class FilterListCommand extends Command {
+    @SubCommand(ShadowFilterCommand.class)
+    public static class ShadowFilterListCommand extends Command {
         private final ShadowChatFilterManager filterManager;
 
         @Inject
-        public FilterListCommand(ShadowChatFilterManager filterManager) {
+        public ShadowFilterListCommand(ShadowChatFilterManager filterManager) {
             this.filterManager = filterManager;
         }
 
@@ -153,7 +142,7 @@ public class FilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "List all filtered words";
+            return "List all shadow filtered words";
         }
 
         @Override
@@ -161,11 +150,11 @@ public class FilterCommand extends Command {
             Set<String> filteredWords = filterManager.getFilteredWords();
 
             if (filteredWords.isEmpty()) {
-                UtilMessage.message(player, "Filter", "There are no words in the filter list");
+                UtilMessage.message(player, "Filter", "There are no words in the shadow filter list");
                 return;
             }
 
-            Component message = Component.text("Filtered Words:", NamedTextColor.GREEN);
+            Component message = Component.text("Shadow Filtered Words:", NamedTextColor.GREEN);
             List<String> sortedWords = new ArrayList<>(filteredWords);
             sortedWords.sort(String::compareTo);
 
@@ -179,12 +168,12 @@ public class FilterCommand extends Command {
     }
 
     @Singleton
-    @SubCommand(FilterCommand.class)
-    public static class FilterReloadCommand extends Command {
+    @SubCommand(ShadowFilterCommand.class)
+    public static class ShadowFilterReloadCommand extends Command {
         private final ShadowChatFilterManager filterManager;
 
         @Inject
-        public FilterReloadCommand(ShadowChatFilterManager filterManager) {
+        public ShadowFilterReloadCommand(ShadowChatFilterManager filterManager) {
             this.filterManager = filterManager;
         }
 
@@ -195,13 +184,13 @@ public class FilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Reload the filter list from the database";
+            return "Reload the shadow filter list from the database";
         }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             filterManager.loadFilteredWords();
-            UtilMessage.message(player, "Filter", "Reloaded filter list from database");
+            UtilMessage.message(player, "Filter", "Reloaded shadow filter list from database");
         }
     }
 }

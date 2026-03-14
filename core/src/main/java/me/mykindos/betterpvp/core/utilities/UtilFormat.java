@@ -99,6 +99,128 @@ public class UtilFormat {
         return formattedNumber;
     }
 
+    private static final Map<Character, Character> LEET_MAP = Map.ofEntries(
+            Map.entry('0', 'o'),
+            Map.entry('1', 'i'),
+            Map.entry('3', 'e'),
+            Map.entry('4', 'a'),
+            Map.entry('5', 's'),
+            Map.entry('7', 't'),
+            Map.entry('8', 'b'),
+            Map.entry('@', 'a'),
+            Map.entry('!', 'i'),
+            Map.entry('$', 's'),
+            Map.entry('+', 't')
+    );
+
+    /**
+     * Normalizes a string by:
+     * 1. Converting to lowercase.
+     * 2. Replacing l33t speak characters with their alphanumeric counterparts.
+     * 3. Removing all non-alphanumeric characters (including spaces).
+     * 4. Collapsing repeated characters down to 2 (e.g., "helllo" -> "hello").
+     *
+     * @param input The string to normalize.
+     * @return The normalized string.
+     */
+    public static String normalize(String input) {
+        if (input == null) return null;
+
+        StringBuilder sb = new StringBuilder();
+        char lastChar = '\0';
+        int repeatCount = 0;
+        for (char c : input.toLowerCase().toCharArray()) {
+            char translated = c;
+            if (LEET_MAP.containsKey(c)) {
+                translated = LEET_MAP.get(c);
+            }
+
+            if (Character.isLetterOrDigit(translated)) {
+                if (translated == lastChar) {
+                    repeatCount++;
+                } else {
+                    repeatCount = 1;
+                }
+
+                if (repeatCount <= 2) {
+                    sb.append(translated);
+                    lastChar = translated;
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Finds the start and end indices of a matched substring in the original string,
+     * given its indices in the normalized string.
+     *
+     * @param original   The original string.
+     * @param normalizedStart The start index in the normalized string.
+     * @param normalizedEnd   The end index in the normalized string.
+     * @return An array of two integers: [originalStart, originalEnd].
+     */
+    public static int[] getOriginalIndices(String original, int normalizedStart, int normalizedEnd) {
+        if (original == null || normalizedStart < 0 || normalizedEnd < normalizedStart) {
+            return new int[]{0, 0};
+        }
+
+        int currentNormalizedIndex = 0;
+        int originalStart = -1;
+        int originalEnd = -1;
+
+        char lastTranslatedChar = '\0';
+        int repeatCount = 0;
+        String lowerOriginal = original.toLowerCase();
+        for (int i = 0; i < lowerOriginal.length(); i++) {
+            char c = lowerOriginal.charAt(i);
+            char translated = c;
+            if (LEET_MAP.containsKey(c)) {
+                translated = LEET_MAP.get(c);
+            }
+
+            boolean isNormalizedChar = false;
+            if (Character.isLetterOrDigit(translated)) {
+                if (translated == lastTranslatedChar) {
+                    repeatCount++;
+                } else {
+                    repeatCount = 1;
+                }
+
+                if (repeatCount <= 2) {
+                    isNormalizedChar = true;
+                    lastTranslatedChar = translated;
+                }
+            }
+
+            if (isNormalizedChar) {
+                if (currentNormalizedIndex == normalizedStart) {
+                    originalStart = i;
+                }
+                currentNormalizedIndex++;
+                if (currentNormalizedIndex == normalizedEnd) {
+                    // Need to continue to include any repeated characters at the end
+                    originalEnd = i + 1;
+                    for (int j = i + 1; j < lowerOriginal.length(); j++) {
+                        char nextC = lowerOriginal.charAt(j);
+                        char nextTranslated = LEET_MAP.getOrDefault(nextC, nextC);
+                        if (nextTranslated == translated && Character.isLetterOrDigit(nextTranslated)) {
+                            originalEnd = j + 1;
+                        } else {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (originalStart == -1) originalStart = 0;
+        if (originalEnd == -1) originalEnd = original.length();
+
+        return new int[]{originalStart, originalEnd};
+    }
+
     /**
      * Cleans and formats the provided string by replacing underscores with spaces
      * and capitalizing each word fully.
