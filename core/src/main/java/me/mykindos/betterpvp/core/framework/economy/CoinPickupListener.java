@@ -23,11 +23,21 @@ import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Objects;
 import java.util.OptionalInt;
 
 @BPvPListener
 @Singleton
 public class CoinPickupListener implements Listener {
+
+    /** Notifies a player with an action-bar message and sound when they receive coins. */
+    public static void notify(Gamer gamer, int coins) {
+        final Player player = Objects.requireNonNull(gamer.getPlayer());
+        new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0f, 2f).play(player);
+        final TextComponent text = Component.text("+" + UtilFormat.formatNumber(coins) + " Coins!", TextColor.color(255, 215, 0));
+        gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
+    }
+
 
     private final ClientManager clientManager;
 

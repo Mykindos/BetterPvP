@@ -31,6 +31,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
+import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
+import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
+import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -56,6 +59,25 @@ public class Clans extends BPvPPlugin {
     private UpdateEventExecutor updateEventExecutor;
 
     private ClanManager clanManager;
+
+    @Override
+    public void onLoad() {
+        LootEntryRegistry.register("given_clan_energy", (obj, strategy) -> {
+            EnergyItem energyType = EnergyItem.valueOf(obj.get("energyType").getAsString());
+            int minAmount = obj.get("minAmount").getAsInt();
+            int maxAmount = obj.get("maxAmount").getAsInt();
+            boolean autoDeposit = obj.has("autoDeposit") && obj.get("autoDeposit").getAsBoolean();
+            return ClanEnergyLoot.given(energyType, strategy, minAmount, maxAmount, autoDeposit);
+        });
+
+        LootEntryRegistry.register("dropped_clan_energy", (obj, strategy) -> {
+            EnergyItem energyType = EnergyItem.valueOf(obj.get("energyType").getAsString());
+            int minAmount = obj.get("minAmount").getAsInt();
+            int maxAmount = obj.get("maxAmount").getAsInt();
+            boolean autoDeposit = obj.has("autoDeposit") && obj.get("autoDeposit").getAsBoolean();
+            return ClanEnergyLoot.dropped(energyType, strategy, minAmount, maxAmount, autoDeposit);
+        });
+    }
 
     @Override
     public void onEnable() {
