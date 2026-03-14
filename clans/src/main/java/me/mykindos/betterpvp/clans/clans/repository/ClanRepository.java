@@ -215,12 +215,11 @@ public class ClanRepository implements IRepository<Clan> {
                     .set(CLAN_METADATA.MAILBOX, "")
                     .execute();
 
+            for (var member : clan.getMembers()) {
+                saveClanMember(clan, member);
+            }
+
         });
-
-        for (var member : clan.getMembers()) {
-            saveClanMember(clan, member);
-        }
-
 
     }
 
@@ -338,7 +337,10 @@ public class ClanRepository implements IRepository<Clan> {
                         .set(CLAN_MEMBERS.CLAN, clan.getId())
                         .set(CLAN_MEMBERS.MEMBER, member.getUuid().toString())
                         .set(CLAN_MEMBERS.RANK, member.getRank().name())
-                        .execute());
+                        .execute()).exceptionally(ex -> {
+                    log.error("Failed to save clan member {} for clan {}", member.getUuid(), clan.getId(), ex).submit();
+                    return null;
+                });
     }
 
     public void deleteClanMember(Clan clan, ClanMember member) {

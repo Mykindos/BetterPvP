@@ -141,7 +141,13 @@ public class ItemPacketRemapper implements PacketListener {
     }
 
     private void onEntityEquipment(PacketSendEvent event) {
-        final WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
+        final WrapperPlayServerEntityEquipment packet;
+        try {
+            packet = new WrapperPlayServerEntityEquipment(event);
+        } catch (Exception e) {
+            // Buffer already consumed by another handler in the pipeline
+            return;
+        }
         for (Equipment equipment : packet.getEquipment()) {
             equipment.setItem(mapTo(equipment.getItem()));
         }
