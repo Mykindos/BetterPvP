@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.components.store.events.PlayerMountEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -1198,6 +1199,25 @@ public class ClansWorldListener extends ClanListener {
             event.setUseInteractedBlock(Event.Result.DENY);
             event.getPlayer().getInventory().remove(itemInMainHand);
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMount(PlayerMountEvent playerMountEvent) {
+        if (playerMountEvent.isCancelled()) return;
+
+        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(playerMountEvent.getPlayer());
+        Optional<Clan> playerLocationClanOptional = clanManager.getClanByLocation(playerMountEvent.getPlayer().getLocation());
+
+        if (playerLocationClanOptional.isEmpty() || playerLocationClanOptional.get().isAdmin()) {
+            return;
+        }
+
+        Clan playerLocationClan = playerLocationClanOptional.get();
+
+        ClanRelation relation = clanManager.getRelation(playerLocationClan, playerClanOptional.orElse(null));
+        if(relation != ClanRelation.SELF && relation != ClanRelation.ALLY) {
+            playerMountEvent.cancel("You cannot mount while in another clans territory");
         }
     }
 
