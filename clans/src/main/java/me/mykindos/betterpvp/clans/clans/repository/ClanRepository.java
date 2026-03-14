@@ -495,7 +495,7 @@ public class ClanRepository implements IRepository<Clan> {
                 .exceptionally(ex -> {
                     log.error("Failed to save clan alliance trust for {} and {}", clan.getName(), alliance.getClan().getName(), ex).submit();
                     return null;
-                })
+                });
     }
     //endregion
 
