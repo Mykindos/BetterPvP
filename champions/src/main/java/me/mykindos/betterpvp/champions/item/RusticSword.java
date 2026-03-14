@@ -14,14 +14,14 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
-@ItemKey("core:standard_sword")
-@FallbackItem(value = Material.IRON_SWORD, keepRecipes = true)
-public class StandardSword extends WeaponItem {
+@ItemKey("core:rustic_sword")
+@FallbackItem(value = Material.WOODEN_SWORD, keepRecipes = true)
+public class RusticSword extends WeaponItem {
 
     private static final ItemStack model;
 
     static {
-        model = ItemStack.of(Material.IRON_SWORD);
+        model = ItemStack.of(Material.WOODEN_SWORD);
         model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
                 .consumeSeconds(Float.MAX_VALUE)
                 .animation(ItemUseAnimation.BLOCK)
@@ -29,8 +29,8 @@ public class StandardSword extends WeaponItem {
     }
 
     @Inject
-    private StandardSword(Champions champions) {
-        super(champions, "Standard Sword", model, ItemRarity.COMMON);
+    private RusticSword(Champions champions) {
+        super(champions, "Rustic Sword", model, ItemRarity.COMMON);
     }
 
 }

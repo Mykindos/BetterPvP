@@ -1,66 +1,118 @@
 magnetic_maul:
-  damage: 8.0
+  damage:
+    base: 7.0
+    min: 6.0
+    max: 8.0
   pullRange: 10.0
   pullFov: 80.3
   energyPerTick: 2.0
   knockbackMultiplier: -1.0
   bypassMinimumKnockback: true
   durability: 1000
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 rake:
-  damage: 6.0
+  damage:
+    base: 7.0
+    min: 6.0
+    max: 8.0
   tremorCooldown: 3.0
   tremorDamage: 5.0
   durability: 1000
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 alligators_tooth:
-  damage: 8.0
+  damage:
+    base: 7.0
+    min: 6.0
+    max: 8.0
   velocityStrength: 0.7
   energyPerTick: 1.0
   skimmingEnergyMultiplier: 3.0
   bonusDamage: 4.0
   durability: 1000
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 giants_broadsword:
-  damage: 9.0
+  damage:
+    base: 9.0
+    min: 8.0
+    max: 10.0
   regenAmplifier: 5
   energyPerTick: 1.5
   durability: 1000
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 throwing_web:
   duration: 2.5
   throwableExpiry: 10.0
   cooldown: 10.0
-scythe:
-  damage: 7.0
+scythe_of_the_fallen_lord:
+  damage:
+    base: 9.0
+    min: 8.0
+    max: 10.0
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
   baseHeal: 1.0
   healPerSoul: 1.0
   maxSoulsDamage: 4.0
   maxSouls: 3
-  soulHarvestSeconds: 1.5
-  soulExpirySeconds: 10.0
-  soulExpiryPerSecond: 0.3
-  soulDespawnSeconds: 7.5
+  soulHarvestSeconds: 0.75
+  soulExpirySeconds: 15.0
+  soulExpiryPerSecond: 0.15
+  soulDespawnSeconds: 10.0
   soulViewDistanceBlocks: 60
   soulsPerPlayer: 1.0
   soulsPerMob: 1.0
   summonPlayerSoulChance: 1.0
-  summonMobSoulChance: 0.4
+  summonMobSoulChance: 1.0
   speedAmplifierPerSoul: 1.0
   durability: 1000
 hyper_axe:
-  damage: 6.0
+  damage:
+    base: 5.0
+    min: 4.0
+    max: 6.0
   hyperRushCooldown: 16.0
   hyperRushSpeedLevel: 3
   hyperRushDuration: 160
   attackSpeedPercentage: 1.3
   durability: 1000
+  attack_speed:
+    base: 0.3
+    min: 0.1
+    max: 0.5
 thunderclap_aegis:
-  damage: 5.0
+  damage:
+    base: 5.0
+    min: 4.0
+    max: 6.0
   velocity: 0.8
   maxChargeTicks: 60
   energyOnCollide: 25.0
   chargeDamage: 7.0
   energyPerTick: 1.0
   durability: 1000
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 meridian_scepter:
-  damage: 5.0
+  damage:
+    base: 0.0
+    min: 0.0
+    max: 0.0
   blackHoleRadius: 0.5
   blackHoleSpeed: 40.0
   blackHoleHitbox: 0.5
@@ -76,6 +128,10 @@ meridian_scepter:
   beamHitbox: 0.5
   beamTravelSeconds: 0.3
   durability: 1000
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 wind_blade:
   enabled: true
   baseDamage: 8.0
@@ -93,34 +149,140 @@ wind_blade:
   slashSpeed: 30.0
   slashAliveMillis: 1000
   velocityStrength: 0.5
-  damage: 1.0
+  damage:
+    base: 6.0
+    min: 7.0
+    max: 8.0
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 ancient_axe:
-  damage: 7.0
+  damage:
+    base: 7.0
+    min: 6.0
+    max: 8.0
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 booster_sword:
-  damage: 6.0
+  damage:
+    base: 6.0
+    min: 5.0
+    max: 7.0
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
+crude_sword:
+  damage:
+    base: 5.0
+    min: 4.0
+    max: 6.0
+  durability: 300
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
+rustic_sword:
+  damage:
+    base: 4.0
+    min: 3.0
+    max: 5.0
+  durability: 150
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 standard_sword:
-  damage: 6.0
+  damage:
+    base: 6.0
+    min: 5.0
+    max: 7.0
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 power_sword:
-  damage: 6.5
+  damage:
+    base: 6.5
+    min: 5.5
+    max: 7.5
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 ancient_sword:
-  damage: 7.0
+  damage:
+    base: 7.0
+    min: 6.0
+    max: 8.0
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 standard_axe:
-  damage: 6.0
+  damage:
+    base: 6.0
+    min: 5.0
+    max: 7.0
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 booster_axe:
-  damage: 6.0
+  damage:
+    base: 6.0
+    min: 5.0
+    max: 7.0
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
+crude_axe:
+  damage:
+    base: 5.0
+    min: 4.0
+    max: 6.0
+  durability: 300
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
+rustic_axe:
+  damage:
+    base: 4.0
+    min: 3.0
+    max: 5.0
+  durability: 150
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 power_axe:
-  damage: 6.5
+  damage:
+    base: 6.5
+    min: 5.5
+    max: 7.5
   durability: 500
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 mjolnir:
-  damage: 9.0
+  damage:
+    base: 9.0
+    min: 8.0
+    max: 10.0
   skyforged-ascent:
     velocity: 3.0
     cooldown: 5.0
@@ -133,8 +295,15 @@ mjolnir:
     velocity: 40.0
     impact-velocity: 1.0
   durability: 1000
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 bloomrot:
-  damage: 1.0
+  damage:
+    base: 6.0
+    min: 5.0
+    max: 7.0
   durability: 500
   beamCooldown: 15.0
   poisonSeconds: 2.0
@@ -145,8 +314,11 @@ bloomrot:
   cloudRadius: 4.0
   cloudSeconds: 6.0
   healPercent: 0.8
+  attack_speed:
+    min: -0.25
+    max: 0.25
+    base: 0.0
 ivybolt:
-  damage: 1.0
   cooldown: 5.0
   durability: 500
   hitbox: 0.7
@@ -154,3 +326,71 @@ ivybolt:
   aliveTime: 3000
   entangleAmplifier: 1
   entangleSeconds: 5.0
+  damage: 1.0
+thornfang:
+  damage:
+    base: 6.0
+    min: 5.0
+    max: 7.0
+  vipersprint:
+    cooldown: 1.5
+    duration: 0.2
+    speed: 3.1
+    damage: 1.0
+    poison-level: 2
+    poison-seconds: 2.0
+    poison-amplifier: 1
+  needlegrasp:
+    cooldown: 8.0
+    extra-damage: 0.0
+    hitbox-size: 0.9
+    speed: 50.0
+    air-duration: 0.8
+    pull-duration: 1.5
+    pull-speed: 15.0
+    recoil-strength: 0.7
+    grace-period-seconds: 3.0
+    damage: 6.0
+  durability: 1500
+  huntersbrand:
+    poison-bonus-damage: 3.0
+    reset-counter-timeout: 5.0
+    frenzy-duration: 2.3
+    frenzy-level: 8
+  attack_speed:
+    base: 0.0
+    min: -0.25
+    max: 0.25
+hinokami_katana:
+  damage:
+    base: 6.0
+    min: 6.0
+    max: 8.0
+  attack_speed:
+    base: 0.5
+    min: 0.25
+    max: 0.75
+  durability: 500
+  hit-ray-size: 2.5
+  reach-override: 0.0
+  primary-attack:
+    ray-size: 2.5
+    reach-override: 5.0
+  hard-slash:
+    radius: 4.5
+    damage: 5.0
+    knockback-strength: 2.0
+    fire-seconds: 2.0
+    cooldown: 8.0
+  dash:
+    strength: 3.0
+    invulnerability-seconds: 0.0
+    cooldown: 0.6
+    energy: 12.0
+  batto_do:
+    cooldown: 10.0
+    damage: 12.0
+    knockback-strength: 1.2
+    dash-strength: 4.0
+    radius: 4.0
+    fire-seconds: 4.0

@@ -11,13 +11,13 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
-@ItemKey("core:standard_axe")
-@FallbackItem(value = Material.IRON_AXE, keepRecipes = true)
-public class StandardAxe extends WeaponItem {
+@ItemKey("core:rustic_axe")
+@FallbackItem(value = Material.WOODEN_AXE, keepRecipes = true)
+public class RusticAxe extends WeaponItem {
 
     @Inject
-    private StandardAxe(Champions champions) {
-        super(champions, "Standard Axe", ItemStack.of(Material.IRON_AXE), ItemRarity.COMMON);
+    private RusticAxe(Champions champions) {
+        super(champions, "Rustic Axe", ItemStack.of(Material.WOODEN_AXE), ItemRarity.COMMON);
     }
 
 }
