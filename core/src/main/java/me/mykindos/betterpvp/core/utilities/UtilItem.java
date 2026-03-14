@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -94,17 +95,11 @@ public class UtilItem {
     }
 
     public static boolean isMergeable(Item item) {
-        final ItemStack itemStack = item.getItemStack();
-        return itemStack.hasItemMeta()
-                && itemStack.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.UNMERGEABLE_KEY, PersistentDataType.BOOLEAN)
-                && Boolean.TRUE.equals(itemStack.getItemMeta().getPersistentDataContainer().get(CoreNamespaceKeys.UNMERGEABLE_KEY, PersistentDataType.BOOLEAN));
+        return !item.hasMetadata("unmergeable");
     }
 
     public static Item makeUnmergeable(Item item) {
-        ItemStack result = item.getItemStack();
-        final ItemMeta meta = result.getItemMeta();
-        meta.getPersistentDataContainer().set(CoreNamespaceKeys.UNMERGEABLE_KEY, PersistentDataType.BOOLEAN, true);
-        result.setItemMeta(meta);
+        item.setMetadata("unmergeable", new FixedMetadataValue(JavaPlugin.getPlugin(Core.class), true));
         return item;
     }
 
