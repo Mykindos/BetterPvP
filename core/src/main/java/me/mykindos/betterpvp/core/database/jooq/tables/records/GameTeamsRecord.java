@@ -5,6 +5,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.core.database.jooq.tables.GameTeams;
+
 import org.jooq.Record2;
 import org.jooq.impl.UpdatableRecordImpl;
 

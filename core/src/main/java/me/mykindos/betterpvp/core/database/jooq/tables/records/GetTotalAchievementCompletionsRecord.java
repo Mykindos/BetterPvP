@@ -5,6 +5,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTotalAchievementCompletions;
+
 import org.jooq.impl.TableRecordImpl;
 
 

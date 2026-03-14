@@ -5,6 +5,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientStats;
+
 import org.jooq.JSONB;
 import org.jooq.Record4;
 import org.jooq.impl.UpdatableRecordImpl;

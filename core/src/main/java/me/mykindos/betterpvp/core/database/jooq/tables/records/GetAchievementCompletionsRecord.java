@@ -4,10 +4,11 @@
 package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
-import me.mykindos.betterpvp.core.database.jooq.tables.GetAchievementCompletions;
-import org.jooq.impl.TableRecordImpl;
-
 import java.time.LocalDateTime;
+
+import me.mykindos.betterpvp.core.database.jooq.tables.GetAchievementCompletions;
+
+import org.jooq.impl.TableRecordImpl;
 
 
 /**

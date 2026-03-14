@@ -4,11 +4,12 @@
 package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
+import java.time.LocalDate;
+
 import me.mykindos.betterpvp.core.database.jooq.tables.Seasons;
+
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
-
-import java.time.LocalDate;
 
 
 /**

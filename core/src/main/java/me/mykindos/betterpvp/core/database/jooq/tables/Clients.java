@@ -4,9 +4,14 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
+import me.mykindos.betterpvp.core.database.jooq.tables.ChatFilter.ChatFilterPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory.ClientNameHistoryPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties.ClientPropertiesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards.ClientRewardsPath;
@@ -22,6 +27,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills.KillsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages.OfflineMessagesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments.PunishmentsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
+
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -43,10 +49,6 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 
 /**
@@ -170,6 +172,19 @@ public class Clients extends TableImpl<ClientsRecord> {
     @Override
     public List<UniqueKey<ClientsRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.CLIENTS_UUID_KEY);
+    }
+
+    private transient ChatFilterPath _chatFilter;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.chat_filter</code>
+     * table
+     */
+    public ChatFilterPath chatFilter() {
+        if (_chatFilter == null)
+            _chatFilter = new ChatFilterPath(this, null, Keys.CHAT_FILTER__CHAT_FILTER_CREATED_BY_FKEY.getInverseKey());
+
+        return _chatFilter;
     }
 
     private transient ClientNameHistoryPath _clientNameHistory;

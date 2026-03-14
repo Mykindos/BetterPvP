@@ -4,8 +4,11 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
+import java.time.LocalDateTime;
+
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetAchievementCompletionsRecord;
+
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Name;
@@ -16,8 +19,6 @@ import org.jooq.TableOptions;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
-
-import java.time.LocalDateTime;
 
 
 /**

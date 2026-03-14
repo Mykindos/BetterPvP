@@ -6,6 +6,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables;
 
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetClientAchievementRanksRecord;
+
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Name;

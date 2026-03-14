@@ -4,11 +4,16 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms.RealmsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Seasons.SeasonsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ServersRecord;
+
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -29,10 +34,6 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 
 /**

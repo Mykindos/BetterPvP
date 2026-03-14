@@ -4,10 +4,14 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
+import me.mykindos.betterpvp.core.database.jooq.tables.ChatFilter;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
@@ -64,15 +68,13 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakR
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchievementCompletionsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
+
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -107,6 +109,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.armour</code>.
      */
     public final Armour ARMOUR = Armour.ARMOUR;
+
+    /**
+     * The table <code>public.chat_filter</code>.
+     */
+    public final ChatFilter CHAT_FILTER = ChatFilter.CHAT_FILTER;
 
     /**
      * The table <code>public.chunk_block_tagging</code>.
@@ -943,6 +950,7 @@ public class Public extends SchemaImpl {
             AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM,
             AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON,
             Armour.ARMOUR,
+            ChatFilter.CHAT_FILTER,
             ChunkBlockTagging.CHUNK_BLOCK_TAGGING,
             ClientNameHistory.CLIENT_NAME_HISTORY,
             ClientProperties.CLIENT_PROPERTIES,

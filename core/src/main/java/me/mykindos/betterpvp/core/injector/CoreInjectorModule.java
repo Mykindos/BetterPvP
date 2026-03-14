@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.filter.IFilterService;
-import me.mykindos.betterpvp.core.chat.filter.impl.DefaultFilterService;
+import me.mykindos.betterpvp.core.chat.filter.impl.DatabaseFilterService;
 import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
@@ -26,7 +26,7 @@ public class CoreInjectorModule extends AbstractModule {
 
 
         bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
-        bind(IFilterService.class).to(DefaultFilterService.class);
+        bind(IFilterService.class).to(DatabaseFilterService.class);
         bind(IIgnoreService.class).to(DefaultIgnoreService.class);
         log.info("Using default integrations").submit();
 
