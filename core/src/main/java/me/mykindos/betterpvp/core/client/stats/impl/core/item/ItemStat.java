@@ -202,6 +202,30 @@ public class ItemStat implements IBuildableStat {
          * The total count of this item sold
          */
         SELL_COUNT,
+        /**
+         * The total amount of currency gained from creating this auction
+         */
+        AUCTION_BUY_AMOUNT,
+        /**
+         * The total count of this item created in auctions
+         */
+        AUCTION_BUY_COUNT,
+        /**
+         * The total amount of currency gained from creating this auction
+         */
+        AUCTION_SELL_AMOUNT,
+        /**
+         * The total count of this item created in auctions
+         */
+        AUCTION_SELL_COUNT,
+        /**
+         * The total amount of currency gained from creating this auction
+         */
+        AUCTION_CREATE_AMOUNT,
+        /**
+         * The total count of this item created in auctions
+         */
+        AUCTION_CREATE_COUNT,
     }
 
 }

@@ -417,12 +417,31 @@ public class ClientManager extends PlayerManager<Client> {
         search().online(player).getStatContainer().incrementStat(iStat, amount);
     }
 
+    /**
+     * Shortcut to increment the stat for an offline player. Will load the client if not already loaded, but will not make them online.
+     * @param id the uuid of the player
+     * @param iStat the stat to increment
+     * @param amount the amount to increment by
+     */
     public void incrementStatOffline(UUID id, IStat iStat, long amount) {
         search().offline(id).thenAccept(clientOptional -> {
             UtilServer.runTask(BPvPPlugin.getPlugin(Core.class), () -> {
                 clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(iStat, amount));
             });
+        });
+    }
 
+    /**
+     * Shortcut to increment the stat for an offline player. Will load the client if not already loaded, but will not make them online.
+     * @param id the uuid of the player
+     * @param iStat the stat to increment
+     * @param amount the amount to increment by
+     */
+    public void incrementStatOffline(UUID id, IStat iStat, double amount) {
+        search().offline(id).thenAccept(clientOptional -> {
+            UtilServer.runTask(BPvPPlugin.getPlugin(Core.class), () -> {
+                clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(iStat, amount));
+            });
         });
     }
 
