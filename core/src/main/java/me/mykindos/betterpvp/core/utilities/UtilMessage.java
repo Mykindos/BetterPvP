@@ -14,6 +14,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -287,6 +288,39 @@ public class UtilMessage {
 
     public static Component deserialize(String message, Object... args) {
         return deserialize(String.format(message, args));
+    }
+
+    /**
+     * Creates a component with a click event that copies text to the clipboard when clicked, and a hover event that shows "Click to Copy"
+     * @param commandText The text to show in the message, which will have the hover and click events
+     * @return A component with a click event that copies text to the clipboard when clicked, and a hover event that shows "Click to Copy"
+     */
+    public static Component copyCommand(String commandText) {
+        return copyCommand(commandText, commandText);
+    }
+
+    /**
+     * Creates a component with a click event that copies text to the clipboard when clicked, and a hover event that shows "Click to Copy"
+     * @param commandText The text to show in the message, which will have the hover and click events. This is usually the command being copied, but can be any text.
+     * @param copyText The text that will be copied to the clipboard when the message is clicked. This is usually the command being copied, but can be any text.
+     * @return A component with a click event that copies text to the clipboard when clicked, and a hover event that shows "Click to Copy"
+     */
+    public static Component copyCommand(String commandText, String copyText) {
+        return UtilMessage.deserialize("<gold>" + commandText + "</gold>")
+                .hoverEvent(HoverEvent.showText(Component.text("Click to Copy Command")))
+                .clickEvent(ClickEvent.copyToClipboard(copyText));
+    }
+
+    /**
+     * Creates a component with a click event that changes the page of a book when clicked, and a hover event that shows "Click to open page X"
+     * @param entryText The text to show in the message, which will have the hover and click events. This is usually the name of the section of the book that this entry corresponds to, but can be any text.
+     * @param pageNum The page number that the book will change to when the message is clicked. This is usually the page that the section of the book that this entry corresponds to starts on, but can be any page number.
+     * @return A component with a click event that changes the page of a book when clicked, and a hover event that shows "Click to open page X"
+     */
+    public static Component tableOfContentsEntry(String entryText, int pageNum) {
+        return Component.empty().append(UtilMessage.deserialize("<reset><black>" + entryText + ": " + pageNum).decoration(TextDecoration.BOLD, false)
+                .hoverEvent(HoverEvent.showText(Component.text("Click to open page " + pageNum)))
+                .clickEvent(ClickEvent.changePage(pageNum)));
     }
 
     public static Component normalize(Component component) {
