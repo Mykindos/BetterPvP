@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemLootEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -45,7 +46,7 @@ public class WeaponListener implements Listener {
     @EventHandler
     public void onSpecialItemDrop(SpecialItemLootEvent event) {
         final ItemInstance item = event.getItemInstance();
-        if (!item.getRarity().isImportant()) {
+        if (!item.getRarity().isImportant() || !(item.getBaseItem() instanceof WeaponItem)) {
             return;
         }
 

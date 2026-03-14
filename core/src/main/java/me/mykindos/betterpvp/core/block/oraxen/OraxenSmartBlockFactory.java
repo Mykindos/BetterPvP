@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.jetbrains.annotations.NotNull;
@@ -125,5 +126,13 @@ public class OraxenSmartBlockFactory implements SmartBlockFactory {
     @Override
     public boolean isSmartBlock(Location location) {
         return from(location).isPresent();
+    }
+
+    @Override
+    public BlockData createBlockData(SmartBlock type) {
+        if (!(type instanceof OraxenBlock block)) {
+            throw new IllegalArgumentException("Type must be an instance of OraxenBlock");
+        }
+        return OraxenBlocks.getOraxenBlockData(block.getId());
     }
 }

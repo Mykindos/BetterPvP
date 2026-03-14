@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.block;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 
 import java.util.Optional;
 
@@ -46,4 +47,10 @@ public interface SmartBlockFactory {
      */
     boolean isSmartBlock(Location location);
 
+    /**
+     * Creates a new {@link BlockData} instance for the given smart block.
+     * @param type the smart block to create the data for
+     * @return a new {@link BlockData} instance
+     */
+    BlockData createBlockData(SmartBlock type);
 }

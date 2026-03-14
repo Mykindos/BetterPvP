@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.block.impl;
 
+import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 
 import java.util.Optional;
 
@@ -31,5 +34,10 @@ public class DefaultSmartBlockFactory implements SmartBlockFactory {
     @Override
     public boolean isSmartBlock(Location location) {
         return false;
+    }
+
+    @Override
+    public BlockData createBlockData(SmartBlock type) {
+        return Material.STONE.createBlockData();
     }
 }
