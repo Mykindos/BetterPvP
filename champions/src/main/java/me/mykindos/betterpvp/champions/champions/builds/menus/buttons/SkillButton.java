@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -23,7 +24,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,8 +116,8 @@ public class SkillButton extends FlashingButton<SkillMenu> {
     }
 
     private void buildActiveItem(ItemView.ItemViewBuilder builder, int displayLevel, int desiredLevel) {
-        Material flashMaterial = this.isFlash() ? Material.WRITTEN_BOOK : Material.BOOK;
-        builder.material(this.isFlashing() ? flashMaterial : Material.WRITTEN_BOOK);
+        builder.material(Material.PAPER).itemModel(Key.key("minecraft", "written_book"));
+        builder.glow(true);
         builder.amount(displayLevel);
 
         Component standardComponent = Component.text(
@@ -133,7 +133,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
     }
 
     private void buildInactiveItem(ItemView.ItemViewBuilder builder, int desiredLevel) {
-        builder.material(Material.BOOK);
+        builder.material(Material.PAPER).itemModel(Key.key("minecraft", "book"));
 
         Component standardComponent = Component.text(skill.getName(), NamedTextColor.RED);
         Component flashingComponent = Component.empty()
