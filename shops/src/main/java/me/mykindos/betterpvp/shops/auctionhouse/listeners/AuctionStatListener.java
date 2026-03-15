@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.shops.auctionhouse.listeners;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.core.item.ItemStat;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 public class AuctionStatListener implements Listener {
     private final ClientManager clientManager;
 
+    @Inject
     public AuctionStatListener(ClientManager clientManager) {
         this.clientManager = clientManager;
     }
