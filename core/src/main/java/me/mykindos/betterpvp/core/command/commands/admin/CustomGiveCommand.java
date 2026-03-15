@@ -47,7 +47,7 @@ public class CustomGiveCommand extends Command {
     @Singleton
     @Override
     public String getName() {
-        return "give";
+        return "legacygive";
     }
 
     @Override
@@ -68,7 +68,7 @@ public class CustomGiveCommand extends Command {
             UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid player name.", args[0]));
             return;
         }
-;
+
         BaseItem baseItem = itemRegistry.getItem(args[1]);
         if (baseItem == null) {
             final @NotNull Map<NamespacedKey, BaseItem> options = itemRegistry.getItemsByKey(args[1]);

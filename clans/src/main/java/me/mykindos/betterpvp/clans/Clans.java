@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementLoader;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.commands.BrigadierClansCommandLoader;
 import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
@@ -104,6 +105,9 @@ public class Clans extends BPvPPlugin {
 
             var clansCommandLoader = injector.getInstance(ClansCommandLoader.class);
             clansCommandLoader.loadCommands(PACKAGE);
+
+            var clansBrigadierCommandLoader = injector.getInstance(BrigadierClansCommandLoader.class);
+            clansBrigadierCommandLoader.loadCommands(PACKAGE);
 
             var clanTipManager = injector.getInstance(ClansTipLoader.class);
             clanTipManager.loadTips(PACKAGE);
