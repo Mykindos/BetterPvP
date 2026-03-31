@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 
 import java.util.Optional;
 
@@ -33,6 +34,11 @@ public class DefaultSmartBlockFactory implements SmartBlockFactory {
 
     @Override
     public boolean isSmartBlock(Location location) {
+        return false;
+    }
+
+    @Override
+    public boolean isSmartBlock(Entity entity) {
         return false;
     }
 

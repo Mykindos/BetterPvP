@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -122,6 +123,10 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
 
     @Override
     public boolean isSmartBlock(Block block) {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("This method must be called on the main thread");
+        }
+
         return NexoBlocks.chorusBlockMechanic(block) != null ||
                 NexoBlocks.customBlockMechanic(block) != null ||
                 NexoBlocks.noteBlockMechanic(block) != null ||
@@ -130,7 +135,20 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
     }
 
     @Override
+    public boolean isSmartBlock(Entity entity) {
+        final Block block = entity.getLocation().getBlock();
+        return NexoBlocks.chorusBlockMechanic(block) != null ||
+                NexoBlocks.customBlockMechanic(block) != null ||
+                NexoBlocks.noteBlockMechanic(block) != null ||
+                NexoBlocks.stringMechanic(block) != null ||
+                NexoFurniture.furnitureMechanic(entity) != null;
+    }
+
+    @Override
     public boolean isSmartBlock(Location location) {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("This method must be called on the main thread");
+        }
         return from(location).isPresent();
     }
 
