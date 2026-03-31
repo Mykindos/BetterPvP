@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.block;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 
 import java.util.Optional;
 
@@ -46,6 +47,13 @@ public interface SmartBlockFactory {
      * @return true if the block at the location is a smart block, false otherwise
      */
     boolean isSmartBlock(Location location);
+
+    /**
+     * Checks if the given entity is a smart block.
+     * @param entity the entity to check
+     * @return true if the entity is a smart block, false otherwise
+     */
+    boolean isSmartBlock(Entity entity);
 
     /**
      * Creates a new {@link BlockData} instance for the given smart block.

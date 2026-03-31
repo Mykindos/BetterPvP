@@ -36,10 +36,21 @@ public class SmartBlockExtent extends AbstractDelegateExtent {
         this.worldRef = new WeakReference<>(world);
     }
 
+    private boolean isSmartBlock(BlockVector3 position) {
+        // 2x2x2 cuboid
+//        final CuboidRegion region = new CuboidRegion(
+//                position.subtract(1, 1, 1),
+//        position.add(1, 1, 1)
+//        );
+//        return this.extent.getEntities(region).stream()
+//                .anyMatch(entity -> factory.isSmartBlock(adapt()));
+        return false; // you know what nevermind
+    }
+
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         // If the block is a smart block, we don't allow setting it in WorldEdit.
-        if (factory.isSmartBlock(adapt(position))) {
+        if (isSmartBlock(position)) {
             return false;
         }
 
@@ -50,7 +61,7 @@ public class SmartBlockExtent extends AbstractDelegateExtent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         // If the block is a smart block, we don't allow setting it in WorldEdit.
-        if (factory.isSmartBlock(adapt(BlockVector3.at(x, y, z)))) {
+        if (isSmartBlock(BlockVector3.at(x, y, z))) {
             return false;
         }
 
@@ -64,7 +75,7 @@ public class SmartBlockExtent extends AbstractDelegateExtent {
         Set<BlockVector3> filtered = new HashSet<>();
         for (BlockVector3 position : region) {
             Block blockAtPosition = adapt(position);
-            if (!factory.isSmartBlock(blockAtPosition)) {
+            if (!isSmartBlock(position)) {
                 filtered.add(position);
             }
         }
@@ -76,7 +87,7 @@ public class SmartBlockExtent extends AbstractDelegateExtent {
     @Override
     public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
         // If the set contains smart blocks, remove them from the set.
-        vset.removeIf(position -> factory.isSmartBlock(adapt(position)));
+        vset.removeIf(this::isSmartBlock);
 
         // Otherwise, we delegate to the parent extent.
         return super.setBlocks(vset, pattern);
