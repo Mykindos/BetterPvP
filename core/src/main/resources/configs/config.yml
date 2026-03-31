@@ -2,6 +2,12 @@ core:
   info:
     server: Clans-1
     season: Season 1
+  i18n:
+    default-locale: en
+    locales:
+      - en
+    strict-keys: false
+    platform-bundles: []
   database:
     supabase:
       url: "https://wenrbemzbvclukhgmbgz.supabase.co"

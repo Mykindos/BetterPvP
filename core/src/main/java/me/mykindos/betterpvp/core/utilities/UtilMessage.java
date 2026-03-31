@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.i18n.TranslationArgument;
+import me.mykindos.betterpvp.core.i18n.TranslationRegistry;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.ExperienceTag;
@@ -12,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.model.tag.ResistanceTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.TimeTag;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -21,10 +24,15 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilMessage {
@@ -63,7 +71,7 @@ public class UtilMessage {
      * @param message Message to send to a player
      */
     public static void message(Audience sender, String prefix, Component message) {
-        sender.sendMessage(getPrefix(prefix).append(normalize(message)));
+        sender.sendMessage(getPrefix(sender, prefix).append(normalize(message)));
     }
 
     /**
@@ -199,7 +207,7 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      */
     public static void simpleMessage(Audience sender, String prefix, String message) {
-        sender.sendMessage(getPrefix(prefix).append(deserialize(message)));
+        sender.sendMessage(getPrefix(sender, prefix).append(deserialize(message)));
     }
 
     /**
@@ -223,7 +231,7 @@ public class UtilMessage {
      * @param hover   Hover event to add to the message
      */
     public static void simpleMessage(Audience sender, String prefix, Component message, Component hover) {
-        sender.sendMessage(getPrefix(prefix).hoverEvent(HoverEvent.showText(hover)).append(normalize(message)));
+        sender.sendMessage(getPrefix(sender, prefix).hoverEvent(HoverEvent.showText(hover)).append(normalize(message)));
     }
 
     /**
@@ -246,7 +254,27 @@ public class UtilMessage {
      * @param component Message to send to the CommandSender
      */
     public static void simpleMessage(Audience sender, String prefix, Component component) {
-        sender.sendMessage(getPrefix(prefix).append(normalize(component)));
+        sender.sendMessage(getPrefix(sender, prefix).append(normalize(component)));
+    }
+
+    public static String key(Player player, String translationKey, Object... args) {
+        return PlainTextComponentSerializer.plainText().serialize(translateComponent(player, translationKey, args));
+    }
+
+    public static void messageKey(Audience sender, String prefix, String translationKey, Object... args) {
+        message(sender, prefix, translateComponent(sender, translationKey, args));
+    }
+
+    public static void simpleMessageKey(Audience sender, String prefix, String translationKey, Object... args) {
+        simpleMessage(sender, prefix, translateComponent(sender, translationKey, args));
+    }
+
+    public static void simpleBroadcastKey(String prefix, String translationKey, Object... args) {
+        broadcastTranslated(prefix, translationKey, null, args);
+    }
+
+    public static void simpleBroadcastKey(String prefix, String translationKey, Component hover, Object... args) {
+        broadcastTranslated(prefix, translationKey, hover, args);
     }
 
     /**
@@ -283,7 +311,16 @@ public class UtilMessage {
             msg = UtilFormat.stripColor(message);
         }
 
-        return normalize(miniMessage.deserialize(msg, tagResolver));
+        return normalize(miniMessage.deserialize(msg));
+    }
+
+    public static Component deserialize(String message, TagResolver... resolvers) {
+        String msg = message;
+        if(msg.contains(String.valueOf(UtilFormat.COLOR_CHAR))) {
+            msg = UtilFormat.stripColor(message);
+        }
+
+        return normalize(miniMessage.deserialize(msg, resolvers));
     }
 
     public static Component deserialize(String message, Object... args) {
@@ -334,6 +371,19 @@ public class UtilMessage {
         return miniMessage.deserialize("<blue>" + prefix + "> ");
     }
 
+    public static Component getPrefix(Audience audience, String prefix) {
+        if (prefix.isEmpty()) {
+            return Component.empty();
+        }
+
+        String translatedPrefix = TranslationRegistry.get().getRaw(prefix, resolveLocale(audience));
+        if (translatedPrefix != null) {
+            return miniMessage.deserialize(translatedPrefix);
+        }
+
+        return getPrefix(prefix);
+    }
+
     /**
      * Broadcasts a message to all players on the server with formatting
      *
@@ -381,6 +431,48 @@ public class UtilMessage {
      */
     public static void broadcast(String prefix, Component message) {
         Bukkit.getServer().broadcast(getPrefix(prefix).append(normalize(message)));
+    }
+
+    private static void broadcastTranslated(String prefix, String translationKey, @Nullable Component hover, Object... args) {
+        Audience console = Bukkit.getConsoleSender();
+        console.sendMessage(withOptionalHover(getPrefix(console, prefix).append(translateComponent(console, translationKey, args)), hover));
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(withOptionalHover(getPrefix(player, prefix).append(translateComponent(player, translationKey, args)), hover));
+        }
+    }
+
+    private static Component withOptionalHover(Component message, @Nullable Component hover) {
+        return hover == null ? message : message.hoverEvent(HoverEvent.showText(hover));
+    }
+
+    private static Component translateComponent(@Nullable Audience audience, String translationKey, Object... args) {
+        Locale locale = resolveLocale(audience);
+        String translated = TranslationRegistry.get().translateString(translationKey, locale);
+        return deserialize(translated, resolvePlaceholders(args));
+    }
+
+    private static Locale resolveLocale(@Nullable Audience audience) {
+        if (audience instanceof Player player) {
+            return TranslationRegistry.get().getPlayerLocale(player);
+        }
+
+        return TranslationRegistry.get().getDefaultLocale();
+    }
+
+    private static TagResolver[] resolvePlaceholders(Object... args) {
+        TagResolver[] resolvers = new TagResolver[args.length];
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+            if (arg instanceof TranslationArgument translationArgument) {
+                resolvers[i] = translationArgument.resolver();
+            } else if (arg instanceof ComponentLike componentLike) {
+                resolvers[i] = Placeholder.component("arg" + i, componentLike.asComponent());
+            } else {
+                resolvers[i] = Placeholder.unparsed("arg" + i, String.valueOf(arg));
+            }
+        }
+        return resolvers;
     }
 
 }

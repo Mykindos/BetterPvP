@@ -56,12 +56,12 @@ public class GameCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String[] args) {
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> set <value>");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> get");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> reset");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game set <game>");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game start");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game end");
+        UtilMessage.messageKey(player, "Game", "game.usage.attribute_set");
+        UtilMessage.messageKey(player, "Game", "game.usage.attribute_get");
+        UtilMessage.messageKey(player, "Game", "game.usage.attribute_reset");
+        UtilMessage.messageKey(player, "Game", "game.usage.set");
+        UtilMessage.messageKey(player, "Game", "game.usage.start");
+        UtilMessage.messageKey(player, "Game", "game.usage.end");
     }
 
     @Singleton
@@ -238,9 +238,9 @@ public class GameCommand extends Command {
         @Override
         public void execute(Player player, Client client, String[] args) {
             if (args.length < 2) {
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> set <value>");
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> get");
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> reset");
+                UtilMessage.messageKey(player, "Game", "game.usage.attribute_set");
+                UtilMessage.messageKey(player, "Game", "game.usage.attribute_get");
+                UtilMessage.messageKey(player, "Game", "game.usage.attribute_reset");
                 return;
             }
 
@@ -312,7 +312,7 @@ public class GameCommand extends Command {
 
         private <T> void setAttributeValue(Player player, GameAttribute<T> attribute, String[] args) {
             if (args.length == 0) {
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> set <value>");
+                UtilMessage.messageKey(player, "Game", "game.usage.attribute_set");
                 return;
             }
 
