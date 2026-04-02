@@ -20,7 +20,6 @@ dependencies {
     compileOnly(libs.mythic)
     compileOnly(project(":core"))
     compileOnly(project(":clans"))
-    compileOnly(libs.mineplex)
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)
