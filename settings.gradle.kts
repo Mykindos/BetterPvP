@@ -15,6 +15,7 @@ if (File("./private/").exists()) {
     include(":private:events")
     include(":private:dungeons")
     include(":private:store")
+    include(":private:store-proxy")
     include(":private:compatability")
 }
 
@@ -50,9 +51,13 @@ dependencyResolutionManagement {
             version("junit", "5.13.0-M2")
             version("jooq", "3.19.3")
             version("postgres", "42.7.4")
+            version("velocity", "3.5.0-SNAPSHOT")
 
             // Library - PostgreSQL
             library("postgres", "org.postgresql", "postgresql").versionRef("postgres")
+
+            // Library - Velocity
+            library("velocity-api", "com.velocitypowered", "velocity-api").versionRef("velocity")
 
             // Library - jOOQ
             library("jooq", "org.jooq", "jooq").versionRef("jooq")
@@ -72,7 +77,7 @@ dependencyResolutionManagement {
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
 
             // Library - Tests
-            library("junit-jupiter", "org.junit.jupiter","junit-jupiter").versionRef("junit")
+            library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("reflections", "org.reflections:reflections:0.10.2")
             library("mockbukkit", "org.mockbukkit.mockbukkit", "mockbukkit-v1.21").versionRef("mockbukkit")
 
