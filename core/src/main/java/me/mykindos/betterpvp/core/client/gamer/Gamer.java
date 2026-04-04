@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
@@ -186,6 +185,14 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     public boolean isInCombat() {
         return !UtilTime.elapsed(lastDamaged, DamageLog.EXPIRY);
+    }
+
+    public long getRemainingCombatMillis() {
+        if (!isInCombat()) {
+            return 0L;
+        }
+
+        return Math.max(0L, DamageLog.EXPIRY - (System.currentTimeMillis() - lastDamaged));
     }
 
     public void setChatChannel(@NotNull ChatChannel chatChannel) {
