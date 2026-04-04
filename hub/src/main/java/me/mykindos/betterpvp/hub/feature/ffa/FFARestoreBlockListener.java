@@ -10,13 +10,13 @@ import org.bukkit.event.Listener;
 
 @BPvPListener
 @Singleton
-public class FfaRestoreBlockListener implements Listener {
+public class FFARestoreBlockListener implements Listener {
 
     private final HubWorld hubWorld;
     private final FFARegionService ffaRegionService;
 
     @Inject
-    public FfaRestoreBlockListener(HubWorld hubWorld, FFARegionService ffaRegionService) {
+    public FFARestoreBlockListener(HubWorld hubWorld, FFARegionService ffaRegionService) {
         this.hubWorld = hubWorld;
         this.ffaRegionService = ffaRegionService;
     }
