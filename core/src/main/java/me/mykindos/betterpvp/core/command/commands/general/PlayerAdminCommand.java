@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.ServerMessage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -55,5 +56,6 @@ public class PlayerAdminCommand extends Command {
                 .metadata("sender", player.getUniqueId().toString())
                 .build();
         crossServerMessageService.broadcast(build);
+        new SoundEffect("minecraft", "block.amethyst_block.resonate", 1.0F).play(player);
     }
 }

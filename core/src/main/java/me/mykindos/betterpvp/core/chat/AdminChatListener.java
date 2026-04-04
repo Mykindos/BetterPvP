@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,7 +21,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @BPvPListener
@@ -93,6 +96,7 @@ public class AdminChatListener implements Listener {
                 }
 
                 clientManager.sendMessageToRank("", component, Rank.HELPER);
+                playSoundToStaff(Set.of(client.getUuid()));
             });
         }).exceptionally(ex -> {
             log.error("Failed processing admin message", ex);
@@ -145,10 +149,21 @@ public class AdminChatListener implements Listener {
                 final Player receiverPlayer = loadedReceiver.getGamer().getPlayer();
                 if (receiverPlayer != null) {
                     UtilMessage.message(receiverPlayer, component);
+                    new SoundEffect("minecraft", "block.amethyst_block.resonate", 1.5F).play(receiverPlayer);
                 }
             }
         }
 
         clientManager.sendMessageToRank("", component, Rank.HELPER);
+        playSoundToStaff(Set.of(senderClient.getUuid()));
+    }
+
+    private void playSoundToStaff(Set<String> excludedUuids) {
+        clientManager.getOnline().stream()
+                .filter(client -> client.hasRank(Rank.HELPER))
+                .filter(client -> !excludedUuids.contains(client.getUuid()))
+                .map(client -> client.getGamer().getPlayer())
+                .filter(Objects::nonNull)
+                .forEach(player -> new SoundEffect("minecraft", "block.amethyst_block.resonate", 1.5F).play(player));
     }
 }

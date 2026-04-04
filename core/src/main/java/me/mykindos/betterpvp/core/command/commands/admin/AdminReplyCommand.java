@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.ServerMessage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -77,6 +78,7 @@ public class AdminReplyCommand extends Command {
                                 .metadata("target", receivingClient.getUniqueId().toString())
                                 .build();
                         crossServerMessageService.broadcast(message);
+                        new SoundEffect("minecraft", "block.amethyst_block.resonate", 1.0F).play(player);
                     }));
         });
     }

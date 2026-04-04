@@ -12,10 +12,13 @@ import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.ServerMessage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class AdminMessageCommand extends Command {
@@ -46,6 +49,7 @@ public class AdminMessageCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         final Gamer gamer = client.getGamer();
+        final var search = clientManager.search(player);
 
         if (args.length == 0) {
             UtilMessage.message(player, "Core", "Usage: <player> <message>");
@@ -57,8 +61,10 @@ public class AdminMessageCommand extends Command {
             return;
         }
 
-        final Collection<Client> matches = clientManager.search(player).advancedOnline(args[0]);
+        // Handles zero-matches
+        final Collection<Client> matches = search.inform(false).advancedOnline(args[0]);
         if (matches.size() > 1) {
+            search.tooManyMatches(matches, args[0]);
             return;
         }
 
@@ -67,16 +73,20 @@ public class AdminMessageCommand extends Command {
             return;
         }
 
-        clientManager.search(player).offline(args[0]).thenAccept(targetOptional -> {
+        // This is not silent, it will show ZERO MATCHES if not found
+        final CompletableFuture<Optional<Client>> offlineSearch = clientManager.search(player).offline(args[0]);
+
+        offlineSearch.thenAccept(targetOptional -> {
             if (targetOptional.isEmpty()) {
-                return;
+                return; // No player found, message was sent above
             }
 
+            // Since the player does exist, let's see if they're online in the network, if they aren't show zero matches
             final Client target = targetOptional.get();
             crossServerMessageService.isPlayerOnline(target.getName()).thenAccept(isOnline ->
                     UtilServer.runTask(core, () -> {
                         if (!isOnline) {
-                            UtilMessage.message(player, "Core", "<gray>No online player to message found");
+                            search.zeroMatches(args[0]);
                             return;
                         }
 
@@ -108,5 +118,6 @@ public class AdminMessageCommand extends Command {
                 .metadata("target", receiver.getUniqueId().toString())
                 .build();
         crossServerMessageService.broadcast(message);
+        new SoundEffect("minecraft", "block.amethyst_block.resonate", 1.0F).play(player);
     }
 }
