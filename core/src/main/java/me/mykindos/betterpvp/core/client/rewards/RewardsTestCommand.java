@@ -6,12 +6,10 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.ServerMessage;
-import me.mykindos.betterpvp.core.framework.server.events.ServerMessageSentEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,11 +22,14 @@ public class RewardsTestCommand extends Command {
 
     private final ClientSQLLayer clientSQLLayer;
     private final ItemFactory itemFactory;
+    private final CrossServerMessageService crossServerMessageService;
 
     @Inject
-    public RewardsTestCommand(ClientSQLLayer clientSQLLayer, ItemFactory itemFactory) {
+    public RewardsTestCommand(ClientSQLLayer clientSQLLayer, ItemFactory itemFactory,
+                              CrossServerMessageService crossServerMessageService) {
         this.clientSQLLayer = clientSQLLayer;
         this.itemFactory = itemFactory;
+        this.crossServerMessageService = crossServerMessageService;
     }
 
     @Override
@@ -46,15 +47,15 @@ public class RewardsTestCommand extends Command {
         final BaseItem baseItem = Objects.requireNonNull(itemFactory.getItemRegistry().getItem("dungeons:dungeon_token"));
         ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
         CompletableFuture.runAsync(() -> {
-            if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-                UtilServer.callEvent(new ServerMessageSentEvent("BetterPvP", ServerMessage.builder()
-                        .channel("ChampionsWinsReward").message("TEST").metadata("uuid", player.getUniqueId().toString()).build()));
-            } else {
-                RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
-                rewardBox.getContents().add(itemStack);
+            crossServerMessageService.broadcast(ServerMessage.builder()
+                    .channel("ChampionsWinsReward")
+                    .message("TEST")
+                    .metadata("uuid", player.getUniqueId().toString())
+                    .build());
 
-                clientSQLLayer.updateClientRewards(client, rewardBox);
-            }
+            RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
+            rewardBox.getContents().add(itemStack);
+            clientSQLLayer.updateClientRewards(client, rewardBox);
         }).exceptionally(ex -> {
             log.info("Error while executing rewards command", ex).submit();
             return null;

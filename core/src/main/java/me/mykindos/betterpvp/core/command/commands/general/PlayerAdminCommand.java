@@ -2,32 +2,25 @@ package me.mykindos.betterpvp.core.command.commands.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.ServerMessage;
-import me.mykindos.betterpvp.core.framework.server.events.ServerMessageReceivedEvent;
-import me.mykindos.betterpvp.core.framework.server.events.ServerMessageSentEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Singleton
 public class PlayerAdminCommand extends Command {
 
-    private final Core core;
-    private final ClientManager clientManager;
     private final CooldownManager cooldownManager;
+    private final CrossServerMessageService crossServerMessageService;
 
     @Inject
-    public PlayerAdminCommand(Core core, ClientManager clientManager, CooldownManager cooldownManager) {
-        this.core = core;
-        this.clientManager = clientManager;
+    public PlayerAdminCommand(CooldownManager cooldownManager, CrossServerMessageService crossServerMessageService) {
         this.cooldownManager = cooldownManager;
+        this.crossServerMessageService = crossServerMessageService;
 
         aliases.add("a");
     }
@@ -56,14 +49,11 @@ public class PlayerAdminCommand extends Command {
             }
         }
 
-        ServerMessage build = ServerMessage.builder().channel("AdminMessage").message(String.join(" ", args))
-                .metadata("sender", player.getUniqueId().toString()).build();
-        if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
-            UtilServer.callEventAsync(core, new ServerMessageSentEvent("BetterPvP", build));
-        } else {
-            UtilServer.callEventAsync(core, new ServerMessageReceivedEvent("BetterPvP", build));
-        }
-
-
+        ServerMessage build = ServerMessage.builder()
+                .channel("AdminMessage")
+                .message(String.join(" ", args))
+                .metadata("sender", player.getUniqueId().toString())
+                .build();
+        crossServerMessageService.broadcast(build);
     }
 }

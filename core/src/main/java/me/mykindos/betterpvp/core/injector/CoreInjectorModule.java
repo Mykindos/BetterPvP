@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
+import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
+import me.mykindos.betterpvp.core.framework.server.VelocityCrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.server.network.PluginMessagingNetworkPlayerCountService;
 
@@ -25,13 +27,11 @@ public class CoreInjectorModule extends AbstractModule {
     protected void configure() {
         bind(Core.class).toInstance(plugin);
 
-
         bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
         bind(IFilterService.class).to(DatabaseFilterService.class);
         bind(IIgnoreService.class).to(DefaultIgnoreService.class);
+        bind(CrossServerMessageService.class).to(VelocityCrossServerMessageService.class);
         bind(NetworkPlayerCountService.class).to(PluginMessagingNetworkPlayerCountService.class);
         log.info("Using default integrations").submit();
-
     }
-
 }
