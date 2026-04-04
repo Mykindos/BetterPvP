@@ -7,10 +7,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.hub.feature.zone.Zone;
 import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
 import me.mykindos.betterpvp.hub.model.HubWorld;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 @BPvPListener
@@ -39,9 +41,21 @@ public class DamageListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        if (event.getPlayer().getGameMode() == GameMode.CREATIVE) {
+            return;
+        }
+
+        if (zoneService.getZone(event.getPlayer()) != Zone.NONE) {
+            event.getPlayer().getInventory().clear();
+        }
+    }
+
     // this gets overwritten by FFA for ffa players
     @EventHandler(priority = EventPriority.NORMAL)
     public void onRespawn(PlayerRespawnEvent event) {
+        event.getPlayer().getInventory().clear();
         event.setRespawnLocation(hubWorld.getSpawnpoint().getLocation());
     }
 
