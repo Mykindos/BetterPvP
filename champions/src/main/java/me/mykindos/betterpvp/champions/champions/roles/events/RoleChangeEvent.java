@@ -15,4 +15,5 @@ public class RoleChangeEvent extends CustomCancellableEvent {
     private final @NotNull LivingEntity livingEntity;
     private final @Nullable Role role;
     private final @Nullable Role previous;
+    private final @NotNull RoleChangeCause cause;
 }

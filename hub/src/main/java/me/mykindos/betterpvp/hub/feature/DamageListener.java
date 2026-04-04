@@ -26,6 +26,11 @@ public class DamageListener implements Listener {
     public void onDamage(DamageEvent event) {
         if (event.getDamagee() instanceof Player player && zoneService.getZone(player) != Zone.FFA) {
             event.setCancelled(true);
+            return;
+        }
+
+        if (event.getDamager() instanceof Player player && zoneService.getZone(player) != Zone.FFA) {
+            event.setCancelled(true);
         }
     }
 

@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -47,7 +48,7 @@ public class TrainerNPC extends ModeledNPC implements HubNPC {
         }));
 
         final ActiveModel model = ModelEngineAPI.createActiveModel("dummy");
-        this.modeledEntity.addModel(model, true);
+        getModeledEntity().addModel(model, true);
     }
 
     @Override
@@ -56,8 +57,10 @@ public class TrainerNPC extends ModeledNPC implements HubNPC {
             return;
         }
 
-        modeledEntity.getModel("dummy").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0, 1, false);
-        new SoundEffect("emaginationfallenreaper", "custom.spell.rslash", 1f, 1f).play(runner);
+        getModeledEntity().getModel("dummy").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0, 1, false);
+
+        new SoundEffect("emaginationfallenreaper", "custom.spell.rslash", 1f, 10f).play(runner);
+        new SoundEffect(Sound.ENTITY_ENDERMAN_TELEPORT, 1.2f, 10f).play(runner);
         runner.teleport(ffaSpawnpoint);
         Particle.SWEEP_ATTACK.builder()
                 .count(5)

@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,6 +57,11 @@ public class PluginMessagingNetworkPlayerCountService implements NetworkPlayerCo
     public int getOnlineCount() {
         final int networkCount = playerCounts.values().stream().mapToInt(Integer::intValue).sum();
         return Math.max(localPlayerCount.get(), networkCount);
+    }
+
+    @Override
+    public Map<String, Integer> getServerPlayerCounts() {
+        return Collections.unmodifiableMap(playerCounts);
     }
 
     @EventHandler

@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.events.ClientRankUpdateEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
@@ -78,6 +79,16 @@ public class Client extends PropertyContainer implements IMapListener, Unique {
 
     public boolean hasRank(Rank rank) {
         return this.rank.getId() >= rank.getId();
+    }
+
+    public void setRank(@NotNull Rank rank) {
+        if (this.rank == rank) {
+            return;
+        }
+
+        final Rank oldRank = this.rank;
+        this.rank = rank;
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClientRankUpdateEvent(this, oldRank, rank)));
     }
 
     @Override

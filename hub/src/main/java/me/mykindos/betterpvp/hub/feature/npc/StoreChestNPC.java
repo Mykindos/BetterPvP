@@ -4,7 +4,7 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
-import me.mykindos.betterpvp.core.store.OpenStoreEvent;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
@@ -57,7 +57,7 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
         final ActiveModel model = ModelEngineAPI.createActiveModel("chest_shadow");
         model.setHitboxScale(2);
         model.setScale(2);
-        this.modeledEntity.addModel(model, true);
+        getModeledEntity().addModel(model, true);
     }
 
     @Override
@@ -66,7 +66,8 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
             return;
         }
 
-        modeledEntity.getModel("chest_shadow").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0.2, 0.7, false);
+        getModeledEntity().getModel("chest_shadow").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0.2, 0.7, false);
+
         new SoundEffect(Sound.BLOCK_CHEST_LOCKED, 0.7f, 1f).play(runner);
         new SoundEffect("littleroom_piratepack", "littleroom.piratepack.captain_chest_item", 0f, 1f).play(runner);
         UtilServer.runTaskLater(hub, () -> {
@@ -83,7 +84,7 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
                     .spawn();
         }, 25L);
 
-        new OpenStoreEvent(runner).callEvent();
+        UtilMessage.message(runner, "Store", "Our store is located at <yellow>https://store.betterpvp.net");
     }
 
     @Override

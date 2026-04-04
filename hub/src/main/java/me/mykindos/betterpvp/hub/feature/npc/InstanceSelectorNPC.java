@@ -3,15 +3,18 @@ package me.mykindos.betterpvp.hub.feature.npc;
 import com.google.common.base.Preconditions;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
-import me.mykindos.betterpvp.core.framework.ServerType;
+import me.mykindos.betterpvp.core.framework.ClansServerType;
+import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.npc.NPCFactory;
 import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
+import me.mykindos.betterpvp.hub.feature.menu.ServerTypeMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -29,11 +32,13 @@ import java.util.List;
 
 public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
 
-    private final ServerType serverType;
+    private final ClansServerType serverType;
+    private final NetworkPlayerCountService networkPlayerCountService;
 
-    public InstanceSelectorNPC(NPCFactory factory, Entity entity, Component tag, ServerType serverType) {
+    public InstanceSelectorNPC(NPCFactory factory, Entity entity, Component tag, ClansServerType serverType, NetworkPlayerCountService networkPlayerCountService) {
         super(factory, entity);
         this.serverType = serverType;
+        this.networkPlayerCountService = networkPlayerCountService;
 
         final Location tagLoc = entity.getLocation().add(0, 3, 0);
         attachToLifecycle(entity.getWorld().spawn(tagLoc, TextDisplay.class, display -> {
@@ -53,21 +58,21 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
 
         final ActiveModel model = ModelEngineAPI.createActiveModel("roman_soldier");
         model.setScale(0.9);
-        this.modeledEntity.addModel(model, true);
+        getModeledEntity().addModel(model, true);
     }
 
     @Override
     public void act(Player runner) {
-        Bukkit.broadcastMessage("Open Instance Selector for " + serverType.name());
+        new ServerTypeMenu(networkPlayerCountService, serverType).show(runner);
     }
 
     public static class Featured extends InstanceSelectorNPC implements Ticked {
 
-        private final String title;
+        private final Component title;
         private final String gradientColors;
 
-        public Featured(NPCFactory factory, Entity entity, String title, TextColor[] gradient, ServerType serverType) {
-            super(factory, entity, Component.empty(), serverType);
+        public Featured(NPCFactory factory, Entity entity, Component title, TextColor[] gradient, ClansServerType serverType, NetworkPlayerCountService networkPlayerCountService) {
+            super(factory, entity, Component.empty(), serverType, networkPlayerCountService);
             Preconditions.checkArgument(gradient.length >= 2, "Gradient must have at least 2 colors");
             this.title = title;
 
@@ -80,7 +85,7 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
             this.gradientColors = gradientBuilder.toString();
 
             // resize model
-            this.modeledEntity.getModel("roman_soldier").orElseThrow().setScale(1.2f);
+            getModeledEntity().getModel("roman_soldier").orElseThrow().setScale(1.2f);
             final Entity display = attached.getFirst();
             final Location location = display.getLocation();
             location.setY(attached.getFirst().getLocation().getY() + 0.7);
@@ -94,8 +99,9 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
             final TextDisplay nameTag = (TextDisplay) attached.getFirst();
 
             final float phase = (float) Math.sin(time / 500d);
+            final String title = PlainTextComponentSerializer.plainText().serialize(this.title);
             final Component titleComponent = MiniMessage.miniMessage()
-                    .deserialize("<gradient" + gradientColors + ":" + phase + ">" + this.title + "</gradient>")
+                    .deserialize("<gradient" + gradientColors + ":" + phase + ">" + title + "</gradient>")
                     .decorate(TextDecoration.BOLD);
             final Component subtitleComponent = Component.text("Featured", NamedTextColor.GRAY)
                     .decoration(TextDecoration.BOLD, false);

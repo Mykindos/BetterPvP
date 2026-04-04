@@ -19,7 +19,7 @@ dependencies {
     compileOnly(libs.libsdisguises)
     compileOnly(libs.mythic)
     compileOnly(project(":core"))
-    compileOnly(project(":clans"))
+    compileOnly(project(":champions"))
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)

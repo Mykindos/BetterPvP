@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.commands.menu;
 
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeCause;
 import me.mykindos.betterpvp.champions.item.MushroomStew;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
@@ -34,7 +35,7 @@ public class KitButton extends SimpleItem {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         player.closeInventory();
 
-        roleManager.equipRole(player, role);
+        roleManager.equipRole(player, role, RoleChangeCause.KIT_SELECTOR);
         if (weapons) {
             roleManager.equipWeapons(player);
             final MushroomStew stew = Objects.requireNonNull(itemFactory.getItemRegistry().getItemByClass(MushroomStew.class));

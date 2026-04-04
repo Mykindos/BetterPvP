@@ -40,7 +40,7 @@ public class HubWorld extends BPvPWorld {
 
     @Inject
     private HubWorld() {
-        super("world");
+        super(MAIN_WORLD_NAME);
         final World world = Objects.requireNonNull(getWorld());
         final File worldFolder = world.getWorldFolder();
         final File dataPointsFile = new File(worldFolder, "dataPoints.json");

@@ -1,8 +1,11 @@
 package me.mykindos.betterpvp.hub.feature;
 
 import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.hub.feature.zone.Zone;
+import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,6 +16,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 @BPvPListener
 @Singleton
 public class InteractListener implements Listener {
+
+    private final ZoneService zoneService;
+
+    @Inject
+    public InteractListener(ZoneService zoneService) {
+        this.zoneService = zoneService;
+    }
 
     @EventHandler
     public void onExperience(PlayerPickupExperienceEvent event) {
@@ -40,7 +50,10 @@ public class InteractListener implements Listener {
         if (GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) {
             return;
         }
-        event.setCancelled(true);
+
+        if (zoneService.getZone(event.getPlayer()) == Zone.COMMON) {
+            event.setCancelled(true);
+        }
     }
 
 }

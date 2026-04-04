@@ -22,7 +22,7 @@ public class HubSidebarListener implements Listener {
     @Inject
     private HubSidebarListener(HubSidebarBuilder sidebarBuilder, SidebarController controller) {
         this.sidebarBuilder = sidebarBuilder;
-        controller.setDefaultProvider(gmr -> new Sidebar(gmr, "Mineplex Clans", SidebarType.HUB));
+        controller.setDefaultProvider(gmr -> new Sidebar(gmr, "BetterPvP Clans", SidebarType.HUB));
     }
 
     @EventHandler

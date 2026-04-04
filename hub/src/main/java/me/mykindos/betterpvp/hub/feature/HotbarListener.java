@@ -1,13 +1,14 @@
 package me.mykindos.betterpvp.hub.feature;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.hub.feature.menu.ServerSelectorMenu;
+import me.mykindos.betterpvp.hub.feature.zone.Zone;
+import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,19 +24,21 @@ import java.util.Objects;
 @Singleton
 public class HotbarListener implements Listener {
 
+    private final NetworkPlayerCountService networkPlayerCountService;
+    private final HubInventoryService inventoryService;
+    private final ZoneService zoneService;
+
+    @Inject
+    public HotbarListener(NetworkPlayerCountService networkPlayerCountService, HubInventoryService inventoryService,
+                          ZoneService zoneService) {
+        this.networkPlayerCountService = networkPlayerCountService;
+        this.inventoryService = inventoryService;
+        this.zoneService = zoneService;
+    }
 
     @EventHandler
     public void onJoin(ClientJoinEvent event) {
-        final Player player = Objects.requireNonNull(event.getClient().getGamer().getPlayer());
-        player.getInventory().clear();
-
-        final ItemStack quickPlay = ItemView.builder()
-                .material(Material.STICK)
-                .customModelData(700)
-                .displayName(Component.text("Quick Play", NamedTextColor.GREEN))
-                .build()
-                .get();
-        player.getInventory().setItem(4, quickPlay);
+        inventoryService.applyHubHotbar(Objects.requireNonNull(event.getClient().getGamer().getPlayer()));
     }
 
     @EventHandler
@@ -44,8 +47,9 @@ public class HotbarListener implements Listener {
             return;
         }
 
-        if (event.getClickedInventory() instanceof PlayerInventory) {
-            event.setCancelled(true); // todo: maybe allow for ffa to work?
+        if (event.getClickedInventory() instanceof PlayerInventory
+                && zoneService.getZone((Player) event.getWhoClicked()) != Zone.FFA) {
+            event.setCancelled(true);
         }
     }
 
@@ -54,7 +58,9 @@ public class HotbarListener implements Listener {
         if (GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) {
             return;
         }
-        event.setCancelled(true); // todo: maybe allow for ffa to work?
+        if (zoneService.getZone(event.getPlayer()) != Zone.FFA) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -71,8 +77,7 @@ public class HotbarListener implements Listener {
         final int customModelData = item.getItemMeta().getCustomModelData();
         switch (customModelData) {
             case 700:
-                // todo: implement opening game selector
-                event.getPlayer().sendMessage("Quick Play");
+                new ServerSelectorMenu(networkPlayerCountService).show(event.getPlayer());
                 break;
         }
     }

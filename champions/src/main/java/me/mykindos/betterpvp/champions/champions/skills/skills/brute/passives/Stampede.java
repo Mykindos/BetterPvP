@@ -27,7 +27,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -36,8 +35,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -46,6 +47,7 @@ import java.util.WeakHashMap;
 public class Stampede extends Skill implements PassiveSkill, MovementSkill, DamageSkill {
 
     private final WeakHashMap<Player, StampedeData> playerData = new WeakHashMap<>();
+    private final Set<Player> trackedPlayers = Collections.newSetFromMap(new WeakHashMap<>());
     private double durationPerStack;
     private double damage;
     private int maxSpeedStrength;
@@ -86,7 +88,14 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
 
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
+        trackedPlayers.remove(player);
+        removeSpeed(player);
         playerData.remove(player);
+    }
+
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        trackedPlayers.add(player);
     }
 
     public double getDamage(int level) {
@@ -108,11 +117,14 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
 
     @UpdateEvent(delay = 200)
     public void updateSpeed() {
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            if(player.isSprinting() && !player.hasActiveItem() && !playerData.containsKey(player)) {
-                if(getLevel(player) > 0) {
-                    startStampede(player);
-                }
+        for (Player player : trackedPlayers) {
+            if (player != null
+                    && player.isOnline()
+                    && player.isSprinting()
+                    && !player.hasActiveItem()
+                    && !playerData.containsKey(player)
+                    && getLevel(player) > 0) {
+                startStampede(player);
             }
         }
 
@@ -121,6 +133,14 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
             Map.Entry<Player, StampedeData> entry = iterator.next();
             Player player = entry.getKey();
             StampedeData data = entry.getValue();
+            if (player == null || !player.isOnline() || !trackedPlayers.contains(player)) {
+                if (player != null) {
+                    removeSpeed(player);
+                }
+                iterator.remove();
+                continue;
+            }
+
             int level = getLevel(player);
 
             if (level < 1) {

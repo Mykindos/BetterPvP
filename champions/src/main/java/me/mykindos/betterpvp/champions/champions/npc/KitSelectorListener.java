@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeCause;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
@@ -73,9 +74,9 @@ public class KitSelectorListener implements Listener {
             return;
         }
 
+        roleManager.equipRole(player, role, RoleChangeCause.KIT_SELECTOR);
         if (selector.isEquip()) {
             // Equip them
-            roleManager.equipRole(player, role);
             roleManager.equipWeapons(player);
             new SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f).play(player);
         }

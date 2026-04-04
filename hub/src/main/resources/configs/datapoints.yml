@@ -42,3 +42,11 @@ spawn:
   z: 0.5
   yaw: -90
   pitch: 0
+
+ffaArenaDisplay:
+  ==: org.bukkit.Location
+  x: -2.5
+  y: 63.8
+  z: -2.5
+  yaw: -45
+  pitch: 0

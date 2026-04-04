@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.hub.feature.npc;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ticxo.modelengine.api.events.ModelRegistrationEvent;
+import com.ticxo.modelengine.api.generator.ModelGenerator;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.npc.NPCRegistry;
@@ -32,7 +33,7 @@ public class HubNPCListener implements Listener {
 
     @EventHandler
     public void onRegister(ModelRegistrationEvent event) {
-        if (loaded) {
+        if (loaded || event.getPhase() != ModelGenerator.Phase.FINISHED) {
             return;
         }
 

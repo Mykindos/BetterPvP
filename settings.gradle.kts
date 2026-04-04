@@ -110,7 +110,7 @@ dependencyResolutionManagement {
             library("json", "org.json", "json").version("20250107")
 
             // Library - Mapper
-            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.7")
+            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.8")
 
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
