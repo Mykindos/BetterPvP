@@ -5,11 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.hub.model.HubWorld;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -19,10 +17,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 @BPvPListener
 @Singleton
 public class JoinQuitListener implements Listener {
-
-    @Config(path = "spawn", configName = "datapoints")
-    @Inject
-    private Location location;
 
     @Inject
     private HubWorld hubWorld;
@@ -45,10 +39,7 @@ public class JoinQuitListener implements Listener {
             event.getPlayer().setHealth(event.getPlayer().getAttribute(Attribute.MAX_HEALTH).getValue());
         }
 
-        if (location.getWorld() == null) {
-            location.setWorld(hubWorld.getWorld());
-        }
-        event.getPlayer().teleport(location);
+        event.getPlayer().teleport(hubWorld.getSpawnpoint().getLocation());
     }
 
     @EventHandler

@@ -6,18 +6,23 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.hub.feature.zone.Zone;
 import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
+import me.mykindos.betterpvp.hub.model.HubWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 @BPvPListener
 @Singleton
 public class DamageListener implements Listener {
 
+    private final HubWorld hubWorld;
     private final ZoneService zoneService;
 
     @Inject
-    private DamageListener(ZoneService zoneService) {
+    private DamageListener(HubWorld hubWorld, ZoneService zoneService) {
+        this.hubWorld = hubWorld;
         this.zoneService = zoneService;
     }
 
@@ -33,5 +38,12 @@ public class DamageListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+    // this gets overwritten by FFA for ffa players
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onRespawn(PlayerRespawnEvent event) {
+        event.setRespawnLocation(hubWorld.getSpawnpoint().getLocation());
+    }
+
 
 }
