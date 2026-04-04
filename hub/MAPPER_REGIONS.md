@@ -13,15 +13,17 @@ There are no additional dynamic region lookups in `hub` beyond the entries below
 | 5 | `ffa_spawnpoint`        | `PerspectiveRegion` | Yes | FFA respawn/spawn location. Also passed to the trainer NPC as the teleport destination. |
 | 6 | `npc_store`             | `PerspectiveRegion` | Yes | Location for the store NPC. |
 | 7 | `npc_trainer`           | `PerspectiveRegion` | Yes | Location for the trainer NPC. |
-| 8 | `npc_selector_classic`  | `PerspectiveRegion` | Yes | Location for the Classic server selector NPC. |
-| 9 | `kit_selector_assassin` | `PerspectiveRegion` | Yes | Kit selector location for the `ASSASSIN` role. |
-| 10 | `kit_selector_knight`   | `PerspectiveRegion` | Yes | Kit selector location for the `KNIGHT` role. |
-| 11 | `kit_selector_brute`    | `PerspectiveRegion` | Yes | Kit selector location for the `BRUTE` role. |
-| 12 | `kit_selector_ranger`   | `PerspectiveRegion` | Yes | Kit selector location for the `RANGER` role. |
-| 13 | `kit_selector_mage`     | `PerspectiveRegion` | Yes | Kit selector location for the `MAGE` role. |
-| 14 | `kit_selector_warlock`  | `PerspectiveRegion` | Yes | Kit selector location for the `WARLOCK` role. |
-| 15 | `npc_selector_squads`   | `PerspectiveRegion` | Optional | Optional server selector NPC for Squads. The code is present but commented out. |
-| 16 | `npc_selector_casual`   | `PerspectiveRegion` | Optional | Optional featured server selector NPC for Casual. The code is present but commented out. |
+| 8 | `ffa_arena_display`     | `PerspectiveRegion` | Yes | Location for the large `FFA Arena` floating text display. |
+| 9 | `ffa_kits_equipped_display` | `PerspectiveRegion` | Yes | Location for the red `Kits equipped upon entering` floating text display. |
+| 10 | `npc_selector_classic`  | `PerspectiveRegion` | Yes | Location for the Classic server selector NPC. |
+| 11 | `kit_selector_assassin` | `PerspectiveRegion` | Yes | Kit selector location for the `ASSASSIN` role. |
+| 12 | `kit_selector_knight`   | `PerspectiveRegion` | Yes | Kit selector location for the `KNIGHT` role. |
+| 13 | `kit_selector_brute`    | `PerspectiveRegion` | Yes | Kit selector location for the `BRUTE` role. |
+| 14 | `kit_selector_ranger`   | `PerspectiveRegion` | Yes | Kit selector location for the `RANGER` role. |
+| 15 | `kit_selector_mage`     | `PerspectiveRegion` | Yes | Kit selector location for the `MAGE` role. |
+| 16 | `kit_selector_warlock`  | `PerspectiveRegion` | Yes | Kit selector location for the `WARLOCK` role. |
+| 17 | `npc_selector_squads`   | `PerspectiveRegion` | Optional | Optional server selector NPC for Squads. The code is present but commented out. |
+| 18 | `npc_selector_casual`   | `PerspectiveRegion` | Optional | Optional featured server selector NPC for Casual. The code is present but commented out. |
 
 ## Notes
 

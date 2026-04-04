@@ -101,6 +101,10 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
         ffaArenaDisplayLocation.setWorld(world);
         this.displays.add(this.spawnFfaArenaDisplay(ffaArenaDisplayLocation));
 
+        final Location ffaKitsEquippedDisplayLocation = getDataPoint("ffa_kits_equipped_display", PerspectiveRegion.class).getLocation();
+        ffaKitsEquippedDisplayLocation.setWorld(world);
+        this.displays.add(this.spawnFfaKitsEquippedDisplay(ffaKitsEquippedDisplayLocation));
+
         this.spawnKitSelectors(world);
 
         final Location classicLocation = getDataPoint("npc_selector_classic", PerspectiveRegion.class).getLocation();
@@ -180,6 +184,14 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
     }
 
     private Entity spawnFfaArenaDisplay(@NotNull Location location) {
+        return spawnTextDisplay(location, Component.text("FFA Arena", TextColor.color(0xffbb00), TextDecoration.BOLD), 2.5f);
+    }
+
+    private Entity spawnFfaKitsEquippedDisplay(@NotNull Location location) {
+        return spawnTextDisplay(location, Component.text("Kits are equipped upon entering", TextColor.color(0xFF0000), TextDecoration.BOLD), 1.3f);
+    }
+
+    private Entity spawnTextDisplay(@NotNull Location location, @NotNull Component text, float scale) {
         return location.getWorld().spawn(location, TextDisplay.class, display -> {
             display.setBackgroundColor(Color.fromARGB(0, 1, 1, 1));
             display.setShadowed(true);
@@ -189,10 +201,10 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
             display.setTransformation(new Transformation(
                     new Vector3f(),
                     new AxisAngle4f(),
-                    new Vector3f(2.5f),
+                    new Vector3f(scale),
                     new AxisAngle4f()
             ));
-            display.text(Component.text("FFA Arena", TextColor.color(0xffbb00), TextDecoration.BOLD));
+            display.text(text);
         });
     }
 
