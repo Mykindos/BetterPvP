@@ -58,7 +58,7 @@ public class HotbarListener implements Listener {
         if (GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) {
             return;
         }
-        if (zoneService.getZone(event.getPlayer()) != Zone.FFA) {
+        if (zoneService.getZone(event.getPlayer()) != Zone.NONE) {
             event.setCancelled(true);
         }
     }
