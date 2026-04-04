@@ -118,7 +118,7 @@ public class GamerListener implements Listener {
         }
 
         Optional<Long> remainingProtectionOptional = gamer.getProperty(GamerProperty.REMAINING_PVP_PROTECTION);
-        if (remainingProtectionOptional.isEmpty()) {
+        if (remainingProtectionOptional.isEmpty() && defaultPvPProtection > 0) {
             gamer.saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, (long) (defaultPvPProtection * 1000L));
         }
 
