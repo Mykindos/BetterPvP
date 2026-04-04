@@ -277,4 +277,9 @@ public class DamageEventProcessor implements Listener {
             UtilServer.runTaskLater(core, () -> fireDamageSource.remove(livingEntity), 1L);
         });
     }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void sendDebug(DamageEvent event) {
+        finalizer.sendDebugInfo(event);
+    }
 }

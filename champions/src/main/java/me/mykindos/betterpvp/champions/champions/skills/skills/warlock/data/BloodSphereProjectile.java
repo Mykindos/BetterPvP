@@ -209,7 +209,6 @@ public final class BloodSphereProjectile extends Projectile {
                         toDamage,
                         NAME);
 
-                event.setForceDamageDelay(0);
                 event.getDurabilityParameters().disableAttackerDurability();
                 UtilDamage.doDamage(event);
 

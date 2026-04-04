@@ -138,7 +138,6 @@ public class MythicMobsAdapter implements CustomDamageAdapter, Listener {
         if (event.isDamageeLiving() && !metadata.isEmpty() && metadata.getFirst().value() instanceof DamageMetadata dm) {
             if (Boolean.TRUE.equals(dm.getPreventsImmunity())) {
                 event.setDamageDelay(0);
-                event.setForceDamageDelay(0);
                 Objects.requireNonNull(event.getLivingDamagee()).setNoDamageTicks(0);
             }
             if (Boolean.TRUE.equals(dm.getPreventsKnockback())) {

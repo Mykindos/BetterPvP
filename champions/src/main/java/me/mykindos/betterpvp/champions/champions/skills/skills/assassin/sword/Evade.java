@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -46,17 +47,24 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
 
-    public double duration;
-    public int forcedDamageDelay;
-    public double internalCooldown;
-    public double internalCooldownDecreasePerLevel;
+    private final DamageDelayManager damageDelayManager;
+
+    private double activeBaseDuration;
+    private double activeDurationIncreasePerLevel;
+    private double baseDamageDelay;
+    private double damageDelayIncreasePerLevel;
+    private double successBaseCooldown;
+    private double successCooldownDecreasePerLevel;
+    private double successDurationHeldMultiplierCooldownAddition;
+    private double successDurationHeldMultiplierCooldownAdditionDecreasePerLevel;
 
     @Inject
     private CooldownManager cooldownManager;
 
     @Inject
-    public Evade(Champions champions, ChampionsManager championsManager) {
+    public Evade(Champions champions, ChampionsManager championsManager, DamageDelayManager damageDelayManager) {
         super(champions, championsManager);
+        this.damageDelayManager = damageDelayManager;
     }
 
     @Override
@@ -69,10 +77,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
         return new String[]{
                 "Hold right click with a Sword to channel",
+                "For a maximum of " + getValueString(this::getActiveDuration, level) + " seconds",
                 "",
                 "If a player hits you while Evading, you",
                 "will teleport behind the attacker and your",
-                "cooldown will be set to a minimum of " + getValueString(this::getInternalCooldown, level) + " seconds ",
+                "cooldown will be set to a minimum of " + getValueString(this::getSuccessCooldown, level) + " seconds ",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
@@ -90,8 +99,20 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         return SkillType.SWORD;
     }
 
-    public double getInternalCooldown(int level){
-        return internalCooldown - ((level - 1) * internalCooldownDecreasePerLevel);
+    public double getActiveDuration(int level) {
+        return activeBaseDuration + (level - 1) * activeDurationIncreasePerLevel;
+    }
+
+    public double getDamageDelay(int level) {
+        return baseDamageDelay + (level - 1) * damageDelayIncreasePerLevel;
+    }
+
+    public double getSuccessCooldown(int level) {
+        return successBaseCooldown - (level - 1) * successCooldownDecreasePerLevel;
+    }
+
+    public double getSuccessDurationHeldMultiplierCooldownAddition(int level) {
+        return successDurationHeldMultiplierCooldownAddition - (level - 1) * successDurationHeldMultiplierCooldownAdditionDecreasePerLevel;
     }
 
 
@@ -101,12 +122,13 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
-
+        int level = getLevel(player);
+        if (level <= 0) return;
         LivingEntity ent = event.getDamager();
 
         event.setKnockback(false);
         event.cancel("Skill Evade");
-        event.setForceDamageDelay(forcedDamageDelay);
+        damageDelayManager.addDelay(event.getDamager(), event.getDamagee(), event.getCause(), (long) (getDamageDelay(level) * 1000L));
 
         Particle.LARGE_SMOKE.builder()
                 .offset(0.3, 0.3, 0.3)
@@ -128,13 +150,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             if (!Boolean.TRUE.equals(success)) {
                 return;
             }
-
-            int level = getLevel(player);
             cooldownManager.removeCooldown(player, getName(), true);
 
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
             double channelTimeInSeconds = channelTime / 1000.0;
-            double newCooldown = getInternalCooldown(level) + channelTimeInSeconds;
+            double newCooldown = getSuccessCooldown(level) + channelTimeInSeconds * getSuccessDurationHeldMultiplierCooldownAddition(level);
 
             if (!isReverse) {
                 if (!UtilLocation.isInFront(ent, player.getLocation())) {
@@ -188,7 +208,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                         it.remove();
                     } else if (championsManager.getEffects().hasEffect(player, EffectTypes.STUN)) {
                         it.remove();
-                    } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) (duration * 1000))) {
+                    } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) (getActiveDuration(level) * 1000))) {
                         handRaisedTime.remove(player.getUniqueId());
                         UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
@@ -245,9 +265,13 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
     @Override
     public void loadSkillConfig() {
-        duration = getConfig("duration", 0.7, Double.class);
-        forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
-        internalCooldown = getConfig("internalCooldown", 0.6, Double.class);
-        internalCooldownDecreasePerLevel = getConfig("internalCooldownDecreasePerLevel", 0.1, Double.class);
+        activeBaseDuration = getConfig("activeBaseDuration", 0.7, Double.class);
+        activeDurationIncreasePerLevel = getConfig("activeDurationIncreasePerLevel", 0.0, Double.class);
+        baseDamageDelay = getConfig("baseDamageDelay", 0.4, Double.class);
+        damageDelayIncreasePerLevel = getConfig("damageDelayIncreasePerLevel", 0.0, Double.class);
+        successBaseCooldown = getConfig("successBaseCooldown", 0.6, Double.class);
+        successCooldownDecreasePerLevel = getConfig("successCooldownDecreasePerLevel", 0.0, Double.class);
+        successDurationHeldMultiplierCooldownAddition = getConfig("successDurationHeldMultiplierCooldownAddition", 1.0, Double.class);
+        successDurationHeldMultiplierCooldownAdditionDecreasePerLevel = getConfig("successDurationHeldMultiplierCooldownAdditionDecreasePerLevel", 0.0, Double.class);
     }
 }

@@ -81,7 +81,6 @@ public class DamageEvent extends CustomCancellableEvent {
     private boolean knockback;
     private boolean hurtAnimation = true;
     private long damageDelay;
-    private long forceDamageDelay = 0;
     
     // Effects and reasons
     @NotNull

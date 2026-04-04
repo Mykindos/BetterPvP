@@ -59,7 +59,7 @@ public class ItemAttackSpeedSupplier implements ToLongFunction<InteractionContex
             final Optional<DamageEvent> damageEventOpt = context.get(InputMeta.DAMAGE_EVENT);
             if (damageEventOpt.isPresent()) {
                 final DamageEvent damageEvent = damageEventOpt.get();
-                final long attackDelay = damageEvent.getForceDamageDelay() > 0 ? damageEvent.getForceDamageDelay() : damageEvent.getDamageDelay();
+                final long attackDelay = damageEvent.getDamageDelay();
                 if (attackDelay > 0) {
                     return attackDelay;
                 }
