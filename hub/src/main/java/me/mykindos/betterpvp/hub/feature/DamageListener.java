@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.hub.Hub;
 import me.mykindos.betterpvp.hub.feature.zone.Zone;
 import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
 import me.mykindos.betterpvp.hub.model.HubWorld;
@@ -14,6 +16,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @BPvPListener
 @Singleton
@@ -49,6 +52,9 @@ public class DamageListener implements Listener {
 
         if (zoneService.getZone(event.getPlayer()) != Zone.NONE) {
             event.getPlayer().getInventory().clear();
+            UtilServer.runTaskLater(JavaPlugin.getPlugin(Hub.class), () -> {
+                event.getPlayer().spigot().respawn();
+            }, 3L);
         }
     }
 

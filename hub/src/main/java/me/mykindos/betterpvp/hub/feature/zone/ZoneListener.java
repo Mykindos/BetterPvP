@@ -11,8 +11,10 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 @BPvPListener
@@ -32,7 +34,12 @@ public class ZoneListener implements Listener {
         this.ffaRegionService = ffaRegionService;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
+    void onRespawn(PlayerRespawnEvent event) {
+        updateZone(event.getPlayer(), event.getRespawnLocation());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     void onMove(PlayerMoveEvent event) {
         if (!event.hasChangedBlock()) {
             return;
@@ -50,12 +57,12 @@ public class ZoneListener implements Listener {
         updateZone(event.getPlayer(), event.getTo());
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     void onTeleport(PlayerTeleportEvent event) {
         updateZone(event.getPlayer(), event.getTo());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     void onJoin(ClientJoinEvent event) {
         final Player player = event.getClient().getGamer().getPlayer();
         if (player != null) {
