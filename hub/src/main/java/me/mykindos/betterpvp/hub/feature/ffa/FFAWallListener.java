@@ -5,12 +5,15 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.hub.Hub;
 import me.mykindos.betterpvp.hub.feature.zone.Zone;
 import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -30,13 +33,15 @@ public class FFAWallListener implements Listener {
 
     private static final double WALL_RADIUS = 10.0;
 
+    private final Hub hub;
     private final ZoneService zoneService;
     private final ClientManager clientManager;
     private final FFARegionService ffaRegionService;
     private final Map<UUID, Set<BlockVector>> rendered = new HashMap<>();
 
     @Inject
-    public FFAWallListener(ZoneService zoneService, ClientManager clientManager, FFARegionService ffaRegionService) {
+    public FFAWallListener(Hub hub, ZoneService zoneService, ClientManager clientManager, FFARegionService ffaRegionService) {
+        this.hub = hub;
         this.zoneService = zoneService;
         this.clientManager = clientManager;
         this.ffaRegionService = ffaRegionService;
@@ -89,9 +94,13 @@ public class FFAWallListener implements Listener {
         }
 
         event.setCancelled(true);
-        event.setUseInteractedBlock(org.bukkit.event.Event.Result.DENY);
-        event.setUseItemInHand(org.bukkit.event.Event.Result.DENY);
-        player.sendBlockChange(ffaRegionService.toLocation(vector), ffaRegionService.getWallData());
+        event.setUseInteractedBlock(Event.Result.DENY);
+        event.setUseItemInHand(Event.Result.DENY);
+
+        // queue later because packets
+        UtilServer.runTaskLater(hub, () -> {
+            player.sendBlockChange(ffaRegionService.toLocation(vector), ffaRegionService.getWallData());
+        }, 1L);
     }
 
     private void clear(Player player) {
