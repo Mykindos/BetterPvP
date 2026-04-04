@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.hub.feature.sidebar;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
@@ -34,7 +33,7 @@ public class DefaultSidebarBuilder implements HubSidebarBuilder {
 
         builder.addBlankLine();
         builder.addStaticLine(Component.text("Rank", NamedTextColor.YELLOW, TextDecoration.BOLD));
-        builder.addDynamicLine(() -> client.getRank().getTag(Rank.ShowTag.SHORT, false));
+        builder.addDynamicLine(() -> Component.text(client.getRank().getName(), client.getRank().getColor()));
         builder.addBlankLine();
         builder.addStaticLine(Component.text("Online", NamedTextColor.YELLOW, TextDecoration.BOLD));
         builder.addDynamicLine(() -> Component.text(networkPlayerCountService.getOnlineCount(), NamedTextColor.WHITE));
