@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,17 +33,47 @@ public class UtilWorld {
     public static Collection<File> getUnloadedWorlds() {
         final File parent = Bukkit.getWorldContainer();
         final List<File> files = new ArrayList<>();
-        for (File file : Objects.requireNonNull(parent.listFiles())) {
-            if (!file.isDirectory() || Bukkit.getWorld(file.getName()) != null) {
-                continue; // Skip non-directories and loaded worlds
+        findWorlds(parent, files, "");
+
+        return files;
+    }
+
+    private static void findWorlds(File directory, List<File> worlds, String path) {
+        File[] files = directory.listFiles();
+        if (files == null) return;
+
+        for (File file : files) {
+            if (!file.isDirectory()) {
+                continue; // Skip non-directories
+            }
+
+            // Check if any loaded world has this folder
+            boolean alreadyLoaded = false;
+            try {
+                File canonicalFile = file.getCanonicalFile();
+                for (World loadedWorld : Bukkit.getWorlds()) {
+                    if (loadedWorld.getWorldFolder().getCanonicalFile().equals(canonicalFile)) {
+                        alreadyLoaded = true;
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                // Fallback to name check if canonical path fails
+                if (Bukkit.getWorld(path + file.getName()) != null) {
+                    alreadyLoaded = true;
+                }
+            }
+
+            if (alreadyLoaded) {
+                continue;
             }
 
             if (new File(file, "level.dat").exists()) {
-                files.add(file); // Add world folder
+                worlds.add(file); // Add world folder
+            } else {
+                findWorlds(file, worlds, path + file.getName() + "/");
             }
         }
-
-        return files;
     }
 
     public static String chunkToPrettyString(Chunk chunk) {

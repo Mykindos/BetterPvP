@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
@@ -46,8 +47,27 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
     public BPvPWorld(@NotNull File worldFolder) {
         Preconditions.checkArgument(worldFolder.isDirectory(), "The file must be a directory.");
         Preconditions.checkArgument(new File(worldFolder, "level.dat").exists(), "Directory is not a world folder.");
-        this.world = new WeakReference<>(Bukkit.getWorld(worldFolder.getName()));
-        this.name = worldFolder.getName();
+        String name = worldFolder.getName();
+        try {
+            File container = Bukkit.getWorldContainer().getCanonicalFile();
+            File current = worldFolder.getParentFile();
+            if (current != null) {
+                current = current.getCanonicalFile();
+            }
+
+            while (current != null && !current.equals(container)) {
+                name = current.getName() + "/" + name;
+                current = current.getParentFile();
+                if (current != null) {
+                    current = current.getCanonicalFile();
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to get canonical path for world folder: {}", worldFolder.getAbsolutePath(), e).submit();
+        }
+
+        this.world = new WeakReference<>(Bukkit.getWorld(name));
+        this.name = name;
     }
 
     public BPvPWorld(@NotNull String name) {
@@ -82,7 +102,11 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
         if (isLoaded()) {
             return;
         }
-        this.world = new WeakReference<>(Bukkit.createWorld(WorldCreator.name(name)));
+        World loaded = Bukkit.createWorld(WorldCreator.name(name));
+        if (loaded == null) {
+            log.error("Failed to load world: {}", name).submit();
+        }
+        this.world = new WeakReference<>(loaded);
     }
 
     /**

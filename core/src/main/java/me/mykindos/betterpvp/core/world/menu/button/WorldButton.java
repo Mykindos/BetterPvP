@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 @Getter
-public final class WorldButton extends DescriptionButton {
+public class WorldButton extends DescriptionButton {
 
     private final BPvPWorld world;
     private final ChatCallbacks chatCallbacks;
