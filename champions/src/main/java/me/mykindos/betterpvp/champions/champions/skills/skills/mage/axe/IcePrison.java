@@ -136,7 +136,9 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
                 int level = getLevel((Player) throwableItem.getThrower());
                 if (throwableItem.getThrower() instanceof Player player) {
                     double duration = getDuration(level) + (((double) (center.getBlockY() - loc.getBlockY()) / sphereSize) * variance);
-                    blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (duration * 1000), true, getName());
+                    if (blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (duration * 1000), true, getName()) == null) {
+                        continue;
+                    }
                 }
                 loc.getBlock().setType(Material.ICE);
                 loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 1f, 1f);
