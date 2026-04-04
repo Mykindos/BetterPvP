@@ -45,7 +45,7 @@ public class DoubleJumpListener implements Listener {
     }
 
     private void disableFlight(Player player) {
-        if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR) || !player.isFlying()) {
+        if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
@@ -76,7 +76,7 @@ public class DoubleJumpListener implements Listener {
     @EventHandler
     public void onToggleFlight(PlayerToggleFlightEvent event) {
         final Player player = event.getPlayer();
-        if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR) || !player.isFlying()) {
+        if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) {
             return; // creative players can still fly, and people who double jumped can't double jump again
         }
 
@@ -107,7 +107,9 @@ public class DoubleJumpListener implements Listener {
 
             if (UtilBlock.isGrounded(player)) {
                 iterator.remove();
-                queueFlight(player);
+                if (zoneService.getZone(player) == Zone.COMMON) {
+                    queueFlight(player);
+                }
             }
         }
     }
