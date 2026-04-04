@@ -65,7 +65,7 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
             return false;
         }
 
-        loadConfig(hub.getConfig("datapoints"));
+        loadConfig(hub.getConfig());
         return true;
     }
 
