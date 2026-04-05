@@ -155,11 +155,15 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 15.0
-      duration: 0.7
-      forcedDamageDelay: 400
+      activeBaseDuration: 0.7
+      activeDurationIncreasePerLevel: 0.0
+      baseDamageDelay: 0.4
+      damageDelayIncreasePerLevel: 0.0
+      successBaseCooldown: 0.6
+      successCooldownDecreasePerLevel: 0.0
       cooldownDecreasePerLevel: 1.0
-      internalCooldown: 0.6
-      internalCooldownDecreasePerLevel: 0.1
+      channelTimeCooldownMultiplier: 1.0
+      channelTimeCooldownMultiplierDecreasePerLevel: 0.0
   knight:
     vanguardsmight:
       cooldown: 15.0

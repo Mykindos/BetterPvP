@@ -55,8 +55,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     private double damageDelayIncreasePerLevel;
     private double successBaseCooldown;
     private double successCooldownDecreasePerLevel;
-    private double successDurationHeldMultiplierCooldownAddition;
-    private double successDurationHeldMultiplierCooldownAdditionDecreasePerLevel;
+    private double channelTimeCooldownMultiplier;
+    private double channelTimeCooldownMultiplierDecreasePerLevel;
 
     @Inject
     private CooldownManager cooldownManager;
@@ -111,8 +111,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         return successBaseCooldown - (level - 1) * successCooldownDecreasePerLevel;
     }
 
-    public double getSuccessDurationHeldMultiplierCooldownAddition(int level) {
-        return successDurationHeldMultiplierCooldownAddition - (level - 1) * successDurationHeldMultiplierCooldownAdditionDecreasePerLevel;
+    public double getChannelTimeCooldownMultiplier(int level) {
+        return channelTimeCooldownMultiplier - (level - 1) * channelTimeCooldownMultiplierDecreasePerLevel;
     }
 
 
@@ -154,7 +154,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
             double channelTimeInSeconds = channelTime / 1000.0;
-            double newCooldown = getSuccessCooldown(level) + channelTimeInSeconds * getSuccessDurationHeldMultiplierCooldownAddition(level);
+            double newCooldown = getSuccessCooldown(level) + channelTimeInSeconds * getChannelTimeCooldownMultiplier(level);
 
             if (!isReverse) {
                 if (!UtilLocation.isInFront(ent, player.getLocation())) {
@@ -271,7 +271,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         damageDelayIncreasePerLevel = getConfig("damageDelayIncreasePerLevel", 0.0, Double.class);
         successBaseCooldown = getConfig("successBaseCooldown", 0.6, Double.class);
         successCooldownDecreasePerLevel = getConfig("successCooldownDecreasePerLevel", 0.0, Double.class);
-        successDurationHeldMultiplierCooldownAddition = getConfig("successDurationHeldMultiplierCooldownAddition", 1.0, Double.class);
-        successDurationHeldMultiplierCooldownAdditionDecreasePerLevel = getConfig("successDurationHeldMultiplierCooldownAdditionDecreasePerLevel", 0.0, Double.class);
+        channelTimeCooldownMultiplier = getConfig("channelTimeCooldownMultiplier", 1.0, Double.class);
+        channelTimeCooldownMultiplierDecreasePerLevel = getConfig("channelTimeCooldownMultiplierDecreasePerLevel", 0.0, Double.class);
     }
 }
