@@ -16,7 +16,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchieveme
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
-import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +39,6 @@ public class AchievementCompletionRepository {
 
     private final Database database;
     private final RealmManager realmManager;
-    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
     public AchievementCompletionRepository(Database database, RealmManager realmManager) {

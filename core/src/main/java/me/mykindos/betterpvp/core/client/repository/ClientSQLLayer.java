@@ -22,7 +22,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Realm;
-import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
@@ -72,7 +72,6 @@ public class ClientSQLLayer {
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedSharedPropertyUpdates;
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedStatUpdates;
     private static final ThreadLocal<Map<UUID, Client>> LOADING_CLIENTS = ThreadLocal.withInitial(HashMap::new);
-    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
     public ClientSQLLayer(Database database, PropertyMapper propertyMapper, StatBuilder statBuilder, RealmManager realmManager, PunishmentRepository punishmentRepository) {

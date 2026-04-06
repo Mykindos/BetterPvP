@@ -38,15 +38,39 @@ public class SnowflakeIdGenerator {
     private static final long SEASON_SHIFT = SEQUENCE_BITS + SERVER_BITS;
     private static final long TIMESTAMP_SHIFT = SEQUENCE_BITS + SERVER_BITS + SEASON_BITS;
 
-    private final long serverId;
-    private final long seasonId;
+    private long serverId;
+    private long seasonId;
 
     private final AtomicLong lastTimestamp = new AtomicLong(-1L);
     private final AtomicLong sequence = new AtomicLong(0L);
 
-    public SnowflakeIdGenerator() {
-        this.serverId = generateServerId((Core.getCurrentRealm() == null ? -1 : Core.getCurrentRealm().getServer().getId()) + "");
-        this.seasonId = generateSeasonId((Core.getCurrentRealm() == null ? -1 : Core.getCurrentRealm().getSeason().getId()) + "");
+    // Global singleton instance
+    private static volatile SnowflakeIdGenerator INSTANCE;
+
+    public static final SnowflakeIdGenerator ID_GENERATOR = getInstance();
+
+    public static SnowflakeIdGenerator getInstance() {
+        if (INSTANCE == null) {
+            synchronized (SnowflakeIdGenerator.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new SnowflakeIdGenerator();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private SnowflakeIdGenerator() {
+        this.serverId = generateServerId("initial");
+        this.seasonId = generateSeasonId("initial");
+        updateIds();
+    }
+
+    public synchronized void updateIds() {
+        if (Core.getCurrentRealm() != null) {
+            this.serverId = generateServerId(Core.getCurrentRealm().getServer().getId() + "");
+            this.seasonId = generateSeasonId(Core.getCurrentRealm().getSeason().getId() + "");
+        }
     }
 
     /**
@@ -68,12 +92,14 @@ public class SnowflakeIdGenerator {
 
         if (timestamp == lastTs) {
             // Same millisecond - increment sequence
-            long seq = sequence.incrementAndGet() & MAX_SEQUENCE;
+            long seq = (sequence.incrementAndGet()) & MAX_SEQUENCE;
             if (seq == 0) {
                 // Sequence exhausted, wait for next millisecond
                 timestamp = waitNextMillis(lastTs);
+                sequence.set(0);
+            } else {
+                sequence.set(seq);
             }
-            sequence.set(seq);
         } else {
             // New millisecond - reset sequence
             sequence.set(0);

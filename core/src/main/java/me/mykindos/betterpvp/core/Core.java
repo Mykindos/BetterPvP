@@ -180,6 +180,7 @@ public class Core extends BPvPPlugin {
         final Season season = database.getOrCreateSeason(currentSeason, seasonName);
         int realmId = database.getRealmId(server.getId(), currentSeason);
         setCurrentRealm(new Realm(realmId, server, season));
+        me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR.updateIds();
     }
 
     @Override

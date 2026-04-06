@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
-import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
@@ -18,7 +18,6 @@ import static me.mykindos.betterpvp.core.database.jooq.tables.GameTeams.GAME_TEA
 
 @Singleton
 public class GameInfoRepository implements IRepository<GameInfo> {
-    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     private final Database database;
     private final ClientManager clientManager;
