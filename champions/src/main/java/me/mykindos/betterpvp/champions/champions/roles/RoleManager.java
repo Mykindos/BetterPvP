@@ -57,6 +57,7 @@ public class RoleManager {
     private void updateRole(@NotNull LivingEntity livingEntity, @NotNull Role role) {
         entityHealthService.setBaseHealth(livingEntity, role.getHealth());
         store.put(livingEntity, role);
+
     }
 
     /**
@@ -73,6 +74,7 @@ public class RoleManager {
      */
     public void cleanUp(@NotNull LivingEntity entity) {
         store.remove(entity);
+        System.out.println(store.size());
     }
 
     /**
@@ -131,7 +133,7 @@ public class RoleManager {
     }
 
     public @NotNull Role getRole(@NotNull Player player) {
-        return store.computeIfAbsent(player, p -> Role.DEFAULT);
+        return store.getOrDefault(player, Role.DEFAULT);
     }
 
     /**
