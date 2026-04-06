@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.orchestration.transport.QueuePluginChannels;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -69,9 +70,8 @@ public class ServerItemButton extends AbstractItem {
         }
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
              DataOutputStream out = new DataOutputStream(bytes)) {
-            out.writeUTF("Connect");
             out.writeUTF(serverName);
-            player.sendPluginMessage(JavaPlugin.getPlugin(Core.class), "BungeeCord", bytes.toByteArray());
+            player.sendPluginMessage(JavaPlugin.getPlugin(Core.class), QueuePluginChannels.QUEUE_REQUEST, bytes.toByteArray());
         } catch (IOException ignored) {
             SoundEffect.WRONG_ACTION.play(player);
         }

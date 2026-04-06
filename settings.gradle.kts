@@ -11,6 +11,9 @@ include(":shops")
 include(":progression")
 include(":game")
 include(":hub")
+include(":orchestration")
+include(":orchestration-service")
+include(":proxy")
 
 if (File("./private/").exists()) {
     include(":private:events")

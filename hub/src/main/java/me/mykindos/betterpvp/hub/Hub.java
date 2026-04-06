@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.hub;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import lombok.Getter;
-import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -29,9 +27,6 @@ import java.util.Set;
 public class Hub extends BPvPPlugin {
 
     private final String PACKAGE = getClass().getPackageName();
-
-    @Getter
-    @Setter
     private Injector injector;
 
     @Inject
@@ -69,5 +64,14 @@ public class Hub extends BPvPPlugin {
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
         }
+    }
+
+    @Override
+    public Injector getInjector() {
+        return injector;
+    }
+
+    public void setInjector(Injector injector) {
+        this.injector = injector;
     }
 }

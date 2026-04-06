@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.VelocityCrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.server.network.PluginMessagingNetworkPlayerCountService;
+import me.mykindos.betterpvp.core.framework.server.orchestration.CoreOrchestrationGatewayProvider;
+import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 
 @CustomLog
 public class CoreInjectorModule extends AbstractModule {
@@ -32,6 +34,7 @@ public class CoreInjectorModule extends AbstractModule {
         bind(IIgnoreService.class).to(DefaultIgnoreService.class);
         bind(CrossServerMessageService.class).to(VelocityCrossServerMessageService.class);
         bind(NetworkPlayerCountService.class).to(PluginMessagingNetworkPlayerCountService.class);
+        bind(OrchestrationGateway.class).toProvider(CoreOrchestrationGatewayProvider.class);
         log.info("Using default integrations").submit();
     }
 }

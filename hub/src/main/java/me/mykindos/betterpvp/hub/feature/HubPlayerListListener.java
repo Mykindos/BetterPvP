@@ -65,7 +65,7 @@ public class HubPlayerListListener implements Listener {
         }
     }
 
-    private void refreshPlayer(Client client) {
+    public void refreshPlayer(Client client) {
         final Player player = client.getGamer().getPlayer();
         if (player == null) {
             return;

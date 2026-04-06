@@ -14,6 +14,7 @@ dependencies {
     compileOnly(libs.bundles.paper)
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
+    implementation(project(":orchestration"))
 
     compileOnly(libs.mapper)
     compileOnly(libs.libsdisguises)
