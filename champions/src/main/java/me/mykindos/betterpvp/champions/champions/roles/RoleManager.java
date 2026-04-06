@@ -74,7 +74,6 @@ public class RoleManager {
      */
     public void cleanUp(@NotNull LivingEntity entity) {
         store.remove(entity);
-        System.out.println(store.size());
     }
 
     /**
