@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":orchestration"))
 
     compileOnly(libs.mapper)
+    compileOnly(libs.packetevents)
     compileOnly(libs.libsdisguises)
     compileOnly(libs.mythic)
     compileOnly(project(":core"))

@@ -1,5 +1,9 @@
 package me.mykindos.betterpvp.hub.feature;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate.Action;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
@@ -19,14 +23,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
 
 @BPvPListener
 @Singleton
 public class HubPlayerListListener implements Listener {
-
-    private static final String TEAM_PREFIX = "hubtab-";
 
     private final Hub hub;
     private final ClientManager clientManager;
@@ -39,15 +45,12 @@ public class HubPlayerListListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(ClientJoinEvent event) {
-        UtilServer.runTaskLater(hub, this::refreshAllPlayers, 2L);
+        UtilServer.runTaskLater(hub, () -> refreshJoin(event.getClient()), 2L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(ClientQuitEvent event) {
-        final String playerName = event.getPlayer().getName();
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            removeManagedEntry(onlinePlayer.getScoreboard(), playerName);
-        }
+        removePlayer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -56,25 +59,56 @@ public class HubPlayerListListener implements Listener {
             return;
         }
 
-        UtilServer.runTaskLater(hub, () -> refreshPlayer(event.getClient()), 1L);
+        UtilServer.runTaskLater(hub, () -> refreshPlayer(event.getClient(), WrapperPlayServerTeams.TeamMode.UPDATE), 1L);
     }
 
-    private void refreshAllPlayers() {
-//        for (Client client : clientManager.getOnline()) {
-//            refreshPlayer(client);
-//        }
+    private void refreshJoin(Client joiningClient) {
+        final Player joiningPlayer = joiningClient.getGamer().getPlayer();
+        if (joiningPlayer == null) {
+            return;
+        }
+
+        final List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> visibleEntries = new ArrayList<>();
+        for (Client onlineClient : clientManager.getOnline()) {
+            final Player onlinePlayer = onlineClient.getGamer().getPlayer();
+            if (onlinePlayer == null) {
+                continue;
+            }
+
+            if (onlinePlayer.equals(joiningPlayer)) {
+                continue;
+            }
+
+            visibleEntries.add(createPlayerInfo(onlineClient));
+        }
+
+        sendDisplayNameUpdate(joiningPlayer, visibleEntries);
+        for (Client onlineClient : clientManager.getOnline()) {
+            final Player onlinePlayer = onlineClient.getGamer().getPlayer();
+            if (onlinePlayer == null || onlinePlayer.equals(joiningPlayer)) {
+                continue;
+            }
+
+            sendNameTagPacket(joiningPlayer, onlineClient, WrapperPlayServerTeams.TeamMode.CREATE);
+        }
+
+        refreshPlayer(joiningClient, WrapperPlayServerTeams.TeamMode.CREATE);
     }
 
     public void refreshPlayer(Client client) {
+        refreshPlayer(client, WrapperPlayServerTeams.TeamMode.UPDATE);
+    }
+
+    private void refreshPlayer(Client client, WrapperPlayServerTeams.TeamMode teamMode) {
         final Player player = client.getGamer().getPlayer();
         if (player == null) {
             return;
         }
 
-        player.playerListName(buildPlayerListName(client));
-
+        final WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = createPlayerInfo(client);
         for (Player viewer : Bukkit.getOnlinePlayers()) {
-            applyTeam(viewer.getScoreboard(), player, client.getRank());
+            sendDisplayNameUpdate(viewer, List.of(playerInfo));
+            sendNameTagPacket(viewer, client, teamMode);
         }
     }
 
@@ -86,30 +120,72 @@ public class HubPlayerListListener implements Listener {
         );
     }
 
-    private void applyTeam(Scoreboard scoreboard, Player player, Rank rank) {
-        removeManagedEntry(scoreboard, player.getName());
-
-        Team team = scoreboard.getTeam(getTeamName(rank));
-        if (team == null) {
-            team = scoreboard.registerNewTeam(getTeamName(rank));
+    private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(Client client) {
+        final Player player = client.getGamer().getPlayer();
+        if (player == null) {
+            throw new IllegalArgumentException("Cannot create player info for offline player");
         }
 
-        team.color(NamedTextColor.YELLOW);
-        team.prefix(rank.getTag(Rank.ShowTag.SHORT, false));
-        team.suffix(Component.empty());
-        team.addEntry(player.getName());
+        final WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo =
+                new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(player.getUniqueId());
+        playerInfo.setDisplayName(buildPlayerListName(client));
+        return playerInfo;
     }
 
-    private void removeManagedEntry(Scoreboard scoreboard, String playerName) {
-        for (Rank rank : Rank.values()) {
-            Team team = scoreboard.getTeam(getTeamName(rank));
-            if (team != null && team.removeEntry(playerName)) {
-                return;
-            }
+    private void sendDisplayNameUpdate(Player viewer, Collection<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> entries) {
+        if (entries.isEmpty()) {
+            return;
+        }
+
+        final WrapperPlayServerPlayerInfoUpdate packet = new WrapperPlayServerPlayerInfoUpdate(
+                EnumSet.of(Action.UPDATE_DISPLAY_NAME),
+                List.copyOf(entries)
+        );
+        PacketEvents.getAPI().getPlayerManager().getUser(viewer).sendPacket(packet);
+    }
+
+    private void sendNameTagPacket(Player viewer, Client client, WrapperPlayServerTeams.TeamMode teamMode) {
+        final Player player = client.getGamer().getPlayer();
+        if (player == null) {
+            return;
+        }
+
+        final WrapperPlayServerTeams packet = new WrapperPlayServerTeams(
+                getTeamName(player),
+                teamMode,
+                teamMode == WrapperPlayServerTeams.TeamMode.REMOVE
+                        ? Optional.empty()
+                        : Optional.of(buildTeamInfo(client)),
+                teamMode == WrapperPlayServerTeams.TeamMode.UPDATE ? List.of() : List.of(player.getName())
+        );
+        PacketEvents.getAPI().getPlayerManager().getUser(viewer).sendPacket(packet);
+    }
+
+    private void removePlayer(Player player) {
+        for (Player viewer : Bukkit.getOnlinePlayers()) {
+            final WrapperPlayServerTeams packet = new WrapperPlayServerTeams(
+                    getTeamName(player),
+                    WrapperPlayServerTeams.TeamMode.REMOVE,
+                    Optional.empty(),
+                    List.of()
+            );
+            PacketEvents.getAPI().getPlayerManager().getUser(viewer).sendPacket(packet);
         }
     }
 
-    private String getTeamName(Rank rank) {
-        return TEAM_PREFIX + rank.getId();
+    private WrapperPlayServerTeams.ScoreBoardTeamInfo buildTeamInfo(Client client) {
+        return new WrapperPlayServerTeams.ScoreBoardTeamInfo(
+                Component.empty(),
+                client.getRank().getTag(Rank.ShowTag.SHORT, false),
+                Component.empty(),
+                WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
+                WrapperPlayServerTeams.CollisionRule.ALWAYS,
+                NamedTextColor.YELLOW,
+                WrapperPlayServerTeams.OptionData.NONE
+        );
+    }
+
+    private String getTeamName(Player player) {
+        return "hub" + player.getUniqueId().toString().replace("-", "").substring(0, 13);
     }
 }
