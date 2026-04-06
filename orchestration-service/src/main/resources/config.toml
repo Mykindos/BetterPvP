@@ -1,6 +1,7 @@
 host = "0.0.0.0"
 port = 8085
 reservation_ttl_seconds = 10
+minimum_regular_join_interval_millis = 0
 boost_interval_seconds = 30
 boost_amount = 5
 default_rank = "PLAYER"

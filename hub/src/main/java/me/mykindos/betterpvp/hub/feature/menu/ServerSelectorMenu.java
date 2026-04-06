@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountSer
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
+import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +18,8 @@ import java.util.Objects;
 
 public class ServerSelectorMenu extends AbstractGui implements Windowed {
 
-    public ServerSelectorMenu(NetworkPlayerCountService networkService) {
+    public ServerSelectorMenu(NetworkPlayerCountService networkService, HubQueueStatusRegistry queueStatusRegistry,
+                              OrchestrationGateway orchestrationGateway) {
         super(9, 3);
         fill(Menu.BACKGROUND_GUI_ITEM, true);
 
@@ -32,7 +35,7 @@ public class ServerSelectorMenu extends AbstractGui implements Windowed {
         final int[] slots = computeSlots(servers.size(), 9);
         for (int i = 0; i < slots.length; i++) {
             final Map.Entry<String, ClansServerType> entry = servers.get(i);
-            setItem(slots[i], new ServerItemButton(entry.getKey(), networkService, entry.getValue()));
+            setItem(slots[i], new ServerItemButton(entry.getKey(), networkService, entry.getValue(), queueStatusRegistry, orchestrationGateway));
         }
     }
 

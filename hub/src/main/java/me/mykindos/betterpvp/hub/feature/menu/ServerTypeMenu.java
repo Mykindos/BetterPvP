@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountSer
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
+import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +21,8 @@ public class ServerTypeMenu extends AbstractGui implements Windowed {
 
     private final ClansServerType serverType;
 
-    public ServerTypeMenu(NetworkPlayerCountService networkService, ClansServerType serverType) {
+    public ServerTypeMenu(NetworkPlayerCountService networkService, ClansServerType serverType,
+                          HubQueueStatusRegistry queueStatusRegistry, OrchestrationGateway orchestrationGateway) {
         super(9, 3);
         this.serverType = serverType;
 
@@ -37,7 +40,7 @@ public class ServerTypeMenu extends AbstractGui implements Windowed {
 
         final int[] slots = ServerSelectorMenu.computeSlots(servers.size(), 9);
         for (int i = 0; i < servers.size() && i < slots.length; i++) {
-            setItem(slots[i], new ServerItemButton(servers.get(i), networkService, serverType));
+            setItem(slots[i], new ServerItemButton(servers.get(i), networkService, serverType, queueStatusRegistry, orchestrationGateway));
         }
     }
 

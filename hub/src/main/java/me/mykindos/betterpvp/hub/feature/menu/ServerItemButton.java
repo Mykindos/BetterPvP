@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
+import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import me.mykindos.betterpvp.orchestration.transport.QueuePluginChannels;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,11 +31,16 @@ public class ServerItemButton extends AbstractItem {
     private final String serverName;
     private final ServerType serverType;
     private final NetworkPlayerCountService networkService;
+    private final HubQueueStatusRegistry queueStatusRegistry;
+    private final OrchestrationGateway orchestrationGateway;
 
-    public ServerItemButton(String serverName, NetworkPlayerCountService networkService, ServerType serverType) {
+    public ServerItemButton(String serverName, NetworkPlayerCountService networkService, ServerType serverType,
+                            HubQueueStatusRegistry queueStatusRegistry, OrchestrationGateway orchestrationGateway) {
         this.serverName = serverName;
         this.networkService = networkService;
         this.serverType = serverType;
+        this.queueStatusRegistry = queueStatusRegistry;
+        this.orchestrationGateway = orchestrationGateway;
     }
 
     @Override

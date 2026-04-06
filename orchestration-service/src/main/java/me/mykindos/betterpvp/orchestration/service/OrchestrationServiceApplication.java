@@ -26,6 +26,7 @@ public final class OrchestrationServiceApplication {
                         config.boostAmount()
                 ),
                 config.reservationTtlSeconds(),
+                config.minimumRegularJoinIntervalMillis(),
                 new PlayerQueuePolicyResolver(config),
                 new ManagedTargetResolver(config.managedTargets())
         );

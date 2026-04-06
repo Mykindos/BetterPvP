@@ -6,8 +6,10 @@ import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.hub.feature.menu.ServerSelectorMenu;
+import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
 import me.mykindos.betterpvp.hub.feature.zone.Zone;
 import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
+import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,13 +29,18 @@ public class HotbarListener implements Listener {
     private final NetworkPlayerCountService networkPlayerCountService;
     private final HubInventoryService inventoryService;
     private final ZoneService zoneService;
+    private final HubQueueStatusRegistry queueStatusRegistry;
+    private final OrchestrationGateway orchestrationGateway;
 
     @Inject
     public HotbarListener(NetworkPlayerCountService networkPlayerCountService, HubInventoryService inventoryService,
-                          ZoneService zoneService) {
+                          ZoneService zoneService, HubQueueStatusRegistry queueStatusRegistry,
+                          OrchestrationGateway orchestrationGateway) {
         this.networkPlayerCountService = networkPlayerCountService;
         this.inventoryService = inventoryService;
         this.zoneService = zoneService;
+        this.queueStatusRegistry = queueStatusRegistry;
+        this.orchestrationGateway = orchestrationGateway;
     }
 
     @EventHandler
@@ -77,7 +84,7 @@ public class HotbarListener implements Listener {
         final int customModelData = item.getItemMeta().getCustomModelData();
         switch (customModelData) {
             case 700:
-                new ServerSelectorMenu(networkPlayerCountService).show(event.getPlayer());
+                new ServerSelectorMenu(networkPlayerCountService, queueStatusRegistry, orchestrationGateway).show(event.getPlayer());
                 break;
         }
     }

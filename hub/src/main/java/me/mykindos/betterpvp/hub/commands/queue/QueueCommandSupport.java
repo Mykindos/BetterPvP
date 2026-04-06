@@ -51,6 +51,10 @@ final class QueueCommandSupport {
                 .append(Component.text("● ", NamedTextColor.DARK_GRAY))
                 .append(Component.text("/queue", NamedTextColor.YELLOW))
                 .append(Component.text(" - View your current queue status.", NamedTextColor.GRAY))
+                .appendNewline()
+                .append(Component.text("● ", NamedTextColor.DARK_GRAY))
+                .append(Component.text("/queue leave", NamedTextColor.YELLOW))
+                .append(Component.text(" - Leave the queue you are currently in.", NamedTextColor.GRAY))
                 .build();
 
         if (client.getRank().getId() >= Rank.ADMIN.getId()) {

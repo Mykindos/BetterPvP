@@ -40,6 +40,7 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
 
     private final QueuePriorityPolicy priorityPolicy;
     private final long reservationTtlSeconds;
+    private final long minimumRegularJoinIntervalMillis;
     private final PlayerQueuePolicyResolver playerQueuePolicyResolver;
     private final ManagedTargetResolver managedTargetResolver;
     private final ScheduledExecutorService scheduler;
@@ -51,13 +52,16 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
     private final Map<String, ServerCapacitySnapshot> capacityByServer = new HashMap<>();
     private final Map<String, Reservation> reservationsById = new HashMap<>();
     private final Map<String, QueueState> queueStateOverrides = new HashMap<>();
+    private final Map<String, Instant> nextRegularAdmissionAtByServer = new HashMap<>();
 
     public InMemoryOrchestrationGateway(QueuePriorityPolicy priorityPolicy,
                                         long reservationTtlSeconds,
+                                        long minimumRegularJoinIntervalMillis,
                                         PlayerQueuePolicyResolver playerQueuePolicyResolver,
                                         ManagedTargetResolver managedTargetResolver) {
         this.priorityPolicy = Objects.requireNonNull(priorityPolicy, "priorityPolicy");
         this.reservationTtlSeconds = reservationTtlSeconds;
+        this.minimumRegularJoinIntervalMillis = Math.max(0L, minimumRegularJoinIntervalMillis);
         this.playerQueuePolicyResolver = Objects.requireNonNull(playerQueuePolicyResolver, "playerQueuePolicyResolver");
         this.managedTargetResolver = Objects.requireNonNull(managedTargetResolver, "managedTargetResolver");
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -82,6 +86,12 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
         final ManagedQueueEntry existingEntry = queueEntriesByPlayer.get(intent.playerUuid());
         if (existingEntry != null) {
             if (existingEntry.ticket().target().targetId().equalsIgnoreCase(target.targetId())) {
+                final PlayerQueuePolicyResolver.ResolvedQueuePolicy existingPolicy = playerQueuePolicyResolver.resolve(intent.playerUuid(), rankByPlayer);
+                if (existingPolicy.bypass()) {
+                    removeExistingQueueEntry(intent.playerUuid());
+                    statusByPlayer.remove(intent.playerUuid());
+                    return CompletableFuture.completedFuture(AdmissionDecision.bypass(target, "Bypass access granted"));
+                }
                 return CompletableFuture.completedFuture(AdmissionDecision.queued(
                         target,
                         existingEntry.ticket().ticketId(),
@@ -121,9 +131,13 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
             return CompletableFuture.completedFuture(AdmissionDecision.denied(target, "Target server is not accepting players"));
         }
 
-        if (targetState == QueueState.OPEN && snapshot.availableRegularSlots() > 0) {
+        final Instant now = Instant.now();
+        if (targetState == QueueState.OPEN
+                && snapshot.availableRegularSlots() > 0
+                && canAdmitRegularPlayer(target.serverName(), now)) {
             final Reservation reservation = createReservation(intent.playerUuid(), target);
             updateReservedCapacity(target.serverName(), 1);
+            recordRegularAdmission(target.serverName(), now);
             LOGGER.info(() -> "Granted immediate reservation " + reservation.reservationId()
                     + " for " + intent.playerUuid() + " to " + target.serverName());
             return CompletableFuture.completedFuture(AdmissionDecision.granted(target, reservation.reservationId(), "Reserved slot available"));
@@ -140,7 +154,7 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
                 .put(intent.playerUuid(), entry);
         queueEntriesByPlayer.put(intent.playerUuid(), entry);
 
-        refreshQueue(target, Instant.now());
+        refreshQueue(target, now);
         return CompletableFuture.completedFuture(AdmissionDecision.queued(target, entry.ticket().ticketId(), "Queued for admission"));
     }
 
@@ -241,6 +255,18 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
             refreshCapacityForServer(previous.currentServer(), Instant.now());
         }
         refreshCapacityForServer(snapshot.currentServer(), Instant.now());
+
+        // If the player is now a bypass rank but still sitting in the queue, promote them immediately.
+        final ManagedQueueEntry existingEntry = queueEntriesByPlayer.get(snapshot.playerUuid());
+        if (existingEntry != null) {
+            final PlayerQueuePolicyResolver.ResolvedQueuePolicy policy = playerQueuePolicyResolver.resolve(snapshot.playerUuid(), rankByPlayer);
+            if (policy.bypass()) {
+                removeExistingQueueEntry(snapshot.playerUuid());
+                statusByPlayer.remove(snapshot.playerUuid());
+                LOGGER.info(() -> "Upgraded queued player " + snapshot.playerUuid() + " to bypass after rank change to " + snapshot.rank());
+            }
+        }
+
         return CompletableFuture.completedFuture(null);
     }
 
@@ -415,7 +441,12 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
 
         int availableSlots = snapshot.availableRegularSlots();
         for (QueueTarget target : targets) {
-            while (availableSlots > 0) {
+            if (queueState(target) != QueueState.OPEN) {
+                refreshQueue(target, now);
+                continue;
+            }
+
+            while (availableSlots > 0 && canAdmitRegularPlayer(serverName, now)) {
                 final List<ManagedQueueEntry> orderedEntries = orderedEntries(target, now);
                 if (orderedEntries.isEmpty()) {
                     break;
@@ -427,6 +458,7 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
 
                 final Reservation reservation = createReservation(first.ticket().playerUuid(), target);
                 updateReservedCapacity(serverName, 1);
+                recordRegularAdmission(serverName, now);
                 availableSlots--;
                 LOGGER.info(() -> "Promoted queued player " + first.ticket().playerUuid()
                         + " with reservation " + reservation.reservationId()
@@ -511,6 +543,20 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
 
     private QueueState queueState(QueueTarget target) {
         return queueStateOverrides.getOrDefault(target.targetId(), capacityState(target.serverName()));
+    }
+
+    private boolean canAdmitRegularPlayer(String serverName, Instant now) {
+        final Instant nextAdmissionAt = nextRegularAdmissionAtByServer.get(serverName);
+        return nextAdmissionAt == null || !now.isBefore(nextAdmissionAt);
+    }
+
+    private void recordRegularAdmission(String serverName, Instant now) {
+        if (minimumRegularJoinIntervalMillis <= 0L) {
+            nextRegularAdmissionAtByServer.remove(serverName);
+            return;
+        }
+
+        nextRegularAdmissionAtByServer.put(serverName, now.plusMillis(minimumRegularJoinIntervalMillis));
     }
 
     private Reservation createReservation(UUID playerUuid, QueueTarget target) {

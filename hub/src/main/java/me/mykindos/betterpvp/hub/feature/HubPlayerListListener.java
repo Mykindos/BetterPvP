@@ -60,9 +60,9 @@ public class HubPlayerListListener implements Listener {
     }
 
     private void refreshAllPlayers() {
-        for (Client client : clientManager.getOnline()) {
-            refreshPlayer(client);
-        }
+//        for (Client client : clientManager.getOnline()) {
+//            refreshPlayer(client);
+//        }
     }
 
     public void refreshPlayer(Client client) {

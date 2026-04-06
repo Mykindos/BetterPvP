@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.npc.NPCFactory;
 import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
 import me.mykindos.betterpvp.hub.feature.menu.ServerTypeMenu;
+import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
+import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -34,11 +36,17 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
 
     private final ClansServerType serverType;
     private final NetworkPlayerCountService networkPlayerCountService;
+    private final HubQueueStatusRegistry queueStatusRegistry;
+    private final OrchestrationGateway orchestrationGateway;
 
-    public InstanceSelectorNPC(NPCFactory factory, Entity entity, Component tag, ClansServerType serverType, NetworkPlayerCountService networkPlayerCountService) {
+    public InstanceSelectorNPC(NPCFactory factory, Entity entity, Component tag, ClansServerType serverType,
+                               NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
+                               OrchestrationGateway orchestrationGateway) {
         super(factory, entity);
         this.serverType = serverType;
         this.networkPlayerCountService = networkPlayerCountService;
+        this.queueStatusRegistry = queueStatusRegistry;
+        this.orchestrationGateway = orchestrationGateway;
 
         final Location tagLoc = entity.getLocation().add(0, 3, 0);
         attachToLifecycle(entity.getWorld().spawn(tagLoc, TextDisplay.class, display -> {
@@ -63,7 +71,7 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
 
     @Override
     public void act(Player runner) {
-        new ServerTypeMenu(networkPlayerCountService, serverType).show(runner);
+        new ServerTypeMenu(networkPlayerCountService, serverType, queueStatusRegistry, orchestrationGateway).show(runner);
     }
 
     public static class Featured extends InstanceSelectorNPC implements Ticked {
@@ -71,8 +79,10 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
         private final Component title;
         private final String gradientColors;
 
-        public Featured(NPCFactory factory, Entity entity, Component title, TextColor[] gradient, ClansServerType serverType, NetworkPlayerCountService networkPlayerCountService) {
-            super(factory, entity, Component.empty(), serverType, networkPlayerCountService);
+        public Featured(NPCFactory factory, Entity entity, Component title, TextColor[] gradient, ClansServerType serverType,
+                        NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
+                        OrchestrationGateway orchestrationGateway) {
+            super(factory, entity, Component.empty(), serverType, networkPlayerCountService, queueStatusRegistry, orchestrationGateway);
             Preconditions.checkArgument(gradient.length >= 2, "Gradient must have at least 2 colors");
             this.title = title;
 

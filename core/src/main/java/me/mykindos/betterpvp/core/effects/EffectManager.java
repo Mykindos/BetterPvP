@@ -5,9 +5,11 @@ import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -143,6 +145,10 @@ public class EffectManager extends Manager<String, ConcurrentHashMap<String, Lis
         EffectType type = effect.getEffectType();
         if (!event.isCancelled()) {
             if (target.isDead()) {
+                if (target instanceof Player player) {
+                    Bukkit.broadcastMessage("dead " + player.getName());
+                    Bukkit.broadcastMessage(UtilEntity.getRemovalReason(player) + "");
+                }
                 return event;
             }
 

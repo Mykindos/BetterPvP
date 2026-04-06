@@ -18,7 +18,9 @@ import me.mykindos.betterpvp.core.npc.NPCRegistry;
 import me.mykindos.betterpvp.core.npc.model.NPC;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.hub.Hub;
+import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
 import me.mykindos.betterpvp.hub.model.HubWorld;
+import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -46,17 +48,22 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
     private final NetworkPlayerCountService networkPlayerCountService;
     private final Hub hub;
     private final HubWorld hubWorld;
+    private final HubQueueStatusRegistry queueStatusRegistry;
+    private final OrchestrationGateway orchestrationGateway;
     private final List<KitSelector> kitSelectors = new ArrayList<>();
     private final List<Entity> displays = new ArrayList<>();
 
     @Inject
     private HubNPCFactory(NPCRegistry registry, CooldownManager cooldownManager, NetworkPlayerCountService networkPlayerCountService,
-                          Hub hub, HubWorld hubWorld) {
+                          Hub hub, HubWorld hubWorld, HubQueueStatusRegistry queueStatusRegistry,
+                          OrchestrationGateway orchestrationGateway) {
         super("hub", registry);
         this.cooldownManager = cooldownManager;
         this.networkPlayerCountService = networkPlayerCountService;
         this.hub = hub;
         this.hubWorld = hubWorld;
+        this.queueStatusRegistry = queueStatusRegistry;
+        this.orchestrationGateway = orchestrationGateway;
     }
 
     public boolean tryLoad(Hub hub) {
@@ -154,9 +161,9 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
                     TextColor.color(255, 182, 23),
                     TextColor.color(255, 116, 23),
             };
-            npc = new InstanceSelectorNPC.Featured(this, golem, title, gradient, serverType, networkPlayerCountService);
+            npc = new InstanceSelectorNPC.Featured(this, golem, title, gradient, serverType, networkPlayerCountService, queueStatusRegistry, orchestrationGateway);
         } else {
-            npc = new InstanceSelectorNPC(this, golem, title, serverType, networkPlayerCountService);
+            npc = new InstanceSelectorNPC(this, golem, title, serverType, networkPlayerCountService, queueStatusRegistry, orchestrationGateway);
         }
         registry.register(npc);
         return npc;
