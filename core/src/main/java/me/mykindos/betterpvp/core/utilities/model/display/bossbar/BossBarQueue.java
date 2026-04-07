@@ -121,20 +121,32 @@ public class BossBarQueue {
 
         for (BossBarColor color : BossBarColor.values()) {
             final BossBarData data;
+            final BossBar bar;
             synchronized (lock) {
                 data = nextElement(color, gamer);
+                if (data == null) {
+                    // Resolve the bar reference while holding the lock so we read a consistent view
+                    // of the bars map. No new bar is created here.
+                    bar = bars.get(color);
+                } else {
+                    // Lazily create the BossBar inside the lock to guarantee that only one
+                    // BossBar instance is ever created per color slot, even under concurrent
+                    // async ticks. Without this guard, two threads could both see null in the
+                    // EnumMap and create separate instances — the untracked instance would stay
+                    // on the client forever (duplicate bar bug) and the conflicting ADD packets
+                    // would cause a Network Protocol Error kick.
+                    bar = bars.computeIfAbsent(color, c ->
+                            BossBar.bossBar(data.getName(), data.getProgress(), c.getAdventureColor(), data.getOverlay()));
+                }
             }
 
             if (data == null) {
                 // No valid element for this color — remove the player from the bar if it exists.
-                BossBar bar = bars.get(color);
                 if (bar != null) {
                     bar.removeViewer(player);
                 }
             } else {
-                // Create or update the bar and ensure the player is viewing it.
-                BossBar bar = bars.computeIfAbsent(color, c ->
-                        BossBar.bossBar(data.getName(), data.getProgress(), c.getAdventureColor(), data.getOverlay()));
+                // Update the bar and ensure the player is viewing it.
                 bar.name(data.getName());
                 bar.progress(data.getProgress());
                 bar.overlay(data.getOverlay());
