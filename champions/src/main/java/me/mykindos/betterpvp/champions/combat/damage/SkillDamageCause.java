@@ -44,7 +44,7 @@ public class SkillDamageCause implements DamageCause {
     }
     
     /**
-     * Creates a skill damage cause with no delay and knockback enabled
+     * Creates a skill damage cause with default delay and no knockback enabled
      * @param skill the skill causing the damage
      */
     public SkillDamageCause(Skill skill) {

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.data;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -129,7 +130,7 @@ public class AxeProjectile extends Projectile {
         UtilDamage.doDamage(new DamageEvent(damagee,
                 caster,
                 null,
-                new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
+                new SkillDamageCause(skill, false, DamageCause.DEFAULT_DELAY, true).withBukkitCause(PROJECTILE),
                 damage,
                 skill.getName()));
         UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), skill.getName());

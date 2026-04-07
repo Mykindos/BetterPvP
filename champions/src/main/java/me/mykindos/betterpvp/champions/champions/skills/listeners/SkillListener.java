@@ -79,10 +79,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -289,9 +289,9 @@ public class SkillListener implements Listener {
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build == null) return;
 
-                Optional<Skill> skillOptional = build.getActiveSkills().stream()
-                        .map(BuildSkill::getSkill)
-                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
+            Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                    .map(BuildSkill::getSkill)
+                    .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
             if (skillOptional.isPresent()) {
                 Skill skill = skillOptional.get();
