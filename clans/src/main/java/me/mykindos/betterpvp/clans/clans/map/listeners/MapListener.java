@@ -175,9 +175,7 @@ public class MapListener implements Listener {
             // Zoom out
             MapSettings.Scale curScale = mapSettings.getScale();
 
-            if (curScale == MapSettings.Scale.FAR && !client.isAdministrating()) {
-                return;
-            } else if (curScale == MapSettings.Scale.FARTHEST) {
+            if (curScale == MapSettings.Scale.FARTHEST) {
                 return;
             }
 
