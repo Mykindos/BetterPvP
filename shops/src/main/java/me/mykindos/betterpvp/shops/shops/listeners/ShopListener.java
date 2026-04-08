@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.shops.events.FinalPlayerSellItemEve
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.i18n.CoreTranslationKeys;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
@@ -29,6 +30,7 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.shops.Shops;
+import me.mykindos.betterpvp.shops.ShopsTranslationKeys;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
@@ -114,23 +116,23 @@ public class ShopListener implements Listener {
 
         if (event.getCurrency() == ShopCurrency.COINS) {
             if (event.getGamer().getIntProperty(GamerProperty.BALANCE) < cost) {
-                event.cancel("You have insufficient funds to purchase this item.");
+                event.cancel(UtilMessage.key(event.getPlayer(), ShopsTranslationKeys.ERROR_INSUFFICIENT_FUNDS));
                 return;
             }
         } else if (event.getCurrency() == ShopCurrency.FRAGMENTS) {
             if (event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) < cost) {
-                event.cancel("You have insufficient funds to purchase this item.");
+                event.cancel(UtilMessage.key(event.getPlayer(), ShopsTranslationKeys.ERROR_INSUFFICIENT_FUNDS));
                 return;
             }
         } else if (event.getCurrency() == ShopCurrency.BARK) {
             if (!UtilInventory.contains(event.getPlayer(), "progression:tree_bark", cost)) {
-                event.cancel("You have insufficient funds to purchase this item.");
+                event.cancel(UtilMessage.key(event.getPlayer(), ShopsTranslationKeys.ERROR_INSUFFICIENT_FUNDS));
                 return;
             }
         }
 
         if (event.getPlayer().getInventory().firstEmpty() == -1) {
-            event.cancel("Your inventory is full.");
+            event.cancel(UtilMessage.key(event.getPlayer(), ShopsTranslationKeys.ERROR_INVENTORY_FULL));
             return;
         }
 
@@ -191,7 +193,7 @@ public class ShopListener implements Listener {
         final ItemInstance instanceResult = itemFactory.fromItemStack(boughtItem).orElseThrow();
         final ItemStack result = instanceResult.createItemStack();
         UtilItem.insert(event.getPlayer(), result);
-        UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
+        UtilMessage.simpleMessageKey(event.getPlayer(), CoreTranslationKeys.PREFIX_SHOP, ShopsTranslationKeys.MESSAGE_PURCHASE_SUCCESS,
                 amount, event.getShopItem().getItemName(), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
         UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
         log.info("{} purchased {}x {} for {} {}",
@@ -219,7 +221,7 @@ public class ShopListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onSellItem(PlayerSellItemEvent event) {
         if (event.getShopItem().getSellPrice() == 0) {
-            event.cancel("You cannot sell this item.");
+            event.cancel(UtilMessage.key(event.getPlayer(), ShopsTranslationKeys.ERROR_CANNOT_SELL));
             return;
         }
 
@@ -254,7 +256,7 @@ public class ShopListener implements Listener {
                             shopItemSellService.removeItemFromInventory(player, i, amount);
 
                             UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
-                            UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
+                            UtilMessage.simpleMessageKey(event.getPlayer(), CoreTranslationKeys.PREFIX_SHOP, ShopsTranslationKeys.MESSAGE_SELL_SUCCESS,
                                     result.amountSold, result.itemName, UtilFormat.formatNumber(result.totalEarned), event.getCurrency().name().toLowerCase());
 
                             log.info("{} sold {}x {} for {} {}",
@@ -300,7 +302,7 @@ public class ShopListener implements Listener {
             });
         });
 
-        UtilMessage.simpleBroadcast("Shop", "Dynamic prices have been updated!",
+        UtilMessage.simpleBroadcastKey(CoreTranslationKeys.PREFIX_SHOP, ShopsTranslationKeys.BROADCAST_DYNAMIC_PRICES_UPDATED,
                 Component.text("This means that buy / sell prices on farming items have been adjusted to reflect the current market.", NamedTextColor.GRAY));
     }
 
