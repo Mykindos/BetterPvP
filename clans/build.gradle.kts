@@ -21,6 +21,7 @@ dependencies {
     compileOnly(project(":champions"))
     compileOnly(project(":shops"))
     compileOnly(libs.packetevents)
+    compileOnly(libs.nexo)
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)
