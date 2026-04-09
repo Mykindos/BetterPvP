@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -24,6 +25,8 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -105,7 +108,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     public void onDamage(DamageEvent event) {
         for (Torment torment : tormentList) {
             if (!torment.getLocation().getWorld().equals(event.getDamagee().getLocation().getWorld())) {
-                return;
+                continue;
             }
             for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange(torment.getLevel()))) {
                 if (target.equals(event.getDamagee())) {
@@ -128,9 +131,24 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 continue;
             }
 
-            double size = getRange(torment.getLevel());
-            int particles = 50;
-            Location loc = torment.getLocation().clone();
+            final int particleRadius = 30;
+            final double size = getRange(torment.getLevel());
+            final int particles = 50;
+            final int teamColor = 5;
+
+            final List<KeyValue<Player, EntityProperty>> nearbyPlayers = UtilPlayer.getNearbyPlayers(torment.getCaster(), torment.getLocation(), particleRadius, EntityProperty.ALL);
+
+            final List<Player> enemies = nearbyPlayers.stream()
+                    .filter(kv -> kv.getValue().equals(EntityProperty.ENEMY))
+                    .map(KeyValue::getKey)
+                    .toList();
+            final List<Player> allies = new ArrayList<>(List.of(torment.getCaster()));
+            allies.addAll(nearbyPlayers.stream()
+                    .filter(kv -> kv.getValue().equals(EntityProperty.FRIENDLY))
+                    .map(KeyValue::getKey)
+                    .toList()
+            );
+            final Location loc = torment.getLocation().clone();
             for (int i = 0; i < particles; i++) {
                 double angle, x, z;
                 angle = 2 * Math.PI * i / particles;
@@ -146,9 +164,13 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                     loc.add(0, 1, 0);
                 }
 
-
-                Particle.END_ROD.builder().location(loc).receivers(30).extra(0).spawn();
-
+                if (i % teamColor == 0) {
+                    //show allie based particles for better identification
+                    Particle.DUST.builder().color(Color.RED).location(loc).receivers(enemies).extra(0).spawn();
+                    Particle.DUST.builder().color(Color.GREEN).location(loc).receivers(allies).extra(0).spawn();
+                } else {
+                    Particle.END_ROD.builder().location(loc).receivers(particleRadius).extra(0).spawn();
+                }
                 loc.subtract(x, 0, z);
 
             }

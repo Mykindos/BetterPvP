@@ -169,7 +169,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         baseRadius = getConfig("baseRadius", 6.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
-        healthBoostStrength = getConfig("healthBoostStrength", 1, Integer.class);
+        healthBoostStrength = getConfig("healthBoostStrength", 4, Integer.class);
     }
 
     @Override
