@@ -576,22 +576,22 @@ public class ClientSQLLayer {
         return rewardBox;
     }
 
-    public CompletableFuture<Void> updateClientRewards(Client client, RewardBox rewardBox) {
-        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            try {
-                ctx.insertInto(CLIENT_REWARDS)
-                        .set(CLIENT_REWARDS.CLIENT, client.getId())
-                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentRealm().getSeason().getId())
-                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
-                        .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
-                        .doUpdate()
-                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
-                        .execute();
-            } catch (Exception ex) {
-                log.error("Error updating rewards for " + client.getName(), ex).submit();
-                throw new RuntimeException(ex);
-            }
-        });
+    public CompletableFuture<Integer> updateClientRewards(Client client, RewardBox rewardBox) {
+        final DSLContext ctx = database.getDslContext();
+        try {
+            final int rows = ctx.insertInto(CLIENT_REWARDS)
+                    .set(CLIENT_REWARDS.CLIENT, client.getId())
+                    .set(CLIENT_REWARDS.SEASON, Core.getCurrentRealm().getSeason().getId())
+                    .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
+                    .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
+                    .doUpdate()
+                    .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
+                    .execute();
+            return CompletableFuture.completedFuture(rows);
+        } catch (Exception ex) {
+            log.error("Error updating rewards for " + client.getName(), ex).submit();
+            throw new RuntimeException(ex);
+        }
     }
 
 
