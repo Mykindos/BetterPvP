@@ -120,7 +120,6 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
                 new SkillDamageCause(skill),
                 damage,
                 skill.getName());
-        event.setForceDamageDelay(0);
         event.setDamageDelay(0);
         UtilDamage.doDamage(event);
 

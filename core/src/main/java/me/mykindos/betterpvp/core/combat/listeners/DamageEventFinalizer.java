@@ -33,6 +33,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,8 +77,7 @@ public class DamageEventFinalizer {
         durabilityProcessor.processDurability(event);
 
         // Process delay
-        long damageDelay = event.getForceDamageDelay() > 0 ? event.getForceDamageDelay() : event.getDamageDelay();
-        delayManager.addDelay(event.getDamager(), event.getDamagee(), event.getCause(), damageDelay);
+        delayManager.addDelay(event.getDamager(), event.getDamagee(), event.getCause(), event.getDamageDelay());
         
         // Play hit sounds
         playHitSounds(event);
@@ -92,9 +92,6 @@ public class DamageEventFinalizer {
 
         // Apply final damage
         applyFinalDamage(event);
-
-        // Send debug info
-        sendDebugInfo(event);
 
         // Update last damaged
         if (event.getDamagee() instanceof Player player && event.getDamager() != null) {
@@ -226,7 +223,7 @@ public class DamageEventFinalizer {
         }
     }
 
-    private void sendDebugInfo(DamageEvent event) {
+    public void sendDebugInfo(DamageEvent event) {
         if (event.getDamagee() instanceof Player player && player.isOp() && player.getEquipment().getItemInMainHand().getType() == Material.DEBUG_STICK) {
             double modifiedDamage = event.getModifiedDamage();
             final List<String> categories = new ArrayList<>();
@@ -236,6 +233,9 @@ public class DamageEventFinalizer {
 
             UtilMessage.simpleMessage(player, "");
             UtilMessage.simpleMessage(player, "Damage", "<u>Details:");
+            UtilMessage.simpleMessage(player, "Damage", "Time: <alt2>" + LocalDateTime.now().toString());
+            UtilMessage.simpleMessage(player, "Damage", "Cancelled: <alt2>"+ event.isCancelled());
+            UtilMessage.simpleMessage(player, "Damage", "Cancel Reason: <alt2>"+ event.getCancelReason());
             UtilMessage.simpleMessage(player, "Damage", "Raw Damage: <alt2>" + event.getRawDamage());
             UtilMessage.simpleMessage(player, "Damage", "Damage: <alt2>" + event.getDamage());
             UtilMessage.simpleMessage(player, "Damage", "Final Damage: <alt2>" + modifiedDamage);
@@ -244,7 +244,6 @@ public class DamageEventFinalizer {
             UtilMessage.simpleMessage(player, "Damage", "Hurt Animation: " + (event.isHurtAnimation() ? "<green>Yes" : "<red>No"));
             UtilMessage.simpleMessage(player, "Damage", "Living Damagee: " + (event.isDamageeLiving() ? "<green>Yes" : "<red>No"));
             UtilMessage.simpleMessage(player, "Damage", "Damage Delay: <alt2>" + event.getDamageDelay() + "ms");
-            UtilMessage.simpleMessage(player, "Damage", "Force Damage Delay: <alt2>" + event.getForceDamageDelay() + "ms");
             UtilMessage.simpleMessage(player, "Damage", "Reasons: <alt2>" + String.join(", ", event.getReasons()));
             UtilMessage.simpleMessage(player, "Damage", "");
             UtilMessage.simpleMessage(player, "Damage", "<u>Cause Breakdown:");

@@ -64,7 +64,6 @@ public class ArrowListener implements Listener {
             return;
         }
 
-        event.setForceDamageDelay(0);
         event.setDamageDelay(0);
     }
 

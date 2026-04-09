@@ -206,7 +206,6 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
                 new InteractionDamageCause(this),
                 chargeDamage * charge,
                 "Voltic Bash");
-        event.setForceDamageDelay(0);
         UtilDamage.doDamage(event);
         data.getLastHit().put(hit, System.currentTimeMillis());
         if (event.isCancelled()) {
