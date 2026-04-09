@@ -100,14 +100,14 @@ public class ClanMapRenderer extends MapRenderer {
     }
 
     private int getCenterX(Player player, MapSettings.Scale scale) {
-        if (scale.ordinal() >= MapSettings.Scale.FAR.ordinal()) {
+        if (scale.ordinal() >= MapSettings.Scale.FARTHEST.ordinal()) {
             return 0;
         }
         return player.getLocation().getBlockX();
     }
 
     private int getCenterZ(Player player, MapSettings.Scale scale) {
-        if (scale.ordinal() >= MapSettings.Scale.FAR.ordinal()) {
+        if (scale.ordinal() >= MapSettings.Scale.FARTHEST.ordinal()) {
             return 0;
         }
         return player.getLocation().getBlockZ();
@@ -151,31 +151,84 @@ public class ClanMapRenderer extends MapRenderer {
 
     private void renderChunkPixels(MapCanvas mapCanvas, ChunkData chunkData, int pixelX, int pixelZ,
                                    int scale, int chunkSize, byte chunkColor, boolean isAdminClan) {
-        MapSettings.Scale s = getScaleFromValue(scale);
+        // At high zoom levels where chunks are very small (1-2 pixels), only render border outlines.
+        // Without this check, border pixels cover every pixel, making claims appear as solid blocks.
+        if (chunkSize <= 2) {
+            renderSmallChunk(mapCanvas, chunkData, pixelX, pixelZ, chunkSize, chunkColor);
+            return;
+        }
+
+        boolean renderDiagonalFill = shouldRenderDiagonalFill(chunkData, scale);
 
         for (int cx = 0; cx < chunkSize; cx++) {
             for (int cz = 0; cz < chunkSize; cz++) {
-                if (!isPixelInMapBounds(pixelX + cx, pixelZ + cz)) continue;
-
                 int x = pixelX + cx;
                 int z = pixelZ + cz;
 
-                // Render admin or close-scale diagonal lines
-                if (s.ordinal() <= MapView.Scale.CLOSE.ordinal() || isAdminClan) {
-                    int diaX = pixelX + cz;
-                    int diaZ = pixelZ + cz;
-                    if (isPixelInMapBounds(diaX, diaZ)) {
-                        mapCanvas.setPixel(diaX, diaZ, chunkColor);
-                    }
-                }
+                if (!isPixelInMapBounds(x, z)) continue;
 
-                // Render far scale non-admin pixels
-                if (!isAdminClan && s.ordinal() >= MapView.Scale.FAR.ordinal()) {
-                    mapCanvas.setPixel(x, z, chunkColor);
+                // Keep the same diagonal style at closest zoom,
+                // but render it on fewer chunks as the map zooms out.
+                if (renderDiagonalFill && scale <= MapSettings.Scale.CLOSE.getValue()) {
+                    if (cx == cz) {
+                        mapCanvas.setPixel(x, z, chunkColor);
+                    }
                 }
 
                 // Render chunk borders
                 renderChunkBorders(mapCanvas, chunkData, cx, cz, x, z, scale, chunkColor);
+            }
+        }
+    }
+
+    private boolean shouldRenderDiagonalFill(ChunkData chunkData, int scale) {
+        if (scale <= MapSettings.Scale.CLOSEST.getValue()) {
+            return true;
+        }
+
+        return true;//Math.floorMod(chunkData.getX() + chunkData.getZ(), scale) == 0;
+    }
+
+    /**
+     * Renders a chunk that is very small on the map (1-2 pixels wide).
+     * Only draws border edges that are actually exposed (not adjacent to the same clan),
+     * preventing claims from appearing as solid filled blocks at high zoom levels.
+     */
+    private void renderSmallChunk(MapCanvas mapCanvas, ChunkData chunkData, int pixelX, int pixelZ,
+                                  int chunkSize, byte chunkColor) {
+        Set<BlockFace> blockFaces = chunkData.getBlockFaceSet();
+
+        // For tiny chunks, draw only the exposed edges as single-pixel lines.
+        // blockFaceSet contains faces where the adjacent chunk IS owned by the same clan (i.e., no border needed).
+
+        if (chunkSize == 1) {
+            // At 1 pixel, we can only draw the pixel if at least one border is exposed
+            boolean hasExposedBorder = !blockFaces.contains(BlockFace.NORTH)
+                    || !blockFaces.contains(BlockFace.SOUTH)
+                    || !blockFaces.contains(BlockFace.WEST)
+                    || !blockFaces.contains(BlockFace.EAST);
+            if (hasExposedBorder && isPixelInMapBounds(pixelX, pixelZ)) {
+                mapCanvas.setPixel(pixelX, pixelZ, chunkColor);
+            }
+            return;
+        }
+
+        // chunkSize == 2: draw only the exposed edge pixels
+        for (int cx = 0; cx < chunkSize; cx++) {
+            for (int cz = 0; cz < chunkSize; cz++) {
+                int x = pixelX + cx;
+                int z = pixelZ + cz;
+                if (!isPixelInMapBounds(x, z)) continue;
+
+                boolean isBorder = false;
+                if (cx == 0 && !blockFaces.contains(BlockFace.WEST)) isBorder = true;
+                if (cx == chunkSize - 1 && !blockFaces.contains(BlockFace.EAST)) isBorder = true;
+                if (cz == 0 && !blockFaces.contains(BlockFace.NORTH)) isBorder = true;
+                if (cz == chunkSize - 1 && !blockFaces.contains(BlockFace.SOUTH)) isBorder = true;
+
+                if (isBorder) {
+                    mapCanvas.setPixel(x, z, chunkColor);
+                }
             }
         }
     }

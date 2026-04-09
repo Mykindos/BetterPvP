@@ -55,7 +55,7 @@ public class LeaveSubCommand extends ClanSubCommand {
             final Optional<ClanMember> leaderOptional = clan.getLeader();
             if (leaderOptional.isPresent()) {
                 final ClanMember leader = leaderOptional.get();
-                if (leader.getUuid().equals(player.getUniqueId().toString())) {
+                if (leader.getUuid().equals(player.getUniqueId())) {
                     if (clan.getMembers().size() > 1) {
                         UtilMessage.message(player, "Clans", "You must pass on <alt>Leadership</alt> before leaving.");
                         return;

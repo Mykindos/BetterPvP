@@ -34,8 +34,12 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         Bukkit.getPluginManager().registerEvents(this, core);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     void onInteract(NexoFurnitureInteractEvent event) {
+        if(event.isCancelled()) {
+            return;
+        }
+
         if (!event.getHand().equals(EquipmentSlot.HAND)) {
             return;
         }
@@ -53,8 +57,12 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     void onDamage(NexoFurnitureDamageEvent event) {
+        if(event.isCancelled()) {
+            return;
+        }
+
         final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
 
         if (from.isEmpty()) {

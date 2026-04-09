@@ -169,7 +169,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         int scale = mapSettings.getScale().getValue();
 
         // Adjust center for far-out scales
-        if (mapSettings.getScale().ordinal() >= MapSettings.Scale.FAR.ordinal()) {
+        if (mapSettings.getScale().ordinal() >= MapSettings.Scale.FARTHEST.ordinal()) {
             centerX = 0;
             centerZ = 0;
         }

@@ -127,18 +127,30 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> {
             try {
                 clientManager.getLoaded().forEach(client -> {
                     client.getStatContainer().getAchievementCompletions().getAllMap().forEach((key, completion) -> {
-                        int total = totalAllAchievementCompletions.get(key);
+                        Integer total = totalAllAchievementCompletions.get(key);
+                        if (total == null) {
+                            log.error("Error getting all total achievement completions for {}", key.asString()).submit();
+                            total = 1;
+                        }
                         completion.setTotalCompletions(total);
                     });
                     client.getStatContainer().getAchievementCompletions().getSeasonMap().forEach((period, map) -> {
                         map.forEach((key, completion) -> {
-                            int total = totalSeasonCompletions.get(period).get(key);
+                            Integer total = totalSeasonCompletions.get(period).get(key);
+                            if (total == null) {
+                                log.error("Error getting season {} total achievement completions for {}", period, key.asString()).submit();
+                                total = 1;
+                            }
                             completion.setTotalCompletions(total);
                         });
                     });
                     client.getStatContainer().getAchievementCompletions().getRealmMap().forEach((period, map) -> {
                         map.forEach((key, completion) -> {
-                            int total = totalRealmCompletions.get(period).get(key);
+                            Integer total = totalRealmCompletions.get(period).get(key);
+                            if (total == null) {
+                                log.error("Error getting realm {} total achievement completions for {}", period, key.asString()).submit();
+                                total = 1;
+                            }
                             completion.setTotalCompletions(total);
                         });
                     });

@@ -26,6 +26,6 @@ public class HealthBoostEffect extends VanillaEffectType {
 
     @Override
     public String getDescription(int level) {
-        return "<white>" + getName() + " " + UtilFormat.getRomanNumeral(level) + "</white> increases health by <stat>" + level * 20 + "</stat>%";
+        return "<white>" + getName() + " " + UtilFormat.getRomanNumeral(level) + "</white> increases health by <stat>" + level * 4 + "</stat>";
     }
 }

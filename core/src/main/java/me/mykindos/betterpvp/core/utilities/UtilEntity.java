@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -285,7 +286,7 @@ public class UtilEntity {
         armorStand.setSilent(true); // Remove sounds the armor stand makes like when it falls or in water
         armorStand.setPortalCooldown(Integer.MAX_VALUE); // We don't want them using portals
         armorStand.setInvulnerable(true); // We don't want them taking damage
-        armorStand.setVisualFire(false); // We don't want them to have fire
+        armorStand.setVisualFire(TriState.FALSE); // We don't want them to have fire
         armorStand.setPersistent(false); // We don't want them to be saved in the world
         armorStand.setCollidable(false); // We don't want them to collide with anything
         return armorStand;

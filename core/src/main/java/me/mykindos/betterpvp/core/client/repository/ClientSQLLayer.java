@@ -22,7 +22,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Realm;
-import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
@@ -46,13 +46,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_NAME_HISTORY;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_PROPERTIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_REWARDS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GAMER_PROPERTIES;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_CLIENT_STATS;
-import static me.mykindos.betterpvp.core.database.jooq.Tables.IGNORES;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.*;
 import static me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.CLIENT_STATS;
 
 
@@ -72,7 +66,6 @@ public class ClientSQLLayer {
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedSharedPropertyUpdates;
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedStatUpdates;
     private static final ThreadLocal<Map<UUID, Client>> LOADING_CLIENTS = ThreadLocal.withInitial(HashMap::new);
-    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     @Inject
     public ClientSQLLayer(Database database, PropertyMapper propertyMapper, StatBuilder statBuilder, RealmManager realmManager, PunishmentRepository punishmentRepository) {
@@ -158,7 +151,7 @@ public class ClientSQLLayer {
 
         try {
             ClientsRecord clientRecord = database.getDslContext().selectFrom(CLIENTS)
-                    .where(CLIENTS.NAME.eq(name))
+                    .where(CLIENTS.NAME.equalIgnoreCase(name))
                     .fetchOne();
 
             if (clientRecord != null) {
@@ -583,22 +576,22 @@ public class ClientSQLLayer {
         return rewardBox;
     }
 
-    public CompletableFuture<Void> updateClientRewards(Client client, RewardBox rewardBox) {
-        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            try {
-                ctx.insertInto(CLIENT_REWARDS)
-                        .set(CLIENT_REWARDS.CLIENT, client.getId())
-                        .set(CLIENT_REWARDS.SEASON, Core.getCurrentRealm().getSeason().getId())
-                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
-                        .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
-                        .doUpdate()
-                        .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
-                        .execute();
-            } catch (Exception ex) {
-                log.error("Error updating rewards for " + client.getName(), ex).submit();
-                throw new RuntimeException(ex);
-            }
-        });
+    public CompletableFuture<Integer> updateClientRewards(Client client, RewardBox rewardBox) {
+        final DSLContext ctx = database.getDslContext();
+        try {
+            final int rows = ctx.insertInto(CLIENT_REWARDS)
+                    .set(CLIENT_REWARDS.CLIENT, client.getId())
+                    .set(CLIENT_REWARDS.SEASON, Core.getCurrentRealm().getSeason().getId())
+                    .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
+                    .onConflict(CLIENT_REWARDS.CLIENT, CLIENT_REWARDS.SEASON)
+                    .doUpdate()
+                    .set(CLIENT_REWARDS.REWARDS, rewardBox.serialize())
+                    .execute();
+            return CompletableFuture.completedFuture(rows);
+        } catch (Exception ex) {
+            log.error("Error updating rewards for " + client.getName(), ex).submit();
+            throw new RuntimeException(ex);
+        }
     }
 
 

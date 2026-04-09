@@ -5,8 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PlayerCombatFeatureStateChangeEvent;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -46,11 +48,14 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
     private final RoleManager roleManager;
     private final EffectManager effectManager;
+    private final CombatFeaturesService combatFeaturesService;
 
     @Inject
-    public AssassinListener(Champions champions, RoleManager roleManager, EffectManager effectManager) {
+    public AssassinListener(Champions champions, RoleManager roleManager, EffectManager effectManager,
+                            CombatFeaturesService combatFeaturesService) {
         this.roleManager = roleManager;
         this.effectManager = effectManager;
+        this.combatFeaturesService = combatFeaturesService;
         loadConfig(champions.getConfig());
 
         ArrayList<RoleEffect> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
@@ -85,7 +90,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
         if (event.getDamager() instanceof Player damager) {
             if (meleeDealsNoKnockbackIsEnabled) {
-                if (roleManager.hasRole(damager, Role.ASSASSIN)) {
+                if (roleManager.hasRole(damager, Role.ASSASSIN) && combatFeaturesService.isActive(damager)) {
                     event.setKnockback(false);
                 }
             }
@@ -93,7 +98,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
         if (event.getDamagee() instanceof Player damagee) {
             if (!noKnockbackReceivedWhenSlowedIsEnabled || effectManager.hasEffect(damagee, EffectTypes.SLOWNESS)) {
-                if (roleManager.hasRole(damagee, Role.ASSASSIN)) {
+                if (roleManager.hasRole(damagee, Role.ASSASSIN) && combatFeaturesService.isActive(damagee)) {
                     event.setKnockback(false);
                 }
             }
@@ -105,7 +110,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
     public void onAssassinArrowDamage(DamageEvent event) {
         if (!(event.getProjectile() instanceof AbstractArrow)) return;
         if (event.getProjectile().getShooter() instanceof Player player) {
-            if (roleManager.hasRole(player, Role.ASSASSIN)) {
+            if (roleManager.hasRole(player, Role.ASSASSIN) && combatFeaturesService.isActive(player)) {
                 event.addModifier(new GenericModifier("Assassin Arrows", DamageOperator.MULTIPLIER, 0));
             }
         }
@@ -122,11 +127,23 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
         for (LivingEntity livingEntity : roleManager.getLivingEntities()) {
             Role role = roleManager.getRole(livingEntity).orElse(null);
-            if (role == Role.ASSASSIN) {
+            if (role == Role.ASSASSIN
+                    && (!(livingEntity instanceof Player player) || combatFeaturesService.isActive(player))) {
                 effectManager.addEffect(livingEntity, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true, false, null);
             } else {
                 effectManager.removeEffect(livingEntity, EffectTypes.SPEED, "Assassin", false);
             }
+        }
+    }
+
+    @EventHandler
+    public void onCombatFeatureStateChange(PlayerCombatFeatureStateChangeEvent event) {
+        if (event.isActive()) {
+            return;
+        }
+
+        if (roleManager.hasRole(event.getPlayer(), Role.ASSASSIN)) {
+            effectManager.removeEffect(event.getPlayer(), EffectTypes.SPEED, "Assassin", false);
         }
     }
 

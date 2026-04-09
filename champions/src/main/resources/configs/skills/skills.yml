@@ -133,7 +133,8 @@ skills:
       baseDuration: 6.0
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
-      vulnerabilityStrength: 4
+      vulnerabilityStrength: 2
+      vulnerabilityIncreasePerLevel: 0
     toxicarrow:
       enabled: true
       maxlevel: 5
@@ -468,7 +469,7 @@ skills:
       durationIncreasePerLevel: 0.0
       baseRadius: 6.0
       radiusIncreasePerLevel: 1.0
-      healthBoostStrength: 1
+      healthBoostStrength: 4
     blizzard:
       enabled: true
       maxlevel: 3
@@ -651,8 +652,8 @@ skills:
       cooldownDecreasePerLevel: 1.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
-      baseCharge: 0.10
-      chargeIncreasePerLevel: 0.05
+      baseCharge: 0.50
+      chargeIncreasePerLevel: 0.25
     blocktoss:
       enabled: true
       maxlevel: 5

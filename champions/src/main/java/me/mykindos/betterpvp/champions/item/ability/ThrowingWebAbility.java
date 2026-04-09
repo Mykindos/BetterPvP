@@ -114,6 +114,10 @@ public class ThrowingWebAbility extends CooldownInteraction implements Throwable
                     (long) (duration * 1000L),
                     true,
                     "throwing_web");
+            if (throwingWeb == null) {
+                throwableItem.getItem().remove();
+                return;
+            }
             throwingWeb.setDestroyStrategy(DestroyStrategy.BREAKABLE);
             Particle.BLOCK.builder().data(Material.COBWEB.createBlockData())
                     .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();

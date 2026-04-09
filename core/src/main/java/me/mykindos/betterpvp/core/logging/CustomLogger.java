@@ -1,13 +1,12 @@
 package me.mykindos.betterpvp.core.logging;
 
-import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ReusableMessageFactory;
 
 public class CustomLogger {
 
     private final String name;
-    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     public CustomLogger(String name) {
         this.name = name;

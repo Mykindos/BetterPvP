@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import me.mykindos.betterpvp.shops.auctionhouse.data.ListingDuration;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,8 +11,6 @@ import java.util.UUID;
 @Data
 @RequiredArgsConstructor
 public class Auction {
-
-    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
     private final long auctionID;
     private final UUID seller;

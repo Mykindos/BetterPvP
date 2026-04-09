@@ -23,6 +23,7 @@ publishing {
 dependencies {
 
     paperweight.paperDevBundle(libs.versions.paper)
+    implementation(project(":orchestration"))
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
     implementation(libs.reflection.remapper)

@@ -1,0 +1,40 @@
+host = "0.0.0.0"
+port = 8085
+reservation_ttl_seconds = 10
+minimum_regular_join_interval_millis = 0
+boost_interval_seconds = 30
+boost_amount = 5
+default_rank = "PLAYER"
+
+[[managed_targets]]
+pattern = "(?i)^clans-([0-9]+)$"
+target_type = "CLANS"
+server_name_template = "Clans-$1"
+
+[ranks.PLAYER]
+priority = 0
+bypass = false
+
+[ranks.YOUTUBE]
+priority = 25
+bypass = true
+
+[ranks.HELPER]
+priority = 50
+bypass = true
+
+[ranks.TRIAL_MOD]
+priority = 75
+bypass = true
+
+[ranks.MODERATOR]
+priority = 100
+bypass = true
+
+[ranks.ADMIN]
+priority = 150
+bypass = true
+
+[ranks.DEVELOPER]
+priority = 200
+bypass = true

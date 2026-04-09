@@ -30,7 +30,9 @@ import me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
+import me.mykindos.betterpvp.core.combat.events.PlayerCombatFeatureStateChangeEvent;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -79,10 +81,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -98,6 +100,7 @@ public class SkillListener implements Listener {
     private final ClientManager clientManager;
     private final ChampionsSkillManager skillManager;
     private final ItemFactory itemFactory;
+    private final CombatFeaturesService combatFeaturesService;
 
     private final HashSet<UUID> inventoryDrop = new HashSet<>();
     private final Map<UUID, DelayedEntry> delayedCooldowns = new WeakHashMap<>();
@@ -105,7 +108,7 @@ public class SkillListener implements Listener {
     @Inject
     public SkillListener(BuildManager buildManager, RoleManager roleManager, CooldownManager cooldownManager,
                          EnergyService energyService, EffectManager effectManager, ClientManager clientManager,
-                         ChampionsSkillManager skillManager, ItemFactory itemFactory) {
+                         ChampionsSkillManager skillManager, ItemFactory itemFactory, CombatFeaturesService combatFeaturesService) {
         this.buildManager = buildManager;
         this.roleManager = roleManager;
         this.cooldownManager = cooldownManager;
@@ -114,6 +117,7 @@ public class SkillListener implements Listener {
         this.clientManager = clientManager;
         this.skillManager = skillManager;
         this.itemFactory = itemFactory;
+        this.combatFeaturesService = combatFeaturesService;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -289,9 +293,9 @@ public class SkillListener implements Listener {
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build == null) return;
 
-                Optional<Skill> skillOptional = build.getActiveSkills().stream()
-                        .map(BuildSkill::getSkill)
-                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
+            Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                    .map(BuildSkill::getSkill)
+                    .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
             if (skillOptional.isPresent()) {
                 Skill skill = skillOptional.get();
@@ -481,6 +485,9 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void onSkillEquip(SkillEquipEvent event) {
+        if (!combatFeaturesService.isActive(event.getPlayer())) {
+            return;
+        }
         final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
         event.getBuildSkill().getSkill().trackPlayer(event.getPlayer(), gamer);
     }
@@ -494,6 +501,9 @@ public class SkillListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLoadBuilds(ChampionsBuildLoadedEvent event) {
         final Player player = event.getPlayer();
+        if (!combatFeaturesService.isActive(player)) {
+            return;
+        }
 
         Role role = roleManager.getRole(player);
         GamerBuilds builds = event.getGamerBuilds();
@@ -510,6 +520,9 @@ public class SkillListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onApplyBuild(ApplyBuildEvent event) {
         final Player player = event.getPlayer();
+        if (!combatFeaturesService.isActive(player)) {
+            return;
+        }
         final Gamer gamer = this.clientManager.search().online(player).getGamer();
         event.getNewBuild().getActiveSkills().forEach(skill -> skill.getSkill().trackPlayer(player, gamer));
     }
@@ -517,6 +530,9 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onRoleChange(RoleChangeEvent event) {
         if (!(event.getLivingEntity() instanceof Player player)) {
+            return;
+        }
+        if (!combatFeaturesService.isActive(player)) {
             return;
         }
         final Role newRole = event.getRole();
@@ -547,6 +563,28 @@ public class SkillListener implements Listener {
     public void onSkillUpdate(SkillUpdateEvent event) {
         final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
         event.getBuildSkill().getSkill().updatePlayer(event.getPlayer(), gamer);
+    }
+
+    @EventHandler
+    public void onCombatFeatureStateChange(PlayerCombatFeatureStateChangeEvent event) {
+        final Player player = event.getPlayer();
+        final Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isEmpty()) {
+            return;
+        }
+
+        final Role role = roleManager.getRole(player);
+        final RoleBuild build = gamerBuildsOptional.get().getActiveBuilds().get(role.getName());
+        if (build == null) {
+            return;
+        }
+
+        final Gamer gamer = this.clientManager.search().online(player).getGamer();
+        if (event.isActive()) {
+            build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.getSkill().trackPlayer(player, gamer));
+        } else {
+            build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.getSkill().invalidatePlayer(player, gamer));
+        }
     }
 
     @EventHandler

@@ -9,9 +9,11 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.RoleSoundProvider;
+import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeCause;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -52,14 +54,17 @@ public class RoleListener implements Listener {
     private final ClientManager clientManager;
     private final BuildManager buildManager;
     private final RoleSoundProvider soundProvider;
+    private final CombatFeaturesService combatFeaturesService;
 
     @Inject
-    public RoleListener(ItemFactory itemFactory, RoleManager roleManager, ClientManager clientManager, BuildManager buildManager, RoleSoundProvider soundProvider) {
+    public RoleListener(ItemFactory itemFactory, RoleManager roleManager, ClientManager clientManager, BuildManager buildManager,
+                        RoleSoundProvider soundProvider, CombatFeaturesService combatFeaturesService) {
         this.itemFactory = itemFactory;
         this.roleManager = roleManager;
         this.clientManager = clientManager;
         this.buildManager = buildManager;
         this.soundProvider = soundProvider;
+        this.combatFeaturesService = combatFeaturesService;
     }
 
     @EventHandler
@@ -70,7 +75,6 @@ public class RoleListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         roleManager.populate(event.getPlayer());
-        equipMessage(event.getPlayer(), roleManager.getRole(event.getPlayer()));
     }
 
     @EventHandler
@@ -89,6 +93,10 @@ public class RoleListener implements Listener {
             return;
         }
 
+        if (!shouldShowRoleChangeMessage(player, event.getCause())) {
+            return;
+        }
+
         Role role = event.getRole();
         if (role == null) {
             UtilMessage.simpleMessage(player, "Class", "Armor Class: <green>None");
@@ -102,7 +110,7 @@ public class RoleListener implements Listener {
     public void onApplyBuild(ApplyBuildEvent event) {
         Player player = event.getPlayer();
         final Role role = roleManager.getRole(player);
-        if (event.getNewBuild().getRole() == role) {
+        if (event.getNewBuild().getRole() == role && combatFeaturesService.isActive(player)) {
             UtilMessage.message(player, equipMessage(player, role));
         }
     }
@@ -111,7 +119,7 @@ public class RoleListener implements Listener {
     public void onDeleteBuild(DeleteBuildEvent event) {
         Player player = event.getPlayer();
         final Role role = roleManager.getRole(player);
-        if (event.getRoleBuild().getRole() == role) {
+        if (event.getRoleBuild().getRole() == role && combatFeaturesService.isActive(player)) {
             UtilMessage.message(player, equipMessage(player, role));
         }
     }
@@ -184,6 +192,12 @@ public class RoleListener implements Listener {
             }
         }
         return Component.empty();
+    }
+
+    private boolean shouldShowRoleChangeMessage(Player player, RoleChangeCause cause) {
+        return cause == RoleChangeCause.KIT_SELECTOR
+                || cause == RoleChangeCause.EXTERNAL
+                || combatFeaturesService.isActive(player);
     }
 
 }

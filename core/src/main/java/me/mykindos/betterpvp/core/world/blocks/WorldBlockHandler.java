@@ -46,15 +46,21 @@ public class WorldBlockHandler {
      * @param expiry      Time in milliseconds to restore
      * @param force       Whether to override an existing restore block's expiry or choose the higher value
      */
-    public RestoreBlock addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force, @Nullable String label) {
+    public @Nullable RestoreBlock addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force, @Nullable String label) {
         return addRestoreBlock(entity, block, block.getBlockData().clone(), newMaterial, expiry, force, label);
     }
 
-    public RestoreBlock addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force) {
+    public @Nullable RestoreBlock addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force) {
         return addRestoreBlock(entity, block, newMaterial, expiry, force, null);
     }
 
-    public RestoreBlock addRestoreBlock(@Nullable LivingEntity entity, Block block, BlockData blockData, Material newMaterial, long expiry, boolean force, @Nullable String label) {
+    public @Nullable RestoreBlock addRestoreBlock(@Nullable LivingEntity entity, Block block, BlockData blockData, Material newMaterial, long expiry, boolean force, @Nullable String label) {
+        final RestoreBlockPlaceEvent event = new RestoreBlockPlaceEvent(entity, block, blockData, newMaterial, expiry, force, label);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return null;
+        }
+
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
         if (restoreBlockOptional.isPresent()) {
             final long newExpiry = System.currentTimeMillis() + expiry;

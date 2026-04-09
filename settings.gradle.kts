@@ -10,11 +10,16 @@ include(":champions")
 include(":shops")
 include(":progression")
 include(":game")
+include(":hub")
+include(":orchestration")
+include(":orchestration-service")
+include(":proxy")
 
 if (File("./private/").exists()) {
     include(":private:events")
     include(":private:dungeons")
     include(":private:store")
+    include(":private:store-proxy")
     include(":private:compatability")
 }
 
@@ -31,7 +36,7 @@ pluginManagement {
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://jitpack.io")
         maven {
-            url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
+            url = uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }
@@ -50,9 +55,13 @@ dependencyResolutionManagement {
             version("junit", "5.13.0-M2")
             version("jooq", "3.19.3")
             version("postgres", "42.7.4")
+            version("velocity", "3.5.0-SNAPSHOT")
 
             // Library - PostgreSQL
             library("postgres", "org.postgresql", "postgresql").versionRef("postgres")
+
+            // Library - Velocity
+            library("velocity-api", "com.velocitypowered", "velocity-api").versionRef("velocity")
 
             // Library - jOOQ
             library("jooq", "org.jooq", "jooq").versionRef("jooq")
@@ -72,7 +81,7 @@ dependencyResolutionManagement {
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
 
             // Library - Tests
-            library("junit-jupiter", "org.junit.jupiter","junit-jupiter").versionRef("junit")
+            library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("reflections", "org.reflections:reflections:0.10.2")
             library("mockbukkit", "org.mockbukkit.mockbukkit", "mockbukkit-v1.21").versionRef("mockbukkit")
 
@@ -109,7 +118,7 @@ dependencyResolutionManagement {
             library("json", "org.json", "json").version("20250107")
 
             // Library - Mapper
-            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.7")
+            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.8")
 
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
@@ -148,8 +157,10 @@ dependencyResolutionManagement {
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("junit-jupiter", "mockbukkit"))
             bundle("paper", listOf("paper-api"))
-            bundle("utils",
-                listOf("commons-text",
+            bundle(
+                "utils",
+                listOf(
+                    "commons-text",
                     "persistent-data-types",
                     "glowapi",
                     "commons-lang3",

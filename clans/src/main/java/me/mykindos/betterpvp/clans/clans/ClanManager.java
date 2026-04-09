@@ -678,7 +678,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * @return true if the target player is an ally of the given player; false otherwise
      */
     public boolean isAlly(Player player, Player target) {
-        return player.equals(target) || getAllies(player).stream().anyMatch(o -> Objects.equals(o.getUuid(), target.getUniqueId().toString()));
+        return player.equals(target) || getAllies(player).stream().anyMatch(o -> Objects.equals(o.getUuid(), target.getUniqueId()));
     }
 
     /**

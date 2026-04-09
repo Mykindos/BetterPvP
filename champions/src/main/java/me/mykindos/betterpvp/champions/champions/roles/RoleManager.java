@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeCause;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.champions.champions.roles.packet.ArmorProtocol;
 import me.mykindos.betterpvp.champions.champions.roles.packet.RemapperIn;
@@ -44,19 +45,22 @@ public class RoleManager {
     public static final Map<Role, ArrayList<RoleEffect>> rolePassiveDescs = new EnumMap<>(Role.class);
 
     @Inject
-    private RoleManager(RoleRepository repository, ClientManager clientManager, EntityHealthService entityHealthService, ItemFactory itemFactory, ArmorProtocol armorProtocol) {
+    private RoleManager(RoleRepository repository, ClientManager clientManager, EntityHealthService entityHealthService,
+                        ItemFactory itemFactory, ArmorProtocol armorProtocol,
+                        RolePlaceholderVisibility visibility) {
         this.repository = repository;
         this.clientManager = clientManager;
         this.entityHealthService = entityHealthService;
         this.itemFactory = itemFactory;
 
         PacketEvents.getAPI().getEventManager().registerListener(new RemapperIn(armorProtocol), PacketListenerPriority.LOWEST);
-        PacketEvents.getAPI().getEventManager().registerListener(new RemapperOut(this), PacketListenerPriority.LOWEST);
+        PacketEvents.getAPI().getEventManager().registerListener(new RemapperOut(this, visibility), PacketListenerPriority.LOWEST);
     }
 
     private void updateRole(@NotNull LivingEntity livingEntity, @NotNull Role role) {
         entityHealthService.setBaseHealth(livingEntity, role.getHealth());
         store.put(livingEntity, role);
+
     }
 
     /**
@@ -98,9 +102,13 @@ public class RoleManager {
      * @return True if the role was successfully equipped, or false if the role change was cancelled
      */
     public boolean equipRole(@NotNull LivingEntity livingEntity, @NotNull Role role) {
+        return equipRole(livingEntity, role, RoleChangeCause.EXTERNAL);
+    }
+
+    public boolean equipRole(@NotNull LivingEntity livingEntity, @NotNull Role role, @NotNull RoleChangeCause cause) {
         final Role previous = getRole(livingEntity).orElse(null);
         if (previous != role) {
-            final RoleChangeEvent roleChangeEvent = new RoleChangeEvent(livingEntity, role, previous);
+            final RoleChangeEvent roleChangeEvent = new RoleChangeEvent(livingEntity, role, previous, cause);
             roleChangeEvent.callEvent();
             if (roleChangeEvent.isCancelled()) {
                 return false;
@@ -131,7 +139,7 @@ public class RoleManager {
     }
 
     public @NotNull Role getRole(@NotNull Player player) {
-        return store.computeIfAbsent(player, p -> Role.DEFAULT);
+        return store.getOrDefault(player, Role.DEFAULT);
     }
 
     /**

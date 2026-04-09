@@ -33,7 +33,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     private double durationIncreasePerLevel;
 
     private int vulnerabilityStrength;
-    private int vulnerabilityDecreasePerLevel;
+    private int vulnerabilityIncreasePerLevel;
 
     @Inject
     public MarkedForDeath(Champions champions, ChampionsManager championsManager) {
@@ -66,7 +66,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     }
 
     public int getVulnerabilityStrength(int level) {
-        return vulnerabilityStrength + ((level - 1) * vulnerabilityDecreasePerLevel);
+        return vulnerabilityStrength + ((level - 1) * vulnerabilityIncreasePerLevel);
     }
 
     @Override
@@ -122,6 +122,6 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
         baseDuration = getConfig("baseDuration", 6.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
-        vulnerabilityDecreasePerLevel = getConfig("vulnerabilityDecreasePerLevel", 1, Integer.class);
+        vulnerabilityIncreasePerLevel = getConfig("vulnerabilityIncreasePerLevel", 0, Integer.class);
     }
 }
