@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchieveme
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
-import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 import static me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions.ACHIEVEMENT_COMPLETIONS;
 import static me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm.ACHIEVEMENT_COMPLETIONS_REALM;
 import static me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason.ACHIEVEMENT_COMPLETIONS_SEASON;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 
 @Singleton
 @CustomLog
@@ -151,7 +151,10 @@ public class AchievementCompletionRepository {
                             final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyName);
                             final Period period = getPeriod(achievementRank);
                             final int rank = Math.toIntExact(achievementRank.getRank());
-                            completions.getCompletion(namespacedKey, StatFilterType.fromPeriod(period), period).orElseThrow().setCompletedRank(rank);
+                            //loading a single completion means other completions will not exist
+                            //holdover from previous of getting achievement ranks
+                            completions.getCompletion(namespacedKey, StatFilterType.fromPeriod(period), period)
+                                    .ifPresent(achievementCompletion -> achievementCompletion.setCompletedRank(rank));
                         });
                 return completions;
             } catch (Exception e) {
