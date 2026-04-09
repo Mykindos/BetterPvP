@@ -76,10 +76,12 @@ skills:
     comboattack:
       enabled: true
       maxlevel: 3
-      damageIncrement: 1.0
-      duration: 0.8
-      durationIncreasePerLevel: 0.4
       baseDamageIncrement: 1.0
+      damageIncrementPerLevel: 0.0
+      baseMaxDamage: 2.0
+      maxDamageIncrementPerLevel: 1.0
+      duration: 1.0
+      durationIncreasePerLevel: 0.0
     concussion:
       enabled: true
       cooldown: 14.0
