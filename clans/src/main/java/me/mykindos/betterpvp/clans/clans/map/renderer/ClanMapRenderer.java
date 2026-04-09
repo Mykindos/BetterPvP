@@ -100,14 +100,14 @@ public class ClanMapRenderer extends MapRenderer {
     }
 
     private int getCenterX(Player player, MapSettings.Scale scale) {
-        if (scale.ordinal() >= MapSettings.Scale.FAR.ordinal()) {
+        if (scale.ordinal() >= MapSettings.Scale.FARTHEST.ordinal()) {
             return 0;
         }
         return player.getLocation().getBlockX();
     }
 
     private int getCenterZ(Player player, MapSettings.Scale scale) {
-        if (scale.ordinal() >= MapSettings.Scale.FAR.ordinal()) {
+        if (scale.ordinal() >= MapSettings.Scale.FARTHEST.ordinal()) {
             return 0;
         }
         return player.getLocation().getBlockZ();
