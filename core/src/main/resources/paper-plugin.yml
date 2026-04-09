@@ -1,0 +1,24 @@
+author: Mykindos
+main: me.mykindos.betterpvp.core.Core
+name: Core
+load: STARTUP
+version: '1.0'
+api-version: '1.21'
+dependencies:
+  server:
+    packetevents:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    MythicMobs:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    ModelEngine:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Nexo:
+      load: BEFORE
+      required: false
+      join-classpath: true

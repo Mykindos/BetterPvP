@@ -14,6 +14,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWi
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.RolePlaceholderVisibility;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -35,9 +36,11 @@ public class RemapperOut implements PacketListener {
 
     static final NamespacedKey FLAG = new NamespacedKey("betterpvp", "role_placeholder");
     private final RoleManager roleManager;
+    private final RolePlaceholderVisibility visibility;
 
-    public RemapperOut(RoleManager roleManager) {
+    public RemapperOut(RoleManager roleManager, RolePlaceholderVisibility visibility) {
         this.roleManager = roleManager;
+        this.visibility = visibility;
     }
 
     @Override
@@ -74,16 +77,20 @@ public class RemapperOut implements PacketListener {
         // below.
         for (EquipmentSlot slot : equipmentSlots) {
             final org.bukkit.inventory.ItemStack item = livingEntity.getEquipment().getItem(switch (slot) {
-                case BOOTS -> org.bukkit.inventory.EquipmentSlot.HEAD;
+                case BOOTS -> org.bukkit.inventory.EquipmentSlot.FEET;
                 case LEGGINGS -> org.bukkit.inventory.EquipmentSlot.LEGS;
                 case CHEST_PLATE -> org.bukkit.inventory.EquipmentSlot.CHEST;
-                case HELMET -> org.bukkit.inventory.EquipmentSlot.FEET;
+                case HELMET -> org.bukkit.inventory.EquipmentSlot.HEAD;
                 default -> throw new IllegalStateException("Unexpected value: " + slot);
             });
 
             if (item.isEmpty()) {
                 equipment.add(new Equipment(slot, ItemStack.EMPTY));
             }
+        }
+
+        if (equipment.isEmpty()) {
+            return; // EntityEquipment requires at least one slot entry
         }
 
         // Queue a new packet to update the just spawned entity's equipment
@@ -101,6 +108,9 @@ public class RemapperOut implements PacketListener {
         }
 
         Role role = this.roleManager.getRole(event.getPlayer());
+        if (!visibility.shouldRender(event.getPlayer())) {
+            return;
+        }
 
         // Update contents
         final List<ItemStack> items = packet.getItems();
@@ -130,6 +140,10 @@ public class RemapperOut implements PacketListener {
             return; // We don't want to override existing armor pieces
         }
 
+        if (!visibility.shouldRender(player)) {
+            return;
+        }
+
         // Replace air with role placeholder
         final Role role = this.roleManager.getRole(player);
         final org.bukkit.inventory.ItemStack placeholder = this.getRolePlaceholder(getSlot(packet.getSlot()), role);
@@ -154,6 +168,10 @@ public class RemapperOut implements PacketListener {
         final @NotNull Optional<Role> roleOpt = this.roleManager.getRole(livingEntity);
         if (roleOpt.isEmpty()) {
             return; // No role, no update
+        }
+
+        if (!visibility.shouldRender(livingEntity)) {
+            return;
         }
 
         // Disable replacement of existing armor pieces so we don't override them

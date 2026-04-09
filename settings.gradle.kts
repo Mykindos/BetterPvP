@@ -10,6 +10,10 @@ include(":champions")
 include(":shops")
 include(":progression")
 include(":game")
+include(":hub")
+include(":orchestration")
+include(":orchestration-service")
+include(":proxy")
 
 if (File("./private/").exists()) {
     include(":private:events")
@@ -31,7 +35,7 @@ pluginManagement {
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://jitpack.io")
         maven {
-            url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
+            url = uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }
@@ -109,7 +113,7 @@ dependencyResolutionManagement {
             library("json", "org.json", "json").version("20250107")
 
             // Library - Mapper
-            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.7")
+            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.8")
 
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
@@ -148,8 +152,10 @@ dependencyResolutionManagement {
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("junit-jupiter", "mockbukkit"))
             bundle("paper", listOf("paper-api"))
-            bundle("utils",
-                listOf("commons-text",
+            bundle(
+                "utils",
+                listOf(
+                    "commons-text",
                     "persistent-data-types",
                     "glowapi",
                     "commons-lang3",

@@ -5,6 +5,8 @@ import com.google.common.base.Predicate;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.TeleportRules;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -87,7 +89,7 @@ public class UtilLocation {
      */
     public static void teleportToward(final @NotNull LivingEntity entity, final @NotNull Vector direction, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
         // Stop raying if we don't have line of sight
-        Optional<Location> teleportLocationOpt = gracefulRayTrace(entity.getLocation(), direction, teleportDistance, entity.getBoundingBox(), entity::hasLineOfSight);
+        Optional<Location> teleportLocationOpt = gracefulRayTrace(entity, entity.getLocation(), direction, teleportDistance, entity.getBoundingBox(), entity::hasLineOfSight);
 
         if (teleportLocationOpt.isEmpty()) {
             // prevent teleport at all
@@ -122,6 +124,13 @@ public class UtilLocation {
     }
 
     public static Optional<Location> gracefulRayTrace(final @NotNull Location origin, final @NotNull Vector direction, double teleportDistance, final @NotNull BoundingBox boundingBox, final @NotNull Predicate<@NotNull Location> predicate) {
+        return gracefulRayTrace(null, origin, direction, teleportDistance, boundingBox, predicate);
+    }
+
+    public static Optional<Location> gracefulRayTrace(final @Nullable LivingEntity entity, final @NotNull Location origin,
+                                                      final @NotNull Vector direction, double teleportDistance,
+                                                      final @NotNull BoundingBox boundingBox,
+                                                      final @NotNull Predicate<@NotNull Location> predicate) {
         // Iterate from their location to their destination
         // Modify the base location by the direction they are facing
         direction.normalize();
@@ -182,6 +191,10 @@ public class UtilLocation {
                     break;
                 }
 
+                if (!validateTeleportLocation(entity, newTeleportLocation) || !validateTeleportLocation(entity, headBlock)) {
+                    break;
+                }
+
                 teleportLocation = newTeleportLocation;
             } catch (IllegalArgumentException ex) {
                 log.warn("Invalid argument provided to copyAABBToLocation", ex).submit();
@@ -190,7 +203,41 @@ public class UtilLocation {
         }
 
         teleportLocation = UtilLocation.shiftOutOfBlocks(teleportLocation, boundingBox);
+        teleportLocation = constrainToTeleportRules(entity, teleportLocation, direction, boundingBox);
         return Optional.of(teleportLocation);
+    }
+
+    private static boolean validateTeleportLocation(@Nullable LivingEntity entity, @NotNull Location location) {
+        if (entity == null) {
+            return true;
+        }
+
+        final TeleportRules gate = Core.getPlugin(Core.class).getInjector().getInstance(TeleportRules.class);
+        return gate.allows(entity, location);
+    }
+
+    private static @NotNull Location constrainToTeleportRules(@Nullable LivingEntity entity, @NotNull Location location,
+                                                              @NotNull Vector direction, @NotNull BoundingBox boundingBox) {
+        if (entity == null) {
+            return location;
+        }
+
+        final Location adjusted = location.clone();
+        final Vector backwards = direction.clone().normalize().multiply(-0.1);
+        if (backwards.lengthSquared() == 0) {
+            return adjusted;
+        }
+
+        for (int i = 0; i < 20; i++) {
+            final Location headBlock = adjusted.clone().add(0.0, boundingBox.getHeight(), 0.0);
+            if (validateTeleportLocation(entity, adjusted) && validateTeleportLocation(entity, headBlock)) {
+                return adjusted;
+            }
+
+            adjusted.add(backwards);
+        }
+
+        return adjusted;
     }
 
     /**

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.framework.statusbar;
 
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.health.EntityHealthService;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBar;
@@ -17,10 +18,12 @@ public class StatusBar extends ActionBar {
 
     private final EntityHealthService healthService;
     private final EnergyService energyService;
+    private final CombatFeaturesService combatFeaturesService;
 
-    public StatusBar(EntityHealthService healthService, EnergyService energyService) {
+    public StatusBar(EntityHealthService healthService, EnergyService energyService, CombatFeaturesService combatFeaturesService) {
         this.healthService = healthService;
         this.energyService = energyService;
+        this.combatFeaturesService = combatFeaturesService;
     }
 
     @Override
@@ -38,12 +41,15 @@ public class StatusBar extends ActionBar {
         }
 
         // Append and prepend the health and energy components
-        final Component health = getHealthComponent(gamer.getPlayer());
-        final Component energy = getEnergyComponent(gamer.getPlayer());
-        component = health.append(Component.text(" ".repeat(3)))
-                .append(component)
-                .append(Component.text(" ".repeat(3)))
-                .append(energy);
+        final Player viewer = gamer.getPlayer();
+        if (viewer != null && combatFeaturesService.isActive(viewer)) {
+            final Component health = getHealthComponent(viewer);
+            final Component energy = getEnergyComponent(viewer);
+            component = health.append(Component.text(" ".repeat(3)))
+                    .append(component)
+                    .append(Component.text(" ".repeat(3)))
+                    .append(energy);
+        }
 
         // Send the action bar to the player
         final Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));

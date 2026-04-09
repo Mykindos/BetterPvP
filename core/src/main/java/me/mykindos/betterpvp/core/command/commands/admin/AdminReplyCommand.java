@@ -2,28 +2,33 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
+import me.mykindos.betterpvp.core.framework.server.ServerMessage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
 public class AdminReplyCommand extends Command {
 
+    private final Core core;
     private final ClientManager clientManager;
+    private final CrossServerMessageService crossServerMessageService;
 
     @Inject
-    public AdminReplyCommand(ClientManager clientManager){
+    public AdminReplyCommand(Core core, ClientManager clientManager, CrossServerMessageService crossServerMessageService) {
+        this.core = core;
         this.clientManager = clientManager;
+        this.crossServerMessageService = crossServerMessageService;
 
         aliases.add("ra");
     }
@@ -40,10 +45,8 @@ public class AdminReplyCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Gamer gamer = client.getGamer();
-        Client receivingClient = null;
-        Gamer receivingGamer = null;
-        if(args.length == 0) {
+        final Gamer gamer = client.getGamer();
+        if (args.length == 0) {
             UtilMessage.message(player, "Core", "You must specify a message");
             return;
         }
@@ -52,38 +55,32 @@ public class AdminReplyCommand extends Command {
             return;
         }
 
-        Optional<Client> optionalReceiver = clientManager.search(player).online(UUID.fromString(gamer.getLastAdminMessenger()));
-        Player receiver = null;
-        if (optionalReceiver.isPresent()) {
-            receivingClient = optionalReceiver.get();
-            receivingGamer = receivingClient.getGamer();
-            receiver = receivingGamer.getPlayer();
-        }
+        clientManager.search(player).offline(UUID.fromString(gamer.getLastAdminMessenger())).thenAccept(optionalReceiver -> {
+            if (optionalReceiver.isEmpty()) {
+                UtilServer.runTask(core, () ->
+                        UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No online player to reply to found")));
+                return;
+            }
 
-        if (receiver == null) {
-            UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No online player to reply to found"));
-            return;
-        }
+            final Client receivingClient = optionalReceiver.get();
+            crossServerMessageService.isPlayerOnline(receivingClient.getName()).thenAccept(isOnline ->
+                    UtilServer.runTask(core, () -> {
+                        if (!isOnline) {
+                            UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No online player to reply to found"));
+                            return;
+                        }
 
-        String playerName = UtilFormat.spoofNameForLunar(player.getName());
-        Rank sendRank = client.getRank();
-        Rank receiveRank = receivingClient.getRank();
-
-        gamer.setLastAdminMessenger(receivingGamer.getUuid());
-        receivingGamer.setLastAdminMessenger(gamer.getUuid());
-
-        Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
-        Component receiverComponent = receiveRank.getPlayerNameMouseOver(receiver.getName());
-        Component arrow = Component.text(" -> ", NamedTextColor.DARK_PURPLE);
-        Component message = Component.text(" " + String.join(" ", args), NamedTextColor.LIGHT_PURPLE);
-        //Start with a Component.empty() to avoid the hoverEvent from propagating down
-        Component component = Component.empty().append(senderComponent).append(arrow).append(receiverComponent).append(message);
-        if (!receivingClient.hasRank(Rank.HELPER)) {
-            //dont send the message twice to a staff member
-            UtilMessage.message(receiver, component);
-        }
-
-        clientManager.sendMessageToRank("", component, Rank.HELPER);
+                        gamer.setLastAdminMessenger(receivingClient.getUuid());
+                        final ServerMessage message = ServerMessage.builder()
+                                .channel("AdminDirectMessage")
+                                .message(String.join(" ", args))
+                                .metadata("sender", player.getUniqueId().toString())
+                                .metadata("target", receivingClient.getUniqueId().toString())
+                                .build();
+                        crossServerMessageService.broadcast(message);
+                        new SoundEffect("minecraft", "block.amethyst_block.resonate", 1.0F).play(player);
+                    }));
+        });
     }
 
     @Override

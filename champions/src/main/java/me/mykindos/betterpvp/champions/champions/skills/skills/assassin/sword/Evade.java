@@ -106,7 +106,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
         event.setKnockback(false);
         event.cancel("Skill Evade");
-        event.setForceDamageDelay(forcedDamageDelay);
 
         Particle.LARGE_SMOKE.builder()
                 .offset(0.3, 0.3, 0.3)
