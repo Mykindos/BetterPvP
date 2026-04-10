@@ -5,9 +5,14 @@ Repository containing all of BetterPvP's plugins for 1.21.11
 - [PaperSpigot](https://papermc.io/downloads)
 - [Docker](https://www.docker.com/) or for Windows and Mac users [Docker Desktop](https://www.docker.com/products/docker-desktop)
 - [LibsDisguises](https://www.spigotmc.org/resources/libs-disguises.32453)
+- [Mapper](https://github.com/BetterPvP/Mapper)
+- [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) (required for some plugins)
+- [Nexo](https://www.spigotmc.org/resources/nexo.123456/) (soft, used by: Clans, Hub)
+- [MythicMobs](https://www.spigotmc.org/resources/mythicmobs.5702/) (soft, used by: Clans)
+- [ModelEngine](https://www.spigotmc.org/resources/modelengine.79477/) (soft, used by: Clans, Game, Hub)
+
 - A Postgres server ([Bundled](docker))
 - A Redis server (optional) ([Bundled](docker))
-
 ## Development Setup
 1. Clone this repository and open it with your IDE of choice:
     ```bash
