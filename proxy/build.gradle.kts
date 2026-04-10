@@ -7,8 +7,8 @@ group = "me.mykindos.betterpvp.proxy"
 description = "Velocity proxy admission layer for BetterPvP orchestration"
 
 dependencies {
-    compileOnly("com.velocitypowered:velocity-api:4.0.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:4.0.0-SNAPSHOT")
+    compileOnly(libs.velocity.api)
+    annotationProcessor(libs.velocity.api)
     implementation(project(":orchestration"))
     implementation(libs.jackson.core)
     implementation(libs.jackson.annotations)

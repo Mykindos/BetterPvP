@@ -1,5 +1,27 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+val outputBuckets = mapOf(
+    "clans" to setOf(
+        ":champions",
+        ":clans",
+        ":core",
+        ":lunar",
+        ":private:compatability",
+        ":private:dungeons",
+        ":private:events",
+        ":private:store",
+        ":progression",
+        ":shops",
+    ),
+    "hub" to setOf(
+        ":champions",
+        ":core",
+        ":hub",
+        ":lunar",
+        ":private:store",
+    ),
+)
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     java apply true
@@ -78,6 +100,18 @@ subprojects {
         destinationDirectory.set(file("$rootDir/build/"))
         mergeServiceFiles()
         duplicatesStrategy = DuplicatesStrategy.INCLUDE // required for flywayg
+
+        doLast {
+            val builtJar = archiveFile.get().asFile
+            outputBuckets.forEach { (bucket, projects) ->
+                if (project.path in projects) {
+                    copy {
+                        from(builtJar)
+                        into(file("$rootDir/build/$bucket"))
+                    }
+                }
+            }
+        }
     }
 
     tasks.assemble.configure {
