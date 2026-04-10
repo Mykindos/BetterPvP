@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
@@ -127,6 +128,19 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         }
     }
 
+
+    /**
+     * All sword, axe, and bow skills cancel. Otherwise, if it is an interact or toggle skill it should also cancel
+     * @param skill the skill
+     * @return {@code true} if the skill should cancel a combo attack, {@code false} otherwise
+     */
+    private boolean shouldCancelCombo(IChampionsSkill skill) {
+        if (skill.getType() == SkillType.SWORD || skill.getType() == SkillType.AXE || skill.getType() == SkillType.BOW) {
+            return true;
+        }
+        return skill instanceof ToggleSkill || skill instanceof InteractSkill;
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSkillUse(PlayerUseSkillEvent event) {
         final Player player = event.getPlayer();
@@ -134,8 +148,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         if (level <= 0) return;
         if (!repeat.containsKey(player)) return;
 
-        if (!(event.getSkill().getType() == SkillType.SWORD || event.getSkill().getType() == SkillType.AXE || event.getSkill().getType() == SkillType.BOW)) return;
-        if (event.getSkill() instanceof ToggleSkill || event.getSkill() instanceof InteractSkill) return;
+        if (!shouldCancelCombo(event.getSkill())) return;
 
         final ComboAttackData data = repeat.remove(player);
         if (data == null) return;
