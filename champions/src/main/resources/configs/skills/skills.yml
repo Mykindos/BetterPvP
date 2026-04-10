@@ -158,13 +158,13 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 15.0
+      cooldownDecreasePerLevel: 2.0
       activeBaseDuration: 0.7
       activeDurationIncreasePerLevel: 0.0
       baseDamageDelay: 0.4
       damageDelayIncreasePerLevel: 0.0
       successBaseCooldown: 0.7
       successCooldownDecreasePerLevel: 0.1
-      cooldownDecreasePerLevel: 1.0
       channelTimeCooldownMultiplier: 1.0
       channelTimeCooldownMultiplierDecreasePerLevel: 0.0
   knight:
