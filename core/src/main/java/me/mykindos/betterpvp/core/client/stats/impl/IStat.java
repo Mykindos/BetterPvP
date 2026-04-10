@@ -21,6 +21,14 @@ public interface IStat {
      */
     long FP_MODIFIER = 1000L;
 
+    static long getLongValueOfDouble(double num) {
+        return (long) (num * FP_MODIFIER);
+    }
+
+    static double getDoubleValueOfLong(long num) {
+        return (double) num / FP_MODIFIER;
+    }
+
     /**
      * Get the stat represented by this object from the statContainer.
      * period object must be the correct type as defined by the type
@@ -32,7 +40,7 @@ public interface IStat {
     Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period);
 
     default Double getDoubleStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
-        return getStat(statContainer, type, period) == null ? null : getStat(statContainer, type, period) / (double) FP_MODIFIER;
+        return getStat(statContainer, type, period) == null ? null : getDoubleValueOfLong(getStat(statContainer, type, period));
     }
 
     /**

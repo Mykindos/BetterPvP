@@ -127,6 +127,57 @@ loadable:
         - 0.75
         - 0.9
       doRewards: true
+  core:player_kills_category:
+    core:player_kills_25:
+      enabled: false
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    core:player_kills_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  core:damage_dealt_category:
+    core:damage_dealt_2500:
+      enabled: false
+      goal: 2500.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    core:damage_dealt_10000:
+      enabled: true
+      goal: 10000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  core:healing_dealt_category:
+    core:healing_dealt_1500:
+      enabled: false
+      goal: 1500.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    core:healing_dealt_5000:
+      enabled: true
+      goal: 5000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
   game:points_captured_category:
     game:points_captured_10:
       enabled: true
