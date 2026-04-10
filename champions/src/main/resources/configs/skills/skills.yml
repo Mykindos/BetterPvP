@@ -162,8 +162,8 @@ skills:
       activeDurationIncreasePerLevel: 0.0
       baseDamageDelay: 0.4
       damageDelayIncreasePerLevel: 0.0
-      successBaseCooldown: 0.6
-      successCooldownDecreasePerLevel: 0.0
+      successBaseCooldown: 0.7
+      successCooldownDecreasePerLevel: 0.1
       cooldownDecreasePerLevel: 1.0
       channelTimeCooldownMultiplier: 1.0
       channelTimeCooldownMultiplierDecreasePerLevel: 0.0
