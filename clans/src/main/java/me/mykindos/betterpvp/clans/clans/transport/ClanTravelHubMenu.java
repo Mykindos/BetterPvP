@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.transport;
 
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import net.kyori.adventure.text.Component;
@@ -13,11 +15,13 @@ public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 
     private final Player player;
     private final ClanManager clanManager;
+    private final Client client;
 
-    public ClanTravelHubMenu(Player player, ClanManager clanManager) {
+    public ClanTravelHubMenu(Player player, Client client, ClanManager clanManager) {
         super(9, 5);
         this.player = player;
         this.clanManager = clanManager;
+        this.client = client;
 
         loadMenu();
     }
@@ -27,41 +31,54 @@ public class ClanTravelHubMenu extends AbstractGui implements Windowed {
         return Component.text("Travel Hub");
     }
 
+    private Integer getShopIndex(Clan clan) {
+        var core = clan.getCore().getPosition();
+        if (core == null) {
+            return null;
+        }
+
+        double x = core.getX();
+        double z = core.getZ();
+
+        if (x < 0 && z < 0) return 2;
+        if (x > 0 && z < 0) return 6;
+        if (x < 0 && z > 0) return 38;
+        if (x > 0 && z > 0) return 42;
+
+        return null;
+    }
+
     private void loadMenu() {
 
-        // Spawns
-        clanManager.getClanByName("North Spawn").ifPresent(clan -> {
-            setItem(4, new SpawnTransportButton(clan, Material.END_CRYSTAL, NamedTextColor.WHITE));
-        });
-
-        clanManager.getClanByName("South Spawn").ifPresent(clan -> {
-            setItem(40, new SpawnTransportButton(clan, Material.END_CRYSTAL, NamedTextColor.WHITE));
-        });
-
         // Shops
-        //top left 2
         clanManager.getClanByName("Blue Shops").ifPresent(clan -> {
-            setItem(2, new ShopTransportButton(clan, Material.BLUE_WOOL, NamedTextColor.BLUE));
+            addShop(clan, Material.BLUE_WOOL, NamedTextColor.BLUE);
         });
 
-        //bottom left 38
         clanManager.getClanByName("Yellow Shops").ifPresent(clan -> {
-            setItem(38, new ShopTransportButton(clan, Material.YELLOW_WOOL, NamedTextColor.YELLOW));
+            addShop(clan, Material.YELLOW_WOOL, NamedTextColor.YELLOW);
         });
 
-        //bottom right 42
         clanManager.getClanByName("Green Shops").ifPresent(clan -> {
-            setItem(42, new ShopTransportButton(clan, Material.GREEN_WOOL, NamedTextColor.GREEN));
+            addShop(clan, Material.GREEN_WOOL, NamedTextColor.GREEN);
         });
 
-        //top right 6
         clanManager.getClanByName("Red Shops").ifPresent(clan -> {
-            setItem(6, new ShopTransportButton(clan, Material.RED_WOOL, NamedTextColor.RED));
+            addShop(clan, Material.RED_WOOL, NamedTextColor.RED);
         });
 
         // Clan Home
         clanManager.getClanByPlayer(player).ifPresent(clan -> {
             setItem(22, new CoreTransportButton(clan));
         });
+    }
+
+    private void addShop(Clan clan, Material material, NamedTextColor color) {
+        Integer slot = getShopIndex(clan);
+        if (slot == null) {
+            return;
+        }
+
+        setItem(slot, new ShopTransportButton(clan, client, material, color));
     }
 }

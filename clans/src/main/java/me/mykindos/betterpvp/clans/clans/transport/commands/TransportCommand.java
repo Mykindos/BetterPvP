@@ -28,6 +28,6 @@ public class TransportCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        new ClanTravelHubMenu(player, clanManager).show(player);
+        new ClanTravelHubMenu(player, client, clanManager).show(player);
     }
 }

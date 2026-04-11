@@ -122,6 +122,11 @@ public class GamerListener implements Listener {
             gamer.saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, (long) (defaultPvPProtection * 1000L));
         }
 
+        Optional<String> preferredSpawnOptional = gamer.getProperty(GamerProperty.PREFERRED_SPAWN);
+        if (preferredSpawnOptional.isEmpty()) {
+            gamer.saveProperty(GamerProperty.PREFERRED_SPAWN, "");
+        }
+
     }
 
 }

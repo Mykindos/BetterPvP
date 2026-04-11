@@ -35,6 +35,7 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
 
     public static final String MAIN_WORLD_NAME = "world";
     public static final String BOSS_WORLD_NAME = "bossworld";
+    public static final String VOID_WORLD_NAME = "void";
 
     private @NotNull WeakReference<World> world;
     private final @NotNull String name;

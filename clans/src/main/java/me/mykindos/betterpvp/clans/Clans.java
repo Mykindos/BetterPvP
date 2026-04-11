@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementLoader;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
+import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
@@ -31,12 +33,15 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
-import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
-import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRules;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -88,6 +93,8 @@ public class Clans extends BPvPPlugin {
 
             core.setCurrentMode(CurrentMode.CLANS);
 
+            setupVoidWorld();
+
             Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
             Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
@@ -138,6 +145,21 @@ public class Clans extends BPvPPlugin {
             this.registerItems();
 
             clearCraftingRecipes();
+        }
+    }
+
+    private static void setupVoidWorld() {
+        World voidWorld = new WorldCreator(BPvPWorld.VOID_WORLD_NAME).createWorld();
+        if (voidWorld != null) {
+            voidWorld.setViewDistance(3);
+            voidWorld.setSimulationDistance(3);
+            voidWorld.setAutoSave(false);
+            voidWorld.setSpawnFlags(false, false);
+            Location spawnPoint = new Location(voidWorld, 0.5, 1, 0.5);
+            spawnPoint.getChunk().setForceLoaded(true);
+            voidWorld.setSpawnLocation(spawnPoint);
+            voidWorld.setGameRule(GameRules.ADVANCE_TIME, false);
+            voidWorld.setGameRule(GameRules.KEEP_INVENTORY, true);
         }
     }
 

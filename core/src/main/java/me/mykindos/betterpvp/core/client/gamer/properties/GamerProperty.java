@@ -35,4 +35,6 @@ public enum GamerProperty {
      */
     MOB_KILLS,
 
+    PREFERRED_SPAWN
+
 }
