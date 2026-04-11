@@ -34,7 +34,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 @BrigadierSubCommand(BrigadierClansCommand.class)
 public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
     private final IFilterService filterService;
-    private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
+    private final SnowflakeIdGenerator ID_GENERATOR = SnowflakeIdGenerator.ID_GENERATOR;
     @Inject
     protected BrigadierCreateSubCommand(ClientManager clientManager, ClanManager clanManager, IFilterService filterService) {
         super(clientManager, clanManager);
