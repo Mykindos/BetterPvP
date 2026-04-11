@@ -22,7 +22,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockReceiveGameEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -69,15 +68,12 @@ public class ClassSelectorListener implements Listener {
     }
 
     @EventHandler
-    void onMove(PlayerMoveEvent event) {
-        if (!event.hasChangedBlock()) {
-            return; // They haven't moved yet
-        }
-
-        final Block blockUnder = event.getTo().getBlock();
-        if (blockUnder.getType().equals(Material.SCULK_SHRIEKER)) {
-            // At this point, they're on top of the class selector, so trigger
-            triggerClassSelector(event.getPlayer(), blockUnder);
+    public void onRightClick(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block clickedBlock = event.getClickedBlock();
+            if (clickedBlock != null && clickedBlock.getType().equals(Material.SCULK_SHRIEKER)) {
+                triggerClassSelector(event.getPlayer(), clickedBlock);
+            }
         }
     }
 
@@ -95,6 +91,7 @@ public class ClassSelectorListener implements Listener {
         new SoundEffect("emaginationfallenheroes", "custom.spell.soulfirecast", 2f, 1).play(blockUnder.getLocation());
         new BukkitRunnable() {
             int ticks = 0;
+
             @Override
             public void run() {
                 if (ticks > 10) {
