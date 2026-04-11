@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.Optional;
@@ -98,6 +99,16 @@ public class VoidWorldListener implements Listener {
         }
 
         event.setRespawnLocation(clan.getCore().getPosition());
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if(player.getWorld().getName().equals(BPvPWorld.VOID_WORLD_NAME)) {
+            if(!player.isOp()) {
+                event.setCancelled(true);
+            }
+        }
     }
 
 }
