@@ -40,9 +40,9 @@ public class VoidWorldListener implements Listener {
         voidWorld = new BPvPWorld(BPvPWorld.VOID_WORLD_NAME).getWorld();
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDamage(DamageEvent event) {
-        if(event.getDamagee().getWorld().getName().equals(BPvPWorld.VOID_WORLD_NAME)) {
+        if (event.getDamagee().getWorld().getName().equals(BPvPWorld.VOID_WORLD_NAME)) {
             event.cancel("Cannot take damage in void world");
         }
     }
@@ -54,49 +54,49 @@ public class VoidWorldListener implements Listener {
         Gamer gamer = client.getGamer();
 
         Optional<String> property = gamer.getProperty(GamerProperty.PREFERRED_SPAWN);
-        if(!player.hasPlayedBefore() || property.isEmpty() || property.get().isEmpty()) {
+        if (!player.hasPlayedBefore() || property.isEmpty() || property.get().isEmpty()) {
             player.teleport(voidWorld.getSpawnLocation());
             player.setGameMode(GameMode.ADVENTURE);
             new ClanTravelHubMenu(player, client, clanManager).show(player);
         }
     }
 
-    @UpdateEvent (delay = 500)
+    @UpdateEvent(delay = 500)
     public void checkTransportMenu() {
-        for(Player player : voidWorld.getPlayers()) {
-            if(WindowManager.getInstance().getOpenWindow(player) == null) {
-                new ClanTravelHubMenu(player, clientManager.search().online(player), clanManager).show(player);
-            }
+        for (Player player : voidWorld.getPlayers()) {
+            if (!player.isOp()) {
+                if (WindowManager.getInstance().getOpenWindow(player) == null) {
+                    new ClanTravelHubMenu(player, clientManager.search().online(player), clanManager).show(player);
+                }
 
-            if(!player.isOp()) {
-                if(player.getGameMode() != GameMode.ADVENTURE) {
+                if (player.getGameMode() != GameMode.ADVENTURE) {
                     player.setGameMode(GameMode.ADVENTURE);
                 }
             }
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         Client client = clientManager.search().online(player);
         Gamer gamer = client.getGamer();
 
         Optional<String> property = gamer.getProperty(GamerProperty.PREFERRED_SPAWN);
-        if(property.isEmpty() || property.get().isEmpty()) {
-            return;        
+        if (property.isEmpty() || property.get().isEmpty()) {
+            return;
         }
 
         Optional<Clan> preferredSpawnOptional = clanManager.getClanByName(property.get());
-        if(preferredSpawnOptional.isEmpty()) {
+        if (preferredSpawnOptional.isEmpty()) {
             return;
         }
 
         Clan clan = preferredSpawnOptional.get();
-        if(clan.getCore() == null || clan.getCore().getPosition() == null) {
+        if (clan.getCore() == null || clan.getCore().getPosition() == null) {
             return;
         }
-        
+
         event.setRespawnLocation(clan.getCore().getPosition());
     }
 
