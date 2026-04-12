@@ -199,7 +199,9 @@ public class BossBarQueue {
             if (pair == null) {
                 return null;
             }
-            data = pair.getRight().getProvider().apply(gamer);
+
+            display = pair.getRight();
+            data = display.getProvider().apply(gamer);
         }
 
         if (display instanceof TimedDisplayObject<?> timed) {

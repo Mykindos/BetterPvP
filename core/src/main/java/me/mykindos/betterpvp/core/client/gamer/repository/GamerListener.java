@@ -64,7 +64,7 @@ public class GamerListener implements Listener {
     }
 
     @UpdateEvent (isAsync = true)
-    public void onUpdate() {
+    public void onUpdateAsync() {
         try {
             this.manager.getOnline().forEach(client -> {
                 final Gamer gamer = client.getGamer();
@@ -77,7 +77,20 @@ public class GamerListener implements Listener {
                 gamer.getBossBarOverlay().show(gamer);
             });
         }catch(Exception ex) {
-            log.error("Error with gamer async onUpdate", ex).submit();
+            log.error("Error with gamer async onUpdateAsync", ex).submit();
+        }
+    }
+
+    @UpdateEvent
+    public void onUpdate() {
+        try {
+            this.manager.getOnline().forEach(client -> {
+                final Gamer gamer = client.getGamer();
+                gamer.getBossBarQueue().show(gamer);
+                gamer.getBossBarOverlay().show(gamer);
+            });
+        }catch(Exception ex) {
+            log.error("Error with gamer onUpdate", ex).submit();
         }
     }
 
