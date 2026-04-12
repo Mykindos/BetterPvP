@@ -44,6 +44,12 @@ public final class NPCRegistry {
         return this.objects.get(id);
     }
 
+    public Collection<NPC> getNPCs(@NotNull NPCFactory npcFactory) {
+        return this.objects.values().stream()
+                .filter(npc -> npc.getFactory().equals(npcFactory))
+                .toList();
+    }
+
     public NPC getNPC(Entity entity) {
         return getNPC(entity.getUniqueId());
     }

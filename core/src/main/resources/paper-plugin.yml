@@ -22,3 +22,7 @@ dependencies:
       load: BEFORE
       required: false
       join-classpath: true
+    Mapper:
+        load: BEFORE
+        required: false
+        join-classpath: true

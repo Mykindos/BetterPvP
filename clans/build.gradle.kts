@@ -20,6 +20,7 @@ dependencies {
     compileOnly(project(":progression"))
     compileOnly(project(":champions"))
     compileOnly(project(":shops"))
+    compileOnly(libs.mapper)
     compileOnly(libs.packetevents)
     compileOnly(libs.nexo)
     compileOnly(libs.modelengine)

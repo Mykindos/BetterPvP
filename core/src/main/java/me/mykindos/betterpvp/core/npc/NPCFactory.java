@@ -20,12 +20,18 @@ public abstract class NPCFactory {
     }
 
     /**
+     * Returns the types of NPCs that this factory can spawn
+     * @return Array of NPC types
+     */
+    public abstract String[] getTypes();
+
+    /**
      * Spawns a default NPC
      *
      * @param location Location to spawn the NPC
-     * @param name     Name of the NPC
+     * @param type     Type of the NPC
      * @return The NPC
      */
-    public abstract NPC spawnDefault(final @NotNull Location location, @NotNull String name);
+    public abstract NPC spawnDefault(final @NotNull Location location, @NotNull String type);
 
 }

@@ -239,7 +239,12 @@ public class HubNPCFactory extends NPCFactory implements ConfigAccessor {
     }
 
     @Override
-    public NPC spawnDefault(@NotNull Location location, @NotNull String name) {
+    public String[] getTypes() {
+        return new String[0];
+    }
+
+    @Override
+    public NPC spawnDefault(@NotNull Location location, @NotNull String type) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }

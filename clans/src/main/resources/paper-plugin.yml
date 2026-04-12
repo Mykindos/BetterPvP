@@ -1,0 +1,33 @@
+author: Mykindos
+main: me.mykindos.betterpvp.clans.Clans
+name: Clans
+load: POSTWORLD
+version: '1.0'
+depend: [Core]
+api-version: '1.21'
+dependencies:
+  server:
+    Progression:
+        load: BEFORE
+        required: false
+        join-classpath: true
+    LibsDisguises:
+        load: BEFORE
+        required: false
+        join-classpath: true
+    Mapper:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    ModelEngine:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Champions:
+        load: BEFORE
+        required: false
+        join-classpath: true
+    Shops:
+        load: BEFORE
+        required: false
+        join-classpath: true

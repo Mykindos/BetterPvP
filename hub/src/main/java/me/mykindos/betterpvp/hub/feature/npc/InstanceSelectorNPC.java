@@ -104,6 +104,7 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
 
         @Override
         public void tick() {
+            super.tick();
             // Get tag and rainbow
             final long time = System.currentTimeMillis();
             final TextDisplay nameTag = (TextDisplay) attached.getFirst();

@@ -15,7 +15,7 @@ dependencies {
 
     compileOnly(project(":core"))
     compileOnly(libs.libsdisguises)
-    compileOnly(libs.mythic)
+    compileOnly(libs.mapper)
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)

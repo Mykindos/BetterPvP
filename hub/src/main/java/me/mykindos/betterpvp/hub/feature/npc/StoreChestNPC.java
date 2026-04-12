@@ -89,6 +89,7 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
 
     @Override
     public void tick() {
+        super.tick();
         final Location location = entity.getLocation();
 
         final long time = System.currentTimeMillis();

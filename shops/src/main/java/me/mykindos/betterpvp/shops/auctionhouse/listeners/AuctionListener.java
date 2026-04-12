@@ -17,20 +17,14 @@ import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionCancelEvent;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionCreateEvent;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionHouseMenu;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionListingMenu;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Iterator;
-import java.util.Optional;
 
 @BPvPListener
 @Singleton
@@ -38,13 +32,11 @@ public class AuctionListener implements Listener {
 
     private final ClientManager clientManager;
     private final AuctionManager auctionManager;
-    private final ShopkeeperManager shopkeeperManager;
 
     @Inject
-    public AuctionListener(ClientManager clientManager, AuctionManager auctionManager, ShopkeeperManager shopkeeperManager) {
+    public AuctionListener(ClientManager clientManager, AuctionManager auctionManager) {
         this.clientManager = clientManager;
         this.auctionManager = auctionManager;
-        this.shopkeeperManager = shopkeeperManager;
     }
 
     @UpdateEvent(delay = 10000)
@@ -94,20 +86,6 @@ public class AuctionListener implements Listener {
             event.cancel("You cannot set a sell price greater than $1,000,000,000.");
             return;
         }
-    }
-
-    @EventHandler
-    public void onInteract(PlayerInteractEntityEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-        if (!(event.getRightClicked() instanceof LivingEntity target)) return;
-
-
-        Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId().toString());
-        shopkeeperOptional.ifPresent(shopkeeper -> {
-            if (shopkeeper.getShopkeeperName().toLowerCase().contains("auction")) {
-                new AuctionHouseMenu(auctionManager).show(event.getPlayer());
-            }
-        });
     }
 
     @EventHandler

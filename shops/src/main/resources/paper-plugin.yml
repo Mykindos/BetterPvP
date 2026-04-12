@@ -1,0 +1,20 @@
+author: Mykindos
+main: me.mykindos.betterpvp.shops.Shops
+name: Shops
+load: POSTWORLD
+version: '1.0'
+api-version: '1.21'
+dependencies:
+  server:
+    Core:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    Mapper:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    ModelEngine:
+      load: BEFORE
+      required: false
+      join-classpath: true

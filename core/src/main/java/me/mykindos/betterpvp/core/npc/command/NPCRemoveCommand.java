@@ -33,7 +33,7 @@ public class NPCRemoveCommand extends Command {
     // /npc remove <ID>
     @Override
     public void execute(Player player, Client client, String... args) {
-        if (args.length < 2) {
+        if (args.length < 1) {
             UtilMessage.message(player, "NPC", "<red>Usage: <yellow>/npc remove <ID>");
             return;
         }

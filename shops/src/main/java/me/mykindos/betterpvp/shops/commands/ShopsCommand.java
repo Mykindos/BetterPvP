@@ -13,11 +13,8 @@ import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.listener.ShopsListenerLoader;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.Arrays;
 
 @Singleton
 public class ShopsCommand extends Command implements IConsoleCommand {
@@ -52,65 +49,6 @@ public class ShopsCommand extends Command implements IConsoleCommand {
         return Rank.ADMIN;
     }
 
-
-
-    @Singleton
-    @SubCommand(ShopsCommand.class)
-    private static class ShopSpawnCommand extends Command {
-
-        @Inject
-        private  ShopkeeperManager shopkeeperManager;
-
-        @Override
-        public String getName() {
-            return "spawn";
-        }
-
-        @Override
-        public String getDescription() {
-            return "Spawn a shopkeeper";
-        }
-
-        @Override
-        public void execute(Player player, Client client, String... args) {
-            if(args.length <= 1) {
-                UtilMessage.message(player, "Shops", "Usage: /shop spawn <entityType> <shop name>");
-                return;
-            }
-            
-            shopkeeperManager.saveShopkeeper(args[0], String.join(" ", Arrays.copyOfRange(args, 1, args.length)), player.getLocation());
-            shopkeeperManager.loadShopsFromConfig();
-        }
-    }
-
-    @Singleton
-    @SubCommand(ShopsCommand.class)
-    private static class ShopRemoveCommand extends Command {
-
-        @Inject
-        private  ShopkeeperManager shopkeeperManager;
-
-        @Override
-        public String getName() {
-            return "remove";
-        }
-
-        @Override
-        public String getDescription() {
-            return "Remove shopkeepers within a radius";
-        }
-
-        @Override
-        public void execute(Player player, Client client, String... args) {
-            if(args.length == 0) {
-                UtilMessage.message(player, "Shops", "Usage: /shop remove <radius>");
-                return;
-            }
-
-            shopkeeperManager.removeShopKeepers(player, Integer.parseInt(args[0]));
-        }
-    }
-
     @Singleton
     @SubCommand(ShopsCommand.class)
     private static class ReloadCommand extends Command implements IConsoleCommand {
@@ -123,9 +61,6 @@ public class ShopsCommand extends Command implements IConsoleCommand {
 
         @Inject
         private ShopsListenerLoader listenerLoader;
-
-        @Inject
-        private ShopkeeperManager shopkeeperManager;
 
         @Inject
         private ShopManager shopManager;
@@ -153,7 +88,6 @@ public class ShopsCommand extends Command implements IConsoleCommand {
 
             shopManager.loadShopItems();
             commandLoader.reload(shops.getClass().getPackageName());
-            shopkeeperManager.loadShopsFromConfig();
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded shops");
         }
