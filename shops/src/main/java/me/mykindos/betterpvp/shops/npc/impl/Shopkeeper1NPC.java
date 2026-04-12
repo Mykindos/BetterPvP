@@ -107,6 +107,7 @@ public class Shopkeeper1NPC extends ModeledNPC implements Actor {
             ItemStack item = showcaseItems.get(i);
             ItemDisplay display = loc.getWorld().spawn(displayLoc, ItemDisplay.class, d -> {
                 d.setItemStack(item);
+                d.setPersistent(false);
                 d.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
                 d.setTransformation(new Transformation(
                         new Vector3f(0, 0, 0),

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A {@link Prop} backed by a ModelEngine {@link ModeledEntity}.
  * <p>
- * Mirrors the ModelEngine setup in {@link me.mykindos.betterpvp.core.npc.model.ModeledNPC}
+ * Mirrors the ModelEngine setup in {@link me.mykindos.betterpvp.core.scene.npc.ModeledNPC}
  * but without behaviors or interaction: subclasses just add models in their {@link #onInit()}
  * after calling {@code super.onInit()}.
  * <p>
@@ -46,6 +46,9 @@ public abstract class ModeledProp extends Prop implements HasModeledEntity {
 
     @Nullable
     public ModeledEntity getModeledEntity() {
+        if (!isInitialized()) {
+            return null;
+        }
         return ModelEngineAPI.getModeledEntity(getEntity());
     }
 

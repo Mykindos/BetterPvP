@@ -75,6 +75,9 @@ public class ModeledNPC extends NPC implements HasModeledEntity {
     @Override
     @Nullable
     public ModeledEntity getModeledEntity() {
+        if (!isInitialized()) {
+            return null;
+        }
         return ModelEngineAPI.getModeledEntity(getEntity());
     }
 
