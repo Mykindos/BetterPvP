@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.npc.NPCRegistry;
+import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -21,19 +21,19 @@ import java.util.UUID;
 @PluginAdapter("ModelEngine")
 public class ShopsNPCListener implements Listener {
 
-    private final NPCRegistry npcRegistry;
+    private final SceneObjectRegistry npcRegistry;
 
     @Inject
-    private ShopsNPCListener(NPCRegistry npcRegistry) {
+    private ShopsNPCListener(SceneObjectRegistry npcRegistry) {
         this.npcRegistry = npcRegistry;
     }
 
     private boolean isShopsNPC(UUID uuid) {
-        return this.npcRegistry.getNPC(uuid) != null;
+        return this.npcRegistry.getObject(uuid) != null;
     }
 
-    private boolean isShopsNPC(Entity uuid) {
-        return this.npcRegistry.getNPC(uuid.getUniqueId()) != null;
+    private boolean isShopsNPC(Entity entity) {
+        return this.npcRegistry.getObject(entity.getUniqueId()) != null;
     }
 
     @EventHandler

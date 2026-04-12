@@ -6,7 +6,15 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey UUID_KEY = new NamespacedKey("core", "uuid");
     public static final NamespacedKey ENTITY_TYPE = new NamespacedKey("core", "entity_type");
-    public static final NamespacedKey NPC = new NamespacedKey("core", "npc");
+    /** Stamped on every entity belonging to a registered {@link me.mykindos.betterpvp.core.scene.SceneObject}. */
+    public static final NamespacedKey SCENE_OBJECT = new NamespacedKey("core", "npc");
+
+    /**
+     * @deprecated Use {@link #SCENE_OBJECT}. Kept as an alias so external callers that haven't
+     *             migrated yet still compile without changes.
+     */
+    @Deprecated
+    public static final NamespacedKey NPC = SCENE_OBJECT;
     public static final NamespacedKey GLOW_KEY = new NamespacedKey("core", "glow");
     public static final NamespacedKey IMMUTABLE_KEY = new NamespacedKey("core", "immutable");
     public static final NamespacedKey ORIGINAL_OWNER = new NamespacedKey("champions", "original_owner");

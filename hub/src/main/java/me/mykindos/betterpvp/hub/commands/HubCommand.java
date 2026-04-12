@@ -8,8 +8,8 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.hub.Hub;
-import me.mykindos.betterpvp.hub.feature.npc.HubNPCFactory;
 import me.mykindos.betterpvp.hub.listener.HubListenerLoader;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -58,9 +58,6 @@ public class HubCommand extends Command implements IConsoleCommand {
         @Inject
         private HubListenerLoader listenerLoader;
 
-        @Inject
-        private HubNPCFactory npcFactory;
-
         @Override
         public String getName() {
             return "reload";
@@ -79,8 +76,8 @@ public class HubCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             hub.reload();
+            hub.getReloadables().forEach(Reloadable::reload);
             commandLoader.reload(hub.getClass().getPackageName());
-            npcFactory.tryLoad(hub);
             UtilMessage.message(sender, "Hub", "Successfully reloaded hub");
         }
     }

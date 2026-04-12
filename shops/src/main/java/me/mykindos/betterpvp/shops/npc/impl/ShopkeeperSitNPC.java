@@ -6,9 +6,9 @@ import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.npc.NPCFactory;
-import me.mykindos.betterpvp.core.npc.behavior.BoneTagBehavior;
-import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
+import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.shops.shops.ShopManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,17 +25,25 @@ public class ShopkeeperSitNPC extends ModeledNPC implements Actor {
     private final ShopManager shopManager;
     private final ClientManager clientManager;
     private final ItemFactory itemFactory;
-    private final ActiveModel model;
     private final String shopName;
+    private final String shopkeeperName;
+    private final String skinBlueprint;
+    private ActiveModel model;
 
-    public ShopkeeperSitNPC(NPCFactory factory, Entity entity, String shopName, String shopkeeperName, String skinBlueprint) {
-        super(factory, entity);
+    public ShopkeeperSitNPC(NPCFactory factory, String shopName, String shopkeeperName, String skinBlueprint) {
+        super(factory);
         Shops plugin = JavaPlugin.getPlugin(Shops.class);
         this.shopManager = plugin.getInjector().getInstance(ShopManager.class);
         this.clientManager = plugin.getInjector().getInstance(ClientManager.class);
         this.itemFactory = plugin.getInjector().getInstance(ItemFactory.class);
         this.shopName = shopName;
+        this.shopkeeperName = shopkeeperName;
+        this.skinBlueprint = skinBlueprint;
+    }
 
+    @Override
+    protected void onInit() {
+        super.onInit();
         this.model = ModelEngineAPI.createActiveModel("scene_market_2");
         this.model.setHitboxScale(1.5);
         this.model.getAnimationHandler().setDefaultProperty(new AnimationHandler.DefaultProperty(ModelState.IDLE, "vendor_sit_2", 0, 0, 1));

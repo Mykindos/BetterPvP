@@ -5,8 +5,8 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.framework.ClansServerType;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
-import me.mykindos.betterpvp.core.npc.NPCFactory;
-import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
 import me.mykindos.betterpvp.hub.feature.menu.ServerTypeMenu;
 import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
@@ -38,18 +38,25 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
     private final NetworkPlayerCountService networkPlayerCountService;
     private final HubQueueStatusRegistry queueStatusRegistry;
     private final OrchestrationGateway orchestrationGateway;
+    private final Component tag;
 
-    public InstanceSelectorNPC(NPCFactory factory, Entity entity, Component tag, ClansServerType serverType,
+    public InstanceSelectorNPC(NPCFactory factory, Component tag, ClansServerType serverType,
                                NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
                                OrchestrationGateway orchestrationGateway) {
-        super(factory, entity);
+        super(factory);
+        this.tag = tag;
         this.serverType = serverType;
         this.networkPlayerCountService = networkPlayerCountService;
         this.queueStatusRegistry = queueStatusRegistry;
         this.orchestrationGateway = orchestrationGateway;
+    }
 
-        final Location tagLoc = entity.getLocation().add(0, 3, 0);
-        attachToLifecycle(entity.getWorld().spawn(tagLoc, TextDisplay.class, display -> {
+    @Override
+    protected void onInit() {
+        super.onInit();
+
+        final Location tagLoc = getEntity().getLocation().add(0, 3, 0);
+        attachToLifecycle(getEntity().getWorld().spawn(tagLoc, TextDisplay.class, display -> {
             display.setBackgroundColor(Color.fromARGB(0, 1, 1, 1));
             display.setShadowed(true);
             display.setSeeThrough(false);
@@ -79,26 +86,31 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
         private final Component title;
         private final String gradientColors;
 
-        public Featured(NPCFactory factory, Entity entity, Component title, TextColor[] gradient, ClansServerType serverType,
+        public Featured(NPCFactory factory, Component title, TextColor[] gradient, ClansServerType serverType,
                         NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
                         OrchestrationGateway orchestrationGateway) {
-            super(factory, entity, Component.empty(), serverType, networkPlayerCountService, queueStatusRegistry, orchestrationGateway);
+            super(factory, Component.empty(), serverType, networkPlayerCountService, queueStatusRegistry, orchestrationGateway);
             Preconditions.checkArgument(gradient.length >= 2, "Gradient must have at least 2 colors");
             this.title = title;
 
-            // build gradient
+            // build gradient string — no entity needed, pure data transformation
             StringBuilder gradientBuilder = new StringBuilder();
             for (TextColor color : gradient) {
                 gradientBuilder.append(":");
                 gradientBuilder.append(color.asHexString());
             }
             this.gradientColors = gradientBuilder.toString();
+        }
 
-            // resize model
+        @Override
+        protected void onInit() {
+            super.onInit(); // InstanceSelectorNPC.onInit() — spawns TextDisplay, adds roman_soldier model
+
+            // resize model and reposition the tag display spawned by the parent
             getModeledEntity().getModel("roman_soldier").orElseThrow().setScale(1.2f);
             final Entity display = attached.getFirst();
             final Location location = display.getLocation();
-            location.setY(attached.getFirst().getLocation().getY() + 0.7);
+            location.setY(location.getY() + 0.7);
             display.teleport(location);
         }
 

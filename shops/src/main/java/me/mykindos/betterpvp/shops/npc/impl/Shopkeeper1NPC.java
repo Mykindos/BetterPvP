@@ -6,9 +6,9 @@ import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.npc.NPCFactory;
-import me.mykindos.betterpvp.core.npc.behavior.BoneTagBehavior;
-import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
+import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -18,7 +18,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -31,40 +30,37 @@ import java.util.List;
 
 public class Shopkeeper1NPC extends ModeledNPC implements Actor {
 
-    /** Distance in front of the NPC where the showcase row is placed. */
-    private static final double FORWARD_DISTANCE = 0.6;
-    /** Height above the entity's bounding-box top where items hover. */
-    private static final double HEIGHT_ABOVE_ENTITY = 1.01;
-    /** Gap between adjacent showcase items, in blocks. */
-    private static final double ITEM_SEPARATION = 0.15;
-    /** How strongly edge items tilt inward, in degrees per block of lateral offset. */
-    private static final float INWARD_CURVE_DEG_PER_BLOCK = 30f;
-    /** Render scale applied to each ItemDisplay (0.4 = 40% of full size). */
-    private static final float ITEM_SCALE = 0.6f;
-    /** Concave-arc depth: edge items are pushed this many blocks further forward per block of offset. */
-    private static final double ARC_DEPTH_PER_BLOCK = 0.2;
-
     private final ShopManager shopManager;
     private final ClientManager clientManager;
     private final ItemFactory itemFactory;
-    private final ActiveModel model;
     private final String shopName;
+    private final String shopkeeperName;
+    private final String skinBlueprint;
+    private final List<ItemStack> showcaseItems;
+    private ActiveModel model;
 
-    public Shopkeeper1NPC(NPCFactory factory, Entity entity, String shopName, String shopkeeperName, String skinBlueprint, List<ItemStack> showcaseItems) {
-        super(factory, entity);
+    public Shopkeeper1NPC(NPCFactory factory, String shopName, String shopkeeperName, String skinBlueprint, List<ItemStack> showcaseItems) {
+        super(factory);
         Shops plugin = JavaPlugin.getPlugin(Shops.class);
         this.shopManager = plugin.getInjector().getInstance(ShopManager.class);
         this.clientManager = plugin.getInjector().getInstance(ClientManager.class);
         this.itemFactory = plugin.getInjector().getInstance(ItemFactory.class);
         this.shopName = shopName;
+        this.shopkeeperName = shopkeeperName;
+        this.skinBlueprint = skinBlueprint;
+        this.showcaseItems = showcaseItems;
+    }
 
+    @Override
+    protected void onInit() {
+        super.onInit();
         this.model = ModelEngineAPI.createActiveModel("scene_market_1");
         this.model.setHitboxScale(1.5);
         this.model.getAnimationHandler().setDefaultProperty(new AnimationHandler.DefaultProperty(ModelState.IDLE, "vendor_table_1", 0, 0, 1));
         this.getModeledEntity().addModel(model, true);
         ModelEngineHelper.remapModel(this.model, ModelEngineAPI.getBlueprint(skinBlueprint));
 
-        setupShowcaseItems(showcaseItems);
+        setupShowcaseItems();
 
         BoneTagBehavior.addNameplate(this,
                 this.model,
@@ -73,10 +69,10 @@ public class Shopkeeper1NPC extends ModeledNPC implements Actor {
                 Component.text(shopName, NamedTextColor.YELLOW));
     }
 
-    private void setupShowcaseItems(List<ItemStack> showcaseItems) {
+    private void setupShowcaseItems() {
         if (showcaseItems.isEmpty()) return;
 
-        Location loc = entity.getLocation();
+        Location loc = getEntity().getLocation();
         int count = showcaseItems.size();
         double yawRad = Math.toRadians(loc.getYaw());
 
@@ -87,7 +83,7 @@ public class Shopkeeper1NPC extends ModeledNPC implements Actor {
         double rightX = Math.cos(yawRad);
         double rightZ = Math.sin(yawRad);
 
-        double baseY = loc.getY() + HEIGHT_ABOVE_ENTITY;
+        double baseY = loc.getY() + 1.01;
 
         for (int i = 0; i < count; i++) {
             // (i - (count-1)/2.0) centres the array symmetrically for both odd and even counts:

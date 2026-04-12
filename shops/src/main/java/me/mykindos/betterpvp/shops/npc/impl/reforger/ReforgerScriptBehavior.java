@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.shops.npc.impl.reforger;
 
 import com.ticxo.modelengine.api.animation.property.IAnimationProperty;
 import com.ticxo.modelengine.api.model.ActiveModel;
-import me.mykindos.betterpvp.core.npc.behavior.ModelEngineScriptBehavior;
+import me.mykindos.betterpvp.core.scene.behavior.ModelEngineScriptBehavior;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;

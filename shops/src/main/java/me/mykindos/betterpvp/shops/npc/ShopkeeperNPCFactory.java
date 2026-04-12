@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.shops.npc;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.npc.NPCFactory;
-import me.mykindos.betterpvp.core.npc.NPCRegistry;
-import me.mykindos.betterpvp.core.npc.model.NPC;
+import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
+import me.mykindos.betterpvp.core.scene.npc.NPC;
+import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
 import me.mykindos.betterpvp.shops.npc.impl.AuctionHouseNPC;
 import me.mykindos.betterpvp.shops.npc.impl.Shopkeeper1NPC;
 import me.mykindos.betterpvp.shops.npc.impl.Shopkeeper2NPC;
@@ -26,7 +26,7 @@ import java.util.List;
 public class ShopkeeperNPCFactory extends NPCFactory {
 
     @Inject
-    private ShopkeeperNPCFactory(NPCRegistry registry) {
+    private ShopkeeperNPCFactory(SceneObjectRegistry registry) {
         super("shops", registry);
     }
 
@@ -48,8 +48,8 @@ public class ShopkeeperNPCFactory extends NPCFactory {
     @Override
     public NPC spawnDefault(@NotNull Location location, @NotNull String type) {
         return switch (type) {
-            case "fisherman" -> new ShopkeeperFishermanNPC(this, backingEntity(location), "Fisherman", "Gillbert", "skin_fisherman");
-            case "resource_merchant" ->  {
+            case "fisherman" -> spawnNPC(new ShopkeeperFishermanNPC(this, "Fisherman", "Gillbert", "skin_fisherman"), backingEntity(location));
+            case "resource_merchant" -> {
                 List<ItemStack> items = List.of(
                         ItemStack.of(Material.DIAMOND),
                         ItemStack.of(Material.GOLD_INGOT),
@@ -57,15 +57,15 @@ public class ShopkeeperNPCFactory extends NPCFactory {
                         ItemStack.of(Material.NETHERITE_INGOT),
                         ItemStack.of(Material.EMERALD)
                 );
-                yield new Shopkeeper1NPC(this, backingEntity(location), "Resource Merchant", "Orelando", "skin_resource_merchant", items);
+                yield spawnNPC(new Shopkeeper1NPC(this, "Resource Merchant", "Orelando", "skin_resource_merchant", items), backingEntity(location));
             }
-            case "blacksmith" -> new Shopkeeper2NPC(this, backingEntity(location), "Blacksmith", "Garrick", "skin_blacksmith");
-            case "block_merchant" -> new Shopkeeper2NPC(this, backingEntity(location), "Block Merchant", "Brock", "skin_block_merchant");
-            case "farmer" -> new Shopkeeper3NPC(this, backingEntity(location), "Farmer", "Wesley", "skin_farmer");
-            case "lumberjack" -> new ShopkeeperSitNPC(this, backingEntity(location), "Lumberjack", "Tim Burr", "skin_lumberjack");
-            case "auctioneer" -> new AuctionHouseNPC(this, backingEntity(location), "Auctioneer", "Baxter", "skin_auctioneer");
-            case "attuner" -> new AttunerNPC(this, backingEntity(location), "Attuner", "Josh", "skin_attuner");
-            case "reforger" -> new ReforgerNPC(this, backingEntity(location), "Reforger", "Ragnar", "skin_reforger");
+            case "blacksmith" -> spawnNPC(new Shopkeeper2NPC(this, "Blacksmith", "Garrick", "skin_blacksmith"), backingEntity(location));
+            case "block_merchant" -> spawnNPC(new Shopkeeper2NPC(this, "Block Merchant", "Brock", "skin_block_merchant"), backingEntity(location));
+            case "farmer" -> spawnNPC(new Shopkeeper3NPC(this, "Farmer", "Wesley", "skin_farmer"), backingEntity(location));
+            case "lumberjack" -> spawnNPC(new ShopkeeperSitNPC(this, "Lumberjack", "Tim Burr", "skin_lumberjack"), backingEntity(location));
+            case "auctioneer" -> spawnNPC(new AuctionHouseNPC(this, "Auctioneer", "Baxter", "skin_auctioneer"), backingEntity(location));
+            case "attuner" -> spawnNPC(new AttunerNPC(this, "Attuner", "Josh", "skin_attuner"), backingEntity(location));
+            case "reforger" -> spawnNPC(new ReforgerNPC(this, "Reforger", "Ragnar", "skin_reforger"), backingEntity(location));
             default -> throw new IllegalArgumentException("Invalid shopkeeper type: " + type);
         };
     }
