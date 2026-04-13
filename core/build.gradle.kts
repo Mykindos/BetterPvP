@@ -42,6 +42,7 @@ dependencies {
 
     compileOnly(libs.lombok)
     compileOnly(libs.mythic)
+    compileOnly(libs.mapper)
     compileOnly(libs.modelengine)
     compileOnly(libs.packetevents)
     compileOnly(libs.packetevents)

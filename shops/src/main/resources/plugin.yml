@@ -1,9 +1,0 @@
-author: Mykindos
-main: me.mykindos.betterpvp.shops.Shops
-name: Shops
-load: POSTWORLD
-version: '1.0'
-depend: [Core]
-softdepend:
-  - MythicMobs
-api-version: '1.21'

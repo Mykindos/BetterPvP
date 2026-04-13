@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.FinalPlayerBuyItemEvent;
@@ -22,43 +20,26 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
-import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
-import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
 import me.mykindos.betterpvp.shops.shops.services.ShopItemSellService;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
-import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.block.Jukebox;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
@@ -66,34 +47,20 @@ import java.util.UUID;
 @CustomLog
 public class ShopListener implements Listener {
 
-    private final ShopkeeperManager shopkeeperManager;
-    private final ShopManager shopManager;
     private final ItemRegistry registry;
     private final ItemFactory itemFactory;
     private final ClientManager clientManager;
     private final ShopItemSellService shopItemSellService;
+    private final ShopManager shopManager;
 
     @Inject
-    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemRegistry registry,
-                        ItemFactory itemFactory, ClientManager clientManager, ShopItemSellService shopItemSellService) {
-        this.shopkeeperManager = shopkeeperManager;
-        this.shopManager = shopManager;
+    public ShopListener(ItemRegistry registry, ItemFactory itemFactory, ClientManager clientManager,
+                        ShopItemSellService shopItemSellService, ShopManager shopManager) {
         this.registry = registry;
         this.itemFactory = itemFactory;
         this.clientManager = clientManager;
         this.shopItemSellService = shopItemSellService;
-    }
-
-    @EventHandler
-    public void onInteract(PlayerInteractEntityEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-        if (!(event.getRightClicked() instanceof LivingEntity target)) return;
-
-
-        Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId().toString());
-        shopkeeperOptional.ifPresent(shopkeeper -> {
-            shopManager.showShopMenu(event.getPlayer(), shopkeeper.getShopkeeperName(), itemFactory, clientManager);
-        });
+        this.shopManager = shopManager;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -302,81 +269,6 @@ public class ShopListener implements Listener {
 
         UtilMessage.simpleBroadcast("Shop", "Dynamic prices have been updated!",
                 Component.text("This means that buy / sell prices on farming items have been adjusted to reflect the current market.", NamedTextColor.GRAY));
-    }
-
-    @EventHandler
-    public void onDamage(DamageEvent event) {
-        if (shopkeeperManager.getObject(event.getDamagee().getUniqueId().toString()).isPresent()) {
-            event.cancel("Cannot damage shopkeepers");
-        }
-    }
-
-    @EventHandler
-    public void onCollide(ThrowableHitEntityEvent event) {
-        if (shopkeeperManager.getObject(event.getCollision().getUniqueId().toString()).isPresent()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onCatch(PlayerFishEvent event) {
-        if (event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
-            if (event.getCaught() == null) return;
-            if (shopkeeperManager.getObject(event.getCaught().getUniqueId().toString()).isPresent()) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
-        event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId().toString()).isPresent());
-    }
-
-    private static final Material[] MUSIC_DISC_MATERIALS = {
-            Material.MUSIC_DISC_RELIC,
-            Material.MUSIC_DISC_OTHERSIDE,
-            Material.MUSIC_DISC_PIGSTEP
-    };
-
-    @UpdateEvent(delay = 1000)
-    public void playParrotMusic() {
-
-        Material song = MUSIC_DISC_MATERIALS[UtilMath.randomInt(MUSIC_DISC_MATERIALS.length)];
-        for (var shopkeeper : shopkeeperManager.getObjects().values()) {
-            if (shopkeeper instanceof ParrotShopkeeper) {
-                Block block = shopkeeper.getEntity().getLocation().subtract(0, 2, 0).getBlock();
-                if (block.getType() == Material.JUKEBOX) {
-                    if (block.getState() instanceof Jukebox jukeboxState) {
-                        if (!jukeboxState.isPlaying()) {
-                            jukeboxState.setRecord(new ItemStack(song));
-                            jukeboxState.update();
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    private boolean loaded;
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        if (shopkeeperManager.getObjects().isEmpty()) {
-            if (!loaded) {
-                UtilServer.runTaskLater(JavaPlugin.getPlugin(Shops.class), shopkeeperManager::loadShopsFromConfig, 100L);
-                loaded = true;
-            }
-        }
-    }
-
-    @UpdateEvent(delay = 10000)
-    public void checkShopkeepers() {
-        if (shopkeeperManager.getObjects().values().stream().anyMatch(shopkeeper -> shopkeeper.getEntity() == null
-                || shopkeeper.getEntity().isDead())) {
-            shopkeeperManager.loadShopsFromConfig();
-        }
     }
 
 }

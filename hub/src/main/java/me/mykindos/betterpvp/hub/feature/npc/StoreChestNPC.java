@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.hub.feature.npc;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.npc.model.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -18,7 +18,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Transformation;
@@ -33,13 +32,18 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
     private final CooldownManager cooldownManager;
     private final Hub hub;
 
-    StoreChestNPC(HubNPCFactory factory, Entity entity, CooldownManager cooldownManager, Hub hub) {
-        super(factory, entity);
+    StoreChestNPC(HubNPCFactory factory, CooldownManager cooldownManager, Hub hub) {
+        super(factory);
         this.cooldownManager = cooldownManager;
         this.hub = hub;
+    }
 
-        final Location tagLoc = entity.getLocation().add(0, 2, 0);
-        attachToLifecycle(entity.getWorld().spawn(tagLoc, TextDisplay.class, display -> {
+    @Override
+    protected void onInit() {
+        super.onInit();
+
+        final Location tagLoc = getEntity().getLocation().add(0, 2, 0);
+        attachToLifecycle(getEntity().getWorld().spawn(tagLoc, TextDisplay.class, display -> {
             display.setBackgroundColor(Color.fromARGB(0, 1, 1, 1));
             display.setShadowed(true);
             display.setSeeThrough(false);
@@ -89,6 +93,7 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
 
     @Override
     public void tick() {
+        super.tick();
         final Location location = entity.getLocation();
 
         final long time = System.currentTimeMillis();
