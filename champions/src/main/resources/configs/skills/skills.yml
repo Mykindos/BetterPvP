@@ -20,6 +20,15 @@ skills:
       baseDuration: 1.0
       durationIncreasePerLevel: 1.0
       hitDistance: 4.0
+    deathwish:
+      enabled: true
+      maxlevel: 3
+      damageIncreaseThreshold: 0.75
+      damageIncreaseAmount: 1.0
+      attackSpeedIncreaseThreshold: 0.5
+      attackSpeedIncreaseAmount: 20
+      effectDuration: 3.0
+      effectDurationIncreasePerLevel: 2.0
     shockingstrikes:
       enabled: true
       maxlevel: 3
