@@ -216,7 +216,7 @@ public class Deathwish extends Skill implements Listener {
 
                     // FX
                     spawnEndEffectParticles(player);
-                    return;
+                    continue;
                 }
             }
 
@@ -224,7 +224,7 @@ public class Deathwish extends Skill implements Listener {
             if (hasTimeElapsed) {
                 spawnEndEffectParticles(player);
                 iterator.remove();
-                return;
+                continue;
             }
 
             spawnThresholdParticles(player, abilityData.getCurrentThreshold());
