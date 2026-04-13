@@ -12,7 +12,6 @@ Repository containing all of BetterPvP's plugins for 1.21.11
 - [ModelEngine](https://www.spigotmc.org/resources/modelengine.79477/) (soft, used by: Clans, Game, Hub)
 
 - A Postgres server ([Bundled](docker))
-- A Redis server (optional) ([Bundled](docker))
 ## Development Setup
 1. Clone this repository and open it with your IDE of choice:
     ```bash
