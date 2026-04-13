@@ -6,21 +6,20 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
+import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
+import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.inventory.window.WindowManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.menu.Menu;
-import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
-import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
-import me.mykindos.betterpvp.core.menu.impl.PagedSingleWindow;
+import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItemRepository;
+import me.mykindos.betterpvp.shops.shops.menus.SellAllMenu;
+import me.mykindos.betterpvp.shops.shops.menus.ShopContext;
+import me.mykindos.betterpvp.shops.shops.menus.ShopItemMenu;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
-import me.mykindos.betterpvp.shops.shops.menus.buttons.SellAllButton;
 import me.mykindos.betterpvp.shops.shops.services.ShopItemSellService;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +31,18 @@ public class ShopManager {
 
     private final ShopItemRepository shopItemRepository;
     private final ShopItemSellService shopItemSellService;
+    private final ItemFactory itemFactory;
+    private final ClientManager clientManager;
 
     private Map<String, List<IShopItem>> shopItems = new HashMap<>();
 
     @Inject
-    public ShopManager(ShopItemRepository shopItemRepository, ShopItemSellService shopItemSellService) {
+    public ShopManager(ShopItemRepository shopItemRepository, ShopItemSellService shopItemSellService,
+                       ItemFactory itemFactory, ClientManager clientManager) {
         this.shopItemRepository = shopItemRepository;
         this.shopItemSellService = shopItemSellService;
+        this.itemFactory = itemFactory;
+        this.clientManager = clientManager;
         loadShopItems();
     }
 
@@ -52,47 +56,31 @@ public class ShopManager {
     }
 
     /**
-     * Shows the specified Shop GUI to the player
-     * @param player the player to show
-     * @param shopkeeper the name of the shopkeeper
-     * @param itemFactory the itemFactory, to pass to ShopMenu
-     * @param clientManager the clientManager, to pass to ShopMenu
+     * Shows the specified Shop GUI to the player.
      */
-    public void showShopMenu(Player player, String shopkeeper, ItemFactory itemFactory, ClientManager clientManager) {
+    public void showShopMenu(Player player, String shopkeeper) {
         List<IShopItem> shopkeeperItems = getShopItems(shopkeeper);
         if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
-        int maxPages = getShopItems(shopkeeper).stream()
-                .map(IShopItem::getPage)
-                .max(Integer::compareTo)
-                .orElse(0);
-        // 50 is the max slot
-        PagedGui.Builder<Gui> builder = PagedGui.guis();
-        builder.setStructure("x x x x x x x x x",
-                        "x x x x x x x x x",
-                        "x x x x x x x x x",
-                        "x x x x x x x x x",
-                        "x x x x x x x x x",
-                        "x x x < - > x x s")
-                .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PageBackwardButton())
-                .addIngredient('-', new BackButton(null))
-                .addIngredient('>', new PageForwardButton())
-                .addIngredient('s', new SellAllButton(shopkeeperItems, shopItemSellService));
-        for (int i = 1; i <= maxPages; i++) {
-            builder.addContent(new ShopMenu(i,
-                    shopkeeperItems,
-                    itemFactory,
-                    clientManager)
-            );
-        }
-        PagedSingleWindow window = (PagedSingleWindow) PagedSingleWindow.builder()
-                .setTitle(shopkeeper + " (1)")
-                .setGui(builder)
-                .build(player);
-        window.addPageChangeHandler((current, next) -> window.changeTitle(shopkeeper + " (" + (next + 1) + ")"));
-        window.open();
+        List<IShopItem> allItems = shopItems.values().stream().flatMap(Collection::stream).toList();
+        ShopContext context = new ShopContext(itemFactory, clientManager, shopItemSellService, allItems);
+        new ShopMenu(shopkeeper, shopkeeperItems, context).show(player);
         log.info("{} opened Shop: {}", player.getName(), shopkeeper).submit();
+    }
+
+    public void notifyDynamicPriceChanged(DynamicShopItem shopItem) {
+        for (Window window : WindowManager.getInstance().getWindows()) {
+            if (!(window instanceof AbstractSingleWindow singleWindow)) {
+                continue;
+            }
+
+            if (singleWindow.getGui() instanceof ShopMenu menu && menu.containsShopItem(shopItem)) {
+                menu.refresh();
+            } else if (singleWindow.getGui() instanceof ShopItemMenu menu && menu.isViewingShopItem(shopItem)) {
+                menu.notifyOpenWindows();
+            } else if (singleWindow.getGui() instanceof SellAllMenu menu && menu.containsShopItem(shopItem)) {
+                menu.notifyPriceChanged();
+            }
+        }
     }
 }

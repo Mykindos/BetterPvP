@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -50,7 +49,7 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
             lore.add(Component.text(""));
             lore.add(UtilMessage.DIVIDER);
             lore.add(Component.text(""));
-            lore.add(Component.text(ClickActions.LEFT.getName() + " to ", NamedTextColor.WHITE).append(Component.text("Withdraw", NamedTextColor.YELLOW)));
+            lore.add(ClickActions.LEFT.to(Component.text("Withdraw")));
             meta.lore(lore);
         });
 

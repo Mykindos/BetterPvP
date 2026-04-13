@@ -4,8 +4,6 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.animation.ModelState;
 import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
@@ -23,8 +21,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ShopkeeperFishermanNPC extends ModeledNPC implements Actor {
 
     private final ShopManager shopManager;
-    private final ClientManager clientManager;
-    private final ItemFactory itemFactory;
     private final String shopName;
     private final String shopkeeperName;
     private final String skinBlueprint;
@@ -34,8 +30,6 @@ public class ShopkeeperFishermanNPC extends ModeledNPC implements Actor {
         super(factory);
         Shops plugin = JavaPlugin.getPlugin(Shops.class);
         this.shopManager = plugin.getInjector().getInstance(ShopManager.class);
-        this.clientManager = plugin.getInjector().getInstance(ClientManager.class);
-        this.itemFactory = plugin.getInjector().getInstance(ItemFactory.class);
         this.shopName = shopName;
         this.shopkeeperName = shopkeeperName;
         this.skinBlueprint = skinBlueprint;
@@ -60,7 +54,7 @@ public class ShopkeeperFishermanNPC extends ModeledNPC implements Actor {
     @Override
     public void act(Player runner) {
         // Open
-        this.shopManager.showShopMenu(runner, shopName, itemFactory, clientManager);
+        this.shopManager.showShopMenu(runner, shopName);
 
         // SFX
         new SoundEffect(Sound.ENTITY_VILLAGER_YES).play(runner);

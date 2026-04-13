@@ -12,7 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
-@ItemKey("core:coal_item")
+@ItemKey("core:coal")
 @FallbackItem(value = Material.COAL, keepRecipes = true)
 public class CoalItem extends BaseItem {
 

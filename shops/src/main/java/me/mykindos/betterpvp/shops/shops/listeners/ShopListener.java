@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.components.shops.events.FinalPlayerSellItemEve
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.inventory.inventory.Inventory;
+import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
@@ -21,7 +23,6 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
@@ -65,27 +66,11 @@ public class ShopListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBuyItem(PlayerBuyItemEvent event) {
-        boolean isShifting = event.getClickType().name().contains("SHIFT");
-
-        //Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
-        //if(isShifting && ((weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)
-        //        || event.getItem().getItemMeta() instanceof Damageable)) {
-        //    isShifting = false;
-        //}
-
-        if (event.getItem().getMaxStackSize() == 1) {
-            isShifting = false;
-        }
-
-        int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
+        int requestedAmount = event.getRequestedAmount();
+        int cost = event.getShopItem().getBuyPrice() * requestedAmount;
 
         if (event.getCurrency() == ShopCurrency.COINS) {
             if (event.getGamer().getIntProperty(GamerProperty.BALANCE) < cost) {
-                event.cancel("You have insufficient funds to purchase this item.");
-                return;
-            }
-        } else if (event.getCurrency() == ShopCurrency.FRAGMENTS) {
-            if (event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) < cost) {
                 event.cancel("You have insufficient funds to purchase this item.");
                 return;
             }
@@ -111,60 +96,30 @@ public class ShopListener implements Listener {
             return;
         }
 
-        boolean isShifting = event.getClickType().name().contains("SHIFT");
-
-        //Optional<IWeapon> weaponByItemStack = weaponManager.getWeaponByItemStack(event.getItem());
-        //if(isShifting && (weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)) {
-        //    isShifting = false;
-        //}
-
-        if (event.getItem().getMaxStackSize() == 1) {
-            isShifting = false;
-        }
-
         final IShopItem shopItem = event.getShopItem();
-
-        int amount;
-        int cost;
-        if (shopItem.getAmount() == 1) {
-            amount = isShifting ? 64 : shopItem.getAmount();
-            cost = amount * shopItem.getBuyPrice();
-        } else {
-            amount = shopItem.getAmount();
-            cost = shopItem.getBuyPrice();
-        }
-
-
+        int amount = event.getRequestedAmount();
+        int cost = amount * shopItem.getBuyPrice();
         if (event.getCurrency() == ShopCurrency.COINS) {
             event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost);
-        } else if (event.getCurrency() == ShopCurrency.FRAGMENTS) {
-            event.getGamer().saveProperty(GamerProperty.FRAGMENTS.name(), event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) - cost);
         } else if (event.getCurrency() == ShopCurrency.BARK) {
             Player player = event.getPlayer();
             UtilInventory.remove(player, "progression:tree_bark", cost);
         }
 
         if (event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
-            dynamicShopItem.setCurrentStock(Math.max(0, dynamicShopItem.getCurrentStock() - amount));
+            setCurrentStockAndNotify(dynamicShopItem, Math.max(0, dynamicShopItem.getCurrentStock() - amount));
         }
 
-        ItemStack boughtItem = new ItemStack(event.getShopItem().getMaterial(), amount);
-        boughtItem.editMeta(meta -> {
-            if (event.getShopItem().getModelData() != 0) {
-                meta.setCustomModelData(event.getShopItem().getModelData());
-            }
-        });
-
+        ItemStack boughtItem = shopItemSellService.createShopItemStack(event.getShopItem(), amount);
         final ItemInstance instanceResult = itemFactory.fromItemStack(boughtItem).orElseThrow();
         final ItemStack result = instanceResult.createItemStack();
         UtilItem.insert(event.getPlayer(), result);
         UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
-                amount, event.getShopItem().getItemName(), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
-        UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
+                amount, shopItemSellService.getItemName(event.getShopItem()), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
         log.info("{} purchased {}x {} for {} {}",
-                        event.getPlayer().getName(), amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase())
+                        event.getPlayer().getName(), amount, shopItemSellService.getItemName(event.getShopItem()), cost, event.getCurrency().name().toLowerCase())
                 .setAction("SHOP_BUY").addClientContext(event.getPlayer())
-                .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
+                .addContext("ShopItem", shopItemSellService.getItemName(event.getShopItem())).addContext("Amount", amount + "")
                 .addContext("Price", cost + "").submit();
 
         // Log the item purchase with UUID
@@ -190,53 +145,89 @@ public class ShopListener implements Listener {
             return;
         }
 
+        int count = 0;
+        for (ItemStack content : event.getInventory().getItems()) {
+            if (content == null) continue;
+            if (shopItemSellService.canSellItem(content, event.getShopItem())) {
+                count += content.getAmount();
+            }
+        }
+        if (count < event.getRequestedAmount()) {
+            event.cancel("You do not have enough of this item to sell.");
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onFinalSellItem(PlayerSellItemEvent event) {
         Player player = event.getPlayer();
+        ShopItem shopItem = (ShopItem) event.getShopItem();
 
         if (event.isCancelled()) {
-            UtilMessage.message(event.getPlayer(), "Shop", event.getCancelReason());
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
-            return;
-        }
-
-        ShopItem shopItem = (ShopItem) event.getShopItem();
-        boolean isShifting = event.getClickType().name().contains("SHIFT");
-
-        if (player.getInventory().contains(event.getItem().getType())) {
-            for (int i = 0; i < player.getInventory().getSize(); i++) {
-                ItemStack item = player.getInventory().getItem(i);
-                if (item == null) continue;
-
-                if (shopItemSellService.canSellItem(item, shopItem)) {
-                    int amount = shopItem.getAmount() == 1
-                        ? (isShifting ? item.getAmount() : shopItem.getAmount())
-                        : shopItem.getAmount();
-
-                    if (item.getAmount() >= amount) {
-                        ShopItemSellService.SellResult result = shopItemSellService.sellItem(player, item, shopItem, amount);
-                        if (result.success) {
-                            shopItemSellService.removeItemFromInventory(player, i, amount);
-
-                            UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
-                            UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
-                                    result.amountSold, result.itemName, UtilFormat.formatNumber(result.totalEarned), event.getCurrency().name().toLowerCase());
-
-                            log.info("{} sold {}x {} for {} {}",
-                                    event.getPlayer().getName(), result.amountSold, result.itemName, result.totalEarned, event.getCurrency().name().toLowerCase())
-                                    .setAction("SHOP_SELL").addClientContext(event.getPlayer())
-                                    .addContext("ShopItem", result.itemName).addContext("Amount", result.amountSold + "")
-                                    .addContext("Price", result.totalEarned + "").submit();
-
-                            new FinalPlayerSellItemEvent(player, event.getGamer(), event.getShopItem(), event.getItem(), event.getCurrency(), result.amountSold, result.totalEarned).callEvent();
-                        }
-                        return;
+            UtilMessage.message(player, "Shop", event.getCancelReason());
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
+            // For staged sells the items live in a VirtualInventory; return them so they are
+            // not silently discarded when the menu closes.
+            if (event.getInventory() instanceof VirtualInventory virtualInventory) {
+                for (int i = 0; i < virtualInventory.getSize(); i++) {
+                    ItemStack item = virtualInventory.getItem(i);
+                    if (item != null && shopItemSellService.canSellItem(item, shopItem)) {
+                        UtilItem.insert(player, item);
+                        virtualInventory.setItem(null, i, null);
                     }
                 }
             }
+            return;
         }
+
+        // Remove matching items from whichever inventory was provided (VirtualInventory or
+        // ReferencingInventory), logging UUIDs as we go and capturing a representative stack
+        // for the FinalPlayerSellItemEvent.
+        Inventory inv = event.getInventory();
+        int remaining = event.getRequestedAmount();
+        ItemStack representative = null;
+        for (int i = 0; i < inv.getSize() && remaining > 0; i++) {
+            ItemStack item = inv.getItem(i);
+            if (item == null || !shopItemSellService.canSellItem(item, shopItem)) continue;
+            if (representative == null) representative = item.clone();
+            shopItemSellService.logSellUUID(player, item);
+            int take = Math.min(item.getAmount(), remaining);
+            remaining -= take;
+            if (take >= item.getAmount()) {
+                inv.setItem(null, i, null);
+            } else {
+                ItemStack reduced = item.clone();
+                reduced.setAmount(item.getAmount() - take);
+                inv.setItem(null, i, reduced);
+            }
+        }
+
+        if (remaining > 0) {
+            // Items were present at validation time but are gone now; abort without side effects.
+            UtilMessage.message(player, "Shop", "You do not have enough of this item to sell.");
+            return;
+        }
+
+        int totalSold = event.getRequestedAmount();
+        int totalEarned = totalSold * shopItem.getSellPrice();
+        String itemName = shopItemSellService.getItemName(shopItem);
+
+        event.getGamer().saveProperty(GamerProperty.BALANCE.name(),
+                event.getGamer().getIntProperty(GamerProperty.BALANCE) + totalEarned);
+
+        if (shopItem instanceof DynamicShopItem dynamicShopItem) {
+            setCurrentStockAndNotify(dynamicShopItem, Math.min(dynamicShopItem.getMaxStock(),
+                    dynamicShopItem.getCurrentStock() + totalSold));
+        }
+
+        UtilMessage.simpleMessage(player, "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
+                totalSold, itemName, UtilFormat.formatNumber(totalEarned), event.getCurrency().name().toLowerCase());
+
+        log.info("{} sold {}x {} for {} {}", player.getName(), totalSold, itemName, totalEarned, event.getCurrency().name().toLowerCase())
+                .setAction("SHOP_SELL").addClientContext(player)
+                .addContext("ShopItem", itemName).addContext("Amount", totalSold + "")
+                .addContext("Price", totalEarned + "").submit();
+
+        new FinalPlayerSellItemEvent(player, event.getGamer(), event.getShopItem(), representative, event.getCurrency(), totalSold, totalEarned).callEvent();
     }
 
     @UpdateEvent(delay = 180_000) // 3 minutes
@@ -259,9 +250,9 @@ public class ShopListener implements Listener {
             shopItems.forEach(shopItem -> {
                 if (shopItem instanceof DynamicShopItem dynamicShopItem) {
                     if (dynamicShopItem.getCurrentStock() < dynamicShopItem.getBaseStock()) {
-                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() + (dynamicShopItem.getBaseStock() / 15)));
+                        setCurrentStockAndNotify(dynamicShopItem, (int) (dynamicShopItem.getCurrentStock() + (dynamicShopItem.getBaseStock() / 15)));
                     } else if (dynamicShopItem.getCurrentStock() > dynamicShopItem.getBaseStock()) {
-                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() - (dynamicShopItem.getBaseStock() / 15)));
+                        setCurrentStockAndNotify(dynamicShopItem, (int) (dynamicShopItem.getCurrentStock() - (dynamicShopItem.getBaseStock() / 15)));
                     }
                 }
             });
@@ -269,6 +260,15 @@ public class ShopListener implements Listener {
 
         UtilMessage.simpleBroadcast("Shop", "Dynamic prices have been updated!",
                 Component.text("This means that buy / sell prices on farming items have been adjusted to reflect the current market.", NamedTextColor.GRAY));
+    }
+
+    private void setCurrentStockAndNotify(DynamicShopItem shopItem, int currentStock) {
+        int oldBuyPrice = shopItem.getBuyPrice();
+        int oldSellPrice = shopItem.getSellPrice();
+        shopItem.setCurrentStock(currentStock);
+        if (oldBuyPrice != shopItem.getBuyPrice() || oldSellPrice != shopItem.getSellPrice()) {
+            shopManager.notifyDynamicPriceChanged(shopItem);
+        }
     }
 
 }

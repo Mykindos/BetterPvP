@@ -14,8 +14,6 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -131,9 +129,7 @@ public class ItemView implements ItemProvider {
             final List<Component> currentLore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
             currentLore.add(Component.empty());
             actions.forEach((clickType, action) -> {
-                final TextComponent clickTo = Component.text(clickType.getName() + " to ", NamedTextColor.WHITE);
-                final TextComponent result = clickTo.append(action.applyFallbackStyle(NamedTextColor.YELLOW));
-                currentLore.add(result);
+                currentLore.add(clickType.to(action));
             });
             meta.lore(currentLore);
         }

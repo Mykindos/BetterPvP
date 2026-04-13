@@ -5,7 +5,6 @@ package me.mykindos.betterpvp.shops.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.shops.database.jooq.tables.Shopitems;
-
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -49,100 +48,10 @@ public class ShopitemsRecord extends UpdatableRecordImpl<ShopitemsRecord> {
     }
 
     /**
-     * Setter for <code>public.shopitems.material</code>.
-     */
-    public ShopitemsRecord setMaterial(String value) {
-        set(2, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.shopitems.material</code>.
-     */
-    public String getMaterial() {
-        return (String) get(2);
-    }
-
-    /**
-     * Setter for <code>public.shopitems.item_name</code>.
-     */
-    public ShopitemsRecord setItemName(String value) {
-        set(3, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.shopitems.item_name</code>.
-     */
-    public String getItemName() {
-        return (String) get(3);
-    }
-
-    /**
-     * Setter for <code>public.shopitems.model_data</code>.
-     */
-    public ShopitemsRecord setModelData(Integer value) {
-        set(4, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.shopitems.model_data</code>.
-     */
-    public Integer getModelData() {
-        return (Integer) get(4);
-    }
-
-    /**
-     * Setter for <code>public.shopitems.menu_slot</code>.
-     */
-    public ShopitemsRecord setMenuSlot(Integer value) {
-        set(5, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.shopitems.menu_slot</code>.
-     */
-    public Integer getMenuSlot() {
-        return (Integer) get(5);
-    }
-
-    /**
-     * Setter for <code>public.shopitems.menu_page</code>.
-     */
-    public ShopitemsRecord setMenuPage(Integer value) {
-        set(6, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.shopitems.menu_page</code>.
-     */
-    public Integer getMenuPage() {
-        return (Integer) get(6);
-    }
-
-    /**
-     * Setter for <code>public.shopitems.amount</code>.
-     */
-    public ShopitemsRecord setAmount(Integer value) {
-        set(7, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.shopitems.amount</code>.
-     */
-    public Integer getAmount() {
-        return (Integer) get(7);
-    }
-
-    /**
      * Setter for <code>public.shopitems.buy_price</code>.
      */
     public ShopitemsRecord setBuyPrice(Integer value) {
-        set(8, value);
+        set(2, value);
         return this;
     }
 
@@ -150,14 +59,14 @@ public class ShopitemsRecord extends UpdatableRecordImpl<ShopitemsRecord> {
      * Getter for <code>public.shopitems.buy_price</code>.
      */
     public Integer getBuyPrice() {
-        return (Integer) get(8);
+        return (Integer) get(2);
     }
 
     /**
      * Setter for <code>public.shopitems.sell_price</code>.
      */
     public ShopitemsRecord setSellPrice(Integer value) {
-        set(9, value);
+        set(3, value);
         return this;
     }
 
@@ -165,7 +74,37 @@ public class ShopitemsRecord extends UpdatableRecordImpl<ShopitemsRecord> {
      * Getter for <code>public.shopitems.sell_price</code>.
      */
     public Integer getSellPrice() {
-        return (Integer) get(9);
+        return (Integer) get(3);
+    }
+
+    /**
+     * Setter for <code>public.shopitems.item_key</code>.
+     */
+    public ShopitemsRecord setItemKey(String value) {
+        set(4, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.shopitems.item_key</code>.
+     */
+    public String getItemKey() {
+        return (String) get(4);
+    }
+
+    /**
+     * Setter for <code>public.shopitems.order</code>.
+     */
+    public ShopitemsRecord setOrder(Integer value) {
+        set(5, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.shopitems.order</code>.
+     */
+    public Integer getOrder() {
+        return (Integer) get(5);
     }
 
     // -------------------------------------------------------------------------
@@ -191,19 +130,15 @@ public class ShopitemsRecord extends UpdatableRecordImpl<ShopitemsRecord> {
     /**
      * Create a detached, initialised ShopitemsRecord
      */
-    public ShopitemsRecord(Integer id, String shopkeeper, String material, String itemName, Integer modelData, Integer menuSlot, Integer menuPage, Integer amount, Integer buyPrice, Integer sellPrice) {
+    public ShopitemsRecord(Integer id, String shopkeeper, Integer buyPrice, Integer sellPrice, String itemKey, Integer order) {
         super(Shopitems.SHOPITEMS);
 
         setId(id);
         setShopkeeper(shopkeeper);
-        setMaterial(material);
-        setItemName(itemName);
-        setModelData(modelData);
-        setMenuSlot(menuSlot);
-        setMenuPage(menuPage);
-        setAmount(amount);
         setBuyPrice(buyPrice);
         setSellPrice(sellPrice);
+        setItemKey(itemKey);
+        setOrder(order);
         resetChangedOnNotNull();
     }
 }

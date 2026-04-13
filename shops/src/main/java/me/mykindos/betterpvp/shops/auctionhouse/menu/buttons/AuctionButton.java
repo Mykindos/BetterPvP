@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
@@ -23,7 +22,6 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class AuctionButton extends ControlItem<AuctionListingMenu> {
 
@@ -53,9 +51,9 @@ public class AuctionButton extends ControlItem<AuctionListingMenu> {
 
             lore.add(Component.text("Expires: ", NamedTextColor.WHITE).append(Component.text(prettyTime.format(new Date(auction.getExpiryTime())), NamedTextColor.YELLOW)));
             lore.add(Component.text(""));
-            lore.add(Component.text(ClickActions.LEFT.getName() + " to ", NamedTextColor.WHITE).append(Component.text("Purchase", NamedTextColor.YELLOW)));
+            lore.add(ClickActions.LEFT.to(Component.text("Purchase")));
             if(auction.getSeller().equals(gui.getPlayer().getUniqueId()) || gui.getPlayer().isOp()){
-                lore.add(Component.text(ClickActions.RIGHT.getName() + " to ", NamedTextColor.WHITE).append(Component.text("Cancel", NamedTextColor.YELLOW)));
+                lore.add(ClickActions.RIGHT.to(Component.text("Cancel")));
             }
 
             meta.lore(lore);

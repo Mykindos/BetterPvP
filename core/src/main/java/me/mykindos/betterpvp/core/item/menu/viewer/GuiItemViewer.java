@@ -1,14 +1,5 @@
 package me.mykindos.betterpvp.core.item.menu.viewer;
 
-import io.papermc.paper.dialog.Dialog;
-import io.papermc.paper.registry.RegistryBuilderFactory;
-import io.papermc.paper.registry.data.dialog.ActionButton;
-import io.papermc.paper.registry.data.dialog.DialogBase;
-import io.papermc.paper.registry.data.dialog.DialogRegistryEntry;
-import io.papermc.paper.registry.data.dialog.action.DialogAction;
-import io.papermc.paper.registry.data.dialog.input.DialogInput;
-import io.papermc.paper.registry.data.dialog.input.TextDialogInput;
-import io.papermc.paper.registry.data.dialog.type.DialogType;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -26,14 +17,13 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
+import me.mykindos.betterpvp.core.menu.button.filter.NameSearchButton;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
@@ -96,7 +86,10 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
 
         this.recipeRegistries = recipeRegistries;
 
-        setItem(45, new NameSearchButton());
+        setItem(45, new NameSearchButton(() -> nameSearch, newName -> {
+            nameSearch = newName;
+            refresh();
+        }));
         setItem(46, new CustomOnlyButton());
         setItem(47, new RaritySearchButton());
         setItem(52, new AutoUpdateItem(1, () -> {
@@ -275,58 +268,4 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
         }
     }
 
-    @SuppressWarnings("UnstableApiUsage")
-    private class NameSearchButton extends AbstractItem {
-
-        @Override
-        public ItemProvider getItemProvider() {
-            if (nameSearch == null) {
-                return ItemView.builder()
-                        .material(Material.PAPER)
-                        .itemModel(Key.key("betterpvp", "menu/icon/regular/magnifying_glass_icon"))
-                        .displayName(Component.text("Search", NamedTextColor.GRAY))
-                        .action(ClickActions.LEFT, Component.text("Search"))
-                        .build();
-            }
-
-            return ItemView.builder()
-                    .material(Material.PAPER)
-                    .itemModel(Key.key("betterpvp", "menu/icon/regular/magnifying_glass_icon"))
-                    .displayName(Component.text("Search: ", NamedTextColor.GRAY).
-                            append(Component.text(nameSearch, NamedTextColor.GOLD)))
-                    .action(ClickActions.LEFT, Component.text("Change Search"))
-                    .action(ClickActions.RIGHT, Component.text("Clear Search"))
-                    .build();
-        }
-
-        @Override
-        public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-            if (clickType.isLeftClick()) {
-                final Dialog dialog = Dialog.create(this::createDialog);
-                player.showDialog(dialog);
-            } else {
-                nameSearch = null;
-                refresh();
-                notifyWindows();
-            }
-        }
-
-        private void createDialog(RegistryBuilderFactory<@NotNull Dialog, ? extends DialogRegistryEntry.Builder> factory) {
-            final DialogRegistryEntry.Builder builder = factory.empty();
-            final TextDialogInput input = DialogInput.text("search", Component.text("Search an item by name")).maxLength(20).build();
-            builder.base(DialogBase.builder(Component.text("Search"))
-                    .inputs(List.of(input))
-                    .build());
-
-            builder.type(DialogType.confirmation(
-                    ActionButton.builder(Component.text("Search")).action(DialogAction.customClick((response, audience) -> {
-                        final String text = response.getText("search");
-                        nameSearch = (text == null || text.isBlank()) ? null : text.toLowerCase().replace(" ", "_");
-                        refresh();
-                        notifyWindows();
-                    }, ClickCallback.Options.builder().build())).build(),
-                    ActionButton.builder(Component.text("Cancel")).build()
-            ));
-        }
-    }
 }

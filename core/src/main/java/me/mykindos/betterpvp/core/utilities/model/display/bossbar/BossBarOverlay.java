@@ -36,10 +36,6 @@ public class BossBarOverlay {
 
     private final Object lock = new Object();
 
-    // -------------------------------------------------------------------------
-    // Management
-    // -------------------------------------------------------------------------
-
     /**
      * Adds an overlay to the list.
      *
@@ -75,10 +71,6 @@ public class BossBarOverlay {
             return !overlays.isEmpty();
         }
     }
-
-    // -------------------------------------------------------------------------
-    // Display
-    // -------------------------------------------------------------------------
 
     /**
      * Composites all active overlays into the boss bar name and shows it to the player.
@@ -117,11 +109,11 @@ public class BossBarOverlay {
         }
 
         if (combined == null) {
-            bar.removeViewer(player);
-        } else {
-            bar.name(combined);
-            bar.addViewer(player);
+            combined = Component.empty();
         }
+
+        bar.name(combined);
+        bar.addViewer(player);
     }
 
     /** Removes expired/invalid overlays from the list. */

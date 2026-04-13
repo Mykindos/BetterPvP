@@ -65,7 +65,8 @@ public class ItemInstanceView implements ItemProvider {
                 DataComponentTypes.CAN_BREAK,
                 DataComponentTypes.CAN_PLACE_ON,
                 DataComponentTypes.ATTRIBUTE_MODIFIERS,
-                DataComponentTypes.CHARGED_PROJECTILES
+                DataComponentTypes.CHARGED_PROJECTILES,
+                DataComponentTypes.BLOCK_DATA
         );
         itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, tooltipBuilder.build());
 
