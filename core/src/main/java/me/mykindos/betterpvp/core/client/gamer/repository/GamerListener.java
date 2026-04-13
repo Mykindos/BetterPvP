@@ -73,8 +73,6 @@ public class GamerListener implements Listener {
                 gamer.getPlayerList().show(gamer);
                 gamer.getExperienceBar().show(gamer);
                 gamer.getExperienceLevel().show(gamer);
-                gamer.getBossBarQueue().show(gamer);
-                gamer.getBossBarOverlay().show(gamer);
             });
         }catch(Exception ex) {
             log.error("Error with gamer async onUpdateAsync", ex).submit();
