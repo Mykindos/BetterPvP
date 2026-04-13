@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.scene;
 
 import me.mykindos.betterpvp.core.scene.behavior.SceneBehavior;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
 import org.bukkit.entity.Entity;
 
@@ -72,7 +73,9 @@ public abstract class SceneEntity extends SceneObject implements Ticked {
         behaviors.forEach(SceneBehavior::stop);
         behaviors.clear();
         for (Entity attachedEntity : attached) {
-            attachedEntity.remove();
+            if (!UtilEntity.isRemoved(attachedEntity)) {
+                attachedEntity.remove();
+            }
         }
         attached.clear();
         super.remove();

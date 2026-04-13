@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.scene.SceneEntity;
 import me.mykindos.betterpvp.core.scene.SceneObject;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -114,7 +115,7 @@ public class BoneTagBehavior implements SceneBehavior {
      */
     @Override
     public void stop() {
-        if (display != null && display.isValid()) {
+        if (display != null && !UtilEntity.isRemoved(display)) {
             display.remove();
         }
         display = null;
