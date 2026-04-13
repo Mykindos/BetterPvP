@@ -175,9 +175,8 @@ public class Deathwish extends Skill implements Listener {
             return;
         }
 
-        // Player is above both thresholds, so we clear any active effects; player will be removed from map during
-        // update event
-        clearAttackSpeedEffect(player);
+        // Player is above both thresholds
+        abilityData.setLastEffectTime(currentTime);  // clear gray particles after times up
     }
 
     /**
@@ -209,6 +208,7 @@ public class Deathwish extends Skill implements Listener {
             final long effectDurationMillis = (long) (getEffectDuration(level) * 1000L);
             final boolean hasTimeElapsed = UtilTime.elapsed(abilityData.getLastEffectTime(), effectDurationMillis);
 
+            // Case: threshold advanced and either time is up or player healed too much
             if (hasTimeElapsed || UtilPlayer.getHealthPercentage(player) > getDamageIncreaseThreshold(level)) {
                 if (abilityData.getCurrentThreshold().getLevel() > DeathwishThreshold.NONE.getLevel()) {
                     clearAttackSpeedEffect(player);
@@ -216,9 +216,15 @@ public class Deathwish extends Skill implements Listener {
 
                     // FX
                     spawnEndEffectParticles(player);
-                    player.playSound(player, Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
                     return;
                 }
+            }
+
+            // Case: time is up but threshold never advanced past NONE
+            if (hasTimeElapsed) {
+                spawnEndEffectParticles(player);
+                iterator.remove();
+                return;
             }
 
             spawnThresholdParticles(player, abilityData.getCurrentThreshold());
@@ -226,6 +232,7 @@ public class Deathwish extends Skill implements Listener {
     }
 
     private void spawnEndEffectParticles(@NotNull Player player) {
+        player.playSound(player, Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
         Location base = player.getLocation();
 
         for (int degree = 0; degree < 360; degree += 10) {
