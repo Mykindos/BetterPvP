@@ -730,11 +730,11 @@ skills:
     overwhelm:
       enabled: true
       maxlevel: 3
-      bonusDamage: 0.5
+      bonusDamage: 1.0
       bonusDamageIncreasePerLevel: 0.0
       healthOverTarget: 0.10
-      baseMaxDamage: 1.0
-      maxDamageIncreasePerLevel: 0.5
+      baseMaxDamage: 2.0
+      maxDamageIncreasePerLevel: 1.0
   ranger:
     winddagger:
       enabled: true
