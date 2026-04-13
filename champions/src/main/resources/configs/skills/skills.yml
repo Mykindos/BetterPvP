@@ -731,7 +731,8 @@ skills:
       enabled: true
       maxlevel: 3
       bonusDamage: 0.5
-      healthOverTarget: 2.0
+      bonusDamageIncreasePerLevel: 0.0
+      healthOverTarget: 0.10
       baseMaxDamage: 1.0
       maxDamageIncreasePerLevel: 0.5
   ranger:
