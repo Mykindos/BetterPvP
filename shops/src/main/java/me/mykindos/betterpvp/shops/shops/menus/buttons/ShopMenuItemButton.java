@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.shops.menus.ShopItemMenu;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
 import net.kyori.adventure.text.Component;
@@ -35,16 +36,22 @@ public class ShopMenuItemButton extends ControlItem<ShopMenu> {
         Component buyPrice = menu.getContext().buildPriceComponent(currency, shopItem.getBuyPrice() * STACK_AMOUNT);
         Component sellPrice = menu.getContext().buildPriceComponent(currency, shopItem.getSellPrice() * STACK_AMOUNT);
 
-        return menu.getContext().createDisplayStack(shopItem, 1).toBuilder()
-                .action(ClickActions.ALL, Component.empty()
-                        .append(Component.text("Open")))
-                .action(ClickActions.LEFT_SHIFT, Component.empty()
-                        .append(Component.text("Buy " + STACK_AMOUNT + " for "))
-                        .append(buyPrice))
-                .action(ClickActions.RIGHT_SHIFT, Component.empty()
+        final ItemView.ItemViewBuilder builder = menu.getContext().createDisplayStack(shopItem, 1).toBuilder();
+        builder.action(ClickActions.ALL, Component.empty().append(Component.text("Open")));
+
+        if (shopItem.getBuyPrice() * 64 < 1_000_000) {
+            builder.action(ClickActions.LEFT_SHIFT, Component.empty()
+                    .append(Component.text("Buy " + STACK_AMOUNT + " for "))
+                    .append(buyPrice));
+
+            if (shopItem.getSellPrice() > 0) {
+                builder.action(ClickActions.RIGHT_SHIFT, Component.empty()
                         .append(Component.text("Sell " + STACK_AMOUNT + " for "))
-                        .append(sellPrice))
-                .build();
+                        .append(sellPrice));
+            }
+        }
+
+        return builder.build();
     }
 
     @Override

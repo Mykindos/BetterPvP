@@ -30,7 +30,7 @@ public class AncientSword extends WeaponItem {
 
     @Inject
     private AncientSword(Champions champions) {
-        super(champions, "Ancient Sword", model, ItemRarity.UNCOMMON);
+        super(champions, "Ancient Sword", model, ItemRarity.RARE);
     }
 
 }

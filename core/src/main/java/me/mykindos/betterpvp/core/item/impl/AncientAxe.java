@@ -12,6 +12,6 @@ import org.bukkit.Material;
 public class AncientAxe extends Sword {
 
     public AncientAxe() {
-        super("Ancient Axe", Material.NETHERITE_AXE, ItemRarity.UNCOMMON);
+        super("Ancient Axe", Material.NETHERITE_AXE, ItemRarity.RARE);
     }
 }
