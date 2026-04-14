@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.shops.shops.items.data.PolynomialData;
-import org.bukkit.Material;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
 
@@ -16,9 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static me.mykindos.betterpvp.shops.database.jooq.Tables.SHOPITEMS;
-import static me.mykindos.betterpvp.shops.database.jooq.Tables.SHOPITEMS_DYNAMIC_PRICING;
-import static me.mykindos.betterpvp.shops.database.jooq.Tables.SHOPITEMS_FLAGS;
+import static me.mykindos.betterpvp.shops.database.jooq.Tables.*;
 
 @Singleton
 @CustomLog
@@ -41,12 +38,8 @@ public class ShopItemRepository {
                 for (var record : shopItemRecords) {
                     int id = record.get(SHOPITEMS.ID);
                     String shopKeeper = record.get(SHOPITEMS.SHOPKEEPER);
-                    Material material = Material.valueOf(record.get(SHOPITEMS.MATERIAL));
-                    String itemName = record.get(SHOPITEMS.ITEM_NAME);
-                    int modelData = record.get(SHOPITEMS.MODEL_DATA);
-                    int menuSlot = record.get(SHOPITEMS.MENU_SLOT);
-                    int menuPage = record.get(SHOPITEMS.MENU_PAGE);
-                    int amount = record.get(SHOPITEMS.AMOUNT);
+                    String itemKey = record.get(SHOPITEMS.ITEM_KEY);
+                    int order = record.get(SHOPITEMS.ORDER);
                     int buyPrice = record.get(SHOPITEMS.BUY_PRICE);
                     int sellPrice = record.get(SHOPITEMS.SELL_PRICE);
 
@@ -78,9 +71,9 @@ public class ShopItemRepository {
                                 minSellPrice, baseSellPrice, maxSellPrice,
                                 maxStock, baseStock, currentStock
                         );
-                        shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, polynomialData);
+                        shopItem = new DynamicShopItem(id, shopKeeper, itemKey, order, polynomialData);
                     } else {
-                        shopItem = new NormalShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, buyPrice, sellPrice);
+                        shopItem = new NormalShopItem(id, shopKeeper, itemKey, order, buyPrice, sellPrice);
                     }
 
                     // Fetch item flags

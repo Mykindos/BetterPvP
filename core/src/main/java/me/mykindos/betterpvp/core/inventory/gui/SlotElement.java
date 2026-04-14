@@ -73,6 +73,14 @@ public interface SlotElement {
         public ItemProvider getBackground() {
             return background;
         }
+
+        public boolean isSynced(String lang, ItemStack assumedStack) {
+            return inventory.isSynced(slot, assumedStack);
+        }
+
+        public ItemStack getClickedItemStack(String lang, ItemStack assumedStack) {
+            return inventory.getItem(slot);
+        }
         
         @Override
         public ItemStack getItemStack(String lang) {

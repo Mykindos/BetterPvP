@@ -84,8 +84,8 @@ public class GamerListener implements Listener {
         try {
             this.manager.getOnline().forEach(client -> {
                 final Gamer gamer = client.getGamer();
-                gamer.getBossBarQueue().show(gamer);
                 gamer.getBossBarOverlay().show(gamer);
+                gamer.getBossBarQueue().show(gamer);
             });
         }catch(Exception ex) {
             log.error("Error with gamer onUpdate", ex).submit();

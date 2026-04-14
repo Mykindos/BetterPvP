@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.shops.database.jooq.tables.records.AuctionsRecord;
 import me.mykindos.betterpvp.shops.database.jooq.tables.records.ShopitemsDynamicPricingRecord;
 import me.mykindos.betterpvp.shops.database.jooq.tables.records.ShopitemsFlagsRecord;
 import me.mykindos.betterpvp.shops.database.jooq.tables.records.ShopitemsRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -36,7 +35,7 @@ public class Keys {
     public static final UniqueKey<AuctionTransactionHistoryRecord> AUCTION_TRANSACTION_HISTORY_PKEY = Internal.createUniqueKey(AuctionTransactionHistory.AUCTION_TRANSACTION_HISTORY, DSL.name("auction_transaction_history_pkey"), new TableField[] { AuctionTransactionHistory.AUCTION_TRANSACTION_HISTORY.AUCTION_ID }, true);
     public static final UniqueKey<AuctionsRecord> AUCTIONS_PKEY = Internal.createUniqueKey(Auctions.AUCTIONS, DSL.name("auctions_pkey"), new TableField[] { Auctions.AUCTIONS.ID }, true);
     public static final UniqueKey<ShopitemsRecord> SHOPITEMS_PKEY = Internal.createUniqueKey(Shopitems.SHOPITEMS, DSL.name("shopitems_pkey"), new TableField[] { Shopitems.SHOPITEMS.ID }, true);
-    public static final UniqueKey<ShopitemsRecord> SHOPITEMS_SHOPKEEPER_MATERIAL_ITEMNAME_UK = Internal.createUniqueKey(Shopitems.SHOPITEMS, DSL.name("shopitems_shopkeeper_material_itemname_uk"), new TableField[] { Shopitems.SHOPITEMS.SHOPKEEPER, Shopitems.SHOPITEMS.MATERIAL, Shopitems.SHOPITEMS.ITEM_NAME }, true);
+    public static final UniqueKey<ShopitemsRecord> SHOPITEMS_SHOPKEEPER_ITEM_KEY_ORDER_UK = Internal.createUniqueKey(Shopitems.SHOPITEMS, DSL.name("shopitems_shopkeeper_item_key_order_uk"), new TableField[] { Shopitems.SHOPITEMS.SHOPKEEPER, Shopitems.SHOPITEMS.ITEM_KEY, Shopitems.SHOPITEMS.ORDER }, true);
     public static final UniqueKey<ShopitemsDynamicPricingRecord> SHOPITEMS_DYNAMIC_PRICING_UK = Internal.createUniqueKey(ShopitemsDynamicPricing.SHOPITEMS_DYNAMIC_PRICING, DSL.name("shopitems_dynamic_pricing_uk"), new TableField[] { ShopitemsDynamicPricing.SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID, ShopitemsDynamicPricing.SHOPITEMS_DYNAMIC_PRICING.REALM }, true);
     public static final UniqueKey<ShopitemsFlagsRecord> SHOPITEMS_FLAGS_PKEY = Internal.createUniqueKey(ShopitemsFlags.SHOPITEMS_FLAGS, DSL.name("shopitems_flags_pkey"), new TableField[] { ShopitemsFlags.SHOPITEMS_FLAGS.ID }, true);
 

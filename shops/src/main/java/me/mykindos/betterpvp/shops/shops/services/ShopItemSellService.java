@@ -3,150 +3,123 @@ package me.mykindos.betterpvp.shops.shops.services;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
-import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
-import me.mykindos.betterpvp.shops.shops.items.ShopItem;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
 
 @Singleton
 @CustomLog
 public class ShopItemSellService {
 
-    private final ClientManager clientManager;
     private final ItemFactory itemFactory;
 
     @Inject
-    public ShopItemSellService(ClientManager clientManager, ItemFactory itemFactory) {
-        this.clientManager = clientManager;
+    public ShopItemSellService(ItemFactory itemFactory) {
         this.itemFactory = itemFactory;
-    }
-
-    /**
-     * Result class for selling operations
-     */
-    public static class SellResult {
-        public final boolean success;
-        public final int amountSold;
-        public final int totalEarned;
-        public final String itemName;
-
-        public SellResult(boolean success, int amountSold, int totalEarned, String itemName) {
-            this.success = success;
-            this.amountSold = amountSold;
-            this.totalEarned = totalEarned;
-            this.itemName = itemName;
-        }
     }
 
     /**
      * Checks if an item can be sold to the given shop item
      */
     public boolean canSellItem(ItemStack item, IShopItem shopItem) {
-        if (item == null || !(shopItem instanceof ShopItem castedShopItem)) {
-            return false;
-        }
-
         if (shopItem.getSellPrice() <= 0) {
             return false;
         }
 
-        if (item.getType() != shopItem.getMaterial()) {
-            return false;
-        }
-
-        // Check if item can't be sold
-        if (item.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.SHOP_NOT_SELLABLE)) {
-            return false;
-        }
-
-        // Check model data if needed
-        ItemMeta itemMeta = item.getItemMeta();
-        if (!castedShopItem.getItemFlags().containsKey("IGNORE_MODELDATA")) {
-            if ((shopItem.getModelData() != 0 && !itemMeta.hasCustomModelData()) ||
-                    (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() != shopItem.getModelData())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Sells an item from player's inventory to the shop
-     */
-    public SellResult sellItem(Player player, ItemStack item, IShopItem shopItem, int amountToSell) {
-        if (!canSellItem(item, shopItem)) {
-            return new SellResult(false, 0, 0, "");
-        }
-
-        Gamer gamer = clientManager.search().online(player).getGamer();
-        int cost = amountToSell * shopItem.getSellPrice();
-
-        // Add currency to player (assuming coins for now, can be extended)
-        gamer.saveProperty(GamerProperty.BALANCE.name(), gamer.getIntProperty(GamerProperty.BALANCE) + cost);
-
-        // Update dynamic shop stock if applicable
-        if (shopItem instanceof DynamicShopItem dynamicShopItem) {
-            dynamicShopItem.setCurrentStock(Math.min(dynamicShopItem.getMaxStock(),
-                    dynamicShopItem.getCurrentStock() + amountToSell));
-        }
-
-        // Log item UUID if available
-        final ItemInstance instance = itemFactory.fromItemStack(item).orElseThrow();
-        final Location location = player.getLocation();
-        Optional<UUIDProperty> component = instance.getComponent(UUIDProperty.class);
-        component.ifPresent(uuidProperty ->
-                log.info("{} sold ({}) at {}", player.getName(), uuidProperty.getUniqueId(),
-                                UtilWorld.locationToString((location)))
-                        .setAction("ITEM_SELL")
-                        .addClientContext(player)
-                        .addItemContext(itemFactory.getItemRegistry(), instance)
-                        .addLocationContext(location)
-                        .submit());
-
-        return new SellResult(true, amountToSell, cost, shopItem.getItemName());
-    }
-
-    /**
-     * Removes items from player's inventory
-     */
-    public void removeItemFromInventory(Player player, int slot, int amount) {
-        ItemStack item = player.getInventory().getItem(slot);
-        if (item == null) return;
-
-        if (item.getAmount() <= amount) {
-            player.getInventory().setItem(slot, new ItemStack(Material.AIR));
-        } else {
-            ItemStack newStack = item.clone();
-            newStack.setAmount(item.getAmount() - amount);
-            player.getInventory().setItem(slot, newStack);
-        }
+        String itemKey = getSellableItemKey(item);
+        return Objects.equals(itemKey, shopItem.getItemKey());
     }
 
     /**
      * Finds matching shop item for a given item stack
      */
     public IShopItem findMatchingShopItem(ItemStack item, List<IShopItem> shopItems) {
+        return findMatchingShopItem(item, createShopItemIndex(shopItems));
+    }
+
+    public IShopItem findMatchingShopItem(ItemStack item, Map<String, IShopItem> shopItemsByKey) {
+        String itemKey = getSellableItemKey(item);
+        if (itemKey == null) {
+            return null;
+        }
+
+        IShopItem shopItem = shopItemsByKey.get(itemKey);
+        return shopItem != null && shopItem.getSellPrice() > 0 ? shopItem : null;
+    }
+
+    public Map<String, IShopItem> createShopItemIndex(Collection<IShopItem> shopItems) {
+        Map<String, IShopItem> shopItemsByKey = new LinkedHashMap<>();
         for (IShopItem shopItem : shopItems) {
-            if (canSellItem(item, shopItem)) {
-                return shopItem;
+            shopItemsByKey.putIfAbsent(shopItem.getItemKey(), shopItem);
+        }
+        return Map.copyOf(shopItemsByKey);
+    }
+
+    private String getSellableItemKey(ItemStack item) {
+        if (item == null || item.getType().isAir()) {
+            return null;
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            if (meta.getPersistentDataContainer().has(CoreNamespaceKeys.SHOP_NOT_SELLABLE)) {
+                return null;
+            }
+
+            String customItemKey = meta.getPersistentDataContainer().get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
+            NamespacedKey key = customItemKey == null ? null : NamespacedKey.fromString(customItemKey);
+            if (key != null && itemFactory.getItemRegistry().getItem(key) != null) {
+                return key.asString();
             }
         }
-        return null;
+
+        return itemFactory.fromItemStack(item)
+                .map(instance -> itemFactory.getItemRegistry().getKey(instance.getBaseItem()))
+                .map(NamespacedKey::asString)
+                .orElse(null);
+    }
+
+    /**
+     * Logs the UUID of a sold item instance, if it has one.
+     * Called once per inventory slot involved in a sell transaction.
+     */
+    public void logSellUUID(Player player, ItemStack item) {
+        itemFactory.fromItemStack(item).ifPresent(instance -> {
+            final Location location = player.getLocation();
+            instance.getComponent(UUIDProperty.class).ifPresent(uuidProperty ->
+                    log.info("{} sold ({}) at {}", player.getName(), uuidProperty.getUniqueId(),
+                                    UtilWorld.locationToString(location))
+                            .setAction("ITEM_SELL")
+                            .addClientContext(player)
+                            .addItemContext(itemFactory.getItemRegistry(), instance)
+                            .addLocationContext(location)
+                            .submit());
+        });
+    }
+
+    public ItemStack createShopItemStack(IShopItem shopItem, int amount) {
+        ItemStack result = itemFactory.create(itemFactory.getItemRegistry().getItem(shopItem.getItemKey())).createItemStack();
+        result.setAmount(amount);
+        return result;
+    }
+
+    public String getItemName(IShopItem shopItem) {
+        return PlainTextComponentSerializer.plainText()
+                .serialize(itemFactory.create(itemFactory.getItemRegistry().getItem(shopItem.getItemKey())).getView().getName());
     }
 }

@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 @EqualsAndHashCode(callSuper = true)
@@ -19,6 +18,6 @@ public class PlayerBuyItemEvent extends CustomCancellableEvent {
     private final IShopItem shopItem;
     private final ItemStack item;
     private final ShopCurrency currency;
-    private final ClickType clickType;
+    private int requestedAmount = -1;
 
 }

@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.shops.shops.items;
 
 import me.mykindos.betterpvp.shops.shops.items.data.PolynomialData;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunctionLagrangeForm;
-import org.bukkit.Material;
 
 
 public class DynamicShopItem extends ShopItem {
@@ -11,8 +10,8 @@ public class DynamicShopItem extends ShopItem {
     private final PolynomialFunctionLagrangeForm buyPolynomial;
     private final PolynomialFunctionLagrangeForm sellPolynomial;
 
-    public DynamicShopItem(int id, String store, String itemName, Material material, int modelData, int slot, int page, int amount, PolynomialData polynomialData) {
-        super(id, store, itemName, material, modelData, slot, page, amount);
+    public DynamicShopItem(int id, String store, String itemKey, int order, PolynomialData polynomialData) {
+        super(id, store, itemKey, order);
         this.polynomialData = polynomialData;
 
         var buyX = new double[]{0, polynomialData.getBaseStock(), polynomialData.getMaxStock()};

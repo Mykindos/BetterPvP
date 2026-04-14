@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.item.armor.ArmorEvent.ArmorAction;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -249,6 +250,7 @@ public class ArmorListener implements Listener {
     private void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.PHYSICAL || e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) return;
         if (!e.hasItem()) return;
+        if (e.useItemInHand() == Event.Result.DENY) return;
 
         final ItemStack useItem = Objects.requireNonNull(e.getItem()).clone();
         final EquipmentSlot equipmentSlot = useItem.getType().getEquipmentSlot();
@@ -257,6 +259,12 @@ public class ArmorListener implements Listener {
         final Player p = e.getPlayer();
         if (e.hasBlock() && blockFactory.from(e.getClickedBlock()).isPresent()) {
             e.setCancelled(true); // Prevent equipping armor if clicking on a smart block
+            return;
+        }
+
+        // disable interactable blocks
+        if (e.getClickedBlock() != null && UtilBlock.isInteractable(e.getClickedBlock())) {
+            e.setCancelled(true);
             return;
         }
 

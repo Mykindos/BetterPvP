@@ -135,9 +135,10 @@ public abstract class AbstractGui implements Gui, GuiParent {
             
             ItemStack cursor = ItemUtils.takeUnlessEmpty(event.getCursor());
             ItemStack clicked = ItemUtils.takeUnlessEmpty(event.getCurrentItem());
-            
-            ItemStack technicallyClicked = inventory.getItem(slot);
-            if (inventory.isSynced(slot, clicked) || didClickBackgroundItem(player, element, inventory, slot, clicked)) {
+
+            String lang = player.locale().getCountry();
+            if (element.isSynced(lang, clicked) || didClickBackgroundItem(player, element, inventory, slot, clicked)) {
+                ItemStack technicallyClicked = element.getClickedItemStack(lang, clicked);
                 
                 // using enum names because SWAP_OFFHAND does not exist on earlier versions 
                 switch (event.getClick().name()) {
@@ -163,7 +164,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
                         handleInvDrop(true, event, inventory, slot, player, technicallyClicked);
                         break;
                     case "DOUBLE_CLICK":
-                        handleInvDoubleClick(event, player, cursor);
+                        handleInvDoubleClick(event, player, cursor, clicked, technicallyClicked);
                         break;
                     default:
                         InvUI.getInstance().getLogger().warning("Unknown click type: " + event.getClick().name());
@@ -387,9 +388,15 @@ public abstract class AbstractGui implements Gui, GuiParent {
      * @param player The {@link Player} that clicked
      * @param cursor The {@link ItemStack} that is on the cursor
      */
-    protected void handleInvDoubleClick(InventoryClickEvent event, Player player, ItemStack cursor) {
+    @SuppressWarnings("deprecation")
+    protected void handleInvDoubleClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack clicked, ItemStack technicallyClicked) {
         if (cursor == null)
             return;
+
+        if (technicallyClicked != null && clicked != null && clicked.isSimilar(cursor)) {
+            technicallyClicked.setAmount(cursor.getAmount());
+            event.setCursor(technicallyClicked);
+        }
         
         // windows handle cursor collect because it is a cross-inventory / cross-gui operation
         Window window = WindowManager.getInstance().getOpenWindow(player);
@@ -415,8 +422,16 @@ public abstract class AbstractGui implements Gui, GuiParent {
         if (element instanceof SlotElement.InventorySlotElement invSlotElement) {
             Inventory inventory = invSlotElement.getInventory();
             int viSlot = invSlotElement.getSlot();
-            if (inventory.isSynced(viSlot, oldStack)) {
-                return inventory.setItem(updateReason, viSlot, newStack);
+            String lang = updateReason instanceof PlayerUpdateReason playerUpdateReason ? playerUpdateReason.getPlayer().locale().getCountry() : "";
+            if (invSlotElement.isSynced(lang, oldStack)) {
+                ItemStack newInventoryStack = newStack;
+                ItemStack clickedStack = invSlotElement.getClickedItemStack(lang, oldStack);
+                if (clickedStack != null && oldStack != null && newStack != null && oldStack.isSimilar(newStack)) {
+                    clickedStack.setAmount(newStack.getAmount());
+                    newInventoryStack = clickedStack;
+                }
+
+                return inventory.setItem(updateReason, viSlot, newInventoryStack);
             }
         }
         

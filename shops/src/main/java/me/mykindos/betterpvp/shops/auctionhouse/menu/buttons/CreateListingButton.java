@@ -49,11 +49,6 @@ public class CreateListingButton extends ControlItem<AuctionHouseMenu> {
             return;
         }
 
-        if(itemInMainHand.getAmount() > 1) {
-            UtilMessage.simpleMessage(player, "Auction House", "You cannot list stacks of items on the Auction House.");
-            return;
-        }
-
         PlayerPrepareListingEvent playerPrepareListingEvent = UtilServer.callEvent(new PlayerPrepareListingEvent(player, itemInMainHand));
         if (!playerPrepareListingEvent.isCancelled()) {
             new ListingCreationMenu(auctionManager, player.getUniqueId(), itemInMainHand.clone()).show(player);

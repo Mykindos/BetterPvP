@@ -4,16 +4,11 @@
 package me.mykindos.betterpvp.shops.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.shops.database.jooq.Keys;
 import me.mykindos.betterpvp.shops.database.jooq.Public;
 import me.mykindos.betterpvp.shops.database.jooq.tables.ShopitemsDynamicPricing.ShopitemsDynamicPricingPath;
 import me.mykindos.betterpvp.shops.database.jooq.tables.ShopitemsFlags.ShopitemsFlagsPath;
 import me.mykindos.betterpvp.shops.database.jooq.tables.records.ShopitemsRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -35,6 +30,10 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -69,36 +68,6 @@ public class Shopitems extends TableImpl<ShopitemsRecord> {
     public final TableField<ShopitemsRecord, String> SHOPKEEPER = createField(DSL.name("shopkeeper"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>public.shopitems.material</code>.
-     */
-    public final TableField<ShopitemsRecord, String> MATERIAL = createField(DSL.name("material"), SQLDataType.VARCHAR(255).nullable(false), this, "");
-
-    /**
-     * The column <code>public.shopitems.item_name</code>.
-     */
-    public final TableField<ShopitemsRecord, String> ITEM_NAME = createField(DSL.name("item_name"), SQLDataType.VARCHAR(255), this, "");
-
-    /**
-     * The column <code>public.shopitems.model_data</code>.
-     */
-    public final TableField<ShopitemsRecord, Integer> MODEL_DATA = createField(DSL.name("model_data"), SQLDataType.INTEGER, this, "");
-
-    /**
-     * The column <code>public.shopitems.menu_slot</code>.
-     */
-    public final TableField<ShopitemsRecord, Integer> MENU_SLOT = createField(DSL.name("menu_slot"), SQLDataType.INTEGER.nullable(false), this, "");
-
-    /**
-     * The column <code>public.shopitems.menu_page</code>.
-     */
-    public final TableField<ShopitemsRecord, Integer> MENU_PAGE = createField(DSL.name("menu_page"), SQLDataType.INTEGER, this, "");
-
-    /**
-     * The column <code>public.shopitems.amount</code>.
-     */
-    public final TableField<ShopitemsRecord, Integer> AMOUNT = createField(DSL.name("amount"), SQLDataType.INTEGER.nullable(false), this, "");
-
-    /**
      * The column <code>public.shopitems.buy_price</code>.
      */
     public final TableField<ShopitemsRecord, Integer> BUY_PRICE = createField(DSL.name("buy_price"), SQLDataType.INTEGER.nullable(false), this, "");
@@ -107,6 +76,16 @@ public class Shopitems extends TableImpl<ShopitemsRecord> {
      * The column <code>public.shopitems.sell_price</code>.
      */
     public final TableField<ShopitemsRecord, Integer> SELL_PRICE = createField(DSL.name("sell_price"), SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>public.shopitems.item_key</code>.
+     */
+    public final TableField<ShopitemsRecord, String> ITEM_KEY = createField(DSL.name("item_key"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+
+    /**
+     * The column <code>public.shopitems.order</code>.
+     */
+    public final TableField<ShopitemsRecord, Integer> ORDER = createField(DSL.name("order"), SQLDataType.INTEGER.nullable(false), this, "");
 
     private Shopitems(Name alias, Table<ShopitemsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -187,7 +166,7 @@ public class Shopitems extends TableImpl<ShopitemsRecord> {
 
     @Override
     public List<UniqueKey<ShopitemsRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.SHOPITEMS_SHOPKEEPER_MATERIAL_ITEMNAME_UK);
+        return Arrays.asList(Keys.SHOPITEMS_SHOPKEEPER_ITEM_KEY_ORDER_UK);
     }
 
     private transient ShopitemsDynamicPricingPath _shopitemsDynamicPricing;
