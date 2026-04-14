@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
-import me.mykindos.betterpvp.core.client.stats.impl.utility.Type;
+import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseRegistry;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
@@ -32,23 +32,31 @@ import java.util.Objects;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DamageModifierStat implements IBuildableStat {
-    public static final String STAT_TYPE = "DAMAGE";
+    public static final String STAT_TYPE = "DAMAGE_MODIFIER";
     private static final DamageCauseRegistry damageCauseRegistry = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(DamageCauseRegistry.class);
 
-    public static DamageStat fromData(String statType, JSONObject data) {
-        DamageStat.DamageStatBuilder builder = builder();
+    public static DamageModifierStat fromData(String statType, JSONObject data) {
+        DamageModifierStat.DamageModifierStatBuilder builder = builder();
         Preconditions.checkArgument(statType.equals(STAT_TYPE));
         builder.relation(Relation.valueOf(data.getString("relation")));
-        builder.type(Type.valueOf(data.getString("type")));
-        builder.damageCause(damageCauseRegistry.get(data.getString("damageCause")));
+        builder.name(data.optString("name", null));
+        if (data.has("damageOperator")) {
+            builder.damageOperator(DamageOperator.valueOf(data.getString("damageOperator")));
+        }
+        if (data.has("modifierType")) {
+            builder.modifierType(ModifierType.valueOf(data.getString("modifierType")));
+        }
+        if (data.has("damageOperand")) {
+            builder.damageOperand(data.getDouble("damageOperand"));
+        }
+        if (data.has("damageCause")) {
+            builder.damageCause(damageCauseRegistry.get(data.getString("damageCause")));
+        }
         return builder.build();
     }
 
-
     @NotNull
     private Relation relation;
-    @NotNull
-    private Type type;
     /**
      * The name of the Modifier
      */
@@ -69,26 +77,65 @@ public class DamageModifierStat implements IBuildableStat {
      */
     @Nullable
     private Double damageOperand;
+    /**
+     * The damage cause
+     */
+    @Nullable
+    private DamageCause damageCause;
 
+    private boolean filterSpecificModifierUsage(Map.Entry<IStat, Long> entry) {
+        DamageModifierStat other = (DamageModifierStat) entry.getKey();
+        if (!relation.equals(other.relation)) return false;
+        if (name != null && !Objects.equals(name, other.name)) return false;
+        if (damageOperator != null && damageOperator != other.damageOperator) return false;
+        if (modifierType != null && modifierType != other.modifierType) return false;
+        return damageCause == null || Objects.equals(damageCause, other.damageCause);
+    }
 
-    private boolean filterDamageCause(Map.Entry<IStat, Long> entry) {
-        DamageStat other = (DamageStat) entry.getKey();
-        return relation.equals(other.relation) && type.equals(other.type);
+    private boolean filterByModifierTypeOnly(Map.Entry<IStat, Long> entry) {
+        DamageModifierStat other = (DamageModifierStat) entry.getKey();
+        if (!relation.equals(other.relation)) return false;
+        if (modifierType != other.modifierType) return false;
+        return damageCause == null || Objects.equals(damageCause, other.damageCause);
+    }
+
+    private boolean filterByOperatorAndModifierType(Map.Entry<IStat, Long> entry) {
+        DamageModifierStat other = (DamageModifierStat) entry.getKey();
+        if (!relation.equals(other.relation)) return false;
+        if (damageOperator != other.damageOperator) return false;
+        if (modifierType != other.modifierType) return false;
+        return damageCause == null || Objects.equals(damageCause, other.damageCause);
+    }
+
+    private boolean filterByOperatorOnly(Map.Entry<IStat, Long> entry) {
+        DamageModifierStat other = (DamageModifierStat) entry.getKey();
+        if (!relation.equals(other.relation)) return false;
+        if (damageOperator != other.damageOperator) return false;
+        return damageCause == null || Objects.equals(damageCause, other.damageCause);
     }
 
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
-        if (damageCause == null) {
-            return getFilteredStat(statContainer, type, period, this::filterDamageCause);
+        // modifierType + damageOperator + null name/operand -> count that operator/type combination
+        if (modifierType != null && damageOperator != null && name == null && damageOperand == null) {
+            return getFilteredStat(statContainer, type, period, this::filterByOperatorAndModifierType);
         }
+        // modifierType only -> count by modifier type
+        if (modifierType != null && damageOperator == null && name == null && damageOperand == null) {
+            return getFilteredStat(statContainer, type, period, this::filterByModifierTypeOnly);
+        }
+        // damageOperator only -> count by operator
+        if (damageOperator != null && modifierType == null && name == null && damageOperand == null) {
+            return getFilteredStat(statContainer, type, period, this::filterByOperatorOnly);
+        }
+        // damageOperand null -> count uses for the provided modifier details
+        if (damageOperand == null) {
+            return getFilteredStat(statContainer, type, period, this::filterSpecificModifierUsage);
+        }
+
         return statContainer.getProperty(type, period, this);
     }
 
-    /**
-     * What type of stat this is, a LONG (default), DOUBLE, OR DURATION
-     *
-     * @return the type of stat
-     */
     @Override
     public @NotNull StatValueType getStatValueType() {
         return StatValueType.DOUBLE;
@@ -99,88 +146,59 @@ public class DamageModifierStat implements IBuildableStat {
         return STAT_TYPE;
     }
 
-    /**
-     * Get the jsonb data in string format for this object
-     *
-     * @return
-     */
     @Override
     public @Nullable JSONObject getJsonData() {
-        return new JSONObject()
-                .putOnce("relation", relation.name())
-                .putOnce("type", type.name())
-                .putOnce("damageCause", Objects.requireNonNull(damageCause).getName());
+        JSONObject obj = new JSONObject()
+                .putOnce("relation", relation.name());
+        if (name != null) obj.putOnce("name", name);
+        if (damageOperator != null) obj.putOnce("damageOperator", damageOperator.name());
+        if (modifierType != null) obj.putOnce("modifierType", modifierType.name());
+        if (damageOperand != null) obj.putOnce("damageOperand", damageOperand);
+        if (damageCause != null) obj.putOnce("damageCause", damageCause.getName());
+        return obj;
     }
 
-    /**
-     * Get the simple name of this stat, without qualifications (if present)
-     * <p>
-     * i.e. Time Played, Flags Captured
-     *
-     * @return the simple name
-     */
     @Override
     public String getSimpleName() {
         StringBuilder stringBuilder = new StringBuilder()
-                .append(UtilFormat.cleanString(relation.name()))
-                .append(" ")
-                .append(UtilFormat.cleanString(type.name()));
-        if (damageCause != null) {
+                .append(UtilFormat.cleanString(relation.name()));
+        if (name != null) {
             stringBuilder.append(" ")
-                    .append(UtilFormat.cleanString(damageCause.getName()));
+                    .append(UtilFormat.cleanString(name));
         }
-
         return stringBuilder.toString();
     }
 
-    /**
-     * Whether this stat is directly savable to the database
-     *
-     * @return {@code true} if it is, {@code false} otherwise
-     */
     @Override
     public boolean isSavable() {
-        return damageCause != null;
+        return name != null && damageOperator != null && modifierType != null && damageOperand != null && damageCause != null;
     }
 
-    /**
-     * Whether this stat contains this statName
-     *
-     * @param statName
-     * @return
-     */
-
-    /**
-     * Whether this stat contains this otherSTat
-     *
-     * @param otherStat
-     * @return
-     */
     @Override
     public boolean containsStat(IStat otherStat) {
-        if (!(otherStat instanceof DamageStat other)) return false;
-        if ((relation != other.relation) || (type != other.type)) return false;
-        return (damageCause != null && damageCause.equals(other.damageCause));
+        if (!(otherStat instanceof DamageModifierStat other)) return false;
+        if (relation != other.relation) return false;
+        if (name != null && !Objects.equals(name, other.name)) return false;
+        if (damageOperator != null && damageOperator != other.damageOperator) return false;
+        if (modifierType != null && modifierType != other.modifierType) return false;
+        if (damageOperand != null && !Objects.equals(damageOperand, other.damageOperand)) return false;
+        return damageCause == null || Objects.equals(damageCause, other.damageCause);
     }
 
-    /**
-     * <p>Get the generic stat that includes this stat.</p>
-     * <p>{@link IStat#containsStat(IStat)} of the generic should be {@code true} for this stat</p>
-     *
-     * @return the generic stat
-     */
     @Override
     public @NotNull IStat getGenericStat() {
-        return DamageStat.builder().relation(relation).type(type).build();
+        return DamageModifierStat.builder().relation(relation).build();
     }
 
     @Override
     public @NotNull IBuildableStat copyFromStatData(@NotNull String statType, JSONObject data) {
-        DamageStat other = fromData(statType, data);
+        DamageModifierStat other = fromData(statType, data);
         this.relation = other.relation;
-        this.type = other.type;
+        this.name = other.name;
+        this.damageOperator = other.damageOperator;
+        this.modifierType = other.modifierType;
+        this.damageOperand = other.damageOperand;
         this.damageCause = other.damageCause;
         return this;
     }
-
 }

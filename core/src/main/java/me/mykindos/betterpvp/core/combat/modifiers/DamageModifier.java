@@ -41,4 +41,7 @@ public interface DamageModifier {
      * @return the modifier type
      */
     ModifierType getType();
+
+    DamageOperator getDamageOperator();
+    double getDamageOperand();
 }
