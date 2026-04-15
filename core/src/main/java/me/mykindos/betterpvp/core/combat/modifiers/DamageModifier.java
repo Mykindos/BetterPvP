@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.combat.modifiers;
 
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface for all damage modifiers that can affect damage values
@@ -42,6 +43,7 @@ public interface DamageModifier {
      */
     ModifierType getType();
 
+    @NotNull
     DamageOperator getDamageOperator();
     double getDamageOperand();
 }

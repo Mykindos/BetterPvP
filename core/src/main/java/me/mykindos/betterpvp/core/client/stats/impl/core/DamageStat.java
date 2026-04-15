@@ -72,6 +72,7 @@ public class DamageStat implements IBuildableStat {
      */
     @Override
     public @NotNull StatValueType getStatValueType() {
+        if (type.equals(Type.COUNT)) return StatValueType.LONG;
         return StatValueType.DOUBLE;
     }
 

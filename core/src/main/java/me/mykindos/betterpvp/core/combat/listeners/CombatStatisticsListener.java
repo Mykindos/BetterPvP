@@ -65,7 +65,7 @@ public class CombatStatisticsListener implements Listener {
                 .relation(Relation.RECEIVED)
                 .damageCause(event.getCause());
 
-        clientManager.incrementStat(damagee, builder.type(Type.COUNT).build(), 1);
+        clientManager.incrementStat(damagee, builder.type(Type.COUNT).build(), 1L);
         clientManager.incrementStat(damagee, builder.type(Type.AMOUNT).build(), event.getDamage());
 
         event.getModifiers().values().forEach(modifier -> {
@@ -93,7 +93,7 @@ public class CombatStatisticsListener implements Listener {
                 .relation(Relation.DEALT)
                 .damageCause(event.getCause());
 
-        clientManager.incrementStat(damager, builder.type(Type.COUNT).build(), 1);
+        clientManager.incrementStat(damager, builder.type(Type.COUNT).build(), 1L);
         clientManager.incrementStat(damager, builder.type(Type.AMOUNT).build(), event.getDamage());
 
         event.getModifiers().values().forEach(modifier -> {

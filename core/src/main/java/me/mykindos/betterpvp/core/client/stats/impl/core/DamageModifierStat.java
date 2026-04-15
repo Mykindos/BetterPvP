@@ -138,7 +138,7 @@ public class DamageModifierStat implements IBuildableStat {
 
     @Override
     public @NotNull StatValueType getStatValueType() {
-        return StatValueType.DOUBLE;
+        return StatValueType.LONG;
     }
 
     @Override
@@ -161,10 +161,20 @@ public class DamageModifierStat implements IBuildableStat {
     @Override
     public String getSimpleName() {
         StringBuilder stringBuilder = new StringBuilder()
+                .append("Damage Modifier")
+                .append(" ")
                 .append(UtilFormat.cleanString(relation.name()));
         if (name != null) {
             stringBuilder.append(" ")
                     .append(UtilFormat.cleanString(name));
+        }
+        if (damageOperator != null) {
+            stringBuilder.append(" ")
+                    .append(UtilFormat.cleanString(damageOperator.name()));
+        }
+        if (damageOperand != null) {
+            stringBuilder.append(" ")
+                    .append(UtilFormat.cleanString(String.valueOf(damageOperand)));
         }
         return stringBuilder.toString();
     }
@@ -187,7 +197,10 @@ public class DamageModifierStat implements IBuildableStat {
 
     @Override
     public @NotNull IStat getGenericStat() {
-        return DamageModifierStat.builder().relation(relation).build();
+        return DamageModifierStat.builder()
+                .relation(relation)
+                .name(name)
+                .build();
     }
 
     @Override
