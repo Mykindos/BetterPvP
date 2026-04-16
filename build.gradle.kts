@@ -20,6 +20,13 @@ val outputBuckets = mapOf(
         ":lunar",
         ":private:store",
     ),
+    "champions" to setOf(
+        ":champions",
+        ":core",
+        ":game",
+        ":lunar",
+        ":private:store",
+    ),
 )
 
 @Suppress("DSL_SCOPE_VIOLATION")

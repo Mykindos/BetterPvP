@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.hub.feature.menu;
 
-import me.mykindos.betterpvp.core.framework.ClansServerType;
+import me.mykindos.betterpvp.core.framework.SelectableServerType;
 import me.mykindos.betterpvp.core.framework.ServerTypes;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
@@ -23,10 +23,10 @@ public class ServerSelectorMenu extends AbstractGui implements Windowed {
         super(9, 3);
         fill(Menu.BACKGROUND_GUI_ITEM, true);
 
-        final List<Map.Entry<String, ClansServerType>> servers = networkService.getServerPlayerCounts().keySet().stream()
+        final List<Map.Entry<String, SelectableServerType>> servers = networkService.getServerPlayerCounts().keySet().stream()
                 .sorted()
                 .map(serverName -> {
-                    final ClansServerType serverType = resolveType(serverName);
+                    final SelectableServerType serverType = resolveType(serverName);
                     return serverType == null ? null : Map.entry(serverName, serverType);
                 })
                 .filter(Objects::nonNull)
@@ -34,7 +34,7 @@ public class ServerSelectorMenu extends AbstractGui implements Windowed {
 
         final int[] slots = computeSlots(servers.size(), 9);
         for (int i = 0; i < slots.length; i++) {
-            final Map.Entry<String, ClansServerType> entry = servers.get(i);
+            final Map.Entry<String, SelectableServerType> entry = servers.get(i);
             setItem(slots[i], new ServerItemButton(entry.getKey(), networkService, entry.getValue(), queueStatusRegistry, orchestrationGateway));
         }
     }
@@ -53,8 +53,10 @@ public class ServerSelectorMenu extends AbstractGui implements Windowed {
         return slots;
     }
 
-    private static ClansServerType resolveType(String serverName) {
-        for (ClansServerType serverType : List.of(ServerTypes.CLANS_CLASSIC, ServerTypes.CLANS_SQUADS, ServerTypes.CLANS_CASUAL)) {
+    private static SelectableServerType resolveType(String serverName) {
+        for (SelectableServerType serverType : List.of(
+                ServerTypes.CLANS_CLASSIC, ServerTypes.CLANS_SQUADS, ServerTypes.CLANS_CASUAL,
+                ServerTypes.CHAMPIONS)) {
             if (serverName.startsWith(serverType.getServerNamePrefix())) {
                 return serverType;
             }

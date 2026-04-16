@@ -10,7 +10,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelector;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.framework.ClansServerType;
+import me.mykindos.betterpvp.core.framework.SelectableServerType;
 import me.mykindos.betterpvp.core.framework.ServerTypes;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
@@ -150,7 +150,7 @@ public class HubSceneLoader extends MapperSceneLoader {
         log.info("Hub scene loaded - {} kit-selector(s)", kitSelectors.size()).submit();
     }
 
-    private NPC spawnInstanceSelector(@NotNull Location location, @NotNull ClansServerType serverType, boolean featured) {
+    private NPC spawnInstanceSelector(@NotNull Location location, @NotNull SelectableServerType serverType, boolean featured) {
         final IronGolem golem = generateDummyEntity(location);
         final Component title = serverType.getDisplayTitle();
 

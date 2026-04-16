@@ -41,7 +41,7 @@ public class QueueResumeCommand extends Command {
 
         final String serverName = args[0];
         try {
-            orchestrationGateway.setQueueState(QueueCommandSupport.buildClansTarget(serverName), QueueState.OPEN).join();
+            orchestrationGateway.setQueueState(QueueCommandSupport.buildTarget(serverName), QueueState.OPEN).join();
             UtilMessage.simpleMessage(player, "Queue", "Set queue state for <yellow>" + serverName + "</yellow> to <yellow>OPEN");
         } catch (Exception ex) {
             QueueCommandSupport.logCommandFailure("update queue state for " + serverName + " to OPEN", ex);

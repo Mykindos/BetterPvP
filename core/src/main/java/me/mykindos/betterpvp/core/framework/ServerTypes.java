@@ -18,6 +18,10 @@ public final class ServerTypes {
             "Clans Casual", 6, "casual",
             Component.text("Casual", NamedTextColor.GREEN, TextDecoration.BOLD));
 
+    public static final ChampionsServerType CHAMPIONS = new ChampionsServerType(
+            "Champions", "champions",
+            Component.text("Champions", NamedTextColor.AQUA, TextDecoration.BOLD));
+
     public static final ServerType HUB = new BaseServerType("Hub");
 
     private ServerTypes() {

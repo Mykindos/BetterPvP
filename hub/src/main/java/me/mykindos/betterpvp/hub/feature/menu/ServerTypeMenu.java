@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.hub.feature.menu;
 
-import me.mykindos.betterpvp.core.framework.ClansServerType;
+import me.mykindos.betterpvp.core.framework.SelectableServerType;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Shows only the servers belonging to a specific {@link ClansServerType}, centered in a single row.
+ * Shows only the servers belonging to a specific {@link SelectableServerType}, centered in a single row.
  * Opened by clicking an {@link me.mykindos.betterpvp.hub.feature.npc.InstanceSelectorNPC}.
  */
 public class ServerTypeMenu extends AbstractGui implements Windowed {
 
-    private final ClansServerType serverType;
+    private final SelectableServerType serverType;
 
-    public ServerTypeMenu(NetworkPlayerCountService networkService, ClansServerType serverType,
+    public ServerTypeMenu(NetworkPlayerCountService networkService, SelectableServerType serverType,
                           HubQueueStatusRegistry queueStatusRegistry, OrchestrationGateway orchestrationGateway) {
         super(9, 3);
         this.serverType = serverType;
