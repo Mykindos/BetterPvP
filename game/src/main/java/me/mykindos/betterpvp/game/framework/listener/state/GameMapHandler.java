@@ -13,9 +13,7 @@ import me.mykindos.betterpvp.game.framework.model.attribute.global.CurrentMapAtt
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.weather.WeatherChangeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,10 +203,5 @@ public class GameMapHandler implements Listener {
             log.error("Failed to load waiting lobby, shutting down...").submit();
             Bukkit.shutdown();
         }
-    }
-
-    @EventHandler
-    public void onWeather(WeatherChangeEvent event) {
-        event.setCancelled(true);
     }
 }
