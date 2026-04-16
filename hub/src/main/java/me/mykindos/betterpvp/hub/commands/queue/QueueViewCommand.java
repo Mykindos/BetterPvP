@@ -41,7 +41,7 @@ public class QueueViewCommand extends Command {
 
         final String serverName = args[0];
         try {
-            final QueueSnapshot snapshot = orchestrationGateway.getQueueSnapshot(QueueCommandSupport.buildClansTarget(serverName)).join();
+            final QueueSnapshot snapshot = orchestrationGateway.getQueueSnapshot(QueueCommandSupport.buildTarget(serverName)).join();
             UtilMessage.simpleMessage(player, "Queue", "Queue Snapshot:");
             UtilMessage.message(player, QueueCommandSupport.buildQueueSnapshotMessage(snapshot));
         } catch (Exception ex) {

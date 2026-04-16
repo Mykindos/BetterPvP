@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -49,10 +50,10 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
     private final Map<UUID, ManagedQueueEntry> queueEntriesByPlayer = new HashMap<>();
     private final Map<UUID, PlayerRankSnapshot> rankByPlayer = new HashMap<>();
     private final Map<UUID, QueueStatusUpdate> statusByPlayer = new HashMap<>();
-    private final Map<String, ServerCapacitySnapshot> capacityByServer = new HashMap<>();
+    private final Map<String, ServerCapacitySnapshot> capacityByServer = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final Map<String, Reservation> reservationsById = new HashMap<>();
     private final Map<String, QueueState> queueStateOverrides = new HashMap<>();
-    private final Map<String, Instant> nextRegularAdmissionAtByServer = new HashMap<>();
+    private final Map<String, Instant> nextRegularAdmissionAtByServer = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     public InMemoryOrchestrationGateway(QueuePriorityPolicy priorityPolicy,
                                         long reservationTtlSeconds,

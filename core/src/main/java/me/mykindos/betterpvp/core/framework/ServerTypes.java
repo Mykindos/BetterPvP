@@ -8,15 +8,19 @@ public final class ServerTypes {
 
     public static final ClansServerType CLANS_CLASSIC = new ClansServerType(
             "Clans Classic", 6, "clans",
-            Component.text("Classic", NamedTextColor.RED, TextDecoration.BOLD));
+            Component.text("Clans Classic", NamedTextColor.RED, TextDecoration.BOLD));
 
     public static final ClansServerType CLANS_SQUADS = new ClansServerType(
             "Clans Squads", 4, "squads",
-            Component.text("Squads", NamedTextColor.AQUA, TextDecoration.BOLD));
+            Component.text("Clans Squads", NamedTextColor.AQUA, TextDecoration.BOLD));
 
     public static final ClansServerType CLANS_CASUAL = new ClansServerType(
             "Clans Casual", 6, "casual",
-            Component.text("Casual", NamedTextColor.GREEN, TextDecoration.BOLD));
+            Component.text("Clans Casual", NamedTextColor.GREEN, TextDecoration.BOLD));
+
+    public static final ChampionsServerType CHAMPIONS = new ChampionsServerType(
+            "Champions", "champions",
+            Component.text("Champions", NamedTextColor.AQUA, TextDecoration.BOLD));
 
     public static final ServerType HUB = new BaseServerType("Hub");
 

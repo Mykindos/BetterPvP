@@ -41,7 +41,7 @@ public class QueuePauseCommand extends Command {
 
         final String serverName = args[0];
         try {
-            orchestrationGateway.setQueueState(QueueCommandSupport.buildClansTarget(serverName), QueueState.PAUSED).join();
+            orchestrationGateway.setQueueState(QueueCommandSupport.buildTarget(serverName), QueueState.PAUSED).join();
             UtilMessage.simpleMessage(player, "Queue", "Set queue state for <yellow>" + serverName + "</yellow> to <yellow>PAUSED");
         } catch (Exception ex) {
             QueueCommandSupport.logCommandFailure("update queue state for " + serverName + " to PAUSED", ex);

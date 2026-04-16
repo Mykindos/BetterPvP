@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.shops.auctionhouse.events.PlayerPrepareListingEvent;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
-import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -48,11 +47,9 @@ public class RuneAuctionListener implements Listener {
 
         itemFactory.fromItemStack(itemStack).ifPresent(item -> {
             if (item.getRarity().isAtLeast(ItemRarity.RARE)) {
-                Bukkit.broadcastMessage("test1");
                 return;
             }
 
-            Bukkit.broadcastMessage("test");
             item.getComponent(RuneContainerComponent.class).ifPresent(container -> {
                 if (container.getRunes().isEmpty()) {
                     event.cancel("You cannot list this type of item unless it has a rune applied.");

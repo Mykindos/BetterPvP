@@ -11,6 +11,11 @@ pattern = "(?i)^clans-([0-9]+)$"
 target_type = "CLANS"
 server_name_template = "Clans-$1"
 
+[[managed_targets]]
+pattern = "(?i)^champions-([0-9]+)$"
+target_type = "CHAMPIONS"
+server_name_template = "Champions-$1"
+
 [ranks.PLAYER]
 priority = 0
 bypass = false

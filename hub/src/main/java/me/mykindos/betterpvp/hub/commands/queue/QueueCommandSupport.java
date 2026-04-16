@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 
+import java.util.Locale;
 import java.util.concurrent.CompletionException;
 
 final class QueueCommandSupport {
@@ -115,8 +116,10 @@ final class QueueCommandSupport {
                 .build();
     }
 
-    static QueueTarget buildClansTarget(String serverName) {
-        return new QueueTarget("clans:" + serverName.toLowerCase(), QueueTargetType.CLANS, serverName);
+    static QueueTarget buildTarget(String serverName) {
+        final String lower = serverName.toLowerCase(Locale.ROOT);
+        final QueueTargetType type = lower.startsWith("champions") ? QueueTargetType.CHAMPIONS : QueueTargetType.CLANS;
+        return new QueueTarget(type.name().toLowerCase(Locale.ROOT) + ":" + lower, type, serverName);
     }
 
     static void logCommandFailure(String action, Exception ex) {

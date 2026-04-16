@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.hub.feature.npc;
 import com.google.common.base.Preconditions;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
-import me.mykindos.betterpvp.core.framework.ClansServerType;
+import me.mykindos.betterpvp.core.framework.SelectableServerType;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
@@ -34,13 +34,13 @@ import java.util.List;
 
 public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
 
-    private final ClansServerType serverType;
+    private final SelectableServerType serverType;
     private final NetworkPlayerCountService networkPlayerCountService;
     private final HubQueueStatusRegistry queueStatusRegistry;
     private final OrchestrationGateway orchestrationGateway;
     private final Component tag;
 
-    public InstanceSelectorNPC(NPCFactory factory, Component tag, ClansServerType serverType,
+    public InstanceSelectorNPC(NPCFactory factory, Component tag, SelectableServerType serverType,
                                NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
                                OrchestrationGateway orchestrationGateway) {
         super(factory);
@@ -86,7 +86,7 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
         private final Component title;
         private final String gradientColors;
 
-        public Featured(NPCFactory factory, Component title, TextColor[] gradient, ClansServerType serverType,
+        public Featured(NPCFactory factory, Component title, TextColor[] gradient, SelectableServerType serverType,
                         NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
                         OrchestrationGateway orchestrationGateway) {
             super(factory, Component.empty(), serverType, networkPlayerCountService, queueStatusRegistry, orchestrationGateway);
