@@ -12,9 +12,6 @@ core:
       password: BetterPvP123!
       ip: 127.0.0.1:5002
       maxPoolSize: 10
-    mineplex:
-      localDatabaseName:
-      globalDatabaseName:
   tips:
     timeBetweenTips: 150.0
   exceptions:
