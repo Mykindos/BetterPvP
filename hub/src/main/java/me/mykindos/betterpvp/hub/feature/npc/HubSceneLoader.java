@@ -138,7 +138,12 @@ public class HubSceneLoader extends MapperSceneLoader {
         // Instance-selector NPC (Classic)
         final Location classicLocation = getDataPoint("npc_selector_classic", PerspectiveRegion.class).getLocation();
         classicLocation.setWorld(world);
-        track(spawnInstanceSelector(classicLocation, ServerTypes.CLANS_CLASSIC, false));
+        track(spawnInstanceSelector(classicLocation, ServerTypes.CLANS_CLASSIC, true));
+
+        // Instance-selector NPC (Champions)
+        final Location championsLocation = getDataPoint("npc_selector_champions", PerspectiveRegion.class).getLocation();
+        championsLocation.setWorld(world);
+        track(spawnInstanceSelector(championsLocation, ServerTypes.CHAMPIONS, false));
 
         // Coming-soon NPCs (multiple data-points with the same name)
         for (PerspectiveRegion region : getDataPoints("npc_coming_soon", PerspectiveRegion.class)) {
