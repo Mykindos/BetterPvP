@@ -83,7 +83,7 @@ public class RoleSelectorManager {
             for (PerspectiveRegion region : regions) {
                 Location location = region.getLocation();
                 // Create the selector, make sure they can edit their hotbar
-                KitSelector selector = new KitSelector(role, true, true);
+                KitSelector selector = new KitSelector(role, false, true);
                 selector.setBuildMenuFunction(player -> {
                     final GamerBuilds builds = buildManager.getObject(player.getUniqueId()).orElseThrow();
                     return new BuildMenu(builds, role, buildManager, skillManager, null, (buildId, menu) -> {

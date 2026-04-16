@@ -26,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -57,6 +58,7 @@ public class KitSelectorListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEntityEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
         if (!selectors.containsKey(event.getRightClicked()) || event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
             return;
         }
