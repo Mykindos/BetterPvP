@@ -110,27 +110,24 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
             @Nullable
             final Long oldValue = event.getOldValue();
             final StatContainer container = event.getContainer();
+
+            IStat changedStat = null;
+            Map<IStat, Long> other = new HashMap<>(watchedStats.size());
+
             //validate and retrieve
-            final List<IStat> statsTemp = watchedStats.stream()
-                    .filter(iStat -> iStat.containsStat(stat))
-                    .toList();
-
-            if (statsTemp.isEmpty()) return;
-            if (statsTemp.size() > 1) {
-                throw new IllegalStateException("Expected 1 changed stat, but got " + statsTemp.size() + ". " +
-                        "Make sure all watched composite Stats have unique savable stats.");
+            for (IStat watched : watchedStats) {
+                if (watched.containsStat(stat)) {
+                    if (changedStat != null) {
+                        throw new IllegalStateException("Expected 1 changed stat...");
+                    }
+                    changedStat = watched;
+                } else {
+                    other.put(watched, getValue(container, watched)); // important fix
+                }
             }
+            if (changedStat == null) return;
 
-            final IStat changedStat = statsTemp.getFirst();
-
-            Map<IStat, Long> otherProperties = new HashMap<>();
-            watchedStats.stream()
-                    .filter(iStat -> !stat.containsStat(stat))
-                    .forEach(iStat -> {
-                        otherProperties.put(stat, getValue(container, stat));
-                    });
-
-            onChangeValue(container, changedStat, newValue, oldValue, otherProperties);
+            onChangeValue(container, changedStat, newValue, oldValue, other);
         } catch (Exception e) {
             log.error("Error looking to update an achievement {}", getName(), e).submit();
         }
@@ -140,13 +137,13 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @Override
     public void onChangeValue(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherProperties) {
-        handleNotify(container, stat, newValue, oldValue, otherProperties);
-        handleComplete(container);
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
+        handleNotify(container, oldPercent, newPercent);
+        handleComplete(container, oldPercent, newPercent);
         long oldLong = (long) (oldPercent * FP_MODIFIER);
         long newLong = (long) (newPercent * FP_MODIFIER);
-        new StatPropertyUpdateEvent(container, this, newLong,oldLong).callEvent();
+        new StatPropertyUpdateEvent(container, this, newLong, oldLong).callEvent();
     }
 
     @Override
@@ -216,9 +213,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void handleNotify(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherStats) {
-        float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
-        float newPercent = calculatePercent(constructMap(stat, newValue, otherStats));
+    public void handleNotify(StatContainer container, float oldPercent, float newPercent) {
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold);
@@ -228,9 +223,9 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void handleComplete(StatContainer container) {
+    public void handleComplete(StatContainer container, float oldPercent, float newPercent) {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
-        if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, achievementFilterType, getPeriod()) >= 1.0f) {
+        if (achievementCompletionOptional.isEmpty() && oldPercent < 1.0f && newPercent >= 1.0f) {
             complete(container);
             notifyComplete(container, Bukkit.getPlayer(container.getUniqueId()));
             if (doRewards) {
