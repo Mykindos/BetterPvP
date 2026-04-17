@@ -61,8 +61,10 @@ public class StatusBar extends ActionBar {
     private Component getHealthComponent(Player player) {
         final int health = (int) Math.ceil(healthService.getHealth(player));
         final int maxHealth = (int) Math.ceil(healthService.getMaxHealth(player));
+        final int bonusHealth = (int) Math.ceil(healthService.getBonusHealth(player));
+        String bonus = bonusHealth == 0 ? "" : "+" + bonusHealth;
         return Component.empty()
-                .append(Component.text(health + "/" + maxHealth, TextColor.color(255, 0, 0)))
+                .append(Component.text(health + "/" + maxHealth + bonus, TextColor.color(255, 0, 0)))
                 .appendSpace()
                 .append(Component.text("<glyph:heart_icon>").font(NEXO));
     }
