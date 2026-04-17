@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,11 +24,11 @@ import org.bukkit.event.EventPriority;
 public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
 
     private double bonusDamage;
+    private double bonusDamageIncreasePerLevel;
 
     private double healthOverTarget;
 
     private double baseMaxDamage;
-
     private double maxDamageIncreasePerLevel;
 
     @Inject
@@ -44,11 +45,13 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You deal " + getValueString(this::getBonusDamage, level) + " bonus damage for every",
-                getValueString(this::getHealthOverTarget, level) + " more health you have than your target",
+                "Deal bonus damage based on how much higher your",
+                "Current health percentage is compared to your target's.",
+                "For every " + getValueString(this::getHealthOverTarget, level, 100, "%", 2) + " over your target's health percentage",
+                "You deal " + getValueString(this::getBonusDamage, level) + " bonus damage",
                 "",
-                "You can deal a maximum of " + getValueString(this::getMaxDamage, level) + " bonus damage"
-        };
+                "Max bonus: " + getValueString(this::getMaxDamage, level) + " damage"
+             };
     }
 
     public double getMaxDamage(int level) {
@@ -56,7 +59,7 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
     }
 
     public double getBonusDamage(int level) {
-        return bonusDamage;
+        return bonusDamage + bonusDamageIncreasePerLevel * (level - 1);
     }
 
     public double getHealthOverTarget(int level) {
@@ -78,13 +81,16 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
         if (!event.isDamageeLiving()) return;
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
+        if (event.getLivingDamagee() == null) return;
         int level = getLevel(player);
         if (level > 0) {
-            LivingEntity ent = event.getLivingDamagee();
-            double difference = (player.getHealth() - ent.getHealth()) / healthOverTarget;
+            final LivingEntity ent = event.getLivingDamagee();
+            final double livingEntityHealthPercent = UtilPlayer.getHealthPercentage(ent);
+            final double playerHealthPercent = UtilPlayer.getHealthPercentage(player);
+            double difference = playerHealthPercent - livingEntityHealthPercent;
             if (difference > 0) {
                 // Calculate damage first, THEN cap it
-                double damageToAdd = difference * bonusDamage;
+                double damageToAdd = difference * getBonusDamage(level);
                 damageToAdd = Math.min(damageToAdd, getMaxDamage(level));
 
                 // Add a flat damage modifier based on health difference
@@ -95,10 +101,11 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
 
     @Override
     public void loadSkillConfig(){
-        bonusDamage = getConfig("bonusDamage", 0.5, Double.class);
-        healthOverTarget = getConfig("healthOverTarget", 2.0, Double.class);
-        baseMaxDamage = getConfig("baseMaxDamage", 1.0, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 0.5, Double.class);
+        bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
+        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.0, Double.class);
+        healthOverTarget = getConfig("healthOverTarget", 0.10, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
     }
 
 
