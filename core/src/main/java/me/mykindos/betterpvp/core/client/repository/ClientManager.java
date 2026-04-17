@@ -280,10 +280,10 @@ public class ClientManager extends PlayerManager<Client> {
      * if their {@code isLoaded} method returns {@code true}, which indicates that
      * the underlying player is actively online in the system.
      *
-     * @return an un
+     * @return an unmodifiable set containing all online Client instances present in the store.
      */
     @Override
-    public synchronized Set<Client> getOnline() {
+    public Set<Client> getOnline() {
         return this.store.asMap().values().stream().filter(Client::isLoaded).collect(Collectors.toUnmodifiableSet());
     }
 

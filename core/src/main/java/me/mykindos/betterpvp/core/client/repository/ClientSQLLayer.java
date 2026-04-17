@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Realm;
-import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
@@ -46,9 +45,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.mykindos.betterpvp.core.database.jooq.Tables.*;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_NAME_HISTORY;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_PROPERTIES;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_REWARDS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GAMER_PROPERTIES;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_CLIENT_STATS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.IGNORES;
 import static me.mykindos.betterpvp.core.database.jooq.tables.ClientStats.CLIENT_STATS;
-
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 
 
 @CustomLog
@@ -450,7 +455,7 @@ public class ClientSQLLayer {
 
     public CompletableFuture<Void> processStatUpdates(Set<Client> clients, Realm realm) {
         List<Query> statementsToRun = clients.stream().flatMap(client -> getStatUpdates(client, realm).stream()).toList();
-        return executeQueriesAsTransaction(statementsToRun, false);
+        return executeQueriesAsTransaction(statementsToRun, true);
     }
 
     private List<Query> getStatUpdates(Client client, Realm realm) {
