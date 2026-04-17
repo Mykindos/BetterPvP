@@ -75,7 +75,7 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
         return new String[] {
                 "Hold right click with a Sword to channel",
                 "",
-                "Charges <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second",
+                "Charges <val>" + getValueString(this::getChargePerSecond, level, 100, "%", 0) + "</val> per second",
                 "",
                 "Release right click to pounce forward",
                 "in the direction you are looking",
