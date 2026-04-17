@@ -31,7 +31,9 @@ public final class PunishmentTypes {
     }
 
     public static IPunishmentType getPunishmentType(String name) {
-        return PUNISHMENT_TYPES.stream().filter(type -> type.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        name = name.replace("_", "").replace(" ", "");
+        final String finalName = name;
+        return PUNISHMENT_TYPES.stream().filter(type -> type.getName().equalsIgnoreCase(finalName)).findFirst().orElse(null);
     }
 
     public static Set<IPunishmentType> getPunishmentTypes() {
