@@ -32,7 +32,8 @@ public interface IStat {
     Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period);
 
     default Double getDoubleStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
-        return getStat(statContainer, type, period) == null ? null : getStat(statContainer, type, period) / (double) FP_MODIFIER;
+        final Long value = getStat(statContainer, type, period);
+        return value == null ? null : value / (double) FP_MODIFIER;
     }
 
     /**
