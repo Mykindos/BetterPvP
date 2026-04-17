@@ -1275,3 +1275,8 @@ skills:
       regenerationStrength: 1
       timeOutOfCombat: 15.0
       timeOutOfCombatDecreasePerLevel: 5.0
+    energypool:
+      enabled: true
+      maxlevel: 3
+      baseEnergyPoolIncrease: 20.0
+      energyPoolIncreasePerLevel: 10.0
