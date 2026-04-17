@@ -127,7 +127,16 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
             }
             if (changedStat == null) return;
 
-            onChangeValue(container, changedStat, newValue, oldValue, other);
+            // newValue/oldValue are for `stat` (the raw changed sub-stat), NOT for changedStat,
+            // which may be a composite/wrapper that contains stat.
+            // At MONITOR priority the container is already updated, so read changedStat's
+            // real current value, then reconstruct its old value by reversing the raw delta.
+            long rawDelta = (newValue == null ? 0L : newValue) - (oldValue == null ? 0L : oldValue);
+            Long changedStatNewValue = getValue(container, changedStat);
+            long effectiveNew = changedStatNewValue == null ? 0L : changedStatNewValue;
+            long effectiveOld = effectiveNew - rawDelta;
+
+            onChangeValue(container, changedStat, effectiveNew, effectiveOld, other);
         } catch (Exception e) {
             log.error("Error looking to update an achievement {}", getName(), e).submit();
         }
@@ -214,6 +223,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @Override
     public void handleNotify(StatContainer container, float oldPercent, float newPercent) {
+        log.info("Notify old {} new {}", oldPercent, newPercent).submit();
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold);
@@ -225,7 +235,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     @Override
     public void handleComplete(StatContainer container, float oldPercent, float newPercent) {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
-        if (achievementCompletionOptional.isEmpty() && oldPercent < 1.0f && newPercent >= 1.0f) {
+        if (achievementCompletionOptional.isEmpty() && newPercent >= 1.0f) {
             complete(container);
             notifyComplete(container, Bukkit.getPlayer(container.getUniqueId()));
             if (doRewards) {
