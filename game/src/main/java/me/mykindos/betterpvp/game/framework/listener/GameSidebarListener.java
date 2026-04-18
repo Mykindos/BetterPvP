@@ -27,6 +27,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -70,13 +71,17 @@ public class GameSidebarListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onWaitingSidebar(SidebarBuildEvent event) {
         if (serverController.getCurrentState() == GameState.IN_GAME || serverController.getCurrentState() == GameState.ENDING) {
             return;
         }
 
         final SidebarComponent.Builder builder = event.getBuilder();
+        final Player player = event.getGamer().getPlayer();
+        if (player == null) {
+            return;
+        }
         builder.addBlankLine();
         builder.addStaticLine(Component.text("Players", NamedTextColor.YELLOW, TextDecoration.BOLD));
         builder.addDynamicLine(() -> {
@@ -97,7 +102,7 @@ public class GameSidebarListener implements Listener {
         builder.addBlankLine();
         builder.addStaticLine(Component.text("Kit", NamedTextColor.RED, TextDecoration.BOLD));
         builder.addDynamicLine(() -> {
-            return Component.text(selectorManager.getRole(event.getGamer().getPlayer()).getName());
+            return Component.text(selectorManager.getRole(player).getName());
         });
         builder.addBlankLine();
         builder.addStaticLine(Component.text("Game", NamedTextColor.GREEN, TextDecoration.BOLD));
