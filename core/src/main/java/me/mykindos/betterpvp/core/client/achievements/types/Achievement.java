@@ -110,33 +110,27 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
             @Nullable
             final Long oldValue = event.getOldValue();
             final StatContainer container = event.getContainer();
-
-            IStat changedStat = null;
-            Map<IStat, Long> other = new HashMap<>(watchedStats.size());
-
             //validate and retrieve
-            for (IStat watched : watchedStats) {
-                if (watched.containsStat(stat)) {
-                    if (changedStat != null) {
-                        throw new IllegalStateException("Expected 1 changed stat...");
-                    }
-                    changedStat = watched;
-                } else {
-                    other.put(watched, getValue(container, watched)); // important fix
-                }
+            final List<IStat> statsTemp = watchedStats.stream()
+                    .filter(iStat -> iStat.containsStat(stat))
+                    .toList();
+
+            if (statsTemp.isEmpty()) return;
+            if (statsTemp.size() > 1) {
+                throw new IllegalStateException("Expected 1 changed stat, but got " + statsTemp.size() + ". " +
+                        "Make sure all watched composite Stats have unique savable stats.");
             }
-            if (changedStat == null) return;
 
-            // newValue/oldValue are for `stat` (the raw changed sub-stat), NOT for changedStat,
-            // which may be a composite/wrapper that contains stat.
-            // At MONITOR priority the container is already updated, so read changedStat's
-            // real current value, then reconstruct its old value by reversing the raw delta.
-            long rawDelta = (newValue == null ? 0L : newValue) - (oldValue == null ? 0L : oldValue);
-            Long changedStatNewValue = getValue(container, changedStat);
-            long effectiveNew = changedStatNewValue == null ? 0L : changedStatNewValue;
-            long effectiveOld = effectiveNew - rawDelta;
+            final IStat changedStat = statsTemp.getFirst();
 
-            onChangeValue(container, changedStat, effectiveNew, effectiveOld, other);
+            Map<IStat, Long> otherProperties = new HashMap<>();
+            watchedStats.stream()
+                    .filter(iStat -> !stat.containsStat(stat))
+                    .forEach(iStat -> {
+                        otherProperties.put(stat, getValue(container, stat));
+                    });
+
+            onChangeValue(container, changedStat, newValue, oldValue, otherProperties);
         } catch (Exception e) {
             log.error("Error looking to update an achievement {}", getName(), e).submit();
         }
@@ -146,13 +140,13 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @Override
     public void onChangeValue(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherProperties) {
+        handleNotify(container, stat, newValue, oldValue, otherProperties);
+        handleComplete(container);
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
-        handleNotify(container, oldPercent, newPercent);
-        handleComplete(container, oldPercent, newPercent);
         long oldLong = (long) (oldPercent * FP_MODIFIER);
         long newLong = (long) (newPercent * FP_MODIFIER);
-        new StatPropertyUpdateEvent(container, this, newLong, oldLong).callEvent();
+        new StatPropertyUpdateEvent(container, this, newLong,oldLong).callEvent();
     }
 
     @Override
@@ -222,7 +216,9 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void handleNotify(StatContainer container, float oldPercent, float newPercent) {
+    public void handleNotify(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherStats) {
+        float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
+        float newPercent = calculatePercent(constructMap(stat, newValue, otherStats));
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold);
@@ -232,9 +228,9 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void handleComplete(StatContainer container, float oldPercent, float newPercent) {
+    public void handleComplete(StatContainer container) {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
-        if (achievementCompletionOptional.isEmpty() && newPercent >= 1.0f) {
+        if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, achievementFilterType, getPeriod()) >= 1.0f) {
             complete(container);
             notifyComplete(container, Bukkit.getPlayer(container.getUniqueId()));
             if (doRewards) {

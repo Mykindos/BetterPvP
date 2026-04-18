@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.client.stats.events.IStatMapListener;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
-import me.mykindos.betterpvp.core.server.Season;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,11 +25,6 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     //realm, istat, value
     protected final ConcurrentMap<Realm, ConcurrentMap<IStat, Long>> myMap = new ConcurrentHashMap<>();
     protected final List<IStatMapListener> listeners = new ArrayList<>();
-
-    /** Cached aggregate over ALL realms: stat → sum */
-    private final ConcurrentMap<IStat, Long> allMap = new ConcurrentHashMap<>();
-    /** Cached aggregate per Season: season → stat → sum */
-    private final ConcurrentMap<Season, ConcurrentMap<IStat, Long>> seasonMap = new ConcurrentHashMap<>();
 
     /**
      * Put the specified stat in this map;
@@ -48,13 +43,6 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
             oldValue.set(v.put(stat, value));
             return v;
         });
-        // keep secondary indexes in sync
-        long delta = value - (oldValue.get() == null ? 0L : oldValue.get());
-        if (delta != 0) {
-            allMap.merge(stat, delta, Long::sum);
-            seasonMap.computeIfAbsent(realm.getSeason(), s -> new ConcurrentHashMap<>())
-                    .merge(stat, delta, Long::sum);
-        }
         if (!silent) {
             listeners.forEach(l -> l.onMapValueChanged(stat, value, oldValue.get()));
         }
@@ -65,10 +53,6 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
             Long newValue = myMap.computeIfAbsent(realm, (k) -> new ConcurrentHashMap<>())
                     .compute(stat, (sk, sv) -> sv == null ? amount : sv + amount);
             Long oldValue = newValue - amount;
-            // keep secondary indexes in sync
-            allMap.merge(stat, amount, Long::sum);
-            seasonMap.computeIfAbsent(realm.getSeason(), s -> new ConcurrentHashMap<>())
-                    .merge(stat, amount, Long::sum);
             listeners.forEach(l -> l.onMapValueChanged(stat, newValue, oldValue));
         }
     }
@@ -76,7 +60,7 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     @Nullable
     public Long get(StatFilterType type, @Nullable Period period, IStat stat) {
         if (type == StatFilterType.ALL) {
-            return allMap.get(stat);
+            return getAll(stat);
         }
 
         if (type == StatFilterType.REALM) {
@@ -86,15 +70,17 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
             return realmMap.get(stat);
         }
 
-        // SEASON – O(1) lookup via secondary index
-        if (!(period instanceof Season season)) throw new ClassCastException("Object passed when StatFilterType is SEASON must be Season, found: " + period);
-        final ConcurrentMap<IStat, Long> sMap = seasonMap.get(season);
-        if (sMap == null) return null;
-        return sMap.get(stat);
+        return myMap.entrySet().stream()
+                .filter(entry -> type.filter(period, entry.getKey()))
+                .mapToLong(entry -> Optional.ofNullable(entry.getValue().get(stat)).orElse(0L))
+                .sum();
+
     }
 
     public Long getAll(IStat stat) {
-        return allMap.getOrDefault(stat, 0L);
+        return myMap.values().stream()
+                .mapToLong(map -> Optional.ofNullable(map.get(stat)).orElse(0L))
+                .sum();
     }
 
     /**
@@ -136,17 +122,7 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
 
     public StatConcurrentHashMap copyFrom(StatConcurrentHashMap other) {
         myMap.clear();
-        allMap.clear();
-        seasonMap.clear();
         myMap.putAll(other.getMyMap());
-        // rebuild secondary indexes
-        myMap.forEach((realm, statMap) ->
-                statMap.forEach((stat, value) -> {
-                    allMap.merge(stat, value, Long::sum);
-                    seasonMap.computeIfAbsent(realm.getSeason(), s -> new ConcurrentHashMap<>())
-                            .merge(stat, value, Long::sum);
-                })
-        );
         return this;
     }
 
