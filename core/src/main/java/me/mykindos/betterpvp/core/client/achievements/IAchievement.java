@@ -258,24 +258,15 @@ public interface IAchievement {
      * @param oldValue
      * @param otherProperties
      */
-
-    /**
-     * Does the logic for whether to call notifyProgress and executes it, using percent values
-     * @param container
-     * @param oldPercent percent complete before the change
-     * @param newPercent percent complete after the change
-     */
-    void handleNotify(final StatContainer container, float oldPercent, float newPercent);
+    void handleNotify(final StatContainer container,
+                      final IStat stat,
+                      final Long newValue,
+                      final @Nullable("Null when no previous value") Long oldValue,
+                      final Map<IStat, Long> otherStats);
 
     /**
      * Does the logic for whether to call {@link IAchievement#notifyComplete(PropertyContainer, Audience)} and {@link IAchievement#complete(PropertyContainer)} and executes it
      * @param container
      */
-    /**
-     * Does the logic for whether to call notifyComplete and complete, using percent values
-     * @param container
-     * @param oldPercent percent complete before the change
-     * @param newPercent percent complete after the change
-     */
-    void handleComplete(final StatContainer container, float oldPercent, float newPercent);
+    void handleComplete(final StatContainer container);
 }
