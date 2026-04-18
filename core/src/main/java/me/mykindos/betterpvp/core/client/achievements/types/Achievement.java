@@ -223,7 +223,6 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @Override
     public void handleNotify(StatContainer container, float oldPercent, float newPercent) {
-        log.info("Notify old {} new {}", oldPercent, newPercent).submit();
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold);
