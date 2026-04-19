@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.core.item.impl.interaction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -15,7 +13,7 @@ import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InputMeta;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerCompletedEvent;
+import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -29,16 +27,17 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Interaction that fells an entire tree when the player breaks a single log.
  * Attached as a base (non-serialized) component on {@link me.mykindos.betterpvp.core.item.impl.Axe},
  * so every axe type inherits tree-felling with zero per-subclass boilerplate.
  *
- * <p>Fires {@link TreeFellerCompletedEvent} after the tree is felled so that progression
+ * <p>Fires {@link TreeFellerEvent} before the tree is felled so that progression
  * perks (e.g. EnchantedLumberfall) can react without depending on this module.
  */
 @Singleton
@@ -55,12 +54,6 @@ public class TreeFellerInteraction extends CooldownInteraction {
     @Inject
     @Config(path = "items.treeFeller.maxBlocks", defaultValue = "15")
     private int maxBlocks;
-
-    /**
-     * Tracks how many blocks each player has felled in the current tree-fell call.
-     * Reset to 0 before each execution and removed after.
-     */
-    private final Map<UUID, Integer> blocksFelledByPlayer = new HashMap<>();
 
     @Inject
     public TreeFellerInteraction(BlockTagManager blockTagManager, EffectManager effectManager,
@@ -85,15 +78,6 @@ public class TreeFellerInteraction extends CooldownInteraction {
             return new InteractionResult.Fail(InteractionResult.FailReason.CUSTOM);
         }
 
-        // Respect the player's disable-tree-feller toggle
-        Client client = actor.getClient();
-        if (client != null) {
-            boolean disabled = (boolean) client.getProperty(ClientProperty.DISABLE_TREEFELLER).orElse(false);
-            if (disabled) {
-                return new InteractionResult.Fail(InteractionResult.FailReason.CUSTOM);
-            }
-        }
-
         // Cancel the original break event; we handle all block breaking manually
         BlockBreakEvent breakEvent = context.getOrNull(InputMeta.BLOCK_BREAK_EVENT);
         if (breakEvent != null) {
@@ -101,20 +85,22 @@ public class TreeFellerInteraction extends CooldownInteraction {
         }
 
         Player player = (Player) actor.getEntity();
-        UUID playerId = player.getUniqueId();
 
         // Save type before breaking (block becomes AIR after breakBlockNaturally)
         Material initialLogType = block.getType();
         Location initialLogLocation = block.getLocation();
 
-        blocksFelledByPlayer.put(playerId, 0);
-        Location firstLeafLocation = fellTree(player, block);
-        blocksFelledByPlayer.remove(playerId);
+        List<Block> blocksToFell = new ArrayList<>();
+        Location firstLeafLocation = collectTree(block, new HashSet<>(), blocksToFell);
+
+        UtilServer.callEvent(new TreeFellerEvent(player, firstLeafLocation, initialLogLocation, initialLogType, blocksToFell));
+
+        for (Block blockToFell : blocksToFell) {
+            UtilBlock.breakBlockNaturally(blockToFell, player, effectManager);
+        }
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
         UtilMessage.simpleMessage(player, "Woodcutting", "You used <alt>Tree Feller</alt>");
-
-        UtilServer.callEvent(new TreeFellerCompletedEvent(player, firstLeafLocation, initialLogLocation, initialLogType));
 
         return InteractionResult.Success.ADVANCE;
     }
@@ -142,22 +128,21 @@ public class TreeFellerInteraction extends CooldownInteraction {
     }
 
     /**
-     * Recursively breaks all connected log blocks within {@code maxBlocks} of the initial chop.
+     * Recursively collects all connected log blocks within {@code maxBlocks} of the initial chop.
      *
-     * @param player the player chopping
-     * @param block  the current log block to break and search from
+     * @param block  the current log block to collect and search from
+     * @param visited blocks already searched during this tree-fell call
+     * @param blocksToFell mutable list of blocks that will be exposed to listeners before breaking
      * @return the location of the first natural leaf block encountered (for EnchantedLumberfall),
      *         or null if none was found
      */
     @Nullable
-    private Location fellTree(@NotNull Player player, @NotNull Block block) {
-        UUID playerId = player.getUniqueId();
-        int felled = blocksFelledByPlayer.getOrDefault(playerId, 0);
-        if (felled >= maxBlocks) return null;
+    private Location collectTree(@NotNull Block block, @NotNull Set<Location> visited, @NotNull List<Block> blocksToFell) {
+        if (blocksToFell.size() >= maxBlocks) return null;
+        if (!visited.add(block.getLocation())) return null;
         if (blockTagManager.isPlayerPlaced(block)) return null;
 
-        UtilBlock.breakBlockNaturally(block, player, effectManager);
-        blocksFelledByPlayer.put(playerId, felled + 1);
+        blocksToFell.add(block);
 
         Location firstLeafLocation = null;
 
@@ -173,7 +158,7 @@ public class TreeFellerInteraction extends CooldownInteraction {
                     }
 
                     if (typeName.contains("_LOG")) {
-                        Location childLeaf = fellTree(player, target);
+                        Location childLeaf = collectTree(target, visited, blocksToFell);
                         if (firstLeafLocation == null) {
                             firstLeafLocation = childLeaf;
                         }

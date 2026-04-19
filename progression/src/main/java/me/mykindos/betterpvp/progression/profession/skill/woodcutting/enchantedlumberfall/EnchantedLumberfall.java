@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerCompletedEvent;
+import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -68,7 +68,7 @@ public class EnchantedLumberfall extends ProfessionSkill {
         return 0.1 * Math.max(1, level);
     }
 
-    public void whenPlayerFellsTree(TreeFellerCompletedEvent event) {
+    public void whenPlayerFellsTree(TreeFellerEvent event) {
         Location locationToActivatePerk = event.getLeafActivationLocation();
         if (locationToActivatePerk == null) return;
 
@@ -98,7 +98,8 @@ public class EnchantedLumberfall extends ProfessionSkill {
                 }, i);
             }
 
-            LootBundle bundle = woodcuttingHandler.getRandomLoot(event.getPlayer(), event.getLocationToActivatePerk());
+            final Location location = event.getPlayer().getLocation();
+            LootBundle bundle = woodcuttingHandler.getRandomLoot(event.getPlayer(), location);
             for (Loot<?, ?> loot : bundle) {
                 final Object award = loot.award(bundle.getContext());
                 if (award instanceof Item item) {
