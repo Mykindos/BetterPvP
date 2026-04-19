@@ -1,21 +1,26 @@
 package me.mykindos.betterpvp.progression.profession;
 
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.loader.DrawioNodeLoaderStrategy;
+import me.mykindos.betterpvp.progression.profession.skill.loader.NodeLoaderStrategy;
+import me.mykindos.betterpvp.progression.profession.skill.loader.YamlNodeLoaderStrategy;
+import me.mykindos.betterpvp.progression.profession.skill.tree.SkillTreeLayout;
+import me.mykindos.betterpvp.progression.profession.skill.tree.SkillTreeReader;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
-import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.io.File;
 import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
+@CustomLog
 public abstract class ProfessionHandler implements IProfession {
 
     protected final Progression progression;
@@ -27,7 +32,8 @@ public abstract class ProfessionHandler implements IProfession {
     public boolean enabled;
 
     @Getter
-    public Map<String, Map<String, List<String>>> skillTreeLayout;
+    @Nullable
+    private SkillTreeLayout skillTree;
 
     protected ProfessionHandler(Progression progression, ClientManager clientManager, ProfessionProfileManager professionProfileManager, String profession) {
         this.progression = progression;
@@ -42,34 +48,63 @@ public abstract class ProfessionHandler implements IProfession {
             ProfessionProfile profile = professionProfile.get();
             return profile.getProfessionDataMap().computeIfAbsent(profession, k -> new ProfessionData(uuid, profession));
         }
-
         return null;
+    }
+
+    public NodeLoaderStrategy getNodeLoaderStrategy() {
+        File dir = new File(progression.getDataFolder(), "professions/" + profession.toLowerCase());
+        for (String name : new String[]{"skill_tree.drawio", "skill_tree.xml"}) {
+            File f = new File(dir, name);
+            if (f.exists()) return new DrawioNodeLoaderStrategy(progression, f);
+        }
+        return new YamlNodeLoaderStrategy();
     }
 
     public void loadConfig() {
         this.enabled = progression.getConfig().getBoolean(profession + ".enabled", true);
+        loadSkillTree();
+    }
 
-        // Load the new nested structure
-        ConfigurationSection layoutSection = progression.getConfig("professions/" + profession.toLowerCase() + "/skill_tree")
-                .getConfigurationSection("skill_tree.layout");
+    private void loadSkillTree() {
+        File dir = new File(progression.getDataFolder(), "professions/" + profession.toLowerCase());
+        File treeFile = resolveTreeFile(dir);
 
-        skillTreeLayout = new HashMap<>();
+        if (treeFile == null) {
+            log.warn("No skill tree file found for profession '{}' in {}", profession, dir.getPath()).submit();
+            skillTree = null;
+            return;
+        }
 
-        if (layoutSection != null) {
-            for (String rowKey : layoutSection.getKeys(false)) {
-                ConfigurationSection rowSection = layoutSection.getConfigurationSection(rowKey);
-                if (rowSection != null) {
-                    Map<String, List<String>> columns = new HashMap<>();
-                    for (String colKey : rowSection.getKeys(false)) {
-                        List<String> columnItems = rowSection.getStringList(colKey);
-                        columns.put(colKey, columnItems);
-                    }
-                    skillTreeLayout.put(rowKey, columns);
-                }
+        try {
+            skillTree = SkillTreeReader.forFile(treeFile).read(treeFile);
+            log.info("Loaded skill tree for '{}' from {} ({} rows)", profession, treeFile.getName(), skillTree.rowCount()).submit();
+        } catch (Exception e) {
+            log.error("Failed to load skill tree for profession '{}'", profession, e).submit();
+            skillTree = null;
+        }
+    }
+
+    /**
+     * Resolves the skill tree file for this profession.
+     * Priority: skill_tree.drawio > skill_tree.xml > skill_tree.yml
+     * On first run, copies the bundled default yml to the data folder.
+     */
+    private File resolveTreeFile(File dir) {
+        for (String name : new String[]{"skill_tree.drawio", "skill_tree.xml", "skill_tree.yml"}) {
+            File candidate = new File(dir, name);
+            if (candidate.exists()) {
+                return candidate;
             }
         }
 
+        // Save the bundled default if present (won't overwrite existing files)
+        String resourcePath = "configs/professions/" + profession.toLowerCase() + "/skill_tree.yml";
+        if (progression.getResource(resourcePath) != null) {
+            progression.saveResource(resourcePath, false);
+            File saved = new File(progression.getDataFolder(), resourcePath);
+            if (saved.exists()) return saved;
+        }
 
+        return null;
     }
-
 }

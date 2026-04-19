@@ -3,7 +3,7 @@ nodes:
   base_fishing:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.fishing.BaseFishing
+    class: me.mykindos.betterpvp.progression.profession.skill.fishing.basefishing.BaseFishing
     dependencies:
       nodes:
       - max_stack_size_attribute_8
@@ -15,7 +15,7 @@ nodes:
   aggressive_rodder:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.fishing.AggressiveRodder
+    class: me.mykindos.betterpvp.progression.profession.skill.fishing.aggressiverodder.AggressiveRodder
     dependencies:
       nodes:
       - max_stack_size_attribute_14
@@ -27,7 +27,7 @@ nodes:
   no_more_mobs:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.fishing.NoMoreMobs
+    class: me.mykindos.betterpvp.progression.profession.skill.fishing.nomoremobs.NoMoreMobs
     dependencies:
       nodes:
       - thicker_lines_attribute_23
@@ -38,7 +38,7 @@ nodes:
   thicker_lines:
     enabled: true
     maxlevel: 250
-    class: me.mykindos.betterpvp.progression.profession.skill.fishing.ThickerLines
+    class: me.mykindos.betterpvp.progression.profession.skill.fishing.thickerlines.ThickerLines
     dependencies:
       nodes: []
       levelsRequired: 0
@@ -47,7 +47,7 @@ nodes:
   feeling_lucky:
     enabled: true
     maxlevel: 250
-    class: me.mykindos.betterpvp.progression.profession.skill.fishing.FeelingLucky
+    class: me.mykindos.betterpvp.progression.profession.skill.fishing.feelinglucky.FeelingLucky
     dependencies:
       nodes: []
       levelsRequired: 0
@@ -56,7 +56,7 @@ nodes:
   expert_baiter:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.fishing.ExpertBaiter
+    class: me.mykindos.betterpvp.progression.profession.skill.fishing.expertbaiter.ExpertBaiter
     dependencies:
       nodes:
       - bait_duration_attribute_25

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profile.repository;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
@@ -10,8 +11,8 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionBuildsRecord;
 import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionExpRecord;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionBuild;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
-import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import org.jooq.DSLContext;
@@ -28,9 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_BUILDS;
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_EXP;
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_PROPERTIES;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.*;
 
 @Singleton
 @CustomLog
@@ -38,7 +37,7 @@ public class ProfessionProfileRepository {
 
     private final Database database;
     private final ClientManager clientManager;
-    private final ProfessionNodeManager skillManager;
+    private final Provider<ProfessionNodeManager> skillManagerProvider;
     private final PropertyMapper propertyMapper;
     private final AtomicReference<ConcurrentHashMap<String, Query>> queuedStatUpdates =
             new AtomicReference<>(new ConcurrentHashMap<>());
@@ -47,17 +46,17 @@ public class ProfessionProfileRepository {
 
     @Inject
     public ProfessionProfileRepository(Database database, ClientManager clientManager,
-                                       ProfessionNodeManager skillManager, PropertyMapper propertyMapper) {
+                                       Provider<ProfessionNodeManager> skillManagerProvider, PropertyMapper propertyMapper) {
         this.database = database;
         this.clientManager = clientManager;
-        this.skillManager = skillManager;
+        this.skillManagerProvider = skillManagerProvider;
         this.propertyMapper = propertyMapper;
 
         createPartitions();
     }
 
     public void createPartitions() {
-        int season = Core.getCurrentSeason();
+        int season = Core.getCurrentRealm().getSeason().getId();
         String partitionTableName = "progression_builds_season_" + season;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
@@ -89,7 +88,7 @@ public class ProfessionProfileRepository {
 
             org.jooq.Query query = ctx.insertInto(PROGRESSION_EXP)
                     .set(PROGRESSION_EXP.CLIENT, client.getId())
-                    .set(PROGRESSION_EXP.SEASON, Core.getCurrentSeason())
+                    .set(PROGRESSION_EXP.SEASON, Core.getCurrentRealm().getSeason().getId())
                     .set(PROGRESSION_EXP.PROFESSION, profession)
                     .set(PROGRESSION_EXP.EXPERIENCE, (long) experience)
                     .onConflict()
@@ -108,7 +107,7 @@ public class ProfessionProfileRepository {
             DSLContext ctx = database.getDslContext();
             Result<ProgressionExpRecord> results = ctx.selectFrom(PROGRESSION_EXP)
                     .where(PROGRESSION_EXP.CLIENT.eq(client.getId()))
-                    .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentSeason())).fetch();
+                    .and(PROGRESSION_EXP.SEASON.eq(Core.getCurrentRealm().getSeason().getId())).fetch();
             results.forEach(result -> {
                 String profession = result.getProfession();
                 double experience = result.getExperience();
@@ -131,7 +130,7 @@ public class ProfessionProfileRepository {
                     .select(PROGRESSION_PROPERTIES.PROPERTY, PROGRESSION_PROPERTIES.VALUE)
                     .from(PROGRESSION_PROPERTIES)
                     .where(PROGRESSION_PROPERTIES.CLIENT.eq(client.getId()))
-                    .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentSeason()))
+                    .and(PROGRESSION_PROPERTIES.SEASON.eq(Core.getCurrentRealm().getSeason().getId()))
                     .and(PROGRESSION_PROPERTIES.PROFESSION.eq(data.getProfession()))
                     .fetch();
 
@@ -149,7 +148,7 @@ public class ProfessionProfileRepository {
             DSLContext ctx = database.getDslContext();
             Result<ProgressionBuildsRecord> results = ctx.selectFrom(PROGRESSION_BUILDS)
                     .where(PROGRESSION_BUILDS.CLIENT.eq(client.getId()))
-                    .and(PROGRESSION_BUILDS.SEASON.eq(Core.getCurrentSeason())).fetch();
+                    .and(PROGRESSION_BUILDS.SEASON.eq(Core.getCurrentRealm().getSeason().getId())).fetch();
 
             results.forEach(buildRecord -> {
                 String profession = buildRecord.getProfession();
@@ -157,9 +156,9 @@ public class ProfessionProfileRepository {
                 int level = buildRecord.getLevel();
 
                 ProfessionData professionData = professionDataMap.computeIfAbsent(profession, k -> new ProfessionData(profile.getGamerUUID(), profession));
-                ProgressionBuild build = professionData.getBuild();
+                ProfessionBuild build = professionData.getBuild();
 
-                skillManager.getSkill(skillName).ifPresent(skill -> build.getSkills().put(skill, level));
+                skillManagerProvider.get().getSkill(skillName).ifPresent(skill -> build.getSkills().put(skill, level));
             });
         } catch (Exception ex) {
             log.error("Failed to load progression builds for {}", profile.getGamerUUID()).submit();
@@ -167,7 +166,7 @@ public class ProfessionProfileRepository {
 
     }
 
-    public void updateBuildForGamer(UUID uuid, ProgressionBuild build) {
+    public void updateBuildForGamer(UUID uuid, ProfessionBuild build) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             Client client = clientManager.search().offline(uuid).join().orElse(null);
             if (client == null) return;
@@ -177,7 +176,7 @@ public class ProfessionProfileRepository {
             build.getSkills().forEach((skill, level) -> {
                 Query query = ctx.insertInto(PROGRESSION_BUILDS)
                         .set(PROGRESSION_BUILDS.CLIENT, client.getId())
-                        .set(PROGRESSION_BUILDS.SEASON, Core.getCurrentSeason())
+                        .set(PROGRESSION_BUILDS.SEASON, Core.getCurrentRealm().getSeason().getId())
                         .set(PROGRESSION_BUILDS.PROFESSION, build.getProfession())
                         .set(PROGRESSION_BUILDS.SKILL, skill.getName())
                         .set(PROGRESSION_BUILDS.LEVEL, level)
@@ -203,7 +202,7 @@ public class ProfessionProfileRepository {
 
             Query query = ctx.insertInto(PROGRESSION_PROPERTIES)
                     .set(PROGRESSION_PROPERTIES.CLIENT, client.getId())
-                    .set(PROGRESSION_PROPERTIES.SEASON, Core.getCurrentSeason())
+                    .set(PROGRESSION_PROPERTIES.SEASON, Core.getCurrentRealm().getSeason().getId())
                     .set(PROGRESSION_PROPERTIES.PROFESSION, profession)
                     .set(PROGRESSION_PROPERTIES.PROPERTY, property)
                     .set(PROGRESSION_PROPERTIES.VALUE, value.toString())

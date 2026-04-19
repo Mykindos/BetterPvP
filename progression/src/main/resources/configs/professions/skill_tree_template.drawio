@@ -1,0 +1,80 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
+  <diagram name="Page-1" id="PKvY7KV2L_VxPwOxNZgC">
+    <mxGraphModel dx="1130" dy="662" grid="1" gridSize="60" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="540" pageHeight="1100" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="WLlp7O5tdH2qB7R_p-uK-2" edge="1" parent="1" source="tree_feller_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tree_feller_2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="90" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <object label="Tree &#xa;Feller" max_level="1" skill_class="me.mykindos.betterpvp.progression.profession.skill.woodcutting.treefeller.TreeFellerSkill" id="tree_feller_1">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="XcpH2yu-LjKgMZux9ZLq-13" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;fontFamily=Helvetica;fontSize=12;fontColor=default;fontStyle=1;resizable=0;opacity=40;movable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="180" y="2160" as="sourcePoint" />
+            <mxPoint x="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xSjNKM_H9NsZE3UdRUFI-3" edge="1" parent="1" source="tree_feller_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tree_feller_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xSjNKM_H9NsZE3UdRUFI-14" edge="1" parent="1" source="tree_feller_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="tree_compactor_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree &#xa;Feller" max_level="1" skill_class="me.mykindos.betterpvp.progression.profession.skill.woodcutting.treefeller.TreeFellerSkill" placeholders="null" id="tree_feller_2">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="WLlp7O5tdH2qB7R_p-uK-1" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;fontFamily=Helvetica;fontSize=12;fontColor=default;fontStyle=1;resizable=0;opacity=40;movable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="360" y="2160" as="sourcePoint" />
+            <mxPoint x="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xSjNKM_H9NsZE3UdRUFI-7" edge="1" parent="1" source="tree_feller_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tree_feller_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xSjNKM_H9NsZE3UdRUFI-13" edge="1" parent="1" source="tree_feller_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="tree_compactor_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree &#xa;Feller" max_level="1" skill_class="me.mykindos.betterpvp.progression.profession.skill.woodcutting.treefeller.TreeFellerSkill" placeholders="null" id="tree_feller_3">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="240" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Tree &#xa;Feller" max_level="1" skill_class="me.mykindos.betterpvp.progression.profession.skill.woodcutting.treefeller.TreeFellerSkill" placeholders="null" id="tree_feller_4">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="480" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="xSjNKM_H9NsZE3UdRUFI-12" edge="1" parent="1" source="tree_compactor_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tree_compactor_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree &#xa;Compactor" max_level="1" skill_class="me.mykindos.betterpvp.progression.profession.skill.woodcutting.treecompactor.TreeCompactor" id="tree_compactor_1">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="xSjNKM_H9NsZE3UdRUFI-11" edge="1" parent="1" source="tree_compactor_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tree_compactor_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree &#xa;Compactor" max_level="1" skill_class="me.mykindos.betterpvp.progression.profession.skill.woodcutting.treecompactor.TreeCompactor" id="tree_compactor_2">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="120" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Tree &#xa;Compactor" max_level="1" skill_class="me.mykindos.betterpvp.progression.profession.skill.woodcutting.treecompactor.TreeCompactor" id="tree_compactor_3">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="240" as="geometry" />
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

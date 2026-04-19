@@ -27,6 +27,13 @@ public class ProfessionAttributeNode extends ProfessionNode {
         super(name);
     }
 
+    public ProfessionAttributeNode(String name, int maxLevel, Map<ProfessionAttribute, AttributeConfig> attributeData) {
+        super(name);
+        this.dataInitialized = true;
+        this.setMaxLevel(maxLevel);
+        this.attributes.putAll(attributeData);
+    }
+
 
     @Override
     public Material getIcon() {

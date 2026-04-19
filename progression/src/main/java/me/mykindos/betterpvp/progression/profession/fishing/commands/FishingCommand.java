@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
-import me.mykindos.betterpvp.progression.profession.skill.builds.menu.FishingProfessionMenu;
+import me.mykindos.betterpvp.progression.profession.skill.menu.FishingMenu;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.entity.Player;
 
@@ -39,7 +39,7 @@ public class FishingCommand extends Command {
         if (args.length != 0) return;
 
         profileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            new FishingProfessionMenu(fishingHandler, profile, professionNodeManager).show(player).addCloseHandler(() -> {
+            new FishingMenu(fishingHandler, profile, professionNodeManager).show(player).addCloseHandler(() -> {
                 profileManager.getRepository().updateBuildForGamer(player.getUniqueId(), profile.getProfessionDataMap().get("Fishing").getBuild());
             });
         });

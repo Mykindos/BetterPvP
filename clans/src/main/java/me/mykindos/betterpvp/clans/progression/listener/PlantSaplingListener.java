@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
-import me.mykindos.betterpvp.progression.profession.skill.woodcutting.ForestFlourisher;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.forestflourisher.ForestFlourisher;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

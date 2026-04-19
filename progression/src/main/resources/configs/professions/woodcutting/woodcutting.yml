@@ -3,7 +3,7 @@ nodes:
   tree_compactor:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeCompactor
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.treecompactor.TreeCompactor
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -13,7 +13,7 @@ nodes:
   auto_planter:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.AutoPlanter
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.autoplanter.AutoPlanter
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -22,7 +22,7 @@ nodes:
   tree_feller:
     enabled: true
     maxlevel: 25
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeFellerSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.treefeller.TreeFellerSkill
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -36,7 +36,7 @@ nodes:
   unlock_dark_oak:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.DarkOakSaplingSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling.DarkOakSaplingSkill
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -46,7 +46,7 @@ nodes:
   unlock_acacia:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.AcaciaSaplingSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling.AcaciaSaplingSkill
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -56,7 +56,7 @@ nodes:
   unlock_spruce:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.SpruceSaplingSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling.SpruceSaplingSkill
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -66,7 +66,7 @@ nodes:
   unlock_mangrove:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.MangroveSaplingSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling.MangroveSaplingSkill
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -76,7 +76,7 @@ nodes:
   unlock_cherry:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.CherrySaplingSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling.CherrySaplingSkill
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -86,7 +86,7 @@ nodes:
   unlock_jungle:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.JungleSaplingSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling.JungleSaplingSkill
     dependencies:
       nodes: []
       levelsRequired: 1
@@ -96,7 +96,7 @@ nodes:
   unlock_pale_oak:
     enabled: true
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.PaleOakSaplingSkill
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling.PaleOakSaplingSkill
     dependencies:
       nodes: []
       levelsRequired: 1
