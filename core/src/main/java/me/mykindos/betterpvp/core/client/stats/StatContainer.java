@@ -70,7 +70,7 @@ public class StatContainer implements Unique, IStatMapListener {
     @Override
     public void onMapValueChanged(IStat stat, Long newValue, @Nullable Long oldValue) {
         try {
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
                 new StatPropertyUpdateEvent(this, stat, newValue, oldValue).callEvent();
             });
         } catch (Exception e) {

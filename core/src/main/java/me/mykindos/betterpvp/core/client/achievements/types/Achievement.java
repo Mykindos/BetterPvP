@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -146,7 +147,8 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
         long oldLong = (long) (oldPercent * FP_MODIFIER);
         long newLong = (long) (newPercent * FP_MODIFIER);
-        new StatPropertyUpdateEvent(container, this, newLong,oldLong).callEvent();
+        // already on async thread – fire directly; the event itself is marked async
+        new StatPropertyUpdateEvent(container, this, newLong, oldLong).callEvent();
     }
 
     @Override
@@ -215,13 +217,34 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         //no rewards by default
     }
 
+    /**
+     * Periodically called to catch completions that may have been missed by the event-driven path
+     * (e.g. newly registered achievements, edge cases during stat loading).
+     */
+    @Override
+    public void forceCheck(StatContainer container) {
+        if (!enabled) return;
+        if (getAchievementCompletion(container).isPresent()) return;
+        float percent = getPercentComplete(container, achievementFilterType, getPeriod());
+        if (percent >= 1.0f) {
+            complete(container);
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
+                    notifyComplete(container, Bukkit.getPlayer(container.getUniqueId())));
+            if (doRewards) {
+                processRewards(container);
+            }
+        }
+    }
+
     @Override
     public void handleNotify(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherStats) {
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherStats));
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
-                notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold);
+                // player messaging must happen on the main thread
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
+                        notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold));
                 return;
             }
         }
@@ -232,7 +255,8 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
         if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, achievementFilterType, getPeriod()) >= 1.0f) {
             complete(container);
-            notifyComplete(container, Bukkit.getPlayer(container.getUniqueId()));
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
+                    notifyComplete(container, Bukkit.getPlayer(container.getUniqueId())));
             if (doRewards) {
                 processRewards(container);
             }
