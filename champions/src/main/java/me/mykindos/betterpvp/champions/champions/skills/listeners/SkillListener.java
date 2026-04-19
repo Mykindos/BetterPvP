@@ -46,7 +46,6 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
-import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -236,8 +235,9 @@ public class SkillListener implements Listener {
             return;
         }
         ItemStack droppedItem = event.getItemDrop().getItemStack();
-        if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
 
+        final SkillType type = SkillWeapons.getTypeFrom(droppedItem);
+        if (type != SkillType.SWORD && type != SkillType.AXE) {
             final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(droppedItem);
             if (itemOpt.isEmpty()) {
                 return; // Not a valid item
@@ -273,10 +273,6 @@ public class SkillListener implements Listener {
     // Show shield for channel skills
     @EventHandler
     public void onRightClick(RightClickEvent event) {
-        if (Compatibility.SWORD_BLOCKING && !UtilItem.isAxe(event.getPlayer().getInventory().getItemInMainHand())) {
-            return; // Return if sword blocking is enabled
-        }
-
         Player player = event.getPlayer();
         ItemStack mainHand = player.getInventory().getItemInMainHand();
 
@@ -351,8 +347,7 @@ public class SkillListener implements Listener {
         final Block clickedBlock = event.getClickedBlock();
 
         if (clickedBlock != null) {
-            if (UtilItem.isAxe(mainHand) &&
-                    UtilBlock.isLog(clickedBlock.getType())) {
+            if (UtilItem.isAxe(mainHand) && UtilBlock.isLog(clickedBlock.getType())) {
                 if (gamer.isInCombat()) {
                     event.setUseInteractedBlock(Event.Result.DENY);
                     event.setUseItemInHand(Event.Result.DENY);

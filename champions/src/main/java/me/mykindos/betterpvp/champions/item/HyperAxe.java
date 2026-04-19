@@ -65,7 +65,7 @@ public class HyperAxe extends WeaponItem implements Reloadable {
 
         // Add components
         addBaseComponent(InteractionContainerComponent.builder()
-                .root(InteractionInputs.SWAP_HAND, hyperRushAbility)
+                .root(InteractionInputs.RIGHT_CLICK, hyperRushAbility)
                 .build());
     }
 
