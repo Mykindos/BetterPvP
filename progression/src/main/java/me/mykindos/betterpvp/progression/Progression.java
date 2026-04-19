@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
+import me.mykindos.betterpvp.core.recipe.RecipeUnlockService;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.item.ProgressionFishBootstrap;
@@ -24,6 +25,7 @@ import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoad
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
+import me.mykindos.betterpvp.progression.profession.skill.SkillTreeRecipeUnlockProvider;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
 import org.bukkit.Bukkit;
@@ -73,6 +75,9 @@ public class Progression extends BPvPPlugin {
 
             var skillManager = injector.getInstance(ProfessionNodeManager.class);
             skillManager.loadSkills();
+
+            var recipeUnlockService = injector.getInstance(RecipeUnlockService.class);
+            recipeUnlockService.register(injector.getInstance(SkillTreeRecipeUnlockProvider.class));
 
             var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
             listenerLoader.registerListeners(PACKAGE);

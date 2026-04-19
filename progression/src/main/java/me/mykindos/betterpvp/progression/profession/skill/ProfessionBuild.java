@@ -9,15 +9,15 @@ import java.util.Map;
 public class ProfessionBuild {
 
     private final String profession;
-    private Map<ProfessionNode, Integer> skills;
+    private Map<ProfessionNode, Integer> nodes;
 
     public ProfessionBuild(String profession) {
         this.profession = profession;
-        this.skills = new HashMap<>();
+        this.nodes = new HashMap<>();
     }
 
     public int getSkillLevel(ProfessionNode skill) {
-        return skills.getOrDefault(skill, 0);
+        return nodes.getOrDefault(skill, 0);
     }
 
 }
