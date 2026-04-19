@@ -23,15 +23,15 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Represents stats only present in Game
+ */
 @SuperBuilder
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @CustomLog
-/**
- * Represents stats only present in Game
- */
 public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildableStat{
     public static final String TYPE = "GAME_NATIVE";
 
@@ -87,9 +87,10 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
     /**
      * Get the stat represented by this object from the statContainer
      *
-     * @param statContainer
-     * @param periodKey
-     * @return
+     * @param statContainer the container to read from
+     * @param type the filter type (ALL, SEASON, or REALM)
+     * @param period the period to filter by (realm or season when type is not ALL)
+     * @return the stat value
      */
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {

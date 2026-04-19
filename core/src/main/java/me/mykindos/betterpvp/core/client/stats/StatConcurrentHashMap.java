@@ -8,13 +8,13 @@ import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IWrapperStat;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
+import me.mykindos.betterpvp.core.server.Season;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -104,7 +104,7 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     @Nullable
     public Long get(StatFilterType type, @Nullable Period period, IStat stat) {
         if (type == StatFilterType.ALL) {
-            return getAll(stat);
+            return allMap.get(stat);
         }
 
         if (type == StatFilterType.REALM) {
@@ -114,17 +114,14 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
             return realmMap.get(stat);
         }
 
-        return myMap.entrySet().stream()
-                .filter(entry -> type.filter(period, entry.getKey()))
-                .mapToLong(entry -> Optional.ofNullable(entry.getValue().get(stat)).orElse(0L))
-                .sum();
-
+        // SEASON type: use cached seasonMap
+        if (!(period instanceof Season season)) throw new ClassCastException("Object passed when StatFilterType is SEASON must be Season, found: " + period);
+        final ConcurrentMap<IStat, Long> sMap = seasonMap.get(season);
+        return sMap == null ? null : sMap.get(stat);
     }
 
     public Long getAll(IStat stat) {
-        return myMap.values().stream()
-                .mapToLong(map -> Optional.ofNullable(map.get(stat)).orElse(0L))
-                .sum();
+        return allMap.getOrDefault(stat, 0L);
     }
 
     /**
