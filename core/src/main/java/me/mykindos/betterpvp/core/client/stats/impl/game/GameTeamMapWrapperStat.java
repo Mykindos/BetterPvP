@@ -46,9 +46,9 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
         GameTeamMapWrapperStat.GameTeamMapWrapperStatBuilder<?, ?> builder = builder();
         Preconditions.checkArgument(type.equals(TYPE));
         builder.gameId(object.getLong("gameId"));
-        builder.gameName(object.getString("gameName"));
-        builder.mapName(object.getString("mapName"));
-        builder.teamName(object.getString("teamName"));
+        builder.gameName(object.optString("gameName", "UNKNOWN"));
+        builder.mapName(object.optString("mapName", "UNKNOWN"));
+        builder.teamName(object.optString("teamName", "UNKNOWN"));
         JSONObject wrappedData = object.getJSONObject("wrappedStat");
         builder.wrappedStat(statBuilder.getStatForStatData(wrappedData.getString("statType"), wrappedData));
         return builder.build();
