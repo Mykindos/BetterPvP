@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting.enchanted
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerCompletedEvent;
+import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,7 +15,7 @@ public class EnchantedLumberfallListener implements Listener {
     private EnchantedLumberfall skill;
 
     @EventHandler
-    public void whenPlayerFellsTree(TreeFellerCompletedEvent event) {
+    public void whenPlayerFellsTree(TreeFellerEvent event) {
         if (skill.getSkillLevel(event.getPlayer()) <= 0) return;
         skill.whenPlayerFellsTree(event);
     }
