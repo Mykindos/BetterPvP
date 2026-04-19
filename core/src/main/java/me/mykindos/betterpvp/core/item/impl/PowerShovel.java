@@ -9,7 +9,7 @@ import org.bukkit.Material;
 @Singleton
 @ItemKey("core:power_shovel")
 @FallbackItem(value = Material.DIAMOND_SHOVEL, keepRecipes = true)
-public class PowerShovel extends Sword {
+public class PowerShovel extends Shovel {
 
     public PowerShovel() {
         super("Power Shovel", Material.DIAMOND_SHOVEL, ItemRarity.UNCOMMON);

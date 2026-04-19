@@ -9,7 +9,7 @@ import org.bukkit.Material;
 @Singleton
 @ItemKey("core:power_axe")
 @FallbackItem(value = Material.DIAMOND_AXE, keepRecipes = true)
-public class PowerAxe extends Sword {
+public class PowerAxe extends Axe {
 
     public PowerAxe() {
         super("Power Axe", Material.DIAMOND_AXE, ItemRarity.UNCOMMON);

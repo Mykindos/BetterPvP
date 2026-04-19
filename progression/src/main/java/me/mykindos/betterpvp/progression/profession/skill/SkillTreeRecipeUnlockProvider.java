@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.recipe.RecipeUnlockProvider;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -17,14 +18,13 @@ public class SkillTreeRecipeUnlockProvider implements RecipeUnlockProvider {
     }
 
     @Override
-    public boolean isUnlocked(Player player, String recipeKey) {
+    public boolean isUnlocked(Player player, Key recipeKey) {
         return professionProfileManager.getObject(player.getUniqueId().toString())
                 .map(profile -> profile.getProfessionDataMap().values().stream()
                         .anyMatch(data -> data.getBuild().getNodes().entrySet().stream()
                                 .anyMatch(entry -> {
-                                    if (!(entry.getKey() instanceof IRecipeUnlockNode unlockNode)) return false;
-                                    return entry.getValue() >= unlockNode.getUnlockLevel()
-                                            && unlockNode.getUnlockedRecipeKeys().contains(recipeKey);
+                                    if (!(entry.getKey() instanceof ProfessionRecipeNode unlockNode)) return false;
+                                    return unlockNode.hasRecipe(recipeKey);
                                 })))
                 .orElse(false);
     }

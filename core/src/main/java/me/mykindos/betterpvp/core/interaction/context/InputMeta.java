@@ -2,8 +2,10 @@ package me.mykindos.betterpvp.core.interaction.context;
 
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.Set;
 import java.util.UUID;
@@ -130,6 +132,22 @@ public final class InputMeta {
      * Available for: Running interactions (last tick only, when next tick would timeout)
      */
     public static final ExecutionKey<Boolean> LAST_RUN = ExecutionKey.ofBoolean("input.last_run");
+
+    // ==================== Block Break Input Properties ====================
+    // Populated when BLOCK_BREAK input triggers
+
+    /**
+     * The block that was broken.
+     * Available for: BLOCK_BREAK
+     */
+    public static final ExecutionKey<Block> BROKEN_BLOCK = ExecutionKey.of("input.broken_block");
+
+    /**
+     * The BlockBreakEvent that triggered this interaction.
+     * Interactions may cancel this event to handle breaking themselves.
+     * Available for: BLOCK_BREAK
+     */
+    public static final ExecutionKey<BlockBreakEvent> BLOCK_BREAK_EVENT = ExecutionKey.of("input.block_break_event");
 
     // ==================== Free-to-Use Properties ====================
 

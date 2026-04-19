@@ -44,6 +44,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
@@ -285,6 +286,27 @@ public class InteractionListener implements Listener, PacketListener {
         };
 
         processInput(damagee, InteractionInputs.DAMAGE_TAKEN, ctx.itemInstance(), ctx.itemStack(), dataSetup);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        Optional<InteractionItemContext> contextOpt = InteractionItemContext.fromMainHand(player, itemFactory);
+        if (contextOpt.isEmpty()) {
+            return;
+        }
+
+        InteractionItemContext ctx = contextOpt.get();
+        Block block = event.getBlock();
+
+        // Pass the block and the event itself — interactions that handle BLOCK_BREAK
+        // are responsible for cancelling the event if they want to control breaking.
+        Consumer<InteractionContext> dataSetup = c -> {
+            c.set(InputMeta.BROKEN_BLOCK, block);
+            c.set(InputMeta.BLOCK_BREAK_EVENT, event);
+        };
+
+        processInput(player, InteractionInputs.BLOCK_BREAK, ctx.itemInstance(), ctx.itemStack(), dataSetup);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

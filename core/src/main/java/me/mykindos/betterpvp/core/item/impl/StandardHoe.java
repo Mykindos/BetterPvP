@@ -9,7 +9,7 @@ import org.bukkit.Material;
 @Singleton
 @ItemKey("core:standard_hoe")
 @FallbackItem(value = Material.IRON_HOE, keepRecipes = true)
-public class StandardHoe extends Sword {
+public class StandardHoe extends Hoe {
 
     public StandardHoe() {
         super("Standard Hoe", Material.IRON_HOE, ItemRarity.COMMON);

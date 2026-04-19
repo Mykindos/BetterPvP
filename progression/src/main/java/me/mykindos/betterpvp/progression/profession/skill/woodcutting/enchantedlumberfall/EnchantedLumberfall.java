@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerCompletedEvent;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -15,7 +16,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
-import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -68,8 +68,8 @@ public class EnchantedLumberfall extends ProfessionSkill {
         return 0.1 * Math.max(1, level);
     }
 
-    public void whenPlayerFellsTree(PlayerUsesTreeFellerEvent event) {
-        Location locationToActivatePerk = event.getLocationToActivatePerk();
+    public void whenPlayerFellsTree(TreeFellerCompletedEvent event) {
+        Location locationToActivatePerk = event.getLeafActivationLocation();
         if (locationToActivatePerk == null) return;
 
         Player player = event.getPlayer();

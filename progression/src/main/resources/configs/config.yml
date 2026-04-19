@@ -1,4 +1,5 @@
 woodcutting:
+  skillPointInterval: 5
   experiencePerWood:
     DARK_OAK_LOG: 10
     ACACIA_LOG: 10

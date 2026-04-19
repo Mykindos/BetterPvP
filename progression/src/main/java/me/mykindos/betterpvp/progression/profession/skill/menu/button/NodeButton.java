@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeDependency;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
@@ -28,12 +29,14 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
     private final NodeSlotType skillNodeType;
     private final ProfessionData professionData;
     private final ProfessionNodeManager progressionSkillManager;
+    private final ProfessionHandler professionHandler;
 
-    public NodeButton(ProfessionNode progressionNode, NodeSlotType skillNodeType, ProfessionData professionData, ProfessionNodeManager progressionSkillManager) {
+    public NodeButton(ProfessionNode progressionNode, NodeSlotType skillNodeType, ProfessionData professionData, ProfessionNodeManager progressionSkillManager, ProfessionHandler professionHandler) {
         this.progressionNode = progressionNode;
         this.skillNodeType = skillNodeType;
         this.professionData = professionData;
         this.progressionSkillManager = progressionSkillManager;
+        this.professionHandler = professionHandler;
     }
 
     @Override
@@ -88,10 +91,7 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         if (!clickType.isLeftClick()) return;
 
-        final int currentLevel = professionData.getLevelFromExperience(professionData.getExperience());
-        final int totalSkillLevels = professionData.getBuild().getNodes().values().stream().mapToInt(Integer::intValue).sum();
-
-        int levelsAvailable = currentLevel - totalSkillLevels;
+        int levelsAvailable = professionHandler.getAvailableSkillPoints(professionData);
 
         if (levelsAvailable <= 0) {
             UtilMessage.message(player, "Profession", "You do not have any skill points available!");

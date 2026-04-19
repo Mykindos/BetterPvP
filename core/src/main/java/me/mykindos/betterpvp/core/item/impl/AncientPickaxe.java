@@ -9,7 +9,7 @@ import org.bukkit.Material;
 @Singleton
 @ItemKey("core:ancient_pickaxe")
 @FallbackItem(value = Material.NETHERITE_PICKAXE, keepRecipes = true)
-public class AncientPickaxe extends Sword {
+public class AncientPickaxe extends Pickaxe {
 
     public AncientPickaxe() {
         super("Ancient Pickaxe", Material.NETHERITE_PICKAXE, ItemRarity.RARE);

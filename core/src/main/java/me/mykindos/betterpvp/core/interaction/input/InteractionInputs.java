@@ -40,6 +40,7 @@ public enum InteractionInputs implements InteractionInput {
     DAMAGE_TAKEN("DAMAGE TAKEN", true),
     PROJECTILE_HIT("PROJECTILE HIT", true), // todo: implement
     KILL("KILL", true),
+    BLOCK_BREAK("BLOCK BREAK", true),
 
     // Passive (no trigger, effect delegated to interaction)
     PASSIVE("PASSIVE", true),
