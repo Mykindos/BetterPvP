@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeCompactor;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.treecompactor.TreeCompactor;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
@@ -120,7 +120,7 @@ public class TreeCompactorCommand extends Command {
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
 
-            int skillLevel = treeCompactor.getPlayerNodeLevel(profile);
+            int skillLevel = treeCompactor.getSkillLevel(profile);
             if (skillLevel <= 0) {
                 feedbackMessage(player, "You do not have this command unlocked. See <green>/woodcutting");
                 return;

@@ -1,13 +1,16 @@
 package me.mykindos.betterpvp.progression.profession.skill;
 
-public abstract class ProfessionSkillNode extends ProfessionNode {
+import com.google.common.base.Preconditions;
 
-    protected ProfessionSkillNode(String name) {
-        super(name);
+public class ProfessionSkillNode extends ProfessionNode {
+
+    public ProfessionSkillNode(String id, ProfessionSkill skill) {
+        super(id);
+        this.skill = Preconditions.checkNotNull(skill);
     }
 
     @Override
     public boolean isGlowing() {
-        return true;
+        return false;
     }
 }

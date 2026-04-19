@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.progression.profession.skill;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Data;
+import me.mykindos.betterpvp.core.skill.ISkill;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -15,8 +15,7 @@ import java.util.List;
 
 @Data
 @CustomLog
-@Singleton
-public abstract class ProfessionNode implements IProfessionNode {
+public abstract class ProfessionNode implements ISkill {
 
     @Inject
     private Progression progression;
@@ -25,6 +24,7 @@ public abstract class ProfessionNode implements IProfessionNode {
     protected ProfessionProfileManager professionProfileManager;
 
     protected final String name;
+    protected ProfessionSkill skill;
     private String displayName;
 
     private String profession;
@@ -32,17 +32,22 @@ public abstract class ProfessionNode implements IProfessionNode {
     private int maxLevel;
     private ProfessionNodeDependency dependencies;
 
+    protected boolean dataInitialized = false;
 
     protected ProfessionNode(String name) {
         this.name = name;
     }
 
     /**
-     * Initialize the node after injection
+     * Initialize the node after injection.
+     * If {@code dataInitialized} is true the node was constructed with inline data
+     * and {@link #loadConfig()} is skipped.
      */
     public void initialize(String profession) {
         this.profession = profession;
-        loadConfig();
+        if (!dataInitialized) {
+            loadConfig();
+        }
     }
 
     @Override
@@ -50,14 +55,21 @@ public abstract class ProfessionNode implements IProfessionNode {
         return enabled;
     }
 
-    public abstract Material getIcon();
+    public Material getIcon() {
+        return skill == null ? Material.BARRIER : skill.getIcon();
+    }
+
+    @Override
+    public String[] getDescription(int level) {
+        return skill == null ? new String[0] : skill.getDescription(level);
+    }
 
     public ItemFlag getFlag() {
-        return null;
+        return skill == null ? null : skill.getFlag();
     }
 
     public boolean isGlowing() {
-        return false;
+        return skill != null && skill.isGlowing();
     }
 
     public void reload() {
@@ -102,7 +114,6 @@ public abstract class ProfessionNode implements IProfessionNode {
         return maxLevel;
     }
 
-    @Override
     public String getProgressionTree() {
         return profession;
     }
@@ -127,7 +138,6 @@ public abstract class ProfessionNode implements IProfessionNode {
         return getName().hashCode();
     }
 
-    @Override
     @Nullable
     public ProfessionNodeDependency getDependencies() {
         return dependencies;

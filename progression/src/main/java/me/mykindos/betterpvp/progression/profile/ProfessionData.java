@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.event.ProfessionPropertyUpdateEvent;
-import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionBuild;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,13 +22,13 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
     private final String profession;
 
     private double experience;
-    private ProgressionBuild build;
+    private ProfessionBuild build;
 
     public ProfessionData(UUID owner, String profession) {
         this.owner = owner;
         this.profession = profession;
         this.experience = 0;
-        this.build = new ProgressionBuild(profession);
+        this.build = new ProfessionBuild(profession);
         properties.registerListener(this);
 
     }
