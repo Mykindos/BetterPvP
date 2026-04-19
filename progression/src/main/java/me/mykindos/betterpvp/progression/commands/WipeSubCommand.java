@@ -53,7 +53,7 @@ public class WipeSubCommand extends Command {
 
             professionProfileManager.getObject(target.getUniqueId()).ifPresent(profile -> {
                 profile.getProfessionDataMap().forEach((profession, data) -> {
-                    data.getBuild().getSkills().clear();
+                    data.getBuild().getNodes().clear();
                 });
             });
 

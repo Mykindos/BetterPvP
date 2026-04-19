@@ -158,7 +158,7 @@ public class ProfessionProfileRepository {
                 ProfessionData professionData = professionDataMap.computeIfAbsent(profession, k -> new ProfessionData(profile.getGamerUUID(), profession));
                 ProfessionBuild build = professionData.getBuild();
 
-                skillManagerProvider.get().getSkill(skillName).ifPresent(skill -> build.getSkills().put(skill, level));
+                skillManagerProvider.get().getSkill(skillName).ifPresent(skill -> build.getNodes().put(skill, level));
             });
         } catch (Exception ex) {
             log.error("Failed to load progression builds for {}", profile.getGamerUUID()).submit();
@@ -173,7 +173,7 @@ public class ProfessionProfileRepository {
 
             List<Query> queries = new ArrayList<>();
 
-            build.getSkills().forEach((skill, level) -> {
+            build.getNodes().forEach((skill, level) -> {
                 Query query = ctx.insertInto(PROGRESSION_BUILDS)
                         .set(PROGRESSION_BUILDS.CLIENT, client.getId())
                         .set(PROGRESSION_BUILDS.SEASON, Core.getCurrentRealm().getSeason().getId())

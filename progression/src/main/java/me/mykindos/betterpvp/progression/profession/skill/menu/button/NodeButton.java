@@ -89,7 +89,7 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
         if (!clickType.isLeftClick()) return;
 
         final int currentLevel = professionData.getLevelFromExperience(professionData.getExperience());
-        final int totalSkillLevels = professionData.getBuild().getSkills().values().stream().mapToInt(Integer::intValue).sum();
+        final int totalSkillLevels = professionData.getBuild().getNodes().values().stream().mapToInt(Integer::intValue).sum();
 
         int levelsAvailable = currentLevel - totalSkillLevels;
 
@@ -115,12 +115,12 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
             // Add 5 to skill level
             int levelsApplied = professionData.getBuild().getSkillLevel(progressionNode);
             if (progressionNode.getMaxLevel() - levelsApplied >= 5) {
-                professionData.getBuild().getSkills().put(progressionNode, professionData.getBuild().getSkillLevel(progressionNode) + Math.min(levelsAvailable, 5));
+                professionData.getBuild().getNodes().put(progressionNode, professionData.getBuild().getSkillLevel(progressionNode) + Math.min(levelsAvailable, 5));
                 SoundEffect.HIGH_PITCH_PLING.play(player);
             }
         } else {
             // Add 1 to skill level
-            professionData.getBuild().getSkills().put(progressionNode, professionData.getBuild().getSkillLevel(progressionNode) + 1);
+            professionData.getBuild().getNodes().put(progressionNode, professionData.getBuild().getSkillLevel(progressionNode) + 1);
             SoundEffect.HIGH_PITCH_PLING.play(player);
         }
 

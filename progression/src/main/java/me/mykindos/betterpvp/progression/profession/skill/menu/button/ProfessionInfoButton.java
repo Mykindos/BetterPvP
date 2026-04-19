@@ -56,11 +56,11 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
                 .appendSpace()
                 .append(Component.text(String.format("(%,d%%)", (int) (progress * 100)), TextColor.color(222, 222, 222)));
 
-        int totalSkillLevels = professionData.getBuild().getSkills().values().stream().mapToInt(Integer::intValue).sum();
+        int totalSkillLevels = professionData.getBuild().getNodes().values().stream().mapToInt(Integer::intValue).sum();
         // Calculate attribute totals
         Map<ProfessionAttribute, Double> attributeTotals = new HashMap<>();
 
-        professionData.getBuild().getSkills().forEach((node, level) -> {
+        professionData.getBuild().getNodes().forEach((node, level) -> {
             if (node instanceof ProfessionAttributeNode attributeNode && level > 0) {
                 attributeNode.getAttributes().forEach((attribute, config) -> {
                     double value = config.getBaseValue() + (Math.max(level - 1, 0) * config.getPerLevel());
