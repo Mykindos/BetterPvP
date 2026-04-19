@@ -10,7 +10,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.zip.Inflater;
 
 public final class DrawioDocumentReader {
@@ -55,6 +57,38 @@ public final class DrawioDocumentReader {
             }
         }
         return "";
+    }
+
+    public static List<String> attributeValues(Element element, String baseName) {
+        List<String> values = new ArrayList<>();
+        addAttributeValues(values, element.getAttribute(baseName));
+
+        for (int i = 0; ; i++) {
+            String value = element.getAttribute(baseName + "_" + i);
+            if (value.isBlank()) {
+                break;
+            }
+            addAttributeValues(values, value);
+        }
+
+        return values;
+    }
+
+    public static String nodeType(Element element) {
+        return firstAttribute(element, "node_type", "type");
+    }
+
+    private static void addAttributeValues(List<String> values, String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            return;
+        }
+
+        for (String value : rawValue.split("[,\\r\\n]+")) {
+            String trimmed = value.trim();
+            if (!trimmed.isBlank()) {
+                values.add(trimmed);
+            }
+        }
     }
 
     private static String inflate(String content) throws Exception {

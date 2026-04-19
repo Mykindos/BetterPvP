@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttribute;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode;
 import me.mykindos.betterpvp.progression.profession.skill.menu.ProfessionMenu;
@@ -29,10 +30,12 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
 
     private final String profession;
     private final ProfessionData professionData;
+    private final ProfessionHandler professionHandler;
 
-    public ProfessionInfoButton(String profession, ProfessionData professionData) {
+    public ProfessionInfoButton(String profession, ProfessionData professionData, ProfessionHandler professionHandler) {
         this.profession = profession;
         this.professionData = professionData;
+        this.professionHandler = professionHandler;
     }
 
     @Override
@@ -56,7 +59,6 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
                 .appendSpace()
                 .append(Component.text(String.format("(%,d%%)", (int) (progress * 100)), TextColor.color(222, 222, 222)));
 
-        int totalSkillLevels = professionData.getBuild().getNodes().values().stream().mapToInt(Integer::intValue).sum();
         // Calculate attribute totals
         Map<ProfessionAttribute, Double> attributeTotals = new HashMap<>();
 
@@ -78,7 +80,7 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
                 .lore(Component.text("Progress: ", NamedTextColor.GRAY).append(Component.text(String.format("%,.1f / %,.1f XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
                 .lore(Component.text("Total Experience: ", NamedTextColor.GRAY).append(Component.text(String.format("%,.1f XP", professionData.getExperience()), NamedTextColor.YELLOW)))
                 .lore(Component.empty())
-                .lore(UtilMessage.deserialize("<green>Points available: <yellow>%d", (currentLevel - totalSkillLevels)));
+                .lore(UtilMessage.deserialize("<green>Points available: <yellow>%d", Math.max(0, professionHandler.getAvailableSkillPoints(professionData))));
 
         // Add attribute totals to lore if any exist
         if (!attributeTotals.isEmpty()) {

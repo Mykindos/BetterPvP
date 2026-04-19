@@ -32,6 +32,9 @@ public abstract class ProfessionHandler implements IProfession {
     public boolean enabled;
 
     @Getter
+    private int skillPointInterval = 1;
+
+    @Getter
     @Nullable
     private SkillTreeLayout skillTree;
 
@@ -61,8 +64,20 @@ public abstract class ProfessionHandler implements IProfession {
     }
 
     public void loadConfig() {
-        this.enabled = progression.getConfig().getBoolean(profession + ".enabled", true);
+        String configPath = profession.toLowerCase();
+        this.enabled = progression.getConfig().getBoolean(configPath + ".enabled", true);
+        this.skillPointInterval = Math.max(1, progression.getConfig().getOrSaveInt(configPath + ".skillPointInterval", 1));
         loadSkillTree();
+    }
+
+    public int getSkillPointsForLevel(int level) {
+        return Math.max(0, level / skillPointInterval);
+    }
+
+    public int getAvailableSkillPoints(ProfessionData professionData) {
+        int currentLevel = professionData.getLevelFromExperience(professionData.getExperience());
+        int totalSkillLevels = professionData.getBuild().getNodes().values().stream().mapToInt(Integer::intValue).sum();
+        return getSkillPointsForLevel(currentLevel) - totalSkillLevels;
     }
 
     private void loadSkillTree() {

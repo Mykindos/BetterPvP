@@ -6,9 +6,9 @@ import me.mykindos.betterpvp.core.item.model.VanillaItem;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 
-public class Axe extends VanillaItem {
+public abstract class Axe extends VanillaItem {
 
-    public Axe(String name, Material material, ItemRarity rarity) {
+    protected Axe(String name, Material material, ItemRarity rarity) {
         super(Component.text(name), material, rarity);
         addSerializableComponent(new RuneContainerComponent(0, 0));
     }

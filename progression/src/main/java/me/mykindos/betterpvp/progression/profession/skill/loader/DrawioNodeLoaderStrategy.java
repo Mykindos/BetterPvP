@@ -7,8 +7,10 @@ import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttribute;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionRecipeNode;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
+import net.kyori.adventure.key.Key;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -84,7 +86,10 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
             String style = mxCell.getAttribute("style");
 
             ProfessionNode node;
-            if (style.contains("ellipse")) {
+            if (isRecipeNode(wrapper)) {
+                if (id.isBlank() || id.equals("0") || id.equals("1")) continue;
+                node = buildRecipeNode(id, wrapper);
+            } else if (style.contains("ellipse")) {
                 if (id.isBlank() || id.equals("0") || id.equals("1")) continue;
                 node = buildAttributeNode(id, wrapper);
             } else {
@@ -222,6 +227,38 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
         }
 
         return new ProfessionAttributeNode(id, maxLevel, attributeMap);
+    }
+
+    private boolean isRecipeNode(Element wrapper) {
+        String nodeType = DrawioDocumentReader.nodeType(wrapper);
+        return "recipe".equalsIgnoreCase(nodeType)
+                || !DrawioDocumentReader.attributeValues(wrapper, "recipe").isEmpty()
+                || !DrawioDocumentReader.attributeValues(wrapper, "recipes").isEmpty();
+    }
+
+    private ProfessionRecipeNode buildRecipeNode(String id, Element wrapper) {
+        Set<Key> recipes = new LinkedHashSet<>();
+        collectRecipeKeys(id, wrapper, "recipe", recipes);
+        collectRecipeKeys(id, wrapper, "recipes", recipes);
+
+        if (recipes.isEmpty()) {
+            log.error("Recipe node {} has no recipes configured", id).submit();
+            return null;
+        }
+
+        ProfessionRecipeNode node = new ProfessionRecipeNode(id, recipes);
+        node.setMaxLevel(parseInt(wrapper.getAttribute("max_level"), 1));
+        return node;
+    }
+
+    private void collectRecipeKeys(String id, Element wrapper, String attributeName, Set<Key> recipes) {
+        for (String recipe : DrawioDocumentReader.attributeValues(wrapper, attributeName)) {
+            try {
+                recipes.add(Key.key(recipe));
+            } catch (IllegalArgumentException e) {
+                log.error("Invalid recipe key '{}' on node {}", recipe, id).submit();
+            }
+        }
     }
 
     private ProfessionNode buildSkillNode(String id, Element wrapper) {

@@ -9,7 +9,7 @@ import org.bukkit.Material;
 @Singleton
 @ItemKey("core:crude_pickaxe")
 @FallbackItem(value = Material.STONE_PICKAXE, keepRecipes = true)
-public class CrudePickaxe extends Sword {
+public class CrudePickaxe extends Pickaxe {
 
     public CrudePickaxe() {
         super("Crude Pickaxe", Material.STONE_PICKAXE, ItemRarity.COMMON);

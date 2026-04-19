@@ -53,7 +53,7 @@ public abstract class ProfessionMenu extends AbstractScrollGui<Item> implements 
                 .addIngredient('u', new ScrollUpButton())
                 .addIngredient('d', new ScrollDownButton())
                 .addIngredient('i', new ProfessionInfoButton(profession, professionProfile.getProfessionDataMap().computeIfAbsent(profession,
-                        key -> new ProfessionData(professionProfile.getGamerUUID(), profession)))));
+                        key -> new ProfessionData(professionProfile.getGamerUUID(), profession)), professionHandler)));
         this.profession = profession;
         this.professionHandler = professionHandler;
         this.professionProfile = professionProfile;
@@ -111,7 +111,7 @@ public abstract class ProfessionMenu extends AbstractScrollGui<Item> implements 
             return AIR;
         }
 
-        return new NodeButton(node, getNodeSlotType(), professionData, progressionSkillManager);
+        return new NodeButton(node, getNodeSlotType(), professionData, progressionSkillManager, professionHandler);
     }
 
     protected Item getConnectionItem(ConnectionType connectionType, String... nodeNames) {

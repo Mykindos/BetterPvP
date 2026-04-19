@@ -9,7 +9,7 @@ import org.bukkit.Material;
 @Singleton
 @ItemKey("core:ancient_shovel")
 @FallbackItem(value = Material.NETHERITE_SHOVEL, keepRecipes = true)
-public class AncientShovel extends Sword {
+public class AncientShovel extends Shovel {
 
     public AncientShovel() {
         super("Ancient Shovel", Material.NETHERITE_SHOVEL, ItemRarity.RARE);

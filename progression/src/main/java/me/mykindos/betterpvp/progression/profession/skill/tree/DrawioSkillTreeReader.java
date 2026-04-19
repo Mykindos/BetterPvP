@@ -37,8 +37,8 @@ public class DrawioSkillTreeReader implements SkillTreeReader {
 
         Map<String, PositionedSkillNode> nodesById = new LinkedHashMap<>();
 
-        collectWrappedSkillNodes(doc.getElementsByTagName("UserObject"), nodesById);
-        collectWrappedSkillNodes(doc.getElementsByTagName("object"), nodesById);
+        collectWrappedProgressionNodes(doc.getElementsByTagName("UserObject"), nodesById);
+        collectWrappedProgressionNodes(doc.getElementsByTagName("object"), nodesById);
 
         NodeList allCells = doc.getElementsByTagName("mxCell");
         List<Element> edgeCells = new ArrayList<>();
@@ -160,7 +160,7 @@ public class DrawioSkillTreeReader implements SkillTreeReader {
         }
     }
 
-    private void collectWrappedSkillNodes(NodeList wrappers, Map<String, PositionedSkillNode> nodesById) {
+    private void collectWrappedProgressionNodes(NodeList wrappers, Map<String, PositionedSkillNode> nodesById) {
         for (int i = 0; i < wrappers.getLength(); i++) {
             Element wrapper = (Element) wrappers.item(i);
             String nodeId = DrawioDocumentReader.drawioId(wrapper);
