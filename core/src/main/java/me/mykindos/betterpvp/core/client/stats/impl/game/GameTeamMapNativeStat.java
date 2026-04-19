@@ -50,37 +50,37 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
     private Action action;
 
     private boolean filterGameIdStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return Objects.requireNonNull(gameId).equals(stat.gameId) && action.equals(stat.action);
     }
 
     private boolean filterGameFullStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return gameName.equals(stat.gameName) && action.equals(stat.action);
     }
 
     private boolean filterGameTeamStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return action.equals(stat.action) && gameName.equals(stat.gameName) && teamName.equals(stat.teamName);
     }
 
     private boolean filterGameMapStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return action.equals(stat.action) && gameName.equals(stat.gameName) && mapName.equals(stat.mapName);
     }
 
     private boolean filterTeamOnlyStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return teamName.equals(stat.teamName) && action.equals(stat.action);
     }
 
     private boolean filterActionOnlyStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return action.equals(stat.action);
     }
 
     private boolean filterAllStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return gameName.equals(stat.gameName) && mapName.equals(stat.mapName) && teamName.equals(stat.teamName) && action.equals(stat.action);
     }
 

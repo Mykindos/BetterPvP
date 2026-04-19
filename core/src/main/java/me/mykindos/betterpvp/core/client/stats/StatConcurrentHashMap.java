@@ -141,19 +141,16 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
             if (realmMap != null) return realmMap;
             return Map.of();
         }
-        final Map<IStat, Long> globalMap = new ConcurrentHashMap<>();
-        myMap.entrySet()
-                .stream()
-                .filter(entry -> type.filter(period, entry.getKey()))
-                .map(Map.Entry::getValue)
-                .forEach(map -> {
-                    map.forEach((statName, stat) ->
-                    globalMap.compute(statName, (key, value) ->
-                            value == null ? stat : value + stat
-                    )
-            );
-        });
-        return globalMap;
+
+        if (type == StatFilterType.ALL) {
+            return allMap;
+        }
+
+        if (!(period instanceof Season season)) {
+            throw new ClassCastException("Object passed when StatFilterType is SEASON must be Season, found: " + period);
+        }
+        final ConcurrentMap<IStat, Long> sMap = seasonMap.get(season);
+        return sMap == null ? Map.of() : sMap;
     }
 
     public void registerListener(IStatMapListener listener) {

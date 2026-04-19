@@ -58,7 +58,7 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
     }
 
     private boolean filterActionStat(Map.Entry<IStat, Long> entry) {
-        final DungeonNativeStat stat = (DungeonNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof DungeonNativeStat stat)) return false;
         return action.equals(stat.action);
     }
 
