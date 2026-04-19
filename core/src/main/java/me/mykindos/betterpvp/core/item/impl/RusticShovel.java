@@ -4,12 +4,13 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.model.VanillaItem;
 import org.bukkit.Material;
 
 @Singleton
 @ItemKey("core:rustic_shovel")
 @FallbackItem(value = Material.WOODEN_SHOVEL, keepRecipes = true)
-public class RusticShovel extends Shovel {
+public class RusticShovel extends VanillaItem {
 
     public RusticShovel() {
         super("Rustic Shovel", Material.WOODEN_SHOVEL, ItemRarity.COMMON);
