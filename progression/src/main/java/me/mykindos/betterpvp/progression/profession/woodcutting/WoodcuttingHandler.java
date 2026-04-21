@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.progression.profession.woodcutting;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -9,6 +11,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.LootTable;
@@ -16,15 +19,23 @@ import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.attributes.doubletreasurechance.WoodcuttingDoubleTreasureChanceAttribute;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.attributes.treasurechance.WoodcuttingTreasureChanceAttribute;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.leaderboards.TotalLogsChoppedLeaderboard;
 import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -35,7 +46,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.DoubleUnaryOperator;
 
 
@@ -53,6 +66,8 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
     private final BlockTagManager blockTagManager;
     private final EffectManager effectManager;
     private final ItemFactory itemFactory;
+    private final WoodcuttingTreasureChanceAttribute treasureChanceAttribute;
+    private final WoodcuttingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute;
 
     /**
      * Maps the log type (key) to its base experience value for chopping it (value)
@@ -62,13 +77,17 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
     private final LootTableRegistry lootTableRegistry;
     private final LootSessionController sessionController;
     private LootTable lootTable;
+    private LootTable treasureLootTable;
 
     @Inject
     public WoodcuttingHandler(Progression progression, ClientManager clientManager, ProfessionProfileManager professionProfileManager,
+                              Provider<ProfessionNodeManager> nodeManager,
                               WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager,
                               BlockTagManager blockTagManager, EffectManager effectManager, ItemFactory itemFactory,
-                              LootTableRegistry lootTableRegistry, LootSessionController sessionController) {
-        super(progression, clientManager, professionProfileManager, "Woodcutting");
+                              LootTableRegistry lootTableRegistry, LootSessionController sessionController,
+                              WoodcuttingTreasureChanceAttribute treasureChanceAttribute,
+                              WoodcuttingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute) {
+        super(progression, clientManager, professionProfileManager, nodeManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;
@@ -76,6 +95,8 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
         this.itemFactory = itemFactory;
         this.lootTableRegistry = lootTableRegistry;
         this.sessionController = sessionController;
+        this.treasureChanceAttribute = treasureChanceAttribute;
+        this.doubleTreasureChanceAttribute = doubleTreasureChanceAttribute;
     }
 
     /**
@@ -84,6 +105,7 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
     @Override
     public void reload() {
         this.lootTable = lootTableRegistry.loadLootTable("woodcutting");
+        this.treasureLootTable = lootTableRegistry.loadLootTable("woodcutting_treasure_chance");
     }
 
     /**
@@ -162,6 +184,8 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
                 totalLogsChoppedLeaderboard.attemptAnnounce(player, result);
             });
         });
+
+        attemptTreasureDrop(player, block.getLocation());
     }
 
     @Override
@@ -177,6 +201,80 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
         final LootSession session = sessionController.resolve(player, lootTable, () -> LootSession.newSession(lootTable, player));
         final LootContext context = new LootContext(session, location, "Woodcutting");
         return this.lootTable.generateLoot(context);
+    }
+
+    private void attemptTreasureDrop(Player player, Location location) {
+        double treasureChance = treasureChanceAttribute.getChance(player);
+        if (treasureChance <= 0 || UtilMath.randDouble(0, 100) >= treasureChance) {
+            return;
+        }
+
+        boolean doubleTreasure = UtilMath.randDouble(0, 100) < doubleTreasureChanceAttribute.getChance(player);
+        LootBundle bundle = getRandomTreasureLoot(player, location);
+        for (Loot<?, ?> loot : bundle) {
+            awardTreasure(player, location, loot, bundle.getContext(), doubleTreasure);
+        }
+    }
+
+    private @NotNull LootBundle getRandomTreasureLoot(Player player, Location location) {
+        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
+        final LootContext context = new LootContext(session, location, "Woodcutting");
+        return this.treasureLootTable.generateLoot(context);
+    }
+
+    private void awardTreasure(Player player, Location location, Loot<?, ?> loot, LootContext context, boolean doubleTreasure) {
+        final Object award = loot.award(context);
+        if (award instanceof Item item) {
+            ItemStack itemStack = item.getItemStack();
+            if (doubleTreasure) {
+                itemStack.setAmount(itemStack.getAmount() * 2);
+                item.setItemStack(itemStack);
+            }
+            sendTreasureMessage(player, location, itemStack, doubleTreasure);
+        } else if (award instanceof ItemStack itemStack) {
+            if (doubleTreasure) {
+                itemStack.setAmount(itemStack.getAmount() * 2);
+            }
+            ItemStack finalItemStack = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+            UtilItem.insert(player, finalItemStack);
+            sendTreasureMessage(player, location, finalItemStack, doubleTreasure);
+        } else if (award instanceof List<?> itemStacks) {
+            for (Object awardedItem : itemStacks) {
+                if (!(awardedItem instanceof ItemStack itemStack)) continue;
+                ItemStack displayItemStack = itemStack;
+                if (doubleTreasure) {
+                    ItemStack extraTreasure = itemStack.clone();
+                    UtilItem.insert(player, extraTreasure);
+                    displayItemStack = itemStack.clone();
+                    displayItemStack.setAmount(itemStack.getAmount() + extraTreasure.getAmount());
+                }
+                sendTreasureMessage(player, location, displayItemStack, doubleTreasure);
+            }
+        }
+    }
+
+    private void sendTreasureMessage(Player player, Location location, ItemStack itemStack, boolean doubleTreasure) {
+        final Component name;
+        if (itemStack.getItemMeta().hasDisplayName()) {
+            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+        } else {
+            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                    Component.translatable(itemStack.getType().translationKey()));
+        }
+
+        TextComponent message = Component.text("You found ")
+                .append(Component.text(UtilFormat.formatNumber(itemStack.getAmount())))
+                .append(Component.text(" "))
+                .append(name);
+
+        if (doubleTreasure) {
+            message = message.append(Component.text(" and doubled your treasure"));
+        }
+
+        UtilMessage.message(player, getName(), message);
+
+        log.info("{} found {}x {} from woodcutting treasure.", player.getName(), itemStack.getAmount(), itemStack.getType().name().toLowerCase())
+                .addClientContext(player).addLocationContext(location).submit();
     }
 
     /**

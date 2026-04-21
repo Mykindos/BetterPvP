@@ -7,15 +7,15 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @CustomLog
-@SkillId("feeling_lucky")
+@NodeId("feeling_lucky")
 public class FeelingLucky extends ProfessionSkill {
 
     @Inject

@@ -3,13 +3,13 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing.expertbaiter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerThrowBaitEvent;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @Singleton
-@SkillId("expert_baiter")
+@NodeId("expert_baiter")
 public class ExpertBaiter extends ProfessionSkill {
 
     @Inject

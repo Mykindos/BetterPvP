@@ -74,6 +74,7 @@ public class Progression extends BPvPPlugin {
             this.registerItems();
 
             var skillManager = injector.getInstance(ProfessionNodeManager.class);
+            skillManager.loadNodeRegistry();
             skillManager.loadSkills();
 
             var recipeUnlockService = injector.getInstance(RecipeUnlockService.class);

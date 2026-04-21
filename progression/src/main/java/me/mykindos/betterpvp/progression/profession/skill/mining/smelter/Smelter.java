@@ -5,14 +5,14 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
-@SkillId("smelter")
+@NodeId("smelter")
 public class Smelter extends ProfessionSkill {
 
     private double smeltChance;

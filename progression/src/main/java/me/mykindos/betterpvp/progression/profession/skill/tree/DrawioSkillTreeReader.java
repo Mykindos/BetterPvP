@@ -86,7 +86,20 @@ public class DrawioSkillTreeReader implements SkillTreeReader {
 
             List<int[]> waypoints = extractWaypoints(edge);
             if (waypoints.isEmpty()) {
-                waypoints = defaultWaypoints(source, target);
+                String style = edge.getAttribute("style");
+                double exitX = parseStyleValue(style, "exitX");
+                double exitY = parseStyleValue(style, "exitY");
+                double entryX = parseStyleValue(style, "entryX");
+                double entryY = parseStyleValue(style, "entryY");
+                // Infer exit side when draw.io didn't store explicit exit attributes
+                if (Double.isNaN(exitX) || Double.isNaN(exitY)) {
+                    int dx = target.slotX() - source.slotX();
+                    if (dx < 0) { exitX = 0; exitY = 0.5; }       // target is left
+                    else if (dx > 0) { exitX = 1; exitY = 0.5; }  // target is right
+                    else { exitX = 0.5; exitY = 1; }               // same column → bottom
+                }
+                if (Double.isNaN(entryX) || Double.isNaN(entryY)) { entryX = 0.5; entryY = 0; }
+                waypoints = defaultWaypoints(source, target, exitX, exitY, entryX, entryY);
             }
 
             fillConnectionCells(source, target, waypoints, cells);
@@ -140,14 +153,46 @@ public class DrawioSkillTreeReader implements SkillTreeReader {
         }
     }
 
-    private List<int[]> defaultWaypoints(PositionedSkillNode source, PositionedSkillNode target) {
+    private List<int[]> defaultWaypoints(PositionedSkillNode source, PositionedSkillNode target,
+                                          double exitX, double exitY, double entryX, double entryY) {
+        boolean exitHoriz = exitY == 0.5;
+        boolean entryHoriz = entryY == 0.5;
+
+        if (exitHoriz && !entryHoriz) {
+            // Exit left/right, enter top/bottom: go horizontal to target column first, then vertical
+            if (source.row() == target.row()) return List.of();
+            return List.of(new int[]{target.slotX(), source.row()});
+        }
+        if (!exitHoriz && entryHoriz) {
+            // Exit top/bottom, enter left/right: go vertical to target row first, then horizontal
+            if (source.slotX() == target.slotX()) return List.of();
+            return List.of(new int[]{source.slotX(), target.row()});
+        }
+        if (exitHoriz) {
+            // Both horizontal exits: S-curve via midpoint column — go horizontal, then vertical, then horizontal
+            if (source.row() == target.row()) return List.of();
+            int midX = (source.slotX() + target.slotX()) / 2;
+            return List.of(
+                    new int[]{midX, source.row()},
+                    new int[]{midX, target.row()}
+            );
+        }
+        // Both vertical exits: U-curve via midpoint row — go vertical, then horizontal, then vertical
         if (source.slotX() == target.slotX()) return List.of();
-        // draw.io orthogonal routing places the horizontal segment at the midpoint row
         int midRow = (source.row() + target.row()) / 2;
         return List.of(
                 new int[]{source.slotX(), midRow},
                 new int[]{target.slotX(), midRow}
         );
+    }
+
+    private double parseStyleValue(String style, String key) {
+        int idx = style.indexOf(key + "=");
+        if (idx < 0) return Double.NaN;
+        int start = idx + key.length() + 1;
+        int end = style.indexOf(';', start);
+        String val = end < 0 ? style.substring(start) : style.substring(start, end);
+        try { return Double.parseDouble(val.trim()); } catch (NumberFormatException e) { return Double.NaN; }
     }
 
     private ConnectionType cornerType(int inDx, int inDy, int outDx, int outDy) {

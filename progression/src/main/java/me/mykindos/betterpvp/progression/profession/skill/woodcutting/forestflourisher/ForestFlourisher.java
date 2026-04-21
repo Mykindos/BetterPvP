@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting.forestflo
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
+import me.mykindos.betterpvp.progression.profession.skill.IProfessionAttribute;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
-import org.bukkit.Material;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -25,8 +25,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Singleton
-@SkillId("forest_flourisher")
-public class ForestFlourisher extends ProfessionSkill {
+@NodeId("forest_flourisher")
+public class ForestFlourisher implements IProfessionAttribute {
 
     /**
      * Global Map that maps a player's <code>UUID</code> to a <code>Set</code> of all saplings they have
@@ -49,50 +49,61 @@ public class ForestFlourisher extends ProfessionSkill {
     private final long cycleDuration = 60000L;
 
 
-    /**
-     * A number between 0 and 1 which represents the percentage that the growth factor is increased by per
-     * level; this is a small decimal number
-     */
-    private double growFactorIncreasePerLvl;
+    private final ProfessionProfileManager profileManager;
 
 
     @Inject
-    public ForestFlourisher() {
-        super("Forest Flourisher");
+    public ForestFlourisher(ProfessionProfileManager profileManager) {
+        this.profileManager = profileManager;
     }
 
 
     @Override
-    public String[] getDescription(int level) {
-        double calculatedGrowFactor = growFactor(level) * 100;
-        String formattedGrowFactor = UtilFormat.formatNumber(calculatedGrowFactor, 2);
-
-        return new String[]{
-                "Saplings you plant grow <green>" + formattedGrowFactor + "%</green> faster"
-        };
-    }
-    
-    /**
-     * @param level the player's skill level for <b>Forest Flourisher</b>
-     * @return the chance for the player's saplings to grow faster; this number will be between 0 and 1
-     */
-    public double growFactor(int level) {
-        return growFactorIncreasePerLvl * level;
+    public String getName() {
+        return "Forest Flourisher";
     }
 
     @Override
-    public Material getIcon() {
-        return Material.BONE_MEAL;
+    public String getDescription() {
+        return "sapling growth acceleration chance";
+    }
+
+    @Override
+    public String getOperation() {
+        return "%";
+    }
+
+    @Override
+    public double getDisplayValue(double value) {
+        return value * 100.0;
+    }
+
+    public double growFactor(Player player) {
+        return IProfessionAttribute.computeValue(player, "Woodcutting", this, profileManager);
+    }
+
+    public double growFactor(UUID playerUUID) {
+        Optional<ProfessionProfile> optionalProfile = profileManager.getObject(playerUUID.toString());
+
+        return optionalProfile
+                .map(profile -> profile.getProfessionDataMap().get("Woodcutting"))
+                .map(data -> data.getBuild().getNodes().entrySet().stream()
+                        .filter(e -> e.getKey() instanceof ProfessionAttributeNode && e.getValue() > 0)
+                        .mapToDouble(e -> ((ProfessionAttributeNode) e.getKey()).getAttributes().entrySet().stream()
+                                .filter(attribute -> attribute.getKey().getClass() == getClass())
+                                .mapToDouble(attribute -> attribute.getValue().getBaseValue()
+                                        + Math.max(e.getValue() - 1, 0) * attribute.getValue().getPerLevel())
+                                .sum())
+                        .sum())
+                .orElse(0.0);
     }
 
     /**
-     * This function's purpose is to return a boolean that tells you if the player has the skill
+     * This function's purpose is to return a boolean that tells you if the player has the attribute
      * <b>Forest Flourisher</b>
      */
-    public boolean doesPlayerHaveSkill(Player player) {
-        Optional<ProfessionProfile> profile = profileManager.getObject(player.getUniqueId().toString());
-
-        return profile.map(this::getSkillLevel).orElse(0) > 0;
+    public boolean doesPlayerHaveAttribute(Player player) {
+        return growFactor(player) > 0;
     }
 
     /**
@@ -132,13 +143,9 @@ public class ForestFlourisher extends ProfessionSkill {
         if (treeType == null) return;
 
         Player player = event.getPlayer();
-        profileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
+        if (!doesPlayerHaveAttribute(player)) return;
 
-            int skillLevel = getSkillLevel(profile);
-            if (skillLevel <= 0) return;
-
-            addSaplingForPlayer(player, event.getBlock());
-        });
+        addSaplingForPlayer(player, event.getBlock());
     }
 
     /**
@@ -165,11 +172,10 @@ public class ForestFlourisher extends ProfessionSkill {
                     .filter(block -> getTreeType(block) != null)
                     .collect(Collectors.toSet());
 
-            Optional<ProfessionProfile> optionalProfile = profileManager.getObject(playerUUID.toString());
-            int skillLevel = optionalProfile.map(this::getSkillLevel).orElse(0);
+            double growFactor = growFactor(playerUUID);
 
             setOfBlocks.forEach(block -> {
-                if (Math.random() < growFactor(skillLevel)) {
+                if (Math.random() < growFactor) {
                     blocksToBeBoneMealed.offer(block);
                 }
             });
@@ -188,11 +194,4 @@ public class ForestFlourisher extends ProfessionSkill {
             block.applyBoneMeal(BlockFace.UP);
         }
     }
-
-    @Override
-    public void loadSkillConfig() {
-        
-        growFactorIncreasePerLvl = getSkillConfig("growFactorIncreasePerLvl", 0.003, Double.class);
-    }
-
 }

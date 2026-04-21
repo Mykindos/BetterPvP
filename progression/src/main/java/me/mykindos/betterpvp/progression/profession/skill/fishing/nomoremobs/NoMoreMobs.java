@@ -3,12 +3,12 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing.nomoremobs;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import org.bukkit.Material;
 
 @Singleton
-@SkillId("no_more_mobs")
+@NodeId("no_more_mobs")
 public class NoMoreMobs extends ProfessionSkill {
 
     @Inject

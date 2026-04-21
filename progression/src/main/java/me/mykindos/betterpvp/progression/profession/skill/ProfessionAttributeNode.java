@@ -18,16 +18,19 @@ import java.util.Map;
 public class ProfessionAttributeNode extends ProfessionNode {
 
     @Getter
-    private final Map<ProfessionAttribute, AttributeConfig> attributes = new HashMap<>();
+    private final Map<IProfessionAttribute, AttributeConfig> attributes = new HashMap<>();
 
     @Inject
     private ProfessionProfileManager profileManager;
+
+    @Inject
+    private ProfessionNodeManager nodeManager;
 
     public ProfessionAttributeNode(String name) {
         super(name);
     }
 
-    public ProfessionAttributeNode(String name, int maxLevel, Map<ProfessionAttribute, AttributeConfig> attributeData) {
+    public ProfessionAttributeNode(String name, int maxLevel, Map<IProfessionAttribute, AttributeConfig> attributeData) {
         super(name);
         this.dataInitialized = true;
         this.setMaxLevel(maxLevel);
@@ -44,8 +47,9 @@ public class ProfessionAttributeNode extends ProfessionNode {
     public String[] getDescription(int level) {
         List<String> desc = new ArrayList<>();
         attributes.forEach((attribute, config) -> {
+            double value = config.getBaseValue() + (Math.max(level-1, 0) * config.getPerLevel());
 
-            desc.add("<green> +" + UtilFormat.formatNumber(config.getBaseValue() + (Math.max(level-1, 0) * config.getPerLevel()), 3) + attribute.getOperation() + "<white> " + attribute.getName());
+            desc.add("<green> +" + UtilFormat.formatNumber(attribute.getDisplayValue(value), 3) + attribute.getOperation() + "<white> " + attribute.getDescription());
         });
         return desc.toArray(new String[0]);
     }
@@ -61,7 +65,11 @@ public class ProfessionAttributeNode extends ProfessionNode {
         for (Map<String, Object> attributeConfig : attributesList) {
             try {
                 String attributeName = (String) attributeConfig.get("attribute");
-                ProfessionAttribute attribute = ProfessionAttribute.valueOf(attributeName);
+                IProfessionAttribute attribute = nodeManager.getAttributeByNodeId(attributeName).orElse(null);
+                if (attribute == null) {
+                    log.error("Unknown attribute '{}' in config for node", attributeName).submit();
+                    continue;
+                }
 
                 double baseValue = ((Number) attributeConfig.getOrDefault("base", 0.0)).doubleValue();
                 double perLevel = ((Number) attributeConfig.getOrDefault("per_level", 0.0)).doubleValue();
@@ -90,7 +98,7 @@ public class ProfessionAttributeNode extends ProfessionNode {
      * @param attribute The attribute to get
      * @return The value of the attribute for the player
      */
-    public double getAttributeValue(Player player, ProfessionAttribute attribute) {
+    public double getAttributeValue(Player player, IProfessionAttribute attribute) {
         AttributeConfig config = attributes.get(attribute);
         if (config == null) {
             return 0.0;

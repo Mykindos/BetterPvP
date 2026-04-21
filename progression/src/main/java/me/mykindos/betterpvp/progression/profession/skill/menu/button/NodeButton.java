@@ -152,28 +152,32 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
             return true;
         }
 
+        if (dependencies.getRequiredLevel() > professionLevel) {
+            return false;
+        }
+
+        // Soft neighbors (undirected edges) provide an alternative path — any one unlocked is enough
+        for (String neighborId : dependencies.getSoftNeighbors()) {
+            Optional<ProfessionNode> neighborOpt = progressionSkillManager.getSkill(neighborId);
+            if (neighborOpt.isPresent() && professionData.getBuild().getSkillLevel(neighborOpt.get()) >= 1) {
+                return true;
+            }
+        }
+
         if (!dependencies.getNodes().isEmpty()) {
-            int totalLevels = 0;
             for (String dependency : dependencies.getNodes()) {
                 Optional<ProfessionNode> dependencySkillOptional = progressionSkillManager.getSkill(dependency);
                 if (dependencySkillOptional.isEmpty()) {
-                    return false;
+                    continue;
                 }
 
-                ProfessionNode dependencySkill = dependencySkillOptional.get();
-                int dependencyLevel = professionData.getBuild().getSkillLevel(dependencySkill);
-                if (dependencyLevel < dependencySkill.getMaxLevel()) {
-                    return false;
+                if (professionData.getBuild().getSkillLevel(dependencySkillOptional.get()) >= 1) {
+                    return true;
                 }
-
-                totalLevels += dependencyLevel;
             }
-
-            return totalLevels >= dependencies.getLevelsRequired()
-                    && dependencies.getRequiredLevel() <= professionLevel;
+            return false;
         }
 
-
-        return dependencies.getRequiredLevel() <= professionLevel;
+        return true;
     }
 }

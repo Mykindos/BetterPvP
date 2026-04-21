@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.progression.profession;
 
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.loader.DrawioNodeLoaderStrategy;
 import me.mykindos.betterpvp.progression.profession.skill.loader.NodeLoaderStrategy;
 import me.mykindos.betterpvp.progression.profession.skill.loader.YamlNodeLoaderStrategy;
@@ -26,6 +28,7 @@ public abstract class ProfessionHandler implements IProfession {
     protected final Progression progression;
     protected final ClientManager clientManager;
     protected final ProfessionProfileManager professionProfileManager;
+    protected final Provider<ProfessionNodeManager> nodeManager;
     protected final String profession;
 
     @Getter
@@ -38,10 +41,12 @@ public abstract class ProfessionHandler implements IProfession {
     @Nullable
     private SkillTreeLayout skillTree;
 
-    protected ProfessionHandler(Progression progression, ClientManager clientManager, ProfessionProfileManager professionProfileManager, String profession) {
+    protected ProfessionHandler(Progression progression, ClientManager clientManager, ProfessionProfileManager professionProfileManager,
+                                Provider<ProfessionNodeManager> nodeManager, String profession) {
         this.progression = progression;
         this.clientManager = clientManager;
         this.professionProfileManager = professionProfileManager;
+        this.nodeManager = nodeManager;
         this.profession = profession;
     }
 
@@ -58,7 +63,7 @@ public abstract class ProfessionHandler implements IProfession {
         File dir = new File(progression.getDataFolder(), "professions/" + profession.toLowerCase());
         for (String name : new String[]{"skill_tree.drawio", "skill_tree.xml"}) {
             File f = new File(dir, name);
-            if (f.exists()) return new DrawioNodeLoaderStrategy(progression, f);
+            if (f.exists()) return new DrawioNodeLoaderStrategy(progression, f, nodeManager.get());
         }
         return new YamlNodeLoaderStrategy();
     }

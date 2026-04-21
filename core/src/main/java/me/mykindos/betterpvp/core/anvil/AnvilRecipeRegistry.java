@@ -6,15 +6,11 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +32,11 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
     @Inject
     private AnvilRecipeRegistry(RecipeRegistries registries) {
         registries.register(new NamespacedKey("betterpvp", "anvil"), this);
+    }
+
+    @Override
+    public Optional<AnvilRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(recipes.get(key));
     }
 
     @Override

@@ -13,21 +13,21 @@ import org.bukkit.event.block.BlockPlaceEvent;
 public class ForestFlourisherListener implements Listener {
 
     @Inject
-    private ForestFlourisher skill;
+    private ForestFlourisher attribute;
 
     @EventHandler
     public void onPlayerPlantSapling(BlockPlaceEvent event) {
-        if (skill.getSkillLevel(event.getPlayer()) <= 0) return;
-        skill.onPlayerPlantSapling(event);
+        if (!attribute.doesPlayerHaveAttribute(event.getPlayer())) return;
+        attribute.onPlayerPlantSapling(event);
     }
 
     @UpdateEvent(delay = 60000L)
     public void increaseSaplingGrowthTime() {
-        skill.increaseSaplingGrowthTime();
+        attribute.increaseSaplingGrowthTime();
     }
 
     @UpdateEvent
     public void pollBlockToBoneMeal() {
-        skill.pollBlockToBoneMeal();
+        attribute.pollBlockToBoneMeal();
     }
 }

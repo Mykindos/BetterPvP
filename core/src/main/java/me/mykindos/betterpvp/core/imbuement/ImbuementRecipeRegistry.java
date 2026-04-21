@@ -34,6 +34,11 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
         registries.register(new NamespacedKey("betterpvp", "imbuement"), this);
     }
 
+    @Override
+    public Optional<ImbuementRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(recipes.get(key));
+    }
+
     /**
      * Registers a new imbuement recipe.
      * @param key The key to register the recipe under

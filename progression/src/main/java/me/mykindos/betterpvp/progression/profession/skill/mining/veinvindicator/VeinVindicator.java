@@ -8,15 +8,15 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 @Singleton
-@SkillId("vein_vindicator")
+@NodeId("vein_vindicator")
 public class VeinVindicator extends ProfessionSkill {
 
     @Inject

@@ -11,8 +11,8 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Singleton
-@SkillId("tree_compactor")
+@NodeId("tree_compactor")
 public class TreeCompactor extends ProfessionSkill {
 
     private final ProfessionProfileManager profileManager;
@@ -60,11 +60,6 @@ public class TreeCompactor extends ProfessionSkill {
     @Override
     public Material getIcon() {
         return Material.OAK_WOOD;
-    }
-
-    @Override
-    public boolean isGlowing() {
-        return false;
     }
 
     @Override

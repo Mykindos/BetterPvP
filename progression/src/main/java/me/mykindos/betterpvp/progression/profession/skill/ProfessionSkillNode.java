@@ -4,13 +4,13 @@ import com.google.common.base.Preconditions;
 
 public class ProfessionSkillNode extends ProfessionNode {
 
-    public ProfessionSkillNode(String id, ProfessionSkill skill) {
+    public ProfessionSkillNode(String id, IProfessionSkill skill) {
         super(id);
         this.skill = Preconditions.checkNotNull(skill);
     }
 
     @Override
     public boolean isGlowing() {
-        return false;
+        return true;
     }
 }

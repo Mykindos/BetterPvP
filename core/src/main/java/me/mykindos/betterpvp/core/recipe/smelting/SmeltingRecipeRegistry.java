@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
-import net.kyori.adventure.key.Namespaced;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -34,7 +34,12 @@ public class SmeltingRecipeRegistry implements RecipeRegistry<SmeltingRecipe> {
     private SmeltingRecipeRegistry(RecipeRegistries registries) {
         registries.register(new NamespacedKey("betterpvp", "smelting"), this);
     }
-    
+
+    @Override
+    public Optional<SmeltingRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(smeltingRecipes.get(key));
+    }
+
     /**
      * Registers a new smelting recipe.
      * Validates that no duplicate recipe exists with the same ingredient types.
