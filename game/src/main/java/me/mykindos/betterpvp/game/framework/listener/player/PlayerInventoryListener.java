@@ -6,8 +6,10 @@ import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoad
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelectorUseEvent;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.listener.player.event.ParticipantRespawnEvent;
 import me.mykindos.betterpvp.game.framework.manager.InventoryProvider;
@@ -19,6 +21,7 @@ import me.mykindos.betterpvp.game.framework.state.GameState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Handles player interactions with their hot bar, in the WAITING LOBBY
@@ -64,7 +67,7 @@ public class PlayerInventoryListener implements Listener {
     // Reset a player's inventory when they switch kit
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onRoleSwitch(KitSelectorUseEvent event) {
-        inventoryProvider.refreshInventory(event.getPlayer());
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> inventoryProvider.refreshInventory(event.getPlayer()), 1L);
     }
 
     // Reset a player's inventory when they switch build
