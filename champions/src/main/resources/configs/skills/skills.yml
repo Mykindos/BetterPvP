@@ -320,6 +320,8 @@ skills:
       damageReductionPerLevel: 0.0
       blocksMelee: true
       blocksArrow: false
+      baseFrontalBlockAngle: 180
+      frontalBlockAngleIncreasePerLevel: 0
       energyDecreasePerLevel: 10.0
       cooldown: 1.25
       cooldownDecreasePerLevel: 0.0
