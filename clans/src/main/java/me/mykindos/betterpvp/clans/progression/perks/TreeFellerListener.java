@@ -33,6 +33,7 @@ public class TreeFellerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onFell(TreeFellerEvent event) {
         final Player player = event.getPlayer();
+        final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
         final Iterator<Block> iterator = event.getBlocks().iterator();
         while (iterator.hasNext()) {
@@ -43,10 +44,11 @@ public class TreeFellerListener implements Listener {
             }
 
             final Clan blockClan = targetBlockLocationClanOptional.get();
+            Event.Result result = blockClan != playerClan ? Event.Result.DENY : Event.Result.DEFAULT;
             final TerritoryInteractEvent tie = new TerritoryInteractEvent(player,
                     blockClan,
                     block,
-                    Event.Result.DEFAULT,
+                    result,
                     TerritoryInteractEvent.InteractionType.BREAK);
             tie.setInform(false); // we don't want to spam them
             tie.callEvent();

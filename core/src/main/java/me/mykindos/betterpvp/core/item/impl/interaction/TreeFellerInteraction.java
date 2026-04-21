@@ -3,11 +3,13 @@ package me.mykindos.betterpvp.core.item.impl.interaction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InputMeta;
@@ -15,8 +17,10 @@ import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -24,12 +28,15 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -42,7 +49,7 @@ import java.util.Set;
  */
 @Singleton
 @CustomLog
-public class TreeFellerInteraction extends CooldownInteraction {
+public class TreeFellerInteraction extends CooldownInteraction implements DisplayedInteraction {
 
     private final BlockTagManager blockTagManager;
     private final EffectManager effectManager;
@@ -52,7 +59,7 @@ public class TreeFellerInteraction extends CooldownInteraction {
     private double cooldown;
 
     @Inject
-    @Config(path = "items.treeFeller.maxBlocks", defaultValue = "15")
+    @Config(path = "items.treeFeller.maxBlocks", defaultValue = "35")
     private int maxBlocks;
 
     @Inject
@@ -95,8 +102,14 @@ public class TreeFellerInteraction extends CooldownInteraction {
 
         UtilServer.callEvent(new TreeFellerEvent(player, firstLeafLocation, initialLogLocation, initialLogType, blocksToFell));
 
-        for (Block blockToFell : blocksToFell) {
-            UtilBlock.breakBlockNaturally(blockToFell, player, effectManager);
+        for (int i = 0; i < blocksToFell.size(); i++) {
+            Block blockToFell = blocksToFell.get(i);
+            UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+                if (isBreakableLog(blockToFell, initialLogLocation)) {
+                    UtilBlock.breakBlockNaturally(blockToFell, player, effectManager);
+                    UtilItem.damageItem(player, player.getInventory().getItemInMainHand(), 1);
+                }
+            }, (long) (i * 0.3));
         }
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
@@ -127,8 +140,20 @@ public class TreeFellerInteraction extends CooldownInteraction {
         }
     }
 
+    private boolean isBreakableLog(@NotNull Block block, @NotNull Location initialLogLocation) {
+        return isLog(block) && (!blockTagManager.isPlayerPlaced(block) || block.getLocation().equals(initialLogLocation));
+    }
+
+    private boolean isTraversable(@NotNull Block block) {
+        return block.getType().name().contains("LEAVES") || isLog(block);
+    }
+
+    private boolean isLog(@NotNull Block block) {
+        return block.getType().name().contains("_LOG");
+    }
+
     /**
-     * Recursively collects all connected log blocks within {@code maxBlocks} of the initial chop.
+     * Collects breakable log blocks breadth-first, traversing through leaves and player-placed blocks.
      *
      * @param block  the current log block to collect and search from
      * @param visited blocks already searched during this tree-fell call
@@ -138,29 +163,31 @@ public class TreeFellerInteraction extends CooldownInteraction {
      */
     @Nullable
     private Location collectTree(@NotNull Block block, @NotNull Set<Location> visited, @NotNull List<Block> blocksToFell) {
-        if (blocksToFell.size() >= maxBlocks) return null;
-        if (!visited.add(block.getLocation())) return null;
-        if (blockTagManager.isPlayerPlaced(block)) return null;
-
-        blocksToFell.add(block);
-
         Location firstLeafLocation = null;
+        Queue<Block> queue = new ArrayDeque<>();
+        queue.add(block);
+        visited.add(block.getLocation());
 
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                for (int y = 0; y <= 1; y++) {
-                    Block target = block.getRelative(x, y, z);
-                    String typeName = target.getType().name();
+        while (!queue.isEmpty() && blocksToFell.size() < maxBlocks) {
+            Block current = queue.poll();
 
-                    if (firstLeafLocation == null && typeName.contains("LEAVES")
-                            && !blockTagManager.isPlayerPlaced(target)) {
-                        firstLeafLocation = target.getLocation();
-                    }
+            if (isBreakableLog(current, block.getLocation())) {
+                blocksToFell.add(current);
+            }
 
-                    if (typeName.contains("_LOG")) {
-                        Location childLeaf = collectTree(target, visited, blocksToFell);
-                        if (firstLeafLocation == null) {
-                            firstLeafLocation = childLeaf;
+            for (int y = 0; y <= 1; y++) {
+                for (int x = -1; x <= 1; x++) {
+                    for (int z = -1; z <= 1; z++) {
+                        Block target = current.getRelative(x, y, z);
+                        String typeName = target.getType().name();
+
+                        if (firstLeafLocation == null && typeName.contains("LEAVES")
+                                && !blockTagManager.isPlayerPlaced(target)) {
+                            firstLeafLocation = target.getLocation();
+                        }
+
+                        if (isTraversable(target) && visited.add(target.getLocation())) {
+                            queue.add(target);
                         }
                     }
                 }
@@ -168,5 +195,15 @@ public class TreeFellerInteraction extends CooldownInteraction {
         }
 
         return firstLeafLocation;
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.text("Tree Feller");
+    }
+
+    @Override
+    public @NotNull Component getDisplayDescription() {
+        return Component.text("Fells the entire tree when you break a log.");
     }
 }

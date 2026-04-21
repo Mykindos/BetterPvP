@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.mining;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.mining.leaderboards.MiningOresMinedLeaderboard;
 import me.mykindos.betterpvp.progression.profession.mining.repository.MiningRepository;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
@@ -39,8 +41,9 @@ public class MiningHandler extends ProfessionHandler {
 
     @Inject
     public MiningHandler(Progression progression, ClientManager clientManager,
-                         ProfessionProfileManager professionProfileManager, MiningRepository miningRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager) {
-        super(progression, clientManager, professionProfileManager, "Mining");
+                         ProfessionProfileManager professionProfileManager, Provider<ProfessionNodeManager> nodeManager,
+                         MiningRepository miningRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager) {
+        super(progression, clientManager, professionProfileManager, nodeManager, "Mining");
         this.miningRepository = miningRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;

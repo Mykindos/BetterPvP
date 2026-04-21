@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.fishing;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -26,6 +27,7 @@ import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingConfigLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.configuration.ConfigurationSection;
@@ -56,8 +58,9 @@ public class FishingHandler extends ProfessionHandler {
 
     @Inject
     protected FishingHandler(Progression progression, ItemFactory itemFactory, ClientManager clientManager,
-                             ProfessionProfileManager professionProfileManager, FishingRepository fishingRepository, LeaderboardManager leaderboardManager) {
-        super(progression, clientManager, professionProfileManager, "Fishing");
+                             ProfessionProfileManager professionProfileManager, Provider<ProfessionNodeManager> nodeManager,
+                             FishingRepository fishingRepository, LeaderboardManager leaderboardManager) {
+        super(progression, clientManager, professionProfileManager, nodeManager, "Fishing");
         this.fishingRepository = fishingRepository;
         this.leaderboardManager = leaderboardManager;
         this.lootLoaders = new FishingConfigLoader<?>[]{

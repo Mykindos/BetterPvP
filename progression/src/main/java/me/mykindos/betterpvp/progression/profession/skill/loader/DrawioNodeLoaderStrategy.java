@@ -3,12 +3,13 @@ package me.mykindos.betterpvp.progression.profession.skill.loader;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.utilities.DrawioDocumentReader;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttribute;
+import me.mykindos.betterpvp.progression.profession.skill.IProfessionAttribute;
+import me.mykindos.betterpvp.progression.profession.skill.IProfessionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionRecipeNode;
-import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import net.kyori.adventure.key.Key;
 import org.w3c.dom.Document;
@@ -30,10 +31,12 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
     private final Progression plugin;
     private final File drawioFile;
+    private final ProfessionNodeManager nodeManager;
 
-    public DrawioNodeLoaderStrategy(Progression plugin, File drawioFile) {
+    public DrawioNodeLoaderStrategy(Progression plugin, File drawioFile, ProfessionNodeManager nodeManager) {
         this.plugin = plugin;
         this.drawioFile = drawioFile;
+        this.nodeManager = nodeManager;
     }
 
     @Override
@@ -101,6 +104,7 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
             progression.getInjector().injectMembers(node);
             node.initialize(profession);
+            applyNodeMetadata(node, wrapper);
             if (!label.isBlank()) {
                 // replace newline character and consecutive whitespaces, and new line
                 label = label.replace("&#xa;", "\n")
@@ -119,6 +123,7 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
     private void applyDirectedEdgeDependencies(Document doc, Map<String, ProfessionNode> nodesByDrawioId) {
         Map<ProfessionNode, Set<String>> parentIdsByChild = new HashMap<>();
+        Map<ProfessionNode, Set<String>> softNeighborsByNode = new HashMap<>();
         NodeList cells = doc.getElementsByTagName("mxCell");
         int directedEdges = 0;
 
@@ -131,7 +136,12 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
             if (source == null || target == null) continue;
 
             EdgeDependency dependency = edgeDependency(cell, source, target);
-            if (dependency == null) continue;
+            if (dependency == null) {
+                // Undirected/bidirectional edge — each node is a soft neighbor of the other
+                softNeighborsByNode.computeIfAbsent(source, ignored -> new LinkedHashSet<>()).add(target.getName());
+                softNeighborsByNode.computeIfAbsent(target, ignored -> new LinkedHashSet<>()).add(source.getName());
+                continue;
+            }
 
             directedEdges++;
             parentIdsByChild.computeIfAbsent(dependency.child(), ignored -> new LinkedHashSet<>())
@@ -140,12 +150,29 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
         for (ProfessionNode node : new LinkedHashSet<>(nodesByDrawioId.values())) {
             Set<String> parentIds = parentIdsByChild.getOrDefault(node, Set.of());
+            Set<String> softIds = softNeighborsByNode.getOrDefault(node, Set.of());
             int requiredLevel = node.getDependencies() == null ? 0 : node.getDependencies().getRequiredLevel();
             int levelsRequired = parentIds.isEmpty() ? 0 : parentIds.size();
-            node.setDependencies(new ProfessionNodeDependency(new ArrayList<>(parentIds), levelsRequired, requiredLevel));
+            node.setDependencies(new ProfessionNodeDependency(new ArrayList<>(parentIds), levelsRequired, requiredLevel, new ArrayList<>(softIds)));
         }
 
         log.info("Loaded {} directed draw.io dependency edges from {}", directedEdges, drawioFile.getName()).submit();
+    }
+
+    private void applyNodeMetadata(ProfessionNode node, Element wrapper) {
+        int requiredLevel = parseInt(firstPresentAttribute(wrapper, "required_level", "requiredLevel"), 0);
+        node.setDependencies(new ProfessionNodeDependency(List.of(), 0, requiredLevel));
+    }
+
+    private String firstPresentAttribute(Element wrapper, String... names) {
+        for (String name : names) {
+            String value = wrapper.getAttribute(name);
+            if (!value.isBlank()) {
+                return value;
+            }
+        }
+
+        return "";
     }
 
     private EdgeDependency edgeDependency(Element edge, ProfessionNode source, ProfessionNode target) {
@@ -196,18 +223,18 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
     private ProfessionAttributeNode buildAttributeNode(String id, Element wrapper) {
         int maxLevel = parseInt(wrapper.getAttribute("max_level"), 1);
-        Map<ProfessionAttribute, ProfessionAttributeNode.AttributeConfig> attributeMap = new HashMap<>();
+        Map<IProfessionAttribute, ProfessionAttributeNode.AttributeConfig> attributeMap = new HashMap<>();
 
         // Single attribute (no suffix)
-        String attrName = wrapper.getAttribute("attribute");
-        if (!attrName.isBlank()) {
-            try {
-                ProfessionAttribute attr = ProfessionAttribute.valueOf(attrName);
+        String attributeId = wrapper.getAttribute("attribute_id");
+        if (!attributeId.isBlank()) {
+            IProfessionAttribute attr = nodeManager.getAttributeByNodeId(attributeId).orElse(null);
+            if (attr == null) {
+                log.error("Unknown attribute '{}' on node {}", attributeId, id).submit();
+            } else {
                 double base = parseDouble(wrapper.getAttribute("base"), 0.0);
                 double perLevel = parseDouble(wrapper.getAttribute("per_level"), 0.0);
                 attributeMap.put(attr, new ProfessionAttributeNode.AttributeConfig(base, perLevel));
-            } catch (IllegalArgumentException e) {
-                log.error("Unknown ProfessionAttribute '{}' on node {}", attrName, id).submit();
             }
         }
 
@@ -216,13 +243,13 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
             String indexedAttr = wrapper.getAttribute("attribute_" + i);
             if (indexedAttr.isBlank()) break;
 
-            try {
-                ProfessionAttribute attr = ProfessionAttribute.valueOf(indexedAttr);
+            IProfessionAttribute attr = nodeManager.getAttributeByNodeId(indexedAttr).orElse(null);
+            if (attr == null) {
+                log.error("Unknown attribute '{}' on node {}", indexedAttr, id).submit();
+            } else {
                 double base = parseDouble(wrapper.getAttribute("base_" + i), 0.0);
                 double perLevel = parseDouble(wrapper.getAttribute("per_level_" + i), 0.0);
                 attributeMap.put(attr, new ProfessionAttributeNode.AttributeConfig(base, perLevel));
-            } catch (IllegalArgumentException e) {
-                log.error("Unknown ProfessionAttribute '{}' on node {}", indexedAttr, id).submit();
             }
         }
 
@@ -262,29 +289,26 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
     }
 
     private ProfessionNode buildSkillNode(String id, Element wrapper) {
-        String skillClass = wrapper.getAttribute("skill_class");
-        if (skillClass.isBlank()) {
+        String skillId = wrapper.getAttribute("skill_id");
+        if (skillId.isBlank()) {
             return null;
         }
 
         int maxLevel = parseInt(wrapper.getAttribute("max_level"), 1);
 
         try {
-            Class<?> clazz = Class.forName(skillClass);
-            if (!ProfessionSkill.class.isAssignableFrom(clazz)) {
-                log.error("Class {} is not a ProfessionSkill (node node_id={})", skillClass, id).submit();
+            IProfessionSkill skill = nodeManager.getSkillByNodeId(skillId).orElse(null);
+            if (skill == null) {
+                log.error("Unknown skill id {} for node {}", skillId, id).submit();
                 return null;
             }
 
-            ProfessionSkill skill = (ProfessionSkill) plugin.getInjector().getInstance(clazz);
             ProfessionSkillNode node = new ProfessionSkillNode(id, skill);
             node.setMaxLevel(maxLevel);
             plugin.getInjector().injectMembers(node);
             return node;
-        } catch (ClassNotFoundException e) {
-            log.error("Could not find class {} for node {}", skillClass, id).submit();
         } catch (Exception e) {
-            log.error("Error creating skill node {} (class={}): {}", id, skillClass, e.getMessage()).submit();
+            log.error("Error creating skill node {} (skill_id={}): {}", id, skillId, e.getMessage()).submit();
         }
 
         return null;

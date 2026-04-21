@@ -4,13 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @Singleton
-@SkillId("swiftness")
+@NodeId("swiftness")
 public class Swiftness extends ProfessionSkill {
 
     @Inject

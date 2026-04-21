@@ -11,14 +11,18 @@ nodes:
     displayName: Tree Compactor
     cooldown: 20.0
   auto_planter:
-    enabled: true
+    enabled: false
     maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.autoplanter.AutoPlanter
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
       levelsRequired: 1
       requiredLevel: 30
     displayName: Auto Planter
+    attributes:
+    - attribute: WOODCUTTING_AUTO_REPLANT
+      base: 1.0
+      per_level: 1.0
   tree_feller:
     enabled: true
     maxlevel: 25
@@ -537,8 +541,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_1
   bark_chance_attribute_2:
     enabled: true
@@ -551,8 +555,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_2
   bark_chance_attribute_3:
     enabled: true
@@ -565,8 +569,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_3
   bark_chance_attribute_4:
     enabled: true
@@ -579,8 +583,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_4
   bark_chance_attribute_5:
     enabled: true
@@ -593,8 +597,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_5
   bark_chance_attribute_6:
     enabled: true
@@ -607,8 +611,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_6
   bark_chance_attribute_7:
     enabled: true
@@ -621,8 +625,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_7
   bark_chance_attribute_8:
     enabled: true
@@ -635,8 +639,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_8
   bark_chance_attribute_9:
     enabled: true
@@ -649,8 +653,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_9
   bark_chance_attribute_10:
     enabled: true
@@ -663,8 +667,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_10
   bark_chance_attribute_11:
     enabled: true
@@ -677,8 +681,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_11
   bark_chance_attribute_12:
     enabled: true
@@ -691,8 +695,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_12
   bark_chance_attribute_13:
     enabled: true
@@ -705,8 +709,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_13
   bark_chance_attribute_14:
     enabled: true
@@ -719,8 +723,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_14
   bark_chance_attribute_15:
     enabled: true
@@ -733,8 +737,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_15
   bark_chance_attribute_16:
     enabled: true
@@ -747,8 +751,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_16
   bark_chance_attribute_17:
     enabled: true
@@ -761,8 +765,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_17
   bark_chance_attribute_18:
     enabled: true
@@ -775,8 +779,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_18
   bark_chance_attribute_19:
     enabled: true
@@ -789,8 +793,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_19
   bark_chance_attribute_20:
     enabled: true
@@ -803,8 +807,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_20
   bark_chance_attribute_21:
     enabled: true
@@ -817,8 +821,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_21
   bark_chance_attribute_22:
     enabled: true
@@ -831,8 +835,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_22
   bark_chance_attribute_23:
     enabled: true
@@ -845,8 +849,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_23
   bark_chance_attribute_24:
     enabled: true
@@ -859,8 +863,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_24
   bark_chance_attribute_25:
     enabled: true
@@ -873,8 +877,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_25
   bark_chance_attribute_26:
     enabled: true
@@ -887,8 +891,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_26
   bark_chance_attribute_27:
     enabled: true
@@ -901,8 +905,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_27
   bark_chance_attribute_28:
     enabled: true
@@ -915,8 +919,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_28
   bark_chance_attribute_29:
     enabled: true
@@ -929,8 +933,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_29
   bark_chance_attribute_30:
     enabled: true
@@ -943,8 +947,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     displayName: bark_chance_attribute_30
   # endregion
   
@@ -1928,8 +1932,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_1
   increased_experience_attribute_2:
     enabled: true
@@ -1942,8 +1946,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_2
   increased_experience_attribute_3:
     enabled: true
@@ -1956,8 +1960,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_3
   increased_experience_attribute_4:
     enabled: true
@@ -1970,8 +1974,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_4
   increased_experience_attribute_5:
     enabled: true
@@ -1984,8 +1988,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_5
   increased_experience_attribute_6:
     enabled: true
@@ -1998,8 +2002,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_6
   increased_experience_attribute_7:
     enabled: true
@@ -2012,8 +2016,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_7
   increased_experience_attribute_8:
     enabled: true
@@ -2026,8 +2030,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_8
   increased_experience_attribute_9:
     enabled: true
@@ -2040,8 +2044,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_9
   increased_experience_attribute_10:
     enabled: true
@@ -2054,8 +2058,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_10
   increased_experience_attribute_11:
     enabled: true
@@ -2068,8 +2072,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_11
   increased_experience_attribute_12:
     enabled: true
@@ -2082,8 +2086,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_12
   increased_experience_attribute_13:
     enabled: true
@@ -2096,8 +2100,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_13
   increased_experience_attribute_14:
     enabled: true
@@ -2110,8 +2114,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_14
   increased_experience_attribute_15:
     enabled: true
@@ -2124,8 +2128,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_15
   increased_experience_attribute_16:
     enabled: true
@@ -2138,8 +2142,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_16
   increased_experience_attribute_17:
     enabled: true
@@ -2152,8 +2156,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_17
   increased_experience_attribute_18:
     enabled: true
@@ -2166,8 +2170,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_18
   increased_experience_attribute_19:
     enabled: true
@@ -2180,8 +2184,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_19
   increased_experience_attribute_20:
     enabled: true
@@ -2194,8 +2198,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_20
   increased_experience_attribute_21:
     enabled: true
@@ -2208,8 +2212,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_21
   increased_experience_attribute_22:
     enabled: true
@@ -2222,8 +2226,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_22
   increased_experience_attribute_23:
     enabled: true
@@ -2236,8 +2240,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_23
   increased_experience_attribute_24:
     enabled: true
@@ -2250,8 +2254,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_24
   increased_experience_attribute_25:
     enabled: true
@@ -2264,8 +2268,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_25
   increased_experience_attribute_26:
     enabled: true
@@ -2278,8 +2282,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_26
   increased_experience_attribute_27:
     enabled: true
@@ -2292,8 +2296,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_27
   increased_experience_attribute_28:
     enabled: true
@@ -2306,8 +2310,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_28
   increased_experience_attribute_29:
     enabled: true
@@ -2320,8 +2324,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_29
   increased_experience_attribute_30:
     enabled: true
@@ -2334,8 +2338,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: WOODCUTTING_INCREASED_EXPERIENCE
-      base: 2.5
-      per_level: 2.5
+      base: 0.025
+      per_level: 0.025
     displayName: increased_experience_attribute_30
   # endregion
   
@@ -3701,8 +3705,8 @@ nodes:
       base: 2.0
       per_level: 2.0
     - attribute: BARK_CHANCE
-      base: 1.5
-      per_level: 1.5
+      base: 0.015
+      per_level: 0.015
     displayName: chop_speed_bark_chance_attribute_1
   sapling_growth_instant_tree_growth_attribute_1:
     enabled: true
@@ -3781,8 +3785,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BARK_CHANCE
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     - attribute: CHOP_SPEED
       base: 1.0
       per_level: 1.0

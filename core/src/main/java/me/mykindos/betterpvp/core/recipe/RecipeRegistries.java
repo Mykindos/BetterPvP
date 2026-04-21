@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Singleton
@@ -32,6 +33,16 @@ public class RecipeRegistries implements RecipeRegistry<Recipe<?, ?>> {
     @Override
     public void registerRecipe(NamespacedKey key, Recipe<?, ?> recipe) {
         throw new UnsupportedOperationException("Cannot register recipes to this registry");
+    }
+
+    public Optional<Recipe<?, ?>> getRecipe(NamespacedKey key) {
+        for (RecipeRegistry<?> registry : registries.values()) {
+            Optional<? extends Recipe<?, ?>> recipe = registry.getRecipe(key);
+            if (recipe.isPresent()) {
+                return Optional.of(recipe.get());
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

@@ -68,6 +68,11 @@ public abstract class ProfessionSkill implements IProfessionSkill {
                 .sum();
     }
 
+    @Override
+    public boolean isGlowing() {
+        return true;
+    }
+
     public String getProgressionTree() {
         return profession;
     }

@@ -24,7 +24,7 @@ public abstract class ProfessionNode implements ISkill {
     protected ProfessionProfileManager professionProfileManager;
 
     protected final String name;
-    protected ProfessionSkill skill;
+    protected IProfessionSkill skill;
     private String displayName;
 
     private String profession;

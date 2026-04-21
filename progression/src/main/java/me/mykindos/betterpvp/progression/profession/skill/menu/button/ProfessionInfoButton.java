@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
-import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttribute;
+import me.mykindos.betterpvp.progression.profession.skill.IProfessionAttribute;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode;
 import me.mykindos.betterpvp.progression.profession.skill.menu.ProfessionMenu;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
@@ -60,7 +60,7 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
                 .append(Component.text(String.format("(%,d%%)", (int) (progress * 100)), TextColor.color(222, 222, 222)));
 
         // Calculate attribute totals
-        Map<ProfessionAttribute, Double> attributeTotals = new HashMap<>();
+        Map<IProfessionAttribute, Double> attributeTotals = new HashMap<>();
 
         professionData.getBuild().getNodes().forEach((node, level) -> {
             if (node instanceof ProfessionAttributeNode attributeNode && level > 0) {
@@ -88,7 +88,7 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
                     .lore(Component.text("Attribute Totals:", NamedTextColor.GOLD));
 
             attributeTotals.forEach((attribute, total) -> {
-                String formattedValue = UtilFormat.formatNumber(total, 1);
+                String formattedValue = UtilFormat.formatNumber(attribute.getDisplayValue(total), 1);
                 builder.lore(Component.text(" +" + formattedValue + attribute.getOperation() + " " + attribute.getName(), NamedTextColor.GREEN));
             });
         }

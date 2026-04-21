@@ -2,12 +2,12 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing.aggressiverod
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
 import org.bukkit.Material;
 
 @Singleton
-@SkillId("aggressive_rodder")
+@NodeId("aggressive_rodder")
 public class AggressiveRodder extends ProfessionSkill {
     
     @Inject

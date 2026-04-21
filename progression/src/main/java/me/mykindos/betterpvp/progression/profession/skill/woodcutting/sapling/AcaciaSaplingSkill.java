@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting.sapling;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.progression.profession.skill.SkillId;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import org.bukkit.Material;
 
 @Singleton
-@SkillId("acacia_sapling")
+@NodeId("acacia_sapling")
 public class AcaciaSaplingSkill extends SaplingSkill {
 
     @Inject

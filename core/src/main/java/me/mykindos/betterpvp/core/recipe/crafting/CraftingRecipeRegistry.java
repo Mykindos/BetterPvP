@@ -37,6 +37,11 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
     }
 
     @Override
+    public Optional<CraftingRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(craftingRecipes.get(key));
+    }
+
+    @Override
     public RecipeResolver<CraftingRecipe> getResolver() {
         return resolver;
     }
