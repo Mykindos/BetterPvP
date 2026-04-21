@@ -44,7 +44,7 @@ public class UtilPlayer {
         final WorldBorder curBorder = player.getWorld().getWorldBorder();
         final WorldBorder newWorldBorder = Bukkit.getServer().createWorldBorder();
         newWorldBorder.setCenter(curBorder.getCenter());
-        newWorldBorder.setSize(1.0);
+        newWorldBorder.setSize(100_000);
         newWorldBorder.setWarningDistance((int) curBorder.getMaxSize());
         newWorldBorder.setDamageAmount(0);
         newWorldBorder.setDamageBuffer(0);
