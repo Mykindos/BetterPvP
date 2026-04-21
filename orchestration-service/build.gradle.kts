@@ -12,6 +12,8 @@ dependencies {
     implementation(libs.jackson.annotations)
     implementation(libs.jackson.databind)
     implementation("org.tomlj:tomlj:1.1.1")
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 application {

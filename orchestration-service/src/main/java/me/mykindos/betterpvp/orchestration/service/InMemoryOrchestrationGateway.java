@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 public class InMemoryOrchestrationGateway implements OrchestrationGateway {
 
     private static final Logger LOGGER = Logger.getLogger(InMemoryOrchestrationGateway.class.getName());
+    private static final long RANK_SNAPSHOT_STALE_SECONDS = 15L;
 
     private final QueuePriorityPolicy priorityPolicy;
     private final long reservationTtlSeconds;
@@ -614,10 +615,17 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
     }
 
     private ServerCapacitySnapshot recomputeOccupancy(ServerCapacitySnapshot snapshot) {
+        final Instant occupancyUpdatedAt = snapshot.updatedAt();
+        evictStaleRankSnapshots(occupancyUpdatedAt);
+
         int regularOnline = 0;
         int bypassOnline = 0;
 
         for (PlayerRankSnapshot playerRankSnapshot : rankByPlayer.values()) {
+            if (playerRankSnapshot.updatedAt().plusSeconds(RANK_SNAPSHOT_STALE_SECONDS).isBefore(occupancyUpdatedAt)) {
+                continue;
+            }
+
             if (!playerRankSnapshot.currentServer().equalsIgnoreCase(snapshot.serverName())) {
                 continue;
             }
@@ -640,6 +648,11 @@ public class InMemoryOrchestrationGateway implements OrchestrationGateway {
                 snapshot.reservedRegular(),
                 snapshot.updatedAt()
         );
+    }
+
+    private void evictStaleRankSnapshots(Instant now) {
+        rankByPlayer.entrySet().removeIf(entry ->
+                entry.getValue().updatedAt().plusSeconds(RANK_SNAPSHOT_STALE_SECONDS).isBefore(now));
     }
 
     private void removeExistingQueueEntry(UUID playerUuid) {

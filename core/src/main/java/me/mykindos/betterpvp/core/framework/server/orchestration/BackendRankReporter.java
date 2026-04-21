@@ -43,7 +43,7 @@ public class BackendRankReporter implements Listener {
         try {
             orchestrationGateway.removePlayerRank(event.getPlayer().getUniqueId()).join();
         } catch (Exception ex) {
-            log.debug("Failed to remove rank snapshot for {}", event.getClient().getName(), ex);
+            log.debug("Failed to remove rank snapshot for {}", event.getClient().getName(), ex).submit();
         }
     }
 
