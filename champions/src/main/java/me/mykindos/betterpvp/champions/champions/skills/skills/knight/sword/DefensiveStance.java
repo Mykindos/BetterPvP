@@ -52,6 +52,10 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
     private boolean blocksArrow;
 
+    private double baseFrontalBlockAngle;
+
+    private double frontalBlockAngleIncreasePerLevel;
+
     @Inject
     public DefensiveStance(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -69,7 +73,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While active, you take " + getValueString(this::getDamageReduction, level, 1, "%", 0) + " reduced damage",
+                "While active, you take " + getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage",
                 "from all melee attacks in front of you",
                 "",
                 "Players who attack you receive " + getValueString(this::getDamage, level) + " damage,",
@@ -78,6 +82,15 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 "Energy / Second: " + getValueString(this::getEnergy, level),
                 "Cooldown: " + getValueString(this::getCooldown, level, 2),
         };
+    }
+
+    /**
+     * Gets the total frontal block angle in degrees
+     * @param level
+     * @return
+     */
+    public double getFrontalBlockAngle(int level) {
+        return baseFrontalBlockAngle + (frontalBlockAngleIncreasePerLevel * (level - 1));
     }
 
     public double getDamage(int level) {
@@ -114,6 +127,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         if (!active.contains(player.getUniqueId())) return;
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         if (!gamer.isHoldingRightClick()) return;
+        if (event.getDamager() == null) return;
 
         int level = getLevel(player);
         if (level > 0) {
@@ -123,7 +137,10 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
             Vector from = UtilVelocity.getTrajectory(player, event.getDamager());
             from.normalize();
-            if (player.getLocation().getDirection().subtract(from).length() > 0.6D) {
+
+            //frontal block angle is in total, divide in half to get side
+            double threshold = 1 - Math.cos(Math.toRadians(getFrontalBlockAngle(level) / 2));
+            if (look.subtract(from).length() > threshold) {
                 return;
             }
 
@@ -207,6 +224,8 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 100.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
+        baseFrontalBlockAngle = getConfig("baseFrontalBlockAngle", 180.0, Double.class);
+        frontalBlockAngleIncreasePerLevel = getConfig("frontalBlockAngleIncreasePerLevel", 0.0, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
         blocksArrow = getConfig("blocksArrow", false, Boolean.class);
     }
