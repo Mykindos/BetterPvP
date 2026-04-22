@@ -26,6 +26,11 @@ public class ProfessionRecipeNode extends ProfessionNode {
     }
 
     @Override
+    public boolean isGlowing() {
+        return true;
+    }
+
+    @Override
     public String[] getDescription(int level) {
         final RecipeRegistries registries = JavaPlugin.getPlugin(Progression.class).getInjector().getInstance(RecipeRegistries.class);
         List<String> desc = new ArrayList<>();
