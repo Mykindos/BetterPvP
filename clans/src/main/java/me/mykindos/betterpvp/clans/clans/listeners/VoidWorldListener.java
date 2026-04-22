@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.inventory.window.WindowManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.GameMode;
@@ -20,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -66,7 +66,7 @@ public class VoidWorldListener implements Listener {
     public void checkTransportMenu() {
         for (Player player : voidWorld.getPlayers()) {
             if (!player.isOp()) {
-                if (WindowManager.getInstance().getOpenWindow(player) == null) {
+                if (player.getOpenInventory().getType() == InventoryType.CRAFTING) {
                     new ClanTravelHubMenu(player, clientManager.search().online(player), clanManager).show(player);
                 }
 
