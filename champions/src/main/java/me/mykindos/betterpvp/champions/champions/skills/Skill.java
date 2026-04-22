@@ -402,6 +402,12 @@ public abstract class Skill implements IChampionsSkill {
             return 0;
         }
 
+        // If its a passive that has no action, return standard level
+        // Passives such as intimidation and backstab do not gain additional levels from boosters
+        if(this.getType().isPassive() && !(this instanceof ToggleSkill)) {
+            return level;
+        }
+
         if (SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
             level++;
         }
