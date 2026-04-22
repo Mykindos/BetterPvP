@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.core.combat.health;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.effects.Effect;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
@@ -21,10 +24,12 @@ import java.util.Optional;
 public class EntityHealthService {
 
     private final ItemFactory itemFactory;
+    private final EffectManager effectManager;
 
     @Inject
-    private EntityHealthService(ItemFactory itemFactory) {
+    private EntityHealthService(ItemFactory itemFactory, EffectManager effectManager) {
         this.itemFactory = itemFactory;
+        this.effectManager = effectManager;
     }
 
     public double getHealth(ItemStack[] healthItems) {
@@ -70,6 +75,11 @@ public class EntityHealthService {
         }
 
         return baseHealth + additionalHealth;
+    }
+
+    public double getBonusHealth(LivingEntity entity) {
+        Optional<Effect> healthEffectOpt = effectManager.getEffect(entity, EffectTypes.HEALTH_BOOST);
+        return healthEffectOpt.map(effect -> effect.getAmplifier() * 4.0d).orElse(0.0);
     }
 
     public double getHealth(LivingEntity entity) {
