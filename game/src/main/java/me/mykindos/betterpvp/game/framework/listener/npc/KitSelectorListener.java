@@ -76,7 +76,7 @@ public class KitSelectorListener implements Listener {
     }
 
     // Handle player interactions with kit selectors
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onRoleSwitch(KitSelectorUseEvent event) {
         if ((serverController.getCurrentState() == GameState.IN_GAME || serverController.getCurrentState() == GameState.ENDING)
                 && !playerController.getParticipant(event.getPlayer()).isAlive()) {
