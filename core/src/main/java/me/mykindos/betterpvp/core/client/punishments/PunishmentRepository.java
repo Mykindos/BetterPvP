@@ -81,7 +81,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
 
         try {
             var records = database.getDslContext()
-                    .select(PUNISHMENTS.asterisk())
+                    .select(PUNISHMENTS.asterisk(), CLIENTS.asterisk())
                     .from(PUNISHMENTS)
                     .join(CLIENTS).on(PUNISHMENTS.CLIENT.eq(CLIENTS.ID))
                     .where(PUNISHMENTS.CLIENT.eq(client.getId()))
@@ -89,15 +89,17 @@ public class PunishmentRepository implements IRepository<Punishment> {
 
             for (var punishmentRecord : records) {
                 int punishmentId = punishmentRecord.get(PUNISHMENTS.ID);
-                long punishedClientId = punishmentRecord.get(CLIENTS.ID);
+                long punishedClientId = punishmentRecord.get(PUNISHMENTS.CLIENT);
                 UUID punishedClientUUID = UUID.fromString(punishmentRecord.get(CLIENTS.UUID));
                 IPunishmentType type = PunishmentTypes.getPunishmentType(punishmentRecord.get(PUNISHMENTS.TYPE));
                 Rule rule = ruleManager.getOrCustom(punishmentRecord.get(PUNISHMENTS.RULE).toLowerCase().replace('_', ' '));
                 long applyTime = punishmentRecord.get(PUNISHMENTS.APPLY_TIME);
                 long expiryTime = punishmentRecord.get(PUNISHMENTS.EXPIRY_TIME);
                 String reason = punishmentRecord.get(PUNISHMENTS.REASON);
-                UUID punisher = UUID.fromString(punishmentRecord.get(PUNISHMENTS.PUNISHER));
-                UUID revoker = UUID.fromString(punishmentRecord.get(PUNISHMENTS.REVOKER));
+                String punisherUuid = punishmentRecord.get(PUNISHMENTS.PUNISHER);
+                UUID punisher = punisherUuid == null || punisherUuid.isEmpty() ? null : UUID.fromString(punisherUuid);
+                String revokerUuid = punishmentRecord.get(PUNISHMENTS.REVOKER);
+                UUID revoker = revokerUuid == null || revokerUuid.isEmpty() ? null : UUID.fromString(revokerUuid);
                 String revokeTypeString = punishmentRecord.get(PUNISHMENTS.REVOKE_TYPE);
                 RevokeType revokeType = revokeTypeString == null ? null : RevokeType.valueOf(revokeTypeString);
                 long revokeTime = punishmentRecord.get(PUNISHMENTS.REVOKE_TIME);
