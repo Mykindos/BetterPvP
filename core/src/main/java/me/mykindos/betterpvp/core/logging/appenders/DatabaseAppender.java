@@ -43,6 +43,10 @@ public class DatabaseAppender implements LogAppender {
     @Override
     public void append(PendingLog pendingLog) {
 
+        if(pendingLog.getContext().isEmpty()) {
+            return;
+        }
+
         if (pendingLog.getLevel().equalsIgnoreCase("ERROR")) {
             return;
         }

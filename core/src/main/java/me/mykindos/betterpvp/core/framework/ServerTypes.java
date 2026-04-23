@@ -22,7 +22,9 @@ public final class ServerTypes {
             "Champions", "champions",
             Component.text("Champions", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-    public static final ServerType HUB = new BaseServerType("Hub");
+    public static final HubServerType HUB = new HubServerType(
+            "Hub", "hub",
+            Component.text("Hub", NamedTextColor.LIGHT_PURPLE));
 
     private ServerTypes() {
     }
