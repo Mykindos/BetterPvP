@@ -318,6 +318,10 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                     continue;
                 }
 
+                if(!enemy.getWorld().equals(bat.getWorld())) {
+                    continue;
+                }
+
                 double distance = enemy.getLocation().distance(bat.getLocation());
                 double innerRadius = getRadius(level);
                 double escapeRange = getEscapeDistance();
