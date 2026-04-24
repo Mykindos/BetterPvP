@@ -151,7 +151,7 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
                     continue;
                 }
 
-                if(!craftableItems.contains(entry.getValue())) continue;
+                //if(!craftableItems.contains(entry.getValue())) continue;
 
                 ItemInstance instance = itemFactory.create(entry.getValue());
                 if (raritySearch == null || instance.getRarity() == raritySearch) {
