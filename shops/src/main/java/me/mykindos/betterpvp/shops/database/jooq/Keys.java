@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.shops.database.jooq.tables.records.AuctionsRecord;
 import me.mykindos.betterpvp.shops.database.jooq.tables.records.ShopitemsDynamicPricingRecord;
 import me.mykindos.betterpvp.shops.database.jooq.tables.records.ShopitemsFlagsRecord;
 import me.mykindos.betterpvp.shops.database.jooq.tables.records.ShopitemsRecord;
+
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;

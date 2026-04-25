@@ -26,6 +26,7 @@ val outputBuckets = mapOf(
         ":game",
         ":lunar",
         ":private:store",
+        ":private:compatability"
     ),
 )
 

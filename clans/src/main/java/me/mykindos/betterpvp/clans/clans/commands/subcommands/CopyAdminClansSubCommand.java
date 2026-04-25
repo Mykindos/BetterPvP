@@ -122,7 +122,7 @@ public class CopyAdminClansSubCommand extends ClanSubCommand {
                 });
             }).exceptionally(ex -> {
                 UtilMessage.message(player, "Clans", "Failed to copy admin clans: " + ex.getMessage());
-                log.error("Failed to copy admin clans with exception {}", ex.getMessage(), ex);
+                log.error("Failed to copy admin clans with exception {}", ex.getMessage(), ex).submit();
                 return null;
             });
         } catch (NumberFormatException ex) {

@@ -7,6 +7,31 @@ import org.junit.jupiter.api.Test;
 public class UtilFormatTest {
 
     @Test
+    @DisplayName("Hash with Salt Test")
+    void testHashWithSalt() {
+        String hostAddress1 = "192.168.0.1";
+        String pepper1 = "testPepper";
+        String expectedHash1 = "d195ab410e999d1f560e8cf5337831313112f8dac67397d6ac897bfab6a4d799";
+        Assertions.assertEquals(expectedHash1, UtilFormat.hashWithSalt(hostAddress1, pepper1));
+
+        String hostAddress2 = "10.0.0.1";
+        String pepper2 = "anotherPepper";
+        String expectedHash2 = "5163e71cee932a6ffa9e3bc5f68cbef638d50760a0f5f04fb4c4dd1d2727567d";
+        Assertions.assertEquals(expectedHash2, UtilFormat.hashWithSalt(hostAddress2, pepper2));
+
+        String hostAddress3 = "127.0.0.1";
+        String pepper3 = "examplePepper";
+        String expectedHash3 = "4df64d933cfe06c214a1d8dcb5d9732fa8b4a7fca3cc25d55c6f6cc5e355832f";
+        Assertions.assertEquals(expectedHash3, UtilFormat.hashWithSalt(hostAddress3, pepper3));
+
+        Assertions.assertThrows(RuntimeException.class, () ->
+                UtilFormat.hashWithSalt(null, "pepper"), "Expected exception for null hostAddress but didn't get one.");
+
+        Assertions.assertThrows(RuntimeException.class, () ->
+                UtilFormat.hashWithSalt("hostAddress", null), "Expected exception for null pepper but didn't get one.");
+    }
+
+    @Test
     @DisplayName("formatNumber Int")
     void formatIntNumber() {
         String formattedString = UtilFormat.formatNumber((int) 5);

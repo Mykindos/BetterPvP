@@ -46,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_IPS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_NAME_HISTORY;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_PROPERTIES;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_REWARDS;
@@ -597,6 +598,22 @@ public class ClientSQLLayer {
             log.error("Error updating rewards for " + client.getName(), ex).submit();
             throw new RuntimeException(ex);
         }
+    }
+
+    public void saveClientAddress(Client client, String address) {
+        database.getAsyncDslContext().executeAsync(ctx -> {
+            return ctx.insertInto(CLIENT_IPS)
+                    .set(CLIENT_IPS.CLIENT, client.getId())
+                    .set(CLIENT_IPS.IP_HASH, address)
+                    .set(CLIENT_IPS.LAST_SEEN, System.currentTimeMillis())
+                    .onConflict(CLIENT_IPS.CLIENT, CLIENT_IPS.IP_HASH)
+                    .doUpdate()
+                    .set(CLIENT_IPS.LAST_SEEN, System.currentTimeMillis())
+                    .execute();
+        }).exceptionally(ex -> {
+            log.error("Error saving client IP address for " + client.getName(), ex).submit();
+            throw new RuntimeException(ex);
+        });
     }
 
 

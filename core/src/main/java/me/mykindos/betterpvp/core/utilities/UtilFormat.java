@@ -9,10 +9,13 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -320,21 +323,17 @@ public class UtilFormat {
      * Generates a SHA-256 hash of the given host address concatenated with the provided salt.
      *
      * @param hostAddress the input string representing the host address
-     * @param salt the salt string to be combined with the host address for hashing
+     * @param pepper the pepper string to be combined with the host address for hashing
      * @return the generated SHA-256 hash as a hexadecimal string
      */
-    public static String hashWithSalt(String hostAddress, String salt) {
+    public static String hashWithSalt(String hostAddress, String pepper) {
         try {
-            String input = hostAddress + salt;
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hashedBytes = md.digest(input.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hashedBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(pepper.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            byte[] digest = mac.doFinal(hostAddress.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException("Failed to hash IP", e);
         }
     }
 

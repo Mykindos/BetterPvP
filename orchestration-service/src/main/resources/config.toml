@@ -12,9 +12,9 @@ target_type = "CLANS"
 server_name_template = "Clans-$1"
 
 [[managed_targets]]
-pattern = "(?i)^champions-([0-9]+)$"
+pattern = "(?i)^champions$"
 target_type = "CHAMPIONS"
-server_name_template = "Champions-$1"
+server_name_template = "Champions"
 
 [ranks.PLAYER]
 priority = 0

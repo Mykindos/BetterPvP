@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSea
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChatFilter;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientIps;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards;
@@ -106,6 +107,11 @@ public class Tables {
      * The table <code>public.chunk_block_tagging</code>.
      */
     public static final ChunkBlockTagging CHUNK_BLOCK_TAGGING = ChunkBlockTagging.CHUNK_BLOCK_TAGGING;
+
+    /**
+     * The table <code>public.client_ips</code>.
+     */
+    public static final ClientIps CLIENT_IPS = ClientIps.CLIENT_IPS;
 
     /**
      * The table <code>public.client_name_history</code>.

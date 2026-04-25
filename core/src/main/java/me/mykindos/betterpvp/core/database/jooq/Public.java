@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSea
 import me.mykindos.betterpvp.core.database.jooq.tables.Armour;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChatFilter;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChunkBlockTagging;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientIps;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards;
@@ -119,6 +120,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.chunk_block_tagging</code>.
      */
     public final ChunkBlockTagging CHUNK_BLOCK_TAGGING = ChunkBlockTagging.CHUNK_BLOCK_TAGGING;
+
+    /**
+     * The table <code>public.client_ips</code>.
+     */
+    public final ClientIps CLIENT_IPS = ClientIps.CLIENT_IPS;
 
     /**
      * The table <code>public.client_name_history</code>.
@@ -952,6 +958,7 @@ public class Public extends SchemaImpl {
             Armour.ARMOUR,
             ChatFilter.CHAT_FILTER,
             ChunkBlockTagging.CHUNK_BLOCK_TAGGING,
+            ClientIps.CLIENT_IPS,
             ClientNameHistory.CLIENT_NAME_HISTORY,
             ClientProperties.CLIENT_PROPERTIES,
             ClientRewards.CLIENT_REWARDS,

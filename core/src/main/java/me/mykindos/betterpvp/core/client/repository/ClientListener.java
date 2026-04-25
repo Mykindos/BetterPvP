@@ -61,8 +61,8 @@ public class ClientListener implements Listener {
     public int maxPlayers;
 
     @Inject
-    @Config(path = "core.salt", defaultValue = "")
-    private String salt;
+    @Config(path = "core.pepper", defaultValue = "")
+    private String pepper;
 
     private final Core core;
     private final ClientManager clientManager;
@@ -189,10 +189,11 @@ public class ClientListener implements Listener {
         }
 
         String hostAddress = event.getAddress().getHostAddress();
-        String saltedAddress = UtilFormat.hashWithSalt(hostAddress, salt);
+        String hashedAddress = UtilFormat.hashWithSalt(hostAddress, pepper);
+
+        clientManager.getSqlLayer().saveClientAddress(client, hashedAddress);
         log.info("{} ({}) logged in", event.getName(), event.getUniqueId())
                 .setAction("CLIENT_LOGIN")
-                .addClientContext(client, false).addContext("Address", saltedAddress)
                 .submit();
 
     }

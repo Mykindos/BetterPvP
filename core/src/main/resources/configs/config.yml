@@ -16,7 +16,7 @@ core:
     timeBetweenTips: 150.0
   exceptions:
     discord-webhook: ''
-  salt: ''
+  pepper: ''
   resourcepack:
     enabled: true
 pvp:

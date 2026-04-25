@@ -5,6 +5,7 @@ package me.mykindos.betterpvp.shops.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.shops.database.jooq.tables.Shopitems;
+
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 

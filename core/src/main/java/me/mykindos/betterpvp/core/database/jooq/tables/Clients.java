@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.ChatFilter.ChatFilterPath;
+import me.mykindos.betterpvp.core.database.jooq.tables.ClientIps.ClientIpsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientNameHistory.ClientNameHistoryPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientProperties.ClientPropertiesPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.ClientRewards.ClientRewardsPath;
@@ -185,6 +186,19 @@ public class Clients extends TableImpl<ClientsRecord> {
             _chatFilter = new ChatFilterPath(this, null, Keys.CHAT_FILTER__CHAT_FILTER_CREATED_BY_FKEY.getInverseKey());
 
         return _chatFilter;
+    }
+
+    private transient ClientIpsPath _clientIps;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.client_ips</code>
+     * table
+     */
+    public ClientIpsPath clientIps() {
+        if (_clientIps == null)
+            _clientIps = new ClientIpsPath(this, null, Keys.CLIENT_IPS__CLIENT_IPS_CLIENT_FKEY.getInverseKey());
+
+        return _clientIps;
     }
 
     private transient ClientNameHistoryPath _clientNameHistory;
