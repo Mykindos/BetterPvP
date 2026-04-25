@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.woodcutting.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.access.AccessScope;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
@@ -10,16 +11,16 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.impl.interaction.TreeFellerInteraction;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
-import me.mykindos.betterpvp.core.recipe.RecipeUnlockService;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 @Singleton
 @ItemKey("progression:willwood_axe")
@@ -34,10 +35,11 @@ public class WillwoodAxe extends BaseItem {
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.BLOCK_BREAK, interaction)
                 .build());
+        addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT, AccessScope.USE, AccessScope.DAMAGE)));
     }
 
     @Inject
-    private void registerRecipe(RecipeUnlockService unlockService, CraftingRecipeRegistry registry, TreeBark treeBark, ItemFactory itemFactory) {
+    private void registerRecipe(CraftingRecipeRegistry registry, TreeBark treeBark, ItemFactory itemFactory) {
         if (registered) return;
         registered = true;
         final BaseItem ironBlock = itemFactory.getFallbackItem(Material.IRON_BLOCK);
@@ -55,16 +57,8 @@ public class WillwoodAxe extends BaseItem {
         builder.setIngredient('T', new RecipeIngredient(treeBark, 1));
         ShapedCraftingRecipe recipe = builder.build();
 
-        // recreate it so we can add the unlock service
         final NamespacedKey key = new NamespacedKey("progression", "willwood_axe");
-        recipe = new ShapedCraftingRecipe(recipe.getResultSupplier(), recipe.getIngredients(), recipe.getItemFactory(), recipe.needsBlueprint()) {
-            @Override
-            public boolean canCraft(@Nullable Player player) {
-                return unlockService.isUnlocked(player, key);
-            }
-        };
         registry.registerRecipe(key, recipe);
     }
-
 
 }

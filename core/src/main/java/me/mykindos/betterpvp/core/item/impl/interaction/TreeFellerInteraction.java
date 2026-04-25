@@ -36,6 +36,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
@@ -54,6 +55,9 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
     private final BlockTagManager blockTagManager;
     private final EffectManager effectManager;
 
+    @Nullable
+    private TreeFellerCooldownModifier cooldownModifier;
+
     @Inject
     @Config(path = "items.treeFeller.cooldown", defaultValue = "20.0")
     private double cooldown;
@@ -70,9 +74,19 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
         this.effectManager = effectManager;
     }
 
+    public void setModifier(@Nullable TreeFellerCooldownModifier modifier) {
+        this.cooldownModifier = modifier;
+    }
+
     @Override
     public double getCooldown() {
         return cooldown;
+    }
+
+    private double getEffectiveCooldown(Player player) {
+        return Optional.ofNullable(cooldownModifier)
+                .map(m -> m.getEffectiveCooldown(player, cooldown))
+                .orElse(cooldown);
     }
 
     @Override
@@ -130,7 +144,7 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
             Player player = (Player) actor.getEntity();
             cooldownManager.use(player,
                     getCooldownName(),
-                    getCooldown(),
+                    getEffectiveCooldown(player),
                     false,
                     true,
                     false,

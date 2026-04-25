@@ -1,14 +1,22 @@
 package me.mykindos.betterpvp.core.recipe.crafting;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.access.AccessScope;
+import me.mykindos.betterpvp.core.access.ItemAccessService;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
+import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +37,14 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
     private final int width;
     private final int height;
     private final boolean needsBlueprint;
+
+    /**
+     * The namespaced key under which this recipe is registered.
+     * Set by {@link CraftingRecipeRegistry#registerRecipe(NamespacedKey, CraftingRecipe)} after registration.
+     * Used by {@link #canCraft(Player)} to delegate to {@link ItemAccessService}.
+     */
+    @Nullable
+    private NamespacedKey recipeKey;
     
     /**
      * Creates a new shaped recipe with a single resultSupplier.
@@ -137,7 +153,31 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
     public @NotNull RecipeType getType() {
         return RecipeType.SHAPED_CRAFTING;
     }
-    
+
+    /** Called by {@link CraftingRecipeRegistry} to store the key after registration. */
+    public void setRecipeKey(@NotNull NamespacedKey key) {
+        this.recipeKey = key;
+    }
+
+    /**
+     * Delegates to {@link ItemAccessService#isAllowed} with {@link AccessScope#CRAFT}.
+     * The component check is performed inside the service — if the result item's
+     * {@link me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent}
+     * does not list CRAFT, the service returns {@code true} immediately.
+     */
+    @Override
+    public boolean canCraft(@Nullable Player player) {
+        if (player == null || recipeKey == null) return true;
+        try {
+            ItemAccessService service = JavaPlugin.getPlugin(Core.class)
+                    .getInjector().getInstance(ItemAccessService.class);
+            Key key = Key.key(recipeKey.namespace(), recipeKey.getKey());
+            return service.isAllowed(player, resultSupplier.get().getBaseItem(), key, AccessScope.CRAFT);
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
     @Override
     public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         List<Integer> consumedSlots = new ArrayList<>();

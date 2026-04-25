@@ -50,7 +50,7 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
             log.warn("Recipe with key {} is already registered, overwriting", key).submit();
         }
 
-        // Check for duplicate recipes for standard recipes only
+        recipe.setRecipeKey(key);
         recipes.put(key, recipe);
         
         // Log registration differently based on recipe type

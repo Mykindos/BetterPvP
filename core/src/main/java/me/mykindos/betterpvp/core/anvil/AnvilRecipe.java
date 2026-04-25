@@ -1,14 +1,22 @@
 package me.mykindos.betterpvp.core.anvil;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.access.AccessScope;
+import me.mykindos.betterpvp.core.access.ItemAccessService;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
+import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +35,9 @@ public class AnvilRecipe implements Recipe<AnvilRecipeResult, ItemInstance> {
     private final @NotNull AnvilRecipeResult result;
     private final int hammerSwings;
     private final @NotNull ItemFactory itemFactory;
+
+    @Nullable
+    private NamespacedKey recipeKey;
     
     /**
      * Creates a new anvil recipe.
@@ -159,6 +170,24 @@ public class AnvilRecipe implements Recipe<AnvilRecipeResult, ItemInstance> {
         return consumedSlots;
     }
     
+    /** Called by {@link AnvilRecipeRegistry} to store the key after registration. */
+    public void setRecipeKey(@NotNull NamespacedKey key) {
+        this.recipeKey = key;
+    }
+
+    @Override
+    public boolean canCraft(@Nullable Player player) {
+        if (player == null || recipeKey == null) return true;
+        try {
+            ItemAccessService service = JavaPlugin.getPlugin(Core.class)
+                    .getInjector().getInstance(ItemAccessService.class);
+            Key key = Key.key(recipeKey.namespace(), recipeKey.getKey());
+            return service.isAllowed(player, result.getPrimaryResult(), key, AccessScope.CRAFT);
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
     /**
      * Gets the ingredient types used in this recipe (ignoring quantities).
      * Used for duplicate recipe detection.
