@@ -62,4 +62,30 @@ public class ProfessionRecipeNode extends ProfessionNode {
         return recipes.contains(recipe);
     }
 
+    /**
+     * Produces a human-readable requirement lore line for this node,
+     * e.g. {@code "Requires Woodcutting Lvl. 30"}.
+     *
+     * <p>The profession name is taken from {@link #getProgressionTree()}, which is set during
+     * {@link #initialize(String)}. The level is taken from
+     * {@link ProfessionNodeDependency#getRequiredLevel()} if non-zero; otherwise the lore falls
+     * back to a generic description without a numeric level.</p>
+     */
+    public Component getRequirementLore() {
+        String professionName = getProgressionTree();
+        if (professionName == null || professionName.isBlank()) {
+            return Component.text("Requires skill tree progression");
+        }
+
+        String capitalized = professionName.substring(0, 1).toUpperCase() + professionName.substring(1).toLowerCase();
+
+        ProfessionNodeDependency dep = getDependencies();
+        int level = dep != null ? dep.getRequiredLevel() : 0;
+        if (level > 0) {
+            return Component.text("Requires " + capitalized + " Lvl. " + level);
+        }
+
+        return Component.text("Requires " + capitalized + " skill tree progression");
+    }
+
 }

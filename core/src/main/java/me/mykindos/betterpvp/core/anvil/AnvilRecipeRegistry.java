@@ -45,6 +45,7 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
             log.warn("Recipe with key {} is already registered, overwriting", key).submit();
         }
 
+        recipe.setRecipeKey(key);
         recipes.put(key, recipe);
         log.info("Registered anvil recipe for {} requiring {} hammer swings with {} ingredients",
                 recipe.getResult().getPrimaryResult().getClass().getSimpleName(),

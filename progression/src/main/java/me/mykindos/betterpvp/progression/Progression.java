@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.access.ItemAccessService;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
@@ -17,7 +18,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
-import me.mykindos.betterpvp.core.recipe.RecipeUnlockService;
+import me.mykindos.betterpvp.core.item.impl.interaction.TreeFellerInteraction;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.item.ProgressionFishBootstrap;
@@ -25,7 +26,8 @@ import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoad
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
-import me.mykindos.betterpvp.progression.profession.skill.SkillTreeRecipeUnlockProvider;
+import me.mykindos.betterpvp.progression.profession.skill.SkillTreeAccessProvider;
+import me.mykindos.betterpvp.progression.profession.skill.woodcutting.attributes.treefellercooldown.TreeFellerCooldownAttribute;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
 import org.bukkit.Bukkit;
@@ -77,8 +79,11 @@ public class Progression extends BPvPPlugin {
             skillManager.loadNodeRegistry();
             skillManager.loadSkills();
 
-            var recipeUnlockService = injector.getInstance(RecipeUnlockService.class);
-            recipeUnlockService.register(injector.getInstance(SkillTreeRecipeUnlockProvider.class));
+            var itemAccessService = injector.getInstance(ItemAccessService.class);
+            itemAccessService.register(injector.getInstance(SkillTreeAccessProvider.class));
+
+            injector.getInstance(TreeFellerInteraction.class)
+                    .setModifier(injector.getInstance(TreeFellerCooldownAttribute.class));
 
             var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
             listenerLoader.registerListeners(PACKAGE);

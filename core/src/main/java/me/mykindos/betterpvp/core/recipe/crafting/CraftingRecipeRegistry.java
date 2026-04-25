@@ -65,6 +65,13 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
             log.warn("Recipe with key {} is already registered, overwriting", key).submit();
         }
 
+        // Store the key on the recipe so canCraft can delegate to ItemAccessService.
+        if (craftingRecipe instanceof ShapedCraftingRecipe shaped) {
+            shaped.setRecipeKey(key);
+        } else if (craftingRecipe instanceof ShapelessCraftingRecipe shapeless) {
+            shapeless.setRecipeKey(key);
+        }
+
         craftingRecipes.put(key, craftingRecipe);
         log.info("Registered recipe: {}", key).submit();
     }

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import org.reflections.Reflections;
 
+import javax.inject.Provider;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
@@ -27,14 +28,17 @@ public class ProfessionNodeManager extends Manager<String, ProfessionNode> {
 
     private final Progression progression;
     private final List<ProfessionHandler> handlers;
+    private final Provider<SkillTreeAccessProvider> accessProviderProvider;
     private final Map<String, IProfessionSkill> skillsByNodeId = new HashMap<>();
     private final Map<String, IProfessionAttribute> attributesByNodeId = new HashMap<>();
 
     @Inject
     public ProfessionNodeManager(Progression progression, FishingHandler fishingHandler,
-                                 WoodcuttingHandler woodcuttingHandler, MiningHandler miningHandler) {
+                                 WoodcuttingHandler woodcuttingHandler, MiningHandler miningHandler,
+                                 Provider<SkillTreeAccessProvider> accessProviderProvider) {
         this.progression = progression;
         this.handlers = List.of(fishingHandler, woodcuttingHandler, miningHandler);
+        this.accessProviderProvider = accessProviderProvider;
     }
 
     public void loadNodeRegistry() {
@@ -102,6 +106,7 @@ public class ProfessionNodeManager extends Manager<String, ProfessionNode> {
 
         log.info("Loaded " + objects.size() + " profession nodes").submit();
         progression.saveConfig();
+        accessProviderProvider.get().rebuildIndex();
     }
 
     public void reload() {
