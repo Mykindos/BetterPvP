@@ -123,7 +123,6 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
     private void applyDirectedEdgeDependencies(Document doc, Map<String, ProfessionNode> nodesByDrawioId) {
         Map<ProfessionNode, Set<String>> parentIdsByChild = new HashMap<>();
-        Map<ProfessionNode, Set<String>> softNeighborsByNode = new HashMap<>();
         NodeList cells = doc.getElementsByTagName("mxCell");
         int directedEdges = 0;
 
@@ -137,9 +136,9 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
             EdgeDependency dependency = edgeDependency(cell, source, target);
             if (dependency == null) {
-                // Undirected/bidirectional edge — each node is a soft neighbor of the other
-                softNeighborsByNode.computeIfAbsent(source, ignored -> new LinkedHashSet<>()).add(target.getName());
-                softNeighborsByNode.computeIfAbsent(target, ignored -> new LinkedHashSet<>()).add(source.getName());
+                // Bidirectional edge — create a hard dependency in each direction
+                parentIdsByChild.computeIfAbsent(source, ignored -> new LinkedHashSet<>()).add(target.getName());
+                parentIdsByChild.computeIfAbsent(target, ignored -> new LinkedHashSet<>()).add(source.getName());
                 continue;
             }
 
@@ -150,10 +149,9 @@ public class DrawioNodeLoaderStrategy implements NodeLoaderStrategy {
 
         for (ProfessionNode node : new LinkedHashSet<>(nodesByDrawioId.values())) {
             Set<String> parentIds = parentIdsByChild.getOrDefault(node, Set.of());
-            Set<String> softIds = softNeighborsByNode.getOrDefault(node, Set.of());
             int requiredLevel = node.getDependencies() == null ? 0 : node.getDependencies().getRequiredLevel();
             int levelsRequired = parentIds.isEmpty() ? 0 : parentIds.size();
-            node.setDependencies(new ProfessionNodeDependency(new ArrayList<>(parentIds), levelsRequired, requiredLevel, new ArrayList<>(softIds)));
+            node.setDependencies(new ProfessionNodeDependency(new ArrayList<>(parentIds), levelsRequired, requiredLevel));
         }
 
         log.info("Loaded {} directed draw.io dependency edges from {}", directedEdges, drawioFile.getName()).submit();
