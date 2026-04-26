@@ -46,9 +46,14 @@ public class RewardsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if (cooldownManager.use(player, "Rewards", 1, true, false)) {
+        if (cooldownManager.use(player, "Inventory", 1, false, false)) {
             CompletableFuture.runAsync(() -> {
                 RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
+
+                if(rewardBox.getContents().isEmpty()) {
+                    UtilMessage.simpleMessage(player, "Inventory", "You have no items to claim.");
+                    return;
+                }
 
                 UtilServer.runTask(core, () -> {
                     new GuiRewardBox(rewardBox, itemFactory, null).show(player).addCloseHandler(() -> {
@@ -65,7 +70,7 @@ public class RewardsCommand extends Command {
                 });
             });
         } else {
-            UtilMessage.simpleMessage(player, "Rewards", "You have checked your rewards recently, please wait a bit before checking again.");
+            UtilMessage.simpleMessage(player, "Inventory", "You have checked your inventory recently, please wait a bit before checking again.");
         }
     }
 }
