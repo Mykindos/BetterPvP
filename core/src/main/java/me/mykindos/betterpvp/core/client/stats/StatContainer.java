@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.client.stats;
 
-import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -8,7 +7,6 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletionsConcurrentHashMap;
 import me.mykindos.betterpvp.core.client.stats.events.IStatMapListener;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
-import me.mykindos.betterpvp.core.client.stats.events.WrapStatEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -56,17 +54,17 @@ public class StatContainer implements Unique, IStatMapListener {
     }
 
     public void incrementStat(@Nullable IStat stat, long amount) {
-        if (stat == null) {
-            log.warn("Attempted to save a null stat").submit();
-            return;
-        }
-        Preconditions.checkArgument(stat.isSavable(), "Stat %s must be savable to increment", stat.getQualifiedName());
-        synchronized (this) {
-            final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(getUniqueId(), stat));
-            final IStat wrappedStat = wrapStatEvent.getStat();
-            changedStats.add(wrappedStat);
-            this.getStats().increase(Core.getCurrentRealm(), wrappedStat, amount);
-        }
+       //if (stat == null) {
+       //    log.warn("Attempted to save a null stat").submit();
+       //    return;
+       //}
+       //Preconditions.checkArgument(stat.isSavable(), "Stat %s must be savable to increment", stat.getQualifiedName());
+       //synchronized (this) {
+       //    final WrapStatEvent wrapStatEvent = UtilServer.callEvent(new WrapStatEvent(getUniqueId(), stat));
+       //    final IStat wrappedStat = wrapStatEvent.getStat();
+       //    changedStats.add(wrappedStat);
+       //    this.getStats().increase(Core.getCurrentRealm(), wrappedStat, amount);
+       //}
     }
 
     @Override
