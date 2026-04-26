@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComp
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
@@ -31,13 +32,14 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
     @Inject
     private RunedPickaxe(Progression progression,
                          CooldownManager cooldownManager,
-                         ClientManager clientManager) {
+                         ClientManager clientManager,
+                         ItemFactory itemFactory) {
         super("Runed Pickaxe",
                 Item.model(Material.DIAMOND_PICKAXE, "runed_pickaxe"),
                 ItemGroup.TOOL,
                 ItemRarity.EPIC);
         this.progression = progression;
-        this.instantMineInteraction = new InstantMineInteraction(cooldownManager, clientManager, 20.0, 7.0);
+        this.instantMineInteraction = new InstantMineInteraction(cooldownManager, clientManager, itemFactory, 20.0, 7.0);
 
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.RIGHT_CLICK, instantMineInteraction)
