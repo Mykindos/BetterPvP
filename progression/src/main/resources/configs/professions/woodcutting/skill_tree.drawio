@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36">
   <diagram name="Page-1" id="PKvY7KV2L_VxPwOxNZgC">
-    <mxGraphModel dx="1400" dy="827" grid="1" gridSize="60" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="540" pageHeight="190" background="none" math="0" shadow="0">
+    <mxGraphModel dx="538" dy="318" grid="1" gridSize="60" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="540" pageHeight="190" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -45,6 +45,9 @@
             <mxGeometry height="60" width="60" x="60" y="540" as="geometry" />
           </mxCell>
         </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-1" edge="1" parent="1" source="forest_flourisher_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="mangrove_sapling_node">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <object label="Forest&#xa;Flourisher" attribute_id="forest_flourisher" base="0.1" per_level="0.1" max_level="1" id="forest_flourisher_1">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="300" y="5100" as="geometry" />
@@ -94,9 +97,9 @@
             <mxGeometry height="60" width="60" x="60" y="5880" as="geometry" />
           </mxCell>
         </object>
-        <object label="Mangrove&#xa;Sapling" skill_id="mangrove_sapling" max_level="1" required_level="35" id="mangrove_sapling_node">
+        <object label="Mangrove&#xa;Sapling" skill_id="mangrove_sapling" max_level="1" id="mangrove_sapling_node">
           <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1">
-            <mxGeometry height="60" width="60" x="360" y="3660" as="geometry" />
+            <mxGeometry height="60" width="60" x="420" y="5100" as="geometry" />
           </mxCell>
         </object>
         <mxCell id="vSJpPm3wwYhSkPHHRFYX-45" edge="1" parent="1" source="bark_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_extra_logs_1">
@@ -217,12 +220,12 @@
             <mxGeometry height="60" width="60" x="240" y="2820" as="geometry" />
           </mxCell>
         </object>
-        <mxCell id="VzMWBcZ4hqjyc5J0G1za-53" edge="1" parent="1" source="bonus_woodcutting_increased_experience_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_woodcutting_increased_experience_7">
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-2" edge="1" parent="1" source="bonus_woodcutting_increased_experience_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_increased_experience_7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <object label="Increased&#xa;Experience" attribute_id="woodcutting_increased_experience" base="0.05" per_level="0.05" max_level="1" id="bonus_woodcutting_increased_experience_6">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
-            <mxGeometry height="60" width="60" x="60" y="3600" as="geometry" />
+            <mxGeometry height="60" width="60" x="60" y="3480" as="geometry" />
           </mxCell>
         </object>
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-55" edge="1" parent="1" source="bonus_woodcutting_increased_experience_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_woodcutting_increased_experience_8">
@@ -230,7 +233,7 @@
         </mxCell>
         <object label="Increased&#xa;Experience" attribute_id="woodcutting_increased_experience" base="0.05" per_level="0.05" max_level="1" id="bonus_woodcutting_increased_experience_7">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
-            <mxGeometry height="60" width="60" x="120" y="3720" as="geometry" />
+            <mxGeometry height="60" width="60" x="60" y="3660" as="geometry" />
           </mxCell>
         </object>
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-58" edge="1" parent="1" source="bonus_woodcutting_increased_experience_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_woodcutting_increased_experience_9">
@@ -238,7 +241,7 @@
         </mxCell>
         <object label="Increased&#xa;Experience" attribute_id="woodcutting_increased_experience" base="0.05" per_level="0.05" max_level="1" id="bonus_woodcutting_increased_experience_8">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
-            <mxGeometry height="60" width="60" x="240" y="3840" as="geometry" />
+            <mxGeometry height="60" width="60" x="180" y="3840" as="geometry" />
           </mxCell>
         </object>
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-59" edge="1" parent="1" source="bonus_woodcutting_increased_experience_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_forest_flourisher_6">
@@ -718,7 +721,7 @@
         </mxCell>
         <object label="Bark&#xa;Multiplier" attribute_id="woodcutting_bark_multiplier" base="0.02" per_level="0.02" max_level="1" id="bonus_woodcutting_bark_multiplier_5">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
-            <mxGeometry height="60" width="60" x="120" y="3480" as="geometry" />
+            <mxGeometry height="60" width="60" x="120" y="3420" as="geometry" />
           </mxCell>
         </object>
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-82" edge="1" parent="1" source="bonus_woodcutting_bark_multiplier_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="bonus_woodcutting_bark_multiplier_7" value="">
@@ -959,9 +962,82 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-162" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.473;entryY=0.042;entryDx=0;entryDy=0;entryPerimeter=0;" target="bonus_woodcutting_double_treasure_chance_5">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-4" edge="1" parent="1" source="recipe_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tree_feller_cooldown_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <object label="Tree Feller" recipe="progression:willwood_axe" required_level="35" id="recipe_1">
           <mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1">
-            <mxGeometry height="60" width="60" x="360" y="3540" as="geometry" />
+            <mxGeometry height="60" width="60" x="420" y="3420" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-9" edge="1" parent="1" source="tree_feller_cooldown_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-10" edge="1" parent="1" source="tree_feller_cooldown_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="3540" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-11" edge="1" parent="1" source="tree_feller_cooldown_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-12" edge="1" parent="1" source="tree_feller_cooldown_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="3540" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-13" edge="1" parent="1" source="tree_feller_cooldown_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="3540" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-15" edge="1" parent="1" source="tree_feller_cooldown_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="3660" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-16" edge="1" parent="1" source="tree_feller_cooldown_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="3660" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-14" edge="1" parent="1" source="tree_feller_cooldown_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-17" edge="1" parent="1" source="tree_feller_cooldown_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="3660" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="FIcQe-DjJEKsFRLBZIb6-18" edge="1" parent="1" source="tree_feller_cooldown_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="3780" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="3780" as="geometry" />
           </mxCell>
         </object>
       </root>

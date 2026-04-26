@@ -9,11 +9,14 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.access.AccessRequirement;
 import me.mykindos.betterpvp.core.access.AccessScope;
 import me.mykindos.betterpvp.core.access.ItemAccessService;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBar;
+import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -50,6 +53,7 @@ public class ItemAccessListener implements Listener {
     /** Milliseconds between repeated denial notifications for the same (player, item) pair. */
     private static final long DENIAL_FEEDBACK_THROTTLE_MS = 1500L;
 
+    private final ClientManager clientManager;
     private final ItemAccessService itemAccessService;
     private final ItemFactory itemFactory;
     private final ItemRegistry itemRegistry;
@@ -62,7 +66,8 @@ public class ItemAccessListener implements Listener {
             .build();
 
     @Inject
-    public ItemAccessListener(ItemAccessService itemAccessService, ItemFactory itemFactory, ItemRegistry itemRegistry) {
+    public ItemAccessListener(ClientManager clientManager, ItemAccessService itemAccessService, ItemFactory itemFactory, ItemRegistry itemRegistry) {
+        this.clientManager = clientManager;
         this.itemAccessService = itemAccessService;
         this.itemFactory = itemFactory;
         this.itemRegistry = itemRegistry;
@@ -146,7 +151,10 @@ public class ItemAccessListener implements Listener {
     private void denyAndNotify(Player player, Key itemKey, AccessRequirement requirement) {
         if (isThrottled(player.getUniqueId(), itemKey)) return;
 
-        player.sendActionBar(requirement.lore().colorIfAbsent(NamedTextColor.RED));
+        final ActionBar actionBar = clientManager.search().online(player).getGamer().getActionBar();
+        actionBar.add(100, new TimedComponent(1.0, false, gmr -> {
+            return requirement.lore().colorIfAbsent(NamedTextColor.RED);
+        }));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.5f, 0.8f);
     }
 

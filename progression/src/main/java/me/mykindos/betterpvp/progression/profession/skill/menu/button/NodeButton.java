@@ -156,14 +156,6 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
             return false;
         }
 
-        // Soft neighbors (undirected edges) provide an alternative path — any one unlocked is enough
-        for (String neighborId : dependencies.getSoftNeighbors()) {
-            Optional<ProfessionNode> neighborOpt = progressionSkillManager.getSkill(neighborId);
-            if (neighborOpt.isPresent() && professionData.getBuild().getSkillLevel(neighborOpt.get()) >= 1) {
-                return true;
-            }
-        }
-
         if (!dependencies.getNodes().isEmpty()) {
             for (String dependency : dependencies.getNodes()) {
                 Optional<ProfessionNode> dependencySkillOptional = progressionSkillManager.getSkill(dependency);

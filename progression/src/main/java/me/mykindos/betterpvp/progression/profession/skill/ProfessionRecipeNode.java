@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -82,7 +83,14 @@ public class ProfessionRecipeNode extends ProfessionNode {
         ProfessionNodeDependency dep = getDependencies();
         int level = dep != null ? dep.getRequiredLevel() : 0;
         if (level > 0) {
-            return Component.text("Requires " + capitalized + " Lvl. " + level);
+            return Component.empty()
+                    .append(Component.text("Unlocked in"))
+                    .appendSpace()
+                    .append(Component.text(capitalized, NamedTextColor.GREEN))
+                    .appendSpace()
+                    .append(Component.text("skill tree at "))
+                    .appendSpace()
+                    .append(Component.text("Lvl. " + level, NamedTextColor.GREEN));
         }
 
         return Component.text("Requires " + capitalized + " skill tree progression");

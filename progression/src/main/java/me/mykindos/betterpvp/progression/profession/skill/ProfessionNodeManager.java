@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.skill;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -11,7 +12,6 @@ import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import org.reflections.Reflections;
 
-import javax.inject.Provider;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;

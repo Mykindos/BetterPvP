@@ -82,7 +82,7 @@ public class RestrictedAccessComponent extends AbstractItemComponent implements 
      */
     @Override
     public int getRenderPriority() {
-        return -2;
+        return Integer.MAX_VALUE;
     }
 
     private NamespacedKey resolveKey(ItemInstance item) {
