@@ -69,7 +69,7 @@ public class SkyforgedAscent extends CooldownInteraction implements DisplayedInt
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

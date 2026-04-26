@@ -51,7 +51,7 @@ public class EnergyBoost extends CooldownInteraction implements DisplayedInterac
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

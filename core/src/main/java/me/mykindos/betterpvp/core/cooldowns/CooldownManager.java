@@ -30,8 +30,12 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -397,6 +401,84 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
             }
 
         }
+    }
+
+    /**
+     * Applies a cooldown and adds a smart action bar component that always displays the
+     * sibling interaction with the least remaining cooldown time.
+     * <p>
+     * Only adds the action bar component if the cooldown was successfully applied (not
+     * already on cooldown, not cancelled by a {@link CooldownEvent}).
+     * Only shows the action bar while the player holds the specified {@link BaseItem}.
+     *
+     * @param player               the player using the ability
+     * @param ability              the cooldown name for this specific ability
+     * @param duration             cooldown duration in seconds
+     * @param inform               whether to notify the player about the cooldown
+     * @param removeOnDeath        whether the cooldown clears on death
+     * @param cancellable          whether the cooldown can be cancelled externally
+     * @param actionBarHeldItem    the BaseItem the player must hold to see the action bar
+     * @param siblingCooldownNames cooldown names of all displayed-cooldown interactions on this item
+     * @param actionBarPriority    priority for the action bar component
+     * @return true if the cooldown was applied successfully
+     */
+    public boolean useWithSiblingActionBar(@NotNull Player player, @NotNull String ability, double duration,
+                                            boolean inform, boolean removeOnDeath, boolean cancellable,
+                                            @NotNull BaseItem actionBarHeldItem,
+                                            @NotNull List<String> siblingCooldownNames,
+                                            int actionBarPriority) {
+        // Apply cooldown through the normal pipeline (no action bar component from use())
+        boolean applied = use(player, ability, duration, inform, removeOnDeath, cancellable, (Predicate<Gamer>) null);
+        if (!applied) return false;
+
+        final ItemFactory itemFactory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
+        final Gamer gamer = clientManager.search().online(player).getGamer();
+
+        TimedComponent actionBarComponent = new TimedComponent(duration + 1.5, false, g -> {
+            final ItemStack item = player.getEquipment().getItemInMainHand();
+            final Optional<ItemInstance> instance = itemFactory.fromItemStack(item);
+            if (instance.isEmpty() || instance.get().getBaseItem() != actionBarHeldItem) {
+                return null;
+            }
+
+            final Optional<ConcurrentHashMap<String, Cooldown>> cooldownsOpt = getObject(player.getUniqueId().toString());
+            if (cooldownsOpt.isEmpty()) return null;
+            final ConcurrentHashMap<String, Cooldown> cooldowns = cooldownsOpt.get();
+
+            // Show the sibling interaction closest to being recharged
+            final Optional<Cooldown> leastRemaining = siblingCooldownNames.stream()
+                    .map(cooldowns::get)
+                    .filter(Objects::nonNull)
+                    .min(Comparator.comparingDouble(Cooldown::getRemaining));
+
+            if (leastRemaining.isEmpty()) return null;
+
+            return renderCooldownBar(leastRemaining.get());
+        });
+
+        gamer.getActionBar().add(actionBarPriority, actionBarComponent);
+        return true;
+    }
+
+    private Component renderCooldownBar(@NotNull Cooldown cooldown) {
+        final TextComponent abilityName = Component.text(cooldown.getName())
+                .decorate(TextDecoration.BOLD)
+                .color(NamedTextColor.WHITE);
+
+        if (cooldown.getRemaining() <= 0) {
+            return Component.join(JoinConfiguration.separator(Component.space()),
+                    abilityName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN),
+                    Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
+        }
+
+        final double max = cooldown.getSeconds() / 1000;
+        final double progress = Math.min(1f, Math.max(0, (max - cooldown.getRemaining()) / max));
+        final ProgressBar progressBar = ProgressBar.withProgress((float) progress);
+        final TextComponent bar = progressBar.build();
+        final double remainingSeconds = Math.max(0.0, cooldown.getRemaining());
+        final TextComponent remaining = Component.text(String.format("%.1fs", remainingSeconds))
+                .color(NamedTextColor.WHITE);
+        return Component.join(JoinConfiguration.separator(Component.space()), abilityName, bar, remaining);
     }
 
     /**

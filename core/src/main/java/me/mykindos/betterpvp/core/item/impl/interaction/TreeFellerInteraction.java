@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InputMeta;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -79,14 +80,13 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
+        if (actor instanceof PlayerInteractionActor playerActor) {
+            return Optional.ofNullable(cooldownModifier)
+                    .map(m -> m.getEffectiveCooldown(playerActor.getPlayer(), cooldown))
+                    .orElse(cooldown);
+        }
         return cooldown;
-    }
-
-    private double getEffectiveCooldown(Player player) {
-        return Optional.ofNullable(cooldownModifier)
-                .map(m -> m.getEffectiveCooldown(player, cooldown))
-                .orElse(cooldown);
     }
 
     @Override
@@ -130,28 +130,6 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
         UtilMessage.simpleMessage(player, "Woodcutting", "You used <alt>Tree Feller</alt>");
 
         return InteractionResult.Success.ADVANCE;
-    }
-
-    /**
-     * Applies the cooldown with an expire-sound callback so the player hears
-     * when Tree Feller is ready to use again.
-     */
-    @Override
-    public void then(@NotNull InteractionActor actor, @NotNull InteractionContext context,
-                     @NotNull InteractionResult result, @Nullable ItemInstance itemInstance,
-                     @Nullable ItemStack itemStack) {
-        if (result.isSuccess() && actor.isPlayer()) {
-            Player player = (Player) actor.getEntity();
-            cooldownManager.use(player,
-                    getCooldownName(),
-                    getEffectiveCooldown(player),
-                    false,
-                    true,
-                    false,
-                    null,
-                    0,
-                    cd -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 0.3f, 1.5f));
-        }
     }
 
     private boolean isBreakableLog(@NotNull Block block, @NotNull Location initialLogLocation) {

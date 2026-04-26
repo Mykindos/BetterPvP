@@ -84,12 +84,12 @@ public class ProfessionRecipeNode extends ProfessionNode {
         int level = dep != null ? dep.getRequiredLevel() : 0;
         if (level > 0) {
             return Component.empty()
-                    .append(Component.text("Unlocked in"))
+                    .append(Component.text("Unlocked with"))
                     .appendSpace()
                     .append(Component.text(capitalized, NamedTextColor.GREEN))
                     .appendSpace()
-                    .append(Component.text("skill tree at "))
-                    .appendSpace()
+//                    .append(Component.text("skill tree at"))
+//                    .appendSpace()
                     .append(Component.text("Lvl. " + level, NamedTextColor.GREEN));
         }
 
