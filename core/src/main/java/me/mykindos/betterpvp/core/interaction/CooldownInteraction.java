@@ -4,6 +4,8 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.cooldowns.Cooldown;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
+import me.mykindos.betterpvp.core.interaction.chain.InteractionChainNode;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -11,6 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -37,7 +42,7 @@ public abstract class CooldownInteraction extends AbstractInteraction {
      *
      * @return the cooldown in seconds
      */
-    public abstract double getCooldown();
+    public abstract double getCooldown(InteractionActor actor);
 
     /**
      * Get the energy cost for this interaction.
@@ -73,7 +78,7 @@ public abstract class CooldownInteraction extends AbstractInteraction {
      * @return true to show action bar cooldown (default false)
      */
     public boolean showActionBarCooldown() {
-        return false;
+        return true;
     }
 
     @Override
@@ -88,7 +93,7 @@ public abstract class CooldownInteraction extends AbstractInteraction {
         }
 
         // Check cooldown (only for players)
-        double cooldown = getCooldown();
+        double cooldown = getCooldown(actor);
         if (cooldown > 0 && actor.isPlayer()) {
             Player player = (Player) actor.getEntity();
             if (cooldownManager.hasCooldown(player, this.cooldownName)) {
@@ -98,7 +103,6 @@ public abstract class CooldownInteraction extends AbstractInteraction {
             }
         }
 
-        // Execute the actual interaction
         return doCooldownExecute(actor, context, itemInstance, itemStack);
     }
 
@@ -108,9 +112,38 @@ public abstract class CooldownInteraction extends AbstractInteraction {
         if (result.isSuccess() && actor.isPlayer()) {
             Player player = (Player) actor.getEntity();
 
-            final double cooldown = getCooldown();
+            final double cooldown = getCooldown(actor);
             if (cooldown > 0) {
-                cooldownManager.use(player, this.cooldownName, cooldown, informCooldown(), true, false, showActionBarCooldown());
+                boolean usedSiblingPath = false;
+                if (this instanceof DisplayedInteraction && itemInstance != null) {
+                    final Optional<InteractionContainerComponent> containerOpt =
+                            itemInstance.getBaseItem().getComponent(InteractionContainerComponent.class);
+                    if (containerOpt.isPresent()) {
+                        final List<String> siblingCooldownNames = containerOpt.get().getChain().getRoots()
+                                .stream()
+                                .map(InteractionChainNode::getInteraction)
+                                .filter(i -> i instanceof CooldownInteraction ci
+                                        && i instanceof DisplayedInteraction
+                                        && ci.getCooldown(actor) > 0)
+                                .map(i -> ((CooldownInteraction) i).getCooldownName())
+                                .toList();
+                        if (siblingCooldownNames.size() > 1) {
+                            cooldownManager.useWithSiblingActionBar(
+                                    player, this.cooldownName, cooldown, informCooldown(), true, false,
+                                    itemInstance.getBaseItem(), siblingCooldownNames, 1000
+                            );
+                            usedSiblingPath = true;
+                        } else if (showActionBarCooldown()) {
+                            // Single displayed-cooldown interaction: gate action bar on holding this item
+                            cooldownManager.use(player, this.cooldownName, cooldown, informCooldown(), true, false,
+                                    itemInstance.getBaseItem());
+                            usedSiblingPath = true;
+                        }
+                    }
+                }
+                if (!usedSiblingPath) {
+                    cooldownManager.use(player, this.cooldownName, cooldown, informCooldown(), true, false, showActionBarCooldown());
+                }
             }
 
             // Use energy after cooldown check passes

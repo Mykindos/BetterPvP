@@ -82,7 +82,7 @@ public class Needlegrasp extends CooldownInteraction implements Listener, Displa
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

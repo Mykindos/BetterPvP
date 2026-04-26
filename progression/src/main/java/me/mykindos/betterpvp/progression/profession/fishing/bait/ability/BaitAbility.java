@@ -46,7 +46,7 @@ public abstract class BaitAbility extends CooldownInteraction implements Display
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return 5.0;
     }
 

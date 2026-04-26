@@ -62,7 +62,7 @@ public class CannonPlaceAbility extends CooldownInteraction implements Displayed
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

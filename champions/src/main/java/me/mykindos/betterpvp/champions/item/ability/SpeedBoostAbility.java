@@ -54,7 +54,7 @@ public class SpeedBoostAbility extends CooldownInteraction implements DisplayedI
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

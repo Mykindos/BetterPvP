@@ -69,7 +69,7 @@ public class MeridianBeamAbility extends CooldownInteraction implements Displaye
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

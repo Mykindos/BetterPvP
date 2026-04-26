@@ -66,7 +66,7 @@ public class ThrowingWebAbility extends CooldownInteraction implements Throwable
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

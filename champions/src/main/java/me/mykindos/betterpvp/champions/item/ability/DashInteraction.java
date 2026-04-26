@@ -63,7 +63,7 @@ public class DashInteraction extends CooldownInteraction implements DisplayedInt
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return 0;
     }
 

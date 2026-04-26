@@ -56,7 +56,7 @@ public class EffectRouletteAbility extends CooldownInteraction implements Displa
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 
