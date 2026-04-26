@@ -41,9 +41,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
@@ -59,6 +59,12 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
             throw new RuntimeException(e);
         }
     }
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("gui-item-viewer-search");
+        return thread;
+    });
 
     private final ItemFactory itemFactory;
     private final RecipeRegistries recipeRegistries;
@@ -118,20 +124,6 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
             // do heavy work off-thread
             final Map<NamespacedKey, BaseItem> pool = itemFactory.getItemRegistry().getItemsSorted();
 
-            // Collect all BaseItems that are craftable (are the result of a recipe)
-            Set<BaseItem> craftableItems = recipeRegistries.getRecipes().stream()
-                    .map(recipe -> {
-                        Object result = recipe.getPrimaryResult();
-                        if (result instanceof BaseItem baseItem) {
-                            return baseItem;
-                        } else if (result instanceof ItemInstance itemInstance) {
-                            return itemInstance.getBaseItem();
-                        }
-                        return null;
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(java.util.stream.Collectors.toSet());
-
             // sort entries by key (case-insensitive, key only)
             List<Map.Entry<NamespacedKey, BaseItem>> entries = new ArrayList<>(pool.entrySet());
             entries.sort(Comparator.comparing(
@@ -151,8 +143,6 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
                     continue;
                 }
 
-                //if(!craftableItems.contains(entry.getValue())) continue;
-
                 ItemInstance instance = itemFactory.create(entry.getValue());
                 if (raritySearch == null || instance.getRarity() == raritySearch) {
                     result.add(instance);
@@ -161,7 +151,7 @@ public class GuiItemViewer extends AbstractPagedGui<ItemInstance> implements Win
             }
 
             return result;
-        }).exceptionally(ex -> {
+        }, executor).exceptionally(ex -> {
             log.error("Failed to refresh item viewer", ex).submit();
             return null;
         }).thenAccept(result -> {
