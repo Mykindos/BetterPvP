@@ -4,16 +4,11 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients.ClientsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.PunishmentsRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -36,6 +31,10 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -112,7 +111,7 @@ public class Punishments extends TableImpl<PunishmentsRecord> {
     /**
      * The column <code>public.punishments.revoke_time</code>.
      */
-    public final TableField<PunishmentsRecord, Long> REVOKE_TIME = createField(DSL.name("revoke_time"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.field(DSL.raw("'-1'::integer"), SQLDataType.BIGINT)), this, "");
+    public final TableField<PunishmentsRecord, Long> REVOKE_TIME = createField(DSL.name("revoke_time"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.field(DSL.raw("'-1'::bigint"), SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>public.punishments.revoke_reason</code>.

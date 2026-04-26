@@ -4,9 +4,6 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
@@ -45,6 +42,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
+import me.mykindos.betterpvp.core.database.jooq.tables.PlayerActivitySnapshots;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
@@ -69,13 +67,15 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakR
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchievementCompletionsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
-
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -892,6 +892,11 @@ public class Public extends SchemaImpl {
     public final OfflineMessages OFFLINE_MESSAGES = OfflineMessages.OFFLINE_MESSAGES;
 
     /**
+     * The table <code>public.player_activity_snapshots</code>.
+     */
+    public final PlayerActivitySnapshots PLAYER_ACTIVITY_SNAPSHOTS = PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS;
+
+    /**
      * The table <code>public.property_map</code>.
      */
     public final PropertyMap PROPERTY_MAP = PropertyMap.PROPERTY_MAP;
@@ -990,6 +995,7 @@ public class Public extends SchemaImpl {
             Logs.LOGS,
             LogsContext.LOGS_CONTEXT,
             OfflineMessages.OFFLINE_MESSAGES,
+            PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS,
             PropertyMap.PROPERTY_MAP,
             Punishments.PUNISHMENTS,
             Realms.REALMS,

@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
+import me.mykindos.betterpvp.core.database.jooq.tables.PlayerActivitySnapshots;
 import me.mykindos.betterpvp.core.database.jooq.tables.PropertyMap;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms;
@@ -59,6 +60,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.KillsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.LogsContextRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.LogsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.OfflineMessagesRecord;
+import me.mykindos.betterpvp.core.database.jooq.tables.records.PlayerActivitySnapshotsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.PropertyMapRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.PunishmentsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.RealmsRecord;
@@ -68,7 +70,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.SmartBlockDataRec
 import me.mykindos.betterpvp.core.database.jooq.tables.records.UuiditemsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsMetadataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -116,10 +117,12 @@ public class Keys {
     public static final UniqueKey<KillsRecord> KILLS_PKEY = Internal.createUniqueKey(Kills.KILLS, DSL.name("kills_pkey"), new TableField[] { Kills.KILLS.ID }, true);
     public static final UniqueKey<LogsRecord> LOGS_PKEY = Internal.createUniqueKey(Logs.LOGS, DSL.name("logs_pkey"), new TableField[] { Logs.LOGS.ID }, true);
     public static final UniqueKey<OfflineMessagesRecord> OFFLINE_MESSAGES_PKEY = Internal.createUniqueKey(OfflineMessages.OFFLINE_MESSAGES, DSL.name("offline_messages_pkey"), new TableField[] { OfflineMessages.OFFLINE_MESSAGES.ID }, true);
+    public static final UniqueKey<PlayerActivitySnapshotsRecord> PLAYER_ACTIVITY_SNAPSHOTS_PKEY = Internal.createUniqueKey(PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS, DSL.name("player_activity_snapshots_pkey"), new TableField[] { PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS.ID }, true);
     public static final UniqueKey<PropertyMapRecord> PROPERTY_MAP_PKEY = Internal.createUniqueKey(PropertyMap.PROPERTY_MAP, DSL.name("property_map_pkey"), new TableField[] { PropertyMap.PROPERTY_MAP.PROPERTY, PropertyMap.PROPERTY_MAP.TYPE }, true);
     public static final UniqueKey<PunishmentsRecord> PUNISHMENTS_PKEY = Internal.createUniqueKey(Punishments.PUNISHMENTS, DSL.name("punishments_pkey"), new TableField[] { Punishments.PUNISHMENTS.ID }, true);
     public static final UniqueKey<RealmsRecord> REALMS_PKEY = Internal.createUniqueKey(Realms.REALMS, DSL.name("realms_pkey"), new TableField[] { Realms.REALMS.ID }, true);
     public static final UniqueKey<RealmsRecord> REALMS_SERVER_SEASON_NAME_UNIQUE = Internal.createUniqueKey(Realms.REALMS, DSL.name("realms_server_season_name_unique"), new TableField[] { Realms.REALMS.SERVER, Realms.REALMS.SEASON }, true);
+    public static final UniqueKey<SeasonsRecord> SEASONS_NAME_UK = Internal.createUniqueKey(Seasons.SEASONS, DSL.name("seasons_name_uk"), new TableField[] { Seasons.SEASONS.NAME }, true);
     public static final UniqueKey<SeasonsRecord> SEASONS_PKEY = Internal.createUniqueKey(Seasons.SEASONS, DSL.name("seasons_pkey"), new TableField[] { Seasons.SEASONS.ID }, true);
     public static final UniqueKey<ServersRecord> SERVERS_ID_UNIQUE = Internal.createUniqueKey(Servers.SERVERS, DSL.name("servers_id_unique"), new TableField[] { Servers.SERVERS.ID }, true);
     public static final UniqueKey<ServersRecord> SERVERS_PKEY = Internal.createUniqueKey(Servers.SERVERS, DSL.name("servers_pkey"), new TableField[] { Servers.SERVERS.NAME }, true);

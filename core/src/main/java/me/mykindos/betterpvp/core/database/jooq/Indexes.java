@@ -16,10 +16,10 @@ import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
 import me.mykindos.betterpvp.core.database.jooq.tables.Logs;
 import me.mykindos.betterpvp.core.database.jooq.tables.LogsContext;
 import me.mykindos.betterpvp.core.database.jooq.tables.OfflineMessages;
+import me.mykindos.betterpvp.core.database.jooq.tables.PlayerActivitySnapshots;
 import me.mykindos.betterpvp.core.database.jooq.tables.Punishments;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogs;
 import me.mykindos.betterpvp.core.database.jooq.tables.WorldLogsMetadata;
-
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;
@@ -52,6 +52,8 @@ public class Indexes {
     public static final Index IDX_LOGS_SERVER_ACTION = Internal.createIndex(DSL.name("idx_logs_server_action"), Logs.LOGS, new OrderField[] { Logs.LOGS.REALM, Logs.LOGS.ACTION }, false);
     public static final Index IDX_OFFLINE_MESSAGES_CLIENT = Internal.createIndex(DSL.name("idx_offline_messages_client"), OfflineMessages.OFFLINE_MESSAGES, new OrderField[] { OfflineMessages.OFFLINE_MESSAGES.CLIENT }, false);
     public static final Index IDX_OFFLINE_MESSAGES_TIME = Internal.createIndex(DSL.name("idx_offline_messages_time"), OfflineMessages.OFFLINE_MESSAGES, new OrderField[] { OfflineMessages.OFFLINE_MESSAGES.TIME_SENT }, false);
+    public static final Index IDX_PAS_CHUNK = Internal.createIndex(DSL.name("idx_pas_chunk"), PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS, new OrderField[] { PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS.WORLD, PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS.CHUNK_X, PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS.CHUNK_Z }, false);
+    public static final Index IDX_PAS_WORLD_TIME = Internal.createIndex(DSL.name("idx_pas_world_time"), PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS, new OrderField[] { PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS.WORLD, PlayerActivitySnapshots.PLAYER_ACTIVITY_SNAPSHOTS.RECORDED_AT }, false);
     public static final Index IDX_PUNISHMENTS_CLIENT = Internal.createIndex(DSL.name("idx_punishments_client"), Punishments.PUNISHMENTS, new OrderField[] { Punishments.PUNISHMENTS.CLIENT }, false);
     public static final Index IDX_STAT_CLIENT = Internal.createIndex(DSL.name("idx_stat_client"), ClientStats.CLIENT_STATS, new OrderField[] { ClientStats.CLIENT_STATS.CLIENT }, false);
     public static final Index IDX_TEAMS = Internal.createIndex(DSL.name("idx_teams"), GameTeams.GAME_TEAMS, new OrderField[] { GameTeams.GAME_TEAMS.ID, GameTeams.GAME_TEAMS.CLIENT }, false);
