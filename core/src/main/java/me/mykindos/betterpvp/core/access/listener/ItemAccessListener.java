@@ -26,6 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -76,6 +77,17 @@ public class ItemAccessListener implements Listener {
     private record ThrottleKey(UUID playerId, Key itemKey) { }
 
     // USE scope
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onUse(BlockDamageEvent event) {
+        Player player = event.getPlayer();
+        ItemStack itemStack = event.getItemInHand();
+        if (itemStack.getType().isAir()) return;
+
+        checkAndDeny(player, itemStack, AccessScope.USE, cancelled -> {
+            if (cancelled) event.setCancelled(true);
+        });
+    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onInteract(PlayerInteractEvent event) {
