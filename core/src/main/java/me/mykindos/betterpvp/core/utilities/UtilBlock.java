@@ -4,8 +4,6 @@ import com.google.common.base.Preconditions;
 import com.jeff_media.morepersistentdatatypes.DataType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
@@ -25,10 +23,11 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.block.CraftBlock;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BlockIterator;
@@ -39,9 +38,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -795,41 +796,140 @@ public class UtilBlock {
         return chunk.getBlock((int) x, (int) y, (int) z);
     }
 
-    /**
-     * Breaks a block naturally as if a player mined it, dropping its appropriate items and playing
-     * the corresponding sound effects. Handles effect-based logic, such as item reservation, if
-     * applicable.
-     *
-     * @param block the block to be broken, must not be null
-     * @param player the player responsible for breaking the block, must not be null
-     * @param effectManager the manager for handling effects on the player, must not be null
-     */
-    public static void breakBlockNaturally(@NotNull Block block, @NotNull Player player, EffectManager effectManager) {
-        final Location location = block.getLocation();
-        final World world = location.getWorld();
-        final List<Item> drops = block.getDrops(player.getInventory().getItemInMainHand(), player).stream()
-                .map(itemStack -> world.dropItemNaturally(location, itemStack))
-                .toList();
-
-        final BlockState state = ((CraftBlock) block).getNMS();
-        block.setType(Material.AIR, true);
-        // copied from NMS
+    public static void playBlockEffect(@NotNull Block block, @NotNull BlockData data) {
+        // Capture NMS state BEFORE the block is broken — it becomes air after Player#breakBlock.
+        final BlockState capturedState = ((CraftBlockData) data).getState();
         final LevelAccessor nmsWorld = ((CraftBlock) block).getHandle();
         final BlockPos position = ((CraftBlock) block).getPosition();
-        if (state.getBlock() instanceof BaseFireBlock) {
+        if (capturedState.getBlock() instanceof BaseFireBlock) {
             nmsWorld.levelEvent(1009, position, 0);
         } else {
-            nmsWorld.levelEvent(2001, position, net.minecraft.world.level.block.Block.getId(state));
+            nmsWorld.levelEvent(2001, position, net.minecraft.world.level.block.Block.getId(capturedState));
         }
+    }
 
-        boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
-        if (isProtected) {
-            drops.forEach(item -> UtilItem.reserveItem(item, player, 10.0));
+    /**
+     * Breaks the given block as if the player mined it. Fires {@link BlockBreakEvent}
+     * via {@link Player#breakBlock(Block)}, which respects vanilla protections, drops items naturally,
+     * and applies tool durability. On success, plays the vanilla block-break particle and sound effect
+     * via the same NMS {@code levelEvent} call.
+     *
+     * @param player the player breaking the block
+     * @param block  the block to break
+     * @return {@code true} if the block was broken; {@code false} if cancelled or already air
+     */
+    public static boolean breakBlock(@NotNull Player player, @NotNull Block block) {
+        if (block.getType().isAir()) return false;
+        // Capture state BEFORE the block is broken — it becomes air after Player#breakBlock.
+        final BlockData data = block.getBlockData();
+        final boolean broken = player.breakBlock(block);
+        if (broken) {
+            playBlockEffect(block, data);
         }
+        return broken;
     }
 
     public static boolean isPressurePlate(Block block) {
         return block.getType().name().endsWith("_PLATE");
+    }
+
+    /**
+     * Set of materials considered "stone-family" for mining interactions.
+     * Includes base stone variants, deepslate, tuff, nether/end variants, and all ore blocks.
+     */
+    private static final Set<Material> STONE_BASED_MATERIALS = EnumSet.of(
+            // Base stone variants
+            Material.STONE,
+            Material.COBBLESTONE,
+            Material.DEEPSLATE,
+            Material.COBBLED_DEEPSLATE,
+            Material.TUFF,
+            Material.ANDESITE,
+            Material.GRANITE,
+            Material.DIORITE,
+            Material.CALCITE,
+            Material.DRIPSTONE_BLOCK,
+            // Nether variants
+            Material.NETHERRACK,
+            Material.BLACKSTONE,
+            Material.BASALT,
+            Material.SMOOTH_BASALT,
+            // End
+            Material.END_STONE,
+            // Overworld ores
+            Material.COAL_ORE,
+            Material.IRON_ORE,
+            Material.COPPER_ORE,
+            Material.GOLD_ORE,
+            Material.REDSTONE_ORE,
+            Material.LAPIS_ORE,
+            Material.DIAMOND_ORE,
+            Material.EMERALD_ORE,
+            // Nether ores
+            Material.NETHER_GOLD_ORE,
+            Material.NETHER_QUARTZ_ORE,
+            Material.GILDED_BLACKSTONE,
+            // Deepslate ores
+            Material.DEEPSLATE_COAL_ORE,
+            Material.DEEPSLATE_IRON_ORE,
+            Material.DEEPSLATE_COPPER_ORE,
+            Material.DEEPSLATE_GOLD_ORE,
+            Material.DEEPSLATE_REDSTONE_ORE,
+            Material.DEEPSLATE_LAPIS_ORE,
+            Material.DEEPSLATE_DIAMOND_ORE,
+            Material.DEEPSLATE_EMERALD_ORE
+    );
+
+    /**
+     * Returns true if the block's material belongs to the stone family
+     * (stone variants, deepslate, tuff, nether/end stone, and all natural ore variants).
+     *
+     * @param block the block to check, must not be null
+     * @return {@code true} if the block is stone-family, otherwise {@code false}
+     */
+    public static boolean isStoneBased(Block block) {
+        return STONE_BASED_MATERIALS.contains(block.getType());
+    }
+
+    /**
+     * Scans a {@code (2*radius+1)^3} cube around {@code center} and returns {@code true}
+     * if the fraction of stone-based blocks is at least {@code threshold}.
+     *
+     * @param center    the center location, must not be null
+     * @param radius    the scan radius (half-extent per axis)
+     * @param threshold the minimum fraction of stone-based blocks required (0.0–1.0)
+     * @return {@code true} if the stone-based fraction meets the threshold
+     */
+    public static boolean isUnderground(Location center, int radius, double threshold) {
+        int total = 0;
+        int stoneCount = 0;
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dy = -radius; dy <= radius; dy++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    Block block = center.getWorld().getBlockAt(
+                            center.getBlockX() + dx,
+                            center.getBlockY() + dy,
+                            center.getBlockZ() + dz);
+                    total++;
+                    if (isStoneBased(block)) {
+                        stoneCount++;
+                    }
+                }
+            }
+        }
+        if (total == 0) return false;
+        return (double) stoneCount / total >= threshold;
+    }
+
+    /**
+     * Convenience overload that checks whether a location is underground using
+     * a radius of 2 and a threshold of 0.55 (55% of the surrounding volume must be stone-based).
+     *
+     * @param center the center location, must not be null
+     * @return {@code true} if the location is considered underground
+     */
+    public static boolean isUnderground(Location center) {
+        return isUnderground(center, 3, 0.35);
     }
 
     /**
@@ -887,5 +987,4 @@ public class UtilBlock {
         blockPdcs.put(getBlockKey(block), container);
         chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.LONG, PersistentDataType.TAG_CONTAINER), blockPdcs);
     }
-
 }

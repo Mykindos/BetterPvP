@@ -84,7 +84,7 @@ public class ProtectionListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockBreak(BlockDropItemEvent event) {
         if (event.isCancelled()) return;
         if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;

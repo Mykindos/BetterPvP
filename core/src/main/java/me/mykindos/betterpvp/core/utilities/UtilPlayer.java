@@ -40,6 +40,7 @@ public class UtilPlayer {
      * @param player the player whose world border is to be modified
      * @param ticks the duration in ticks for the warning time delay
      */
+
     public static void setWarningEffect(Player player, int ticks) {
         final WorldBorder curBorder = player.getWorld().getWorldBorder();
         final WorldBorder newWorldBorder = Bukkit.getServer().createWorldBorder();
