@@ -121,7 +121,7 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
             Block blockToFell = blocksToFell.get(i);
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
                 if (isBreakableLog(blockToFell, initialLogLocation)) {
-                    UtilBlock.breakBlockNaturally(blockToFell, player, effectManager);
+                    UtilBlock.breakBlock(player, blockToFell);
                     UtilItem.damageItem(player, itemInMainHand, 1);
                 }
             }, (long) (i * 0.3));
