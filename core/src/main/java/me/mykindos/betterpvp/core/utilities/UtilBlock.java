@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.SoundCategory;
-import org.bukkit.SoundGroup;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -22,6 +24,7 @@ import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -807,9 +810,18 @@ public class UtilBlock {
         final List<Item> drops = block.getDrops(player.getInventory().getItemInMainHand(), player).stream()
                 .map(itemStack -> world.dropItemNaturally(location, itemStack))
                 .toList();
-        final SoundGroup soundGroup = block.getBlockData().getSoundGroup();
+
+        final BlockState state = ((CraftBlock) block).getNMS();
         block.setType(Material.AIR, true);
-        world.playSound(location, soundGroup.getBreakSound(), SoundCategory.BLOCKS, 1.0f, 1.0f);
+        // copied from NMS
+        final LevelAccessor nmsWorld = ((CraftBlock) block).getHandle();
+        final BlockPos position = ((CraftBlock) block).getPosition();
+        if (state.getBlock() instanceof BaseFireBlock) {
+            nmsWorld.levelEvent(1009, position, 0);
+        } else {
+            nmsWorld.levelEvent(2001, position, net.minecraft.world.level.block.Block.getId(state));
+        }
+
         boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
         if (isProtected) {
             drops.forEach(item -> UtilItem.reserveItem(item, player, 10.0));

@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockMatcher;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
@@ -23,7 +24,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -52,15 +52,18 @@ public class InstantMineInteraction extends CooldownInteraction implements Displ
 
     @Setter private double cooldown;
     @Setter private double duration;
+    @Setter private BlockMatcher targetBlocks;
     private final ClientManager clientManager;
     private final ItemFactory itemFactory;
     private final Progression plugin;
 
     public InstantMineInteraction(CooldownManager cooldownManager, ClientManager clientManager,
-                                   ItemFactory itemFactory, double cooldown, double duration) {
+                                   ItemFactory itemFactory, double cooldown, double duration,
+                                   BlockMatcher targetBlocks) {
         super("Instant Mine", cooldownManager);
         this.cooldown = cooldown;
         this.duration = duration;
+        this.targetBlocks = targetBlocks;
         this.clientManager = clientManager;
         this.itemFactory = itemFactory;
         this.plugin = JavaPlugin.getPlugin(Progression.class);
@@ -168,16 +171,12 @@ public class InstantMineInteraction extends CooldownInteraction implements Displ
 
     private class InstantMineListener implements Listener {
 
-        private boolean isTooHard(Block block) {
-            return block.getType().getHardness() >= Material.OBSIDIAN.getHardness();
-        }
-
         @EventHandler(priority = EventPriority.NORMAL)
         public void onBlockDamage(BlockDamageEvent event) {
             Player player = event.getPlayer();
             if (!isActive(player.getUniqueId())) return;
             if (!isHoldingSourceItem(player)) return;
-            if (isTooHard(event.getBlock())) return;
+            if (!targetBlocks.matches(event.getBlock())) return;
             event.setInstaBreak(true);
             new SoundEffect(Sound.BLOCK_LAVA_POP).play(event.getBlock().getLocation());
             new SoundEffect(Sound.BLOCK_AMETHYST_BLOCK_RESONATE).play(event.getBlock().getLocation());
@@ -188,7 +187,7 @@ public class InstantMineInteraction extends CooldownInteraction implements Displ
             Player player = event.getPlayer();
             if (!isActive(player.getUniqueId())) return;
             if (!isHoldingSourceItem(player)) return;
-            if (isTooHard(event.getBlock())) return;
+            if (!targetBlocks.matches(event.getBlock())) return;
 
             // Spawn particles to make it more visually appealing
             Block block = event.getBlock();

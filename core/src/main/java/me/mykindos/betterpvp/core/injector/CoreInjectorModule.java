@@ -9,6 +9,12 @@ import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
+import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRules;
+import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRulesImpl;
+import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgressService;
+import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgressServiceImpl;
+import me.mykindos.betterpvp.core.framework.blockbreak.resolver.BlockBreakResolver;
+import me.mykindos.betterpvp.core.framework.blockbreak.resolver.DefaultBlockBreakResolver;
 import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.VelocityCrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
@@ -35,6 +41,9 @@ public class CoreInjectorModule extends AbstractModule {
         bind(CrossServerMessageService.class).to(VelocityCrossServerMessageService.class);
         bind(NetworkPlayerCountService.class).to(PluginMessagingNetworkPlayerCountService.class);
         bind(OrchestrationGateway.class).toProvider(CoreOrchestrationGatewayProvider.class);
+        bind(GlobalBlockBreakRules.class).to(GlobalBlockBreakRulesImpl.class);
+        bind(BlockBreakResolver.class).to(DefaultBlockBreakResolver.class);
+        bind(BlockBreakProgressService.class).to(BlockBreakProgressServiceImpl.class);
         log.info("Using default integrations").submit();
     }
 }

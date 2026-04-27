@@ -5,6 +5,10 @@ import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.framework.blockbreak.component.ToolComponent;
+import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakProperties;
+import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
+import me.mykindos.betterpvp.core.framework.blockbreak.rule.preset.BlockGroups;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
@@ -39,11 +43,15 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
                 ItemGroup.TOOL,
                 ItemRarity.EPIC);
         this.progression = progression;
-        this.instantMineInteraction = new InstantMineInteraction(cooldownManager, clientManager, itemFactory, 20.0, 7.0);
+        this.instantMineInteraction = new InstantMineInteraction(cooldownManager, clientManager, itemFactory,
+                20.0, 7.0, BlockGroups.STONES);
 
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.RIGHT_CLICK, instantMineInteraction)
                 .build());
+
+        addBaseComponent(new ToolComponent()
+                .addRule(BlockBreakRule.of(BlockGroups.STONES, BlockBreakProperties.breakable(180))));
     }
 
     @Override
