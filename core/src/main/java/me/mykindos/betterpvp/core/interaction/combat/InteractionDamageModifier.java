@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.interaction.combat;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.With;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
@@ -18,34 +19,36 @@ import me.mykindos.betterpvp.core.interaction.Interaction;
 public class InteractionDamageModifier implements DamageModifier {
     
     protected final Interaction interaction;
-    protected final DamageOperator operator;
+    @Getter
+    protected final DamageOperator damageOperator;
     @With
     protected ModifierType modifierType = ModifierType.ABILITY;
-    protected final double operand;
+    @Getter
+    protected final double damageOperand;
     protected final int priority;
     
     /**
      * Creates an item interaction damage modifier
      * @param interaction the item interaction this modifier is for
-     * @param operator the damage operator
-     * @param operand the damage operand
+     * @param damageOperator the damage operator
+     * @param damageOperand the damage operand
      * @param priority the priority of this modifier
      */
-    public InteractionDamageModifier(Interaction interaction, DamageOperator operator, double operand, int priority) {
+    public InteractionDamageModifier(Interaction interaction, DamageOperator damageOperator, double damageOperand, int priority) {
         this.interaction = interaction;
-        this.operator = operator;
+        this.damageOperator = damageOperator;
         this.priority = priority;
-        this.operand = operand;
+        this.damageOperand = damageOperand;
     }
     
     /**
      * Creates a item interaction damage modifier with default priority
      * @param interaction the item interaction this modifier is for
-    * @param operator the damage operator
-    * @param operand the damage operand
+    * @param damageOperator the damage operator
+    * @param damageOperand the damage operand
      */
-    public InteractionDamageModifier(Interaction interaction, DamageOperator operator, double operand) {
-        this(interaction, operator, operand, 300);
+    public InteractionDamageModifier(Interaction interaction, DamageOperator damageOperator, double damageOperand) {
+        this(interaction, damageOperator, damageOperand, 300);
     }
     
     @Override
@@ -76,7 +79,7 @@ public class InteractionDamageModifier implements DamageModifier {
     
     @Override
     public ModifierResult apply(DamageEvent event) {
-        return new ModifierResult(operand, operator, interaction.getName());
+        return new ModifierResult(damageOperand, damageOperator, interaction.getName());
     }
     
     @Override

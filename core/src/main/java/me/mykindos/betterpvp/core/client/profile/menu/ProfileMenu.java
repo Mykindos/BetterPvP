@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.client.profile.menu;
 
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
-import me.mykindos.betterpvp.core.client.achievements.display.AchievementMenu;
+import me.mykindos.betterpvp.core.client.achievements.display.AchievementScopeMenu;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.RealmManager;
@@ -109,7 +109,7 @@ public class ProfileMenu extends AbstractGui implements Windowed {
 
         @Override
         public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-            new AchievementMenu(client, null, StatFilterType.ALL, null, achievementManager, realmManager, ProfileMenu.this).show(player);
+            new AchievementScopeMenu(client, achievementManager, realmManager, ProfileMenu.this).show(player);
         }
     }
 

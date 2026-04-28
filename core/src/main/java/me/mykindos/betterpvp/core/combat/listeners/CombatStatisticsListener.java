@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.combat.listeners;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.core.DamageModifierStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.DamageStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.Type;
@@ -64,8 +65,20 @@ public class CombatStatisticsListener implements Listener {
                 .relation(Relation.RECEIVED)
                 .damageCause(event.getCause());
 
-        clientManager.incrementStat(damagee, builder.type(Type.COUNT).build(), 1);
+        clientManager.incrementStat(damagee, builder.type(Type.COUNT).build(), 1L);
         clientManager.incrementStat(damagee, builder.type(Type.AMOUNT).build(), event.getDamage());
+
+        event.getModifiers().values().forEach(modifier -> {
+            final DamageModifierStat damageModifierStat = DamageModifierStat.builder()
+                    .relation(Relation.RECEIVED)
+                    .name(modifier.getName())
+                    .damageOperator(modifier.getDamageOperator())
+                    .modifierType(modifier.getType())
+                    .damageOperand(modifier.getDamageOperand())
+                    .damageCause(event.getCause())
+                    .build();
+            clientManager.incrementStat(damagee, damageModifierStat, 1L);
+        });
     }
     
     /**
@@ -80,8 +93,22 @@ public class CombatStatisticsListener implements Listener {
                 .relation(Relation.DEALT)
                 .damageCause(event.getCause());
 
-        clientManager.incrementStat(damager, builder.type(Type.COUNT).build(), 1);
+        clientManager.incrementStat(damager, builder.type(Type.COUNT).build(), 1L);
         clientManager.incrementStat(damager, builder.type(Type.AMOUNT).build(), event.getDamage());
+
+        event.getModifiers().values().forEach(modifier -> {
+            final DamageModifierStat damageModifierStat = DamageModifierStat.builder()
+                    .relation(Relation.DEALT)
+                    .name(modifier.getName())
+                    .damageOperator(modifier.getDamageOperator())
+                    .modifierType(modifier.getType())
+                    .damageOperand(modifier.getDamageOperand())
+                    .damageCause(event.getCause())
+                    .build();
+
+            clientManager.incrementStat(damager, damageModifierStat, 1L);
+        });
+
     }
     
     /**
