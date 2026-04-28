@@ -50,8 +50,10 @@ public class RiftPickaxeProjectile extends Projectile {
     private final int maxBounces;
     private final ItemDisplay itemDisplay;
     private final Supplier<Material> oreSupplier;
+    private final ExplosiveExcavationInteraction explosiveExcavation;
 
     public RiftPickaxeProjectile(
+            ExplosiveExcavationInteraction explosiveExcavation,
             Player caster,
             double hitboxSize,
             Location location,
@@ -63,6 +65,7 @@ public class RiftPickaxeProjectile extends Projectile {
             int maxBounces,
             Supplier<Material> oreSupplier) {
         super(caster, hitboxSize, location, aliveTime);
+        this.explosiveExcavation = explosiveExcavation;
         this.explosionRadius = explosionRadius;
         this.explosionIntervalMillis = explosionIntervalMillis;
         this.oreChance = oreChance;
@@ -88,7 +91,7 @@ public class RiftPickaxeProjectile extends Projectile {
         if (recalled) return;
         recalled = true;
         recallTime = System.currentTimeMillis();
-        new SoundEffect(Sound.ITEM_TOTEM_USE, 2.0f, 0.8f).play(getLocation());
+        new SoundEffect(Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 0.8f).play(getLocation());
     }
 
     @Override
@@ -99,15 +102,16 @@ public class RiftPickaxeProjectile extends Projectile {
         // Spawn trail particles along the interpolated line
         final Collection<Player> receivers = location.getNearbyPlayers(60);
         for (Location point : interpolateLine()) {
-            Particle.END_ROD.builder()
+            Particle.NAUTILUS.builder()
                     .count(1)
                     .extra(0.1)
                     .offset(0.05, 0.05, 0.05)
                     .location(point)
                     .receivers(receivers)
                     .spawn();
-            Particle.CRIT.builder()
+            Particle.ENCHANTED_HIT.builder()
                     .count(2)
+                    .extra(0.1)
                     .offset(0.1, 0.1, 0.1)
                     .location(point)
                     .receivers(receivers)
@@ -117,13 +121,15 @@ public class RiftPickaxeProjectile extends Projectile {
         // Fire explosion at interval
         long now = System.currentTimeMillis();
         if (now - lastExplosionTime >= explosionIntervalMillis && UtilBlock.isUnderground(location)) {
-            ExplosiveExcavationInteraction.detonate(caster, location, explosionRadius, oreChance, oreSupplier);
+            explosiveExcavation.detonate(caster, location, explosionRadius, oreChance, oreSupplier);
             lastExplosionTime = now;
         }
 
         if (!recalled) {
-            new SoundEffect(Sound.ITEM_TRIDENT_RETURN, 1.2f, 0.4f).play(getLocation());
+            new SoundEffect(Sound.BLOCK_BEACON_POWER_SELECT, 2.0f, 0.4f).play(getLocation());
             return;
+        } else {
+            new SoundEffect(Sound.BLOCK_BEACON_POWER_SELECT, 1.2f, 0.2f).play(getLocation());
         }
 
         // Recalled: move toward caster's midpoint
@@ -151,7 +157,8 @@ public class RiftPickaxeProjectile extends Projectile {
         // Check if we hit an unbreakable surface
         final Block hitBlock = result.getHitBlock();
         if (hitBlock != null) {
-            ExplosiveExcavationInteraction.detonate(caster, location, explosionRadius, oreChance, oreSupplier);
+            new SoundEffect(Sound.ENTITY_BEE_HURT, 2.0f, 0.4f).play(getLocation());
+            explosiveExcavation.detonate(caster, location, explosionRadius, oreChance, oreSupplier);
             bounces++;
             // After exhausting bounces, stop reflecting and start the return flight so the
             // projectile cleans itself up via the existing recall path instead of pinballing.
@@ -168,10 +175,10 @@ public class RiftPickaxeProjectile extends Projectile {
 
     public void remove() {
         itemDisplay.remove();
-        Particle.GUST.builder()
-                .count(1)
+        Particle.ELECTRIC_SPARK.builder()
+                .count(10)
                 .extra(0.3)
-                .offset(0.3, 0.3, 0.3)
+                .offset(1.5, 1.5, 1.5)
                 .location(location)
                 .receivers(60)
                 .spawn();

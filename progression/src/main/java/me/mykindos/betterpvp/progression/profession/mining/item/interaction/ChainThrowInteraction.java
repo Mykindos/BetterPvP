@@ -55,6 +55,7 @@ public class ChainThrowInteraction extends CooldownInteraction implements Displa
     private boolean allowRecall;
 
     private final BaseItem heldItem;
+    private final ExplosiveExcavationInteraction explosiveExcavation;
     private final ItemFactory itemFactory;
     private final Map<Player, RiftPickaxeProjectile> projectiles = new HashMap<>();
 
@@ -68,11 +69,13 @@ public class ChainThrowInteraction extends CooldownInteraction implements Displa
     @Setter
     private Supplier<Material> oreSupplier = () -> null;
 
-    public ChainThrowInteraction(CooldownManager cooldownManager, ItemFactory itemFactory, BaseItem heldItem,
-                                  double cooldown, double aliveTime, double speed,
-                                  double explosionInterval, int explosionRadius, double oreChance,
-                                  int maxBounces, boolean allowRecall) {
+    public ChainThrowInteraction(ExplosiveExcavationInteraction explosiveExcavation, CooldownManager cooldownManager,
+                                 ItemFactory itemFactory, BaseItem heldItem,
+                                 double cooldown, double aliveTime, double speed,
+                                 double explosionInterval, int explosionRadius, double oreChance,
+                                 int maxBounces, boolean allowRecall) {
         super("Chain Throw", cooldownManager);
+        this.explosiveExcavation = explosiveExcavation;
         this.heldItem = heldItem;
         this.itemFactory = itemFactory;
         this.cooldown = cooldown;
@@ -152,6 +155,7 @@ public class ChainThrowInteraction extends CooldownInteraction implements Displa
         final ItemStack displayItem = itemInstance.createItemStack();
 
         final RiftPickaxeProjectile projectile = new RiftPickaxeProjectile(
+                explosiveExcavation,
                 caster,
                 0.3,
                 caster.getEyeLocation().add(caster.getLocation().getDirection().multiply(0.5)),
@@ -203,6 +207,11 @@ public class ChainThrowInteraction extends CooldownInteraction implements Displa
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Hurl the pickaxe forward, detonating the path. Returns after 4 seconds or on impact with an unbreakable surface.");
+        return Component.empty()
+                .append(Component.text("Hurl the pickaxe forward, triggering"))
+                .appendSpace()
+                .append(explosiveExcavation.getDisplayName())
+                .appendSpace()
+                .append(Component.text("every bounce. Press again to recall it."));
     }
 }
