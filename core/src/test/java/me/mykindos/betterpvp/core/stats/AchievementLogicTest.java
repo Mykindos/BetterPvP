@@ -162,7 +162,7 @@ class AchievementLogicTest {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
 
-        statsMap.put(null, watchedStat, 50L, true); // allMap: stat → 50
+        statsMap.put(realm, watchedStat, 50L, true); // seed via a real realm; reads still use StatFilterType.ALL aggregation
 
         StatPropertyUpdateEvent event = makeEvent(watchedStat, 50L, 0L);
         achievement.onPropertyChangeListener(event);
@@ -212,7 +212,7 @@ class AchievementLogicTest {
         achievement.setEnabled(true);
 
         // container currently reports 70 for watchedStat (after the increment)
-        statsMap.put(null, watchedStat, 70L, true);
+        statsMap.put(realm, watchedStat, 70L, true);
         // raw delta = newValue - oldValue = 70 - 20 = 50
         StatPropertyUpdateEvent event = makeEvent(watchedStat, 70L, 20L);
         achievement.onPropertyChangeListener(event);

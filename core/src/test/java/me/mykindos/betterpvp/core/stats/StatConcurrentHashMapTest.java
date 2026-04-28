@@ -58,7 +58,7 @@ class StatConcurrentHashMapTest {
         lenient().when(stat2.getStatType()).thenReturn("stat2");
     }
 
-    // ── put ──────────���───────────────────────────────────────────────────────
+    // put
 
     @Test
     @DisplayName("put: primary map is updated")
@@ -243,7 +243,7 @@ class StatConcurrentHashMapTest {
         assertEquals(50L, dest.get(StatFilterType.REALM, realm, stat1));
     }
 
-    // ── concurrent correctness ──────────────────────────────────────���─────────
+    // ── concurrent correctness ─────────────────────────────────────────────
 
     @Test
     @DisplayName("concurrent increases from many threads produce correct totals")

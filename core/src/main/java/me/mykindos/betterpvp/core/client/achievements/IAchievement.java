@@ -253,7 +253,7 @@ public interface IAchievement {
     /**
      * Periodically called to catch completions that may have been missed by the event-driven path
      * (e.g. newly registered achievements, or players that already met requirements before the achievement existed).
-     * Default implementation is a no-op; override in {@link Achievement}.
+     * Implementations should provide any forced completion-check logic required for the achievement.
      * @param container the stat container to check
      */
     void forceCheck(final StatContainer container);
