@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.achievements.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -12,6 +13,7 @@ import org.bukkit.event.Listener;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class AchievementListener implements Listener {
 
     private final AchievementManager achievementManager;
@@ -41,9 +43,13 @@ public class AchievementListener implements Listener {
     @UpdateEvent(delay = 1000L * 60 * 5, isAsync = true)
     public void periodicAchievementCheck() {
         clientManager.getOnline().forEach(client ->
-                achievementManager.getObjects().values().forEach(achievement ->
-                        achievement.forceCheck(client.getStatContainer())
-                )
+                achievementManager.getObjects().values().forEach(achievement -> {
+                    try {
+                        achievement.forceCheck(client.getStatContainer());
+                    } catch (Exception e) {
+                        log.error("Error while force-checking achievement {} for client {}: ", achievement.getNamespacedKey(), client.getName(), e).submit();
+                    }
+                })
         );
     }
 }

@@ -268,10 +268,10 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
                 if (player != null) {
                     notifyComplete(container, player);
                 }
+                if (doRewards) {
+                    processRewards(container);
+                }
             });
-            if (doRewards) {
-                processRewards(container);
-            }
         }
     }
 
