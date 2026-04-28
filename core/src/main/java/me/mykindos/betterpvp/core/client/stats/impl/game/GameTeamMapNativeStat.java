@@ -40,9 +40,9 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         Preconditions.checkArgument(type.equals(TYPE));
         builder.action(Action.valueOf(object.getString("action")));
         builder.gameId(object.optLong("gameId"));
-        builder.gameName(object.optString("gameName", ""));
-        builder.mapName(object.optString("mapName", ""));
-        builder.teamName(object.optString("teamName", ""));
+        builder.gameName(object.optString("gameName", "UNKNOWN"));
+        builder.mapName(object.optString("mapName", "UNKNOWN"));
+        builder.teamName(object.optString("teamName", GameTeamMapStat.NONE_TEAM_NAME));
         return builder.build();
     }
 
