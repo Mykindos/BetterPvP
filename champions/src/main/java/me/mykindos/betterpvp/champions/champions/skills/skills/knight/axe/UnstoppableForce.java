@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -35,6 +37,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -46,6 +49,7 @@ import java.util.UUID;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class UnstoppableForce extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CrowdControlSkill, MovementSkill, OffensiveSkill {
 
     private double baseDamage;
@@ -84,6 +88,9 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
     @Override
     public boolean activate(Player player, int level) {
+        if (active.contains(player.getUniqueId())) {
+            return true;
+        }
         if (championsManager.getCooldowns().hasCooldown(player, getName())) {
             UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s %s</alt> for <alt>%s</alt> seconds.", getName(), level,
                     Math.max(0, championsManager.getCooldowns().getAbilityRecharge(player, getName()).getRemaining()));
@@ -191,6 +198,21 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
                 || event.getEffect().getEffectType() == EffectTypes.SLOWNESS) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onMeleeWhileCharging(DamageEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+
+        if (event.getCause() instanceof SkillDamageCause skillDamageCause && skillDamageCause.getSkill() == this) {
+            return;
+        }
+
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
+
+        event.cancel("Skill " + getName());
     }
 
     @Override

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.click;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
@@ -32,6 +33,7 @@ import java.util.WeakHashMap;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class RightClickListener implements Listener {
 
     private final ClientManager clientManager;
@@ -90,7 +92,10 @@ public class RightClickListener implements Listener {
             // If the click took longer than 250ms, remove it from the cache
             // Unless they're blocking with a shield, meaning they are still holding right click
             final boolean canBlock = gamer.canBlock();
-            if ((!canBlock && System.currentTimeMillis() - context.getTime() > 249) || (canBlock && !(player.isHandRaised() || player.isBlocking() || player.hasActiveItem()))) {
+            if ((!canBlock && System.currentTimeMillis() - context.getTime() > 249)
+                    || (canBlock
+                    && !(player.isHandRaised() || player.isBlocking() || player.hasActiveItem())
+                    && gamer.timeSinceLastBlock() > 250)) {
                 iterator.remove();
                 gamer.setLastBlock(-1);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
@@ -98,10 +103,10 @@ public class RightClickListener implements Listener {
                 continue;
             }
 
-            // If they aren't holding the same item anymore, remove it from the cache
-            // and call the release of the right click
-            ItemStack holding = player.getInventory().getItem(context.getEvent().getHand());
-            if (!UtilItem.isSimilar(holding, previouslyHolding)) {
+            // Keep holding state by slot + item type only (ignore durability/meta fluctuations).
+            final EquipmentSlot cachedSlot = context.getEvent().getHand();
+            final ItemStack holding = player.getInventory().getItem(cachedSlot);
+            if (cachedSlot != EquipmentSlot.HAND || holding.getType() != previouslyHolding.getType()) {
                 iterator.remove();
                 gamer.setLastBlock(-1);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
@@ -130,7 +135,9 @@ public class RightClickListener implements Listener {
             final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
             final boolean sword = UtilItem.isSword(main) || UtilItem.isSword(off);
-            final boolean shield = main.getType().equals(Material.SHIELD) || off.getType().equals(Material.SHIELD);
+            // Ignore temporary undroppable offhand shields so channel skills do not get force-released on left click.
+            final boolean shield = main.getType().equals(Material.SHIELD)
+                    || (off.getType().equals(Material.SHIELD) && !UtilItem.isUndroppable(off));
             if (!rightClickCache.containsKey(player) || !(sword || shield)) {
                 return;
             }
@@ -151,11 +158,12 @@ public class RightClickListener implements Listener {
             return; // Return if they are not right-clicking or if they are right-clicking a usable block
         }
 
-        // Check for default blocking
-        final ItemStack item = Objects.requireNonNullElse(event.getItem(), new ItemStack(Material.AIR));
-
         // Call event
         final Player player = event.getPlayer();
+        // Use the actual mainhand item as fallback instead of AIR — when startUsingItem(OFF_HAND)
+        // fires a synthetic PlayerInteractEvent, event.getItem() is null but the player's mainhand
+        // hasn't changed. Storing AIR would cause a type-mismatch eviction on the next tick.
+        final ItemStack item = Objects.requireNonNullElse(event.getItem(), player.getInventory().getItemInMainHand());
         final Gamer gamer = clientManager.search().online(player).getGamer();
         gamer.setLastBlock(System.currentTimeMillis());
         final RightClickEvent clickEvent = new RightClickEvent(player, null, false, event.getHand());
@@ -199,14 +207,14 @@ public class RightClickListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onFinalShieldCheck(RightClickEvent event) {
-        if (!event.isHoldClick() || event.getHand() != EquipmentSlot.HAND) {
-            return; // Only update at the start of the click
+        final Player player = event.getPlayer();
+        final ItemStack offhand = player.getInventory().getItemInOffHand();
+
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
         }
 
-        Player player = event.getPlayer();
-
         // Remove shield if we are not blocking
-        final ItemStack offhand = player.getInventory().getItemInOffHand();
         if (!event.hasBlockingItem() || event.getBlockingItem().getType().isAir()) {
             if (UtilItem.isUndroppable(offhand)) {
                 player.getInventory().setItemInOffHand(null);
