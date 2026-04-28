@@ -38,7 +38,7 @@ public class FleshHookAchievement extends SingleSimpleAchievement {
 
     @Override
     public Material getMaterial(StatContainer container, StatFilterType type, Period period) {
-        return Material.IRON_AXE;
+        return Material.TRIPWIRE_HOOK;
     }
 
     @Override

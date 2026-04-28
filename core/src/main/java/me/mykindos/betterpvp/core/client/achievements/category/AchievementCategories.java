@@ -9,6 +9,9 @@ public class AchievementCategories {
 
     public static final NamespacedKey COMBAT_CATEGORY = new NamespacedKey("core", "combat_category");
     public static final NamespacedKey DEATH_TYPE = new NamespacedKey("core", "death_category");
+    public static final NamespacedKey PLAYER_KILLS_TYPE = new NamespacedKey("core", "player_kills_category");
+    public static final NamespacedKey DAMAGE_DEALT_TYPE = new NamespacedKey("core", "damage_dealt_category");
+    public static final NamespacedKey HEALING_DEALT_TYPE = new NamespacedKey("core", "healing_dealt_category");
 
     public static final NamespacedKey CLANS = new NamespacedKey("clans", "clans_category");
 

@@ -34,17 +34,18 @@ public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchieveme
         return statGoals.get(getKey());
     }
 
-    protected Long getProperty(StatContainer container) {
+    protected Number getProperty(StatContainer container) {
         return getValue(container, getKey());
     }
 
     @Override
     public List<Component> getProgressComponent(StatContainer container, StatFilterType type, Period period) {
-        Long value = getValue(container, getKey(), type, period);
-        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, type, period));
-        Component bar = progressComponent.getFirst();
+        final String value = getKey().formattedStatValue(container, type, period);
+        final String goal = IStat.formatStatValue(getGoal(), getKey().getStatValueType());
+        final List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, type, period));
+        final Component bar = progressComponent.getFirst();
         progressComponent.removeFirst();
-        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", value, getGoal())));
+        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", value, goal)));
         return progressComponent;
     }
 }

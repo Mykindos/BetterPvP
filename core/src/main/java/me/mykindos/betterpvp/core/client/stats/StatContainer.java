@@ -50,7 +50,7 @@ public class StatContainer implements Unique, IStatMapListener {
     }
 
     public void incrementStat(@NotNull IStat stat, double amount) {
-        incrementStat(stat, (long) (amount * IStat.FP_MODIFIER));
+        incrementStat(stat, IStat.getLongValueOfDouble(amount));
     }
 
     public void incrementStat(@Nullable IStat stat, long amount) {
