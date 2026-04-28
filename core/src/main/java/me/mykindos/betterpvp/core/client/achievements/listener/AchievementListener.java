@@ -34,12 +34,13 @@ public class AchievementListener implements Listener {
     }
 
     /**
-     * Periodically scan all loaded clients against all registered achievements.
+     * Periodically scan all online clients against all registered achievements.
      * Catches completions missed by the event-driven path (new achievements, edge cases, etc.).
+     * Restricted to online clients to avoid unnecessary work and DB writes for offline players.
      */
     @UpdateEvent(delay = 1000L * 60 * 5, isAsync = true)
     public void periodicAchievementCheck() {
-        clientManager.getLoaded().forEach(client ->
+        clientManager.getOnline().forEach(client ->
                 achievementManager.getObjects().values().forEach(achievement ->
                         achievement.forceCheck(client.getStatContainer())
                 )

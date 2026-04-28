@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.server.Season;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -135,19 +136,19 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
             if (!(period instanceof Realm realm))
                 throw new ClassCastException("Object passed when StatFilterType is REALM must be Realm, found: " + period);
             final ConcurrentMap<IStat, Long> realmMap = myMap.get(realm);
-            if (realmMap != null) return realmMap;
+            if (realmMap != null) return Collections.unmodifiableMap(realmMap);
             return Map.of();
         }
 
         if (type == StatFilterType.ALL) {
-            return allMap;
+            return Collections.unmodifiableMap(allMap);
         }
 
         if (!(period instanceof Season season)) {
             throw new ClassCastException("Object passed when StatFilterType is SEASON must be Season, found: " + period);
         }
         final ConcurrentMap<IStat, Long> sMap = seasonMap.get(season);
-        return sMap == null ? Map.of() : sMap;
+        return sMap == null ? Map.of() : Collections.unmodifiableMap(sMap);
     }
 
     public void registerListener(IStatMapListener listener) {

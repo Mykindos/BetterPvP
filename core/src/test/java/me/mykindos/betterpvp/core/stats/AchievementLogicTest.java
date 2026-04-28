@@ -235,7 +235,8 @@ class AchievementLogicTest {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
 
-        achievement.handleNotify(container, 0.4f, 0.55f); // crosses 0.50
+        // oldValue=40 (40%), newValue=55 (55%) — crosses the 50% threshold
+        achievement.handleNotify(container, watchedStat, 55L, 40L, Map.of());
         assertEquals(1, achievement.notifyProgressCount, "Should notify once at 50% threshold");
     }
 
@@ -246,7 +247,8 @@ class AchievementLogicTest {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
 
-        achievement.handleNotify(container, 0.3f, 0.45f); // still below 0.50
+        // oldValue=30 (30%), newValue=45 (45%) — still below 50% threshold
+        achievement.handleNotify(container, watchedStat, 45L, 30L, Map.of());
         assertEquals(0, achievement.notifyProgressCount);
     }
 
@@ -257,7 +259,8 @@ class AchievementLogicTest {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
 
-        achievement.handleNotify(container, 0.50f, 0.60f); // old == threshold, not below
+        // oldValue=50 (50%), newValue=60 (60%) — old is exactly at threshold, not below it
+        achievement.handleNotify(container, watchedStat, 60L, 50L, Map.of());
         assertEquals(0, achievement.notifyProgressCount);
     }
 
@@ -268,7 +271,8 @@ class AchievementLogicTest {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
 
-        achievement.handleNotify(container, 0.1f, 0.95f); // crosses both 0.50 and 0.90
+        // oldValue=10 (10%), newValue=95 (95%) — crosses both 50% and 90% thresholds
+        achievement.handleNotify(container, watchedStat, 95L, 10L, Map.of());
         assertEquals(1, achievement.notifyProgressCount, "Only the first crossed threshold should fire");
     }
 
@@ -278,12 +282,13 @@ class AchievementLogicTest {
 
     @Test
     @Order(40)
-    @DisplayName("handleComplete: complete() is called when newPercent >= 1.0 and not yet completed")
+    @DisplayName("handleComplete: complete() is called when at 100% and not yet completed")
     void handleComplete_callsCompleteWhenFull() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
+        statsMap.put(realm, watchedStat, 100L, true); // 100% — ALL aggregate = 100
 
-        achievement.handleComplete(container, 0.9f, 1.0f);
+        achievement.handleComplete(container);
 
         verify(mockAchievementManager).saveCompletion(eq(container), eq(achievement), isNull());
     }
@@ -294,22 +299,24 @@ class AchievementLogicTest {
     void handleComplete_doesNotCallCompleteIfAlreadyDone() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
+        statsMap.put(realm, watchedStat, 100L, true); // 100%
         when(completions.getCompletion(any(), any()))
                 .thenReturn(Optional.of(mock(AchievementCompletion.class)));
 
-        achievement.handleComplete(container, 0.9f, 1.0f);
+        achievement.handleComplete(container);
 
         verify(mockAchievementManager, never()).saveCompletion(any(), any(), any());
     }
 
     @Test
     @Order(42)
-    @DisplayName("handleComplete: complete() is NOT called when newPercent < 1.0")
+    @DisplayName("handleComplete: complete() is NOT called when < 100%")
     void handleComplete_doesNotCallCompleteWhenNotFull() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
+        statsMap.put(realm, watchedStat, 90L, true); // 90% — not yet done
 
-        achievement.handleComplete(container, 0.5f, 0.9f);
+        achievement.handleComplete(container);
 
         verify(mockAchievementManager, never()).saveCompletion(any(), any(), any());
     }
@@ -320,13 +327,14 @@ class AchievementLogicTest {
     void handleComplete_calledExactlyOnce() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
+        statsMap.put(realm, watchedStat, 100L, true); // 100%
 
         // first call — not yet completed
-        achievement.handleComplete(container, 0.9f, 1.0f);
+        achievement.handleComplete(container);
         // second call — simulate completion now recorded
         when(completions.getCompletion(any(), any()))
                 .thenReturn(Optional.of(mock(AchievementCompletion.class)));
-        achievement.handleComplete(container, 1.0f, 1.0f);
+        achievement.handleComplete(container);
 
         verify(mockAchievementManager, times(1)).saveCompletion(any(), any(), any());
     }
@@ -341,7 +349,7 @@ class AchievementLogicTest {
     void forceCheck_completesWhenFull() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
-        statsMap.put(null, watchedStat, 100L, true); // 100% complete
+        statsMap.put(realm, watchedStat, 100L, true); // seed via realm fixture; ALL aggregate picks it up
 
         achievement.forceCheck(container);
 
@@ -354,7 +362,7 @@ class AchievementLogicTest {
     void forceCheck_skipsWhenAlreadyCompleted() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
-        statsMap.put(null, watchedStat, 100L, true);
+        statsMap.put(realm, watchedStat, 100L, true); // seed via realm fixture
         when(completions.getCompletion(any(), any()))
                 .thenReturn(Optional.of(mock(AchievementCompletion.class)));
 
@@ -369,7 +377,7 @@ class AchievementLogicTest {
     void forceCheck_skipsWhenDisabled() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(false);
-        statsMap.put(null, watchedStat, 100L, true);
+        statsMap.put(realm, watchedStat, 100L, true); // seed via realm fixture
 
         achievement.forceCheck(container);
 
@@ -382,7 +390,7 @@ class AchievementLogicTest {
     void forceCheck_skipsWhenNotFull() {
         TestAchievement achievement = makeAchievement(100L);
         achievement.setEnabled(true);
-        statsMap.put(null, watchedStat, 50L, true);
+        statsMap.put(realm, watchedStat, 50L, true); // seed via realm fixture
 
         achievement.forceCheck(container);
 
@@ -467,10 +475,8 @@ class AchievementLogicTest {
             capturedNewValue = newValue;
             capturedOldValue = oldValue;
             // Delegate to parent for threshold/completion logic, but skip StatPropertyUpdateEvent (no Bukkit PluginManager in tests)
-            float oldPercent = calculatePercent(Map.of(stat, oldValue == null ? 0L : oldValue));
-            float newPercent = calculatePercent(Map.of(stat, newValue));
-            handleNotify(container, oldPercent, newPercent);
-            handleComplete(container, oldPercent, newPercent);
+            handleNotify(container, stat, newValue, oldValue, otherProperties);
+            handleComplete(container);
         }
 
         @Override
