@@ -228,8 +228,12 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         float percent = getPercentComplete(container, achievementFilterType, getPeriod());
         if (percent >= 1.0f) {
             complete(container);
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
-                    notifyComplete(container, Bukkit.getPlayer(container.getUniqueId())));
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                org.bukkit.entity.Player player = Bukkit.getPlayer(container.getUniqueId());
+                if (player != null) {
+                    notifyComplete(container, player);
+                }
+            });
             if (doRewards) {
                 processRewards(container);
             }
@@ -243,8 +247,12 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 // player messaging must happen on the main thread
-                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
-                        notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold));
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                    org.bukkit.entity.Player player = Bukkit.getPlayer(container.getUniqueId());
+                    if (player != null) {
+                        notifyProgress(container, player, threshold);
+                    }
+                });
                 return;
             }
         }
@@ -255,8 +263,12 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
         if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, achievementFilterType, getPeriod()) >= 1.0f) {
             complete(container);
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
-                    notifyComplete(container, Bukkit.getPlayer(container.getUniqueId())));
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                org.bukkit.entity.Player player = Bukkit.getPlayer(container.getUniqueId());
+                if (player != null) {
+                    notifyComplete(container, player);
+                }
+            });
             if (doRewards) {
                 processRewards(container);
             }
