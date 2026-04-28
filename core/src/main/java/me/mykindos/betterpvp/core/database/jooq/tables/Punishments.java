@@ -4,15 +4,19 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients.ClientsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.PunishmentsRecord;
+
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.InverseForeignKey;
 import org.jooq.Name;
@@ -31,10 +35,6 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 
 /**
@@ -61,7 +61,7 @@ public class Punishments extends TableImpl<PunishmentsRecord> {
     /**
      * The column <code>public.punishments.id</code>.
      */
-    public final TableField<PunishmentsRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<PunishmentsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.punishments.client</code>.
@@ -111,7 +111,7 @@ public class Punishments extends TableImpl<PunishmentsRecord> {
     /**
      * The column <code>public.punishments.revoke_time</code>.
      */
-    public final TableField<PunishmentsRecord, Long> REVOKE_TIME = createField(DSL.name("revoke_time"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.field(DSL.raw("'-1'::bigint"), SQLDataType.BIGINT)), this, "");
+    public final TableField<PunishmentsRecord, Long> REVOKE_TIME = createField(DSL.name("revoke_time"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.field(DSL.raw("'-1'::integer"), SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>public.punishments.revoke_reason</code>.
@@ -188,11 +188,6 @@ public class Punishments extends TableImpl<PunishmentsRecord> {
     @Override
     public List<Index> getIndexes() {
         return Arrays.asList(Indexes.IDX_PUNISHMENTS_CLIENT);
-    }
-
-    @Override
-    public Identity<PunishmentsRecord, Integer> getIdentity() {
-        return (Identity<PunishmentsRecord, Integer>) super.getIdentity();
     }
 
     @Override

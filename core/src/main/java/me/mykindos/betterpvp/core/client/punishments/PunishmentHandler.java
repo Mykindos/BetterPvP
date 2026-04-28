@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
@@ -60,6 +61,7 @@ public class PunishmentHandler {
         String formattedTime = UtilTime.getTime(time, 1);
 
         Punishment punishment = new Punishment(
+                SnowflakeIdGenerator.ID_GENERATOR.nextId(),
                 target.getId(),
                 target.getUniqueId(),
                 type,

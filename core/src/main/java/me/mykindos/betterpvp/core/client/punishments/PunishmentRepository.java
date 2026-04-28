@@ -88,7 +88,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                     .fetch();
 
             for (var punishmentRecord : records) {
-                int punishmentId = punishmentRecord.get(PUNISHMENTS.ID);
+                long punishmentId = punishmentRecord.get(PUNISHMENTS.ID);
                 long punishedClientId = punishmentRecord.get(PUNISHMENTS.CLIENT);
                 UUID punishedClientUUID = UUID.fromString(punishmentRecord.get(CLIENTS.UUID));
                 IPunishmentType type = PunishmentTypes.getPunishmentType(punishmentRecord.get(PUNISHMENTS.TYPE));

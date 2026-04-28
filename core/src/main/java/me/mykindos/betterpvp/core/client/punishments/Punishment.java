@@ -34,7 +34,7 @@ public class Punishment {
     /**
      * The id of this punishment
      */
-    private int id;
+    private final long id;
     /**
      * The UUID of the punished player
      */

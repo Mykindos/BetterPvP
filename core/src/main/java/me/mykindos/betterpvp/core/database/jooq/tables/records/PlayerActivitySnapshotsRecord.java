@@ -5,6 +5,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.core.database.jooq.tables.PlayerActivitySnapshots;
+
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 

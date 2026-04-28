@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
@@ -128,6 +129,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         String formattedTime = UtilTime.getTime(time, 1);
 
         Punishment punishment = new Punishment(
+                SnowflakeIdGenerator.ID_GENERATOR.nextId(),
                 target.getId(),
                 target.getUniqueId(),
                 type,

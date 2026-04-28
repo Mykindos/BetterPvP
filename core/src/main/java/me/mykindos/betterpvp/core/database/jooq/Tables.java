@@ -67,6 +67,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakR
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchievementCompletionsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
+
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;

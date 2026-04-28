@@ -1,0 +1,5 @@
+ALTER TABLE punishments
+    ALTER COLUMN id TYPE BIGINT,
+    ALTER COLUMN id DROP DEFAULT;
+
+DROP SEQUENCE IF EXISTS punishments_id_seq;

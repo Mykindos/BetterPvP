@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -145,7 +146,7 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
 
         String formattedTime = new PrettyTime().format(new Date(time)).replace(" from now", "");
 
-        Punishment punishment = new Punishment(target.getId(), target.getUniqueId(), type, ruleManager.getObject("CUSTOM").orElseThrow(), System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
+        Punishment punishment = new Punishment(SnowflakeIdGenerator.ID_GENERATOR.nextId(), target.getId(), target.getUniqueId(), type, ruleManager.getObject("CUSTOM").orElseThrow(), System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
         target.getPunishments().add(punishment);
         punishmentRepository.save(punishment);
 

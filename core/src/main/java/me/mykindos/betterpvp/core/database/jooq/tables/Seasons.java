@@ -4,6 +4,9 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
+import java.time.LocalDate;
+import java.util.Collection;
+
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions.AchievementCompletionsPath;
@@ -11,6 +14,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSea
 import me.mykindos.betterpvp.core.database.jooq.tables.Realms.RealmsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.Servers.ServersPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.SeasonsRecord;
+
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -31,11 +35,6 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
-
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 
 /**
@@ -144,11 +143,6 @@ public class Seasons extends TableImpl<SeasonsRecord> {
     @Override
     public UniqueKey<SeasonsRecord> getPrimaryKey() {
         return Keys.SEASONS_PKEY;
-    }
-
-    @Override
-    public List<UniqueKey<SeasonsRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.SEASONS_NAME_UK);
     }
 
     private transient AchievementCompletionsSeasonPath _achievementCompletionsSeason;

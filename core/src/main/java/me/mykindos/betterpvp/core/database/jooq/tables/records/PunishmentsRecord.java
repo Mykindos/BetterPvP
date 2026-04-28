@@ -21,7 +21,7 @@ public class PunishmentsRecord extends UpdatableRecordImpl<PunishmentsRecord> {
     /**
      * Setter for <code>public.punishments.id</code>.
      */
-    public PunishmentsRecord setId(Integer value) {
+    public PunishmentsRecord setId(Long value) {
         set(0, value);
         return this;
     }
@@ -29,8 +29,8 @@ public class PunishmentsRecord extends UpdatableRecordImpl<PunishmentsRecord> {
     /**
      * Getter for <code>public.punishments.id</code>.
      */
-    public Integer getId() {
-        return (Integer) get(0);
+    public Long getId() {
+        return (Long) get(0);
     }
 
     /**
@@ -203,7 +203,7 @@ public class PunishmentsRecord extends UpdatableRecordImpl<PunishmentsRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<Integer> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -221,7 +221,7 @@ public class PunishmentsRecord extends UpdatableRecordImpl<PunishmentsRecord> {
     /**
      * Create a detached, initialised PunishmentsRecord
      */
-    public PunishmentsRecord(Integer id, Long client, String type, String rule, Long applyTime, Long expiryTime, String reason, String punisher, String revoker, String revokeType, Long revokeTime, String revokeReason) {
+    public PunishmentsRecord(Long id, Long client, String type, String rule, Long applyTime, Long expiryTime, String reason, String punisher, String revoker, String revokeType, Long revokeTime, String revokeReason) {
         super(Punishments.PUNISHMENTS);
 
         setId(id);
