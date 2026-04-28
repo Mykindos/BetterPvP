@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -108,7 +109,7 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
      * @param oreSupplier  function returning the ore Material for a single shell-replacement;
      *                     return {@code null} to skip a given replacement
      */
-    public static void detonate(Player player, Location center, int radius, double oreChance,
+    public void detonate(Player player, Location center, int radius, double oreChance,
                                  Supplier<Material> oreSupplier) {
         // Recursion guard: Player#breakBlock fires BlockBreakEvent → InteractionListener →
         // potentially re-routes to this interaction. Without the guard, one mine would chain.
@@ -135,6 +136,7 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
                                 center.getBlockY() + dy,
                                 center.getBlockZ() + dz);
 
+                        if (block.equals(center.getBlock())) continue; // Don't break the block that was just mined to trigger this
                         if (!UtilBlock.isStoneBased(block)) continue;
 
                         // Mark this location so the clans-side silencer can suppress
@@ -160,11 +162,13 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
                 }
             }
 
-            Particle.EXPLOSION.builder()
+            Particle.FLASH.builder()
                     .count(1)
+                    .color(Color.AQUA)
                     .location(center.toCenterLocation())
                     .receivers(60)
                     .spawn();
+            new SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, (float) (1 + Math.random()), 0.5f).play(center);
             new SoundEffect(Sound.ENTITY_BREEZE_WIND_BURST, (float) (0 + Math.random()), 0.5f).play(center);
         } finally {
             DETONATING.remove(id);

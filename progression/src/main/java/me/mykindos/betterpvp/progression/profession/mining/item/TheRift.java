@@ -68,7 +68,7 @@ public class TheRift extends BaseItem implements Reloadable {
         this.explosiveExcavationInteraction.setOreSupplier(this::pickWeightedOre);
 
         this.chainThrowInteraction = new ChainThrowInteraction(
-                cooldownManager, itemFactory, this,
+                this.explosiveExcavationInteraction, cooldownManager, itemFactory, this,
                 15.0,  // cooldown seconds
                 4.0,   // alive time seconds
                 1.4,   // speed blocks/tick
