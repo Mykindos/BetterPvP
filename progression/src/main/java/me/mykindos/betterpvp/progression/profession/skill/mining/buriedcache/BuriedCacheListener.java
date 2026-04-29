@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.progression.profession.skill.mining.smelter;
+package me.mykindos.betterpvp.progression.profession.skill.mining.buriedcache;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,10 +9,10 @@ import org.bukkit.event.Listener;
 
 @BPvPListener
 @Singleton
-public class SmelterListener implements Listener {
+public class BuriedCacheListener implements Listener {
 
     @Inject
-    private Smelter skill;
+    private BuriedCache skill;
 
     @EventHandler
     public void onBlockBreak(PlayerMinesOreEvent event) {
