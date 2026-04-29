@@ -56,6 +56,20 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
         return SILENT_BREAKS.getIfPresent(location) != null;
     }
 
+    /**
+     * Mark a block location so the clans-side silencer suppresses the territory-protection
+     * notification for the next break attempt. Reused by sibling mining interactions
+     * (e.g. {@code OreburstChargeInteraction}) that perform the same kind of multi-block
+     * scripted breaks.
+     */
+    public static void markSilent(Location location) {
+        SILENT_BREAKS.put(location, Boolean.TRUE);
+    }
+
+    public static void unmarkSilent(Location location) {
+        SILENT_BREAKS.invalidate(location);
+    }
+
     @Setter private double triggerChance;
     @Setter private int radius;
     @Setter private double oreChance;
