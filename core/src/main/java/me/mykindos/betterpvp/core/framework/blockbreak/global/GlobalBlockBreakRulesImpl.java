@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -61,12 +62,12 @@ public class GlobalBlockBreakRulesImpl implements GlobalBlockBreakRules, Listene
     }
 
     @Override
-    public Optional<BlockBreakRule> resolve(@NotNull UUID playerId, @NotNull Block block) {
-        final List<BlockBreakRule> list = rulesByPlayer.get(playerId);
+    public Optional<BlockBreakRule> resolve(@NotNull Player player, @NotNull Block block) {
+        final List<BlockBreakRule> list = rulesByPlayer.get(player.getUniqueId());
         if (list == null) return Optional.empty();
         // snapshot to avoid CME if mutation happens mid-iteration
         for (BlockBreakRule r : new ArrayList<>(list)) {
-            if (r.matcher().matches(block)) return Optional.of(r);
+            if (r.matcher().matches(block) && r.condition().test(player)) return Optional.of(r);
         }
         return Optional.empty();
     }

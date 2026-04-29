@@ -152,9 +152,20 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
     @Override
     public void cancelSessionsAt(@NotNull UUID worldUid, int x, int y, int z) {
+        cancelSessionsAtInternal(worldUid, x, y, z, null);
+    }
+
+    @Override
+    public void cancelSessionsAt(@NotNull UUID worldUid, int x, int y, int z, @NotNull UUID exceptPlayerId) {
+        cancelSessionsAtInternal(worldUid, x, y, z, exceptPlayerId);
+    }
+
+    private void cancelSessionsAtInternal(UUID worldUid, int x, int y, int z, UUID exceptPlayerId) {
         final Iterator<Map.Entry<UUID, BreakSession>> it = sessions.entrySet().iterator();
         while (it.hasNext()) {
-            final BreakSession s = it.next().getValue();
+            final Map.Entry<UUID, BreakSession> entry = it.next();
+            if (exceptPlayerId != null && exceptPlayerId.equals(entry.getKey())) continue;
+            final BreakSession s = entry.getValue();
             if (s.getWorldUid().equals(worldUid)
                     && s.getBlockPos().getX() == x
                     && s.getBlockPos().getY() == y
@@ -193,6 +204,9 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         final Vector3i pos = session.getBlockPos();
         final Block block = world.getBlockAt(pos.getX(), pos.getY(), pos.getZ());
+        if (block.getType().isAir()) {
+            return;
+        }
 
         final ItemStack held = player.getInventory().getItemInMainHand();
         final BlockBreakProperties props = resolver.resolve(player, block, held);
@@ -212,8 +226,9 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         //   - Creative mode, except with non-mining items the wiki lists explicitly.
         // Bypass progress accumulation entirely so we don't leave a session that drips progress
         // when the client doesn't continuously send digging packets (creative single-click).
+        final boolean allowed = nextAllowedProgressMillis.getOrDefault(session.getPlayerId(), 0L) <= System.currentTimeMillis();
         if (hardness == 0f || isCreativeInstant(player, held)) {
-            completeBreak(player, block, session, true);
+            if (allowed) completeBreak(player, block, session, true);
             return;
         }
 
@@ -227,12 +242,12 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         // damage value in our scaled units, so this check is equivalent to speedMultiplier > 30 * hardness.
         final boolean instant = progressPerTick >= 1.0;
 
-        // Non-instant breaks must respect the 6-tick post-completion delay. Instant breaks chain freely.
-        if (!instant) {
-            final Long gateUntil = nextAllowedProgressMillis.get(session.getPlayerId());
-            if (gateUntil != null && System.currentTimeMillis() < gateUntil) {
-                return;
-            }
+        // Vanilla 6-tick post-completion delay. Successful instant breaks don't arm the
+        // cooldown (so chains run freely), but a failed instant break does — the gate then
+        // throttles the retry loop on listener-cancelled breaks.
+        final Long gateUntil = nextAllowedProgressMillis.get(session.getPlayerId());
+        if (gateUntil != null && System.currentTimeMillis() < gateUntil) {
+            return;
         }
 
         session.setProgress(session.getProgress() + progressPerTick);
@@ -252,21 +267,59 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
     }
 
+    /**
+     * Reset the session's progress after a break attempt. The session is <b>not</b> removed —
+     * end-of-session is driven by:
+     * <ul>
+     *   <li>{@code CANCELLED_DIGGING} packet (player released or retargeted)</li>
+     *   <li>{@link #onItemHeldChange} / {@link #onQuit}</li>
+     *   <li>A fresh {@code START_DIGGING} replacing this session</li>
+     *   <li>The resolver returning {@code !isBreakable()} on the next tick (e.g. block is now AIR)</li>
+     * </ul>
+     * This means a held left-click survives across:
+     * <ul>
+     *   <li>A successful break followed by a same-tick block replacement (e.g. Vein Echo respawn)</li>
+     *   <li>A {@code BlockBreakEvent} cancelled by a listener (e.g. Clans territory check) —
+     *       progress simply restarts from 0 on the next tick</li>
+     * </ul>
+     * Because we pin {@code BLOCK_BREAK_SPEED} to {@code -Integer.MAX_VALUE} on join, the client
+     * never emits {@code FINISHED_DIGGING} on its own and stays in "digging" state until it sees
+     * a release/retarget — so it's safe to keep the session alive without producing duplicate
+     * client-side break attempts.
+     */
     private void completeBreak(Player player, Block block, BreakSession session, boolean instant) {
-        sessions.remove(session.getPlayerId());
+        // Idempotency guard: tick() and the runTask-scheduled dispatchBlockDamage can both
+        // try to complete the same instant break on the same tick. Whoever runs first
+        // stamps the tick; the second call bails. Tick-stamp instead of an AIR check so
+        // a same-tick replacement (e.g. Vein Echo restoring the block) isn't misread as
+        // a fresh breakable block.
+        if (block.getType().isAir()) {
+            return;
+        }
+
+        final boolean broke = breakBlock(player, block);
+
+        session.setProgress(0.0);
+        session.setLastStageSent(-1);
         clearOverlay(session);
 
-        if (instant) {
-            nextAllowedProgressMillis.remove(session.getPlayerId());
-        } else {
+        if (!instant || !broke) {
             nextAllowedProgressMillis.put(
                     session.getPlayerId(),
                     System.currentTimeMillis() + INTER_BREAK_COOLDOWN_MS);
+        } else {
+            nextAllowedProgressMillis.remove(session.getPlayerId());
         }
 
-        final ItemStack tool = player.getInventory().getItemInMainHand();
-        if (breakBlock(player, block)) {
-            cancelSessionsAt(block.getWorld().getUID(), block.getX(), block.getY(), block.getZ());
+        if (broke) {
+            // Clear other players' sessions on this block, but keep ours alive so the
+            // resolver can either (a) end it next tick when the block is AIR, or
+            // (b) seamlessly continue if something replaces the block first.
+            cancelSessionsAt(block.getWorld().getUID(),
+                    block.getX(),
+                    block.getY(),
+                    block.getZ(),
+                    player.getUniqueId());
         }
     }
 
@@ -494,6 +547,9 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
      */
     private boolean tryPredictInstantBreak(Player player, int sequence, UUID worldUid,
                                            Vector3i pos, BlockFace face) {
+        if (nextAllowedProgressMillis.getOrDefault(player.getUniqueId(), 0L) > System.currentTimeMillis()) {
+            return false; // still in cooldown from a previous non-instant break; can't predict
+        }
 
         final Material blockType;
         try {

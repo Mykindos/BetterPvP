@@ -32,7 +32,7 @@ public class DefaultBlockBreakResolver implements BlockBreakResolver {
     @Override
     public @NotNull BlockBreakProperties resolve(@NotNull Player player, @NotNull Block block, @Nullable ItemStack held) {
         final BlockBreakProperties tool = resolveFromTool(held, block).orElse(null);
-        final BlockBreakProperties global = globalRules.resolve(player.getUniqueId(), block)
+        final BlockBreakProperties global = globalRules.resolve(player, block)
                 .map(BlockBreakRule::properties).orElse(null);
 
         // Either side unbreakable → unbreakable.

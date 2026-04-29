@@ -3,9 +3,8 @@ package me.mykindos.betterpvp.progression.profession.mining.item;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.blockbreak.component.ToolComponent;
+import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRules;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakProperties;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.preset.BlockGroups;
@@ -19,52 +18,52 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.DivineAmulet;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
-import me.mykindos.betterpvp.core.item.impl.MagicEssence;
-import me.mykindos.betterpvp.core.item.impl.MagicSeal;
-import me.mykindos.betterpvp.core.item.impl.PolariteChunk;
+import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
+import me.mykindos.betterpvp.core.item.impl.VoidSphere;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.mining.item.interaction.InstantMineInteraction;
+import me.mykindos.betterpvp.progression.profession.mining.item.interaction.VeinEchoInteraction;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-@ItemKey("progression:runed_pickaxe")
-public class RunedPickaxe extends BaseItem implements Reloadable {
+@ItemKey("progression:deep_resonator")
+public class DeepResonator extends BaseItem implements Reloadable {
 
     @EqualsAndHashCode.Exclude
-    private final InstantMineInteraction instantMineInteraction;
+    private final VeinEchoInteraction veinEchoInteraction;
 
     @EqualsAndHashCode.Exclude
     private final Progression progression;
-
     private transient boolean registered;
 
     @Inject
-    private RunedPickaxe(Progression progression,
-                         CooldownManager cooldownManager,
-                         ClientManager clientManager,
-                         ItemFactory itemFactory) {
-        super("Runed Pickaxe",
-                Item.model(Material.DIAMOND_PICKAXE, "runed_pickaxe"),
+    private DeepResonator(Progression progression, GlobalBlockBreakRules globalRules) {
+        super("Deep Resonator",
+                Item.model(Material.DIAMOND_PICKAXE, "deep_resonator"),
                 ItemGroup.TOOL,
                 ItemRarity.EPIC);
         this.progression = progression;
-        this.instantMineInteraction = new InstantMineInteraction(cooldownManager, clientManager, itemFactory,
-                20.0, 7.0, BlockGroups.STONES);
+        this.veinEchoInteraction = new VeinEchoInteraction(progression, globalRules,
+                10.0, // duration seconds
+                0.50, // ore-respawn chance per ore mine
+                1,    // bonus stacks granted on a successful respawn
+                30,   // max stacks
+                30    // framework-scaled speed bonus per stack (1× diamond tier ≈ +0.5 diamond per 15)
+        );
 
         addBaseComponent(InteractionContainerComponent.builder()
-                .root(InteractionInputs.RIGHT_CLICK, instantMineInteraction)
+                .root(InteractionInputs.BLOCK_BREAK, veinEchoInteraction)
                 .build());
 
         addBaseComponent(new ToolComponent()
                 .addRule(BlockBreakRule.of(BlockGroups.STONES, BlockBreakProperties.breakable(180))));
-
         addSerializableComponent(new DurabilityComponent(2560));
     }
 
@@ -75,30 +74,33 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
             durability.setMaxDamage(parent.getConfig("durability.max-damage", 2560, Integer.class));
         });
 
-        final Config instantMineConfig = parent.fork("instantMine");
-        instantMineInteraction.setCooldown(instantMineConfig.getConfig("cooldown", 20.0, Double.class));
-        instantMineInteraction.setDuration(instantMineConfig.getConfig("duration", 7.0, Double.class));
+        final Config veinEchoConfig = parent.fork("vein-echo");
+        veinEchoInteraction.setDurationSeconds(veinEchoConfig.getConfig("duration", 10.0, Double.class));
+        veinEchoInteraction.setOreRespawnChance(veinEchoConfig.getConfig("ore-respawn-chance", 0.50, Double.class));
+        veinEchoInteraction.setOreRespawnBonusStacks(veinEchoConfig.getConfig("ore-respawn-bonus-stacks", 1, Integer.class));
+        veinEchoInteraction.setMaxStacks(veinEchoConfig.getConfig("max-stacks", 20, Integer.class));
+        veinEchoInteraction.setSpeedPerStack(veinEchoConfig.getConfig("speed-per-stack", 30, Integer.class));
     }
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry,
                                 ItemFactory itemFactory,
-                                MagicEssence magicEssence,
-                                MagicSeal magicSeal,
+                                DivineAmulet divineAmulet,
+                                VoidSphere voidSphere,
                                 DurakHandle durakHandle,
-                                PolariteChunk polariteChunk) {
+                                OverchargedCrystal overchargedCrystal) {
         if (registered) return;
         registered = true;
         String[] pattern = new String[] {
-                "PPP",
-                "EDS",
+                "VVV",
+                "ADO",
                 " D ",
         };
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('P', new RecipeIngredient(polariteChunk, 1));
-        builder.setIngredient('E', new RecipeIngredient(magicEssence, 1));
-        builder.setIngredient('S', new RecipeIngredient(magicSeal, 1));
+        builder.setIngredient('V', new RecipeIngredient(voidSphere, 1));
+        builder.setIngredient('A', new RecipeIngredient(divineAmulet, 1));
+        builder.setIngredient('O', new RecipeIngredient(overchargedCrystal, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
-        registry.registerRecipe(new NamespacedKey("progression", "runed_pickaxe"), builder.build());
+        registry.registerRecipe(new NamespacedKey("progression", "deep_resonator"), builder.build());
     }
 }

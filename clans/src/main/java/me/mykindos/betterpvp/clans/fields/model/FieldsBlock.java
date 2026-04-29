@@ -25,6 +25,14 @@ public class FieldsBlock {
     private long lastUsed; // when it was last mined, used for regeneration
     private boolean active; // if it is active or not
 
+    // Set by Fields#addTemporaryBlock when an ore is materialized by a script
+    // (e.g. an ability). Temporaries do not persist to the DB, do not
+    // respawn after being mined, and revert to {@code previousData} when their
+    // expiry passes without being mined.
+    private boolean temporary;
+    private long expiresAtMs;
+    private @Nullable BlockData previousData;
+
     public World getWorld() {
         return Bukkit.getWorld(world);
     }

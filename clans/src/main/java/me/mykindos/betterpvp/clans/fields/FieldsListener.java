@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
+import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -22,8 +23,11 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -32,6 +36,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
@@ -110,12 +115,27 @@ public class FieldsListener extends ClanListener {
 
         if (allow) {
             event.setInform(false); // Block the message that they cant break
-            block.setLastUsed(System.currentTimeMillis());
-            block.setActive(false);
+            if (block.isTemporary()) {
+                // Temporaries are forgotten on break — no respawn timer, no DB writeback.
+                fields.forget(type, block);
+            } else {
+                block.setLastUsed(System.currentTimeMillis());
+                block.setActive(false);
+            }
+
             UtilServer.callEvent(new FieldsInteractableUseEvent(fields, type, block, event.getPlayer()));
             UtilBlock.playBlockEffect(event.getBlock(), event.getBlock().getBlockData());
-            event.getBlock().setType(type.getReplacement().getMaterial()); // Then replace the block
-            event.getBlock().setBlockData(type.getReplacement());
+
+            // Then replace the block
+            if (block.isTemporary()) {
+                final BlockData previousData = Objects.requireNonNull(block.getPreviousData());
+                event.getBlock().setType(previousData.getMaterial());
+                event.getBlock().setBlockData(previousData);
+            } else {
+                event.getBlock().setType(type.getReplacement().getMaterial());
+                event.getBlock().setBlockData(type.getReplacement());
+            }
+
             UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
             UtilItem.damageItem(event.getPlayer(), event.getPlayer().getInventory().getItemInMainHand(), 1);
         }
@@ -159,25 +179,103 @@ public class FieldsListener extends ClanListener {
         }).put(block, blockType);
     }
 
+    /**
+     * Claims authority over scripted ore placements inside the Fields zone. Runs at LOW so this
+     * fires before {@code ClansWorldListener#onScriptedBlockPlace} (NORMAL) — flipping the result
+     * to {@link Event.Result#ALLOW} suppresses the access-deny path that would otherwise cancel
+     * placements in foreign territory (Fields belongs to an admin clan, so default access is
+     * denied for everyone).
+     * <p>
+     * Conditions for ALLOW: replacement is an ore, previous state is AIR or stone-based. If a
+     * matching {@link FieldsInteractable} type is registered, the resulting block is registered
+     * as a temporary ore so the standard mine/XP flow applies and the unmined block reverts on
+     * expiry.
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    public void onScriptedBlockPlace(ScriptedBlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+
+        final Block block = event.getBlock();
+        final boolean inFields = clanManager.getClanByLocation(block.getLocation())
+                .map(c -> c.getName().equalsIgnoreCase("Fields"))
+                .orElse(false);
+        if (!inFields) return;
+
+        final Material replacementMat = event.getReplacementData().getMaterial();
+        final Material previousMat = event.getPreviousData().getMaterial();
+
+        if (!UtilBlock.isOre(replacementMat)) return;
+
+        // Stone check: UtilBlock.isStoneBased reads the live block. Only trust it if the world
+        // block currently matches previousMat (it should, since the firing code hasn't applied
+        // the replacement yet).
+        final boolean previousIsAir = previousMat == Material.AIR;
+        final boolean previousIsStone = !previousIsAir && UtilBlock.isStoneBased(block);
+        if (!previousIsAir && !previousIsStone) return;
+        final Optional<Pair<FieldsInteractable, FieldsBlock>> present = fields.getBlock(block);
+        if (present.isPresent()) {
+            final FieldsInteractable interactable = present.get().getKey();
+            if (interactable.getType().getMaterial() != replacementMat) {
+                return; // already a registered fields tile
+            }
+
+            // if it's the same, try respawning the ore
+            block.setType(interactable.getType().getMaterial());
+            block.setBlockData(interactable.getType());
+            present.get().getValue().setActive(true);
+            event.setResult(Event.Result.ALLOW);
+            return;
+        }
+
+        // Register temp tracking if a matching FieldsInteractable exists. Not all ore materials
+        // need to participate in the Fields XP/respawn loop — that's fine, just allow without
+        // tracking.
+        final Optional<FieldsInteractable> typeOpt = fields.getBlockTypes().stream()
+                .filter(t -> t.getType().getMaterial() == replacementMat)
+                .findFirst();
+        if (typeOpt.isEmpty()) return;
+
+        event.setResult(Event.Result.ALLOW);
+        fields.addTemporaryBlock(typeOpt.get(), block, event.getReplacementData(), event.getPreviousData(), 60_000L);
+    }
+
     @UpdateEvent(delay = 5_000)
     public void respawnOres() {
         final double modifier = fields.getSpeedBuff();
-        fields.getBlocks().entries().forEach(entry -> {
+        // Snapshot to avoid CME — temporary entries may be removed mid-iteration on expiry.
+        final var entries = new java.util.ArrayList<>(fields.getBlocks().entries());
+        for (var entry : entries) {
             final FieldsBlock interactable = entry.getValue();
             final FieldsInteractable type = entry.getKey();
+
+            if (interactable.isTemporary()) {
+                // Temp blocks never auto-respawn. If still active and past their expiry,
+                // revert the world block (if it's still the temp ore) and forget the entry.
+                if (interactable.isActive() && System.currentTimeMillis() >= interactable.getExpiresAtMs()) {
+                    final Block worldBlock = interactable.getLocation().getBlock();
+                    if (interactable.getBlockData() != null
+                            && worldBlock.getBlockData().matches(interactable.getBlockData())
+                            && interactable.getPreviousData() != null) {
+                        worldBlock.setBlockData(interactable.getPreviousData());
+                    }
+                    fields.forget(type, interactable);
+                }
+                continue;
+            }
+
             if (interactable.isActive()) {
-                return; // The block is already the interactable, ignore
+                continue; // The block is already the interactable, ignore
             }
 
             if (!UtilTime.elapsed(interactable.getLastUsed(), (long) (type.getRespawnDelay() * 1_000 / modifier))) {
-                return;
+                continue;
             }
 
             final Block block = interactable.getLocation().getBlock();
             block.setType(type.getType().getMaterial());
             block.setBlockData(interactable.getBlockData() == null ? type.getType() : interactable.getBlockData());
             interactable.setActive(true);
-        });
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.framework.blockbreak.component.ToolComponent;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakProperties;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.preset.BlockGroups;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
@@ -17,12 +18,20 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.MeridianOrb;
+import me.mykindos.betterpvp.core.item.impl.VoidSphere;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.item.interaction.ChainThrowInteraction;
 import me.mykindos.betterpvp.progression.profession.mining.item.interaction.ExplosiveExcavationInteraction;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.LinkedHashMap;
@@ -38,29 +47,32 @@ public class TheRift extends BaseItem implements Reloadable {
     private static final String CONFIG_FILE = "items/tool";
     private static final String ITEM_KEY = "the_rift";
 
-    private final ExplosiveExcavationInteraction explosiveExcavationInteraction;
-    private final ChainThrowInteraction chainThrowInteraction;
+    private transient final ExplosiveExcavationInteraction explosiveExcavationInteraction;
+    private transient final ChainThrowInteraction chainThrowInteraction;
 
     // Map<Material, Weight> populated from items/tool.yml :: the_rift.oreWeights.
     // Both interactions read from this through a shared Supplier so config reloads
     // propagate without re-wiring.
-    private final Map<Material, Double> oreWeights = new LinkedHashMap<>();
+    private transient final Map<Material, Double> oreWeights = new LinkedHashMap<>();
+    private transient boolean registered;
 
     @EqualsAndHashCode.Exclude
     private final Progression progression;
 
     @Inject
     private TheRift(Progression progression,
+                    BlockTagManager blockTagManager,
                     CooldownManager cooldownManager,
                     ItemFactory itemFactory) {
         super("The Rift",
                 Item.model(Material.DIAMOND_PICKAXE, "the_rift"),
                 ItemGroup.TOOL,
-                ItemRarity.EPIC);
+                ItemRarity.LEGENDARY);
         this.progression = progression;
 
         this.explosiveExcavationInteraction = new ExplosiveExcavationInteraction(
                 itemFactory,
+                blockTagManager,
                 0.5, // trigger chance per stone mine
                 2,    // sphere radius (~5-block diameter)
                 0.35  // chance per shell block to be replaced with ore
@@ -82,21 +94,28 @@ public class TheRift extends BaseItem implements Reloadable {
 
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.BLOCK_BREAK, explosiveExcavationInteraction)
-                .root(InteractionInputs.RIGHT_CLICK, chainThrowInteraction)
+                .root(InteractionInputs.SWAP_HAND, chainThrowInteraction)
                 .build());
 
         addBaseComponent(new ToolComponent()
                 .addRule(BlockBreakRule.of(BlockGroups.STONES, BlockBreakProperties.breakable(180))));
+
+        addSerializableComponent(new DurabilityComponent(3584));
     }
 
     @Override
     public void reload() {
-        final Config excavationConfig = Config.item(progression, this).fork("excavation");
+        final Config parent = Config.item(progression, this);
+        getComponent(DurabilityComponent.class).ifPresent(durability -> {
+            durability.setMaxDamage(parent.getConfig("durability.max-damage", 3584, Integer.class));
+        });
+
+        final Config excavationConfig = parent.fork("excavation");
         explosiveExcavationInteraction.setTriggerChance(excavationConfig.getConfig("trigger-chance", 0.5, Double.class));
         explosiveExcavationInteraction.setRadius(excavationConfig.getConfig("radius", 2, Integer.class));
         explosiveExcavationInteraction.setOreChance(excavationConfig.getConfig("ore-chance", 0.35, Double.class));
 
-        final Config chainThrowConfig = Config.item(progression, this).fork("chain-throw");
+        final Config chainThrowConfig = parent.fork("chain-throw");
         chainThrowInteraction.setCooldown(chainThrowConfig.getConfig("cooldown", 15.0, Double.class));
         chainThrowInteraction.setAliveTime(chainThrowConfig.getConfig("alive-time", 4.0, Double.class));
         chainThrowInteraction.setSpeed(chainThrowConfig.getConfig("speed", 1.4, Double.class));
@@ -159,5 +178,25 @@ public class TheRift extends BaseItem implements Reloadable {
             if (roll < cumulative) return entry.getKey();
         }
         return null;
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry,
+                                ItemFactory itemFactory,
+                                VoidSphere voidSphere,
+                                DurakHandle durakHandle,
+                                MeridianOrb meridianOrb) {
+        if (registered) return;
+        registered = true;
+        String[] pattern = new String[] {
+                "VMV",
+                "VDV",
+                " D ",
+        };
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('V', new RecipeIngredient(voidSphere, 1));
+        builder.setIngredient('M', new RecipeIngredient(meridianOrb, 1));
+        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        registry.registerRecipe(new NamespacedKey("progression", "the_rift"), builder.build());
     }
 }
