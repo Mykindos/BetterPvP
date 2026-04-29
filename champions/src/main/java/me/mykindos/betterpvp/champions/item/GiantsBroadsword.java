@@ -52,7 +52,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
         model = Item.model("giants_broadsword");
         model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
                 .consumeSeconds(Float.MAX_VALUE)
-                .animation(ItemUseAnimation.NONE)
+                .animation(ItemUseAnimation.SPEAR)
                 .build());
         model.setData(DataComponentTypes.USE_EFFECTS, UseEffects.useEffects()
                 .canSprint(true)

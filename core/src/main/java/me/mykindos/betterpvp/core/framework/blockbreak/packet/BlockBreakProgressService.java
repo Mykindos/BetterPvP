@@ -27,4 +27,12 @@ public interface BlockBreakProgressService {
 
     /** Cancel all sessions on a specific block (e.g. when one digger completes it). */
     void cancelSessionsAt(@NotNull UUID worldUid, int x, int y, int z);
+
+    /**
+     * Cancel all sessions on a specific block <i>except</i> the given player's session.
+     * Used when a player completes a break but their own session is being kept alive
+     * (e.g. they're still holding left-click and we want the resolver to drive
+     * end-of-session on the next tick rather than removing it here).
+     */
+    void cancelSessionsAt(@NotNull UUID worldUid, int x, int y, int z, @NotNull UUID exceptPlayerId);
 }

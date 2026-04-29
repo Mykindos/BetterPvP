@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -170,6 +171,38 @@ public class ClansWorldListener extends ClanListener {
                     this.effectManager.addEffect(player, EffectTypes.NO_FALL, 7000);
                 }
             });
+        }
+    }
+
+    /**
+     * Access gate for {@link ScriptedBlockPlaceEvent}. Runs at NORMAL — earlier listeners
+     * (e.g. {@code FieldsListener} at LOW) get a chance to set
+     * {@link Event.Result#ALLOW} and bypass the check. If nobody has claimed the placement
+     * (result still {@link Event.Result#DEFAULT}) and the location is in another clan's
+     * territory, we silently cancel via a {@link TerritoryInteractEvent} probe with
+     * {@code inform=false} — no chat spam for ability-driven placements.
+     */
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onScriptedBlockPlace(final ScriptedBlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getResult() != Event.Result.DEFAULT) return;
+
+        final Player player = event.getPlayer();
+        final Block block = event.getBlock();
+
+        if (UtilBlock.isTutorial(block.getLocation())) return;
+
+        final Optional<Clan> locationClanOptional = clanManager.getClanByLocation(block.getLocation());
+        if (locationClanOptional.isEmpty()) return; // unclaimed — allow
+
+        final Clan locationClan = locationClanOptional.get();
+        final TerritoryInteractEvent tie = new TerritoryInteractEvent(
+                player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.PLACE);
+        tie.setInform(false);
+        tie.callEvent();
+
+        if (tie.getResult() == Event.Result.DENY) {
+            event.setCancelled(true);
         }
     }
 

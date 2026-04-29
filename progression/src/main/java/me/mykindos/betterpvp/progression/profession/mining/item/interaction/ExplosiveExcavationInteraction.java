@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.progression.profession.mining.item.interaction;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
@@ -21,6 +23,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -60,14 +63,16 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
 
     @SuppressWarnings("unused")
     private final ItemFactory itemFactory;
+    private final BlockTagManager blockTagManager;
 
-    public ExplosiveExcavationInteraction(ItemFactory itemFactory,
-                                           double triggerChance, int radius, double oreChance) {
+    public ExplosiveExcavationInteraction(ItemFactory itemFactory, BlockTagManager blockTagManager,
+                                          double triggerChance, int radius, double oreChance) {
         super("Explosive Excavation");
         this.itemFactory = itemFactory;
         this.triggerChance = triggerChance;
         this.radius = radius;
         this.oreChance = oreChance;
+        this.blockTagManager = blockTagManager;
     }
 
     @Override
@@ -138,24 +143,35 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
 
                         if (block.equals(center.getBlock())) continue; // Don't break the block that was just mined to trigger this
                         if (!UtilBlock.isStoneBased(block)) continue;
+                        if (blockTagManager.isPlayerPlaced(block)) continue; // Skip player-placed blocks to avoid people making grinding setups
 
                         // Mark this location so the clans-side silencer can suppress
                         // TerritoryInteractEvent.inform for the BlockBreakEvent that
                         // Player#breakBlock is about to fire. Cleared right after.
                         final Location key = block.getLocation();
                         SILENT_BREAKS.put(key, Boolean.TRUE);
-                        final boolean broken;
                         try {
-                            broken = UtilBlock.breakBlock(player, block);
+                            UtilBlock.breakBlock(player, block);
                         } finally {
                             SILENT_BREAKS.invalidate(key);
                         }
-                        if (!broken) continue;
 
                         if (distSq >= shellThresholdSq && RANDOM.nextDouble() < oreChance) {
                             final Material ore = oreSupplier.get();
                             if (ore != null) {
-                                block.setType(ore);
+                                final BlockData oreData = ore.createBlockData();
+                                final ScriptedBlockPlaceEvent event = new ScriptedBlockPlaceEvent(
+                                        player,
+                                        block,
+                                        block.getBlockData(),
+                                        oreData,
+                                        "progression:explosive_excavation"
+                                );
+                                event.callEvent();
+                                if (!event.isCancelled()) {
+                                    block.setBlockData(oreData);
+                                    UtilBlock.playBlockEffect(block, oreData);
+                                }
                             }
                         }
                     }

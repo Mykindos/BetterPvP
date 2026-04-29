@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.framework.blockbreak.global;
 
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -23,5 +24,10 @@ public interface GlobalBlockBreakRules {
 
     @NotNull List<BlockBreakRule> getRules(@NotNull UUID playerId);
 
-    Optional<BlockBreakRule> resolve(@NotNull UUID playerId, @NotNull Block block);
+    /**
+     * Resolves the first matching rule for {@code player} on {@code block}. A rule
+     * matches when its matcher accepts the block <em>and</em> its condition predicate
+     * accepts the player; rules failing either are skipped.
+     */
+    Optional<BlockBreakRule> resolve(@NotNull Player player, @NotNull Block block);
 }
