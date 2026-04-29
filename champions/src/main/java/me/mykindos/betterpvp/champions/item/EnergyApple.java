@@ -41,7 +41,7 @@ public class EnergyApple extends BaseItem implements Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, this);
-        double energy = config.getConfig("energy", 0.25, Double.class);
+        double energy = config.getConfig("energy", 25.0, Double.class);
         double cooldown = config.getConfig("cooldown", 10.0, Double.class);
         energyBoost.setEnergy(energy);
         energyBoost.setCooldown(cooldown);
