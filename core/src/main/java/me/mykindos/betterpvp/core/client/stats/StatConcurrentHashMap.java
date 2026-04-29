@@ -204,29 +204,31 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     }
 
     public StatConcurrentHashMap copyFrom(StatConcurrentHashMap other) {
-        myMap.clear();
-        allMap.clear();
-        seasonMap.clear();
-        leafAllMap.clear();
-        leafSeasonMap.clear();
-        leafRealmMap.clear();
-        // deep-copy each inner map so mutations to this instance don't affect `other`
-        other.getMyMap().forEach((realm, statMap) ->
-                myMap.put(realm, new ConcurrentHashMap<>(statMap)));
-        // rebuild all secondary indexes
-        myMap.forEach((realm, statMap) ->
-                statMap.forEach((stat, value) -> {
-                    allMap.merge(stat, value, Long::sum);
-                    seasonMap.computeIfAbsent(realm.getSeason(), s -> new ConcurrentHashMap<>())
-                            .merge(stat, value, Long::sum);
-                    IStat leaf = getLeaf(stat);
-                    leafAllMap.merge(leaf, value, Long::sum);
-                    leafSeasonMap.computeIfAbsent(realm.getSeason(), s -> new ConcurrentHashMap<>())
-                            .merge(leaf, value, Long::sum);
-                    leafRealmMap.computeIfAbsent(realm, r -> new ConcurrentHashMap<>())
-                            .merge(leaf, value, Long::sum);
-                })
-        );
+        synchronized (myMap) {
+            myMap.clear();
+            allMap.clear();
+            seasonMap.clear();
+            leafAllMap.clear();
+            leafSeasonMap.clear();
+            leafRealmMap.clear();
+            // deep-copy each inner map so mutations to this instance don't affect `other`
+            other.getMyMap().forEach((realm, statMap) ->
+                    myMap.put(realm, new ConcurrentHashMap<>(statMap)));
+            // rebuild all secondary indexes
+            myMap.forEach((realm, statMap) ->
+                    statMap.forEach((stat, value) -> {
+                        allMap.merge(stat, value, Long::sum);
+                        seasonMap.computeIfAbsent(realm.getSeason(), s -> new ConcurrentHashMap<>())
+                                .merge(stat, value, Long::sum);
+                        IStat leaf = getLeaf(stat);
+                        leafAllMap.merge(leaf, value, Long::sum);
+                        leafSeasonMap.computeIfAbsent(realm.getSeason(), s -> new ConcurrentHashMap<>())
+                                .merge(leaf, value, Long::sum);
+                        leafRealmMap.computeIfAbsent(realm, r -> new ConcurrentHashMap<>())
+                                .merge(leaf, value, Long::sum);
+                    })
+            );
+        }
         return this;
     }
 

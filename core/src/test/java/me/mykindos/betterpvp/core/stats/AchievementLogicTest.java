@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.server.Server;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,7 +94,10 @@ class AchievementLogicTest {
         mockedJavaPlugin.when(() -> JavaPlugin.getPlugin(Core.class)).thenReturn(mockCore);
 
         mockedBukkit = Mockito.mockStatic(Bukkit.class);
-        // Bukkit.getPlayer() returns null when called from tests — acceptable since we only verify calls
+        // Stub Bukkit.getPlayer(UUID) so that notifyProgress/notifyComplete are always invoked
+        // regardless of whether production code guards on a non-null player.
+        Player mockPlayer = mock(Player.class);
+        mockedBukkit.when(() -> Bukkit.getPlayer(any(UUID.class))).thenReturn(mockPlayer);
     }
 
     @AfterAll
