@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -288,9 +287,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     private Map<IStat, Long> constructMap(IStat stat, Long value, Map<IStat, Long> otherProperties) {
-        // IdentityHashMap uses reference equality / System.identityHashCode, bypassing any proxy overhead
-        // on IStat implementations when used as map keys.
-        Map<IStat, Long> newMap = new IdentityHashMap<>(otherProperties);
+        Map<IStat, Long> newMap = new HashMap<>(otherProperties);
         newMap.put(stat, value);
         return newMap;
     }
