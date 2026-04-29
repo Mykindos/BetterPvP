@@ -2,21 +2,24 @@ package me.mykindos.betterpvp.game.framework.model.stats;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
-import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static me.mykindos.betterpvp.core.database.jooq.tables.GameData.GAME_DATA;
 import static me.mykindos.betterpvp.core.database.jooq.tables.GameTeams.GAME_TEAMS;
 
 @Singleton
+@CustomLog
 public class GameInfoRepository implements IRepository<GameInfo> {
 
     private final Database database;
@@ -41,7 +44,12 @@ public class GameInfoRepository implements IRepository<GameInfo> {
                             .onConflictDoNothing()
             );
             object.getPlayerTeams().forEach((uuid, teamName) -> {
-                final long clientId = clientManager.search().offline(uuid).join().orElseThrow().getId();
+                final Optional<Client> clientOpt = clientManager.search().offline(uuid).join();
+                if (clientOpt.isEmpty()) {
+                    log.warn("Could not resolve client for uuid {} while saving game_teams for game {} — skipping", uuid, object.getId()).submit();
+                    return;
+                }
+                final long clientId = clientOpt.get().getId();
                 queries.add(
                         context.insertInto(GAME_TEAMS)
                                 .set(GAME_TEAMS.ID, object.getId())

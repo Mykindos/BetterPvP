@@ -58,37 +58,37 @@ public class GameTeamMapWrapperStat extends GameTeamMapStat implements IWrapperS
     private IStat wrappedStat;
 
     private boolean filterGameIdStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapWrapperStat stat)) return false;
         return Objects.requireNonNull(gameId).equals(stat.gameId) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterGameFullStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapWrapperStat stat)) return false;
         return gameName.equals(stat.gameName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterGameTeamStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
-        return wrappedStat.containsStat(stat) && gameName.equals(stat.gameName) && teamName.equals(stat.teamName);
+        if (!(entry.getKey() instanceof GameTeamMapWrapperStat stat)) return false;
+        return wrappedStat.containsStat(stat.wrappedStat) && gameName.equals(stat.gameName) && teamName.equals(stat.teamName);
     }
 
     private boolean filterGameMapStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapWrapperStat stat)) return false;
         return wrappedStat.containsStat(stat.wrappedStat) && gameName.equals(stat.gameName) && mapName.equals(stat.mapName);
     }
 
     private boolean filterTeamOnlyStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapWrapperStat stat)) return false;
         return teamName.equals(stat.teamName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterWrapperOnlyStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapWrapperStat stat)) return false;
         return wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterAllStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapWrapperStat stat = (GameTeamMapWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapWrapperStat stat)) return false;
         return gameName.equals(stat.gameName) && mapName.equals(stat.mapName) && teamName.equals(stat.teamName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 

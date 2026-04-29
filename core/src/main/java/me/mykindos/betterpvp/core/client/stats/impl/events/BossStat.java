@@ -60,7 +60,7 @@ public class BossStat implements IBuildableStat {
     }
 
     private boolean filterActionStat(Map.Entry<IStat, Long> entry) {
-        BossStat other = (BossStat) entry.getKey();
+        if (!(entry.getKey() instanceof BossStat other)) return false;
         return action.equals(other.action);
     }
 

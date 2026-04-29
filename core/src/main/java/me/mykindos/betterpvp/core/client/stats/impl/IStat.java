@@ -114,16 +114,17 @@ public interface IStat {
      * @return the total value of the stats that meet the filter
      */
     default Long getFilteredStat(StatContainer statContainer, StatFilterType type, Period period, Predicate<Map.Entry<IStat, Long>> filter) {
-        return statContainer.getStats().getStatsOfPeriod(type, period).entrySet().stream()
-                .filter((entry) -> {
-                    try {
-                        return filter.test(entry);
-                    } catch (IllegalArgumentException | ClassCastException ignored) {
-                        return false;
-                    }
-                })
-                .mapToLong(Map.Entry::getValue)
-                .sum();
+        long sum = 0L;
+        for (Map.Entry<IStat, Long> entry : statContainer.getStats().getStatsOfPeriod(type, period).entrySet()) {
+            try {
+                if (filter.test(entry)) {
+                    sum += entry.getValue();
+                }
+            } catch (IllegalArgumentException | ClassCastException ignored) {
+                // Legacy filters may still cast blindly; treat those entries as non-matches.
+            }
+        }
+        return sum;
     }
 
     /**

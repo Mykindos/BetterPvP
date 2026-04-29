@@ -2,8 +2,10 @@ package me.mykindos.betterpvp.core.client.achievements.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
@@ -11,13 +13,16 @@ import org.bukkit.event.Listener;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class AchievementListener implements Listener {
 
     private final AchievementManager achievementManager;
+    private final ClientManager clientManager;
 
     @Inject
-    public AchievementListener(AchievementManager achievementManager) {
+    public AchievementListener(AchievementManager achievementManager, ClientManager clientManager) {
         this.achievementManager = achievementManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler
@@ -28,5 +33,23 @@ public class AchievementListener implements Listener {
     @UpdateEvent(delay = 1000L * 60 * 10, isAsync = true)
     public void updateTotalRanks () {
         achievementManager.updateTotalAchievementCompletions();
+    }
+
+    /**
+     * Periodically scan all online clients against all registered achievements.
+     * Catches completions missed by the event-driven path (new achievements, edge cases, etc.).
+     * Restricted to online clients to avoid unnecessary work and DB writes for offline players.
+     */
+    @UpdateEvent(delay = 1000L * 60 * 5, isAsync = true)
+    public void periodicAchievementCheck() {
+        clientManager.getOnline().forEach(client ->
+                achievementManager.getObjects().values().forEach(achievement -> {
+                    try {
+                        achievement.forceCheck(client.getStatContainer());
+                    } catch (Exception e) {
+                        log.error("Error while force-checking achievement {} for client {}: ", achievement.getNamespacedKey(), client.getName(), e).submit();
+                    }
+                })
+        );
     }
 }

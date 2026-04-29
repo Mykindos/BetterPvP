@@ -23,15 +23,15 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Represents stats only present in Game
+ */
 @SuperBuilder
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @CustomLog
-/**
- * Represents stats only present in Game
- */
 public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildableStat{
     public static final String TYPE = "GAME_NATIVE";
 
@@ -40,9 +40,9 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
         Preconditions.checkArgument(type.equals(TYPE));
         builder.action(Action.valueOf(object.getString("action")));
         builder.gameId(object.optLong("gameId"));
-        builder.gameName(object.optString("gameName", ""));
-        builder.mapName(object.optString("mapName", ""));
-        builder.teamName(object.optString("teamName", ""));
+        builder.gameName(object.optString("gameName", "UNKNOWN"));
+        builder.mapName(object.optString("mapName", "UNKNOWN"));
+        builder.teamName(object.optString("teamName", GameTeamMapStat.NONE_TEAM_NAME));
         return builder.build();
     }
 
@@ -50,46 +50,47 @@ public class GameTeamMapNativeStat extends GameTeamMapStat implements IBuildable
     private Action action;
 
     private boolean filterGameIdStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return Objects.requireNonNull(gameId).equals(stat.gameId) && action.equals(stat.action);
     }
 
     private boolean filterGameFullStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return gameName.equals(stat.gameName) && action.equals(stat.action);
     }
 
     private boolean filterGameTeamStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return action.equals(stat.action) && gameName.equals(stat.gameName) && teamName.equals(stat.teamName);
     }
 
     private boolean filterGameMapStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return action.equals(stat.action) && gameName.equals(stat.gameName) && mapName.equals(stat.mapName);
     }
 
     private boolean filterTeamOnlyStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return teamName.equals(stat.teamName) && action.equals(stat.action);
     }
 
     private boolean filterActionOnlyStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return action.equals(stat.action);
     }
 
     private boolean filterAllStat(Map.Entry<IStat, Long> entry) {
-        final GameTeamMapNativeStat stat = (GameTeamMapNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof GameTeamMapNativeStat stat)) return false;
         return gameName.equals(stat.gameName) && mapName.equals(stat.mapName) && teamName.equals(stat.teamName) && action.equals(stat.action);
     }
 
     /**
      * Get the stat represented by this object from the statContainer
      *
-     * @param statContainer
-     * @param periodKey
-     * @return
+     * @param statContainer the container to read from
+     * @param type the filter type (ALL, SEASON, or REALM)
+     * @param period the period to filter by (realm or season when type is not ALL)
+     * @return the stat value
      */
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {

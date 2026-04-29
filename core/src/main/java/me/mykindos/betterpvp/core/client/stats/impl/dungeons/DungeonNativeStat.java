@@ -58,16 +58,17 @@ public class DungeonNativeStat extends DungeonStat implements IBuildableStat {
     }
 
     private boolean filterActionStat(Map.Entry<IStat, Long> entry) {
-        final DungeonNativeStat stat = (DungeonNativeStat) entry.getKey();
+        if (!(entry.getKey() instanceof DungeonNativeStat stat)) return false;
         return action.equals(stat.action);
     }
 
     /**
      * Get the stat represented by this object from the statContainer
      *
-     * @param statContainer
-     * @param periodKey
-     * @return
+     * @param statContainer the container to read from
+     * @param type the filter type (ALL, SEASON, or REALM)
+     * @param period the period to filter by (realm or season when type is not ALL)
+     * @return the stat value
      */
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {

@@ -3,6 +3,7 @@ plugins {
     id("io.papermc.paperweight.userdev")
     `maven-publish`
     id("jooqdynamic")
+    id("me.champeau.jmh")
 }
 
 version = "1.0.0"

@@ -251,6 +251,13 @@ public interface IAchievement {
     void processRewards(final StatContainer container);
 
     /**
+     * Periodically called to catch completions that may have been missed by the event-driven path
+     * (e.g. newly registered achievements, or players that already met requirements before the achievement existed).
+     * Implementations should provide any forced completion-check logic required for the achievement.
+     * @param container the stat container to check
+     */
+    void forceCheck(final StatContainer container);
+    /**
      * Does the logic for whether to call {@link IAchievement#notifyProgress(PropertyContainer, Audience, float)} and executes it
      * @param container
      * @param property

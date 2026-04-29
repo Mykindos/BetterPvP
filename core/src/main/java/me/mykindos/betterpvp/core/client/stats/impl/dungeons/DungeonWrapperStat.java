@@ -52,12 +52,12 @@ public class DungeonWrapperStat extends DungeonStat implements IWrapperStat {
     private IStat wrappedStat;
 
     private boolean filterDungeonStat(Map.Entry<IStat, Long> entry) {
-        final DungeonWrapperStat stat = (DungeonWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof DungeonWrapperStat stat)) return false;
         return dungeonName.equals(stat.dungeonName) && wrappedStat.containsStat(stat.wrappedStat);
     }
 
     private boolean filterWrappedStat (Map.Entry<IStat, Long> entry) {
-        final DungeonWrapperStat stat = (DungeonWrapperStat) entry.getKey();
+        if (!(entry.getKey() instanceof DungeonWrapperStat stat)) return false;
         return wrappedStat.containsStat(stat.wrappedStat);
     }
 
@@ -73,9 +73,9 @@ public class DungeonWrapperStat extends DungeonStat implements IWrapperStat {
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
         if (Strings.isNullOrEmpty(dungeonName)) {
-            return this.getFilteredStat(statContainer, type, period, this::filterDungeonStat);
+            return this.getFilteredStat(statContainer, type, period, this::filterWrappedStat);
         }
-        return this.getFilteredStat(statContainer, type, period, this::filterWrappedStat);
+        return this.getFilteredStat(statContainer, type, period, this::filterDungeonStat);
     }
 
     @Override

@@ -29,7 +29,23 @@ public class GenericStat implements IStat {
 
     @Override
     public Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
-        return getFilteredStat(statContainer, type, period, this::filterStat);
+        if (stat instanceof IWrapperStat) {
+            // Defensive fallback: inner stat is itself a wrapper (not expected by convention, but safe).
+            return getFilteredStat(statContainer, type, period, this::filterStat);
+        }
+        if (!stat.isSavable()) {
+            // Partial / composite stat (e.g. ChampionsSkillStat with level = -1): the inner stat is
+            // NOT stored as an exact key in leafAllMap, so the O(1) index cannot be used.
+            // These stats use containsStat() partial-matching semantics and must fall back to O(n).
+            // Examples: ChampionsSkillStat(TIME_PLAYED, Fireball, level=-1) used by UseAllSkillsAchievement.
+            return getFilteredStat(statContainer, type, period, this::filterStat);
+        }
+        // O(1) fast path: look up the leaf aggregate index instead of iterating the whole stat map.
+        // Safe only when the inner stat IS stored verbatim as a leaf key (isSavable() == true), e.g.
+        // ClientStat.KILLS — the leaf aggregate gives the sum of all IWrapperStat variants that wrap it
+        // (ClanWrapperStat, GameTeamMapWrapperStat, …).
+        Long value = statContainer.getStats().getLeafAggregate(type, period, stat);
+        return value == null ? 0L : value;
     }
 
     /**
