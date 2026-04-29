@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -242,16 +243,25 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @Override
     public void handleNotify(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherStats) {
-        float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
+        if (notifyThresholds.isEmpty()) return;
+        // Compute new percent first; avoid building the old-value map when progress is below all thresholds
         float newPercent = calculatePercent(constructMap(stat, newValue, otherStats));
+        boolean maybeThreshold = false;
+        for (float t : notifyThresholds) {
+            if (newPercent >= t) {
+                maybeThreshold = true;
+                break;
+            }
+        }
+        if (!maybeThreshold) return;
+        float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 // player messaging must happen on the main thread
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                     org.bukkit.entity.Player player = Bukkit.getPlayer(container.getUniqueId());
-                    if (player != null) {
-                        notifyProgress(container, player, threshold);
-                    }
+                    net.kyori.adventure.audience.Audience audience = player != null ? player : net.kyori.adventure.audience.Audience.empty();
+                    notifyProgress(container, audience, threshold);
                 });
                 return;
             }
@@ -260,8 +270,10 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @Override
     public void handleComplete(StatContainer container) {
+        // Fast path: skip the more expensive completion-status lookup when not yet at 100%
+        if (getPercentComplete(container, achievementFilterType, getPeriod()) < 1.0f) return;
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
-        if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, achievementFilterType, getPeriod()) >= 1.0f) {
+        if (achievementCompletionOptional.isEmpty()) {
             complete(container);
             UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                 org.bukkit.entity.Player player = Bukkit.getPlayer(container.getUniqueId());
@@ -276,7 +288,9 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     private Map<IStat, Long> constructMap(IStat stat, Long value, Map<IStat, Long> otherProperties) {
-        Map<IStat, Long> newMap = new HashMap<>(otherProperties);
+        // IdentityHashMap uses reference equality / System.identityHashCode, bypassing any proxy overhead
+        // on IStat implementations when used as map keys.
+        Map<IStat, Long> newMap = new IdentityHashMap<>(otherProperties);
         newMap.put(stat, value);
         return newMap;
     }

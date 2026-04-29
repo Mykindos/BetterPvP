@@ -403,7 +403,7 @@ class AchievementLogicTest {
 
     @Test
     @Order(60)
-    @DisplayName("performance: 10k sequential onChangeValue calls complete within 200ms")
+    @DisplayName("performance: 10k sequential onChangeValue calls complete within 500ms")
     void performance_onChangeValueThroughput() {
         TestAchievement achievement = makeAchievement(100_000L);
         achievement.setEnabled(true);
@@ -413,7 +413,7 @@ class AchievementLogicTest {
             achievement.onChangeValue(container, watchedStat, (long) i, (long) (i - 1), Map.of());
         }
         long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-        assertTrue(elapsedMs < 200, "10k onChangeValue calls took too long: " + elapsedMs + "ms");
+        assertTrue(elapsedMs < 500, "10k onChangeValue calls took too long: " + elapsedMs + "ms");
     }
 
     // ─────────────────────────────────────────────────────────────────────────

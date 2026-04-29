@@ -107,13 +107,14 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     @Nullable
     public Long get(StatFilterType type, @Nullable Period period, IStat stat) {
         if (type == StatFilterType.ALL) {
+            if (allMap.isEmpty()) return null;
             return allMap.get(stat);
         }
 
         if (type == StatFilterType.REALM) {
             if (!(period instanceof Realm realm)) throw new ClassCastException("Object passed when StatFilterType is REALM must be Realm, found: " + period);
             final ConcurrentMap<IStat, Long> realmMap = myMap.get(realm);
-            if (realmMap == null) return null;
+            if (realmMap == null || realmMap.isEmpty()) return null;
             return realmMap.get(stat);
         }
 
