@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.framework.blockbreak.global;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,14 +27,6 @@ public class GlobalBlockBreakRulesImpl implements GlobalBlockBreakRules, Listene
     public void addRule(@NotNull UUID playerId, @NotNull BlockBreakRule rule) {
         rulesByPlayer.compute(playerId, (id, existing) -> {
             final List<BlockBreakRule> list = existing == null ? new ArrayList<>() : existing;
-            for (BlockBreakRule e : list) {
-                if (rule.matcher().overlaps(e.matcher())) {
-                    final Set<Material> a = rule.matcher().knownMaterials();
-                    final Set<Material> b = e.matcher().knownMaterials();
-                    throw new IllegalArgumentException(
-                            "Global rule conflict for " + id + ": new=" + a + " existing=" + b);
-                }
-            }
             list.add(rule);
             return list;
         });
@@ -70,6 +60,17 @@ public class GlobalBlockBreakRulesImpl implements GlobalBlockBreakRules, Listene
             if (r.matcher().matches(block) && r.condition().test(player)) return Optional.of(r);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public @NotNull List<BlockBreakRule> resolveAll(@NotNull Player player, @NotNull Block block) {
+        final List<BlockBreakRule> list = rulesByPlayer.get(player.getUniqueId());
+        if (list == null) return List.of();
+        final List<BlockBreakRule> matched = new ArrayList<>();
+        for (BlockBreakRule r : new ArrayList<>(list)) {
+            if (r.matcher().matches(block) && r.condition().test(player)) matched.add(r);
+        }
+        return matched;
     }
 
     @EventHandler

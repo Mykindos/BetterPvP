@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -32,8 +33,15 @@ public class DefaultBlockBreakResolver implements BlockBreakResolver {
     @Override
     public @NotNull BlockBreakProperties resolve(@NotNull Player player, @NotNull Block block, @Nullable ItemStack held) {
         final BlockBreakProperties tool = resolveFromTool(held, block).orElse(null);
-        final BlockBreakProperties global = globalRules.resolve(player, block)
-                .map(BlockBreakRule::properties).orElse(null);
+
+        // Fold all matching globals so multiple rules (e.g. an item buff plus a
+        // passive profession attribute) can both contribute to the player's speed.
+        final List<BlockBreakRule> globals = globalRules.resolveAll(player, block);
+        BlockBreakProperties global = null;
+        for (BlockBreakRule rule : globals) {
+            final BlockBreakProperties props = rule.properties();
+            global = global == null ? props : global.merge(props);
+        }
 
         // Either side unbreakable → unbreakable.
         if ((tool != null && !tool.isBreakable()) || (global != null && !global.isBreakable())) {

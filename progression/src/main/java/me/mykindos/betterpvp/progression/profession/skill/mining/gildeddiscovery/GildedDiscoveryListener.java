@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.progression.profession.skill.mining.veinvindicator;
+package me.mykindos.betterpvp.progression.profession.skill.mining.gildeddiscovery;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,12 +9,12 @@ import org.bukkit.event.Listener;
 
 @BPvPListener
 @Singleton
-public class VeinVindicatorListener implements Listener {
+public class GildedDiscoveryListener implements Listener {
 
     @Inject
-    private VeinVindicator skill;
+    private GildedDiscovery skill;
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onBlockBreak(PlayerMinesOreEvent event) {
         if (skill.getSkillLevel(event.getPlayer()) <= 0) return;
         skill.onBlockBreak(event);

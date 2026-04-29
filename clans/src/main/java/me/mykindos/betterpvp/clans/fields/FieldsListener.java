@@ -236,7 +236,7 @@ public class FieldsListener extends ClanListener {
         if (typeOpt.isEmpty()) return;
 
         event.setResult(Event.Result.ALLOW);
-        fields.addTemporaryBlock(typeOpt.get(), block, event.getReplacementData(), event.getPreviousData(), 60_000L);
+        fields.addTemporaryBlock(typeOpt.get(), block, event.getReplacementData(), event.getPreviousData(), 5_000L);
     }
 
     @UpdateEvent(delay = 5_000)

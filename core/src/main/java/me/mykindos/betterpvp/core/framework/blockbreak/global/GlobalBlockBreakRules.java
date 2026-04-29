@@ -15,7 +15,11 @@ import java.util.UUID;
  */
 public interface GlobalBlockBreakRules {
 
-    /** Adds a global rule for the player. Conflict policy mirrors {@code ToolComponent}. */
+    /**
+     * Adds a global rule for the player. Multiple rules with overlapping matchers may
+     * coexist — at resolve time their {@link BlockBreakRule#properties()} stack
+     * additively via {@code BlockBreakProperties.merge}.
+     */
     void addRule(@NotNull UUID playerId, @NotNull BlockBreakRule rule);
 
     void removeRule(@NotNull UUID playerId, @NotNull BlockBreakRule rule);
@@ -30,4 +34,11 @@ public interface GlobalBlockBreakRules {
      * accepts the player; rules failing either are skipped.
      */
     Optional<BlockBreakRule> resolve(@NotNull Player player, @NotNull Block block);
+
+    /**
+     * Resolves every rule for {@code player} that matches {@code block} and whose
+     * condition accepts the player. Returned in registration order. Used by the
+     * resolver to additively stack overlapping global rules.
+     */
+    @NotNull List<BlockBreakRule> resolveAll(@NotNull Player player, @NotNull Block block);
 }
