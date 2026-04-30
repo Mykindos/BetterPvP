@@ -103,8 +103,8 @@ public class DamageEventProcessor implements Listener {
             return false; // Entity is invulnerable
         }
 
-        // Check if we can proceed with damage due to damage delays
-        if (!delayManager.processDamageDelay(damageEvent)) return false;
+        // Pre-event delay check (uses the damager as known before any listener can change it)
+        if (!delayManager.processPreEventDelay(damageEvent)) return false;
 
         // Check if they can be hurt
         if (damageEvent.isDamageeLiving() && damageEvent.getDamager() instanceof LivingEntity livingDamager) {
@@ -124,12 +124,21 @@ public class DamageEventProcessor implements Listener {
             return false; // The adapter has cancelled the event
         }
 
+        // Snapshot the damager before firing the event — listeners may resolve it to a real
+        // entity (e.g. Ice Prison assigning the caster as damager during the event call).
+        final LivingEntity preDamager = damageEvent.getDamager();
+
         // Fire our custom event
         UtilServer.callEvent(damageEvent);
 
         if (damageEvent.isCancelled()) {
             return false;
         }
+
+        // Post-event delay phase: re-check with the resolved damager and apply modifiers.
+        // This catches the case where a listener promoted the damager from null → player,
+        // meaning the previously stored delay key (player, damagee, cause) now applies.
+        if (!delayManager.processPostEventDelay(damageEvent, preDamager)) return false;
 
         // Call the finalizer
         finalizer.finalizeEvent(damageEvent, adapter);
