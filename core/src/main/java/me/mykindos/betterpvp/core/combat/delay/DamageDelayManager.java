@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -126,26 +125,47 @@ public class DamageDelayManager {
     }
     
     /**
-     * Processes damage delay for an event
+     * Pre-event phase: checks whether the damage is currently gated by an active delay.
+     * Must be called BEFORE the DamageEvent is fired, using the damager as it stands at
+     * that point (may still be null for skill-applied environmental damage).
+     *
      * @param event the damage event
-     * @return true if the damage should proceed, false if it should be blocked by delay
+     * @return true if the damage should proceed to the event call, false if blocked by delay
      */
-    public boolean processDamageDelay(DamageEvent event) {
-        // Check if damage can proceed
-        final boolean canDealDamage = canDealDamage(event.getDamager(), event.getDamagee(), event.getCause());
-        if (!canDealDamage) {
-            return false;
+    public boolean processPreEventDelay(DamageEvent event) {
+        return canDealDamage(event.getDamager(), event.getDamagee(), event.getCause());
+    }
+
+    /**
+     * Post-event phase: sets default delays, applies effect modifiers, and re-checks the
+     * delay with the <em>resolved</em> damager (which may have been set by a listener during
+     * the event call, e.g. Ice Prison assigning the caster as damager).
+     * <p>
+     * If the damager changed during the event the resolved damager key is also checked so
+     * that an existing delay registered under that key correctly blocks the hit.
+     *
+     * @param event       the damage event (damager may now differ from {@code preDamager})
+     * @param preDamager  the damager that was present before the event was fired
+     * @return true if the damage should proceed to finalisation, false if blocked
+     */
+    public boolean processPostEventDelay(DamageEvent event, @Nullable Entity preDamager) {
+        // If the damager was resolved/changed during the event, check the new key too.
+        Entity resolvedDamager = event.getDamager();
+        if (resolvedDamager != preDamager) {
+            if (!canDealDamage(resolvedDamager, event.getDamagee(), event.getCause())) {
+                return false;
+            }
         }
 
         // Set default delays if not already set
         setDefaultDelays(event);
 
-        // Apply effect modifiers
+        // Apply effect modifiers now that the real damager is known
         applyEffectModifiers(event);
 
         return true;
     }
-    
+
     /**
      * Gets the remaining delay for a specific damage combination
      * @param damager the damager (can be null)

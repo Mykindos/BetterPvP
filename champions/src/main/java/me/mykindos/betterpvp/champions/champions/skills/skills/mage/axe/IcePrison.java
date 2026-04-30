@@ -114,7 +114,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     public void despawn(Player player) {
         final List<RestoreBlock> blocks = blockHandler.getRestoreBlocks(player, getName());
-        final Collection<Player> receivers = player.getWorld().getNearbyPlayers(blocks.get(0).getBlock().getLocation(), 60);
+        final Collection<Player> receivers = player.getWorld().getNearbyPlayers(blocks.getFirst().getBlock().getLocation(), 60);
         for (RestoreBlock block : blocks) {
             final Location loc = block.getBlock().getLocation();
             loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 0.4f, 1.8f);
