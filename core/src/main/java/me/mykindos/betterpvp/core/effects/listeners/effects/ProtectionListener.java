@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -17,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import net.minecraft.world.entity.projectile.FishingHook;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -64,13 +66,11 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
-        if (!(event.getSource() instanceof Player player)) return;
+        if (!(event.getSource() instanceof Player)) return;
 
         event.getEntities().removeIf(ent -> {
-            if(ent instanceof Player target) {
-                if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
-                    return true;
-                }
+            if (ent instanceof Player target) {
+                return effectManager.hasEffect(target, EffectTypes.PROTECTION);
             }
             return false;
         });
@@ -91,6 +91,23 @@ public class ProtectionListener implements Listener {
         event.getItems().forEach(item -> {
             UtilItem.reserveItem(item, event.getPlayer(), reserveTime);
         });
+    }
+
+    @EventHandler
+    public void onEntityHurtEvent(EntityCanHurtEntityEvent event) {
+        if (event.getDamagee() instanceof Player damagee &&
+                event.getDamager() instanceof Player damager) {
+            if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
+                UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
+                event.setResult(Event.Result.DENY);
+            }
+
+            if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
+                UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
+                EffectTypes.disableProtectionReminder(damager);
+                event.setResult(Event.Result.DENY);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

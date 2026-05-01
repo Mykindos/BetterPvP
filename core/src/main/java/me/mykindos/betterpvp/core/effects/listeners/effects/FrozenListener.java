@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -95,6 +96,24 @@ public class FrozenListener implements Listener {
             }
         }
     }
+
+    @EventHandler
+    public void onCanHurt(EntityCanHurtEntityEvent event) {
+        if (event.getDamagee() instanceof LivingEntity damagee) {
+            if (effectManager.hasEffect(damagee, EffectTypes.FROZEN)) {
+                UtilMessage.message(event.getDamager(), "Frozen", "<yellow>%s</yellow> is frozen and cannot receive damage!", damagee.getName());
+                event.setResult(Event.Result.DENY);
+            }
+        }
+
+        if (event.getDamager() instanceof LivingEntity damager) {
+            if (effectManager.hasEffect(damager, EffectTypes.FROZEN)) {
+                UtilMessage.message(damager, "Frozen", "You cannot damage anything while you are Frozen!");
+                event.setResult(Event.Result.DENY);
+            }
+        }
+    }
+
 
 
 

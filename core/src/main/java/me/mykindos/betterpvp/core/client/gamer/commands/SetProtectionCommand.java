@@ -46,7 +46,7 @@ public class SetProtectionCommand extends Command {
             return;
         }
 
-        clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
+        clientManager.search().offline(args[0]).thenAccept(clientOptional -> {
             if (clientOptional.isEmpty()) {
                 UtilMessage.message(player, "Protection", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
                 return;

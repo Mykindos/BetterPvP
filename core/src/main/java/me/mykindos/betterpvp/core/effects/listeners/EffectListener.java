@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -18,7 +17,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -179,17 +177,6 @@ public class EffectListener implements Listener {
         effectsOptional.ifPresent(effects -> {
             effects.values().forEach(effectList -> effectList.forEach(effect -> effect.getEffectType().onReceive(event.getPlayer(), effect)));
         });
-    }
-
-    @EventHandler
-    public void onCanHurt(EntityCanHurtEntityEvent event) {
-        if (!event.isAllowed()) return;
-
-        if (effectManager.hasEffect(event.getDamagee(), EffectTypes.PROTECTION)
-                || effectManager.hasEffect(event.getDamagee(), EffectTypes.VANISH)
-                || effectManager.hasEffect(event.getDamagee(), EffectTypes.FROZEN)) {
-            event.setResult(Event.Result.DENY);
-        }
     }
 
 }

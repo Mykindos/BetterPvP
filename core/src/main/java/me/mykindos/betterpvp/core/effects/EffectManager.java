@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.effects;
 
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -25,6 +26,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Singleton
+@CustomLog
 public class EffectManager extends Manager<String, ConcurrentHashMap<String, List<Effect>>> {
 
     // Thread-safe cache for effect type names
@@ -271,14 +273,17 @@ public class EffectManager extends Manager<String, ConcurrentHashMap<String, Lis
             List<Effect> effectList = effects.get(type.getName());
             if (effectList == null) return;
             effectList.removeIf(effect -> {
+                try {
+                    if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                        vanillaEffectType.onExpire(target, effect, notify);
+                    }
 
-                if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                    vanillaEffectType.onExpire(target, effect, notify);
+                    UtilServer.callEvent(new EffectExpireEvent(target, effect, notify));
+                    return true;
+                } catch (Exception e) {
+                    log.error("Error while removing effect {} from {}: ", effect.getEffectType().getName(), target.getName(), e).submit();
+                    return false;
                 }
-
-                UtilServer.callEvent(new EffectExpireEvent(target, effect, notify));
-                return true;
-
             });
         });
 
