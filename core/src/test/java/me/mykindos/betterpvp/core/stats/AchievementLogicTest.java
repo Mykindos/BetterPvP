@@ -204,6 +204,20 @@ class AchievementLogicTest {
         assertFalse(achievement.onChangeValueCalled);
     }
 
+    @Test
+    @Order(13)
+    @DisplayName("onPropertyChangeListener: cancelled event is ignored (mirrors ignoreCancelled = true)")
+    void listener_cancelledEventIsIgnored() {
+        TestAchievement achievement = makeAchievement(100L);
+        achievement.setEnabled(true);
+
+        StatPropertyUpdateEvent event = makeEvent(watchedStat, 50L, 0L);
+        event.cancel("stats disabled");
+        achievement.onPropertyChangeListener(event);
+
+        assertFalse(achievement.onChangeValueCalled, "onChangeValue should NOT be called for a cancelled event");
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Delta reconstruction
     // ─────────────────────────────────────────────────────────────────────────
@@ -240,7 +254,7 @@ class AchievementLogicTest {
         achievement.setEnabled(true);
 
         // oldValue=40 (40%), newValue=55 (55%) — crosses the 50% threshold
-        achievement.handleNotify(container, watchedStat, 55L, 40L, Map.of());
+        achievement.handleNotify(container, 40f / 100f, 55f / 100f);
         assertEquals(1, achievement.notifyProgressCount, "Should notify once at 50% threshold");
     }
 
@@ -252,7 +266,7 @@ class AchievementLogicTest {
         achievement.setEnabled(true);
 
         // oldValue=30 (30%), newValue=45 (45%) — still below 50% threshold
-        achievement.handleNotify(container, watchedStat, 45L, 30L, Map.of());
+        achievement.handleNotify(container, 30f / 100f, 45f / 100f);
         assertEquals(0, achievement.notifyProgressCount);
     }
 
@@ -264,7 +278,7 @@ class AchievementLogicTest {
         achievement.setEnabled(true);
 
         // oldValue=50 (50%), newValue=60 (60%) — old is exactly at threshold, not below it
-        achievement.handleNotify(container, watchedStat, 60L, 50L, Map.of());
+        achievement.handleNotify(container, 50f / 100f, 60f / 100f);
         assertEquals(0, achievement.notifyProgressCount);
     }
 
@@ -276,7 +290,7 @@ class AchievementLogicTest {
         achievement.setEnabled(true);
 
         // oldValue=10 (10%), newValue=95 (95%) — crosses both 50% and 90% thresholds
-        achievement.handleNotify(container, watchedStat, 95L, 10L, Map.of());
+        achievement.handleNotify(container, 10f / 100f, 95f / 100f);
         assertEquals(1, achievement.notifyProgressCount, "Only the first crossed threshold should fire");
     }
 
@@ -292,7 +306,7 @@ class AchievementLogicTest {
         achievement.setEnabled(true);
         statsMap.put(realm, watchedStat, 100L, true); // 100% — ALL aggregate = 100
 
-        achievement.handleComplete(container);
+        achievement.handleComplete(container, 1.0f);
 
         verify(mockAchievementManager).saveCompletion(eq(container), eq(achievement), isNull());
     }
@@ -307,7 +321,7 @@ class AchievementLogicTest {
         when(completions.getCompletion(any(), any()))
                 .thenReturn(Optional.of(mock(AchievementCompletion.class)));
 
-        achievement.handleComplete(container);
+        achievement.handleComplete(container, 1.0f);
 
         verify(mockAchievementManager, never()).saveCompletion(any(), any(), any());
     }
@@ -320,7 +334,7 @@ class AchievementLogicTest {
         achievement.setEnabled(true);
         statsMap.put(realm, watchedStat, 90L, true); // 90% — not yet done
 
-        achievement.handleComplete(container);
+        achievement.handleComplete(container, 0.9f);
 
         verify(mockAchievementManager, never()).saveCompletion(any(), any(), any());
     }
@@ -334,11 +348,11 @@ class AchievementLogicTest {
         statsMap.put(realm, watchedStat, 100L, true); // 100%
 
         // first call — not yet completed
-        achievement.handleComplete(container);
+        achievement.handleComplete(container, 1.0f);
         // second call — simulate completion now recorded
         when(completions.getCompletion(any(), any()))
                 .thenReturn(Optional.of(mock(AchievementCompletion.class)));
-        achievement.handleComplete(container);
+        achievement.handleComplete(container, 1.0f);
 
         verify(mockAchievementManager, times(1)).saveCompletion(any(), any(), any());
     }
@@ -479,8 +493,14 @@ class AchievementLogicTest {
             capturedNewValue = newValue;
             capturedOldValue = oldValue;
             // Delegate to parent for threshold/completion logic, but skip StatPropertyUpdateEvent (no Bukkit PluginManager in tests)
-            handleNotify(container, stat, newValue, oldValue, otherProperties);
-            handleComplete(container);
+            java.util.Map<IStat, Long> oldMap = new java.util.HashMap<>(otherProperties);
+            oldMap.put(stat, oldValue == null ? 0L : oldValue);
+            java.util.Map<IStat, Long> newMap = new java.util.HashMap<>(otherProperties);
+            newMap.put(stat, newValue);
+            float oldPercent = calculatePercent(oldMap);
+            float newPercent = calculatePercent(newMap);
+            handleNotify(container, oldPercent, newPercent);
+            handleComplete(container, newPercent);
         }
 
         @Override

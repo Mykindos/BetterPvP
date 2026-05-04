@@ -25,9 +25,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,10 +41,10 @@ import java.util.Set;
 
 /**
  * Represents an Achievement. Achievements are for a certain period (ALL, meaning stats across all realms,
- * SEASON, stats across all realms that have a speicific season, and REALM, for the specific realm
+ * SEASON, stats across all realms that have a specific season, and REALM, for the specific realm
  */
 @CustomLog
-public abstract class Achievement implements IAchievement, Listener, IStat {
+public abstract class Achievement implements IAchievement, IStat {
 
     protected static final AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
     @Getter
@@ -68,6 +65,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
      */
     private List<Float> notifyThresholds;
 
+    @Getter
     protected boolean enabled;
     protected boolean doRewards;
 
@@ -85,9 +83,6 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     /**
      * Gets the value of this iStat based off of this achievement's AchievementType
-     * @param container
-     * @param stat
-     * @return
      */
     protected Long getValue(StatContainer container, IStat stat) {
         return switch (getAchievementFilterType()) {
@@ -101,54 +96,57 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    @Override
-    public void onPropertyChangeListener(final StatPropertyUpdateEvent event) {
-        if (!enabled) return;
-        try {
-            final IStat stat = event.getStat();
-            final Long newValue = event.getNewValue();
-            @Nullable
-            final Long oldValue = event.getOldValue();
-            final StatContainer container = event.getContainer();
-            //validate and retrieve
-            final List<IStat> statsTemp = watchedStats.stream()
-                    .filter(iStat -> iStat.containsStat(stat))
-                    .toList();
-
-            if (statsTemp.isEmpty()) return;
-            if (statsTemp.size() > 1) {
-                throw new IllegalStateException("Expected 1 changed stat, but got " + statsTemp.size() + ". " +
-                        "Make sure all watched composite Stats have unique savable stats.");
-            }
-
-            final IStat changedStat = statsTemp.getFirst();
-
-            Map<IStat, Long> otherProperties = new HashMap<>();
-            watchedStats.stream()
-                    .filter(iStat -> !stat.containsStat(stat))
-                    .forEach(iStat -> {
-                        otherProperties.put(stat, getValue(container, stat));
-                    });
-
-            onChangeValue(container, changedStat, newValue, oldValue, otherProperties);
-        } catch (Exception e) {
-            log.error("Error looking to update an achievement {}", getName(), e).submit();
-        }
-
-
-    }
-
     @Override
     public void onChangeValue(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherProperties) {
-        handleNotify(container, stat, newValue, oldValue, otherProperties);
-        handleComplete(container);
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
+        handleNotify(container, oldPercent, newPercent);
+        handleComplete(container, newPercent);
         long oldLong = (long) (oldPercent * FP_MODIFIER);
         long newLong = (long) (newPercent * FP_MODIFIER);
         // already on async thread – fire directly; the event itself is marked async
         new StatPropertyUpdateEvent(container, this, newLong, oldLong).callEvent();
+    }
+
+    @Override
+    public void onPropertyChangeListener(StatPropertyUpdateEvent event) {
+        if (!enabled) return;
+        if (event.isCancelled()) return;
+
+        final IStat eventStat = event.getStat();
+
+        // Single pass: split watchedStats into the matched stat and the rest
+        IStat changedStat = null;
+        int matchCount = 0;
+        final Map<IStat, Long> otherProperties = new HashMap<>();
+        final StatContainer container = event.getContainer();
+
+        for (IStat iStat : watchedStats) {
+            if (iStat.containsStat(eventStat)) {
+                changedStat = iStat;
+                matchCount++;
+            } else {
+                otherProperties.put(iStat, getValue(container, iStat));
+            }
+        }
+
+        if (matchCount == 0) return;
+        if (matchCount > 1) {
+            throw new IllegalStateException("Achievement '" + name +
+                    "' has " + matchCount + " watched stats that all contain " + eventStat.getStatType() +
+                    ". Make sure all watched composite stats have unique savable stats.");
+        }
+
+        // Use the container's live value as the authoritative new value, then reconstruct
+        // effectiveOld from the event delta so concurrent increments are handled correctly.
+        final Long effectiveNew = getValue(container, changedStat);
+        final Long rawNew = event.getNewValue();
+        final Long rawOld = event.getOldValue();
+        final long delta = rawNew - (rawOld == null ? 0L : rawOld);
+        final long effectiveOld = effectiveNew - delta;
+
+
+        onChangeValue(container, changedStat, effectiveNew, effectiveOld, otherProperties);
     }
 
     @Override
@@ -241,19 +239,8 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void handleNotify(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherStats) {
+    public void handleNotify(StatContainer container, float oldPercent, float newPercent) {
         if (notifyThresholds.isEmpty()) return;
-        // Compute new percent first; avoid building the old-value map when progress is below all thresholds
-        float newPercent = calculatePercent(constructMap(stat, newValue, otherStats));
-        boolean maybeThreshold = false;
-        for (float t : notifyThresholds) {
-            if (newPercent >= t) {
-                maybeThreshold = true;
-                break;
-            }
-        }
-        if (!maybeThreshold) return;
-        float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 // player messaging must happen on the main thread
@@ -268,9 +255,8 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     @Override
-    public void handleComplete(StatContainer container) {
-        // Fast path: skip the more expensive completion-status lookup when not yet at 100%
-        if (getPercentComplete(container, achievementFilterType, getPeriod()) < 1.0f) return;
+    public void handleComplete(StatContainer container, float newPercent) {
+        if (newPercent < 1.0f) return;
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
         if (achievementCompletionOptional.isEmpty()) {
             complete(container);

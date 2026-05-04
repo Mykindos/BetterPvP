@@ -73,7 +73,11 @@ public class StatContainer implements Unique, IStatMapListener {
     public void onMapValueChanged(IStat stat, Long newValue, @Nullable Long oldValue) {
         try {
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                new StatPropertyUpdateEvent(this, stat, newValue, oldValue).callEvent();
+                final StatPropertyUpdateEvent event = new StatPropertyUpdateEvent(this, stat, newValue, oldValue);
+                event.callEvent();
+                if (event.isCancelled()) {
+                    changedStats.remove(stat);
+                }
             });
         } catch (Exception e) {
             log.error("Exception on map value change {}", stat, e).submit();

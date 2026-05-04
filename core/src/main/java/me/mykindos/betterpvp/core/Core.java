@@ -136,6 +136,9 @@ public class Core extends BPvPPlugin {
         var coreAchievementLoader = injector.getInstance(CoreAchievementLoader.class);
         coreAchievementLoader.loadAll(PACKAGE);
 
+        // Register AchievementManager as reloadable so achievements re-read their config on /reload
+        getReloadables().add(injector.getInstance(me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager.class));
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 

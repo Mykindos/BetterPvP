@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.core.client.achievements.repository.AchievementComp
 import me.mykindos.betterpvp.core.client.achievements.types.Achievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
-import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -28,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface IAchievement {
 
@@ -38,24 +38,39 @@ public interface IAchievement {
     String getName();
 
     /**
-     * Listens for the event to call {@link IAchievement#onChangeValue(StatContainer, IStat, Long, Long, Map)} if valid
-     * @param event
+     * Whether this achievement is enabled. Disabled achievements are skipped during stat-update dispatch.
      */
-    void onPropertyChangeListener(final StatPropertyUpdateEvent event);
+    boolean isEnabled();
 
     /**
-     * Called when a watched property is updated
-     * @param container the {@link PropertyContainer} being updated
-     * @param property the property that has changed
+     * Get the watched stats for this achievement. Used by the centralised dispatch to find relevant achievements.
+     */
+    Set<IStat> getWatchedStats();
+
+    /**
+     * Called when a watched stat is updated
+     * @param container the {@link StatContainer} being updated
+     * @param stat the stat that has changed
      * @param newValue the value that was changed
      * @param oldValue the previous value, {@code null} when there is no previous value
-     * @param otherProperties the other watched properties for the container, excluding the changed property
+     * @param otherStats the other watched stats for the container, excluding the changed stat
      */
     void onChangeValue(final StatContainer container,
                        final IStat stat,
                        final Long newValue,
                        final @Nullable("Null when no previous value") Long oldValue,
                        final Map<IStat, Long> otherStats);
+
+    /**
+     * Entry-point for processing a {@link me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent}
+     * for this achievement. Mirrors the {@code ignoreCancelled = true} semantics of the Bukkit event handler:
+     * cancelled events are silently ignored. Checks whether this achievement is enabled and whether
+     * the changed stat matches a watched stat, then reconstructs the effective old value from the
+     * event delta and delegates to {@link #onChangeValue}.
+     *
+     * @param event the stat-property update event to process
+     */
+    void onPropertyChangeListener(me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent event);
 
     /**
      * Get the {@link AchievementCategory} of this {@link IAchievement}
@@ -257,23 +272,22 @@ public interface IAchievement {
      * @param container the stat container to check
      */
     void forceCheck(final StatContainer container);
-    /**
-     * Does the logic for whether to call {@link IAchievement#notifyProgress(PropertyContainer, Audience, float)} and executes it
-     * @param container
-     * @param property
-     * @param newValue
-     * @param oldValue
-     * @param otherProperties
-     */
-    void handleNotify(final StatContainer container,
-                      final IStat stat,
-                      final Long newValue,
-                      final @Nullable("Null when no previous value") Long oldValue,
-                      final Map<IStat, Long> otherStats);
 
     /**
-     * Does the logic for whether to call {@link IAchievement#notifyComplete(PropertyContainer, Audience)} and {@link IAchievement#complete(PropertyContainer)} and executes it
-     * @param container
+     * Does the logic for whether to call {@link IAchievement#notifyProgress(StatContainer, Audience, float)} and executes it.
+     * Callers are expected to pre-compute the percentages so this method does not recompute them.
+     * @param container the stat container
+     * @param oldPercent the completion percent before the change (0–1)
+     * @param newPercent the completion percent after the change (0–1)
      */
-    void handleComplete(final StatContainer container);
+    void handleNotify(final StatContainer container, final float oldPercent, final float newPercent);
+
+    /**
+     * Does the logic for whether to call {@link IAchievement#notifyComplete(StatContainer, Audience)} and
+     * {@link IAchievement#complete(StatContainer)} and executes it.
+     * Callers are expected to pre-compute the new percentage so this method does not recompute it.
+     * @param container the stat container
+     * @param newPercent the completion percent after the change (0–1)
+     */
+    void handleComplete(final StatContainer container, final float newPercent);
 }
