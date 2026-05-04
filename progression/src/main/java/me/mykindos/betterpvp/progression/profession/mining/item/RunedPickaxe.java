@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.mining.item;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.access.AccessScope;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.blockbreak.component.ToolComponent;
@@ -17,6 +18,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -31,6 +33,8 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.item.interaction.InstantMineInteraction;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+
+import java.util.Set;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
@@ -64,6 +68,8 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
 
         addBaseComponent(new ToolComponent()
                 .addRule(BlockBreakRule.of(BlockGroups.STONES, BlockBreakProperties.breakable(180))));
+
+        addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT, AccessScope.USE, AccessScope.DAMAGE)));
 
         addSerializableComponent(new DurabilityComponent(2560));
     }

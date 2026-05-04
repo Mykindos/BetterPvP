@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.FishLoot;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -23,19 +22,19 @@ public class PlayerCaughtFishEvent extends ProgressionFishingEvent {
     private FishLoot fishLoot;
 
     final FishHook hook;
-    final Entity caught;
 
     @Setter
     private boolean ignoresWeight;
     @Setter
     private boolean baseFishingUnlocked;
 
-    public PlayerCaughtFishEvent(Player player, LootBundle bundle, @Nullable FishLoot fishLoot,
-                                  FishHook hook, Entity caught) {
+    public PlayerCaughtFishEvent(Player player,
+                                 LootBundle bundle,
+                                 @Nullable FishLoot fishLoot,
+                                 FishHook hook) {
         super(player);
         this.bundle = bundle;
         this.fishLoot = fishLoot;
         this.hook = hook;
-        this.caught = caught;
     }
 }

@@ -5,14 +5,15 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
 import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.mining.attributes.goldenchance.GoldenChanceAttribute;
 import me.mykindos.betterpvp.progression.profession.skill.mining.attributes.goldenyield.GoldenYieldAttribute;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
@@ -59,13 +60,13 @@ public class GildedDiscovery extends ProfessionSkill {
         return baseChance + (level * chancePerLevel);
     }
 
-    public void onBlockBreak(PlayerMinesOreEvent event) {
+    public void onBlockBreak(BlockDropItemEvent event) {
         Player player = event.getPlayer();
-        Block block = event.getMinedOreBlock();
+        BlockState state = event.getBlockState();
+        if (blockTagManager.isPlayerPlaced(event.getBlock())) return;
 
-        if (!UtilBlock.isStoneBased(block)) return;
-        if (UtilBlock.isOre(block.getType())) return;
-        if (blockTagManager.isPlayerPlaced(block)) return;
+        if (!UtilBlock.isStoneBased(state.getType())) return;
+        if (UtilBlock.isOre(state.getType())) return;
 
         profileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getSkillLevel(profile);
@@ -75,7 +76,9 @@ public class GildedDiscovery extends ProfessionSkill {
             if (Math.random() >= chance) return;
 
             int extraYield = UtilMath.randomInt(baseYieldMin, baseYieldMax) + (int) goldenYield.getBonusYield(player);
-            block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.GOLD_ORE, extraYield));
+            final ItemStack stack = new ItemStack(Material.GOLD_ORE, extraYield);
+            final Item item = state.getWorld().dropItemNaturally(state.getLocation().toCenterLocation(), stack);
+            event.getItems().add(item);
         });
     }
 

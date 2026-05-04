@@ -17,8 +17,10 @@ public interface GlobalBlockBreakRules {
 
     /**
      * Adds a global rule for the player. Multiple rules with overlapping matchers may
-     * coexist — at resolve time their {@link BlockBreakRule#properties()} stack
-     * additively via {@code BlockBreakProperties.merge}.
+     * coexist — at resolve time the resolver folds them by {@link BlockBreakRule#layer()}:
+     * additive speeds sum, multiplicative speeds compose by product, overrides replace
+     * the result (highest {@link BlockBreakRule#priority()} wins), and any unbreakable
+     * short-circuits to unbreakable.
      */
     void addRule(@NotNull UUID playerId, @NotNull BlockBreakRule rule);
 

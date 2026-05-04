@@ -34,6 +34,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -46,7 +47,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.function.Function;
@@ -208,6 +208,11 @@ public class FishingListener implements Listener {
                 Particle.HAPPY_VILLAGER.builder().location(hookLocation).receivers(60, true).spawn();
             }
             case CAUGHT_FISH -> {
+                final Entity caught = event.getCaught();
+                if (caught != null) {
+                    caught.remove(); // remove default
+                }
+
                 final LootBundle bundle = fishLoot.get(player);
                 if (bundle == null) {
                     UtilMessage.message(player, "Fishing", "<red>No loot bundle found — please report this to an admin!");
@@ -225,7 +230,7 @@ public class FishingListener implements Listener {
                 }
 
                 PlayerCaughtFishEvent caughtFishEvent = new PlayerCaughtFishEvent(
-                        player, bundle, primaryFishLoot, event.getHook(), event.getCaught());
+                        player, bundle, primaryFishLoot, event.getHook());
 
                 Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
                 progressionSkillOptional.ifPresent(progressionSkill ->
@@ -237,12 +242,6 @@ public class FishingListener implements Listener {
                         }));
 
                 UtilServer.callEvent(caughtFishEvent);
-
-                UtilServer.runTaskLater(progression, () -> {
-                    if (event.getCaught() instanceof Item && event.getCaught().isValid()) {
-                        event.getCaught().remove();
-                    }
-                }, 20L * 60L);
             }
         }
     }
@@ -252,32 +251,34 @@ public class FishingListener implements Listener {
         if (!fishingHandler.isEnabled()) return;
         final Player player = event.getPlayer();
         final FishHook hook = event.getHook();
-        final Item entity = (Item) Objects.requireNonNull(event.getCaught());
-
         final LootBundle bundle = event.getBundle();
         fishLoot.remove(player);
 
         splash(hook.getLocation());
 
-        entity.setCanMobPickup(false);
-        UtilItem.reserveItem(entity, player, 10);
-
         // Award all loot entries in the bundle.
         for (Loot<?, ?> loot : bundle) {
             final LootContext context = bundle.getContext();
+            if (loot.award(context) instanceof Item item) {
+                UtilItem.reserveItem(item, player, 30);
+                UtilServer.runTaskLater(progression, () -> {
+                    if (item.isValid()) {
+                        item.remove();
+                    }
+                }, 20L * 60L);
+            }
+
             if (loot instanceof FishLoot fishLoot) {
                 // rollFish() was already called in onFish CAUGHT_FISH before the event was fired.
                 // Skills may have mutated the weight. Now award and grant XP.
-                fishLoot.award(context);
                 final Fish fish = fishLoot.getCurrentFish();
                 if (fish != null) {
                     fishingHandler.addFish(player, fish);
                     UtilMessage.message(player, "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!",
                             fish.getTypeName(), me.mykindos.betterpvp.core.utilities.UtilFormat.formatNumber(fish.getWeight()));
                 }
-            } else {
-                loot.award(context);
             }
+
         }
 
         fishingHandler.attemptTreasureDrop(player, hook.getLocation());

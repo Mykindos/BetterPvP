@@ -13,13 +13,14 @@ public interface BlockBreakResolver {
      * Compute the effective break properties for {@code player} breaking
      * {@code block} while holding {@code held} (may be null/air).
      * <p>
-     * Composition rules:
-     * <ul>
-     *   <li>Tool rule found, no global rule → tool only (no stacking).</li>
-     *   <li>Tool rule found, global rule found → additive merge of speeds; either unbreakable wins.</li>
-     *   <li>No tool rule, global rule found → global only.</li>
-     *   <li>Neither → vanilla fallback (uses {@code Material.getHardness()} and a hand-equivalent speed).</li>
-     * </ul>
+     * Composition order (see {@code RuleLayer}):
+     * <ol>
+     *   <li>Base = tool {@code ToolComponent} match, else vanilla destroy-speed fallback.</li>
+     *   <li>If any matching rule (tool or global) is unbreakable → unbreakable wins.</li>
+     *   <li>If any global {@code OVERRIDE} matches → that rule's speed replaces the result;
+     *       highest {@code priority()} wins, ties go to last-registered.</li>
+     *   <li>Otherwise: {@code (base + Σ additive) × Π multiplicative}, clamped to {@code MIN_SPEED}.</li>
+     * </ol>
      */
     @NotNull
     BlockBreakProperties resolve(@NotNull Player player, @NotNull Block block, @Nullable ItemStack held);

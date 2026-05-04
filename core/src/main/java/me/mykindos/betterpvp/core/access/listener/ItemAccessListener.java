@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.access.AccessRequirement;
 import me.mykindos.betterpvp.core.access.AccessScope;
 import me.mykindos.betterpvp.core.access.ItemAccessService;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor;
+import me.mykindos.betterpvp.core.interaction.event.InteractionPreExecuteEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -93,6 +95,18 @@ public class ItemAccessListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         Player player = event.getPlayer();
+        ItemStack itemStack = player.getEquipment().getItemInMainHand();
+        if (itemStack.getType().isAir()) return;
+
+        checkAndDeny(player, itemStack, AccessScope.USE, cancelled -> {
+            if (cancelled) event.setCancelled(true);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onInteraction(InteractionPreExecuteEvent event) {
+        if (!(event.getActor() instanceof PlayerInteractionActor playerActor)) return;
+        final Player player = playerActor.getPlayer();
         ItemStack itemStack = player.getEquipment().getItemInMainHand();
         if (itemStack.getType().isAir()) return;
 

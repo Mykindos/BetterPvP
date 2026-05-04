@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.progression.profession.skill.mining.attributes.sto
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.blockbreak.ToolMiningSpeed;
 import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRules;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakProperties;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockMatcher;
+import me.mykindos.betterpvp.core.framework.blockbreak.rule.RuleLayer;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.preset.BlockGroups;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
@@ -39,8 +39,8 @@ public class StoneEfficiencyAttributeListener implements Listener {
     }
 
     /**
-     * Properties are computed per-resolve from the live attribute value, so level-ups
-     * apply without re-registering the rule. Quits clear all of a player's rules via
+     * Multiplicative rule — properties are computed per-resolve so level-ups apply
+     * without re-registering. Quits clear all of a player's rules via
      * {@code GlobalBlockBreakRulesImpl#onQuit}.
      */
     private record DynamicStoneEfficiencyRule(UUID playerId, StoneEfficiencyAttribute attribute) implements BlockBreakRule {
@@ -53,15 +53,18 @@ public class StoneEfficiencyAttributeListener implements Listener {
         @Override
         public @NotNull BlockBreakProperties properties() {
             final Player player = Bukkit.getPlayer(playerId);
-            if (player == null) return BlockBreakProperties.breakable(BlockBreakProperties.MIN_SPEED);
-            final double bonus = attribute.getMiningSpeedBonus(player);
-            final int speed = Math.max(BlockBreakProperties.MIN_SPEED, (int) Math.round(ToolMiningSpeed.DIAMOND * bonus));
-            return BlockBreakProperties.breakable(speed);
+            final double bonus = player == null ? 0.0 : attribute.getMiningSpeedBonus(player);
+            return BlockBreakProperties.multiplier(1.0 + Math.max(0.0, bonus));
         }
 
         @Override
         public @NotNull Predicate<Player> condition() {
             return p -> p.getUniqueId().equals(playerId) && attribute.getMiningSpeedBonus(p) > 0;
+        }
+
+        @Override
+        public @NotNull RuleLayer layer() {
+            return RuleLayer.MULTIPLICATIVE;
         }
     }
 }

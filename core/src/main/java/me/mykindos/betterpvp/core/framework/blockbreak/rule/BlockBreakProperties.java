@@ -7,11 +7,16 @@ import lombok.ToString;
 /**
  * Immutable value: how a block behaves when broken under a specific rule.
  * <p>
- * Break speed is in the framework's scaled units (vanilla tool speed × 15) and
- * is expressed as a non-negative {@code int}. Must always be strictly positive —
- * a value of {@code 1} is the slowest allowed. To express "cannot break", set
- * {@link #breakable} to {@code false}; the speed field is then meaningless but
- * still kept positive for invariant simplicity.
+ * Carries one of three payloads, picked by the rule's {@link RuleLayer}:
+ * <ul>
+ *   <li>An int {@code breakSpeed} for {@code ADDITIVE} / {@code OVERRIDE} rules
+ *       and for tool base rules. In the framework's scaled units (vanilla × 15).</li>
+ *   <li>A double {@code multiplier} for {@code MULTIPLICATIVE} rules. {@code 1.0} is
+ *       a no-op; {@code 1.10} is +10%.</li>
+ *   <li>{@link #unbreakable()} short-circuits the resolver regardless of layer.</li>
+ * </ul>
+ * The unused field for any given variant is left at a benign default
+ * ({@code MIN_SPEED} / {@code 1.0}) so getters are always safe to call.
  */
 @Getter
 @ToString
@@ -21,31 +26,25 @@ public final class BlockBreakProperties {
 
     private final boolean breakable;
     private final int breakSpeed;
+    private final double multiplier;
 
-    public BlockBreakProperties(boolean breakable, int breakSpeed) {
-        Preconditions.checkArgument(breakSpeed > 0, "breakSpeed must be > 0 (got %s)", breakSpeed);
+    private BlockBreakProperties(boolean breakable, int breakSpeed, double multiplier) {
         this.breakable = breakable;
         this.breakSpeed = breakSpeed;
+        this.multiplier = multiplier;
     }
 
     public static BlockBreakProperties unbreakable() {
-        return new BlockBreakProperties(false, MIN_SPEED);
+        return new BlockBreakProperties(false, MIN_SPEED, 1.0);
     }
 
     public static BlockBreakProperties breakable(int speed) {
-        return new BlockBreakProperties(true, speed);
+        Preconditions.checkArgument(speed > 0, "breakSpeed must be > 0 (got %s)", speed);
+        return new BlockBreakProperties(true, speed, 1.0);
     }
 
-    /**
-     * Additive merge of two rule outcomes (tool + global).
-     * Unbreakable always wins: if either side is unbreakable, the merged result is unbreakable.
-     * Otherwise speeds add. Saturating add to avoid overflow on absurd stacking.
-     */
-    public BlockBreakProperties merge(BlockBreakProperties other) {
-        if (other == null) return this;
-        if (!this.breakable || !other.breakable) return unbreakable();
-        final long sum = (long) this.breakSpeed + (long) other.breakSpeed;
-        final int capped = sum > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) sum;
-        return new BlockBreakProperties(true, capped);
+    public static BlockBreakProperties multiplier(double multiplier) {
+        Preconditions.checkArgument(multiplier > 0.0, "multiplier must be > 0 (got %s)", multiplier);
+        return new BlockBreakProperties(true, MIN_SPEED, multiplier);
     }
 }

@@ -33,41 +33,47 @@ public class DefaultBlockBreakResolver implements BlockBreakResolver {
     @Override
     public @NotNull BlockBreakProperties resolve(@NotNull Player player, @NotNull Block block, @Nullable ItemStack held) {
         final BlockBreakProperties tool = resolveFromTool(held, block).orElse(null);
-
-        // Fold all matching globals so multiple rules (e.g. an item buff plus a
-        // passive profession attribute) can both contribute to the player's speed.
         final List<BlockBreakRule> globals = globalRules.resolveAll(player, block);
-        BlockBreakProperties global = null;
+
+        if (tool != null && !tool.isBreakable()) return BlockBreakProperties.unbreakable();
         for (BlockBreakRule rule : globals) {
-            final BlockBreakProperties props = rule.properties();
-            global = global == null ? props : global.merge(props);
+            if (!rule.properties().isBreakable()) return BlockBreakProperties.unbreakable();
         }
 
-        // Either side unbreakable → unbreakable.
-        if ((tool != null && !tool.isBreakable()) || (global != null && !global.isBreakable())) {
-            return BlockBreakProperties.unbreakable();
+        // Sort once, then walk in three passes (additive → multiplicative → override).
+        // Within each layer, highest priority is applied first; ties preserve registration order.
+        final List<BlockBreakRule> ordered = new java.util.ArrayList<>(globals);
+        ordered.sort(java.util.Comparator
+                .comparingInt((BlockBreakRule r) -> r.layer().ordinal())
+                .thenComparing(java.util.Comparator.comparingInt(BlockBreakRule::priority).reversed()));
+
+        long additiveSum = 0L;
+        double multiplierProduct = 1.0;
+        BlockBreakRule winningOverride = null;
+        for (BlockBreakRule rule : ordered) {
+            switch (rule.layer()) {
+                case ADDITIVE -> additiveSum += rule.properties().getBreakSpeed();
+                case MULTIPLICATIVE -> multiplierProduct *= rule.properties().getMultiplier();
+                case OVERRIDE -> {
+                    // First in this pass wins because the list is pre-sorted by priority desc.
+                    if (winningOverride == null) winningOverride = rule;
+                }
+            }
         }
 
-        if (tool != null && global != null) {
-            return tool.merge(global); // additive
+        if (winningOverride != null) {
+            return BlockBreakProperties.breakable(
+                    Math.max(BlockBreakProperties.MIN_SPEED, winningOverride.properties().getBreakSpeed()));
         }
-        if (tool != null) return tool;       // no stacking when no global match
-        if (global != null) return global;   // no stacking when no tool match
 
-        // Neither matched — true vanilla fallback. Use Paper's real tool/block speed
-        // so a diamond pickaxe on dirt still mines fast, and a fist on stone is slow.
-        // Drops are governed by breakNaturally(held) downstream, which already respects
-        // NEEDS_*_TOOL tags (obsidian + wooden pickaxe drops nothing).
-        final ItemStack effectiveHeld = held == null ? new ItemStack(org.bukkit.Material.AIR) : held;
-        float destroySpeed = block.getDestroySpeed(effectiveHeld);
-        // Vanilla applies a ~3.33x slowdown when the tool isn't the preferred tier
-        // (the 30 → 100 divisor in the wiki formula). Bake it into the speed here.
-        if (!block.isPreferredTool(effectiveHeld)) {
-            destroySpeed /= (100f / 30f);
+        final int base = tool != null ? tool.getBreakSpeed() : vanillaFallbackSpeed(block, held);
+        if (additiveSum == 0L && multiplierProduct == 1.0) {
+            return BlockBreakProperties.breakable(Math.max(BlockBreakProperties.MIN_SPEED, base));
         }
-        final int scaled = Math.max(BlockBreakProperties.MIN_SPEED,
-                Math.round(destroySpeed * (float) ToolMiningSpeed.SCALE));
-        return BlockBreakProperties.breakable(scaled);
+
+        final double combined = ((double) base + (double) additiveSum) * multiplierProduct;
+        final int saturated = combined > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) Math.round(combined);
+        return BlockBreakProperties.breakable(Math.max(BlockBreakProperties.MIN_SPEED, saturated));
     }
 
     private Optional<BlockBreakProperties> resolveFromTool(@Nullable ItemStack held, Block block) {
@@ -77,5 +83,21 @@ public class DefaultBlockBreakResolver implements BlockBreakResolver {
         final Optional<ToolComponent> compOpt = instOpt.get().getComponent(ToolComponent.class);
         if (compOpt.isEmpty()) return Optional.empty();
         return compOpt.get().resolve(block).map(BlockBreakRule::properties);
+    }
+
+    /**
+     * True vanilla fallback when the held item has no {@code ToolComponent} match.
+     * Uses Paper's destroy-speed lookup so a diamond pick on dirt is fast and a fist
+     * on stone is slow. Drops are governed by {@code breakNaturally(held)} downstream,
+     * which already respects {@code NEEDS_*_TOOL} tags.
+     */
+    private int vanillaFallbackSpeed(Block block, @Nullable ItemStack held) {
+        final ItemStack effectiveHeld = held == null ? new ItemStack(org.bukkit.Material.AIR) : held;
+        float destroySpeed = block.getDestroySpeed(effectiveHeld);
+        if (!block.isPreferredTool(effectiveHeld)) {
+            destroySpeed /= (100f / 30f);
+        }
+        return Math.max(BlockBreakProperties.MIN_SPEED,
+                Math.round(destroySpeed * (float) ToolMiningSpeed.SCALE));
     }
 }

@@ -12,12 +12,13 @@ import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
-import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDropItemEvent;
 
 @BPvPListener
 @Singleton
@@ -39,12 +40,12 @@ public class SalvagersTouchAttributeListener implements Listener {
         this.sessionController = sessionController;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerMinesOre(PlayerMinesOreEvent event) {
-        Block block = event.getMinedOreBlock();
-        if (!UtilBlock.isStoneBased(block)) return;
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerMinesOre(BlockDropItemEvent event) {
+        BlockState block = event.getBlockState();
+        if (!UtilBlock.isStoneBased(block.getType())) return;
         if (UtilBlock.isOre(block.getType())) return;
-        if (blockTagManager.isPlayerPlaced(block)) return;
+        if (blockTagManager.isPlayerPlaced(event.getBlock())) return;
 
         double chance = attribute.getChance(event.getPlayer());
         if (chance <= 0) return;
@@ -53,10 +54,13 @@ public class SalvagersTouchAttributeListener implements Listener {
         Player player = event.getPlayer();
         LootTable table = lootTableRegistry.loadLootTable(LOOT_TABLE_ID);
         LootSession session = sessionController.resolve(player, table, () -> LootSession.newSession(table, player));
-        LootContext context = new LootContext(session, block.getLocation(), "Mining");
+        LootContext context = new LootContext(session, block.getLocation().toCenterLocation(), "Mining");
         LootBundle bundle = table.generateLoot(context);
         for (Loot<?, ?> loot : bundle) {
-            loot.award(context);
+            final Object award = loot.award(context);
+            if (award instanceof Item item) {
+                event.getItems().add(item);
+            }
         }
     }
 }

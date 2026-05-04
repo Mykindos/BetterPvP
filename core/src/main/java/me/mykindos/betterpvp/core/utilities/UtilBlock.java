@@ -884,11 +884,15 @@ public class UtilBlock {
      * Returns true if the block's material belongs to the stone family
      * (stone variants, deepslate, tuff, nether/end stone, and all natural ore variants).
      *
-     * @param block the block to check, must not be null
+     * @param type the block to check, must not be null
      * @return {@code true} if the block is stone-family, otherwise {@code false}
      */
-    public static boolean isStoneBased(Block block) {
-        return STONE_BASED_MATERIALS.contains(block.getType());
+    public static boolean isStoneBased(Material type) {
+        return STONE_BASED_MATERIALS.contains(type);
+    }
+
+    public static boolean isStoneBased(Block type) {
+        return isStoneBased(type.getType());
     }
 
     /**
@@ -911,7 +915,7 @@ public class UtilBlock {
                             center.getBlockY() + dy,
                             center.getBlockZ() + dz);
                     total++;
-                    if (isStoneBased(block)) {
+                    if (isStoneBased(block.getType())) {
                         stoneCount++;
                     }
                 }

@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -103,6 +104,13 @@ public final class FishLoot extends Loot<Fish, Item> {
         Player player = null;
         if (audience instanceof Player p) {
             player = p;
+        } else if (audience instanceof ForwardingAudience forwardingAudience) {
+            for (Audience member : forwardingAudience.audiences()) {
+                if (member instanceof Player p) {
+                    player = p;
+                    break;
+                }
+            }
         }
 
         final BaseItem baseItem = itemFactory.getItemRegistry().getItem(itemKey);

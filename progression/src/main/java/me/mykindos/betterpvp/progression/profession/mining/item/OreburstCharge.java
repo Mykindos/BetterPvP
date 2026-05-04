@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.mining.item;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.access.AccessScope;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableHandler;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.CoalBlockItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
@@ -30,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
@@ -74,6 +77,8 @@ public class OreburstCharge extends BaseItem implements Reloadable {
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.LEFT_CLICK, oreburstChargeInteraction)
                 .build());
+
+        addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT, AccessScope.USE, AccessScope.DAMAGE)));
     }
 
     @Override

@@ -2,15 +2,17 @@ package me.mykindos.betterpvp.progression.profession.skill.mining.attributes.ore
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -40,8 +42,8 @@ public class OreInfusionAttributeListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerMinesOre(PlayerMinesOreEvent event) {
-        Block minedBlock = event.getMinedOreBlock();
+    public void onPlayerMinesOre(BlockBreakEvent event) {
+        Block minedBlock = event.getBlock();
         if (!UtilBlock.isStoneBased(minedBlock)) return;
         if (UtilBlock.isOre(minedBlock.getType())) return;
         if (blockTagManager.isPlayerPlaced(minedBlock)) return;
@@ -59,7 +61,20 @@ public class OreInfusionAttributeListener implements Listener {
                     if (UtilBlock.isOre(neighbor.getType())) continue;
                     if (blockTagManager.isPlayerPlaced(neighbor)) continue;
                     if (random.nextDouble() >= chance) continue;
-                    neighbor.setType(ORE_POOL[random.nextInt(ORE_POOL.length)]);
+
+                    final BlockData previousData = neighbor.getBlockData();
+                    final BlockData replacementData = ORE_POOL[random.nextInt(ORE_POOL.length)].createBlockData();
+                    final ScriptedBlockPlaceEvent placeEvent = new ScriptedBlockPlaceEvent(
+                            event.getPlayer(),
+                            neighbor,
+                            previousData,
+                            replacementData,
+                            "progression:ore_infusion");
+                    placeEvent.callEvent();
+                    if (placeEvent.isCancelled()) continue;
+
+                    neighbor.setBlockData(placeEvent.getReplacementData());
+                    UtilBlock.playBlockEffect(neighbor, placeEvent.getReplacementData());
                 }
             }
         }

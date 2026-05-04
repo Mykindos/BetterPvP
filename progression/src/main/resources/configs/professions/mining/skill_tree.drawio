@@ -370,7 +370,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-121" edge="1" parent="1" source="treasure_trigger_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="treasure_trigger_2" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_1">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_1">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="4080" as="geometry" />
           </mxCell>
@@ -378,12 +378,12 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-122" edge="1" parent="1" source="treasure_trigger_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="treasure_trigger_3" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_2">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_2">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="3960" as="geometry" />
           </mxCell>
         </object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_3">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_3">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="3840" as="geometry" />
           </mxCell>
@@ -394,7 +394,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-149" edge="1" parent="1" source="treasure_trigger_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_26">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_4">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_4">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="4860" as="geometry" />
           </mxCell>
@@ -402,7 +402,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-135" edge="1" parent="1" source="treasure_trigger_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_5">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_5">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="4980" as="geometry" />
           </mxCell>
@@ -410,7 +410,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-136" edge="1" parent="1" source="treasure_trigger_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_6">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_6">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="5100" as="geometry" />
           </mxCell>
@@ -418,7 +418,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-137" edge="1" parent="1" source="treasure_trigger_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_7">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_7">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="5220" as="geometry" />
           </mxCell>
@@ -426,7 +426,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-139" edge="1" parent="1" source="treasure_trigger_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="golden_yield_7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_8">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_8">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="120" y="5340" as="geometry" />
           </mxCell>
@@ -434,7 +434,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-176" edge="1" parent="1" source="treasure_trigger_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="increased_experience_9">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_9">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_9">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="120" y="6480" as="geometry" />
           </mxCell>
@@ -442,7 +442,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-175" edge="1" parent="1" source="treasure_trigger_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_9">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_10">
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.0005" per_level="0.0005" max_level="1" id="treasure_trigger_10">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="180" y="6360" as="geometry" />
           </mxCell>
