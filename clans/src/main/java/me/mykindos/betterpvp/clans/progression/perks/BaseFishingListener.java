@@ -40,61 +40,39 @@ public class BaseFishingListener implements Listener {
     @EventHandler
     public void onStartFishing(PlayerStartFishingEvent event) {
         Player player = event.getPlayer();
+        if (hasBaseFishing(player)) return;
 
-        Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
-        if(progressionSkillOptional.isEmpty()) {
-            return;
+        Optional<Clan> playerClan = clanManager.getClanByPlayer(player);
+        Optional<Clan> hookClan = clanManager.getClanByLocation(event.getHook().getLocation());
+        Optional<Clan> standClan = clanManager.getClanByLocation(player.getLocation());
+
+        // Standing or hooking inside the player's own clan territory requires Base Fishing.
+        if (playerClan.isPresent()) {
+            Clan own = playerClan.get();
+            if (standClan.map(own::equals).orElse(false) || hookClan.map(own::equals).orElse(false)) {
+                denyFishing(event, player, "You must unlock <green>Base Fishing</green> to fish in your own territory");
+                return;
+            }
         }
 
-        ProfessionNode skill = progressionSkillOptional.get();
-
-        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            var profession = profile.getProfessionDataMap().get("Fishing");
-            if (profession != null) {
-                int skillLevel = profession.getBuild().getSkillLevel(skill);
-                if (skillLevel >= 1) return;
-
-                Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-
-                Optional<Clan> playerLocationClanOptional = clanManager.getClanByLocation(player.getLocation());
-                if(playerLocationClanOptional.isPresent()) {
-                    Clan playerLocationClan = playerLocationClanOptional.get();
-
-                    if(playerClanOptional.isPresent()) {
-                        Clan playerClan = playerClanOptional.get();
-                        if(playerClan.equals(playerLocationClan)) {
-                            cancelFishing(event, player);
-                            return;
-                        }
-                    }
-                }
-
-                Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getHook().getLocation());
-                if(locationClanOptional.isPresent()) {
-                    Clan locationClan = locationClanOptional.get();
-
-
-                    if(playerClanOptional.isPresent()) {
-                        Clan playerClan = playerClanOptional.get();
-                        if(playerClan.equals(locationClan)) {
-                            cancelFishing(event, player);
-                            return;
-                        }
-                    }
-
-                    if(!locationClan.getName().equalsIgnoreCase("Fields")) {
-                        event.getHook().remove();
-                        UtilMessage.simpleMessage(player, "Fishing", "You can only fish at <yellow>Fields</yellow> or in the <yellow>Wilderness</yellow>.");
-                    }
-                }
-            }
-        });
+        // Hook landing in any non-Fields clan territory is gated.
+        if (hookClan.isPresent() && !hookClan.get().getName().equalsIgnoreCase("Fields")) {
+            denyFishing(event, player, "You can only fish at <yellow>Fields</yellow> or in the <yellow>Wilderness</yellow>.");
+        }
     }
 
-    private void cancelFishing(PlayerStartFishingEvent event, Player player) {
+    private boolean hasBaseFishing(Player player) {
+        Optional<ProfessionNode> skill = progressionSkillManager.getSkill("Base Fishing");
+        if (skill.isEmpty()) return true; // skill node missing — fail-open so fishing isn't blocked
+        return professionProfileManager.getObject(player.getUniqueId().toString())
+                .map(profile -> profile.getProfessionDataMap().get("Fishing"))
+                .map(data -> data.getBuild().getSkillLevel(skill.get()) >= 1)
+                .orElse(false);
+    }
+
+    // PlayerStartFishingEvent isn't Cancellable; removing the hook is the only way to short-circuit.
+    private void denyFishing(PlayerStartFishingEvent event, Player player, String message) {
         event.getHook().remove();
-        UtilMessage.simpleMessage(player, "Fishing", "You must unlock <green>Base Fishing</green> to fish in your own territory");
-
+        UtilMessage.simpleMessage(player, "Fishing", message);
     }
-
 }

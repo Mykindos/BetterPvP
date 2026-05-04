@@ -3,75 +3,90 @@ package me.mykindos.betterpvp.progression.profession.fishing;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.loot.Loot;
+import me.mykindos.betterpvp.core.loot.LootBundle;
+import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootTable;
+import me.mykindos.betterpvp.core.loot.LootTableRegistry;
+import me.mykindos.betterpvp.core.loot.session.LootSession;
+import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
-import me.mykindos.betterpvp.core.utilities.model.WeighedList;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.fishing.data.CaughtFish;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
-import me.mykindos.betterpvp.progression.profession.fishing.fish.FishTypeLoader;
-import me.mykindos.betterpvp.progression.profession.fishing.fish.SimpleFishType;
 import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.BiggestFishLeaderboard;
 import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.FishingCountLeaderboard;
 import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.FishingWeightLeaderboard;
-import me.mykindos.betterpvp.progression.profession.fishing.loot.SwimmerLoader;
-import me.mykindos.betterpvp.progression.profession.fishing.loot.SwimmerType;
-import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureLoader;
-import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
-import me.mykindos.betterpvp.progression.profession.fishing.model.FishingConfigLoader;
-import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
+import me.mykindos.betterpvp.progression.profession.skill.fishing.attributes.fishingdoubletreasurechance.FishingDoubleTreasureChanceAttribute;
+import me.mykindos.betterpvp.progression.profession.skill.fishing.attributes.fishingtreasurechance.FishingTreasureChanceAttribute;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
-import org.bukkit.configuration.ConfigurationSection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Location;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.reflections.Reflections;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Modifier;
 import java.util.Objects;
-import java.util.Set;
 
 @Singleton
 @CustomLog
-public class FishingHandler extends ProfessionHandler {
+@Getter
+public class FishingHandler extends ProfessionHandler implements Reloadable {
 
+    @me.mykindos.betterpvp.core.config.Config(path = "fishing.xpPerPound", defaultValue = "0.10")
     @Inject
-    @Config(path = "fishing.xpPerPound", defaultValue = "0.10")
     private double xpPerPound;
 
-    @Getter
     private final FishingRepository fishingRepository;
     private final LeaderboardManager leaderboardManager;
+    private final ItemFactory itemFactory;
+    private final FishingTreasureChanceAttribute treasureChanceAttribute;
+    private final FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute;
+    private final LootTableRegistry lootTableRegistry;
+    private final LootSessionController sessionController;
 
-    @Getter
-    private final WeighedList<FishingLootType> lootTypes = new WeighedList<>();
-
-    private final FishingConfigLoader<?>[] lootLoaders;
-
+    private LootTable lootTable;
+    private LootTable treasureLootTable;
 
     @Inject
     protected FishingHandler(Progression progression, ItemFactory itemFactory, ClientManager clientManager,
                              ProfessionProfileManager professionProfileManager, Provider<ProfessionNodeManager> nodeManager,
-                             FishingRepository fishingRepository, LeaderboardManager leaderboardManager) {
+                             FishingRepository fishingRepository, LeaderboardManager leaderboardManager,
+                             LootTableRegistry lootTableRegistry, LootSessionController sessionController,
+                             FishingTreasureChanceAttribute treasureChanceAttribute,
+                             FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute) {
         super(progression, clientManager, professionProfileManager, nodeManager, "Fishing");
         this.fishingRepository = fishingRepository;
         this.leaderboardManager = leaderboardManager;
-        this.lootLoaders = new FishingConfigLoader<?>[]{
-                new SwimmerLoader(),
-                new FishTypeLoader(itemFactory),
-                new TreasureLoader(itemFactory)
-        };
+        this.itemFactory = itemFactory;
+        this.lootTableRegistry = lootTableRegistry;
+        this.sessionController = sessionController;
+        this.treasureChanceAttribute = treasureChanceAttribute;
+        this.doubleTreasureChanceAttribute = doubleTreasureChanceAttribute;
+    }
+
+    @Override
+    public void reload() {
+        this.lootTable = lootTableRegistry.loadLootTable("fishing");
+        this.treasureLootTable = lootTableRegistry.loadLootTable("fishing_treasure_chance");
     }
 
     public void addFish(Player player, Fish fish) {
-
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) return;
 
@@ -80,7 +95,7 @@ public class FishingHandler extends ProfessionHandler {
             professionData.grantExperience(xp, player);
         }
 
-        log.info("{} caught a {} pound {} for {} experience", player.getName(), fish.getWeight(), fish.getType().getName(), xp)
+        log.info("{} caught a {} pound {} for {} experience", player.getName(), fish.getWeight(), fish.getTypeName(), xp)
                 .addClientContext(player).addLocationContext(player.getLocation())
                 .addContext("Experience", xp + "").addContext("Fish Weight", fish.getWeight() + "").submit();
 
@@ -92,85 +107,104 @@ public class FishingHandler extends ProfessionHandler {
         long weightCaught = (long) professionData.getProperties().getOrDefault("TOTAL_WEIGHT_CAUGHT", 0L);
         professionData.getProperties().put("TOTAL_WEIGHT_CAUGHT", weightCaught + fish.getWeight());
 
-
         leaderboardManager.getObject("Total Weight Caught").ifPresent(leaderboard -> {
             FishingWeightLeaderboard fishingWeightLeaderboard = (FishingWeightLeaderboard) leaderboard;
-            fishingWeightLeaderboard.add(player.getUniqueId(), (long) fish.getWeight()).whenComplete((result, throwable3) -> {
-                if (throwable3 != null) {
-                    log.error("Failed to add weight to leaderboard for player " + player.getName(), throwable3).submit();
+            fishingWeightLeaderboard.add(player.getUniqueId(), (long) fish.getWeight()).whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    log.error("Failed to add weight to leaderboard for player " + player.getName(), throwable).submit();
                     return;
                 }
-
                 fishingWeightLeaderboard.attemptAnnounce(player, result);
             });
         });
 
         leaderboardManager.getObject("Total Fish Caught").ifPresent(leaderboard -> {
             FishingCountLeaderboard fishingCountLeaderboard = (FishingCountLeaderboard) leaderboard;
-            fishingCountLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable3) -> {
-                if (throwable3 != null) {
-                    log.error("Failed to add fish count to leaderboard for player " + player.getName(), throwable3).submit();
+            fishingCountLeaderboard.add(player.getUniqueId(), 1L).whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    log.error("Failed to add fish count to leaderboard for player " + player.getName(), throwable).submit();
                     return;
                 }
-
                 fishingCountLeaderboard.attemptAnnounce(player, result);
             });
         });
 
         leaderboardManager.getObject("Biggest Fish Caught").ifPresent(leaderboard -> {
             BiggestFishLeaderboard biggestFishLeaderboard = (BiggestFishLeaderboard) leaderboard;
-            biggestFishLeaderboard.add(fish.getUuid(), new CaughtFish(player.getUniqueId(), fish.getType().getName(), fish.getWeight())).whenComplete((result, throwable3) -> {
-                if (throwable3 != null) {
-                    log.error("Failed to add biggest fish to leaderboard for player " + player.getName(), throwable3).submit();
+            biggestFishLeaderboard.add(fish.getUuid(), new CaughtFish(player.getUniqueId(), fish.getTypeName(), fish.getWeight())).whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    log.error("Failed to add biggest fish to leaderboard for player " + player.getName(), throwable).submit();
                     return;
                 }
-
                 biggestFishLeaderboard.attemptAnnounce(player, result);
             });
         });
-
     }
 
-    private void loadLootTypes(Reflections reflections, ExtendedYamlConfiguration config) {
-        Set<Class<? extends FishingLootType>> classes = reflections.getSubTypesOf(FishingLootType.class);
-        classes.removeIf(clazz -> clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()) || clazz.isEnum());
-        classes.removeIf(clazz -> clazz.isAnnotationPresent(Deprecated.class));
-        classes.removeIf(clazz -> clazz == SimpleFishType.class); // Skip config fish type
-        classes.removeIf(clazz -> clazz == SwimmerType.class); // Skip config fish type
-        classes.removeIf(clazz -> clazz == TreasureType.class); // Skip config fish type
-        for (var clazz : classes) {
-            FishingLootType type = progression.getInjector().getInstance(clazz);
-            progression.getInjector().injectMembers(type);
+    public @NotNull LootBundle getRandomLoot(Player player, Location location) {
+        final LootSession session = sessionController.resolve(player, lootTable, () -> LootSession.newSession(lootTable, player));
+        final LootContext context = new LootContext(session, location, "Fishing");
+        return this.lootTable.generateLoot(context);
+    }
 
-            // We do a weight of 1 because we want fish with the same frequency to be equally likely
-            type.loadConfig(config);
-            lootTypes.add(type.getFrequency(), 1, type);
+    public void attemptTreasureDrop(Player player, Location location) {
+        double treasureChance = treasureChanceAttribute.getChance(player);
+        if (treasureChance <= 0 || UtilMath.randDouble(0, 100) >= treasureChance) {
+            return;
         }
 
-        ConfigurationSection customFishSection = config.getConfigurationSection("fishing.loot");
-        if (customFishSection == null) {
-            customFishSection = config.createSection("fishing.loot");
+        LootBundle firstBundle = getRandomTreasureLoot(player, location);
+        for (Loot<?, ?> loot : firstBundle) {
+            awardTreasure(player, location, loot, firstBundle.getContext(), false);
         }
 
-        for (String key : customFishSection.getKeys(false)) {
-            final ConfigurationSection section = customFishSection.getConfigurationSection(key);
-            final String type = Objects.requireNonNull(section).getString("type");
-
-            boolean found = false;
-            for (FishingConfigLoader<?> loader : lootLoaders) {
-                if (loader.getTypeKey().equalsIgnoreCase(type)) {
-                    final FishingLootType loaded = (FishingLootType) loader.read(section);
-                    loaded.loadConfig(config);
-                    lootTypes.add(loaded.getFrequency(), 1, loaded);
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                throw new IllegalArgumentException("Unknown loot type: " + type);
+        // Roll a second bundle independently rather than doubling amounts on the first.
+        if (UtilMath.randDouble(0, 100) < doubleTreasureChanceAttribute.getChance(player)) {
+            LootBundle secondBundle = getRandomTreasureLoot(player, location);
+            for (Loot<?, ?> loot : secondBundle) {
+                awardTreasure(player, location, loot, secondBundle.getContext(), true);
             }
         }
-        log.info("Loaded " + lootTypes.size() + " fishing loot types").submit();
+    }
+
+    private @NotNull LootBundle getRandomTreasureLoot(Player player, Location location) {
+        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
+        final LootContext context = new LootContext(session, location, "Fishing");
+        return this.treasureLootTable.generateLoot(context);
+    }
+
+    private void awardTreasure(Player player, Location location, Loot<?, ?> loot, LootContext context, boolean doubled) {
+        final Object award = loot.award(context);
+        if (award instanceof Item item) {
+            sendTreasureMessage(player, location, item.getItemStack(), doubled);
+        } else if (award instanceof ItemStack itemStack) {
+            sendTreasureMessage(player, location, itemStack, doubled);
+        }
+    }
+
+    private void sendTreasureMessage(Player player, Location location, ItemStack itemStack, boolean doubled) {
+        final Component name;
+        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
+            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+        } else {
+            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                    Component.translatable(itemStack.getType().translationKey()));
+        }
+
+        TextComponent message = Component.text("You found ")
+                .append(Component.text(UtilFormat.formatNumber(itemStack.getAmount())))
+                .append(Component.text(" "))
+                .append(name);
+
+        if (doubled) {
+            message = message.append(Component.text(" (doubled!)"));
+        }
+
+        UtilMessage.message(player, getName(), message);
+
+        log.info("{} found {}x {} from fishing treasure{}", player.getName(), itemStack.getAmount(),
+                        itemStack.getType().name().toLowerCase(), doubled ? " (doubled)" : "")
+                .addClientContext(player).addLocationContext(location).submit();
     }
 
     @Override
@@ -181,11 +215,5 @@ public class FishingHandler extends ProfessionHandler {
     @Override
     public void loadConfig() {
         super.loadConfig();
-
-        lootTypes.clear();
-
-        Reflections classScan = new Reflections(this.getClass().getPackageName());
-        loadLootTypes(classScan, progression.getConfig());
-
     }
 }

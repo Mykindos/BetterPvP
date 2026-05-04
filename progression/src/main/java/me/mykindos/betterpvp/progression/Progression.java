@@ -16,17 +16,21 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.impl.interaction.TreeFellerInteraction;
+import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.item.ProgressionFishBootstrap;
 import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
+import me.mykindos.betterpvp.progression.profession.fishing.loot.FishLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.SkillTreeAccessProvider;
+import me.mykindos.betterpvp.progression.profession.skill.fishing.expertbaiter.ExpertBaiterAccessProvider;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.attributes.treefellercooldown.TreeFellerCooldownAttribute;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
@@ -51,6 +55,23 @@ public class Progression extends BPvPPlugin {
 
     @Inject
     private UpdateEventExecutor updateEventExecutor;
+
+    @Override
+    public void onLoad() {
+        // Register "fish" loot entry parser before Core's onEnable populates the registry.
+        LootEntryRegistry.register("fish", (obj, strategy) -> {
+            final Core core = (Core) org.bukkit.Bukkit.getPluginManager().getPlugin("Core");
+            if (core == null) throw new IllegalStateException("Core plugin not loaded");
+            final ItemFactory itemFactory = core.getInjector().getInstance(ItemFactory.class);
+            final String itemId = obj.get("itemId").getAsString();
+            final org.bukkit.NamespacedKey itemKey = org.bukkit.NamespacedKey.fromString(itemId);
+            com.google.common.base.Preconditions.checkNotNull(itemKey, "Invalid item ID: " + itemId);
+            final String displayName = obj.get("displayName").getAsString();
+            final int minWeight = obj.get("minWeight").getAsInt();
+            final int maxWeight = obj.get("maxWeight").getAsInt();
+            return new FishLoot(itemFactory, itemKey, displayName, minWeight, maxWeight, strategy, ctx -> true);
+        });
+    }
 
     @Override
     public void onEnable() {
@@ -81,6 +102,7 @@ public class Progression extends BPvPPlugin {
 
             var itemAccessService = injector.getInstance(ItemAccessService.class);
             itemAccessService.register(injector.getInstance(SkillTreeAccessProvider.class));
+            itemAccessService.register(injector.getInstance(ExpertBaiterAccessProvider.class));
 
             injector.getInstance(TreeFellerInteraction.class)
                     .setModifier(injector.getInstance(TreeFellerCooldownAttribute.class));

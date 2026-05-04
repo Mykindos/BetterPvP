@@ -1,17 +1,17 @@
 package me.mykindos.betterpvp.progression.profession.fishing.listener;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.loot.Loot;
+import me.mykindos.betterpvp.core.loot.LootBundle;
+import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -23,15 +23,13 @@ import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFis
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStopFishingEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
+import me.mykindos.betterpvp.progression.profession.fishing.loot.FishLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
-import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
-import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -79,14 +77,15 @@ public class FishingListener implements Listener {
     private final ArrayListMultimap<Player, Bait> activeBaits = ArrayListMultimap.create();
     private final WeakHashMap<FishHook, Boolean> activeHooks = new WeakHashMap<>();
 
-    // Saving it so depending on fish weight the time to reel and lure time can be adjusted
-    // Also make it refresh every X seconds, so it doesn't feel like you're bound to one fish
-    private final LoadingCache<Player, FishingLoot> fishLoot = Caffeine.newBuilder()
-            .weakKeys()
-            .build(key -> getRandomLoot());
+    /**
+     * Maps each player to their pre-rolled loot bundle for the current cast.
+     * Rolled when the hook enters the water and cleared on reel-in or catch.
+     */
+    private final WeakHashMap<Player, LootBundle> fishLoot = new WeakHashMap<>();
 
     @Inject
-    public FishingListener(Progression progression, FishingHandler fishingHandler, ClientManager clientManager, ProfessionProfileManager professionProfileManager, ProfessionNodeManager progressionSkillManager) {
+    public FishingListener(Progression progression, FishingHandler fishingHandler, ClientManager clientManager,
+                           ProfessionProfileManager professionProfileManager, ProfessionNodeManager progressionSkillManager) {
         this.progression = progression;
         this.fishingHandler = fishingHandler;
         this.clientManager = clientManager;
@@ -99,11 +98,9 @@ public class FishingListener implements Listener {
         fishingHandler.getFishingRepository().saveAllFish(true);
     }
 
-    // Title display
     @UpdateEvent(delay = 500)
     public void waitCue() {
         if (!fishingHandler.isEnabled()) return;
-        final Iterator<Player> iterator = fishLoot.asMap().keySet().iterator();
         Component component = Component.text()
                 .append(Component.text(".", animatedDot == 1 ? NamedTextColor.WHITE : NamedTextColor.GRAY))
                 .append(Component.space())
@@ -121,34 +118,24 @@ public class FishingListener implements Listener {
         } else if (animatedDot <= 1) {
             direction = 1;
         }
-
         animatedDot += direction;
 
-        while (iterator.hasNext()) {
-            final Player player = iterator.next();
+        for (Player player : fishLoot.keySet()) {
             final FishHook fishHook = player.getFishHook();
             if (fishHook == null || !fishHook.isValid()) {
-                iterator.remove();
                 continue;
             }
-
             if (!fishHook.getState().equals(FishHook.HookState.BOBBING)) {
-                continue; // Only display the dots when the hook is in the water
+                continue;
             }
-
-            // Three dots that appear whenever your hook is in the water
-            // Dots will have an animation where they will turn white, from gray, in a loop
-            // The dots will be in the middle of the screen, and will be 3 dots in a row
             final TitleComponent title = TitleComponent.subtitle(0, 0.8, 0, false, gamer -> component);
             clientManager.search().online(player).getGamer().getTitleQueue().add(500, title);
         }
     }
 
-    // Fishing determination
     @UpdateEvent
     public void updateFishingStatus() {
         if (!fishingHandler.isEnabled()) return;
-        // Clear baits
         activeBaits.asMap().keySet().removeIf(player -> player == null || !player.isOnline());
         activeBaits.values().removeIf(Bait::hasExpired);
 
@@ -164,27 +151,25 @@ public class FishingListener implements Listener {
             final boolean inWater = fishHook.getState().equals(FishHook.HookState.BOBBING);
             if (inWater) {
                 if (activeHooks.get(fishHook)) {
-                    continue; // Already fishing
+                    continue;
                 }
                 this.activeHooks.put(fishHook, true);
-                Bukkit.getScheduler().runTaskLater(progression, () -> startFishing(player, fishHook), 1L);
+                org.bukkit.Bukkit.getScheduler().runTaskLater(progression, () -> startFishing(player, fishHook), 1L);
             }
         }
     }
 
     private void startFishing(Player player, FishHook hook) {
-        final FishingLoot loot = this.fishLoot.get(player);// store a new fish in the cache for them
-        UtilServer.callEvent(new PlayerStartFishingEvent(player, loot, hook));
+        final LootBundle bundle = fishingHandler.getRandomLoot(player, hook.getLocation());
+        fishLoot.put(player, bundle);
+        UtilServer.callEvent(new PlayerStartFishingEvent(player, bundle, hook));
 
-        // Process baits
         activeBaits.values().stream()
                 .filter(bait -> bait.doesAffect(hook))
-                .collect(Collectors.toMap(Bait::getType, // This makes sure that there can't be repeated types
-                        Function.identity(),
-                        (existing, replacement) -> existing))
+                .collect(Collectors.toMap(Bait::getType, Function.identity(), (existing, replacement) -> existing))
                 .values()
                 .forEach(bait -> bait.track(hook));
-        hook.setWaitTime(Math.max(1, hook.getWaitTime())); // If it gets to 0, it will be stuck in the water
+        hook.setWaitTime(Math.max(1, hook.getWaitTime()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -193,25 +178,17 @@ public class FishingListener implements Listener {
         if (!event.getReason().equals(PlayerStopFishingEvent.FishingResult.CATCH)) {
             return;
         }
-
-        final FishingLoot loot = event.getLoot();
-        if (!(loot instanceof Fish fish)) {
-            return;
-        }
-
-        fishingHandler.addFish(event.getPlayer(), fish);
+        // Fish XP/leaderboards are handled in onCatch(PlayerCaughtFishEvent) via FishLoot entries.
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onFish(PlayerFishEvent event) {
         if (!fishingHandler.isEnabled()) return;
         final Player player = event.getPlayer();
-        event.setExpToDrop(0); // Remove their xp
+        event.setExpToDrop(0);
         switch (event.getState()) {
             case FISHING -> {
-                // they cast their rod
                 final FishHook hook = event.getHook();
-                // Set defaults
                 hook.setWaitTime((int) (minWaitTime * 20), (int) (maxWaitTime * 20));
                 hook.setLureTime(20, 40);
                 hook.setSkyInfluenced(false);
@@ -219,35 +196,45 @@ public class FishingListener implements Listener {
                 activeHooks.put(hook, false);
             }
             case BITE -> {
-                // something bit their hook but hasn't been reeled in yet
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2F);
             }
             case REEL_IN -> {
-                // They reeled in before
-                UtilServer.callEvent(new PlayerStopFishingEvent(player, fishLoot.getIfPresent(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL));
-                fishLoot.invalidate(player);
+                UtilServer.callEvent(new PlayerStopFishingEvent(player, fishLoot.get(player), PlayerStopFishingEvent.FishingResult.EARLY_REEL));
+                fishLoot.remove(player);
             }
             case FAILED_ATTEMPT -> {
-                // they had a bite but missed it
                 final Location hookLocation = event.getHook().getLocation();
                 splash(hookLocation);
                 Particle.HAPPY_VILLAGER.builder().location(hookLocation).receivers(60, true).spawn();
             }
             case CAUGHT_FISH -> {
-                final FishingLoot loot = fishLoot.get(player);
-                PlayerCaughtFishEvent caughtFishEvent = new PlayerCaughtFishEvent(event.getPlayer(), loot, event.getHook(), event.getCaught());
+                final LootBundle bundle = fishLoot.get(player);
+                if (bundle == null) {
+                    UtilMessage.message(player, "Fishing", "<red>No loot bundle found — please report this to an admin!");
+                    return;
+                }
+
+                // Find the first FishLoot in the bundle to attach to the event (for skill hooks).
+                FishLoot primaryFishLoot = null;
+                for (Loot<?, ?> entry : bundle) {
+                    if (entry instanceof FishLoot fl) {
+                        primaryFishLoot = fl;
+                        fl.rollFish(); // re-roll weight for this specific catch
+                        break;
+                    }
+                }
+
+                PlayerCaughtFishEvent caughtFishEvent = new PlayerCaughtFishEvent(
+                        player, bundle, primaryFishLoot, event.getHook(), event.getCaught());
 
                 Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
-                progressionSkillOptional.ifPresent(progressionSkill -> professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-                    var profession = profile.getProfessionDataMap().get("Fishing");
-                    if (profession != null) {
-                        int skillLevel = profession.getBuild().getSkillLevel(progressionSkill);
-                        if (skillLevel >= 1) {
-
-                            caughtFishEvent.setBaseFishingUnlocked(true);
-                        }
-                    }
-                }));
+                progressionSkillOptional.ifPresent(progressionSkill ->
+                        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
+                            var profession = profile.getProfessionDataMap().get("Fishing");
+                            if (profession != null && profession.getBuild().getSkillLevel(progressionSkill) >= 1) {
+                                caughtFishEvent.setBaseFishingUnlocked(true);
+                            }
+                        }));
 
                 UtilServer.callEvent(caughtFishEvent);
 
@@ -263,28 +250,45 @@ public class FishingListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     void onCatch(PlayerCaughtFishEvent event) {
         if (!fishingHandler.isEnabled()) return;
-        // this is the final step
-        Player player = event.getPlayer();
-        FishHook hook = event.getHook();
+        final Player player = event.getPlayer();
+        final FishHook hook = event.getHook();
         final Item entity = (Item) Objects.requireNonNull(event.getCaught());
 
-        final FishingLoot caught = event.getLoot();
-        fishLoot.invalidate(player);
+        final LootBundle bundle = event.getBundle();
+        fishLoot.remove(player);
 
         splash(hook.getLocation());
 
         entity.setCanMobPickup(false);
         UtilItem.reserveItem(entity, player, 10);
 
-        caught.processCatch(event);
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
+        // Award all loot entries in the bundle.
+        for (Loot<?, ?> loot : bundle) {
+            final LootContext context = bundle.getContext();
+            if (loot instanceof FishLoot fishLoot) {
+                // rollFish() was already called in onFish CAUGHT_FISH before the event was fired.
+                // Skills may have mutated the weight. Now award and grant XP.
+                fishLoot.award(context);
+                final Fish fish = fishLoot.getCurrentFish();
+                if (fish != null) {
+                    fishingHandler.addFish(player, fish);
+                    UtilMessage.message(player, "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!",
+                            fish.getTypeName(), me.mykindos.betterpvp.core.utilities.UtilFormat.formatNumber(fish.getWeight()));
+                }
+            } else {
+                loot.award(context);
+            }
+        }
 
-        UtilServer.callEvent(new PlayerStopFishingEvent(player, caught, PlayerStopFishingEvent.FishingResult.CATCH));
+        fishingHandler.attemptTreasureDrop(player, hook.getLocation());
+
+        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
+        UtilServer.callEvent(new PlayerStopFishingEvent(player, bundle, PlayerStopFishingEvent.FishingResult.CATCH));
     }
 
-    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDropFish(PlayerDropItemEvent event) {
-        if(event.getItemDrop().getItemStack().getType() == Material.COD) {
+        if (event.getItemDrop().getItemStack().getType() == Material.COD) {
             UtilServer.runTaskLater(progression, () -> {
                 if (event.getItemDrop().isValid()) {
                     event.getItemDrop().remove();
@@ -323,26 +327,5 @@ public class FishingListener implements Listener {
     private void splash(Location hookLocation) {
         Particle.SPLASH.builder().location(hookLocation).offset(0.25, 0, 0.25).receivers(60, true).count(25).spawn();
         Particle.BUBBLE_POP.builder().location(hookLocation).offset(0.25, 0, 0.25).receivers(60, true).count(5).spawn();
-    }
-
-    private FishingLoot getRandomLoot() {
-        final FishingLootType type = fishingHandler.getLootTypes().random();
-        if (type == null) {
-            // Return an empty loot
-            return new FishingLoot() {
-                @Override
-                public FishingLootType getType() {
-                    return null;
-                }
-
-                @Override
-                public void processCatch(PlayerCaughtFishEvent event) {
-                    UtilMessage.message(event.getPlayer(), "Fishing", "<red>No fish registered! Please report this to an admin!");
-                    clientManager.sendMessageToRank("Progression", UtilMessage.deserialize("<yellow>%s</yellow> <red>caught a FishingLootType null fish. Is the config correct? Please report this internally.", event.getPlayer()), Rank.TRIAL_MOD);
-                }
-            };
-        }
-
-        return type.generateLoot();
     }
 }

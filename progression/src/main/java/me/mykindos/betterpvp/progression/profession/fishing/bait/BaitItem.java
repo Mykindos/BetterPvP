@@ -1,15 +1,19 @@
 package me.mykindos.betterpvp.progression.profession.fishing.bait;
 
+import me.mykindos.betterpvp.core.access.AccessScope;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.fishing.bait.ability.BaitAbility;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Set;
 
 /**
  * Base class for all bait items.
@@ -37,6 +41,9 @@ public abstract class BaitItem extends BaseItem implements Reloadable {
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.RIGHT_CLICK, ability)
                 .build());
+
+        // Gate crafting behind the Expert Baiter skill via ExpertBaiterAccessProvider.
+        addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT)));
     }
     
     @Override
