@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.mining.gildeddiscover
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
+import me.mykindos.betterpvp.core.framework.economy.CoinItem;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.progression.profession.skill.NodeId;
@@ -44,8 +45,7 @@ public class GildedDiscovery extends ProfessionSkill {
         double chance = UtilMath.round(getTriggerChance(level) * 100.0, 2);
         return new String[]{
                 "When mining stone-based blocks, you have a",
-                "<green>" + chance + "% <reset>chance to discover a gold vein,",
-                "dropping <green>" + baseYieldMin + "-" + baseYieldMax + " <reset>extra gold ore.",
+                "<green>" + chance + "% <reset>chance to get coins,",
                 "",
                 "Does not trigger on actual ore blocks or player-placed blocks."
         };
@@ -75,8 +75,8 @@ public class GildedDiscovery extends ProfessionSkill {
             double chance = getTriggerChance(skillLevel) + goldenChance.getBonusChance(player);
             if (Math.random() >= chance) return;
 
-            int extraYield = UtilMath.randomInt(baseYieldMin, baseYieldMax) + (int) goldenYield.getBonusYield(player);
-            final ItemStack stack = new ItemStack(Material.GOLD_ORE, extraYield);
+            int yield = UtilMath.randomInt(baseYieldMin, baseYieldMax) + (int) goldenYield.getBonusYield(player);
+            final ItemStack stack = CoinItem.BAR.generateItem(yield);
             final Item item = state.getWorld().dropItemNaturally(state.getLocation().toCenterLocation(), stack);
             event.getItems().add(item);
         });

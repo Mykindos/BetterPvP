@@ -305,37 +305,37 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_1">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_1">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="180" y="540" as="geometry" />
           </mxCell>
         </object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_2">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_2">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="360" as="geometry" />
           </mxCell>
         </object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_3">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_3">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="1020" as="geometry" />
           </mxCell>
         </object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_4">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_4">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="1020" as="geometry" />
           </mxCell>
         </object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_5">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_5">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="120" y="1140" as="geometry" />
           </mxCell>
         </object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_6">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_6">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="180" y="1260" as="geometry" />
           </mxCell>
         </object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_7">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_7">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="1380" as="geometry" />
           </mxCell>
@@ -343,7 +343,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-75" edge="1" parent="1" source="ore_infusion_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ore_infusion_9" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_8">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_8">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="2400" as="geometry" />
           </mxCell>
@@ -351,7 +351,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-76" edge="1" parent="1" source="ore_infusion_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ore_infusion_10" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_9">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_9">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="2580" as="geometry" />
           </mxCell>
@@ -362,7 +362,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-83" edge="1" parent="1" source="ore_infusion_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="golden_chance_4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_10">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_10">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="2760" as="geometry" />
           </mxCell>
@@ -1199,7 +1199,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-191" edge="1" parent="1" source="ore_infusion_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_12">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_11">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_11">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="120" y="6780" as="geometry" />
           </mxCell>
@@ -1207,7 +1207,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-192" edge="1" parent="1" source="ore_infusion_12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="ore_infusion_13">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_12">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_12">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="6900" as="geometry" />
           </mxCell>
@@ -1215,7 +1215,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-197" edge="1" parent="1" source="ore_infusion_13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="increased_experience_4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_13">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_13">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="120" y="7020" as="geometry" />
           </mxCell>
@@ -1223,7 +1223,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-205" edge="1" parent="1" source="ore_infusion_14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_15">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_14">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_14">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="7560" as="geometry" />
           </mxCell>
@@ -1231,7 +1231,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-206" edge="1" parent="1" source="ore_infusion_15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_16">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_15">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_15">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="7680" as="geometry" />
           </mxCell>
@@ -1239,7 +1239,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-223" edge="1" parent="1" source="ore_infusion_16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_34">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_16">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_16">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="7800" as="geometry" />
           </mxCell>
@@ -1247,12 +1247,12 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-252" edge="1" parent="1" source="ore_infusion_17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_18">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_17">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_17">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="8700" as="geometry" />
           </mxCell>
         </object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_18">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_18">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="8820" as="geometry" />
           </mxCell>
@@ -1260,7 +1260,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-239" edge="1" parent="1" source="ore_infusion_19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_20">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_19">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_19">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="8280" as="geometry" />
           </mxCell>
@@ -1268,7 +1268,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-240" edge="1" parent="1" source="ore_infusion_20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_38">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_20">
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.005" per_level="0.0" max_level="1" id="ore_infusion_20">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="8400" as="geometry" />
           </mxCell>

@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.progression.profession.skill.mining.attributes.ore
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
+import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.IProfessionAttribute;
 import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -9,12 +12,18 @@ import org.bukkit.entity.Player;
 
 @Singleton
 @NodeId("ore_infusion")
-public class OreInfusionAttribute implements IProfessionAttribute {
+public class OreInfusionAttribute implements IProfessionAttribute, Reloadable {
 
+    private final Progression progression;
     private final ProfessionProfileManager profileManager;
+    @Getter
+    private double oreChance;
+    @Getter
+    private double radius;
 
     @Inject
-    public OreInfusionAttribute(ProfessionProfileManager profileManager) {
+    public OreInfusionAttribute(Progression progression, ProfessionProfileManager profileManager) {
+        this.progression = progression;
         this.profileManager = profileManager;
     }
 
@@ -40,5 +49,16 @@ public class OreInfusionAttribute implements IProfessionAttribute {
 
     public double getChance(Player player) {
         return IProfessionAttribute.computeValue(player, "Mining", this, profileManager);
+    }
+
+    @Override
+    public void reload() {
+        this.oreChance = getConfig("ore-chance", 0.01, Double.class);
+        this.radius = getConfig("radius", 10.0, Double.class);
+    }
+
+    protected <T> T getConfig(String key, Object defaultValue, Class<T> type) {
+        String path = "attributes.ore-infusion." + key;
+        return progression.getConfig("professions/mining/mining").getOrSaveObject(path, defaultValue, type);
     }
 }

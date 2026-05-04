@@ -25,7 +25,7 @@ public class GoldenYieldAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "increased gold ore yield from Gilded Discovery";
+        return "increased yield from Gilded Discovery";
     }
 
     @Override

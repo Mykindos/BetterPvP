@@ -171,7 +171,7 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
         final ThrowableItem throwable = new ThrowableItem(this, item, player, getName(), 10_000L, true);
         throwable.setCollideGround(true);
         throwable.setCanHitFriendlies(true);
-        //default is 0.4
+        //default is 0.
         throwable.setCollisionRadius(0.6);
         championsManager.getThrowables().addThrowable(throwable);
 
