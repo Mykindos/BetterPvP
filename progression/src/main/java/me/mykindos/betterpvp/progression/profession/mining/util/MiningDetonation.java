@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
@@ -76,6 +77,19 @@ public final class MiningDetonation {
                           double shellThresholdSq,
                           boolean broken) {}
 
+    private static final BlockFace[] FACES = {
+            BlockFace.UP, BlockFace.DOWN,
+            BlockFace.NORTH, BlockFace.SOUTH,
+            BlockFace.EAST, BlockFace.WEST
+    };
+
+    public static boolean isExposedSurfaceBlock(Block block) {
+        for (BlockFace face : FACES) {
+            if (block.getRelative(face).getType().isAir()) return true;
+        }
+        return false;
+    }
+
     /**
      * Carves the sphere and offers each surviving block to {@code placementPredicate}; if
      * the predicate returns true and the per-block roll passes, fires a
@@ -127,9 +141,6 @@ public final class MiningDetonation {
 
                         if (skipCenter && block.equals(center.getBlock())) continue;
                         if (!UtilBlock.isStoneBased(block)) continue;
-                        // Never reprocess existing ore — protects previousData from leaking
-                        // a stale ore into the next Fields temp registration.
-                        if (UtilBlock.isOre(block.getType())) continue;
                         if (blockTagManager.isPlayerPlaced(block)) continue;
 
                         final Location key = block.getLocation();
@@ -140,6 +151,11 @@ public final class MiningDetonation {
                         } finally {
                             SILENT_BREAKS.invalidate(key);
                         }
+
+                        // Never reprocess existing ore — protects previousData from leaking
+                        // a stale ore into the next Fields temp registration.
+                        if (UtilBlock.isOre(block.getType())) continue;
+
                         // Capture AFTER the break: in Fields, breakBlock can succeed via
                         // FieldsListener#onOreMine which reverts an active temp ore to stone.
                         // Reading before would freeze the stale ore data and leak it into

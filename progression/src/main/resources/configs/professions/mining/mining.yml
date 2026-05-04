@@ -18,13 +18,6 @@ skills:
     maxlevel: 50
     baseChance: 0.01
     chancePerLevel: 0.0005
-  demolition_charge:
-    enabled: true
-    maxlevel: 25
-    baseRadius: 3.0
-    baseDamage: 4.0
-    cooldown: 10.0
-    markDurationSeconds: 30.0
   gilded_discovery:
     enabled: true
     maxlevel: 50

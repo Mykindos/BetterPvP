@@ -84,7 +84,7 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
                          Supplier<Material> oreSupplier) {
         MiningDetonation.detonate(player, center, radius, oreChance, oreSupplier,
                 "progression:explosive_excavation", blockTagManager, true,
-                ctx -> ctx.broken() && ctx.distSq() >= ctx.shellThresholdSq());
+                ctx -> MiningDetonation.isExposedSurfaceBlock(ctx.block()));
 
         Particle.FLASH.builder()
                 .count(1)

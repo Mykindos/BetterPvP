@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.progression.profession.skill.mining.attributes.blastdamage;
+package me.mykindos.betterpvp.progression.profession.skill.mining.attributes.increasedexperience;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -8,32 +8,37 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.entity.Player;
 
 @Singleton
-@NodeId("blast_damage")
-public class BlastDamageAttribute implements IProfessionAttribute {
+@NodeId("mining_increased_experience")
+public class MiningIncreasedExperienceAttribute implements IProfessionAttribute {
 
     private final ProfessionProfileManager profileManager;
 
     @Inject
-    public BlastDamageAttribute(ProfessionProfileManager profileManager) {
+    public MiningIncreasedExperienceAttribute(ProfessionProfileManager profileManager) {
         this.profileManager = profileManager;
     }
 
     @Override
     public String getName() {
-        return "Blast Damage";
+        return "Increased experience";
     }
 
     @Override
     public String getDescription() {
-        return "increased Demolition Charge explosion damage";
+        return "mining experience gained from all sources";
     }
 
     @Override
     public String getOperation() {
-        return "";
+        return "%";
     }
 
-    public double getBonusDamage(Player player) {
+    @Override
+    public double getDisplayValue(double value) {
+        return value * 100.0;
+    }
+
+    public double getExperienceIncrease(Player player) {
         return IProfessionAttribute.computeValue(player, "Mining", this, profileManager);
     }
 }

@@ -21,8 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -41,12 +39,6 @@ import java.util.function.Supplier;
  */
 @Getter
 public class OreburstChargeInteraction extends CooldownInteraction implements ThrowableListener, DisplayedInteraction {
-
-    private static final BlockFace[] FACES = {
-            BlockFace.UP, BlockFace.DOWN,
-            BlockFace.NORTH, BlockFace.SOUTH,
-            BlockFace.EAST, BlockFace.WEST
-    };
 
     @Setter private double cooldown;
     @Setter private double throwableExpiry;
@@ -142,8 +134,7 @@ public class OreburstChargeInteraction extends CooldownInteraction implements Th
                          Supplier<Material> oreSupplier) {
         MiningDetonation.detonate(player, center, radius, oreChance, oreSupplier,
                 "progression:oreburst_charge", blockTagManager, false,
-                ctx -> (ctx.broken() && ctx.distSq() >= ctx.shellThresholdSq())
-                        || isExposedSurfaceBlock(ctx.block()));
+                ctx -> MiningDetonation.isExposedSurfaceBlock(ctx.block()));
 
         Particle.FLASH.builder()
                 .count(1)
@@ -158,12 +149,5 @@ public class OreburstChargeInteraction extends CooldownInteraction implements Th
                 .spawn();
         new SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 1.0f).play(center);
         new SoundEffect(Sound.ENTITY_BREEZE_WIND_BURST, (float) Math.random(), 0.5f).play(center);
-    }
-
-    private boolean isExposedSurfaceBlock(Block block) {
-        for (BlockFace face : FACES) {
-            if (block.getRelative(face).getType().isAir()) return true;
-        }
-        return false;
     }
 }

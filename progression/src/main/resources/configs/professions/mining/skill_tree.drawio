@@ -1,128 +1,1278 @@
-<mxfile host="Electron" agent="Mozilla/5.0" version="29.6.6">
+<mxfile host="Electron" agent="Mozilla/5.0">
   <diagram name="Page-1" id="MiningSkillTree">
-    <mxGraphModel dx="1280" dy="1500" grid="1" gridSize="60" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1260" pageHeight="1440" background="none" math="0" shadow="0">
+    <mxGraphModel dx="1556" dy="919" grid="1" gridSize="60" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="540" pageHeight="1440" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-
-        <!-- Row 1: Salvager's Touch (y=60) -->
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="60" as="geometry" /></mxCell></object>
-        <object label="Salvager's&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="60" as="geometry" /></mxCell></object>
-
-        <!-- Row 2: Fortune (y=180) -->
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="180" as="geometry" /></mxCell></object>
-        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="180" as="geometry" /></mxCell></object>
-
-        <!-- Row 3: Stone Efficiency (y=300) -->
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="300" as="geometry" /></mxCell></object>
-        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="300" as="geometry" /></mxCell></object>
-
-        <!-- Row 4: Ore Infusion (y=420) -->
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="420" as="geometry" /></mxCell></object>
-        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="420" as="geometry" /></mxCell></object>
-
-        <!-- Row 5: Treasure Trigger (y=540) -->
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="540" as="geometry" /></mxCell></object>
-        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="540" as="geometry" /></mxCell></object>
-
-        <!-- Row 6: Blast Radius (y=660) -->
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="660" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Radius" attribute_id="blast_radius" base="0.5" per_level="0.5" max_level="1" id="blast_radius_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="660" as="geometry" /></mxCell></object>
-
-        <!-- Row 7: Blast Damage (y=780) -->
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="780" as="geometry" /></mxCell></object>
-        <object label="Blast&#xa;Damage" attribute_id="blast_damage" base="1.0" per_level="1.0" max_level="1" id="blast_damage_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="780" as="geometry" /></mxCell></object>
-
-        <!-- Row 8: Golden Chance (y=900) -->
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="900" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="900" as="geometry" /></mxCell></object>
-
-        <!-- Row 9: Golden Yield (y=1020) -->
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_1"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_2"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_3"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_4"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="420" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_5"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="540" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_6"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="660" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_7"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="780" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_8"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="900" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_9"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1020" y="1020" as="geometry" /></mxCell></object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_10"><mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="1140" y="1020" as="geometry" /></mxCell></object>
-
-        <!-- Row 10: Skills (y=1140) -->
-        <object label="Buried&#xa;Cache" skill_id="buried_cache" max_level="1" id="buried_cache_node"><mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="60" y="1140" as="geometry" /></mxCell></object>
-        <object label="Demolition&#xa;Charge" skill_id="demolition_charge" max_level="1" id="demolition_charge_node"><mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="180" y="1140" as="geometry" /></mxCell></object>
-        <object label="Gilded&#xa;Discovery" skill_id="gilded_discovery" max_level="1" id="gilded_discovery_node"><mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1"><mxGeometry height="60" width="60" x="300" y="1140" as="geometry" /></mxCell></object>
-
-        <!-- Row 11: Recipes (y=1260) -->
-        <object label="The Rift" recipe="progression:the_rift" id="recipe_the_rift"><mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1"><mxGeometry height="60" width="60" x="60" y="1260" as="geometry" /></mxCell></object>
-        <object label="Runed&#xa;Pickaxe" recipe="progression:runed_pickaxe" id="recipe_runed_pickaxe"><mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1"><mxGeometry height="60" width="60" x="180" y="1260" as="geometry" /></mxCell></object>
-        <object label="Deep&#xa;Resonator" recipe="progression:deep_resonator" id="recipe_deep_resonator"><mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1"><mxGeometry height="60" width="60" x="300" y="1260" as="geometry" /></mxCell></object>
-
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-6" edge="1" parent="1" source="salvagers_touch_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="salvagers_touch_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="300" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-13" edge="1" parent="1" source="salvagers_touch_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="salvagers_touch_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="420" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-30" edge="1" parent="1" source="salvagers_touch_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-254" edge="1" parent="1" source="salvagers_touch_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="ore_infusion_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="660" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-70" edge="1" parent="1" source="salvagers_touch_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="salvagers_touch_5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="2100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-71" edge="1" parent="1" source="salvagers_touch_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="salvagers_touch_7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="2220" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-42" edge="1" parent="1" source="salvagers_touch_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="fortune_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-44" edge="1" parent="1" source="salvagers_touch_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="1260" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-74" edge="1" parent="1" source="salvagers_touch_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="2340" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-78" edge="1" parent="1" source="salvagers_touch_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="2880" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-80" edge="1" parent="1" source="salvagers_touch_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="fortune_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="3120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-89" edge="1" parent="1" source="salvagers_touch_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="stone_efficiency_12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Salvager&#39;s&#xa;Touch" attribute_id="salvagers_touch" base="0.05" per_level="0.05" max_level="1" id="salvagers_touch_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="3300" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-11" edge="1" parent="1" source="fortune_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="390" />
+              <mxPoint x="390" y="390" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="240" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-12" edge="1" parent="1" source="fortune_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="fortune_3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="510" />
+              <mxPoint x="450" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="420" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-31" edge="1" parent="1" source="fortune_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-255" edge="1" parent="1" source="fortune_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="600" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-79" edge="1" parent="1" source="fortune_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="salvagers_touch_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="3000" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-81" edge="1" parent="1" source="fortune_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="salvagers_touch_10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="3270" />
+              <mxPoint x="330" y="3330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-279" edge="1" parent="1" source="fortune_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="3240" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-45" edge="1" parent="1" source="fortune_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-58" edge="1" parent="1" source="fortune_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="1380" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-66" edge="1" parent="1" source="fortune_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="2040" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-67" edge="1" parent="1" source="fortune_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="2160" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-68" edge="1" parent="1" source="fortune_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="2280" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-73" edge="1" parent="1" source="fortune_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="90" y="2490" />
+              <mxPoint x="209" y="2490" />
+              <mxPoint x="209" y="2430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="2400" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="60" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-5" edge="1" parent="1" source="stone_efficiency_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="salvagers_touch_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-10" edge="1" parent="1" source="stone_efficiency_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="180" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-32" edge="1" parent="1" source="stone_efficiency_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="780" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-33" edge="1" parent="1" source="stone_efficiency_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="stone_efficiency_5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="900" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-37" edge="1" parent="1" source="stone_efficiency_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-38" edge="1" parent="1" source="stone_efficiency_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-253" edge="1" parent="1" source="stone_efficiency_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="stone_efficiency_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="1020" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-41" edge="1" parent="1" source="stone_efficiency_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="salvagers_touch_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-43" edge="1" parent="1" source="stone_efficiency_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="1140" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-56" edge="1" parent="1" source="stone_efficiency_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="stone_efficiency_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="1560" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-52" edge="1" parent="1" source="stone_efficiency_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="1680" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-53" edge="1" parent="1" source="stone_efficiency_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="90" y="1890" />
+              <mxPoint x="210" y="1890" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="1740" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-65" edge="1" parent="1" source="stone_efficiency_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="fortune_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-69" edge="1" parent="1" source="stone_efficiency_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="salvagers_touch_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="1920" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-25" edge="1" parent="1" source="ore_infusion_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ore_infusion_2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="450" />
+              <mxPoint x="270" y="450" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="540" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="360" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="1020" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="1020" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="1140" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="1260" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="1380" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-75" edge="1" parent="1" source="ore_infusion_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ore_infusion_9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="2400" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-76" edge="1" parent="1" source="ore_infusion_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ore_infusion_10" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="2580" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-77" edge="1" parent="1" source="ore_infusion_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="salvagers_touch_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-83" edge="1" parent="1" source="ore_infusion_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="golden_chance_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="2760" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-121" edge="1" parent="1" source="treasure_trigger_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="treasure_trigger_2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="4080" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-122" edge="1" parent="1" source="treasure_trigger_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="treasure_trigger_3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="3960" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="3840" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-148" edge="1" parent="1" source="treasure_trigger_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-149" edge="1" parent="1" source="treasure_trigger_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="4860" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-135" edge="1" parent="1" source="treasure_trigger_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="4980" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-136" edge="1" parent="1" source="treasure_trigger_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="5100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-137" edge="1" parent="1" source="treasure_trigger_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="5220" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-139" edge="1" parent="1" source="treasure_trigger_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="golden_yield_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="5340" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-176" edge="1" parent="1" source="treasure_trigger_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="increased_experience_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="6480" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-175" edge="1" parent="1" source="treasure_trigger_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Treasure&#xa;Trigger" attribute_id="treasure_trigger" base="0.05" per_level="0.05" max_level="1" id="treasure_trigger_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="6360" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-198" edge="1" parent="1" source="increased_experience_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="increased_experience_10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-263" edge="1" parent="1" source="increased_experience_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pickaxe_preservation_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="7140" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-260" edge="1" parent="1" source="increased_experience_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="increased_experience_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="5760" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-261" edge="1" parent="1" source="increased_experience_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="increased_experience_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="5880" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-262" edge="1" parent="1" source="increased_experience_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="increased_experience_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="6000" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-171" edge="1" parent="1" source="increased_experience_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="6120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-189" edge="1" parent="1" source="increased_experience_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="ore_infusion_11">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="6690" />
+              <mxPoint x="150" y="6690" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-248" edge="1" parent="1" source="increased_experience_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="6540" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-202" edge="1" parent="1" source="increased_experience_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="7380" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-210" edge="1" parent="1" source="increased_experience_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="increased_experience_12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-216" edge="1" parent="1" source="increased_experience_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_11">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="7500" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-211" edge="1" parent="1" source="increased_experience_12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="increased_experience_13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-215" edge="1" parent="1" source="increased_experience_12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="pickaxe_preservation_8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_12">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="7620" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-219" edge="1" parent="1" source="increased_experience_13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="pickaxe_preservation_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_13">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="7680" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-201" edge="1" parent="1" source="pickaxe_preservation_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pickaxe_preservation_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="7140" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-164" edge="1" parent="1" source="pickaxe_preservation_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="pickaxe_preservation_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="5760" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-163" edge="1" parent="1" source="pickaxe_preservation_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pickaxe_preservation_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="5880" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-162" edge="1" parent="1" source="pickaxe_preservation_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pickaxe_preservation_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="6000" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-172" edge="1" parent="1" source="pickaxe_preservation_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="6120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-203" edge="1" parent="1" source="pickaxe_preservation_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="7380" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-220" edge="1" parent="1" source="pickaxe_preservation_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pickaxe_preservation_9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="90" y="7950" />
+              <mxPoint x="150" y="7950" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="7800" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-214" edge="1" parent="1" source="pickaxe_preservation_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="pickaxe_preservation_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-222" edge="1" parent="1" source="pickaxe_preservation_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="7740" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-249" edge="1" parent="1" source="pickaxe_preservation_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pickaxe_preservation_10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="7980" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Pickaxe&#xa;Preservation" attribute_id="pickaxe_preservation" base="0.03" per_level="0.03" max_level="1" id="pickaxe_preservation_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="8100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-61" edge="1" parent="1" source="golden_chance_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_chance_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="1860" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-62" edge="1" parent="1" source="golden_chance_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_chance_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="1980" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="2100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-85" edge="1" parent="1" source="golden_chance_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_yield_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="2880" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-87" edge="1" parent="1" source="golden_chance_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_yield_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="3120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-116" edge="1" parent="1" source="increased_experience_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="increased_experience_2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="4020" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-117" edge="1" parent="1" source="increased_experience_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="increased_experience_3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="4140" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-257" edge="1" parent="1" source="increased_experience_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_17">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="4410" />
+              <mxPoint x="210" y="4410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <object label="Increased&#xa;Experience" attribute_id="mining_increased_experience" base="0.05" per_level="0.05" max_level="1" id="increased_experience_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="4260" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-282" edge="1" parent="1" source="golden_chance_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="golden_yield_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="5160" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-156" edge="1" parent="1" source="golden_chance_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="recipe_oreburst_charge">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-165" edge="1" parent="1" source="golden_chance_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_yield_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-259" edge="1" parent="1" source="golden_chance_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_yield_10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Chance" attribute_id="golden_chance" base="0.05" per_level="0.05" max_level="1" id="golden_chance_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="5460" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-86" edge="1" parent="1" source="golden_yield_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="golden_chance_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_1">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="3000" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-88" edge="1" parent="1" source="golden_yield_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="salvagers_touch_10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="3270" />
+              <mxPoint x="210" y="3330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-278" edge="1" parent="1" source="golden_yield_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_2">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="3240" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-118" edge="1" parent="1" source="golden_yield_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="golden_yield_4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_3">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="4020" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-119" edge="1" parent="1" source="golden_yield_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="golden_yield_5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_4">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="4140" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-123" edge="1" parent="1" source="golden_yield_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="golden_yield_6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_5">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="4260" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-126" edge="1" parent="1" source="golden_yield_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_6">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="4380" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-140" edge="1" parent="1" source="golden_yield_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="golden_chance_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-142" edge="1" parent="1" source="golden_yield_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_chance_10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_7">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="5280" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_8">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="5040" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_9">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="5520" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_10">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="5520" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-120" edge="1" parent="1" source="buried_cache_node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="treasure_trigger_1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Buried&#xa;Cache" skill_id="buried_cache" max_level="1" required_level="35" id="buried_cache_node">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="4200" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-157" edge="1" parent="1" source="recipe_oreburst_charge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="increased_experience_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-158" edge="1" parent="1" source="recipe_oreburst_charge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="pickaxe_preservation_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Oreburst&#xa;Charge" recipe="progression:oreburst_charge" required_level="50" id="recipe_oreburst_charge">
+          <mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="5640" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-60" edge="1" parent="1" source="gilded_discovery_node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_chance_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Gilded&#xa;Discovery" skill_id="gilded_discovery" max_level="1" required_level="15" id="gilded_discovery_node">
+          <mxCell parent="1" style="rounded=1;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;whiteSpace=wrap;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="1740" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="The Rift" recipe="progression:the_rift" required_level="75" id="recipe_the_rift">
+          <mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="8940" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Runed&#xa;Pickaxe" recipe="progression:runed_pickaxe" required_level="25" id="recipe_runed_pickaxe">
+          <mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="2580" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Deep&#xa;Resonator" recipe="progression:deep_resonator" required_level="65" id="recipe_deep_resonator">
+          <mxCell parent="1" style="rhombus;whiteSpace=wrap;html=1;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="7260" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-1" edge="1" parent="1" source="stone_efficiency_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.493;entryY=-0.05;entryDx=0;entryDy=0;entryPerimeter=0;" target="stone_efficiency_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-59" edge="1" parent="1" source="stone_efficiency_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-63" edge="1" parent="1" source="stone_efficiency_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="gilded_discovery_node">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_11">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="1500" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-90" edge="1" parent="1" source="stone_efficiency_12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="stone_efficiency_13" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_12">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="3180" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-91" edge="1" parent="1" source="stone_efficiency_13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="stone_efficiency_14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_13">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="3060" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_14">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="2940" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-275" edge="1" parent="1" source="stone_efficiency_15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="stone_efficiency_23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-280" edge="1" parent="1" source="stone_efficiency_15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_15">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="3600" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-111" edge="1" parent="1" source="stone_efficiency_16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="increased_experience_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-115" edge="1" parent="1" source="stone_efficiency_16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="golden_yield_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_16">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="3900" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-128" edge="1" parent="1" source="stone_efficiency_17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="stone_efficiency_18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_17">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="4485" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-129" edge="1" parent="1" source="stone_efficiency_18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="stone_efficiency_19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_18">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="4560" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-130" edge="1" parent="1" source="stone_efficiency_19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_19">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="4620" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-131" edge="1" parent="1" source="stone_efficiency_20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="stone_efficiency_21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_20">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="4680" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-150" edge="1" parent="1" source="stone_efficiency_21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_21">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="4740" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-274" edge="1" parent="1" source="stone_efficiency_22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="stone_efficiency_15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-277" edge="1" parent="1" source="stone_efficiency_22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="stone_efficiency_24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_22">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="3480" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-276" edge="1" parent="1" source="stone_efficiency_23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="stone_efficiency_24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-281" edge="1" parent="1" source="stone_efficiency_23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_23">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="3600" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_24">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="3480" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-268" edge="1" parent="1" source="stone_efficiency_25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_25">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="3720" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-143" edge="1" parent="1" source="stone_efficiency_26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="stone_efficiency_27" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_26">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="4980" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-144" edge="1" parent="1" source="stone_efficiency_27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="stone_efficiency_28" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_27">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="5100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-145" edge="1" parent="1" source="stone_efficiency_28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_28">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="5220" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-258" edge="1" parent="1" source="stone_efficiency_29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="golden_yield_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_29">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="5340" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-173" edge="1" parent="1" source="stone_efficiency_30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="stone_efficiency_31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-174" edge="1" parent="1" source="stone_efficiency_30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="treasure_trigger_10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_30">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="6240" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_31">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="6120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-182" edge="1" parent="1" source="fortune_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="fortune_13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-183" edge="1" parent="1" source="fortune_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="fortune_12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_11">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="6720" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-186" edge="1" parent="1" source="fortune_12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="fortune_16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-187" edge="1" parent="1" source="fortune_12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="fortune_14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_12">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="6840" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-184" edge="1" parent="1" source="fortune_13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="fortune_14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_13">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="6720" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-185" edge="1" parent="1" source="fortune_14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="fortune_15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_14">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="6840" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-195" edge="1" parent="1" source="fortune_15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_15">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="6960" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-188" edge="1" parent="1" source="fortune_16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="fortune_15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_16">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="6960" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-226" edge="1" parent="1" source="fortune_17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-238" edge="1" parent="1" source="fortune_17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_17">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="8220" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-228" edge="1" parent="1" source="fortune_18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_37">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_18">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="8340" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-237" edge="1" parent="1" source="fortune_19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_19">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="8280" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-265" edge="1" parent="1" source="fortune_20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Fortune" attribute_id="fortune" base="0.05" per_level="0.05" max_level="1" id="fortune_20">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="8400" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-209" edge="1" parent="1" source="stone_efficiency_32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="increased_experience_11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_32">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="7380" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-224" edge="1" parent="1" source="stone_efficiency_33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-227" edge="1" parent="1" source="stone_efficiency_33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="fortune_17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_33">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="8100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-230" edge="1" parent="1" source="stone_efficiency_34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_34">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="7920" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-225" edge="1" parent="1" source="stone_efficiency_35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-235" edge="1" parent="1" source="stone_efficiency_35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="fortune_19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_35">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="8220" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-264" edge="1" parent="1" source="stone_efficiency_36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_37">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_36">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="300" y="8340" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-242" edge="1" parent="1" source="stone_efficiency_37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_37">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="8460" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-243" edge="1" parent="1" source="stone_efficiency_38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_39">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_38">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="240" y="8580" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-244" edge="1" parent="1" source="stone_efficiency_39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="stone_efficiency_40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-251" edge="1" parent="1" source="stone_efficiency_39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ore_infusion_17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_39">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="8700" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-245" edge="1" parent="1" source="stone_efficiency_40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_40">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="8820" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Stone&#xa;Efficiency" attribute_id="stone_efficiency" base="0.05" per_level="0.05" max_level="1" id="stone_efficiency_41">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="180" y="8940" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-191" edge="1" parent="1" source="ore_infusion_11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_11">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="6780" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-192" edge="1" parent="1" source="ore_infusion_12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="ore_infusion_13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_12">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="6900" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-197" edge="1" parent="1" source="ore_infusion_13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="increased_experience_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_13">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="120" y="7020" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-205" edge="1" parent="1" source="ore_infusion_14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_14">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="7560" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-206" edge="1" parent="1" source="ore_infusion_15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_15">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="7680" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-223" edge="1" parent="1" source="ore_infusion_16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_16">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="7800" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-252" edge="1" parent="1" source="ore_infusion_17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_17">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="360" y="8700" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_18">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="420" y="8820" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-239" edge="1" parent="1" source="ore_infusion_19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ore_infusion_20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_19">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="8280" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="1Vpb-A6OnpxDK0nBlSpK-240" edge="1" parent="1" source="ore_infusion_20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object label="Ore&#xa;Infusion" attribute_id="ore_infusion" base="0.05" per_level="0.05" max_level="1" id="ore_infusion_20">
+          <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
+            <mxGeometry height="60" width="60" x="60" y="8400" as="geometry" />
+          </mxCell>
+        </object>
       </root>
     </mxGraphModel>
   </diagram>
