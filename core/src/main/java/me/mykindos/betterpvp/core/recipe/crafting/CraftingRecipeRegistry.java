@@ -37,6 +37,11 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
     }
 
     @Override
+    public Optional<CraftingRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(craftingRecipes.get(key));
+    }
+
+    @Override
     public RecipeResolver<CraftingRecipe> getResolver() {
         return resolver;
     }
@@ -58,6 +63,13 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
     public void registerRecipe(@NotNull NamespacedKey key, @NotNull CraftingRecipe craftingRecipe) {
         if (craftingRecipes.containsKey(key)) {
             log.warn("Recipe with key {} is already registered, overwriting", key).submit();
+        }
+
+        // Store the key on the recipe so canCraft can delegate to ItemAccessService.
+        if (craftingRecipe instanceof ShapedCraftingRecipe shaped) {
+            shaped.setRecipeKey(key);
+        } else if (craftingRecipe instanceof ShapelessCraftingRecipe shapeless) {
+            shapeless.setRecipeKey(key);
         }
 
         craftingRecipes.put(key, craftingRecipe);

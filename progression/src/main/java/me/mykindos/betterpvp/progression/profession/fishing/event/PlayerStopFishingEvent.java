@@ -1,18 +1,20 @@
 package me.mykindos.betterpvp.progression.profession.fishing.event;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
+import me.mykindos.betterpvp.core.loot.LootBundle;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class PlayerStopFishingEvent extends ProgressionFishingEvent {
 
-    private final FishingLoot loot;
+    @Nullable
+    private final LootBundle bundle;
     private final FishingResult reason;
 
-    public PlayerStopFishingEvent(Player player, FishingLoot loot, FishingResult reason) {
+    public PlayerStopFishingEvent(Player player, @Nullable LootBundle bundle, FishingResult reason) {
         super(player);
-        this.loot = loot;
+        this.bundle = bundle;
         this.reason = reason;
     }
 

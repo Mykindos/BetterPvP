@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.clans.fields.repository.FieldsRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,6 +95,44 @@ public class Fields {
     public void addBlock(@NotNull FieldsInteractable type, @NotNull Block block) {
         blocks.put(type, new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getBlockData()));
         repository.save(new FieldsBlockEntry(type, block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getBlockData().getAsString()));
+    }
+
+    /**
+     * Registers a transient Fields ore — appears in-memory only, never persists to the DB,
+     * and does not auto-respawn when mined. Used when an ability/script materializes an ore
+     * inside the Fields zone. The block reverts to {@code previousData} on expiry; on mine
+     * it is removed entirely (forgotten).
+     * <p>
+     * Both {@code replacementData} and {@code previousData} are explicit parameters because the
+     * caller (typically a {@code ScriptedBlockPlaceEvent} handler) runs before the firing code
+     * mutates the world block — at call time {@code block.getBlockData()} still equals
+     * {@code previousData}, so reading it would snapshot the wrong state.
+     *
+     * @param type            the matching {@link FieldsInteractable} so the existing mine/XP flow works
+     * @param block           the world block being replaced
+     * @param replacementData the block state that the script will apply (stored as the active ore)
+     * @param previousData    the block state to restore if the temp expires unmined
+     * @param ttlMs           time-to-live before unmined expiry, in milliseconds
+     */
+    public void addTemporaryBlock(@NotNull FieldsInteractable type, @NotNull Block block,
+                                  @NotNull BlockData replacementData, @NotNull BlockData previousData,
+                                  long ttlMs) {
+        final FieldsBlock entry = new FieldsBlock(
+                block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), replacementData);
+        entry.setActive(true);
+        entry.setTemporary(true);
+        entry.setExpiresAtMs(System.currentTimeMillis() + ttlMs);
+        entry.setPreviousData(previousData);
+        blocks.put(type, entry);
+    }
+
+    /**
+     * Removes a {@link FieldsBlock} entry entirely. Used by the temp-block flow on mine/expiry,
+     * since temporaries should be forgotten rather than left in the inactive-awaiting-respawn
+     * state that {@code FieldsListener#onOreMine} produces for permanent blocks.
+     */
+    public void forget(@NotNull FieldsInteractable type, @NotNull FieldsBlock block) {
+        blocks.remove(type, block);
     }
 
     /**

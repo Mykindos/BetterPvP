@@ -3,8 +3,10 @@ package me.mykindos.betterpvp.core.loot.serialization;
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.framework.economy.CoinItem;
 import me.mykindos.betterpvp.core.loot.economy.CoinLoot;
+import me.mykindos.betterpvp.core.loot.entity.EntitySpawnLoot;
 import me.mykindos.betterpvp.core.loot.item.ItemLoot;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -55,6 +57,13 @@ public final class LootEntryRegistry {
             int minAmount = obj.get("minAmount").getAsInt();
             int maxAmount = obj.get("maxAmount").getAsInt();
             return CoinLoot.given(coinType, strategy, minAmount, maxAmount);
+        });
+
+        LootEntryRegistry.register("entity_spawn", (obj, strategy) -> {
+            EntityType entityType = EntityType.valueOf(obj.get("entityType").getAsString().toUpperCase());
+            boolean launchAtSource = obj.has("launchAtSource") && obj.get("launchAtSource").getAsBoolean();
+            String pdcMarkerKey = obj.has("pdcMarkerKey") ? obj.get("pdcMarkerKey").getAsString() : null;
+            return new EntitySpawnLoot(entityType, launchAtSource, pdcMarkerKey, strategy, ctx -> true);
         });
 
         LootEntryRegistry.register("dropped_coin", (obj, strategy) -> {

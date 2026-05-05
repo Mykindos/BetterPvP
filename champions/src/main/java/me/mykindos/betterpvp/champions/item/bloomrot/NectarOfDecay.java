@@ -81,7 +81,7 @@ public class NectarOfDecay extends CooldownInteraction implements Listener, Disp
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

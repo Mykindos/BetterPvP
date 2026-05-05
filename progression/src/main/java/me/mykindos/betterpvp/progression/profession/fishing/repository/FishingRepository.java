@@ -26,11 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_BIGGEST_FISH_CAUGHT;
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_BIGGEST_FISH_CAUGHT_BY_CLIENT;
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_TOP_FISHING_BY_COUNT;
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.GET_TOP_FISHING_BY_WEIGHT;
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_FISHING;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.*;
 
 @CustomLog
 @Singleton
@@ -66,7 +62,7 @@ public class FishingRepository {
 
         fishToSave.add(database.getDslContext().insertInto(PROGRESSION_FISHING)
                 .set(PROGRESSION_FISHING.CLIENT, client.getId())
-                .set(PROGRESSION_FISHING.TYPE, fish.getType().getName())
+                .set(PROGRESSION_FISHING.TYPE, fish.getTypeName())
                 .set(PROGRESSION_FISHING.WEIGHT, fish.getWeight()));
 
     }

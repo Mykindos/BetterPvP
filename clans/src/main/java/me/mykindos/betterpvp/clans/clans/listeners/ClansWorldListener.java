@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -32,7 +33,6 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -49,6 +49,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.ArmorStand;
@@ -64,6 +65,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -170,6 +172,40 @@ public class ClansWorldListener extends ClanListener {
                     this.effectManager.addEffect(player, EffectTypes.NO_FALL, 7000);
                 }
             });
+        }
+    }
+
+    /**
+     * Access gate for {@link ScriptedBlockPlaceEvent}. Runs at NORMAL — earlier listeners
+     * (e.g. {@code FieldsListener} at LOW) get a chance to set
+     * {@link Event.Result#ALLOW} and bypass the check. If nobody has claimed the placement
+     * (result still {@link Event.Result#DEFAULT}) and the location is in another clan's
+     * territory, we silently cancel via a {@link TerritoryInteractEvent} probe with
+     * {@code inform=false} — no chat spam for ability-driven placements.
+     */
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onScriptedBlockPlace(final ScriptedBlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getResult() != Event.Result.DEFAULT) return;
+
+        final Player player = event.getPlayer();
+        final Block block = event.getBlock();
+
+        if (UtilBlock.isTutorial(block.getLocation())) return;
+
+        final Optional<Clan> locationClanOptional = clanManager.getClanByLocation(block.getLocation());
+        if (locationClanOptional.isEmpty()) return; // unclaimed — allow
+        final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+
+        final Clan locationClan = locationClanOptional.get();
+        final Event.Result result = locationClan == playerClan ? Event.Result.DEFAULT : Event.Result.DENY;
+        final TerritoryInteractEvent tie = new TerritoryInteractEvent(
+                player, locationClan, block, result, TerritoryInteractEvent.InteractionType.PLACE);
+        tie.setInform(false);
+        tie.callEvent();
+
+        if (tie.getResult() == Event.Result.DENY) {
+            event.setCancelled(true);
         }
     }
 
@@ -1062,33 +1098,21 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void handleOreReplacements(BlockBreakEvent event) {
-        if (event.isCancelled()) return;
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void handleOreReplacements(BlockDropItemEvent event) {
+        BlockState block = event.getBlockState();
+        if (block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
+            final ItemStack stack = new ItemStack(Material.LEATHER, 1);
+            event.getItems().clear();
 
-        Clan clan = clanManager.getClanByLocation(event.getBlock().getLocation()).orElse(null);
-        if (clan == null || !clan.isAdmin()) {
-            if (clan != null) {
-                Clan playerClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
-                if (clan != playerClan) {
-                    return;
-                }
-            }
-            Block block = event.getBlock();
-            if (block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
-                event.setDropItems(false);
-                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.LEATHER, 1));
-                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
-                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
-                }
+            Item item = block.getWorld().dropItemNaturally(block.getLocation(), stack);
+            event.getItems().add(item);
+        } else if (block.getType() == Material.GILDED_BLACKSTONE) {
+            final ItemStack stack = new ItemStack(Material.NETHERITE_INGOT, 1);
+            event.getItems().clear();
 
-            } else if (block.getType() == Material.GILDED_BLACKSTONE) {
-                event.setDropItems(false);
-                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
-                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
-                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
-                }
-            }
+            Item item = block.getWorld().dropItemNaturally(block.getLocation(), stack);
+            event.getItems().add(item);
         }
     }
 

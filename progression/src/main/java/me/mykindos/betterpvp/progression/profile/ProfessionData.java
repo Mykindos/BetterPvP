@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.event.ProfessionPropertyUpdateEvent;
-import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionBuild;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,13 +22,13 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
     private final String profession;
 
     private double experience;
-    private ProgressionBuild build;
+    private ProfessionBuild build;
 
     public ProfessionData(UUID owner, String profession) {
         this.owner = owner;
         this.profession = profession;
         this.experience = 0;
-        this.build = new ProgressionBuild(profession);
+        this.build = new ProfessionBuild(profession);
         properties.registerListener(this);
 
     }
@@ -43,14 +43,14 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
 
     public int getLevelFromExperience(double experience) {
         int level = 1;
-        double expForNextLevel = 25;
+        double expForNextLevel = 80;
 
         double experienceCopy = experience;
 
         while (experienceCopy >= expForNextLevel) {
             level++;
             experienceCopy -= expForNextLevel;
-            expForNextLevel *= 1.01;
+            expForNextLevel *= 1.104;
         }
 
         return level;
@@ -62,11 +62,11 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
         }
 
         double totalExperience = 0;
-        double expForCurrentLevel = 25;
+        double expForCurrentLevel = 80;
 
         for (int i = 2; i <= level; i++) {
             totalExperience += expForCurrentLevel;
-            expForCurrentLevel *= 1.01;
+            expForCurrentLevel *= 1.104;
         }
 
         return totalExperience;
