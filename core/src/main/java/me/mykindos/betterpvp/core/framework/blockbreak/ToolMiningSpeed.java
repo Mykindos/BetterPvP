@@ -27,6 +27,7 @@ public final class ToolMiningSpeed {
     public static final int HAND      = 1  * SCALE;  // 15
     public static final int WOOD      = 2  * SCALE;  // 30
     public static final int STONE     = 4  * SCALE;  // 60
+    public static final int COPPER    = 5  * SCALE;  // 75
     public static final int IRON      = 6  * SCALE;  // 90
     public static final int DIAMOND   = 8  * SCALE;  // 120
     public static final int NETHERITE = 9  * SCALE;  // 135
