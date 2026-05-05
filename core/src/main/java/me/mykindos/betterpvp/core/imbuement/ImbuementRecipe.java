@@ -4,7 +4,6 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.access.AccessScope;
 import me.mykindos.betterpvp.core.access.ItemAccessService;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.recipe.Recipe;
@@ -26,8 +25,8 @@ import java.util.Map;
  * Provides common functionality while allowing specialized implementations for different recipe types.
  */
 @Getter
-public abstract class ImbuementRecipe implements Recipe<ImbuementRecipeResult, ItemInstance> {
-    
+public abstract class ImbuementRecipe implements Recipe<ImbuementRecipeResult> {
+
     protected final @NotNull ItemFactory itemFactory;
 
     @Nullable
@@ -53,30 +52,28 @@ public abstract class ImbuementRecipe implements Recipe<ImbuementRecipeResult, I
             ItemAccessService service = JavaPlugin.getPlugin(Core.class)
                     .getInjector().getInstance(ItemAccessService.class);
             Key key = Key.key(recipeKey.namespace(), recipeKey.getKey());
-            BaseItem resultItem = getPrimaryResult().getPrimaryResult();
-            return service.isAllowed(player, resultItem, key, AccessScope.CRAFT);
+            return service.isAllowed(player, previewResult().getPrimaryBaseItem(), key, AccessScope.CRAFT);
         } catch (Exception e) {
             return true;
         }
     }
-    
+
     @Override
     public @NotNull RecipeType getType() {
         return RecipeType.IMBUEMENT;
     }
-    
+
     @Override
     public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         List<Integer> consumedSlots = new ArrayList<>();
-        
-        // For imbuement recipes, we consume ALL ingredients exactly
+
         for (Map.Entry<Integer, ItemInstance> entry : new HashMap<>(ingredients).entrySet()) {
             if (entry.getValue() != null) {
                 ingredients.remove(entry.getKey());
                 consumedSlots.add(entry.getKey());
             }
         }
-        
+
         return consumedSlots;
     }
-} 
+}

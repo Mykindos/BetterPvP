@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.anvil.AnvilRecipe;
 import me.mykindos.betterpvp.core.anvil.AnvilRecipeRegistry;
-import me.mykindos.betterpvp.core.anvil.AnvilRecipeResult;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -40,7 +39,7 @@ public class DurakHandle extends BaseItem {
 
         final AnvilRecipe recipe = new AnvilRecipe(
                 ingredients,
-                new AnvilRecipeResult(this),
+                this,
                 5,
                 itemFactory
         );

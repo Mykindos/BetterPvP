@@ -30,7 +30,7 @@ import java.util.List;
 
 public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
 
-    public GuiRecipeViewer(@NotNull Collection<Recipe<?, ?>> recipes, @Nullable Windowed previousWindow) {
+    public GuiRecipeViewer(@NotNull Collection<Recipe<?>> recipes, @Nullable Windowed previousWindow) {
         super(9, 6, false, new Structure(
                 "0XXXXXXX0",
                 "0XXXXXXX0",
@@ -44,11 +44,11 @@ public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
                 .addIngredient('B', new BackTabButton(previousWindow)));
 
         // Sort recipes: CraftingRecipe first, ImbuementRecipe last
-        List<Recipe<?, ?>> sortedRecipes = new ArrayList<>(recipes);
+        List<Recipe<?>> sortedRecipes = new ArrayList<>(recipes);
         sortedRecipes.sort(Comparator.comparingInt(this::getRecipePriority));
 
         List<Gui> guis = new ArrayList<>();
-        for (Recipe<?, ?> recipe : sortedRecipes) {
+        for (Recipe<?> recipe : sortedRecipes) {
             guis.add(createGui(recipe));
         }
 
@@ -66,7 +66,7 @@ public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
         });
     }
 
-    private Gui createGui(Recipe<?, ?> recipe) {
+    private Gui createGui(Recipe<?> recipe) {
         if (recipe instanceof CastingMoldRecipe castingMoldRecipe) {
             return new GuiCastingRecipeViewer(castingMoldRecipe);
         } else if (recipe instanceof CraftingRecipe craftingRecipe) {
@@ -98,7 +98,7 @@ public class GuiRecipeViewer extends AbstractPagedGui<Gui> implements Windowed {
         update();
     }
 
-    private int getRecipePriority(Recipe<?, ?> recipe) {
+    private int getRecipePriority(Recipe<?> recipe) {
         return switch (recipe) {
             case CraftingRecipe craftingRecipe -> 0; // CraftingRecipe first
             case SmeltingRecipe smeltingRecipe -> 2;

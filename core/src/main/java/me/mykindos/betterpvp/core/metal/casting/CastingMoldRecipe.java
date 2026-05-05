@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.metal.casting;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -23,21 +22,14 @@ import java.util.Optional;
  * a specific casting mold type and what the resulting filled mold should be.
  */
 @Getter
-public class CastingMoldRecipe implements Recipe<BaseItem, ItemInstance> {
-    
+public class CastingMoldRecipe implements Recipe<ItemInstance> {
+
     private final @NotNull CastingMold baseMold;
     private final int requiredMillibuckets;
     private final @NotNull Alloy alloy;
     private final @NotNull BaseItem result;
     private final ItemFactory itemFactory;
 
-    /**
-     * Creates a new casting mold recipe.
-     * @param baseMold The base casting mold that can be filled
-     * @param requiredMillibuckets The amount of liquid alloy required to fill this mold
-     * @param alloy The alloy type that can be used to fill this mold
-     * @param result The filled casting mold that results from using this alloy
-     */
     public CastingMoldRecipe(@NotNull CastingMold baseMold, int requiredMillibuckets, @NotNull Alloy alloy, @NotNull BaseItem result, ItemFactory itemFactory) {
         this.baseMold = baseMold;
         this.requiredMillibuckets = requiredMillibuckets;
@@ -45,32 +37,22 @@ public class CastingMoldRecipe implements Recipe<BaseItem, ItemInstance> {
         this.result = result;
         this.itemFactory = itemFactory;
     }
-    
-    /**
-     * Checks if the given alloy can be used to fill this mold.
-     * @param alloy The alloy to check
-     * @return true if the alloy is accepted, false otherwise
-     */
+
     public boolean acceptsAlloy(@NotNull Alloy alloy) {
         return this.alloy.equals(alloy);
     }
-    
-    /**
-     * Checks if this recipe can be used with the given mold.
-     * @param mold The mold to check
-     * @return true if the mold matches this recipe's base mold
-     */
+
     public boolean matches(@NotNull BaseItem mold) {
         return baseMold.equals(mold);
     }
 
     @Override
-    public @NotNull BaseItem getPrimaryResult() {
-        return result;
+    public @NotNull ItemInstance previewResult() {
+        return itemFactory.createPreview(result);
     }
 
     @Override
-    public @NotNull ItemInstance createPrimaryResult() {
+    public @NotNull ItemInstance createResult() {
         return itemFactory.create(result);
     }
 
@@ -85,7 +67,7 @@ public class CastingMoldRecipe implements Recipe<BaseItem, ItemInstance> {
             int amount = value.getAmount();
             final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(value);
             if (instanceOpt.isEmpty()) {
-                continue; // notihng we can do with this item
+                continue;
             }
 
             final ItemInstance instance = instanceOpt.get();
@@ -118,7 +100,7 @@ public class CastingMoldRecipe implements Recipe<BaseItem, ItemInstance> {
 
     @Override
     public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
-        return List.of(); // No ingredients are consumed in this recipe
+        return List.of();
     }
 
     @Override

@@ -5,16 +5,13 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.recipe.Recipe;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +21,7 @@ import java.util.Set;
  * Unlike crafting recipes, smelting recipes are shapeless and require specific temperatures.
  */
 @Getter
-public class SmeltingRecipe implements Recipe<SmeltingResult, SmeltingResult> {
+public class SmeltingRecipe implements Recipe<SmeltingResult> {
     
     private final @NotNull Map<BaseItem, Integer> ingredients;
     private final @NotNull SmeltingResult result;
@@ -49,12 +46,12 @@ public class SmeltingRecipe implements Recipe<SmeltingResult, SmeltingResult> {
     }
     
     @Override
-    public @NotNull SmeltingResult getPrimaryResult() {
+    public @NotNull SmeltingResult previewResult() {
         return result;
     }
-    
+
     @Override
-    public @NotNull SmeltingResult createPrimaryResult() {
+    public @NotNull SmeltingResult createResult() {
         return result;
     }
     

@@ -35,6 +35,7 @@ public class BaseItem implements Item {
 
     @Getter
     protected final @NotNull ItemStack model;
+    private final byte[] modelBytes;
     @Getter
     private final @NotNull ItemGroup itemGroup;
     @Getter
@@ -72,7 +73,12 @@ public class BaseItem implements Item {
         this.model = model;
         this.itemGroup = group;
         this.instanceRarityProvider = rarityProvider;
+        this.modelBytes = model.serializeAsBytes();
         addItemStackRenderer(new DurabilityRenderer());
+    }
+
+    public final @NotNull ItemStack getModel() {
+        return model.clone();
     }
 
     protected void addItemStackRenderer(@NotNull ItemStackRenderer renderer) {
@@ -174,8 +180,7 @@ public class BaseItem implements Item {
     public int hashCode() {
         ItemStack model = this.model.clone();
         model.setAmount(1); // Ensure consistent hashCode regardless of item amount
-        final byte[] bytes = model.serializeAsBytes();
-        int result = Arrays.hashCode(bytes); // Serialize the item to bytes for consistency
+        int result = Arrays.hashCode(this.modelBytes); // Serialize the item to bytes for consistency
 
         // Use enum ordinal for absolute consistency (though hashCode should work too)
         result = 31 * result + itemGroup.ordinal();

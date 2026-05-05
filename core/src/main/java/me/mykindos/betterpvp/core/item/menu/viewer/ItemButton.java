@@ -38,7 +38,7 @@ public class ItemButton extends ControlItem<AbstractGui> {
     private volatile Result cachedResult;
     private volatile ItemProvider cachedProvider;
 
-    private record Result(LinkedList<Recipe<?, ?>> recipes, LinkedList<Recipe<?, ?>> usages) {}
+    private record Result(LinkedList<Recipe<?>> recipes, LinkedList<Recipe<?>> usages) {}
 
     public ItemButton(ItemInstance item) {
         this.itemInstance = item;
@@ -46,9 +46,9 @@ public class ItemButton extends ControlItem<AbstractGui> {
         RecipeRegistries registries = JavaPlugin.getPlugin(Core.class)
                 .getInjector().getInstance(RecipeRegistries.class);
 
-        CompletableFuture<LinkedList<Recipe<?, ?>>> recipesFuture =
+        CompletableFuture<LinkedList<Recipe<?>>> recipesFuture =
                 registries.getResolver().lookup(new ExactResultParameter(item.getBaseItem()));
-        CompletableFuture<LinkedList<Recipe<?, ?>>> usagesFuture =
+        CompletableFuture<LinkedList<Recipe<?>>> usagesFuture =
                 registries.getResolver().lookup(new ExactIngredientParameter(item.getBaseItem()));
 
         this.loadFuture = recipesFuture.thenCombine(usagesFuture, Result::new)
@@ -99,7 +99,7 @@ public class ItemButton extends ControlItem<AbstractGui> {
             return;
         }
 
-        LinkedList<Recipe<?, ?>> result;
+        LinkedList<Recipe<?>> result;
         if (clickType.isLeftClick()) {
             result = cachedResult.recipes;
         } else if (clickType.isRightClick()) {

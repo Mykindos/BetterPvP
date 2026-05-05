@@ -49,6 +49,7 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
     @Override
     public void clearRecipe(NamespacedKey key) {
         if (craftingRecipes.remove(key) != null) {
+            resolver.invalidate();
             log.info("Cleared recipe: {}", key).submit();
         } else {
             log.warn("No recipe found with key {}, cannot clear", key).submit();
@@ -73,6 +74,7 @@ public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
         }
 
         craftingRecipes.put(key, craftingRecipe);
+        resolver.invalidate();
         log.info("Registered recipe: {}", key).submit();
     }
 

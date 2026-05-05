@@ -4,9 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
-import me.mykindos.betterpvp.core.recipe.RecipeType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,7 +80,7 @@ public class SmeltingService {
         recipe.consumeIngredients(matrix, itemFactory);
 
         // Create the primary result
-        return recipe.createPrimaryResult();
+        return recipe.createResult();
     }
     
     /**

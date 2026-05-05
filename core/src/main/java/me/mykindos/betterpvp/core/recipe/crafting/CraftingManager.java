@@ -109,7 +109,7 @@ public class CraftingManager {
         }
         
         CraftingRecipe craftingRecipe = recipeOpt.get();
-        ItemInstance result = craftingRecipe.createPrimaryResult();
+        ItemInstance result = craftingRecipe.createResult();
         
         // Call the crafting event
         if (player != null) {

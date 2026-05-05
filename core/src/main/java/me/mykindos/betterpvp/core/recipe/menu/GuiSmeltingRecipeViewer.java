@@ -57,7 +57,7 @@ public class GuiSmeltingRecipeViewer extends AbstractGui implements Windowed {
         for (RecipeIngredient ingredient : recipe.getIngredients().values()) {
             final BaseItem item = ingredient.getBaseItem();
             final int amount = ingredient.getAmount();
-            final ItemInstance instance = itemFactory.create(item);
+            final ItemInstance instance = itemFactory.createPreview(item);
             instance.getItemStack().setAmount(amount);
             setItem(contentSlots[index++], new ItemButton(instance));
         }
@@ -88,16 +88,16 @@ public class GuiSmeltingRecipeViewer extends AbstractGui implements Windowed {
             }
 
             if (component.get().getMaxTemperature() >= temperature) {
-                fuelItems.add(itemFactory.create(item).getView());
+                fuelItems.add(itemFactory.createPreview(item).getView());
             }
         }
         setItem(33, new AutoCycleItem(10, fuelItems.toArray(new ItemProvider[0])));
 
-        final SmeltingResult result = recipe.createPrimaryResult();
+        final SmeltingResult result = recipe.previewResult();
         setItem(15, new AlloyButton(result.getPrimaryResult().getAlloyType(), result.getTotalMillibuckets(), true, "Yields"));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
-                .icon(itemFactory.create(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())
+                .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())
                 .wikiEntry("Test", url)
                 .description(Component.text("Click on an ingredient to look at its recipes. Each recipe requires fuel and a minimum temperature to smelt the alloy."))
                 .build());

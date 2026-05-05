@@ -7,9 +7,9 @@ import java.util.function.Predicate;
 /**
  * Marker class for lookup parameters used in {@link RecipeResolver}
  */
-public interface LookupParameter extends Predicate<Recipe<?, ?>> {
+public interface LookupParameter extends Predicate<Recipe<?>> {
 
-    static LookupParameter of(Predicate<Recipe<?, ?>> predicate) {
+    static LookupParameter of(Predicate<Recipe<?>> predicate) {
         return predicate::test;
     }
 
@@ -20,6 +20,6 @@ public interface LookupParameter extends Predicate<Recipe<?, ?>> {
      * @return true if the recipe matches, false otherwise
      */
     @Override
-    boolean test(Recipe<?, ?> recipe);
+    boolean test(Recipe<?> recipe);
 
 }

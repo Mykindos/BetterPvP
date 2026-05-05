@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipe;
-import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeResult;
 import me.mykindos.betterpvp.core.imbuement.RuneImbuementRecipe;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -190,8 +189,7 @@ public class ImbuementPedestalRecipeExecutor {
 
         // Drop secondary results (only for standard recipes)
         if (recipe instanceof StandardImbuementRecipe standardRecipe) {
-            ImbuementRecipeResult result = standardRecipe.getPrimaryResult();
-            for (var secondaryResult : result.getSecondaryResults()) {
+            for (var secondaryResult : standardRecipe.getSecondaryBaseItems()) {
                 ItemStack secondaryStack = itemFactory.create(secondaryResult).createItemStack();
                 explosionCenter.getWorld().dropItemNaturally(explosionCenter, secondaryStack);
             }
@@ -207,11 +205,10 @@ public class ImbuementPedestalRecipeExecutor {
      */
     private ItemStack createPrimaryResult(@NotNull ImbuementRecipe recipe, @NotNull List<ItemInstance> currentItems) {
         if (recipe instanceof RuneImbuementRecipe runeRecipe) {
-            // For rune recipes, we need to pass the current items
-            return runeRecipe.createPrimaryResult(currentItems).createItemStack();
+            // For rune recipes, we need to pass the current items so the result reflects their state
+            return runeRecipe.applyRuneToItems(currentItems).createItemStack();
         } else {
-            // For standard recipes, use the normal method
-            return recipe.createPrimaryResult().createItemStack();
+            return recipe.createResult().getPrimaryResult().createItemStack();
         }
     }
 

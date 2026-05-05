@@ -53,14 +53,14 @@ public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
 
                 final BaseItem baseItem = ingredient.getBaseItem();
                 final int amount = ingredient.getAmount();
-                final ItemInstance instance = itemFactory.create(baseItem);
+                final ItemInstance instance = itemFactory.createPreview(baseItem);
                 instance.getItemStack().setAmount(amount);
                 setItem(x, y, new ItemButton(instance));
             }
         }
 
         // Hammer
-        final ItemInstance hammer = itemFactory.create(itemFactory.getItemRegistry().getItem("core:hammer"));
+        final ItemInstance hammer = itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:hammer"));
         final TextComponent hammerName = Component.text(recipe.getHammerSwings(), NamedTextColor.YELLOW)
                 .appendSpace()
                 .append(Component.text("Hammer Swings", NamedTextColor.GREEN));
@@ -70,10 +70,10 @@ public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
                 .build()));
 
         // Result
-        setItem(15, new SimpleItem(recipe.createPrimaryResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().getPrimaryResult().createItemStack()));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
-                .icon(itemFactory.create(itemFactory.getItemRegistry().getItem("core:anvil")).createItemStack())
+                .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:anvil")).createItemStack())
                 .wikiEntry("Test", url)
                 .description(Component.text("Click on an ingredient to look at its recipes. Anvil recipes require a certain amount of hammer swings to execute."))
                 .build());

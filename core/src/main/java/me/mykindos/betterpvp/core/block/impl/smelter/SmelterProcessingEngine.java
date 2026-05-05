@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.block.impl.smelter;
 
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
@@ -28,10 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static me.mykindos.betterpvp.core.block.impl.smelter.SmelterConstants.CASTING_PITCH;
-import static me.mykindos.betterpvp.core.block.impl.smelter.SmelterConstants.CASTING_VOLUME;
-import static me.mykindos.betterpvp.core.block.impl.smelter.SmelterConstants.DEFAULT_CONTENT_SLOTS;
-import static me.mykindos.betterpvp.core.block.impl.smelter.SmelterConstants.DEFAULT_RESULT_SLOTS;
+import static me.mykindos.betterpvp.core.block.impl.smelter.SmelterConstants.*;
 
 /**
  * Handles smelting operations and casting mold processing for Smelter
@@ -210,7 +206,7 @@ public class SmelterProcessingEngine {
         if (UtilTime.elapsed(lastCast, getCastTime())) {
             // Get the result item
             // Check if we can add the result
-            ItemInstance result = recipe.createPrimaryResult();
+            ItemInstance result = recipe.createResult();
             if (!canAddResultItem(result)) {
                 return false; // Cannot add result item
             }

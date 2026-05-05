@@ -35,7 +35,8 @@ public class ItemFactory {
     @Getter
     private final ItemRegistry itemRegistry;
     private final ComponentSerializationRegistry serializationRegistry;
-    private final List<Function<ItemInstance, ItemInstance>> defaultBuilders = new ArrayList<>();
+    private final List<Function<ItemInstance, ItemInstance>> builders = new ArrayList<>();
+    private final List<Function<ItemInstance, ItemInstance>> persistentBuilders = new ArrayList<>();
 
     @Inject
     private ItemFactory(ItemRegistry itemRegistry, ComponentSerializationRegistry serializationRegistry) {
@@ -44,26 +45,47 @@ public class ItemFactory {
     }
 
     /**
-     * Registers a default builder that will be applied to all ItemInstances created by this factory.
-     * This can be used to set common properties or components on all items.
+     * Registers a builder that will be applied to every ItemInstance produced by this factory,
+     * including display previews. Use this for builders that affect visible state
+     * (display name, lore, model, durability, etc.) or attach pure data components without side effects.
      *
      * @param builder The consumer to apply to each ItemInstance
      */
-    public void registerDefaultBuilder(@NotNull Consumer<@NotNull ItemInstance> builder) {
-        registerDefaultBuilder(itemInstance -> {
+    public void registerBuilder(@NotNull Consumer<@NotNull ItemInstance> builder) {
+        registerBuilder(itemInstance -> {
             builder.accept(itemInstance);
             return itemInstance;
         });
     }
 
     /**
-     * Registers a default builder that will be applied to all ItemInstances created by this factory.
-     * This can be used to set common properties or components on all items.
-     * @param builder The function to apply to each ItemInstance
+     * @see #registerBuilder(Consumer)
      */
-    public void registerDefaultBuilder(@NotNull Function<@NotNull ItemInstance, @NotNull ItemInstance> builder) {
+    public void registerBuilder(@NotNull Function<@NotNull ItemInstance, @NotNull ItemInstance> builder) {
         Preconditions.checkNotNull(builder, "Builder cannot be null");
-        defaultBuilders.add(builder);
+        builders.add(builder);
+    }
+
+    /**
+     * Registers a builder that runs only for live ItemInstances ({@link #create}), never for previews
+     * ({@link #createPreview}). Use this for builders with side effects on persistent state,
+     * registries, or external systems (e.g. UUID assignment + DB save).
+     *
+     * @param builder The consumer to apply to each live ItemInstance
+     */
+    public void registerPersistentBuilder(@NotNull Consumer<@NotNull ItemInstance> builder) {
+        registerPersistentBuilder(itemInstance -> {
+            builder.accept(itemInstance);
+            return itemInstance;
+        });
+    }
+
+    /**
+     * @see #registerPersistentBuilder(Consumer)
+     */
+    public void registerPersistentBuilder(@NotNull Function<@NotNull ItemInstance, @NotNull ItemInstance> builder) {
+        Preconditions.checkNotNull(builder, "Builder cannot be null");
+        persistentBuilders.add(builder);
     }
 
     /**
@@ -82,8 +104,11 @@ public class ItemFactory {
 
         // Apply all builders and serialize components
         ItemInstance instance = new ItemInstance(baseItem, baseItem.getModel().clone(), serializationRegistry);
-        for (Function<ItemInstance, ItemInstance> defaultBuilder : defaultBuilders) {
-            instance = defaultBuilder.apply(instance);
+        for (Function<ItemInstance, ItemInstance> builder1 : builders) {
+            instance = builder1.apply(instance);
+        }
+        for (Function<ItemInstance, ItemInstance> persistentBuilder : persistentBuilders) {
+            instance = persistentBuilder.apply(instance);
         }
         instance.serializeAllComponentsToItemStack();
 
@@ -123,7 +148,26 @@ public class ItemFactory {
             // No additional actions needed
         });
     }
-    
+
+    /**
+     * Creates a display-only ItemInstance from a BaseItem. Applies only builders registered via
+     * {@link #registerBuilder}, skipping persistent builders ({@link #registerPersistentBuilder})
+     * and the PDC fallback-tagging that {@link #create} performs. Use this for previews like the
+     * item viewer GUI, where the resulting ItemStack is rendered but never re-read or persisted.
+     *
+     * @param baseItem The base item to instantiate
+     * @return A preview ItemInstance with no persistent side effects
+     */
+    @Contract(pure = true)
+    public ItemInstance createPreview(@NotNull BaseItem baseItem) {
+        ItemInstance instance = new ItemInstance(baseItem, baseItem.getModel().clone(), serializationRegistry);
+        for (Function<ItemInstance, ItemInstance> builder : builders) {
+            instance = builder.apply(instance);
+        }
+        instance.serializeAllComponentsToItemStack();
+        return instance;
+    }
+
     /**
      * Reads an ItemStack and creates an ItemInstance for it, if possible.
      * Components are automatically deserialized by the ItemInstance constructor.

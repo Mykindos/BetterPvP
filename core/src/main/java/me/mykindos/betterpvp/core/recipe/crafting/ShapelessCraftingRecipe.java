@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 /**
  * A shapeless recipe that requires specific ingredients but not in any particular arrangement.
@@ -32,40 +32,53 @@ import java.util.function.Supplier;
 @Getter
 public class ShapelessCraftingRecipe implements CraftingRecipe {
 
-    private final Supplier<ItemInstance> resultSupplier;
+    private final BaseItem result;
+    private final Consumer<ItemInstance> resultCustomizer;
     private final Map<Integer, RecipeIngredient> ingredients;
     private final ItemFactory itemFactory;
     private final boolean needsBlueprint;
 
     @Nullable
     private NamespacedKey recipeKey;
-    
+
     /**
-     * Creates a new shapeless recipe with a single resultSupplier.
-     * 
-     * @param resultSupplier The resultSupplier of the recipe
+     * Creates a new shapeless recipe.
+     * @param result The base item produced
+     * @param resultCustomizer Side-effect-free customizer applied to both preview and live results
      * @param ingredients The ingredients required (slot positions are ignored for matching)
      * @param itemFactory The ItemFactory to use for item matching
      */
-    public ShapelessCraftingRecipe(@NotNull Supplier<ItemInstance> resultSupplier, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this.resultSupplier = resultSupplier;
+    public ShapelessCraftingRecipe(@NotNull BaseItem result,
+                                   @NotNull Consumer<ItemInstance> resultCustomizer,
+                                   @NotNull Map<Integer, RecipeIngredient> ingredients,
+                                   @NotNull ItemFactory itemFactory,
+                                   boolean needsBlueprint) {
+        this.result = result;
+        this.resultCustomizer = resultCustomizer;
         this.ingredients = new HashMap<>(ingredients);
         this.itemFactory = itemFactory;
         this.needsBlueprint = needsBlueprint;
     }
 
-    public ShapelessCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
-        this(() -> itemFactory.create(result), ingredients, itemFactory, needsBlueprint);
-    }
-    
-    @Override
-    public @NotNull ItemInstance getPrimaryResult() {
-        return resultSupplier.get();
+    public ShapelessCraftingRecipe(@NotNull BaseItem result,
+                                   @NotNull Map<Integer, RecipeIngredient> ingredients,
+                                   @NotNull ItemFactory itemFactory,
+                                   boolean needsBlueprint) {
+        this(result, instance -> {}, ingredients, itemFactory, needsBlueprint);
     }
 
     @Override
-    public @NotNull ItemInstance createPrimaryResult() {
-        return resultSupplier.get();
+    public @NotNull ItemInstance previewResult() {
+        ItemInstance instance = itemFactory.createPreview(result);
+        resultCustomizer.accept(instance);
+        return instance;
+    }
+
+    @Override
+    public @NotNull ItemInstance createResult() {
+        ItemInstance instance = itemFactory.create(result);
+        resultCustomizer.accept(instance);
+        return instance;
     }
 
     @Override
@@ -75,26 +88,23 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
 
     @Override
     public boolean matches(@NotNull Map<Integer, ItemStack> items) {
-        // Create a map of BaseItem to required amounts
         Map<BaseItem, Integer> requiredIngredients = new HashMap<>();
         for (RecipeIngredient ingredient : ingredients.values()) {
             requiredIngredients.merge(ingredient.getBaseItem(), ingredient.getAmount(), Integer::sum);
         }
-        
-        // Create a map of BaseItem to available amounts
+
         Multimap<BaseItem, Integer> availableIngredients = ArrayListMultimap.create();
         for (ItemStack stack : items.values()) {
             if (stack == null || stack.getType().isAir()) {
                 continue;
             }
-            
+
             itemFactory.fromItemStack(stack).ifPresent(instance -> {
                 BaseItem baseItem = instance.getBaseItem();
                 availableIngredients.put(baseItem, stack.getAmount());
             });
         }
-        
-        // Check if all required ingredients are available in sufficient quantities
+
         outer:
         for (Map.Entry<BaseItem, Integer> entry : requiredIngredients.entrySet()) {
             BaseItem baseItem = entry.getKey();
@@ -103,11 +113,10 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
             if (!availableIngredients.containsKey(baseItem)) {
                 return false;
             }
-            
+
             Collection<Integer> availableAmounts = availableIngredients.get(baseItem);
             for (int availableAmount : availableAmounts) {
                 if (availableAmount >= requiredAmount) {
-                    // remove entry
                     availableIngredients.remove(baseItem, availableAmount);
                     continue outer;
                 }
@@ -115,7 +124,7 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
 
             return false;
         }
-        
+
         return availableIngredients.isEmpty();
     }
 
@@ -137,7 +146,7 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
             ItemAccessService service = JavaPlugin.getPlugin(Core.class)
                     .getInjector().getInstance(ItemAccessService.class);
             Key key = Key.key(recipeKey.namespace(), recipeKey.getKey());
-            return service.isAllowed(player, resultSupplier.get().getBaseItem(), key, AccessScope.CRAFT);
+            return service.isAllowed(player, result, key, AccessScope.CRAFT);
         } catch (Exception e) {
             return true;
         }
@@ -147,7 +156,6 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
     public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         List<Integer> consumedSlots = new ArrayList<>();
 
-        // Create a map of BaseItem to required amounts (only for items that should be consumed)
         Map<BaseItem, Integer> requiredIngredients = new HashMap<>();
         for (RecipeIngredient ingredient : getIngredients().values()) {
             if (ingredient.isConsumeOnCraft()) {
@@ -155,12 +163,10 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
             }
         }
 
-        // Consume items from the matrix
         for (Map.Entry<BaseItem, Integer> entry : requiredIngredients.entrySet()) {
             BaseItem baseItem = entry.getKey();
             int amountToConsume = entry.getValue();
 
-            // Find matching items in the matrix and consume them
             for (Map.Entry<Integer, ItemInstance> matrixEntry : new HashMap<>(ingredients).entrySet()) {
                 if (amountToConsume <= 0) {
                     break;
@@ -178,7 +184,6 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
                 }
 
                 ItemStack stack = instance.createItemStack();
-                // Consume from this stack
                 int amountFromThisStack = Math.min(stack.getAmount(), amountToConsume);
                 amountToConsume -= amountFromThisStack;
 
@@ -194,7 +199,7 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
                 consumedSlots.add(slot);
             }
         }
-        
+
         return consumedSlots;
     }
-} 
+}

@@ -43,6 +43,7 @@ public class BukkitMaterialAdapter {
         Arrays.stream(Material.values())
                 .filter(Material::isItem)
                 .filter(material -> !excludedMaterials.contains(material))
+                .filter(Material::isLegacy)
                 .parallel()
                 .forEach(material -> {
                     final VanillaItem item = new VanillaItem(material, ItemRarity.COMMON);

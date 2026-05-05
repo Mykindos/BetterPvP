@@ -60,9 +60,10 @@ public class SmeltingRecipeRegistry implements RecipeRegistry<SmeltingRecipe> {
         // Add to our smelting-specific collections
         smeltingRecipes.put(key, recipe);
         smeltableItems.addAll(recipe.getIngredientTypes());
-        
-        log.info("Registered smelting recipe with ingredients: {} -> {}", 
-                newIngredientTypes, recipe.getSmeltingResult().getPrimaryResult().getName()).submit();
+        resolver.invalidate();
+
+        log.info("Registered smelting recipe with ingredients: {} -> {}",
+                newIngredientTypes, recipe.previewResult().getPrimaryResult().getName()).submit();
     }
     
     /**

@@ -47,8 +47,9 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
 
         recipe.setRecipeKey(key);
         recipes.put(key, recipe);
+        resolver.invalidate();
         log.info("Registered anvil recipe for {} requiring {} hammer swings with {} ingredients",
-                recipe.getResult().getPrimaryResult().getClass().getSimpleName(),
+                recipe.getPrimaryBaseItem().getClass().getSimpleName(),
                 recipe.getHammerSwings(),
                 recipe.getIngredients().size()).submit();
     }
@@ -96,8 +97,8 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
      */
     public @NotNull List<AnvilRecipe> findRecipesWithResult(@NotNull BaseItem result) {
         return recipes.values().stream()
-                .filter(recipe -> recipe.getResult().getPrimaryResult().equals(result) ||
-                                recipe.getResult().getSecondaryResults().contains(result))
+                .filter(recipe -> recipe.getPrimaryBaseItem().equals(result) ||
+                                recipe.getSecondaryBaseItems().contains(result))
                 .collect(Collectors.toList());
     }
     
@@ -123,6 +124,7 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
      */
     public void clear() {
         recipes.clear();
+        resolver.invalidate();
         log.info("Cleared all anvil recipes").submit();
     }
 } 
