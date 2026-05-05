@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -26,16 +27,17 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -427,37 +429,82 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
                                             @NotNull BaseItem actionBarHeldItem,
                                             @NotNull List<String> siblingCooldownNames,
                                             int actionBarPriority) {
-        // Apply cooldown through the normal pipeline (no action bar component from use())
-        boolean applied = use(player, ability, duration, inform, removeOnDeath, cancellable, (Predicate<Gamer>) null);
-        if (!applied) return false;
+        if (!use(player, ability, duration, inform, removeOnDeath, cancellable, (Predicate<Gamer>) null)) {
+            return false;
+        }
 
-        final ItemFactory itemFactory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
+        final String expectedItemKey = resolveItemKey(actionBarHeldItem);
+        if (expectedItemKey == null) {
+            return true; // Cooldown applied; just no action bar (item not registered)
+        }
+
         final Gamer gamer = clientManager.search().online(player).getGamer();
-
-        TimedComponent actionBarComponent = new TimedComponent(duration + 1.5, false, g -> {
-            final ItemStack item = player.getEquipment().getItemInMainHand();
-            final Optional<ItemInstance> instance = itemFactory.fromItemStack(item);
-            if (instance.isEmpty() || instance.get().getBaseItem() != actionBarHeldItem) {
-                return null;
-            }
-
-            final Optional<ConcurrentHashMap<String, Cooldown>> cooldownsOpt = getObject(player.getUniqueId().toString());
-            if (cooldownsOpt.isEmpty()) return null;
-            final ConcurrentHashMap<String, Cooldown> cooldowns = cooldownsOpt.get();
-
-            // Show the sibling interaction closest to being recharged
-            final Optional<Cooldown> leastRemaining = siblingCooldownNames.stream()
-                    .map(cooldowns::get)
-                    .filter(Objects::nonNull)
-                    .min(Comparator.comparingDouble(Cooldown::getRemaining));
-
-            if (leastRemaining.isEmpty()) return null;
-
-            return renderCooldownBar(leastRemaining.get());
-        });
-
-        gamer.getActionBar().add(actionBarPriority, actionBarComponent);
+        final TimedComponent component = new TimedComponent(duration + 1.5, false,
+                g -> renderSiblingActionBar(player, ability, expectedItemKey, siblingCooldownNames));
+        gamer.getActionBar().add(actionBarPriority, component);
         return true;
+    }
+
+    private @Nullable String resolveItemKey(@NotNull BaseItem item) {
+        final ItemFactory itemFactory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
+        final NamespacedKey key = itemFactory.getItemRegistry().getKey(item);
+        return key == null ? null : key.toString();
+    }
+
+    /**
+     * Async-safe provider body for the sibling action bar. Returns {@code null} to skip this frame
+     * (player not holding the item, no active sibling cooldown, or an exception).
+     */
+    private @Nullable Component renderSiblingActionBar(@NotNull Player player, @NotNull String ability,
+                                                       @NotNull String expectedItemKey,
+                                                       @NotNull List<String> siblingCooldownNames) {
+        try {
+            if (!isHoldingItemWithKey(player, expectedItemKey)) return null;
+
+            final ConcurrentHashMap<String, Cooldown> cooldowns = getObject(player.getUniqueId().toString()).orElse(null);
+            if (cooldowns == null) return null;
+
+            final Cooldown leastRemaining = findLeastRemaining(cooldowns, siblingCooldownNames);
+            return leastRemaining == null ? null : renderCooldownBar(leastRemaining);
+        } catch (Exception ex) {
+            log.warn("Sibling action bar provider failed for {} ability={} siblings={}",
+                    player.getName(), ability, siblingCooldownNames, ex).submit();
+            return null;
+        }
+    }
+
+    /**
+     * Cheap PDC string compare instead of {@link ItemFactory#fromItemStack(ItemStack)} — avoids
+     * rebuilding an {@link ItemInstance} every action-bar frame for every online player.
+     */
+    private boolean isHoldingItemWithKey(@NotNull Player player, @NotNull String expectedItemKey) {
+        final ItemStack item = player.getEquipment().getItemInMainHand();
+        if (item.getType().isAir()) return false;
+        final ItemMeta meta = item.getItemMeta();
+        if (meta == null) return false;
+        final String heldKey = meta.getPersistentDataContainer()
+                .get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
+        return expectedItemKey.equals(heldKey);
+    }
+
+    /**
+     * Returns the cooldown closest to being recharged among the given names, or {@code null} if none
+     * are active. Indexed for-loop + primitive min avoids Stream/Comparator/Optional allocation per tick.
+     */
+    private @Nullable Cooldown findLeastRemaining(@NotNull ConcurrentHashMap<String, Cooldown> cooldowns,
+                                                  @NotNull List<String> names) {
+        Cooldown best = null;
+        double bestRemaining = Double.POSITIVE_INFINITY;
+        for (int i = 0, n = names.size(); i < n; i++) {
+            final Cooldown cd = cooldowns.get(names.get(i));
+            if (cd == null) continue;
+            final double r = cd.getRemaining();
+            if (r < bestRemaining) {
+                bestRemaining = r;
+                best = cd;
+            }
+        }
+        return best;
     }
 
     private Component renderCooldownBar(@NotNull Cooldown cooldown) {
