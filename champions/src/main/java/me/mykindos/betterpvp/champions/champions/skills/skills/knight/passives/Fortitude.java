@@ -98,6 +98,11 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
 
         HashSet<Player> remove = new HashSet<>();
         for (Player player : health.keySet()) {
+            if(!player.isOnline()) {
+                remove.add(player);
+                continue;
+            }
+
             if (UtilTime.elapsed(last.get(player), (long) (healInterval * 1000))) {
                 health.put(player, health.get(player) - healRate);
                 last.put(player, System.currentTimeMillis());
