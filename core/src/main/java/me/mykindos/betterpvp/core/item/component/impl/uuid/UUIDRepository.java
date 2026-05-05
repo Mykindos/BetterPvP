@@ -52,16 +52,16 @@ public class UUIDRepository implements IRepository<UUIDItem> {
 
     @Override
     public void save(UUIDItem object) {
-        try {
-            database.getDslContext()
-                    .insertInto(UUIDITEMS)
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.insertInto(UUIDITEMS)
                     .set(UUIDITEMS.UUID, object.getUuid().toString())
                     .set(UUIDITEMS.REALM, Core.getCurrentRealm().getId())
                     .set(UUIDITEMS.NAMESPACE, object.getNamespace())
                     .set(UUIDITEMS.KEYNAME, object.getKey())
                     .execute();
-        } catch (Exception ex) {
+        }).exceptionally(ex -> {
             log.error("Failed to save UUIDItem for namespace: {}", object.getNamespace(), ex).submit();
-        }
+            return null;
+        });
     }
 }
