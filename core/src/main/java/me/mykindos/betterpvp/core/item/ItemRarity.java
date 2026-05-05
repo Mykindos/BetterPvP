@@ -10,7 +10,7 @@ public enum ItemRarity {
 
     COMMON(0, "Common", NamedTextColor.WHITE, false, 'ꐥ'),
     UNCOMMON(1, "Uncommon", NamedTextColor.GREEN, false, 'ꑏ'),
-    RARE(2, "Rare", NamedTextColor.LIGHT_PURPLE, false, 'ꑅ'),
+    RARE(2, "Rare", TextColor.color(74, 103, 255), false, 'ꑅ'),
     EPIC(3, "Epic", NamedTextColor.DARK_PURPLE, false, 'ꐭ'),
     LEGENDARY(4, "Legendary", NamedTextColor.GOLD, true, 'ꐵ'),
     MYTHICAL(5, "Mythical", NamedTextColor.DARK_RED, true, 'ꐾ');
