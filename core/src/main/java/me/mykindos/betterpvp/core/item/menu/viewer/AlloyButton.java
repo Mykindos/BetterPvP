@@ -45,7 +45,7 @@ public class AlloyButton extends ControlItem<Gui> {
     private volatile Result cachedResult;
     private volatile ItemProvider cachedProvider;
 
-    private record Result(LinkedList<Recipe<?, ?>> recipes, LinkedList<Recipe<?, ?>> usages) {}
+    private record Result(LinkedList<Recipe<?>> recipes, LinkedList<Recipe<?>> usages) {}
 
     public AlloyButton(Alloy alloy, int millibuckets, boolean viewOnly, String millibucketPrefix) {
         this.viewOnly = viewOnly;
@@ -56,15 +56,15 @@ public class AlloyButton extends ControlItem<Gui> {
         RecipeRegistries registries = JavaPlugin.getPlugin(Core.class)
                 .getInjector().getInstance(RecipeRegistries.class);
 
-        CompletableFuture<LinkedList<Recipe<?, ?>>> recipesFuture =
+        CompletableFuture<LinkedList<Recipe<?>>> recipesFuture =
                 registries.getResolver().lookup(recipe -> {
                     if (recipe instanceof SmeltingRecipe smeltingRecipe) {
-                        return smeltingRecipe.getPrimaryResult().getPrimaryResult().getAlloyType() == alloy;
+                        return smeltingRecipe.previewResult().getPrimaryResult().getAlloyType() == alloy;
                     }
                     return false;
                 });
 
-        CompletableFuture<LinkedList<Recipe<?, ?>>> usagesFuture =
+        CompletableFuture<LinkedList<Recipe<?>>> usagesFuture =
                 registries.getResolver().lookup(recipe -> {
                     if (recipe instanceof CastingMoldRecipe castingMoldRecipe) {
                         return castingMoldRecipe.getAlloy() == alloy;
@@ -135,7 +135,7 @@ public class AlloyButton extends ControlItem<Gui> {
             return;
         }
 
-        LinkedList<Recipe<?, ?>> result;
+        LinkedList<Recipe<?>> result;
         if (clickType.isLeftClick()) {
             result = cachedResult.recipes;
         } else if (clickType.isRightClick()) {

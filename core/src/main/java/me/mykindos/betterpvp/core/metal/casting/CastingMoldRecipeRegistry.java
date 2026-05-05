@@ -49,6 +49,7 @@ public class CastingMoldRecipeRegistry implements RecipeRegistry<CastingMoldReci
         }
 
         recipes.put(key, recipe);
+        resolver.invalidate();
         log.info("Registered casting mold recipe for {} requiring {} mB for alloy {}",
                 recipe.getBaseMold().getClass().getSimpleName(),
                 recipe.getRequiredMillibuckets(),
@@ -115,6 +116,7 @@ public class CastingMoldRecipeRegistry implements RecipeRegistry<CastingMoldReci
      */
     public void clear() {
         recipes.clear();
+        resolver.invalidate();
         log.info("Cleared all casting mold recipes").submit();
     }
 } 

@@ -16,10 +16,10 @@ import java.util.Set;
 
 @Singleton
 @CustomLog
-public class RecipeRegistries implements RecipeRegistry<Recipe<?, ?>> {
+public class RecipeRegistries implements RecipeRegistry<Recipe<?>> {
 
     private final Map<NamespacedKey, RecipeRegistry<?>> registries = new HashMap<>();
-    private final RecipeResolver<Recipe<?, ?>> resolver = new RecipeResolver<>(this);
+    private final RecipeResolver<Recipe<?>> resolver = new RecipeResolver<>(this);
 
     public void register(NamespacedKey key, RecipeRegistry<?> registry) {
         registries.put(key, registry);
@@ -31,13 +31,13 @@ public class RecipeRegistries implements RecipeRegistry<Recipe<?, ?>> {
     }
 
     @Override
-    public void registerRecipe(NamespacedKey key, Recipe<?, ?> recipe) {
+    public void registerRecipe(NamespacedKey key, Recipe<?> recipe) {
         throw new UnsupportedOperationException("Cannot register recipes to this registry");
     }
 
-    public Optional<Recipe<?, ?>> getRecipe(NamespacedKey key) {
+    public Optional<Recipe<?>> getRecipe(NamespacedKey key) {
         for (RecipeRegistry<?> registry : registries.values()) {
-            Optional<? extends Recipe<?, ?>> recipe = registry.getRecipe(key);
+            Optional<? extends Recipe<?>> recipe = registry.getRecipe(key);
             if (recipe.isPresent()) {
                 return Optional.of(recipe.get());
             }
@@ -46,8 +46,8 @@ public class RecipeRegistries implements RecipeRegistry<Recipe<?, ?>> {
     }
 
     @Override
-    public Collection<Recipe<?, ?>> getRecipes() {
-        List<Recipe<?, ?>> recipes = new ArrayList<>();
+    public Collection<Recipe<?>> getRecipes() {
+        List<Recipe<?>> recipes = new ArrayList<>();
         for (RecipeRegistry<?> registry : registries.values()) {
             recipes.addAll(registry.getRecipes());
         }
@@ -55,7 +55,7 @@ public class RecipeRegistries implements RecipeRegistry<Recipe<?, ?>> {
     }
 
     @Override
-    public RecipeResolver<Recipe<?, ?>> getResolver() {
+    public RecipeResolver<Recipe<?>> getResolver() {
         return resolver;
     }
 }

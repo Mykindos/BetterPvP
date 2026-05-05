@@ -63,17 +63,17 @@ public class GuiCraftingRecipeViewer extends AbstractGui implements Windowed {
 
                 final BaseItem baseItem = ingredient.getBaseItem();
                 final int amount = ingredient.getAmount();
-                final ItemInstance instance = itemFactory.create(baseItem);
+                final ItemInstance instance = itemFactory.createPreview(baseItem);
                 instance.getItemStack().setAmount(amount);
                 setItem(x, y, new ItemButton(instance));
             }
         }
 
-        setItem(15, new SimpleItem(recipe.createPrimaryResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().createItemStack()));
         setItem(16, new BlueprintButton());
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
-                .icon(itemFactory.create(itemFactory.getItemRegistry().getItem("core:workbench")).createItemStack())
+                .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:workbench")).createItemStack())
                 .wikiEntry("Test", url)
                 .description(Component.text("Click on an ingredient to look at its recipes. Crafting recipes that require a blueprint can only be used in a workbench."))
                 .build());

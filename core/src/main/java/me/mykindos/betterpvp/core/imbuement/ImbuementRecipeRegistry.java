@@ -52,7 +52,8 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
 
         recipe.setRecipeKey(key);
         recipes.put(key, recipe);
-        
+        resolver.invalidate();
+
         // Log registration differently based on recipe type
         log.info("Registered custom imbuement recipe: {}", key).submit();
     }
@@ -99,7 +100,7 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
         return recipes.values().stream()
                 .filter(recipe -> {
                     if (recipe instanceof StandardImbuementRecipe standardRecipe) {
-                        return standardRecipe.getPrimaryResult().getPrimaryResult().equals(result);
+                        return standardRecipe.getPrimaryBaseItem().equals(result);
                     }
                     return false;
                 })

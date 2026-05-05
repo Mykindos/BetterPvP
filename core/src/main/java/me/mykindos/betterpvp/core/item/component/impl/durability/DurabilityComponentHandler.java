@@ -30,7 +30,7 @@ public class DurabilityComponentHandler implements Listener {
         // damage component so they can be used with vanilla mechanics
         // and the PlayerItemDamageEvent is called, even if we don't use the
         // component as intended.
-        itemFactory.registerDefaultBuilder(instance -> {
+        itemFactory.registerBuilder(instance -> {
             final Optional<DurabilityComponent> componentOpt = instance.getComponent(DurabilityComponent.class);
             if (componentOpt.isEmpty()) {
                 return; // No durability component present

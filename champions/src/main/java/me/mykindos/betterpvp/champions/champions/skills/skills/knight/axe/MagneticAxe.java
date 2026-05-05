@@ -52,7 +52,7 @@ import static me.mykindos.betterpvp.core.utilities.Resources.ItemModel.INVISIBLE
 public class MagneticAxe extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
     private final ItemFactory itemFactory;
-    private final BaseItem placeholderItem;
+    private final ItemStack placeholderItem;
     private final Map<Player, List<AxeProjectile>> data = new HashMap<>();
 
     private double baseDamage;
@@ -66,10 +66,11 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         super(champions, championsManager);
         this.itemFactory = itemFactory;
 
-        this.placeholderItem = new BaseItem("Magnetic Axe Placeholder",
+        final BaseItem baseItem = new BaseItem("Magnetic Axe Placeholder",
                 ItemView.builder().material(Material.STICK).itemModel(INVISIBLE).hideTooltip(true).build().get(),
                 ItemGroup.MISC,
                 ItemRarity.COMMON);
+        this.placeholderItem = itemFactory.create(baseItem).createItemStack();
     }
 
     @Override
@@ -131,7 +132,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         int slot = player.getInventory().getHeldItemSlot();
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 1.0F);
 
-        player.getInventory().setItemInMainHand(itemFactory.create(placeholderItem).createItemStack());
+        player.getInventory().setItemInMainHand(placeholderItem);
 
         Vector perpendicularAxis = player.getLocation().getDirection().crossProduct(new Vector(0, 1, 0)).normalize();
         Location rightHandPosition = player.getLocation().add(0, 1, 0).add(perpendicularAxis.multiply(0.3));
@@ -250,7 +251,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
     private boolean matches(ItemStack itemStack) {
         if (itemStack == null) return false;
-        return itemFactory.create(placeholderItem).getItemStack().isSimilar(itemStack);
+        return placeholderItem.isSimilar(itemStack);
     }
 
     @EventHandler
@@ -282,7 +283,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     public void onPlayerDeath(PlayerDeathEvent event) {
         Iterator<ItemStack> iterator = event.getPlayer().getInventory().iterator();
 
-        UtilInventory.remove(event.getPlayer(), itemFactory.create(placeholderItem).createItemStack());
+        UtilInventory.remove(event.getPlayer(), placeholderItem);
         while (iterator.hasNext()) {
             ItemStack current = iterator.next();
             if (this.matches(current)) {

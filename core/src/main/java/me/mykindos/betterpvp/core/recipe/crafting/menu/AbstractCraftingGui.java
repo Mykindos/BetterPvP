@@ -324,7 +324,7 @@ public abstract class AbstractCraftingGui extends AbstractGui {
         }
 
         blocked = false;
-        return result.createPrimaryResult().createItemStack();
+        return result.previewResult().createItemStack();
     }
 
     private void playCrafted(Player player) {

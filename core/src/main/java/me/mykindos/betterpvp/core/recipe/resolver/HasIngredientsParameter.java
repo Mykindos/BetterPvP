@@ -35,7 +35,7 @@ public class HasIngredientsParameter implements LookupParameter {
     }
 
     @Override
-    public boolean test(Recipe<?, ?> recipe) {
+    public boolean test(Recipe<?> recipe) {
         if (!(recipe instanceof CraftingRecipe)) {
             return false;
         }

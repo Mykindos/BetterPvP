@@ -50,17 +50,17 @@ public class GuiImbuingRecipeViewer extends AbstractGui implements Windowed {
 
                 final BaseItem baseItem = ingredient.getBaseItem();
                 final int amount = ingredient.getAmount();
-                final ItemInstance instance = itemFactory.create(baseItem);
+                final ItemInstance instance = itemFactory.createPreview(baseItem);
                 instance.getItemStack().setAmount(amount);
                 setItem(x, y, new ItemButton(instance));
             }
         }
 
         // Result
-        setItem(15, new SimpleItem(recipe.createPrimaryResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().getPrimaryResult().createItemStack()));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
-                .icon(itemFactory.create(itemFactory.getItemRegistry().getItem("core:imbuement_pedestal")).createItemStack())
+                .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:imbuement_pedestal")).createItemStack())
                 .wikiEntry("Test", url)
                 .description(Component.text("Click on an ingredient to look at its recipes. To imbue an item, place its ingredients in the imbuement pedestal and right-click it to start imbuing."))
                 .build());

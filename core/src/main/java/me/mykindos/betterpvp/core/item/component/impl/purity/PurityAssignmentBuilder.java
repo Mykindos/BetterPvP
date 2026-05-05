@@ -22,8 +22,8 @@ public class PurityAssignmentBuilder implements Listener {
 
     @Inject
     public PurityAssignmentBuilder(ItemFactory itemFactory, PurityDistributionRegistry distributionRegistry) {
-        // Register as a default builder that runs on all item creation
-        itemFactory.registerDefaultBuilder(instance -> {
+        // Register as a builder that runs on all item creation, including previews
+        itemFactory.registerBuilder(instance -> {
             // Only apply purity to items that should have it
             if (shouldApplyPurity(instance)) {
                 // Roll for purity using the default distribution

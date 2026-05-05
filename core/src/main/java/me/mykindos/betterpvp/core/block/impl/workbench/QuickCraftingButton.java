@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
@@ -41,7 +40,7 @@ public class QuickCraftingButton extends ControlItem<Gui> {
         LinkedList<CraftingRecipe> quickCrafts = workbenchGui.quickCrafts;
         if (slot < quickCrafts.size()) {
             CraftingRecipe recipe = quickCrafts.get(slot);
-            return ItemView.of(recipe.createPrimaryResult().getView().get())
+            return ItemView.of(recipe.previewResult().getView().get())
                     .toBuilder()
                     .action(ClickActions.LEFT, Component.text("Quick Craft", TextColor.color(0, 255, 30)))
                     .action(ClickActions.LEFT_SHIFT, Component.text("Bulk Quick Craft", TextColor.color(255, 215, 0)))

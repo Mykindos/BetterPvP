@@ -72,7 +72,7 @@ public class GuiWorkbench extends AbstractTabGui implements Windowed {
     public void updateQuickCrafts() {
         this.craftingManager.getRegistry()
                 .getResolver()
-                .lookup(lookupParameter)
+                .coldLookup(lookupParameter)
                 .whenComplete((result, ex) -> {
                     if (ex != null) {
                         log.error("Error looking up quick crafts for workbench", ex).submit();

@@ -39,14 +39,14 @@ public class GuiCastingRecipeViewer extends AbstractGui implements Windowed {
         ItemFactory itemFactory = injector.getInstance(ItemFactory.class);
 
 
-        setItem(12, new ItemButton(itemFactory.create(recipe.getBaseMold())));
+        setItem(12, new ItemButton(itemFactory.createPreview(recipe.getBaseMold())));
         setItem(19, new AlloyButton(recipe.getAlloy(), recipe.getRequiredMillibuckets(), false, "Required"));
-        setItem(26, new ItemButton(itemFactory.create(recipe.getResult())));
+        setItem(26, new ItemButton(itemFactory.createPreview(recipe.getResult())));
 
-        setItem(15, new SimpleItem(recipe.createPrimaryResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().createItemStack()));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
-                .icon(itemFactory.create(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())
+                .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())
                 .wikiEntry("Test", url)
                 .description(Component.text("Click on an ingredient to look at its recipes. Casting recipes require an alloy to be stored in the smelter first. Click on the alloy to view its recipe."))
                 .build());

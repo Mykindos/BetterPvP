@@ -6,7 +6,7 @@ import org.bukkit.NamespacedKey;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface RecipeRegistry<T extends Recipe<?, ?>> {
+public interface RecipeRegistry<T extends Recipe<?>> {
 
     void registerRecipe(NamespacedKey key, T recipe);
 

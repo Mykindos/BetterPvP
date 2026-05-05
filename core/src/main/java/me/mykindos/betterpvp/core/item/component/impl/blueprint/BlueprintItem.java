@@ -56,7 +56,7 @@ public class BlueprintItem extends BaseItem {
                 .orElseThrow(() -> new IllegalArgumentException("Item is not a blueprint"))
                 .getCraftingRecipes()
                 .stream()
-                .map(CraftingRecipe::createPrimaryResult)
+                .map(CraftingRecipe::previewResult)
                 .max(Comparator.comparingInt(r -> r.getRarity().getImportance()));
     }
 

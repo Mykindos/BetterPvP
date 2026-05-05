@@ -100,11 +100,13 @@ public class MinecraftCraftingRecipeAdapter {
         // Get the recipe shape and choice map
         String[] shape = shapedRecipe.getShape();
         Map<Character, RecipeChoice> choiceMap = shapedRecipe.getChoiceMap();
-        
-        // Create a builder for our shaped recipe
-        ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(() -> {
-            return itemFactory.get().create(itemFactory.get().getFallbackItem(result), item -> item.getItemStack().setAmount(result.getAmount()));
-        }, shape, itemFactory.get());
+
+        final int amount = result.getAmount();
+        ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(
+                itemFactory.get().getFallbackItem(result),
+                instance -> instance.getItemStack().setAmount(amount),
+                shape,
+                itemFactory.get());
         
         // Add the ingredients
         for (Map.Entry<Character, RecipeChoice> entry : choiceMap.entrySet()) {
@@ -159,9 +161,13 @@ public class MinecraftCraftingRecipeAdapter {
             ingredientMap.put(i, ingredients.get(i));
         }
         
-        return new ShapelessCraftingRecipe(() -> {
-            return itemFactory.get().create(itemFactory.get().getFallbackItem(result), item -> item.getItemStack().setAmount(result.getAmount()));
-        }, ingredientMap, itemFactory.get(), false);
+        final int amount = result.getAmount();
+        return new ShapelessCraftingRecipe(
+                itemFactory.get().getFallbackItem(result),
+                instance -> instance.getItemStack().setAmount(amount),
+                ingredientMap,
+                itemFactory.get(),
+                false);
     }
 
     public void registerDefaults(Map<NamespacedKey, CraftingRecipe> craftingRecipes) {

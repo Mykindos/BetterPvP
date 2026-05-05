@@ -13,21 +13,37 @@ import java.util.Map;
 /**
  * Base interface for all recipe types in the system.
  * Recipes define how items can be combined to create new items.
+ *
+ * <p>Each recipe exposes its result through two methods with the same return type {@code T}:
+ * a side-effect-free snapshot ({@link #previewResult()}) and a live, possibly side-effecting,
+ * fresh production ({@link #createResult()}).</p>
+ *
+ * <p>If {@code T} contains an {@code ItemInstance}, the snapshot variant wraps a preview
+ * instance (built via {@link ItemFactory#createPreview}) while the live variant wraps a
+ * fully-built instance (built via {@link ItemFactory#create}). If {@code T} carries no
+ * item content, both methods may return the same value.</p>
  */
-public interface Recipe<T, K> {
+public interface Recipe<T> {
 
     /**
-     * Gets the primary result of this recipe.
+     * Returns a snapshot of the recipe's result.
+     * Implementations MUST be side-effect-free: no persistent builders,
+     * no DB writes, no UUID generation. Safe to call freely from GUIs,
+     * tooltips, recipe browsers, and matching/registry code.
      *
-     * @return The primary result of this recipe, which is an instance of type T
+     * @return A snapshot of the result; equivalent in shape to {@link #createResult()}
+     *         but with any embedded items built as previews.
      */
-    @NotNull T getPrimaryResult();
+    @NotNull T previewResult();
 
     /**
-     * Creates the primary result of this recipe.
-     * @return An ItemInstance representing the primary result of this recipe
+     * Produces the live result of this recipe. May trigger persistent builders
+     * (UUID assignment, DB writes, etc.) when the result contains an
+     * {@code ItemInstance}. Use only when actually crafting / executing the recipe.
+     *
+     * @return The live result.
      */
-    @NotNull K createPrimaryResult();
+    @NotNull T createResult();
 
     /**
      * Checks if the provided items match this recipe.

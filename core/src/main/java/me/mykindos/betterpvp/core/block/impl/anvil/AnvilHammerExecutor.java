@@ -103,13 +103,13 @@ public class AnvilHammerExecutor {
                 .filter(Objects::nonNull)
                 .toList();
 
-        // Get the recipe result
-        AnvilRecipeResult result = recipe.getResult();
+        // Get the live recipe result
+        AnvilRecipeResult result = recipe.createResult();
 
         //todo stats for this
 
         // Drop the primary result
-        ItemStack primaryResult = itemFactory.create(result.getPrimaryResult()).createItemStack();
+        ItemStack primaryResult = result.getPrimaryResult().createItemStack();
         location.getWorld().dropItemNaturally(location, primaryResult);
 
         final ItemStat primaryStat = ItemStat.builder()

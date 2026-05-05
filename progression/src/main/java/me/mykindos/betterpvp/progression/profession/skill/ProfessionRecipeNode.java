@@ -37,17 +37,17 @@ public class ProfessionRecipeNode extends ProfessionNode {
         List<String> desc = new ArrayList<>();
         desc.add("Unlock the following recipes:");
         for (Key key : recipes) {
-            final Optional<Recipe<?, ?>> recipeOpt = registries.getRecipe(NamespacedKey.fromString(key.asString()));
+            final Optional<Recipe<?>> recipeOpt = registries.getRecipe(NamespacedKey.fromString(key.asString()));
             if (recipeOpt.isEmpty()) {
                 continue; // not found
             }
 
-            final Recipe<?, ?> recipe = recipeOpt.get();
+            final Recipe<?> recipe = recipeOpt.get();
             final Component text;
-            if (recipe.createPrimaryResult() instanceof ItemInstance instance) {
+            if (recipe.previewResult() instanceof ItemInstance instance) {
                 text = instance.getView().getName();
             } else {
-                text = Component.text(recipe.createPrimaryResult().toString());
+                text = Component.text(recipe.previewResult().toString());
             }
 
             desc.add("<gray> - <green>" + UtilMessage.miniMessage.serialize(text));

@@ -16,7 +16,7 @@ public class UUIDBuilder implements Listener {
 
     @Inject
     private UUIDBuilder(UUIDManager uuidManager, ItemFactory itemFactory, ItemRegistry itemRegistry) {
-        itemFactory.registerDefaultBuilder(instance -> {
+        itemFactory.registerPersistentBuilder(instance -> {
             if (instance.getRarity().isImportant() && instance.getItemStack().getMaxStackSize() <= 1) {
                 final UUIDProperty property = new UUIDProperty();
                 final NamespacedKey key = Objects.requireNonNull(itemRegistry.getKey(instance.getBaseItem()));

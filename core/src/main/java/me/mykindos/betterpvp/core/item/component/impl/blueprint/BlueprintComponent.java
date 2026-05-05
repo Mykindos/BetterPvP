@@ -49,7 +49,7 @@ public class BlueprintComponent extends AbstractItemComponent implements LoreCom
     @Override
     public List<Component> getLines(ItemInstance item) {
         return craftingRecipes.stream()
-                .map(CraftingRecipe::createPrimaryResult)
+                .map(CraftingRecipe::previewResult)
                 .sorted((r1, r2) -> Integer.compare(r2.getRarity().getImportance(), r1.getRarity().getImportance()))
                 .map(result -> Component.text("● ", NamedTextColor.GRAY).append(result.getView().getName()))
                 .distinct()

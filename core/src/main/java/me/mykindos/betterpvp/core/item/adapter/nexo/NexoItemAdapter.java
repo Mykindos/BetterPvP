@@ -36,7 +36,7 @@ public class NexoItemAdapter implements Listener {
     private NexoItemAdapter(ItemFactory itemFactory, ItemRegistry itemRegistry) {
         this.itemFactory = itemFactory;
         this.itemRegistry = itemRegistry;
-        itemFactory.registerDefaultBuilder(this::populateNexoItem);
+        itemFactory.registerBuilder(this::populateNexoItem);
 
         nexoItems.addAll(itemRegistry.getItems().values().stream()
                 .filter(item -> item instanceof NexoItem)
