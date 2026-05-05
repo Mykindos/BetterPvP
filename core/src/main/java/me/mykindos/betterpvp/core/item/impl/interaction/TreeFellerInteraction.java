@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor;
+import me.mykindos.betterpvp.core.interaction.condition.ConditionResult;
 import me.mykindos.betterpvp.core.interaction.context.InputMeta;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -56,6 +57,8 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
     private final BlockTagManager blockTagManager;
     private final EffectManager effectManager;
 
+    private final Set<Location> blocksBeingFelled = new HashSet<>();
+
     @Nullable
     private TreeFellerCooldownModifier cooldownModifier;
 
@@ -73,6 +76,16 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
         super("Tree Feller", cooldownManager);
         this.blockTagManager = blockTagManager;
         this.effectManager = effectManager;
+
+        // Suppress re-entry: when our own scheduled UtilBlock.breakBlock fires a BlockBreakEvent,
+        // the broken block's location will be in blocksBeingFelled, so we silently no-op.
+        addCondition((actor, context) -> {
+            Block broken = context.getOrNull(InputMeta.BROKEN_BLOCK);
+            if (broken != null && blocksBeingFelled.contains(broken.getLocation())) {
+                return ConditionResult.fail();
+            }
+            return ConditionResult.success();
+        });
     }
 
     public void setModifier(@Nullable TreeFellerCooldownModifier modifier) {
@@ -112,17 +125,23 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
         Location initialLogLocation = block.getLocation();
 
         List<Block> blocksToFell = new ArrayList<>();
-        Location firstLeafLocation = collectTree(block, new HashSet<>(), blocksToFell);
+        collectTree(block, new HashSet<>(), blocksToFell);
 
-        UtilServer.callEvent(new TreeFellerEvent(player, firstLeafLocation, initialLogLocation, initialLogType, blocksToFell));
+        UtilServer.callEvent(new TreeFellerEvent(player, initialLogLocation, initialLogType, blocksToFell));
 
         final ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         for (int i = 0; i < blocksToFell.size(); i++) {
             Block blockToFell = blocksToFell.get(i);
+            Location fellLocation = blockToFell.getLocation();
+            blocksBeingFelled.add(fellLocation);
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
-                if (isBreakableLog(blockToFell, initialLogLocation)) {
-                    UtilBlock.breakBlock(player, blockToFell);
-                    UtilItem.damageItem(player, itemInMainHand, 1);
+                try {
+                    if (isBreakableLog(blockToFell, initialLogLocation)) {
+                        UtilBlock.breakBlock(player, blockToFell);
+                        UtilItem.damageItem(player, itemInMainHand, 1);
+                    }
+                } finally {
+                    blocksBeingFelled.remove(fellLocation);
                 }
             }, (long) (i * 0.3));
         }
@@ -151,12 +170,8 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
      * @param block  the current log block to collect and search from
      * @param visited blocks already searched during this tree-fell call
      * @param blocksToFell mutable list of blocks that will be exposed to listeners before breaking
-     * @return the location of the first natural leaf block encountered (for EnchantedLumberfall),
-     *         or null if none was found
      */
-    @Nullable
-    private Location collectTree(@NotNull Block block, @NotNull Set<Location> visited, @NotNull List<Block> blocksToFell) {
-        Location firstLeafLocation = null;
+    private void collectTree(@NotNull Block block, @NotNull Set<Location> visited, @NotNull List<Block> blocksToFell) {
         Queue<Block> queue = new ArrayDeque<>();
         queue.add(block);
         visited.add(block.getLocation());
@@ -172,12 +187,6 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
                 for (int x = -1; x <= 1; x++) {
                     for (int z = -1; z <= 1; z++) {
                         Block target = current.getRelative(x, y, z);
-                        String typeName = target.getType().name();
-
-                        if (firstLeafLocation == null && typeName.contains("LEAVES")
-                                && !blockTagManager.isPlayerPlaced(target)) {
-                            firstLeafLocation = target.getLocation();
-                        }
 
                         if (isTraversable(target) && visited.add(target.getLocation())) {
                             queue.add(target);
@@ -187,7 +196,6 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
             }
         }
 
-        return firstLeafLocation;
     }
 
     @Override

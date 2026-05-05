@@ -8,7 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -25,14 +24,6 @@ public class TreeFellerEvent extends CustomEvent {
 
     private final Player player;
 
-    /**
-     * The location of the first leaf block encountered during tree-felling.
-     * Null when the tree had no leaves (or all leaves were player-placed).
-     * Intended for drop-on-leaves perks like EnchantedLumberfall.
-     */
-    @Nullable
-    private final Location leafActivationLocation;
-
     private final Location initialLogLocation;
     private final Material initialLogType;
 
@@ -43,12 +34,10 @@ public class TreeFellerEvent extends CustomEvent {
     private final List<Block> blocks;
 
     public TreeFellerEvent(@NotNull Player player,
-                           @Nullable Location leafActivationLocation,
                            @NotNull Location initialLogLocation,
                            @NotNull Material initialLogType,
                            @NotNull List<Block> blocks) {
         this.player = player;
-        this.leafActivationLocation = leafActivationLocation;
         this.initialLogLocation = initialLogLocation;
         this.initialLogType = initialLogType;
         this.blocks = blocks;
