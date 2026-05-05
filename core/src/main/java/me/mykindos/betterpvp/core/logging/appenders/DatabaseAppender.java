@@ -47,7 +47,9 @@ public class DatabaseAppender implements LogAppender {
             return;
         }
 
-        if (pendingLog.getLevel().equalsIgnoreCase("ERROR")) {
+        String logLevel = pendingLog.getLevel();
+        if (logLevel.equalsIgnoreCase("ERROR")
+                || logLevel.equalsIgnoreCase("DEBUG")) {
             return;
         }
 

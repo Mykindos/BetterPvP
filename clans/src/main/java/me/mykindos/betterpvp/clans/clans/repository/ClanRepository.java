@@ -588,7 +588,7 @@ public class ClanRepository implements IRepository<Clan> {
 
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ctx.deleteFrom(CLAN_INSURANCE)
-                    .where(CLAN_INSURANCE.TIME.add(duration).le(currentTime))
+                    .where(CLAN_INSURANCE.TIME.le(currentTime - duration))
                     .execute();
         }).exceptionally(ex -> {
             log.error("Failed to delete expired insurance", ex).submit();
