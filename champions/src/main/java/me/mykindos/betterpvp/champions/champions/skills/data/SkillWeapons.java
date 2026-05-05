@@ -1,17 +1,14 @@
 package me.mykindos.betterpvp.champions.champions.skills.data;
 
-import me.mykindos.betterpvp.core.Core;
+import io.papermc.paper.persistence.PersistentDataContainerView;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Objects;
-import java.util.Optional;
 
 public class SkillWeapons {
 
@@ -34,15 +31,12 @@ public class SkillWeapons {
     }
 
     public static SkillType getTypeFrom(ItemStack item) {
-        final Core plugin = JavaPlugin.getPlugin(Core.class);
-        final ItemFactory itemFactory = plugin.getInjector().getInstance(ItemFactory.class);
-        final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(item);
-        if (itemOpt.isEmpty()) {
-            return null;
+        final PersistentDataContainerView pdc = item.getPersistentDataContainer();
+        if (!pdc.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
+            return null; // Not a custom item
         }
 
-        final BaseItem baseItem = itemOpt.get().getBaseItem();
-        final String namespacedKey = Objects.requireNonNull(itemFactory.getItemRegistry().getKey(baseItem)).toString();
+        final String namespacedKey = Objects.requireNonNull(pdc.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING));
         final String key = namespacedKey.toLowerCase().split(":")[1];
         return switch (key) {
             case "ancient_sword", "power_sword", "booster_sword", "standard_sword", "crude_sword", "rustic_sword" -> SkillType.SWORD;
