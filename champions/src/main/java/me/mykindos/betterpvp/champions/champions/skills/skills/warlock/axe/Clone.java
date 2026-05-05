@@ -152,15 +152,15 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         double healthReduction = getHealthReduction(level);
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
-        Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
+        final Disguise disguise = createDisguise(player);
         DisguiseAPI.disguiseNextEntity(disguise); // Apparently fixes a client crash
 
-        Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
+        final Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
 
         setCloneProperties(clone, player);
 
         //leap the clone forward
-        VelocityData velocityData = new VelocityData(clone.getLocation().getDirection(), leapStrength, false, 0.0D, 0.2D, 1.0D, false);
+        final VelocityData velocityData = new VelocityData(clone.getLocation().getDirection(), leapStrength, false, 0.0D, 0.2D, 1.0D, false);
         UtilVelocity.velocity(clone, player, velocityData, VelocityType.CUSTOM);
 
         //Find nearby enemies relative to the clones location after teleporting
@@ -288,10 +288,14 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @EventHandler
     public void onDeathEvent(EntityDeathEvent event) {
         if (event.getEntity() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))) {
+            event.getDrops().clear();
+            event.setDroppedExp(0);
             removeClone(clone, getCloneOwner(clone));
             return;
         }
         if (event.getEntity() instanceof Player player && clones.containsKey(player)) {
+            event.getDrops().clear();
+            event.setDroppedExp(0);
             removeClone(clones.get(player).getClone(), player);
         }
     }
@@ -308,6 +312,21 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
         target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
+    }
+
+
+    private PlayerDisguise createDisguise(Player player) {
+        final PlayerDisguise disguise = new PlayerDisguise(player).setNameVisible(false);
+        /*final PlayerWatcher watcher = disguise.getWatcher();
+        final PlayerInventory playerInventory = player.getInventory();
+
+        watcher.setHelmet(playerInventory.getHelmet() == null ? ItemStack.of(this.getClassType().getHelmet()) : playerInventory.getHelmet());
+        watcher.setChestplate(playerInventory.getChestplate() == null ? ItemStack.of(this.getClassType().getChestplate()) : playerInventory.getChestplate());
+        watcher.setLeggings(playerInventory.getLeggings() == null ? ItemStack.of(this.getClassType().getLeggings()) : playerInventory.getLeggings());
+        watcher.setBoots(playerInventory.getBoots() == null ? ItemStack.of(this.getClassType().getBoots()) : playerInventory.getBoots());
+        watcher.setItemInMainHand(playerInventory.getItemInMainHand());*/
+
+        return disguise;
     }
 
     private void setCloneProperties(Vindicator clone, Player player) {
@@ -332,7 +351,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     private void removeClone(Vindicator clone, Player player) {
         clone.getWorld().spawnParticle(Particle.SQUID_INK, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
         clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
-
+        clone.getEquipment().clear();
         //Remove disguise
         DisguiseAPI.undisguiseToAll(clone);
         clone.remove();
