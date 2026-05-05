@@ -77,7 +77,7 @@ public class BlackHoleAbility extends CooldownInteraction implements DisplayedIn
     }
 
     @Override
-    public double getCooldown() {
+    public double getCooldown(InteractionActor actor) {
         return cooldown;
     }
 

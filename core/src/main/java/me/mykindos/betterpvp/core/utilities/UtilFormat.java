@@ -96,7 +96,7 @@ public class UtilFormat {
 
         // Remove trailing zeros if forceDecimals is false
         if (!trailingZeroes) {
-            formattedNumber = formattedNumber.replaceAll("\\.?0*$", "");
+            formattedNumber = formattedNumber.replaceAll("(?<=\\.)0+$", "").replaceAll("\\.$", "");
         }
 
         return formattedNumber;

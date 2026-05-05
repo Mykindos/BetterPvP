@@ -6,15 +6,11 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +35,17 @@ public class AnvilRecipeRegistry implements RecipeRegistry<AnvilRecipe> {
     }
 
     @Override
+    public Optional<AnvilRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(recipes.get(key));
+    }
+
+    @Override
     public void registerRecipe(@NotNull NamespacedKey key, @NotNull AnvilRecipe recipe) {
         if (recipes.containsKey(key)) {
             log.warn("Recipe with key {} is already registered, overwriting", key).submit();
         }
 
+        recipe.setRecipeKey(key);
         recipes.put(key, recipe);
         log.info("Registered anvil recipe for {} requiring {} hammer swings with {} ingredients",
                 recipe.getResult().getPrimaryResult().getClass().getSimpleName(),

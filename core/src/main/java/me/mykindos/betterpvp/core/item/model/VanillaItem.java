@@ -3,17 +3,12 @@ package me.mykindos.betterpvp.core.item.model;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.Material;
 import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -23,6 +18,10 @@ public class VanillaItem extends BaseItem {
 
     public VanillaItem(Material type, ItemRarity rarity) {
         this(Component.translatable(type.translationKey()), type, rarity);
+    }
+
+    public VanillaItem(String name, Material type, ItemRarity rarity) {
+        this(Component.text(name), type, rarity);
     }
 
     public VanillaItem(Component component, Material type, ItemRarity rarity) {

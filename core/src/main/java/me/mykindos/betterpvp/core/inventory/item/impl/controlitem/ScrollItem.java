@@ -19,6 +19,7 @@ public abstract class ScrollItem extends ControlItem<ScrollGui<?>> {
     public ScrollItem(int scrollLeftClick) {
         scroll = new HashMap<>();
         scroll.put(ClickType.LEFT, scrollLeftClick);
+        scroll.put(ClickType.SHIFT_LEFT, scrollLeftClick * 5);
     }
     
     public ScrollItem(HashMap<ClickType, Integer> scroll) {
@@ -27,7 +28,9 @@ public abstract class ScrollItem extends ControlItem<ScrollGui<?>> {
     
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        if (scroll.containsKey(clickType)) getGui().scroll(scroll.get(clickType));
+        if (scroll.containsKey(clickType)) {
+            getGui().scroll(scroll.get(clickType));
+        }
     }
     
 }

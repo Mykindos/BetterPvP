@@ -1,0 +1,31 @@
+package me.mykindos.betterpvp.progression.profession.skill.fishing.nomoremobs;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.progression.profession.skill.NodeId;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
+import org.bukkit.Material;
+
+@Singleton
+@NodeId("no_more_mobs")
+public class NoMoreMobs extends ProfessionSkill {
+
+    @Inject
+    public NoMoreMobs() {
+        super("No More Mobs");
+    }
+
+
+    @Override
+    public String[] getDescription(int level) {
+        return new String[]{
+                "You will no longer catch mobs while fishing."
+        };
+    }
+
+    @Override
+    public Material getIcon() {
+        return Material.ZOMBIE_HEAD;
+    }
+
+}

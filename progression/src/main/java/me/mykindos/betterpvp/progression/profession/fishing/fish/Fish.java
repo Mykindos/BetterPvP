@@ -3,29 +3,26 @@ package me.mykindos.betterpvp.progression.profession.fishing.fish;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
-import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.utility.ProgressionNamespacedKeys;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
 
+/**
+ * Plain data object representing a caught fish.
+ * Weight may be mutated by skills (ThickerLines, CatchWeightAttribute) before the drop is awarded.
+ */
 @Data
 @AllArgsConstructor
-public class Fish implements FishingLoot {
+public class Fish {
 
     private UUID uuid;
-    private FishType type;
+    /** Display name / type name for leaderboard persistence. */
+    private String typeName;
     private int weight;
 
     public static boolean isFishItem(ItemStack itemStack) {
@@ -42,28 +39,13 @@ public class Fish implements FishingLoot {
         return pdc.has(ProgressionNamespacedKeys.FISHING_FISH_TYPE, PersistentDataType.STRING);
     }
 
+    /** Convenience accessor matching the old {@code fish.getType().getName()} call sites. */
+    public String getDisplayName() {
+        return typeName;
+    }
+
     @Override
-    public void processCatch(PlayerCaughtFishEvent event) {
-        SimpleFishType fishType = (SimpleFishType) type;
-        final Item entity = (Item) event.getCaught();
-        if (entity != null) {
-            int currentWeight = Math.max(1, weight);
-
-            while (currentWeight > 0) {
-                int dropWeight = Math.min(currentWeight, 64);
-                currentWeight -= dropWeight;
-                ItemStack drop = fishType.generateItem(dropWeight);
-                Item item = entity.getWorld().dropItem(entity.getLocation(), drop);
-                UtilItem.reserveItem(item, event.getPlayer(), 10);
-                // For some reason the entity doesnt have the correct velocity at the time of execution, wait 1 tick.
-                UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> item.setVelocity(entity.getVelocity()), 1);
-                UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), item::remove, 20L * 30L); // Despawn fish after 30 seconds
-
-            }
-
-            entity.setItemStack(new ItemStack(Material.AIR));
-            UtilMessage.message(event.getPlayer(), "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!",
-                    type.getName(), UtilFormat.formatNumber(weight));
-        }
+    public String toString() {
+        return UtilFormat.formatNumber(weight) + "lb " + typeName;
     }
 }

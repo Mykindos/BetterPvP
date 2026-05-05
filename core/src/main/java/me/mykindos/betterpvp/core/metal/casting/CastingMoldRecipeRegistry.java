@@ -11,8 +11,6 @@ import me.mykindos.betterpvp.core.recipe.smelting.Alloy;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +31,11 @@ public class CastingMoldRecipeRegistry implements RecipeRegistry<CastingMoldReci
     @Inject
     private CastingMoldRecipeRegistry(RecipeRegistries registries) {
         registries.register(new NamespacedKey("betterpvp", "casting_mold"), this);
+    }
+
+    @Override
+    public Optional<CastingMoldRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(recipes.get(key));
     }
 
     /**

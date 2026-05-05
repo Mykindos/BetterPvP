@@ -34,6 +34,11 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
         registries.register(new NamespacedKey("betterpvp", "imbuement"), this);
     }
 
+    @Override
+    public Optional<ImbuementRecipe> getRecipe(NamespacedKey key) {
+        return Optional.ofNullable(recipes.get(key));
+    }
+
     /**
      * Registers a new imbuement recipe.
      * @param key The key to register the recipe under
@@ -45,7 +50,7 @@ public class ImbuementRecipeRegistry implements RecipeRegistry<ImbuementRecipe> 
             log.warn("Recipe with key {} is already registered, overwriting", key).submit();
         }
 
-        // Check for duplicate recipes for standard recipes only
+        recipe.setRecipeKey(key);
         recipes.put(key, recipe);
         
         // Log registration differently based on recipe type
