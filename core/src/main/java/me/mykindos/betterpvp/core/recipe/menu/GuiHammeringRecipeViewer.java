@@ -64,13 +64,13 @@ public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
         final TextComponent hammerName = Component.text(recipe.getHammerSwings(), NamedTextColor.YELLOW)
                 .appendSpace()
                 .append(Component.text("Hammer Swings", NamedTextColor.GREEN));
-        setItem(33, new SimpleItem(ItemView.of(hammer.createItemStack()).toBuilder()
+        setItem(33, new SimpleItem(ItemView.of(hammer.getView().get()).toBuilder()
                 .amount(recipe.getRequiredHammerSwings())
                 .displayName(hammerName)
                 .build()));
 
         // Result
-        setItem(15, new SimpleItem(recipe.previewResult().getPrimaryResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().getPrimaryResult().getView().get()));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:anvil")).createItemStack())
