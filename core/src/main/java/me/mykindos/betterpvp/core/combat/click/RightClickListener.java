@@ -36,17 +36,20 @@ import java.util.WeakHashMap;
 @CustomLog
 public class RightClickListener implements Listener {
 
+    /** Grace period (ms) before evicting a canBlock player with a cosmetic shield after release. */
+    private static final long COSMETIC_SHIELD_RELEASE_GRACE_MS = 150;
+
     private final ClientManager clientManager;
     private final WeakHashMap<Player, RightClickContext> rightClickCache = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> lastDrop = new WeakHashMap<>();
     /**
      * Tracks the first moment we observed !(isHandRaised || isBlocking || hasActiveItem) for a
-     * canBlock player.  We only evict once that condition has persisted for > 150 ms, which
+     * canBlock player.  We only evict once that condition has persisted for > 100 ms, which
      * avoids false-positives from the 1-2 tick delay between startUsingItem() and the server
      * reflecting the item-use state.  The timer is reset every time onRightClick fires (i.e.
      * every time the client re-sends the right-click packet while holding), so the effective
-     * window is "150ms since the last client right-click packet", giving ~150ms release lag
-     * while still being well above the ~100ms observed client re-send interval.
+     * window is "100ms since the last client right-click packet", giving ~100ms release lag
+     * while still being well above the ~50ms observed client re-send interval.
      */
     private final WeakHashMap<Player, Long> suspectedRelease = new WeakHashMap<>();
 
@@ -120,13 +123,28 @@ public class RightClickListener implements Listener {
                     // Player is actively using the item — clear any pending release timer
                     suspectedRelease.remove(player);
                 } else {
-                    // First tick we noticed a potential release — start the timer
+                    // The grace period is only needed when a cosmetic shield was placed via
+                    // startUsingItem(OFF_HAND), which causes isHandRaised/hasActiveItem to be
+                    // unreliable for 1-2 ticks. If no undroppable shield is in the offhand,
+                    // no startUsingItem was called and we can evict immediately.
+                    final boolean hasCosmicShield = UtilItem.isUndroppable(player.getInventory().getItemInOffHand());
+                    if (!hasCosmicShield) {
+                        log.debug("[RCL] Evicting {} — canBlock release (no cosmetic shield, immediate)", player.getName()).submit();
+                        suspectedRelease.remove(player);
+                        iterator.remove();
+                        gamer.setLastBlock(-1);
+                        final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
+                        UtilServer.callEvent(releaseEvent);
+                        continue;
+                    }
+
+                    // Cosmetic shield path — use the grace timer to absorb startUsingItem() latency
                     final long suspectedAt = suspectedRelease.computeIfAbsent(player, p -> System.currentTimeMillis());
                     final long suspectedFor = System.currentTimeMillis() - suspectedAt;
-                    log.debug("[RCL] {} canBlock=true but not using — suspectedFor={}ms | raised={} blocking={} activeItem={}",
+                    log.debug("[RCL] {} canBlock=true (cosmetic shield) but not using — suspectedFor={}ms | raised={} blocking={} activeItem={}",
                             player.getName(), suspectedFor,
                             player.isHandRaised(), player.isBlocking(), player.hasActiveItem()).submit();
-                    if (suspectedFor > 150) {
+                    if (suspectedFor > COSMETIC_SHIELD_RELEASE_GRACE_MS) {
                         log.debug("[RCL] Evicting {} — canBlock release confirmed after {}ms", player.getName(), suspectedFor).submit();
                         suspectedRelease.remove(player);
                         iterator.remove();
