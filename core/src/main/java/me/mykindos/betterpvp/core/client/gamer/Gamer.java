@@ -107,13 +107,15 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
             final ItemStack main = player.getInventory().getItemInMainHand();
             final ItemStack off = player.getInventory().getItemInOffHand();
             if (UtilItem.isUndroppable(main) || UtilItem.isUndroppable(off)) {
-                return timeSinceLastBlock() <= 250;
+                final long t = timeSinceLastBlock();
+                return t >= 0 && t <= 250;
             }
 
             return player.isBlocking() || player.isHandRaised() || lastBlock != -1;
         }
 
-        return timeSinceLastBlock() <= 250;
+        final long t = timeSinceLastBlock();
+        return t >= 0 && t <= 250;
     }
 
     public @Nullable Player getPlayer() {

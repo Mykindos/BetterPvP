@@ -39,6 +39,16 @@ public class RightClickListener implements Listener {
     private final ClientManager clientManager;
     private final WeakHashMap<Player, RightClickContext> rightClickCache = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> lastDrop = new WeakHashMap<>();
+    /**
+     * Tracks the first moment we observed !(isHandRaised || isBlocking || hasActiveItem) for a
+     * canBlock player.  We only evict once that condition has persisted for > 150 ms, which
+     * avoids false-positives from the 1-2 tick delay between startUsingItem() and the server
+     * reflecting the item-use state.  The timer is reset every time onRightClick fires (i.e.
+     * every time the client re-sends the right-click packet while holding), so the effective
+     * window is "150ms since the last client right-click packet", giving ~150ms release lag
+     * while still being well above the ~100ms observed client re-send interval.
+     */
+    private final WeakHashMap<Player, Long> suspectedRelease = new WeakHashMap<>();
 
     @Inject
     public RightClickListener(ClientManager clientManager) {
@@ -83,6 +93,7 @@ public class RightClickListener implements Listener {
             if (!player.isOnline()) {
                 iterator.remove();
                 gamer.setLastBlock(-1);
+                suspectedRelease.remove(player);
                 if (UtilItem.isUndroppable(player.getInventory().getItemInOffHand())) {
                     player.getInventory().setItemInOffHand(null);
                 }
@@ -92,23 +103,50 @@ public class RightClickListener implements Listener {
             // If the click took longer than 250ms, remove it from the cache
             // Unless they're blocking with a shield, meaning they are still holding right click
             final boolean canBlock = gamer.canBlock();
-            if ((!canBlock && System.currentTimeMillis() - context.getTime() > 249)
-                    || (canBlock
-                    && !(player.isHandRaised() || player.isBlocking() || player.hasActiveItem())
-                    && gamer.timeSinceLastBlock() > 250)) {
+            if (!canBlock && System.currentTimeMillis() - context.getTime() > 249) {
+                log.debug("[RCL] Evicting {} — no-block timeout ({}ms since context)", player.getName(),
+                        System.currentTimeMillis() - context.getTime()).submit();
                 iterator.remove();
                 gamer.setLastBlock(-1);
+                suspectedRelease.remove(player);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
                 UtilServer.callEvent(releaseEvent);
                 continue;
+            }
+
+            if (canBlock) {
+                final boolean stillUsing = player.isHandRaised() || player.isBlocking() || player.hasActiveItem();
+                if (stillUsing) {
+                    // Player is actively using the item — clear any pending release timer
+                    suspectedRelease.remove(player);
+                } else {
+                    // First tick we noticed a potential release — start the timer
+                    final long suspectedAt = suspectedRelease.computeIfAbsent(player, p -> System.currentTimeMillis());
+                    final long suspectedFor = System.currentTimeMillis() - suspectedAt;
+                    log.debug("[RCL] {} canBlock=true but not using — suspectedFor={}ms | raised={} blocking={} activeItem={}",
+                            player.getName(), suspectedFor,
+                            player.isHandRaised(), player.isBlocking(), player.hasActiveItem()).submit();
+                    if (suspectedFor > 150) {
+                        log.debug("[RCL] Evicting {} — canBlock release confirmed after {}ms", player.getName(), suspectedFor).submit();
+                        suspectedRelease.remove(player);
+                        iterator.remove();
+                        gamer.setLastBlock(-1);
+                        final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
+                        UtilServer.callEvent(releaseEvent);
+                        continue;
+                    }
+                }
             }
 
             // Keep holding state by slot + item type only (ignore durability/meta fluctuations).
             final EquipmentSlot cachedSlot = context.getEvent().getHand();
             final ItemStack holding = player.getInventory().getItem(cachedSlot);
             if (cachedSlot != EquipmentSlot.HAND || holding.getType() != previouslyHolding.getType()) {
+                log.debug("[RCL] Evicting {} — item type mismatch (was={} now={})", player.getName(),
+                        previouslyHolding.getType(), holding.getType()).submit();
                 iterator.remove();
                 gamer.setLastBlock(-1);
+                suspectedRelease.remove(player);
                 final RightClickEndEvent releaseEvent = new RightClickEndEvent(context.getGamer().getPlayer());
                 UtilServer.callEvent(releaseEvent);
                 continue;
@@ -144,6 +182,7 @@ public class RightClickListener implements Listener {
 
             rightClickCache.remove(player);
             gamer.setLastBlock(-1);
+            suspectedRelease.remove(player);
             if (UtilItem.isUndroppable(off)) {
                 player.getInventory().setItemInOffHand(null);
             }
@@ -175,6 +214,10 @@ public class RightClickListener implements Listener {
 
         UtilServer.callEvent(clickEvent);
         rightClickCache.put(player, context);
+        // Reset the canBlock release timer — the client just re-sent its right-click, so it is
+        // definitely still holding.  This makes suspectedRelease track "time since last packet"
+        // rather than "time since first !stillUsing tick", keeping the release detection tight.
+        suspectedRelease.remove(player);
     }
 
     @EventHandler
