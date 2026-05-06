@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -68,7 +67,7 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> imp
         super.addObject(key, achievement);
         achievementPlugins.put(key, plugin);
         for (IStat watchedStat : achievement.getWatchedStats()) {
-            statIndex.computeIfAbsent(watchedStat, k -> Collections.synchronizedSet(new HashSet<>()))
+            statIndex.computeIfAbsent(watchedStat, k -> ConcurrentHashMap.newKeySet())
                     .add(achievement);
         }
     }
