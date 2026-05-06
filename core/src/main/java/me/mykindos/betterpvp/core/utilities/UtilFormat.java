@@ -95,8 +95,8 @@ public class UtilFormat {
         @SuppressWarnings("MalformedFormatString") String formattedNumber = String.format("%." + decimalPlaces + "f", num);
 
         // Remove trailing zeros if forceDecimals is false
-        if (!trailingZeroes) {
-            formattedNumber = formattedNumber.replaceAll("(?<=\\.)0+$", "").replaceAll("\\.$", "");
+        if (!trailingZeroes && formattedNumber.contains(".")) {
+            formattedNumber = formattedNumber.replaceAll("0+$", "").replaceAll("\\.$", "");
         }
 
         return formattedNumber;

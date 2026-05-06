@@ -115,6 +115,9 @@ class AchievementLogicTest {
         when(watchedStat.isSavable()).thenReturn(true);
         when(watchedStat.containsStat(watchedStat)).thenReturn(true);
         lenient().when(watchedStat.getStatType()).thenReturn("test_stat");
+        // delegate getStat to the real statsMap so Achievement.getValue returns the live container value
+        lenient().when(watchedStat.getStat(any(), any(), any())).thenAnswer(inv ->
+                statsMap.get(inv.getArgument(1), inv.getArgument(2), watchedStat));
 
         statsMap = new StatConcurrentHashMap();
         completions = mock(AchievementCompletionsConcurrentHashMap.class);
