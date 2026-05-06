@@ -1039,9 +1039,9 @@ skills:
       cooldownDecreasePerLevel: 3.0
       baseRange: 8.0
       rangeIncreasePerLevel: 1.0
-      baseHealthReduction: 6.0
-      healthReductionDecreasePerLevel: 0.5
-      baseHealthReductionPerPlayerAffected: 1.0
+      baseHealthReduction: 12.0
+      healthReductionDecreasePerLevel: 1.0
+      baseHealthReductionPerPlayerAffected: 2.0
       healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
       baseDuration: 20.0
       durationIncreasePerLevel: 2.5
@@ -1113,8 +1113,8 @@ skills:
       rangeIncreasePerLevel: 0.5
       baseDamageIncrease: 0.33
       damageIncreasePerLevel: 0.0
-      baseHealthReduction: 8.0
-      healthReductionDecreasePerLevel: 0.7
+      baseHealthReduction: 12.0
+      healthReductionDecreasePerLevel: 1.0
     cleanse:
       enabled: true
       maxlevel: 5
@@ -1123,7 +1123,7 @@ skills:
       canUseWhileStunned: true
       canUseWhileLevitating: true
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 2.0
+      baseHealthReduction: 4.0
       healthReductionDecreasePerLevel: 0.0
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0
@@ -1131,13 +1131,15 @@ skills:
       durationIncreasePerLevel: 0.5
       distance: 5
       duration: 2.0
+      baseHealthReductionPerPlayerAffected: 2.0
+      healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
     clone:
       enabled: true
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 4.0
-      healthReductionDecreasePerLevel: 0.5
+      baseHealthReduction: 8.0
+      healthReductionDecreasePerLevel: 1.5
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
       baseHealth: 10.0
