@@ -1216,7 +1216,7 @@ skills:
       radius: 4
       energySiphoned: 1.0
       elapsedTimeToProcAbility: 2.0
-      healthGainedOnRandomSiphon: 1.0
+      healthGainedOnRandomSiphon: 2.0
       randomSiphonHealthGainChance: 0.1
     bloodsphere:
       enabled: true
