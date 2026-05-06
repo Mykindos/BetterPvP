@@ -1162,8 +1162,8 @@ skills:
     grasp:
       enabled: true
       maxlevel: 5
-      cooldown: 30.0
-      cooldownDecreasePerLevel: 1.5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 2.0
       baseDistance: 10.0
       distanceIncreasePerLevel: 5.0
       baseDamage: 2.0
@@ -1171,13 +1171,13 @@ skills:
     leech:
       enabled: true
       maxlevel: 5
-      cooldown: 25.0
+      cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
       baseRange: 7.0
       rangeIncreasePerLevel: 0.0
       baseLeechedHealth: 1.0
       leachedHealthIncreasePerLevel: 0.0
-      leechedHealth: 1.0
+      leechedHealth: 2.0
       maximumEnemies: 2
       maximumEnemiesIncreasePerLevel: 0
     wreath:
@@ -1186,13 +1186,13 @@ skills:
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
       baseDamage: 2.0
-      damageIncreasePerLevel: 0.66
+      damageIncreasePerLevel: 0.75
       slowStrength: 2
       slowDuration: 2.0
-      healthPerEnemyHit: 1.0
+      healthPerEnemyHit: 2.0
       maxCharges: 3
       maxChargesIncreasePerLevel: 0
-      rechargeSeconds: 10.0
+      rechargeSeconds: 9.0
       rechargeSecondsDecreasePerLevel: 1.0
       healthPerEnemyHitIncreasePerLevel: 0.0
     frailty:
@@ -1220,7 +1220,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 15.0
-      cooldownDecreasePerLevel: 0.5
+      cooldownDecreasePerLevel: 0.75
       growthPerSecond: 0.1
       growthPerSecondIncreasePerLevel: 0.05
       expireSeconds: 7.0
@@ -1231,8 +1231,8 @@ skills:
       applyTravelSpeed: 6.0
       damagePerSecond: 3.0
       damageIncreasePerLevel: 1.0
-      regenPerSecond: 5.0
-      regenIncreasePerLevel: 0.5
+      regenPerSecond: 8.0
+      regenIncreasePerLevel: 1.0
       impactHealthMultiplier: 0.1
       impactHealthMultiplierIncreasePerLevel: 0.05
       healthSeconds: 0.5
