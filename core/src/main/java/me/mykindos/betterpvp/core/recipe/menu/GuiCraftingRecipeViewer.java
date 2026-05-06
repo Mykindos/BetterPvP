@@ -69,7 +69,7 @@ public class GuiCraftingRecipeViewer extends AbstractGui implements Windowed {
             }
         }
 
-        setItem(15, new SimpleItem(recipe.previewResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().getView().get()));
         setItem(16, new BlueprintButton());
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry

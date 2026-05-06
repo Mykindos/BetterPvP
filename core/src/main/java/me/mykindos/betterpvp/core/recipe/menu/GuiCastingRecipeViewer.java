@@ -43,7 +43,7 @@ public class GuiCastingRecipeViewer extends AbstractGui implements Windowed {
         setItem(19, new AlloyButton(recipe.getAlloy(), recipe.getRequiredMillibuckets(), false, "Required"));
         setItem(26, new ItemButton(itemFactory.createPreview(recipe.getResult())));
 
-        setItem(15, new SimpleItem(recipe.previewResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().getView().get()));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())

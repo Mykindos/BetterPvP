@@ -57,7 +57,7 @@ public class GuiImbuingRecipeViewer extends AbstractGui implements Windowed {
         }
 
         // Result
-        setItem(15, new SimpleItem(recipe.previewResult().getPrimaryResult().createItemStack()));
+        setItem(15, new SimpleItem(recipe.previewResult().getPrimaryResult().getView().get()));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:imbuement_pedestal")).createItemStack())
