@@ -191,7 +191,7 @@ public class HotBarLayoutManager {
                 try {
                     ctxl.deleteFrom(CHAMPIONS_HOTBAR_LAYOUTS)
                             .where(CHAMPIONS_HOTBAR_LAYOUTS.CLIENT.eq(client.getId()))
-                            .and(CHAMPIONS_HOTBAR_LAYOUTS.ROLE.eq(layout.getBuild().getRole().getName()))
+                            .and(CHAMPIONS_HOTBAR_LAYOUTS.ROLE.eq(layout.getBuild().getRole().name()))
                             .and(CHAMPIONS_HOTBAR_LAYOUTS.ID.eq(layout.getBuild().getId()))
                             .execute();
 
