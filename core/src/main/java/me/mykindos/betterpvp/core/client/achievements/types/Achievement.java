@@ -95,6 +95,17 @@ public abstract class Achievement implements IAchievement, IStat {
         };
     }
 
+    protected String getFormattedStatValue(StatContainer container, IStat stat) {
+        return switch (getAchievementFilterType()) {
+            case ALL ->
+                    stat.formattedStatValue(container, StatFilterType.ALL, null);
+            case SEASON ->
+                    stat.formattedStatValue(container, StatFilterType.SEASON, Core.getCurrentRealm().getSeason());
+            case REALM ->
+                    stat.formattedStatValue(container, StatFilterType.REALM, Core.getCurrentRealm());
+        };
+    }
+
 
     @Override
     public void onChangeValue(StatContainer container, IStat stat, Long newValue, @Nullable("Null when no previous value") Long oldValue, Map<IStat, Long> otherProperties) {

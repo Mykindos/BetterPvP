@@ -15,11 +15,20 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.function.Predicate;
+
 public interface IStat {
     /**
      * The amount that {@link Double} or {@link Float} values are multiplied then cast to long by
      */
     long FP_MODIFIER = 1000L;
+
+    static long getLongValueOfDouble(double num) {
+        return (long) (num * FP_MODIFIER);
+    }
+
+    static double getDoubleValueOfLong(long num) {
+        return (double) num / FP_MODIFIER;
+    }
 
     /**
      * Get the stat represented by this object from the statContainer.
@@ -32,7 +41,7 @@ public interface IStat {
     Long getStat(StatContainer statContainer, StatFilterType type, @Nullable Period period);
 
     default Double getDoubleStat(StatContainer statContainer, StatFilterType type, @Nullable Period period) {
-        return getStat(statContainer, type, period) == null ? null : getStat(statContainer, type, period) / (double) FP_MODIFIER;
+        return getStat(statContainer, type, period) == null ? null : getDoubleValueOfLong(getStat(statContainer, type, period));
     }
 
     /**
@@ -53,6 +62,20 @@ public interface IStat {
             case DOUBLE -> String.valueOf(getDoubleStat(statContainer, type, period));
             case DURATION -> UtilTime.humanReadableFormat(Duration.of(getStat(statContainer, type, period), ChronoUnit.MILLIS));
             default -> String.valueOf(getStat(statContainer, type, period));
+        };
+    }
+
+    /**
+     * Formats a raw stat value as a string based on the type of stat value
+     * @param value the raw stat value
+     * @param type the type of stat value
+     * @return the formatted stat value as a string
+     */
+    static String formatStatValue(long value, StatValueType type) {
+        return switch (type) {
+            case DOUBLE -> String.valueOf(getDoubleValueOfLong(value));
+            case DURATION -> UtilTime.humanReadableFormat(Duration.of(value, ChronoUnit.MILLIS));
+            default -> String.valueOf(value);
         };
     }
 
