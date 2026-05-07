@@ -246,7 +246,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
         pullInwardRadius = getConfig("pullInwardRadius", 5.0, Double.class);
         pullInwardStrength = getConfig("pullInwardStrength", 1.5, Double.class);
 
-        final double pullInwardDelayInSeconds = getConfig("pullInwardDelay", 1.0, Double.class);
+        final double pullInwardDelayInSeconds = getConfig("pullInwardDelay", 1.5, Double.class);
         pullInwardDelayMillis = (long) (pullInwardDelayInSeconds * 1000L);
 
         final double expirationTimeInSeconds = getConfig("expirationTime", 6.0, Double.class);
