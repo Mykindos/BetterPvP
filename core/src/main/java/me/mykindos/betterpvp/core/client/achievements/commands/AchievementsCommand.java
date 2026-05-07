@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.achievements.display.AchievementMenu;
+import me.mykindos.betterpvp.core.client.achievements.display.AchievementScopeMenu;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.RealmManager;
 import me.mykindos.betterpvp.core.command.Command;
@@ -36,7 +36,7 @@ public class AchievementsCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        new AchievementMenu(client, achievementManager, realmManager).show(player);
+        new AchievementScopeMenu(client, achievementManager, realmManager, null).show(player);
     }
 
     @Override

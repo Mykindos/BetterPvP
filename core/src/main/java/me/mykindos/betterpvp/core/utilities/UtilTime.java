@@ -116,6 +116,9 @@ public class UtilTime {
     }
 
     public static String humanReadableFormat(Duration duration) {
+        if (duration.isZero()) {
+            return "0 seconds";
+        }
         long days = duration.toDays();
         duration = duration.minus(days, ChronoUnit.DAYS);
         long hours = duration.toHours();
@@ -126,19 +129,23 @@ public class UtilTime {
 
         StringBuilder result = new StringBuilder();
         if (days > 0) {
-            result.append(days).append(" days ");
+            result.append(days).append(days == 1 ? " day " : " days ");
         }
         if (hours > 0) {
-            result.append(hours).append(" hours ");
+            result.append(hours).append(hours == 1 ? " hour " : " hours ");
         }
         if (minutes > 0) {
-            result.append(minutes).append(" minutes ");
+            result.append(minutes).append(minutes == 1 ? " minute " : " minutes ");
         }
         if (seconds > 0) {
-            result.append(seconds).append(" seconds");
+            result.append(seconds).append(seconds == 1 ? " second " : " seconds ");
         }
 
-        return result.toString().trim();
+        String resString = result.toString().trim();
+        if (resString.isBlank()) {
+            return "under 1 second";
+        }
+        return result.toString();
     }
 
     public static String getTime(double d, int decPoint) {

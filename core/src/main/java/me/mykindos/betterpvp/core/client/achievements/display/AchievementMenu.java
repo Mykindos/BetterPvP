@@ -33,8 +33,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @CustomLog
 @Getter
@@ -67,8 +69,8 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
                 "# x x x x x x x #",
                 "# x x x x x x x #",
                 "# # # < - > # # #")
-                .addIngredient('x',Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                .addIngredient('#',Menu.BACKGROUND_ITEM)
+                .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                .addIngredient('#', Menu.BACKGROUND_ITEM)
                 .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new StatBackButton(previous))
                 .addIngredient('>', new PageForwardButton())
@@ -92,33 +94,31 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
         this.previous = previous;
 
         this.type = type;
-        this.period = period;
+        this.period = type == StatFilterType.ALL ? null : period;
 
-        seasonButton.setRefresh(() ->
-                seasonButton.onChangeSeason().thenApply(status -> {
-                    if (status.equals(Boolean.FALSE)) return Boolean.FALSE;
-                    setContent(getItems());
-                    return Boolean.TRUE;
-                })
-        );
+        if (type == StatFilterType.ALL) {
+            // Global achievements are not season/realm scoped — hide both controls.
+            setItem(7, 0, Menu.BACKGROUND_GUI_ITEM);
+            setItem(8, 0, Menu.BACKGROUND_GUI_ITEM);
+        } else {
+            // Seasonal: remove the "All" season option and hide the realm filter entirely.
+            seasonButton.getContexts().removeIf(ctx -> ctx.getStatFilterType() == StatFilterType.ALL);
+            setItem(8, 0, Menu.BACKGROUND_GUI_ITEM);
 
-        realmButton.setRefresh(() ->
-                realmButton.onChangeSeason().thenApply(status -> {
-                    if (status.equals(Boolean.FALSE)) return Boolean.FALSE;
-                    setContent(getItems());
-                    return Boolean.TRUE;
-                })
-        );
-
-
+            seasonButton.setRefresh(() ->
+                    seasonButton.onChangeSeason().thenApply(status -> {
+                        if (status.equals(Boolean.FALSE)) return Boolean.FALSE;
+                        setContent(getItems());
+                        return Boolean.TRUE;
+                    })
+            );
+        }
 
         setContent(getItems());
     }
 
     private List<Item> getItems() {
         Collection<IAchievementCategory> childCategories;
-        //reset the achievement category if it is no longer valid
-        //get the category buttons
         if (achievementCategory != null) {
             childCategories = achievementCategory.getChildren();
         } else {
@@ -127,8 +127,11 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
                     .toList();
         }
 
-        //add the categories
+        final Set<NamespacedKey> validCategoryTree = getValidCategoryTree();
+
+        //add the categories (only those with at least one matching achievement in their tree)
         final List<Item> items = new ArrayList<>(childCategories.stream()
+                .filter(child -> validCategoryTree.contains(child.getNamespacedKey()))
                 .map(child -> (Item) new AchievementCategoryButton(child, type, period, client, achievementManager, realmManager, this))
                 .toList());
 
@@ -155,13 +158,41 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
         return items;
     }
 
+    private Set<NamespacedKey> getValidCategoryTree() {
+        final Set<NamespacedKey> validCategories = new HashSet<>();
+        achievementManager.getAchievementCategoryManager().getObjects().values()
+                .forEach(category -> markValidCategoryTree(category, validCategories));
+        return validCategories;
+    }
+
+    private boolean markValidCategoryTree(@NotNull IAchievementCategory category, @NotNull Set<NamespacedKey> validCategories) {
+        final NamespacedKey categoryKey = category.getNamespacedKey();
+        final boolean hasDirectAchievements = achievementManager.getObjects().values().stream()
+                .anyMatch(achievement -> type.equals(achievement.getAchievementFilterType())
+                        && Objects.equals(achievement.getAchievementCategory(), categoryKey));
+
+        boolean hasValidChild = false;
+        for (IAchievementCategory child : category.getChildren()) {
+            if (markValidCategoryTree(child, validCategories)) {
+                hasValidChild = true;
+            }
+        }
+
+        if (hasDirectAchievements || hasValidChild) {
+            validCategories.add(categoryKey);
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * @return The title of this menu.
      */
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Achievements");
+        return Component.text(type == StatFilterType.ALL ? "Achievements - Global" : "Achievements - Seasonal");
     }
 
     @Override
@@ -187,6 +218,4 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
         this.pages = pages;
         update();
     }
-
 }
-

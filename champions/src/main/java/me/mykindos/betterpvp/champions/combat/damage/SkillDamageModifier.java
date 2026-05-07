@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.combat.damage;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
@@ -15,32 +16,34 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 public class SkillDamageModifier implements DamageModifier {
     
     protected final Skill skill;
-    protected final DamageOperator operator;
-    protected final double operand;
+    @Getter
+    protected final DamageOperator damageOperator;
+    @Getter
+    protected final double damageOperand;
     protected final int priority;
     
     /**
      * Creates a skill damage modifier
      * @param skill the skill this modifier is for
-     * @param operator the damage operator
-     * @param operand the damage operand
+     * @param damageOperator the damage operator
+     * @param damageOperand the damage operand
      * @param priority the priority of this modifier
      */
-    public SkillDamageModifier(Skill skill, DamageOperator operator, double operand, int priority) {
+    public SkillDamageModifier(Skill skill, DamageOperator damageOperator, double damageOperand, int priority) {
         this.skill = skill;
-        this.operator = operator;
+        this.damageOperator = damageOperator;
         this.priority = priority;
-        this.operand = operand;
+        this.damageOperand = damageOperand;
     }
     
     /**
      * Creates a skill damage modifier with default priority
      * @param skill the skill this modifier is for
-     * @param operator the damage operator
-     * @param operand the flat damage increase
+     * @param damageOperator the damage operator
+     * @param damageOperand the flat damage increase
      */
-    public SkillDamageModifier(Skill skill, DamageOperator operator, double operand) {
-        this(skill, operator, operand, 200);
+    public SkillDamageModifier(Skill skill, DamageOperator damageOperator, double damageOperand) {
+        this(skill, damageOperator, damageOperand, 200);
     }
     
     @Override
@@ -71,7 +74,7 @@ public class SkillDamageModifier implements DamageModifier {
     
     @Override
     public ModifierResult apply(DamageEvent event) {
-        return new ModifierResult(operand, operator, skill.getName());
+        return new ModifierResult(damageOperand, damageOperator, skill.getName());
     }
     
     @Override

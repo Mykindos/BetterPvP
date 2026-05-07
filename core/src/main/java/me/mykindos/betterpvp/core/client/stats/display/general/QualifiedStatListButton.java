@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.stats.display.general;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@CustomLog
 public class QualifiedStatListButton extends ControlItem<IAbstractStatMenu> {
     private final List<IStat> stats;
     private final int numPerItem;
@@ -54,8 +56,20 @@ public class QualifiedStatListButton extends ControlItem<IAbstractStatMenu> {
         List<Component> description = stats.stream()
                 .skip(startIndex)
                 .limit(endIndex - startIndex)
-                .map(stat -> UtilMessage.deserialize("<gold>%s</gold>: <yellow>%s</yellow>",
-                        stat.getQualifiedName(), stat.formattedStatValue(statContainer, statFilterType, period))
+                .map(stat -> {
+                    final String formattedValue = stat.formattedStatValue(statContainer, statFilterType, period);
+                    if (formattedValue.isBlank()) {
+                        log.error("Stat {} returned blank formatted value (raw value {}) for client {} with filter type {} and period {}",
+                                stat.getQualifiedName(),
+                                stat.getStat(statContainer, statFilterType, period),
+                                gui.getClient().getName(),
+                                statFilterType,
+                                period)
+                                .submit();
+                    }
+                    return UtilMessage.deserialize("<gold>%s</gold>: <yellow>%s</yellow>",
+                            stat.getQualifiedName(), formattedValue);
+                }
                 )
                 .toList();
         return ItemView.builder()
