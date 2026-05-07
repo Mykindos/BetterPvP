@@ -73,7 +73,13 @@ public class StatContainer implements Unique, IStatMapListener {
     public void onMapValueChanged(IStat stat, Long newValue, @Nullable Long oldValue) {
         try {
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                new StatPropertyUpdateEvent(this, stat, newValue, oldValue).callEvent();
+                final StatPropertyUpdateEvent event = new StatPropertyUpdateEvent(this, stat, newValue, oldValue);
+                event.callEvent();
+                // NOTE: do NOT remove from changedStats here based on cancellation.
+                // Removing changedStats entries asynchronously is racy — processStatUpdates can
+                // run between the synchronous add (in incrementStat) and this async remove,
+                // and it can also remove entries added by a later incrementStat call for the
+                // same stat. The stats feature-flag is enforced at save time in ClientSQLLayer.
             });
         } catch (Exception e) {
             log.error("Exception on map value change {}", stat, e).submit();

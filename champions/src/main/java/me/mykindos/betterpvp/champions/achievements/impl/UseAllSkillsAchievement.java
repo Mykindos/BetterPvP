@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.achievements.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
@@ -13,7 +12,6 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -23,7 +21,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -40,8 +37,6 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
                 AchievementCategories.CHAMPIONS,
                 StatFilterType.ALL, 60_000L,
                 getAllSkills(skillManager));
-        //cannot register via BPvPListener as it loads before skills are loaded
-        ListenerLoader.register(JavaPlugin.getPlugin(Champions.class), this);
     }
 
     private static GenericStat[] getAllSkills(ChampionsSkillManager skillManager) {

@@ -2,15 +2,17 @@ package me.mykindos.betterpvp.core.client.stats.events;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.framework.events.CustomEvent;
+import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 
 @EqualsAndHashCode(callSuper = true)
 @Getter
+@Setter
 @ToString
-public class StatPropertyUpdateEvent extends CustomEvent {
+public class StatPropertyUpdateEvent extends CustomCancellableEvent {
 
     private final StatContainer container;
     private final IStat stat;

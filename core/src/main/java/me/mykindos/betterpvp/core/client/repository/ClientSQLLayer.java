@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.client.stats.StatConcurrentHashMap;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientsRecord;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
@@ -67,6 +68,10 @@ public class ClientSQLLayer {
     private final RealmManager realmManager;
     @Getter
     private final PunishmentRepository punishmentRepository;
+
+    @Config(path = "stats.enabled", defaultValue = "true")
+    @Inject
+    private boolean statsEnabled;
 
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedPropertyUpdates;
     private final AtomicReference<ConcurrentHashMap<String, ConcurrentHashMap<String, Query>>> queuedSharedPropertyUpdates;
@@ -461,6 +466,13 @@ public class ClientSQLLayer {
 
     private List<Query> getStatUpdates(Client client, Realm realm) {
         synchronized (client.getStatContainer()) {
+            if (!statsEnabled) {
+                // Stats persistence is disabled via feature flag — clear dirty tracking
+                // without generating any DB queries. In-memory values are preserved for
+                // display but will not be written to the database.
+                client.getStatContainer().getChangedStats().clear();
+                return List.of();
+            }
             List<Query> statementStream = client.getStatContainer().getChangedStats().stream().map(stat -> {
                 return getSaveStatProperty(client.getStatContainer(), realm, stat, client.getStatContainer().getProperty(StatFilterType.REALM, realm, stat));
             }).toList();
