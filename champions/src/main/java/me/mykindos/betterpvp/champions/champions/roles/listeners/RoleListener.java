@@ -17,9 +17,7 @@ import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -35,7 +33,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRemoveEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -49,7 +46,6 @@ import java.util.function.Function;
 @BPvPListener
 public class RoleListener implements Listener {
 
-    private final ItemFactory itemFactory;
     private final RoleManager roleManager;
     private final ClientManager clientManager;
     private final BuildManager buildManager;
@@ -57,9 +53,8 @@ public class RoleListener implements Listener {
     private final CombatFeaturesService combatFeaturesService;
 
     @Inject
-    public RoleListener(ItemFactory itemFactory, RoleManager roleManager, ClientManager clientManager, BuildManager buildManager,
+    public RoleListener(RoleManager roleManager, ClientManager clientManager, BuildManager buildManager,
                         RoleSoundProvider soundProvider, CombatFeaturesService combatFeaturesService) {
-        this.itemFactory = itemFactory;
         this.roleManager = roleManager;
         this.clientManager = clientManager;
         this.buildManager = buildManager;
@@ -127,26 +122,6 @@ public class RoleListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void damageSound(DamageEvent pre) {
         pre.setSoundProvider(soundProvider);
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onShootBow(EntityShootBowEvent event) {
-        if (event.getBow() != null && itemFactory.isCustomItem(event.getBow())) {
-            return; // custom bow
-        }
-
-        final LivingEntity livingEntity = event.getEntity();
-        if (UtilBlock.isInLiquid(livingEntity)) {
-            UtilMessage.message(livingEntity, "Bow", "You cannot shoot a bow in liquid.");
-            event.setCancelled(true);
-            return;
-        }
-
-        final Role role = roleManager.getRole(livingEntity).orElse(null);
-        if (role != Role.ASSASSIN && role != Role.RANGER) {
-            UtilMessage.message(livingEntity, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
