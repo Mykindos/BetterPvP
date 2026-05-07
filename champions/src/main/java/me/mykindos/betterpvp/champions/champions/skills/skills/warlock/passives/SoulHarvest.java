@@ -33,6 +33,8 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     private final List<SoulData> souls = new ArrayList<>();
 
+    private double soulDurationSeconds;
+
     private double baseBuffDuration;
 
     private double buffDurationIncreasePerLevel;
@@ -82,7 +84,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
         if(UtilEntity.isPlayerSpawned(event.getEntity())) return;
-        souls.add(new SoulData(event.getEntity().getUniqueId(), event.getEntity().getLocation(), System.currentTimeMillis() + 120_000));
+        souls.add(new SoulData(event.getEntity().getUniqueId(), event.getEntity().getLocation(), System.currentTimeMillis() + (long) (soulDurationSeconds * 1000L)));
     }
 
     @UpdateEvent(delay = 250)
@@ -120,6 +122,8 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     @Override
     public void loadSkillConfig() {
+        soulDurationSeconds = getConfig("soulDurationSeconds", 120.0, Double.class);
+
         baseBuffDuration = getConfig("baseBuffDuration", 2.0, Double.class);
         buffDurationIncreasePerLevel = getConfig("buffDurationIncreasePerLevel", 1.0, Double.class);
 

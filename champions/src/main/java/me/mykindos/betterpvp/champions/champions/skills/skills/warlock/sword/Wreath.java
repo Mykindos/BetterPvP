@@ -294,7 +294,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
 
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
 
         healthPerEnemyHit = getConfig("healthPerEnemyHit", 2.0, Double.class);
         healthPerEnemyHitIncreasePerLevel = getConfig("healthPerEnemyHitIncreasePerLevel", 0.0, Double.class);
@@ -304,7 +304,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
         maxCharges = getConfig("maxCharges", 3, Integer.class);
         maxChargesIncreasePerLevel = getConfig("maxChargesIncreasePerLevel", 0, Integer.class);
 
-        rechargeSeconds = getConfig("rechargeSeconds", 10.0, Double.class);
+        rechargeSeconds = getConfig("rechargeSeconds", 9.0, Double.class);
         rechargeSecondsDecreasePerLevel = getConfig("rechargeSecondsDecreasePerLevel", 1.0, Double.class);
     }
 }
