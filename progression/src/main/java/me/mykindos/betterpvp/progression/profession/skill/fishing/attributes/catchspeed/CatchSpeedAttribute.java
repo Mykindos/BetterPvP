@@ -25,7 +25,7 @@ public class CatchSpeedAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "reduces the time it takes for fish to bite after casting";
+        return "increased catch speed";
     }
 
     @Override

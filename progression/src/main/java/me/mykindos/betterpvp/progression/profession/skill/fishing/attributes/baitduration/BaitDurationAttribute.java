@@ -25,7 +25,7 @@ public class BaitDurationAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "extends how long thrown bait remains active in the water";
+        return "increased bait duration";
     }
 
     @Override

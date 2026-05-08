@@ -25,7 +25,7 @@ public class CatchSpeedNearbyAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "grants nearby fishing players a catch speed boost based on your own skill";
+        return "increased catch speed for nearby players";
     }
 
     @Override

@@ -25,7 +25,7 @@ public class CatchWeightAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "increases the weight of fish caught, granting more items and experience";
+        return "increased size of fish caught";
     }
 
     @Override

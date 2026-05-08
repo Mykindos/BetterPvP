@@ -25,7 +25,7 @@ public class BaitNonConsumptionChanceAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "chance that thrown bait is returned to your inventory instead of being consumed";
+        return "chance to not consume baits when thrown";
     }
 
     @Override
