@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -42,12 +43,31 @@ public class WoodcuttingListener implements Listener {
     private final ClientManager clientManager;
     private final WoodcuttingHandler woodcuttingHandler;
     private final WorldBlockHandler worldBlockHandler;
+    private final BlockTagManager blockTagManager;
 
     @Inject
-    public WoodcuttingListener(ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler) {
+    public WoodcuttingListener(ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler, BlockTagManager blockTagManager) {
         this.clientManager = clientManager;
         this.woodcuttingHandler = woodcuttingHandler;
         this.worldBlockHandler = worldBlockHandler;
+        this.blockTagManager = blockTagManager;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBreakReplaceWithLootTable(BlockBreakEvent event) {
+        Material blockType = event.getBlock().getType();
+
+        if (!woodcuttingHandler.getExperiencePerWood().containsKey(blockType)) return;
+        Block choppedLogBlock = event.getBlock();
+
+        // Proceed with vanilla drop if it was placed by a player
+        if (blockTagManager.isPlayerPlaced(choppedLogBlock)) {
+            return;
+        }
+
+        event.setDropItems(false);
+        woodcuttingHandler.processLogDropReplacement(event.getPlayer(), choppedLogBlock);
+
     }
 
     /**
@@ -82,7 +102,7 @@ public class WoodcuttingListener implements Listener {
     public void whenPlayerStripsALog(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if(event.useItemInHand() == Event.Result.DENY || event.useInteractedBlock() == Event.Result.DENY) return;
+        if (event.useItemInHand() == Event.Result.DENY || event.useInteractedBlock() == Event.Result.DENY) return;
 
         Block block = event.getClickedBlock();
         if (block == null) return;
@@ -91,7 +111,7 @@ public class WoodcuttingListener implements Listener {
         Player player = event.getPlayer();
         if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
 
-        if(worldBlockHandler.isRestoreBlock(block)) {
+        if (worldBlockHandler.isRestoreBlock(block)) {
             event.setCancelled(true);
             return;
         }

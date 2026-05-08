@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
+import me.mykindos.betterpvp.core.loot.item.DroppedItemLoot;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
@@ -36,6 +37,7 @@ import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -46,6 +48,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,6 +79,7 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
 
     private final LootTableRegistry lootTableRegistry;
     private final LootSessionController sessionController;
+    private final Map<String, LootTable> logLootTables = new HashMap<>();
     private LootTable lootTable;
     private LootTable treasureLootTable;
 
@@ -104,6 +108,17 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
      */
     @Override
     public void reload() {
+        this.logLootTables.put("OAK_LOG", lootTableRegistry.loadLootTable("woodcutting_oak_log"));
+        this.logLootTables.put("SPRUCE_LOG", lootTableRegistry.loadLootTable("woodcutting_spruce_log"));
+        this.logLootTables.put("BIRCH_LOG", lootTableRegistry.loadLootTable("woodcutting_birch_log"));
+        this.logLootTables.put("JUNGLE_LOG", lootTableRegistry.loadLootTable("woodcutting_jungle_log"));
+        this.logLootTables.put("ACACIA_LOG", lootTableRegistry.loadLootTable("woodcutting_acacia_log"));
+        this.logLootTables.put("DARK_OAK_LOG", lootTableRegistry.loadLootTable("woodcutting_dark_oak_log"));
+        this.logLootTables.put("MANGROVE_LOG", lootTableRegistry.loadLootTable("woodcutting_mangrove_log"));
+        this.logLootTables.put("CHERRY_LOG", lootTableRegistry.loadLootTable("woodcutting_cherry_log"));
+        this.logLootTables.put("PALE_OAK_LOG", lootTableRegistry.loadLootTable("woodcutting_pale_oak_log"));
+        this.logLootTables.put("CRIMSON_STEM", lootTableRegistry.loadLootTable("woodcutting_crimson_stem"));
+        this.logLootTables.put("WARPED_STEM", lootTableRegistry.loadLootTable("woodcutting_warped_stem"));
         this.lootTable = lootTableRegistry.loadLootTable("woodcutting");
         this.treasureLootTable = lootTableRegistry.loadLootTable("woodcutting_treasure_chance");
     }
@@ -119,7 +134,8 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
     /**
      * This handles all the experience gaining and logging that happens when a
      * player chops a log (`block`)
-     * @param chopLogEvent the event that was called
+     *
+     * @param chopLogEvent       the event that was called
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
@@ -193,14 +209,22 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
         return "Woodcutting";
     }
 
-    /**
-     * Gets a random item from the loot table with a random amount between min and max
-     * @return An ItemStack with a random amount
-     */
-    public @NotNull LootBundle getRandomLoot(Player player, Location location) {
-        final LootSession session = sessionController.resolve(player, lootTable, () -> LootSession.newSession(lootTable, player));
-        final LootContext context = new LootContext(session, location, "Woodcutting");
-        return this.lootTable.generateLoot(context);
+    public void processLogDropReplacement(Player player, Block block) {
+        boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
+        LootTable logLootTable = logLootTables.get(block.getType().name().replace("STRIPPED_", ""));
+        LootSession lootSession = sessionController.resolve(player, logLootTable, () -> LootSession.newSession(logLootTable, player));
+        LootContext lootContext = new LootContext(lootSession, block.getLocation(), "Woodcutting");
+        LootBundle loot = logLootTable.generateLoot(lootContext);
+
+        loot.getLoot().stream().filter(lootType -> lootType instanceof DroppedItemLoot)
+                .forEach(lootType -> {
+                    DroppedItemLoot droppedItemLoot = (DroppedItemLoot) lootType;
+                    Item item = droppedItemLoot.award(lootContext);
+                    Bukkit.broadcastMessage("Awarding " + item.getItemStack().getType().name());
+                    if (isProtected) {
+                        UtilItem.reserveItem(item, player, 10);
+                    }
+                });
     }
 
     private void attemptTreasureDrop(Player player, Location location) {

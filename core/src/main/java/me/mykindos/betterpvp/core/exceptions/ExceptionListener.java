@@ -31,6 +31,7 @@ public class ExceptionListener implements Listener {
 
     @EventHandler
     public void onServerError(ServerExceptionEvent event) {
+        if(discordWebhook.isEmpty()) return;
 
         UtilServer.runTask(core, true, () -> {
 
