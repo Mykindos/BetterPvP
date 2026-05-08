@@ -116,7 +116,7 @@ public class AchievementCompletionRepository {
                             final AchievementCompletion achievementCompletion = new AchievementCompletion(completionId,
                                     container.getClient(),
                                     new NamespacedKey(namespace, key),
-                                    StatFilterType.ALL,
+                                    StatFilterType.fromPeriod(period),
                                     period,
                                     timestamp
                             );

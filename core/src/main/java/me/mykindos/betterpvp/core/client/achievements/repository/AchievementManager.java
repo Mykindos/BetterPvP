@@ -158,6 +158,9 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> imp
                         .ifPresent(c -> c.setTotalCompletions(finalTotal)));
     }
     public CompletableFuture<Void> updateTotalAchievementCompletions() {
+        totalAllAchievementCompletions.clear();
+        totalSeasonCompletions.clear();
+        totalRealmCompletions.clear();
         return achievementCompletionRepository.updateTotalCompletions(
                 totalAllAchievementCompletions,
                 totalSeasonCompletions,
@@ -166,29 +169,17 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> imp
             try {
                 clientManager.getLoaded().forEach(client -> {
                     client.getStatContainer().getAchievementCompletions().getAllMap().forEach((key, completion) -> {
-                        Integer total = totalAllAchievementCompletions.get(key);
-                        if (total == null) {
-                            log.error("Error getting all total achievement completions for {}, no total exists ", key.asString(), new RuntimeException("Missing all-time total for achievement: " + key.asString())).submit();
-                            total = 1;
-                        }
+                        Integer total = totalAllAchievementCompletions.getOrDefault(key, 1);
                         completion.setTotalCompletions(total);
                     });
                     client.getStatContainer().getAchievementCompletions().getSeasonMap().forEach((period, map) ->
                             map.forEach((key, completion) -> {
-                                Integer total = totalSeasonCompletions.get(period).get(key);
-                                if (total == null) {
-                                    log.error("Error getting season {} total achievement completions for {}, no total exists ", period, key.asString(), new RuntimeException("Missing season total for achievement: " + key.asString())).submit();
-                                    total = 1;
-                                }
+                                Integer total = totalSeasonCompletions.get(period).getOrDefault(key, 1);
                                 completion.setTotalCompletions(total);
                             }));
                     client.getStatContainer().getAchievementCompletions().getRealmMap().forEach((period, map) ->
                             map.forEach((key, completion) -> {
-                                Integer total = totalRealmCompletions.get(period).get(key);
-                                if (total == null) {
-                                    log.error("Error getting realm {} total achievement completions for {}, no total exists ", period, key.asString(), new RuntimeException("Missing realm total for achievement: " + key.asString())).submit();
-                                    total = 1;
-                                }
+                                Integer total = totalRealmCompletions.get(period).getOrDefault(key, 1);
                                 completion.setTotalCompletions(total);
                             }));
                 });
