@@ -233,20 +233,8 @@ public abstract class Achievement implements IAchievement, IStat {
     @Override
     public void forceCheck(StatContainer container) {
         if (!enabled) return;
-        if (getAchievementCompletion(container).isPresent()) return;
         float percent = getPercentComplete(container, achievementFilterType, getPeriod());
-        if (percent >= 1.0f) {
-            complete(container);
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                org.bukkit.entity.Player player = Bukkit.getPlayer(container.getUniqueId());
-                if (player != null) {
-                    notifyComplete(container, player);
-                }
-                if (doRewards) {
-                    processRewards(container);
-                }
-            });
-        }
+        handleComplete(container, percent);
     }
 
     @Override
