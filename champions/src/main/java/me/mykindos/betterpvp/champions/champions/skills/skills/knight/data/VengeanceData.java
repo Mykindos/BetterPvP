@@ -10,7 +10,4 @@ public class VengeanceData {
      * In milliseconds.
      */
     private long lastTimeWhenTakenDamage = System.currentTimeMillis();
-
-    private long inwardPullStartTime = -1L;
-    private boolean doingInwardPull = false;
 }

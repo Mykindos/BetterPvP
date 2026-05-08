@@ -106,7 +106,7 @@ subprojects {
         archiveBaseName.set(project.name)
         archiveVersion.set("")
         archiveClassifier.set("")
-        destinationDirectory.set(file("$rootDir/build/"))
+        destinationDirectory.set(file("../../TestServer/plugins"))
         mergeServiceFiles()
         duplicatesStrategy = DuplicatesStrategy.INCLUDE // required for flywayg
 

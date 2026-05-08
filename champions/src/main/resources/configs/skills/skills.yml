@@ -254,9 +254,6 @@ skills:
       maxlevel: 3
       baseDamage: 0.5
       damageIncreasePerLevel: 0.25
-      pullInwardRadius: 5.0
-      pullInwardStrength: 1.5
-      pullInwardDelay: 1.5
       maxStacks: 3
       expirationTime: 6.0
     cleave:

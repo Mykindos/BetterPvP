@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentCom
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -50,19 +51,10 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     private double damageIncreasePerLevel;
 
     /**
-     * The number of melee hits a player can take before reaching max stacks. Once the player reaches max stacks,
-     * they will not gain any more stacks until they use their next melee attack or the stacks expire.
+     * The number of melee hits a player can take before reaching max stacks.
      */
     private int maxStacks;
 
-    /** The radius around the player in which enemies will be pulled inward when max stacks is reached. */
-    private double pullInwardRadius;
-
-    /** The strength of the pull inward when max stacks is reached. */
-    private double pullInwardStrength;
-
-    /** The delay between reaching max stacks and the pull inward actually happening, in milliseconds. */
-    private long pullInwardDelayMillis;
     private long expirationTimeInMillis;
 
     private final PermanentComponent stacksActionBar = new PermanentComponent(
@@ -72,10 +64,6 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
 
                 final @Nullable VengeanceData abilityData = playerDataMap.get(player);
                 if (abilityData == null) return null;
-
-                if (abilityData.isDoingInwardPull()) {
-                    return Component.text("Pulling enemies inward...").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD);
-                }
 
                 final int hitsTaken = abilityData.getHitsTaken();
                 final int hitsThatCanBeTaken = Math.max(0, maxStacks - hitsTaken);
@@ -97,9 +85,6 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
                 "Every hit you take will increase",
                 "the damage of your next melee",
                 "attack by " + getValueString(this::getDamage, level) + " damage.",
-                "",
-                "At max stacks, your melee attack",
-                "pulls enemies in and resets stacks.",
         };
     }
 
@@ -117,19 +102,19 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
         if (level <= 0) return;
 
         final @NotNull VengeanceData abilityData = playerDataMap.computeIfAbsent(player, p -> new VengeanceData());
-        if (abilityData.getHitsTaken() >= maxStacks || abilityData.isDoingInwardPull()) return;
+        if (abilityData.getHitsTaken() >= maxStacks) return;
 
         abilityData.setLastTimeWhenTakenDamage(System.currentTimeMillis());
         abilityData.setHitsTaken(abilityData.getHitsTaken() + 1);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onHit(DamageEvent event) {
+    public void onPlayerHitEnemy(DamageEvent event) {
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
 
         final @Nullable VengeanceData abilityData = playerDataMap.get(player);
-        if (abilityData == null || abilityData.getHitsTaken() <= 0 || abilityData.isDoingInwardPull()) return;
+        if (abilityData == null || abilityData.getHitsTaken() <= 0) return;
 
         final int level = getLevel(player);
         if (level <= 0) return;  // Shouldn't happen since the player has ability data but no harm in checking
@@ -141,12 +126,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
 
         player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1.0f, pitch);
 
-        if (abilityData.getHitsTaken() >= maxStacks) {
-            player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_SHOOT, 1.0f, 2.0f);
-            abilityData.setDoingInwardPull(true);
-            abilityData.setInwardPullStartTime(System.currentTimeMillis());
-            abilityData.setHitsTaken(0);
-        }
+        playerDataMap.remove(player);
     }
 
     @UpdateEvent
@@ -168,48 +148,23 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
             final @NotNull VengeanceData abilityData = playerDataMap.get(player);
 
             // If doing pull, don't worry about stacks expiring right now.
-            if (!abilityData.isDoingInwardPull()) {
-                if (UtilTime.elapsed(abilityData.getLastTimeWhenTakenDamage(), expirationTimeInMillis)) {
-                    player.playSound(player, Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-                    iterator.remove();
-                }
-
-                continue;
-            }
-
-            if (UtilTime.elapsed(abilityData.getInwardPullStartTime(), pullInwardDelayMillis)) {
-                abilityData.setDoingInwardPull(false);
-                doPullInward(player);
+            if (UtilTime.elapsed(abilityData.getLastTimeWhenTakenDamage(), expirationTimeInMillis)) {
+                player.playSound(player, Sound.ENTITY_ITEM_BREAK, 1.0f, 1.5f);
                 iterator.remove();
-                continue;
             }
+
+            final int green = 165 - ((abilityData.getHitsTaken() * 165) / maxStacks);
+            final Color color = Color.fromRGB(255, green, 0);
 
             // Play some particles to signify inward pull
-            Particle.GUST.builder()
-                    .count(3)
+            Particle.DUST.builder()
+                    .color(color)
+                    .count(1)
                     .extra(0)
                     .offset(0.5, 0.5, 0.5)
-                    .location(player.getLocation())
+                    .location(player.getLocation().add(0.0, player.getHeight()/2, 0.0))
                     .receivers(30)
                     .spawn();
-        }
-    }
-
-    private void doPullInward(@NotNull Player player) {
-        player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_SHOOT, 1.0f, 0.5f);
-
-        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), pullInwardRadius)) {
-            if (!player.hasLineOfSight(target.getLocation())) continue;
-
-            final Vector direction = player.getLocation().toVector()
-                    .subtract(target.getLocation().toVector())
-                    .normalize();
-
-            final VelocityData velocityData = new VelocityData(
-                    direction, pullInwardStrength, true, 0.0D, 0.1D, 0.1D, true
-            );
-
-            UtilVelocity.velocity(target, player, velocityData, VelocityType.CUSTOM);
         }
     }
 
@@ -243,11 +198,6 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
         baseDamage = getConfig("baseDamage", 0.75, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.25, Double.class);
         maxStacks = getConfig("maxStacks", 3, Integer.class);
-        pullInwardRadius = getConfig("pullInwardRadius", 5.0, Double.class);
-        pullInwardStrength = getConfig("pullInwardStrength", 1.5, Double.class);
-
-        final double pullInwardDelayInSeconds = getConfig("pullInwardDelay", 1.5, Double.class);
-        pullInwardDelayMillis = (long) (pullInwardDelayInSeconds * 1000L);
 
         final double expirationTimeInSeconds = getConfig("expirationTime", 6.0, Double.class);
         expirationTimeInMillis = (long) (expirationTimeInSeconds * 1000L);
