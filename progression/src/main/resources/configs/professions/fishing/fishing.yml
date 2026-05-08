@@ -58,9 +58,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_1
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_2:
     enabled: true
     maxlevel: 1
@@ -72,9 +72,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_2
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_3:
     enabled: true
     maxlevel: 1
@@ -86,9 +86,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_3
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_4:
     enabled: true
     maxlevel: 1
@@ -100,9 +100,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_4
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_5:
     enabled: true
     maxlevel: 1
@@ -115,9 +115,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_5
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   
   thicker_lines_attribute_6:
     enabled: true
@@ -131,9 +131,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_6
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   
   thicker_lines_attribute_7:
     enabled: true
@@ -146,9 +146,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_7
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_8:
     enabled: true
     maxlevel: 1
@@ -161,9 +161,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_8
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_9:
     enabled: true
     maxlevel: 1
@@ -175,9 +175,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_9
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_10:
     enabled: true
     maxlevel: 1
@@ -189,9 +189,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_10
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_11:
     enabled: true
     maxlevel: 1
@@ -203,9 +203,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_11
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_12:
     enabled: true
     maxlevel: 1
@@ -217,9 +217,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_12
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_13:
     enabled: true
     maxlevel: 1
@@ -231,9 +231,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_13
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_14:
     enabled: true
     maxlevel: 1
@@ -245,9 +245,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_14
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_15:
     enabled: true
     maxlevel: 1
@@ -259,9 +259,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_15
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_16:
     enabled: true
     maxlevel: 1
@@ -273,9 +273,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_16
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_17:
     enabled: true
     maxlevel: 1
@@ -287,9 +287,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_17
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_18:
     enabled: true
     maxlevel: 1
@@ -301,9 +301,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_18
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_19:
     enabled: true
     maxlevel: 1
@@ -315,9 +315,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_19
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_20:
     enabled: true
     maxlevel: 1
@@ -329,9 +329,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_20
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_21:
     enabled: true
     maxlevel: 1
@@ -343,9 +343,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_21
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_22:
     enabled: true
     maxlevel: 1
@@ -357,9 +357,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_22
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_23:
     enabled: true
     maxlevel: 1
@@ -371,9 +371,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_23
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_24:
     enabled: true
     maxlevel: 1
@@ -385,9 +385,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_24
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_25:
     enabled: true
     maxlevel: 1
@@ -399,9 +399,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_25
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_26:
     enabled: true
     maxlevel: 1
@@ -414,9 +414,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_26
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_27:
     enabled: true
     maxlevel: 1
@@ -428,9 +428,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_27
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_28:
     enabled: true
     maxlevel: 1
@@ -442,9 +442,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_28
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_29:
     enabled: true
     maxlevel: 1
@@ -455,9 +455,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_29
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   thicker_lines_attribute_30:
     enabled: true
     maxlevel: 1
@@ -468,9 +468,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_weight
-      base: 2.5
-      per_level: 2.5
-    displayName: thicker_lines_attribute_30
+      base: 0.025
+      per_level: 0.025
+    displayName: Thicker Lines
   # endregion
   # region Swiftness Thicker Lines Attributes
   swiftness_thicker_lines_attribute_1:
@@ -487,9 +487,9 @@ nodes:
       base: 10.0
       per_level: 10.0
     - attribute: catch_weight
-      base: 5.0
-      per_level: 5.0
-    displayName: swiftness_thicker_lines_attribute_1
+      base: 0.05
+      per_level: 0.05
+    displayName: Swiftness and Thicker Lines
   # endregion
   # region Swiftness Attributes
   swiftness_attribute_1:
@@ -503,9 +503,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_1
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_2:
     enabled: true
     maxlevel: 1
@@ -517,9 +517,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_2
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_3:
     enabled: true
     maxlevel: 1
@@ -532,9 +532,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_3
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_4:
     enabled: true
     maxlevel: 1
@@ -546,9 +546,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_4
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_5:
     enabled: true
     maxlevel: 1
@@ -560,9 +560,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_5
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_6:
     enabled: true
     maxlevel: 1
@@ -574,9 +574,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_6
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_7:
     enabled: true
     maxlevel: 1
@@ -588,9 +588,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_7
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_8:
     enabled: true
     maxlevel: 1
@@ -602,9 +602,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_8
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_9:
     enabled: true
     maxlevel: 1
@@ -617,9 +617,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_9
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_10:
     enabled: true
     maxlevel: 1
@@ -632,9 +632,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_10
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_11:
     enabled: true
     maxlevel: 1
@@ -646,9 +646,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_11
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_12:
     enabled: true
     maxlevel: 1
@@ -659,9 +659,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_12
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_13:
     enabled: true
     maxlevel: 1
@@ -672,9 +672,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_13
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_14:
     enabled: true
     maxlevel: 1
@@ -685,9 +685,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_14
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_15:
     enabled: true
     maxlevel: 1
@@ -698,9 +698,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_15
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_16:
     enabled: true
     maxlevel: 1
@@ -711,9 +711,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_16
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_17:
     enabled: true
     maxlevel: 1
@@ -724,9 +724,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_17
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_18:
     enabled: true
     maxlevel: 1
@@ -737,9 +737,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_18
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_19:
     enabled: true
     maxlevel: 1
@@ -750,9 +750,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_19
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_20:
     enabled: true
     maxlevel: 1
@@ -763,9 +763,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_20
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_21:
     enabled: true
     maxlevel: 1
@@ -776,9 +776,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_21
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_22:
     enabled: true
     maxlevel: 1
@@ -789,9 +789,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_22
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_23:
     enabled: true
     maxlevel: 1
@@ -802,9 +802,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_23
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_24:
     enabled: true
     maxlevel: 1
@@ -815,9 +815,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_24
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_25:
     enabled: true
     maxlevel: 1
@@ -828,9 +828,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_25
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_26:
     enabled: true
     maxlevel: 1
@@ -841,9 +841,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_26
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_27:
     enabled: true
     maxlevel: 1
@@ -854,9 +854,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_27
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_28:
     enabled: true
     maxlevel: 1
@@ -867,9 +867,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_28
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_29:
     enabled: true
     maxlevel: 1
@@ -880,9 +880,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_29
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   swiftness_attribute_30:
     enabled: true
     maxlevel: 1
@@ -893,9 +893,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 2.5
-      per_level: 1.0
-    displayName: swiftness_attribute_30
+      base: 0.025
+      per_level: 0.001
+    displayName: Swiftness
   # endregion
   # region Expert Baiter Attributes
   bait_duration_attribute_1:
@@ -908,9 +908,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_1
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_2:
     enabled: true
     maxlevel: 1
@@ -922,9 +922,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_2
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_3:
     enabled: true
     maxlevel: 1
@@ -936,9 +936,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_3
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_4:
     enabled: true
     maxlevel: 1
@@ -950,9 +950,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_4
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_5:
     enabled: true
     maxlevel: 1
@@ -964,9 +964,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_5
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_6:
     enabled: true
     maxlevel: 1
@@ -979,9 +979,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_6
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_7:
     enabled: true
     maxlevel: 1
@@ -994,9 +994,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_7
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_8:
     enabled: true
     maxlevel: 1
@@ -1009,9 +1009,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_8
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_9:
     enabled: true
     maxlevel: 1
@@ -1023,9 +1023,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_9
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_10:
     enabled: true
     maxlevel: 1
@@ -1037,9 +1037,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_10
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_11:
     enabled: true
     maxlevel: 1
@@ -1051,9 +1051,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_11
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_12:
     enabled: true
     maxlevel: 1
@@ -1065,9 +1065,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_12
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_13:
     enabled: true
     maxlevel: 1
@@ -1079,9 +1079,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_13
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_14:
     enabled: true
     maxlevel: 1
@@ -1093,9 +1093,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_14
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_15:
     enabled: true
     maxlevel: 1
@@ -1107,9 +1107,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_15
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_16:
     enabled: true
     maxlevel: 1
@@ -1121,9 +1121,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_16
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_17:
     enabled: true
     maxlevel: 1
@@ -1135,9 +1135,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_17
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_18:
     enabled: true
     maxlevel: 1
@@ -1149,9 +1149,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_18
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_19:
     enabled: true
     maxlevel: 1
@@ -1163,9 +1163,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_19
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_20:
     enabled: true
     maxlevel: 1
@@ -1177,9 +1177,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_20
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_21:
     enabled: true
     maxlevel: 1
@@ -1191,9 +1191,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_21
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_22:
     enabled: true
     maxlevel: 1
@@ -1205,9 +1205,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_22
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_23:
     enabled: true
     maxlevel: 1
@@ -1219,9 +1219,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_23
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_24:
     enabled: true
     maxlevel: 1
@@ -1233,9 +1233,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_24
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_25:
     enabled: true
     maxlevel: 1
@@ -1247,9 +1247,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_25
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_26:
     enabled: true
     maxlevel: 1
@@ -1261,9 +1261,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_26
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_27:
     enabled: true
     maxlevel: 1
@@ -1275,9 +1275,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_27
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_28:
     enabled: true
     maxlevel: 1
@@ -1290,9 +1290,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_28
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_29:
     enabled: true
     maxlevel: 1
@@ -1303,9 +1303,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_29
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   bait_duration_attribute_30:
     enabled: true
     maxlevel: 1
@@ -1316,9 +1316,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_attribute_30
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration
   # endregion
   # region Treasure Chance Attributes
   treasure_chance_attribute_1:
@@ -1331,9 +1331,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_1
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_2:
     enabled: true
     maxlevel: 1
@@ -1345,9 +1345,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_2
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_3:
     enabled: true
     maxlevel: 1
@@ -1359,9 +1359,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_3
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_4:
     enabled: true
     maxlevel: 1
@@ -1373,9 +1373,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_4
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_5:
     enabled: true
     maxlevel: 1
@@ -1387,9 +1387,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_5
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_6:
     enabled: true
     maxlevel: 1
@@ -1401,9 +1401,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_6
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_7:
     enabled: true
     maxlevel: 1
@@ -1417,9 +1417,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_7
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_8:
     enabled: true
     maxlevel: 1
@@ -1432,9 +1432,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_8
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_9:
     enabled: true
     maxlevel: 1
@@ -1446,9 +1446,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_9
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_10:
     enabled: true
     maxlevel: 1
@@ -1460,9 +1460,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_10
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_11:
     enabled: true
     maxlevel: 1
@@ -1474,9 +1474,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_11
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_12:
     enabled: true
     maxlevel: 1
@@ -1488,9 +1488,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_12
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_13:
     enabled: true
     maxlevel: 1
@@ -1502,9 +1502,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_13
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_14:
     enabled: true
     maxlevel: 1
@@ -1516,9 +1516,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_14
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_15:
     enabled: true
     maxlevel: 1
@@ -1530,9 +1530,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_15
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_16:
     enabled: true
     maxlevel: 1
@@ -1544,9 +1544,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_16
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_17:
     enabled: true
     maxlevel: 1
@@ -1558,9 +1558,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_17
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_18:
     enabled: true
     maxlevel: 1
@@ -1572,9 +1572,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_18
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_19:
     enabled: true
     maxlevel: 1
@@ -1586,9 +1586,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_19
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_20:
     enabled: true
     maxlevel: 1
@@ -1600,9 +1600,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_20
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_21:
     enabled: true
     maxlevel: 1
@@ -1614,9 +1614,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_21
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_22:
     enabled: true
     maxlevel: 1
@@ -1628,9 +1628,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_22
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_23:
     enabled: true
     maxlevel: 1
@@ -1642,9 +1642,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_23
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_24:
     enabled: true
     maxlevel: 1
@@ -1656,9 +1656,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_24
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_25:
     enabled: true
     maxlevel: 1
@@ -1670,9 +1670,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_25
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_26:
     enabled: true
     maxlevel: 1
@@ -1684,9 +1684,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_26
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_27:
     enabled: true
     maxlevel: 1
@@ -1697,9 +1697,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_27
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_28:
     enabled: true
     maxlevel: 1
@@ -1711,9 +1711,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_28
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_29:
     enabled: true
     maxlevel: 1
@@ -1725,9 +1725,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_29
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_30:
     enabled: true
     maxlevel: 1
@@ -1739,9 +1739,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_30
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_31:
     enabled: true
     maxlevel: 1
@@ -1753,9 +1753,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_31
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_32:
     enabled: true
     maxlevel: 1
@@ -1767,9 +1767,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_32
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_33:
     enabled: true
     maxlevel: 1
@@ -1782,9 +1782,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_33
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_34:
     enabled: true
     maxlevel: 1
@@ -1795,9 +1795,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_34
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_35:
     enabled: true
     maxlevel: 1
@@ -1808,9 +1808,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_35
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_36:
     enabled: true
     maxlevel: 1
@@ -1821,9 +1821,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_36
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_37:
     enabled: true
     maxlevel: 1
@@ -1834,9 +1834,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_37
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_38:
     enabled: true
     maxlevel: 1
@@ -1847,9 +1847,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_38
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_39:
     enabled: true
     maxlevel: 1
@@ -1860,9 +1860,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_39
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   treasure_chance_attribute_40:
     enabled: true
     maxlevel: 1
@@ -1873,9 +1873,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_40
+      base: 0.005
+      per_level: 0.005
+    displayName: Treasure Chance
   # endregion
   # region Double Treasure Chance Attributes
   double_treasure_chance_attribute_1:
@@ -1889,9 +1889,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_1
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_2:
     enabled: true
     maxlevel: 1
@@ -1903,9 +1903,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_2
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_3:
     enabled: true
     maxlevel: 1
@@ -1917,9 +1917,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_3
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_4:
     enabled: true
     maxlevel: 1
@@ -1931,9 +1931,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_4
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_5:
     enabled: true
     maxlevel: 1
@@ -1945,9 +1945,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_5
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_6:
     enabled: true
     maxlevel: 1
@@ -1959,9 +1959,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_6
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_7:
     enabled: true
     maxlevel: 1
@@ -1973,9 +1973,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_7
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_8:
     enabled: true
     maxlevel: 1
@@ -1987,9 +1987,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_8
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_9:
     enabled: true
     maxlevel: 1
@@ -2001,9 +2001,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_9
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_10:
     enabled: true
     maxlevel: 1
@@ -2015,9 +2015,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_10
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_11:
     enabled: true
     maxlevel: 1
@@ -2030,9 +2030,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_11
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_12:
     enabled: true
     maxlevel: 1
@@ -2044,9 +2044,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_12
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   double_treasure_chance_attribute_13:
     enabled: true
     maxlevel: 1
@@ -2058,9 +2058,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_double_treasure_chance
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_13
+      base: 0.001
+      per_level: 0.001
+    displayName: Double Treasure Chance
   
   treasure_chance_double_treasure_chance_attribute_1:
     enabled: true
@@ -2074,12 +2074,12 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 2.0
-      per_level: 2.0
+      base: 0.02
+      per_level: 0.02
     - attribute: fishing_double_treasure_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_1
+      base: 0.02
+      per_level: 0.02
+    displayName: Mega Treasure Chance
   treasure_chance_double_treasure_chance_attribute_2:
     enabled: true
     maxlevel: 1
@@ -2092,12 +2092,12 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 2.0
-      per_level: 2.0
+      base: 0.02
+      per_level: 0.02
     - attribute: fishing_double_treasure_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_2
+      base: 0.02
+      per_level: 0.02
+    displayName: Mega Treasure Chance
   treasure_chance_double_treasure_chance_attribute_3:
     enabled: true
     maxlevel: 1
@@ -2110,12 +2110,12 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 2.0
-      per_level: 2.0
+      base: 0.02
+      per_level: 0.02
     - attribute: fishing_double_treasure_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_3
+      base: 0.02
+      per_level: 0.02
+    displayName: Mega Treasure Chance
   treasure_chance_double_treasure_chance_attribute_4:
     enabled: true
     maxlevel: 1
@@ -2128,12 +2128,12 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_treasure_chance
-      base: 2.0
-      per_level: 2.0
+      base: 0.02
+      per_level: 0.02
     - attribute: fishing_double_treasure_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_4
+      base: 0.02
+      per_level: 0.02
+    displayName: Mega Treasure Chance
   # endregion
 
     # region Bait Duration Consume Attributes
@@ -2148,12 +2148,12 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_duration
-      base: 5.0
-      per_level: 5.0
+      base: 0.05
+      per_level: 0.05
     - attribute: bait_non_consumption_chance
-      base: 5.0
-      per_level: 5.0
-    displayName: bait_duration_consume_attribute_1
+      base: 0.05
+      per_level: 0.05
+    displayName: Bait Duration and Consume chance
   # endregion
   # region Bait Consume Attributes
   bait_consume_attribute_1:
@@ -2168,9 +2168,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_1
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_2:
     enabled: true
     maxlevel: 1
@@ -2182,9 +2182,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_2
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_3:
     enabled: true
     maxlevel: 1
@@ -2196,9 +2196,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_3
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_4:
     enabled: true
     maxlevel: 1
@@ -2211,9 +2211,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_4
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_5:
     enabled: true
     maxlevel: 1
@@ -2226,9 +2226,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_5
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_6:
     enabled: true
     maxlevel: 1
@@ -2240,9 +2240,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_6
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_7:
     enabled: true
     maxlevel: 1
@@ -2254,9 +2254,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_7
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_8:
     enabled: true
     maxlevel: 1
@@ -2267,9 +2267,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_8
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_9:
     enabled: true
     maxlevel: 1
@@ -2280,9 +2280,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_9
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_10:
     enabled: true
     maxlevel: 1
@@ -2293,9 +2293,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_10
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   bait_consume_attribute_11:
     enabled: true
     maxlevel: 1
@@ -2306,9 +2306,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: bait_non_consumption_chance
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_11
+      base: 0.02
+      per_level: 0.02
+    displayName: Reduced Bait Consumption
   # endregion
   # region Fishing Durability Reduction Attributes
   durability_reduction_attribute_1:
@@ -2322,9 +2322,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_1
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_2:
     enabled: true
     maxlevel: 1
@@ -2336,9 +2336,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_2
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_3:
     enabled: true
     maxlevel: 1
@@ -2351,9 +2351,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_3
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_4:
     enabled: true
     maxlevel: 1
@@ -2367,9 +2367,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_4
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_5:
     enabled: true
     maxlevel: 1
@@ -2383,9 +2383,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_5
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_6:
     enabled: true
     maxlevel: 1
@@ -2399,9 +2399,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_6
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_7:
     enabled: true
     maxlevel: 1
@@ -2414,9 +2414,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_7
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_8:
     enabled: true
     maxlevel: 1
@@ -2428,9 +2428,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_8
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_9:
     enabled: true
     maxlevel: 1
@@ -2442,9 +2442,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_9
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_10:
     enabled: true
     maxlevel: 1
@@ -2456,9 +2456,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_10
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_11:
     enabled: true
     maxlevel: 1
@@ -2469,9 +2469,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_11
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_12:
     enabled: true
     maxlevel: 1
@@ -2482,9 +2482,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_12
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_13:
     enabled: true
     maxlevel: 1
@@ -2495,9 +2495,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_13
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_14:
     enabled: true
     maxlevel: 1
@@ -2508,9 +2508,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_14
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_15:
     enabled: true
     maxlevel: 1
@@ -2521,9 +2521,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_15
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_16:
     enabled: true
     maxlevel: 1
@@ -2534,9 +2534,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_16
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_17:
     enabled: true
     maxlevel: 1
@@ -2547,9 +2547,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_17
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_18:
     enabled: true
     maxlevel: 1
@@ -2560,9 +2560,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_18
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_19:
     enabled: true
     maxlevel: 1
@@ -2573,9 +2573,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_19
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_20:
     enabled: true
     maxlevel: 1
@@ -2586,9 +2586,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_20
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_21:
     enabled: true
     maxlevel: 1
@@ -2599,9 +2599,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_21
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_22:
     enabled: true
     maxlevel: 1
@@ -2612,9 +2612,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_22
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_23:
     enabled: true
     maxlevel: 1
@@ -2625,9 +2625,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_23
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_24:
     enabled: true
     maxlevel: 1
@@ -2638,9 +2638,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_24
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_25:
     enabled: true
     maxlevel: 1
@@ -2651,9 +2651,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_25
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_26:
     enabled: true
     maxlevel: 1
@@ -2664,9 +2664,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_26
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_27:
     enabled: true
     maxlevel: 1
@@ -2677,9 +2677,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_27
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_28:
     enabled: true
     maxlevel: 1
@@ -2690,9 +2690,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_28
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_29:
     enabled: true
     maxlevel: 1
@@ -2703,9 +2703,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_29
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   durability_reduction_attribute_30:
     enabled: true
     maxlevel: 1
@@ -2716,9 +2716,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_durability_reduction
-      base: 5.0
-      per_level: 5.0
-    displayName: durability_reduction_attribute_30
+      base: 0.05
+      per_level: 0.05
+    displayName: Reduced Durability Loss
   # endregion
   # region Nearby Catch Speed Attributes
   nearby_catch_speed_attribute_1:
@@ -2732,9 +2732,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_1
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_2:
     enabled: true
     maxlevel: 1
@@ -2746,9 +2746,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_2
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_3:
     enabled: true
     maxlevel: 1
@@ -2760,9 +2760,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_3
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_4:
     enabled: true
     maxlevel: 1
@@ -2774,9 +2774,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_4
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_5:
     enabled: true
     maxlevel: 1
@@ -2788,9 +2788,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_5
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_6:
     enabled: true
     maxlevel: 1
@@ -2802,9 +2802,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_6
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_7:
     enabled: true
     maxlevel: 1
@@ -2815,9 +2815,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_7
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_8:
     enabled: true
     maxlevel: 1
@@ -2828,9 +2828,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_8
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_9:
     enabled: true
     maxlevel: 1
@@ -2841,9 +2841,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_9
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_10:
     enabled: true
     maxlevel: 1
@@ -2854,9 +2854,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_10
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_11:
     enabled: true
     maxlevel: 1
@@ -2867,9 +2867,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_11
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_12:
     enabled: true
     maxlevel: 1
@@ -2880,9 +2880,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_12
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_13:
     enabled: true
     maxlevel: 1
@@ -2893,9 +2893,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_13
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_14:
     enabled: true
     maxlevel: 1
@@ -2906,9 +2906,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_14
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_15:
     enabled: true
     maxlevel: 1
@@ -2919,9 +2919,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_15
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_16:
     enabled: true
     maxlevel: 1
@@ -2932,9 +2932,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_16
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_17:
     enabled: true
     maxlevel: 1
@@ -2945,9 +2945,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_17
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_18:
     enabled: true
     maxlevel: 1
@@ -2958,9 +2958,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_18
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_19:
     enabled: true
     maxlevel: 1
@@ -2971,9 +2971,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_19
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_20:
     enabled: true
     maxlevel: 1
@@ -2984,9 +2984,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_20
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_21:
     enabled: true
     maxlevel: 1
@@ -2997,9 +2997,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_21
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_22:
     enabled: true
     maxlevel: 1
@@ -3010,9 +3010,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_22
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_23:
     enabled: true
     maxlevel: 1
@@ -3023,9 +3023,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_23
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_24:
     enabled: true
     maxlevel: 1
@@ -3036,9 +3036,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_24
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_25:
     enabled: true
     maxlevel: 1
@@ -3049,9 +3049,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_25
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_26:
     enabled: true
     maxlevel: 1
@@ -3062,9 +3062,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_26
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_27:
     enabled: true
     maxlevel: 1
@@ -3075,9 +3075,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_27
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_28:
     enabled: true
     maxlevel: 1
@@ -3088,9 +3088,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_28
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_29:
     enabled: true
     maxlevel: 1
@@ -3101,9 +3101,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_29
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   nearby_catch_speed_attribute_30:
     enabled: true
     maxlevel: 1
@@ -3114,9 +3114,9 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed_nearby
-      base: 5.0
-      per_level: 5.0
-    displayName: nearby_catch_speed_attribute_30
+      base: 0.015
+      per_level: 0.015
+    displayName: Nearby Player Fishing Speed
   # endregion
   # region Increased Experience Attributes
   increased_experience_attribute_1:
@@ -3134,7 +3134,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_1
+    displayName: Increased Experience
   increased_experience_attribute_2:
     enabled: true
     maxlevel: 1
@@ -3150,7 +3150,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_2
+    displayName: Increased Experience
   increased_experience_attribute_3:
     enabled: true
     maxlevel: 1
@@ -3165,7 +3165,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_3
+    displayName: Increased Experience
   increased_experience_attribute_4:
     enabled: true
     maxlevel: 1
@@ -3180,7 +3180,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_4
+    displayName: Increased Experience
   increased_experience_attribute_5:
     enabled: true
     maxlevel: 1
@@ -3196,7 +3196,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_5
+    displayName: Increased Experience
   increased_experience_attribute_6:
     enabled: true
     maxlevel: 1
@@ -3211,7 +3211,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_6
+    displayName: Increased Experience
   increased_experience_attribute_7:
     enabled: true
     maxlevel: 1
@@ -3226,7 +3226,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_7
+    displayName: Increased Experience
   increased_experience_attribute_8:
     enabled: true
     maxlevel: 1
@@ -3242,7 +3242,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_8
+    displayName: Increased Experience
   increased_experience_attribute_9:
     enabled: true
     maxlevel: 1
@@ -3257,7 +3257,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_9
+    displayName: Increased Experience
   increased_experience_attribute_10:
     enabled: true
     maxlevel: 1
@@ -3272,7 +3272,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_10
+    displayName: Increased Experience
   increased_experience_attribute_11:
     enabled: true
     maxlevel: 1
@@ -3285,7 +3285,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_11
+    displayName: Increased Experience
   increased_experience_attribute_12:
     enabled: true
     maxlevel: 1
@@ -3300,7 +3300,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_12
+    displayName: Increased Experience
   increased_experience_attribute_13:
     enabled: true
     maxlevel: 1
@@ -3315,7 +3315,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_13
+    displayName: Increased Experience
   increased_experience_attribute_14:
     enabled: true
     maxlevel: 1
@@ -3331,7 +3331,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_14
+    displayName: Increased Experience
   increased_experience_attribute_15:
     enabled: true
     maxlevel: 1
@@ -3346,7 +3346,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_15
+    displayName: Increased Experience
   increased_experience_attribute_16:
     enabled: true
     maxlevel: 1
@@ -3361,7 +3361,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_16
+    displayName: Increased Experience
   increased_experience_attribute_17:
     enabled: true
     maxlevel: 1
@@ -3376,7 +3376,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_17
+    displayName: Increased Experience
   increased_experience_attribute_18:
     enabled: true
     maxlevel: 1
@@ -3391,7 +3391,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_18
+    displayName: Increased Experience
   increased_experience_attribute_19:
     enabled: true
     maxlevel: 1
@@ -3407,7 +3407,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_19
+    displayName: Increased Experience
   increased_experience_attribute_20:
     enabled: true
     maxlevel: 1
@@ -3422,7 +3422,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_20
+    displayName: Increased Experience
   increased_experience_attribute_20_1:
     enabled: true
     maxlevel: 1
@@ -3438,7 +3438,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_20_1
+    displayName: Increased Experience_1
   increased_experience_attribute_21:
     enabled: true
     maxlevel: 1
@@ -3454,7 +3454,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_21
+    displayName: Increased Experience
   increased_experience_attribute_22:
     enabled: true
     maxlevel: 1
@@ -3470,7 +3470,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_22
+    displayName: Increased Experience
   increased_experience_attribute_23:
     enabled: true
     maxlevel: 1
@@ -3485,7 +3485,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_23
+    displayName: Increased Experience
   increased_experience_attribute_24:
     enabled: true
     maxlevel: 1
@@ -3501,7 +3501,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_24
+    displayName: Increased Experience
   increased_experience_attribute_25:
     enabled: true
     maxlevel: 1
@@ -3516,7 +3516,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_25
+    displayName: Increased Experience
   increased_experience_attribute_26:
     enabled: true
     maxlevel: 1
@@ -3531,7 +3531,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_26
+    displayName: Increased Experience
   increased_experience_attribute_27:
     enabled: true
     maxlevel: 1
@@ -3547,7 +3547,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_27
+    displayName: Increased Experience
   increased_experience_attribute_28:
     enabled: true
     maxlevel: 1
@@ -3562,7 +3562,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_28
+    displayName: Increased Experience
   increased_experience_attribute_29:
     enabled: true
     maxlevel: 1
@@ -3577,7 +3577,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_29
+    displayName: Increased Experience
   increased_experience_attribute_30:
     enabled: true
     maxlevel: 1
@@ -3593,7 +3593,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_30
+    displayName: Increased Experience
   increased_experience_attribute_31:
     enabled: true
     maxlevel: 1
@@ -3608,7 +3608,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_31
+    displayName: Increased Experience
   increased_experience_attribute_32:
     enabled: true
     maxlevel: 1
@@ -3623,7 +3623,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_32
+    displayName: Increased Experience
   increased_experience_attribute_33:
     enabled: true
     maxlevel: 1
@@ -3639,7 +3639,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_33
+    displayName: Increased Experience
   increased_experience_attribute_34:
     enabled: true
     maxlevel: 1
@@ -3654,7 +3654,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_34
+    displayName: Increased Experience
   increased_experience_attribute_35:
     enabled: true
     maxlevel: 1
@@ -3667,7 +3667,7 @@ nodes:
     - attribute: fishing_increased_experience
       base: 0.02
       per_level: 0.02
-    displayName: increased_experience_attribute_35
+    displayName: Increased Experience
   
   # endregion
   mega_attribute_1:
@@ -3681,21 +3681,21 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: fishing_increased_experience
-      base: 2.0
-      per_level: 0.0
+      base: 0.01
+      per_level: 0.01
     - attribute: catch_weight
-      base: 1.0
-      per_level: 1.0
+      base: 0.01
+      per_level: 0.01
     - attribute: catch_speed
-      base: 0.5
-      per_level: 0.5
+      base: 0.025
+      per_level: 0.025
     - attribute: fishing_treasure_chance
-      base: 0.25
-      per_level: 0.25
+      base: 0.025
+      per_level: 0.025
     - attribute: fishing_durability_reduction
-      base: 3.0
-      per_level: 3.0
+      base: 0.015
+      per_level: 0.015
     - attribute: bait_duration
-      base: 2.5
-      per_level: 2.5
+      base: 0.020
+      per_level: 0.020
     displayName: mega_attribute_1
