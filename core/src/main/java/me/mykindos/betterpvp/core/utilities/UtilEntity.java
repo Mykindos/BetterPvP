@@ -25,6 +25,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -338,12 +339,19 @@ public class UtilEntity {
     }
 
     /**
+     *
+     */
+    public static double health(LivingEntity ent, double mod) {
+        return health(ent, mod, EntityRegainHealthEvent.RegainReason.CUSTOM);
+    }
+
+    /**
      * Returns the amount of healing actually done
      * @param ent
      * @param mod
      * @return
      */
-    public static double health(LivingEntity ent, double mod) {
+    public static double health(LivingEntity ent, double mod, EntityRegainHealthEvent.RegainReason reason) {
         if (ent.isDead()) {
             return 0;
         }
@@ -352,14 +360,14 @@ public class UtilEntity {
         double healing = mod;
         if (health < 0.0D) {
             healing = 0 - entityHealth;
-            health = 0.0D;
-
+            ent.setHealth(0);
+            return healing;
         }
         if (health > UtilPlayer.getMaxHealth(ent)) {
             healing = UtilPlayer.getMaxHealth(ent) - entityHealth;
-            health = UtilPlayer.getMaxHealth(ent);
         }
-        ent.setHealth(health);
+        //living entity guards against overheal and calculates max health the same way we do
+        ent.heal(healing);
         return healing;
     }
 
