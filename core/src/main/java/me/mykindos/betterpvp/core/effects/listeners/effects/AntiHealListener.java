@@ -13,11 +13,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+
+import java.util.Set;
+
+import static org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.CUSTOM;
+import static org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.MAGIC;
+import static org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.MAGIC_REGEN;
+import static org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.REGEN;
+import static org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason.SATIATED;
 
 @BPvPListener
 @Singleton
 public class AntiHealListener implements Listener {
+
+    private static final Set<EntityRegainHealthEvent.RegainReason> healReasons = Set.of(
+            SATIATED,
+            MAGIC,
+            MAGIC_REGEN,
+            CUSTOM,
+            REGEN
+    );
 
     private final EffectManager effectManager;
 
@@ -30,9 +45,7 @@ public class AntiHealListener implements Listener {
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
         if (!(event.getEntity() instanceof LivingEntity ent)) return;
         effectManager.getEffect(ent, EffectTypes.ANTI_HEAL).ifPresent(effect -> {
-            if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED
-                    || event.getRegainReason() == EntityRegainHealthEvent.RegainReason.REGEN
-                    || event.getRegainReason() == EntityRegainHealthEvent.RegainReason.MAGIC_REGEN) {
+            if (healReasons.contains(event.getRegainReason())) {
                 if ((event.getEntity() instanceof Player player)) {
                     player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.5f, 2.0f);
                 }
@@ -48,10 +61,5 @@ public class AntiHealListener implements Listener {
             event.getTarget().getWorld().playSound(event.getTarget().getLocation(), Sound.BLOCK_GLASS_BREAK, 2.0f, 2.0f );
             UtilMessage.message(event.getTarget(), "Anti Heal", "You can no longer regenerate health!");
         }
-    }
-
-    @EventHandler
-    public void removeEffectOnDeath(PlayerDeathEvent event) {
-        effectManager.removeEffect(event.getEntity(), EffectTypes.REGENERATION);
     }
 }
