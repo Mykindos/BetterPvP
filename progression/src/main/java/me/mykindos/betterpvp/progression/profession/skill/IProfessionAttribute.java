@@ -13,7 +13,7 @@ public interface IProfessionAttribute {
     }
 
     default double getDisplayValue(double value) {
-        return value;
+        return value * 100;
     }
 
     static double computeValue(Player player, String profession, IProfessionAttribute attribute, ProfessionProfileManager profileManager) {
