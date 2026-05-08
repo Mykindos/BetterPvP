@@ -166,7 +166,7 @@ public class LootTableDeserializer implements JsonDeserializer<LootTable> {
                         final String mythicMobName = awardStrategyObj.get("mythicMobName").getAsString();
                         final long dropDelay = awardStrategyObj.get("dropDelay").getAsLong();
                         final long dropInterval = awardStrategyObj.get("dropInterval").getAsLong();
-                        final SoundEffect dropSound = parseSoundEffect(awardStrategyObj.get("dropSound").getAsJsonObject());
+                        final SoundEffect dropSound = parseSoundEffect(awardStrategyObj.get("soundEffect").getAsJsonObject());
                         yield new LootChest(mythicMobName, dropSound, dropDelay, dropInterval);
                     }
                     default: {
