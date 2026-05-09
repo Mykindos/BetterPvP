@@ -17,7 +17,6 @@ public interface IProfessionAttribute {
     }
 
     static double computeValue(Player player, String profession, IProfessionAttribute attribute, ProfessionProfileManager profileManager) {
-        System.out.println(System.identityHashCode(profileManager));
         return profileManager.getObject(player.getUniqueId().toString())
                 .map(profile -> profile.getProfessionDataMap().get(profession))
                 .map(data -> data.getBuild().getNodes().entrySet().stream()
