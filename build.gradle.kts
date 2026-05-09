@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val outputBuckets = mapOf(
     "clans" to setOf(
@@ -133,9 +134,9 @@ subprojects {
         options.compilerArgs.add("-Xlint:deprecation")
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            freeCompilerArgs += "-Xlint:deprecation"
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.add("-Xlint:deprecation")
         }
     }
 
