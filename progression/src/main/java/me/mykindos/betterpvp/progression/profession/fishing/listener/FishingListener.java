@@ -18,7 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
-import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureDropEvent;
+import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureChanceCalculationEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStopFishingEvent;
@@ -286,8 +286,6 @@ public class FishingListener implements Listener {
 
         }
 
-        fishingHandler.attemptTreasureDrop(player, hook.getLocation());
-
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
         UtilServer.callEvent(new PlayerStopFishingEvent(player, bundle, PlayerStopFishingEvent.FishingResult.CATCH));
     }
@@ -331,7 +329,7 @@ public class FishingListener implements Listener {
     }
 
     @EventHandler
-    public void onTreasureDrop(FishingTreasureDropEvent event) {
+    public void onTreasureDrop(FishingTreasureChanceCalculationEvent event) {
         if (!fishingHandler.isEnabled()) return;
         for (Bait activeBait : activeBaits.values()) {
             if (!activeBait.getType().equalsIgnoreCase("Lucky")) continue;
