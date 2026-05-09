@@ -281,8 +281,6 @@ public class FishingListener implements Listener {
 
         }
 
-        fishingHandler.attemptTreasureDrop(player, hook.getLocation());
-
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
         UtilServer.callEvent(new PlayerStopFishingEvent(player, bundle, PlayerStopFishingEvent.FishingResult.CATCH));
     }

@@ -3,12 +3,10 @@ package me.mykindos.betterpvp.progression.profession.fishing;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.LootTable;
@@ -16,9 +14,6 @@ import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
@@ -29,19 +24,11 @@ import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.Fishing
 import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.FishingWeightLeaderboard;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
-import me.mykindos.betterpvp.progression.profession.skill.fishing.attributes.fishingdoubletreasurechance.FishingDoubleTreasureChanceAttribute;
-import me.mykindos.betterpvp.progression.profession.skill.fishing.attributes.fishingtreasurechance.FishingTreasureChanceAttribute;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 @Singleton
 @CustomLog
@@ -55,35 +42,27 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
     private final FishingRepository fishingRepository;
     private final LeaderboardManager leaderboardManager;
     private final ItemFactory itemFactory;
-    private final FishingTreasureChanceAttribute treasureChanceAttribute;
-    private final FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute;
     private final LootTableRegistry lootTableRegistry;
     private final LootSessionController sessionController;
 
     private LootTable lootTable;
-    private LootTable treasureLootTable;
 
     @Inject
     protected FishingHandler(Progression progression, ItemFactory itemFactory, ClientManager clientManager,
                              ProfessionProfileManager professionProfileManager, Provider<ProfessionNodeManager> nodeManager,
                              FishingRepository fishingRepository, LeaderboardManager leaderboardManager,
-                             LootTableRegistry lootTableRegistry, LootSessionController sessionController,
-                             FishingTreasureChanceAttribute treasureChanceAttribute,
-                             FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute) {
+                             LootTableRegistry lootTableRegistry, LootSessionController sessionController) {
         super(progression, clientManager, professionProfileManager, nodeManager, "Fishing");
         this.fishingRepository = fishingRepository;
         this.leaderboardManager = leaderboardManager;
         this.itemFactory = itemFactory;
         this.lootTableRegistry = lootTableRegistry;
         this.sessionController = sessionController;
-        this.treasureChanceAttribute = treasureChanceAttribute;
-        this.doubleTreasureChanceAttribute = doubleTreasureChanceAttribute;
     }
 
     @Override
     public void reload() {
         this.lootTable = lootTableRegistry.loadLootTable("fishing");
-        this.treasureLootTable = lootTableRegistry.loadLootTable("fishing_treasure_chance");
     }
 
     public void addFish(Player player, Fish fish) {
@@ -145,66 +124,6 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
         final LootSession session = sessionController.resolve(player, lootTable, () -> LootSession.newSession(lootTable, player));
         final LootContext context = new LootContext(session, location, "Fishing");
         return this.lootTable.generateLoot(context);
-    }
-
-    public void attemptTreasureDrop(Player player, Location location) {
-        double treasureChance = treasureChanceAttribute.getChance(player);
-        if (treasureChance <= 0 || UtilMath.randDouble(0, 100) >= treasureChance) {
-            return;
-        }
-
-        LootBundle firstBundle = getRandomTreasureLoot(player, location);
-        for (Loot<?, ?> loot : firstBundle) {
-            awardTreasure(player, location, loot, firstBundle.getContext(), false);
-        }
-
-        // Roll a second bundle independently rather than doubling amounts on the first.
-        if (UtilMath.randDouble(0, 100) < doubleTreasureChanceAttribute.getChance(player)) {
-            LootBundle secondBundle = getRandomTreasureLoot(player, location);
-            for (Loot<?, ?> loot : secondBundle) {
-                awardTreasure(player, location, loot, secondBundle.getContext(), true);
-            }
-        }
-    }
-
-    private @NotNull LootBundle getRandomTreasureLoot(Player player, Location location) {
-        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
-        final LootContext context = new LootContext(session, location, "Fishing");
-        return this.treasureLootTable.generateLoot(context);
-    }
-
-    private void awardTreasure(Player player, Location location, Loot<?, ?> loot, LootContext context, boolean doubled) {
-        final Object award = loot.award(context);
-        if (award instanceof Item item) {
-            sendTreasureMessage(player, location, item.getItemStack(), doubled);
-        } else if (award instanceof ItemStack itemStack) {
-            sendTreasureMessage(player, location, itemStack, doubled);
-        }
-    }
-
-    private void sendTreasureMessage(Player player, Location location, ItemStack itemStack, boolean doubled) {
-        final Component name;
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
-            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
-        } else {
-            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
-                    Component.translatable(itemStack.getType().translationKey()));
-        }
-
-        TextComponent message = Component.text("You found ")
-                .append(Component.text(UtilFormat.formatNumber(itemStack.getAmount())))
-                .append(Component.text(" "))
-                .append(name);
-
-        if (doubled) {
-            message = message.append(Component.text(" (doubled!)"));
-        }
-
-        UtilMessage.message(player, getName(), message);
-
-        log.info("{} found {}x {} from fishing treasure{}", player.getName(), itemStack.getAmount(),
-                        itemStack.getType().name().toLowerCase(), doubled ? " (doubled)" : "")
-                .addClientContext(player).addLocationContext(location).submit();
     }
 
     @Override
