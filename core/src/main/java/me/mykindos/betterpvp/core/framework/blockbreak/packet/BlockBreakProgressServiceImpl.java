@@ -16,15 +16,16 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.papermc.paper.event.block.BlockBreakProgressUpdateEvent;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.block.SmartBlockBreakOverride;
+import me.mykindos.betterpvp.core.block.SmartBlockFactory;
+import me.mykindos.betterpvp.core.block.SmartBlockInstance;
+import me.mykindos.betterpvp.core.block.SmartBlockOverrides;
 import me.mykindos.betterpvp.core.framework.blockbreak.ToolMiningSpeed;
 import me.mykindos.betterpvp.core.framework.blockbreak.resolver.BlockBreakResolver;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakProperties;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.BaseFireBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -37,7 +38,6 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -100,14 +101,16 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
     private static final long INTER_BREAK_COOLDOWN_MS = 300L;
 
     private final BlockBreakResolver resolver;
+    private final SmartBlockFactory smartBlockFactory;
     /** One active session per player; new dig replaces previous. */
     private final ConcurrentHashMap<UUID, BreakSession> sessions = new ConcurrentHashMap<>();
     /** Wall-clock millis at which the player's next non-instant break may begin accumulating progress. */
     private final ConcurrentHashMap<UUID, Long> nextAllowedProgressMillis = new ConcurrentHashMap<>();
 
     @Inject
-    public BlockBreakProgressServiceImpl(BlockBreakResolver resolver) {
+    public BlockBreakProgressServiceImpl(BlockBreakResolver resolver, SmartBlockFactory smartBlockFactory) {
         this.resolver = resolver;
+        this.smartBlockFactory = smartBlockFactory;
         PacketEvents.getAPI().getEventManager().registerListener(new DigListener(), PacketListenerPriority.HIGH);
     }
 
@@ -204,18 +207,30 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         final Vector3i pos = session.getBlockPos();
         final Block block = world.getBlockAt(pos.getX(), pos.getY(), pos.getZ());
-        if (block.getType().isAir()) {
+
+        final ItemStack held = player.getInventory().getItemInMainHand();
+
+        // Resolve the merged SmartBlock override (own-fields ∘ Nexo Breakable defaults) once
+        // per tick. We use it for two things: hardness (the tick-loop owns this) and the
+        // empty-air guard. Speed multipliers ride through the resolver path below.
+        // Nexo blocks often appear as AIR or BARRIER, so we must not rely on getType().
+        final SmartBlockBreakOverride smartOverride =
+                SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
+        final OptionalDouble smartHardness = smartOverride.hardness();
+
+        if (smartHardness.isEmpty() && block.getType().isAir()) {
             return;
         }
 
-        final ItemStack held = player.getInventory().getItemInMainHand();
         final BlockBreakProperties props = resolver.resolve(player, block, held);
         if (!props.isBreakable()) {
             cancelSessionFor(session.getPlayerId());
             return;
         }
 
-        final float hardness = block.getType().getHardness();
+        final float hardness = smartHardness.isPresent()
+                ? (float) smartHardness.getAsDouble()
+                : block.getType().getHardness();
         if (hardness < 0f) {
             cancelSessionFor(session.getPlayerId());
             return;
@@ -251,6 +266,12 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
 
         session.setProgress(session.getProgress() + progressPerTick);
+
+        // Provider-specific break-progress HUD (action bar overlay for Nexo/Oraxen blocks;
+        // no-op for vanilla, which already shows the destruction-stage overlay).
+        if (smartBlockFactory.isSmartBlock(block)) {
+            smartBlockFactory.displayBreakProgress(player, block, Math.min(1.0, session.getProgress()));
+        }
 
         if (session.getProgress() >= 1.0) {
             completeBreak(player, block, session, instant);
@@ -288,16 +309,18 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
      * client-side break attempts.
      */
     private void completeBreak(Player player, Block block, BreakSession session, boolean instant) {
+        final boolean targetSmartBlock = smartBlockFactory.isTargetSmartBlock(player);
+
         // Idempotency guard: tick() and the runTask-scheduled dispatchBlockDamage can both
         // try to complete the same instant break on the same tick. Whoever runs first
         // stamps the tick; the second call bails. Tick-stamp instead of an AIR check so
         // a same-tick replacement (e.g. Vein Echo restoring the block) isn't misread as
         // a fresh breakable block.
-        if (block.getType().isAir()) {
+        if (block.getType().isAir() && !targetSmartBlock) {
             return;
         }
 
-        final boolean broke = breakBlock(player, block);
+        final boolean broke = breakBlock(player, block, targetSmartBlock);
 
         session.setProgress(0.0);
         session.setLastStageSent(-1);
@@ -323,20 +346,13 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
     }
 
-    private boolean breakBlock(Player player, Block block) {
-        final BlockState state = ((CraftBlock) block).getNMS();
-        final boolean success = player.breakBlock(block);
-        if (success) {
-            // copied from NMS
-            final LevelAccessor world = ((CraftBlock) block).getHandle();
-            final BlockPos position = ((CraftBlock) block).getPosition();
-            if (state.getBlock() instanceof BaseFireBlock) {
-                world.levelEvent(1009, position, 0);
-            } else {
-                world.levelEvent(2001, position, net.minecraft.world.level.block.Block.getId(state));
-            }
+    private boolean breakBlock(Player player, Block block, boolean smartBlock) {
+        if (smartBlock) {
+            final SmartBlockInstance smartBlockInstance = smartBlockFactory.from(block).orElseThrow();
+            return smartBlockFactory.breakBlock(player, smartBlockInstance);
+        } else {
+            return UtilBlock.breakBlock(player, block);
         }
-        return success;
     }
 
     /**
@@ -614,7 +630,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
             return;
         }
 
-        if (!breakBlock(player, block)) {
+        if (!breakBlock(player, block, smartBlockFactory.isTargetSmartBlock(player))) {
             sendBlockState(player, block);
             return;
         }

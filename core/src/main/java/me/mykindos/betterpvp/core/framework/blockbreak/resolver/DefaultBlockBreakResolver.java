@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.framework.blockbreak.resolver;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.block.SmartBlockBreakOverride;
+import me.mykindos.betterpvp.core.block.SmartBlockFactory;
+import me.mykindos.betterpvp.core.block.SmartBlockOverrides;
 import me.mykindos.betterpvp.core.framework.blockbreak.ToolMiningSpeed;
 import me.mykindos.betterpvp.core.framework.blockbreak.component.ToolComponent;
 import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRules;
@@ -23,15 +26,21 @@ public class DefaultBlockBreakResolver implements BlockBreakResolver {
 
     private final ItemFactory itemFactory;
     private final GlobalBlockBreakRules globalRules;
+    private final SmartBlockFactory smartBlockFactory;
 
     @Inject
-    public DefaultBlockBreakResolver(ItemFactory itemFactory, GlobalBlockBreakRules globalRules) {
+    public DefaultBlockBreakResolver(ItemFactory itemFactory, GlobalBlockBreakRules globalRules,
+                                     SmartBlockFactory smartBlockFactory) {
         this.itemFactory = itemFactory;
         this.globalRules = globalRules;
+        this.smartBlockFactory = smartBlockFactory;
     }
 
     @Override
     public @NotNull BlockBreakProperties resolve(@NotNull Player player, @NotNull Block block, @Nullable ItemStack held) {
+        final SmartBlockBreakOverride smartOverride = SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
+        if (smartOverride.unbreakable()) return BlockBreakProperties.unbreakable();
+
         final BlockBreakProperties tool = resolveFromTool(held, block).orElse(null);
         final List<BlockBreakRule> globals = globalRules.resolveAll(player, block);
 
@@ -58,6 +67,22 @@ public class DefaultBlockBreakResolver implements BlockBreakResolver {
                     // First in this pass wins because the list is pre-sorted by priority desc.
                     if (winningOverride == null) winningOverride = rule;
                 }
+            }
+        }
+
+        // Fold SmartBlock multipliers into the same product. speedMultiplier always applies;
+        // toolSpeedMultiplier applies only when the requiredTool predicate matches the held
+        // item — or unconditionally when the predicate is absent (Nexo's defaults arrive
+        // pre-resolved, so they take this path).
+        if (smartOverride.speedMultiplier().isPresent()) {
+            multiplierProduct *= smartOverride.speedMultiplier().getAsDouble();
+        }
+        if (smartOverride.toolSpeedMultiplier().isPresent()) {
+            final boolean toolMatches = smartOverride.requiredTool()
+                    .map(p -> held != null && p.test(held))
+                    .orElse(true);
+            if (toolMatches) {
+                multiplierProduct *= smartOverride.toolSpeedMultiplier().getAsDouble();
             }
         }
 

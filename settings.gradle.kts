@@ -133,7 +133,7 @@ dependencyResolutionManagement {
             library("mythic", "io.lumine", "Mythic-Dist").version("5.9.5")
 
             // Library - Nexo
-            library("nexo", "com.nexomc", "nexo").version("1.7.1")
+            library("nexo", "com.nexomc", "nexo").version("1.23")
 
             // Library - Oraxen
             library("oraxen", "io.th0rgal", "oraxen").version("1.200.0")

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.block;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,6 +16,29 @@ public abstract class SmartBlock {
     protected SmartBlock(@NotNull String id, @NotNull String name) {
         this.id = id;
         this.name = name;
+    }
+
+    /**
+     * Composite of break-related overrides for this block, evaluated for a specific
+     * interaction (player + held item + instance state). Default implementation returns
+     * {@link SmartBlockBreakOverride#empty()} — every field absent.
+     *
+     * <p>Resolution order in {@code DefaultBlockBreakResolver}:
+     * <ol>
+     *   <li>Fields supplied here win.</li>
+     *   <li>If this {@code SmartBlock} also implements {@code NexoBlock}, fields absent
+     *       here are filled from Nexo's {@code Breakable} (hardness, multipliers).</li>
+     *   <li>Anything still absent falls back to vanilla / global rules.</li>
+     * </ol>
+     *
+     * <p>Subclasses should typically override this method via the builder, e.g.
+     * {@code return SmartBlockBreakOverride.builder().hardness(5.0).build();} — and rely
+     * on the merge with Nexo defaults for everything else.
+     */
+    public @NotNull SmartBlockBreakOverride getBreakOverride(@NotNull SmartBlockInstance instance,
+                                                              @NotNull Player player,
+                                                              @NotNull ItemStack held) {
+        return SmartBlockBreakOverride.empty();
     }
 
     /**
