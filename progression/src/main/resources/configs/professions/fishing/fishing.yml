@@ -484,8 +484,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: catch_speed
-      base: 10.0
-      per_level: 10.0
+      base: 0.02
+      per_level: 0.02
     - attribute: catch_weight
       base: 0.05
       per_level: 0.05

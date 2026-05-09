@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.FishHook;
 import org.jetbrains.annotations.NotNull;
@@ -57,8 +58,15 @@ public class SpeedyBaitAbility extends BaitAbility {
             }
 
             @Override
+            public double getMultiplier() {
+                return multiplier;
+            }
+
+            @Override
             protected void onTrack(FishHook hook) {
+                Bukkit.broadcastMessage("Setting wait time to " + (hook.getWaitTime() * multiplier) + " from " + hook.getWaitTime());
                 hook.setWaitTime((int) (hook.getWaitTime() / multiplier));
+
             }
         };
     }

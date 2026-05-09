@@ -19,14 +19,17 @@ import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.fishing.data.CaughtFish;
+import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureDropEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.BiggestFishLeaderboard;
 import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.FishingCountLeaderboard;
 import me.mykindos.betterpvp.progression.profession.fishing.leaderboards.FishingWeightLeaderboard;
+import me.mykindos.betterpvp.progression.profession.fishing.listener.FishingListener;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.fishing.attributes.fishingdoubletreasurechance.FishingDoubleTreasureChanceAttribute;
@@ -35,6 +38,7 @@ import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -59,6 +63,7 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
     private final FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute;
     private final LootTableRegistry lootTableRegistry;
     private final LootSessionController sessionController;
+    private final Provider<FishingListener> fishingListenerProvider;
 
     private LootTable lootTable;
     private LootTable treasureLootTable;
@@ -69,7 +74,8 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
                              FishingRepository fishingRepository, LeaderboardManager leaderboardManager,
                              LootTableRegistry lootTableRegistry, LootSessionController sessionController,
                              FishingTreasureChanceAttribute treasureChanceAttribute,
-                             FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute) {
+                             FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute,
+                             Provider<FishingListener> fishingListenerProvider) {
         super(progression, clientManager, professionProfileManager, nodeManager, "Fishing");
         this.fishingRepository = fishingRepository;
         this.leaderboardManager = leaderboardManager;
@@ -78,6 +84,7 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
         this.sessionController = sessionController;
         this.treasureChanceAttribute = treasureChanceAttribute;
         this.doubleTreasureChanceAttribute = doubleTreasureChanceAttribute;
+        this.fishingListenerProvider = fishingListenerProvider;
     }
 
     @Override
@@ -149,6 +156,11 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
 
     public void attemptTreasureDrop(Player player, Location location) {
         double treasureChance = treasureChanceAttribute.getChance(player);
+
+        FishingTreasureDropEvent event = UtilServer.callEvent(new FishingTreasureDropEvent(player, location, treasureChance));
+        Bukkit.broadcastMessage("Treasure drop chance for " + player.getName() + ": " + treasureChance + " -> " + event.getTreasureChance());
+        treasureChance = event.getTreasureChance();
+
         if (treasureChance <= 0 || UtilMath.randDouble(0, 100) >= treasureChance) {
             return;
         }

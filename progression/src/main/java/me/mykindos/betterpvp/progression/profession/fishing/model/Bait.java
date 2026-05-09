@@ -94,6 +94,7 @@ public abstract class Bait {
 
     public abstract Material getMaterial();
     public abstract double getRadius();
+    public abstract double getMultiplier();
 
     protected abstract void onTrack(FishHook hook);
 

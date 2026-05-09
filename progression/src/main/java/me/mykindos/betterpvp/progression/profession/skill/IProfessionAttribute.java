@@ -28,8 +28,8 @@ public interface IProfessionAttribute {
 
     private static double computeNodeContribution(ProfessionAttributeNode node, int level, IProfessionAttribute attribute) {
         return node.getAttributes().entrySet().stream()
-                .filter(e -> e.getKey().getClass() == attribute.getClass())
-                .mapToDouble(e -> e.getValue().getBaseValue() + Math.max(level - 1, 0) * e.getValue().getPerLevel())
+                .filter(e -> e.getKey().getClass().isInstance(attribute.getClass()))
+                .mapToDouble(e -> e.getValue().getBaseValue() + (Math.max(level - 1, 0) * e.getValue().getPerLevel()))
                 .sum();
     }
 }

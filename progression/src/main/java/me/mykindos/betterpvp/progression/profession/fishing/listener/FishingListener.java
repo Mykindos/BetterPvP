@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
+import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureDropEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStopFishingEvent;
@@ -82,6 +83,10 @@ public class FishingListener implements Listener {
      * Rolled when the hook enters the water and cleared on reel-in or catch.
      */
     private final WeakHashMap<Player, LootBundle> fishLoot = new WeakHashMap<>();
+
+    public ArrayListMultimap<Player, Bait> getActiveBaits() {
+        return activeBaits;
+    }
 
     @Inject
     public FishingListener(Progression progression, FishingHandler fishingHandler, ClientManager clientManager,
@@ -323,6 +328,21 @@ public class FishingListener implements Listener {
         final Location location = event.getPlayer().getEyeLocation();
         event.getBait().spawn(progression, location, velocity);
         activeBaits.put(event.getPlayer(), event.getBait());
+    }
+
+    @EventHandler
+    public void onTreasureDrop(FishingTreasureDropEvent event) {
+        if (!fishingHandler.isEnabled()) return;
+        for (Bait activeBait : activeBaits.values()) {
+            if (!activeBait.getType().equalsIgnoreCase("Lucky")) continue;
+            if (activeBait.getLocation().getWorld().equals(event.getLocation().getWorld())) {
+                if (activeBait.getLocation().distanceSquared(event.getLocation()) <= Math.pow(activeBait.getRadius(), 2)) {
+                    event.setTreasureChance(event.getTreasureChance() + activeBait.getMultiplier());
+                    break;
+                }
+            }
+
+        }
     }
 
     private void splash(Location hookLocation) {

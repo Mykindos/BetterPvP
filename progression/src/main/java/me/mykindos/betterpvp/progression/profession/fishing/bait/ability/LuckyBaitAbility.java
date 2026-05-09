@@ -11,41 +11,40 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 /**
- * Ability for the Event Bait item.
- * Similar to speedy bait but with special particle effects.
+ * Ability for the Lucky Bait item.
+ * Increases the treasure chance for players fishing within the baits radius.
  */
 @Singleton
 @EqualsAndHashCode(callSuper = true)
-public class EventBaitAbility extends BaitAbility {
-    
-    private final Progression plugin;
+public class LuckyBaitAbility extends BaitAbility {
 
+    private final Progression plugin;
     /**
-     * Creates a new event bait ability
+     * Creates a new lucky bait ability
      *
      * @param cooldownManager The cooldown manager
-     * @param plugin The progression plugin
      */
     @Inject
-    public EventBaitAbility(CooldownManager cooldownManager, Progression plugin) {
-        super("event_bait", cooldownManager);
+    public LuckyBaitAbility(CooldownManager cooldownManager, Progression plugin) {
+        super("lucky_bait", cooldownManager);
         this.plugin = plugin;
     }
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Event Bait");
+        return Component.text("Lucky Bait");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Reduces the waiting time for fish to bite. This bait has a bigger radius than usual.");
+        return Component.text("Increases the chance of finding treasure while fishing");
     }
 
     @Override
@@ -53,12 +52,12 @@ public class EventBaitAbility extends BaitAbility {
         return new Bait(getDuration()) {
             @Override
             public String getType() {
-                return "Event";
+                return "Lucky";
             }
 
             @Override
             public Material getMaterial() {
-                return Material.LIGHT_BLUE_GLAZED_TERRACOTTA;
+                return Material.YELLOW_GLAZED_TERRACOTTA;
             }
 
             @Override
@@ -73,7 +72,7 @@ public class EventBaitAbility extends BaitAbility {
 
             @Override
             protected void onTrack(FishHook hook) {
-                hook.setWaitTime((int) (hook.getWaitTime() / multiplier));
+
             }
 
             @Override
@@ -90,7 +89,7 @@ public class EventBaitAbility extends BaitAbility {
                     final Location center = floatingEntity.getLocation();
                     final int colorIncrement = (int)((double) 255 / 15 * rIncrement);
 
-                    final Collection<org.bukkit.entity.Player> receivers = center.getWorld().getNearbyPlayers(center, 48);
+                    final Collection<Player> receivers = center.getWorld().getNearbyPlayers(center, 48);
 
                     @Override
                     public void run() {
@@ -101,7 +100,7 @@ public class EventBaitAbility extends BaitAbility {
                             Location newLocation = new Location(center.getWorld(), center.getX() + addX, center.getY() + addY, center.getZ() + addZ);
                             if (r < 15) {
                                 Particle.DUST.builder()
-                                        .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(0, Math.max(125, 0), Math.max(255 - colorIncrement * count, 0)), 1.5f))
+                                        .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(Math.max(255 - colorIncrement * count, 0), Math.max(215, 0), 0), 1.5f))
                                         .location(newLocation)
                                         .receivers(receivers)
                                         .spawn();
@@ -114,6 +113,7 @@ public class EventBaitAbility extends BaitAbility {
                     }
                 }.runTaskTimer(plugin, 0, 1);
             }
+
         };
     }
 } 
