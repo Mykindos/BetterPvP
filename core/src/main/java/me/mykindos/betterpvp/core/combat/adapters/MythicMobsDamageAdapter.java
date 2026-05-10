@@ -8,6 +8,7 @@ import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
@@ -64,6 +65,7 @@ public class MythicMobsDamageAdapter implements Listener {
         var mobManager = MythicBukkit.inst().getMobManager();
         ActiveMob damagee = mobManager.getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
         if (damagee != null) {
+            event.setSoundProvider(SoundProvider.NONE);
             final EntityDamageEvent.DamageCause cause = event.getBukkitCause();
 
             if(damagee.getType().getDigOutOfGround()) {
