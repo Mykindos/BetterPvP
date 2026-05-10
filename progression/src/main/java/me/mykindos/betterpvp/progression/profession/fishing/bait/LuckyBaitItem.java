@@ -53,11 +53,11 @@ public class LuckyBaitItem extends BaitItem {
                 "VAV",
         };
         BaseItem sunfishItem = itemFactory.getItemRegistry().getItem("progression:sunfish");
-        BaseItem honeyBlock = itemFactory.getFallbackItem(Material.HONEY_BLOCK);
+        BaseItem honeycomb = itemFactory.getFallbackItem(Material.HONEYCOMB);
 
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('V', new RecipeIngredient(sunfishItem, 64 ));
-        builder.setIngredient('A', new RecipeIngredient(honeyBlock, 1));
+        builder.setIngredient('V', new RecipeIngredient(sunfishItem, 64));
+        builder.setIngredient('A', new RecipeIngredient(honeycomb, 1));
         builder.setIngredient('D', new RecipeIngredient(magicEssence, 1));
         registry.registerRecipe(new NamespacedKey("progression", "lucky_bait"), builder.build());
     }

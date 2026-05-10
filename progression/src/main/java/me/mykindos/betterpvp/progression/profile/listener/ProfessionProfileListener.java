@@ -40,7 +40,10 @@ public class ProfessionProfileListener implements Listener {
 
     @EventHandler
     public void onPropertyUpdate(ProfessionPropertyUpdateEvent event) {
-        professionProfileManager.getRepository().saveProperty(event.getUuid(), event.getProfession(), event.getProperty(), event.getValue());
+        professionProfileManager.getObject(event.getUuid().toString()).ifPresent(profile -> {
+            if (!profile.isLoaded()) return;
+            professionProfileManager.getRepository().saveProperty(event.getUuid(), event.getProfession(), event.getProperty(), event.getValue());
+        });
     }
 
     @UpdateEvent(delay = 60 * 5 * 1000, isAsync = true)

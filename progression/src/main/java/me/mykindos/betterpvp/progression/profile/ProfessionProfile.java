@@ -11,5 +11,6 @@ public class ProfessionProfile {
 
     private final UUID gamerUUID;
     private Map<String, ProfessionData> professionDataMap = new HashMap<>();
+    private boolean loaded;
 
 }

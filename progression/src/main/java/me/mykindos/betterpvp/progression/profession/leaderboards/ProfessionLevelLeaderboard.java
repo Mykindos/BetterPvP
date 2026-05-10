@@ -144,14 +144,14 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
 
     private int getLevelFromExperience(long experience) {
         int level = 1;
-        double expForNextLevel = 25;
+        double expForNextLevel = 80;
 
         double experienceCopy = experience;
 
         while (experienceCopy >= expForNextLevel) {
             level++;
             experienceCopy -= expForNextLevel;
-            expForNextLevel *= 1.01;
+            expForNextLevel *= 1.104;
         }
 
         return level;

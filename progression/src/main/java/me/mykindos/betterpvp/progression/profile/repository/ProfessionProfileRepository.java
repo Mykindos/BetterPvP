@@ -29,7 +29,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.mykindos.betterpvp.progression.database.jooq.Tables.*;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_BUILDS;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_EXP;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_PROPERTIES;
 
 @Singleton
 @CustomLog
@@ -72,14 +74,20 @@ public class ProfessionProfileRepository {
     public ProfessionProfile loadProfileForGamer(UUID uuid) {
         ProfessionProfile profile = new ProfessionProfile(uuid);
 
-        Client client = clientManager.search().online(uuid).orElseThrow();
-        loadExperience(client, profile);
-        loadBuilds(client, profile);
+        try {
+            Client client = clientManager.search().online(uuid).orElseThrow();
+            loadExperience(client, profile);
+            loadBuilds(client, profile);
+            profile.setLoaded(true);
+        } catch (Exception ex) {
+            log.error("Failed to load progression profile for {}", uuid, ex).submit();
+        }
 
         return profile;
     }
 
     public void saveExperience(UUID gamer, String profession, double experience) {
+
         CompletableFuture.runAsync(() -> {
             Client client = clientManager.search().offline(gamer).join().orElse(null);
             if (client == null) return;
@@ -91,11 +99,14 @@ public class ProfessionProfileRepository {
                     .set(PROGRESSION_EXP.SEASON, Core.getCurrentRealm().getSeason().getId())
                     .set(PROGRESSION_EXP.PROFESSION, profession)
                     .set(PROGRESSION_EXP.EXPERIENCE, (long) experience)
-                    .onConflict()
+                    .onConflict(PROGRESSION_EXP.CLIENT, PROGRESSION_EXP.SEASON, PROGRESSION_EXP.PROFESSION)
                     .doUpdate()
                     .set(PROGRESSION_EXP.EXPERIENCE, (long) experience);
 
             queuedExpUpdates.get().put(gamer + profession, query);
+        }).exceptionally(ex -> {
+            log.error("Failed to save fishing xp for " + gamer + " " + profession + " " + experience + ": " + ex.getMessage()).submit();
+            return null;
         });
 
 
@@ -216,7 +227,11 @@ public class ProfessionProfileRepository {
 
     public void processStatUpdates(boolean async) {
         if (async) {
-            database.getAsyncDslContext().executeAsyncVoid(this::performStatUpdates);
+            database.getAsyncDslContext().executeAsyncVoid(this::performStatUpdates)
+                    .exceptionally(ex -> {
+                        log.error("Failed to process stat updates ", ex).submit();
+                        return null;
+                    });
         } else {
             performStatUpdates(database.getDslContext());
         }

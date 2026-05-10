@@ -28,15 +28,22 @@ public class ProfessionRepository {
 
     public void createPartitions() {
         int season = Core.getCurrentRealm().getSeason().getId();
-        String partitionTableName = "progression_exp_season_" + season;
+        String partitionXpTableName = "progression_exp_season_" + season;
+        String partitionPropertiesTableName = "progression_properties_season_" + season;
         try {
             database.getDslContext().execute(DSL.sql(String.format(
                     "CREATE TABLE IF NOT EXISTS %s PARTITION OF progression_exp FOR VALUES IN (%d)",
-                    partitionTableName, season
+                    partitionXpTableName, season
             )));
-            log.info("Created partition {} for season {}", partitionTableName, season).submit();
+
+            log.info("Created partition {} for season {}", partitionXpTableName, season).submit();
+            database.getDslContext().execute(DSL.sql(String.format(
+                    "CREATE TABLE IF NOT EXISTS %s PARTITION OF progression_properties FOR VALUES IN (%d)",
+                    partitionPropertiesTableName, season
+            )));
+            log.info("Created partition {} for season {}", partitionPropertiesTableName, season).submit();
         } catch (Exception e) {
-            log.info("Partition {} may already exist", partitionTableName).submit();
+            log.info("Partition {} or {} may already exist", partitionXpTableName, partitionPropertiesTableName).submit();
         }
     }
 

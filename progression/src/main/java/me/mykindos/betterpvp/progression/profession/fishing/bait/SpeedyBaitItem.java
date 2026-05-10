@@ -53,11 +53,11 @@ public class SpeedyBaitItem extends BaitItem {
                 "AVA",
                 "VAV",
         };
-        BaseItem sunfishItem = itemFactory.getItemRegistry().getItem("progression:tuna");
-        BaseItem honeyBlock = itemFactory.getFallbackItem(Material.HONEY_BLOCK);
+        BaseItem tuna = itemFactory.getItemRegistry().getItem("progression:tuna");
+        BaseItem honeyBlock = itemFactory.getFallbackItem(Material.HONEYCOMB);
 
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('V', new RecipeIngredient(sunfishItem, 16));
+        builder.setIngredient('V', new RecipeIngredient(tuna, 16));
         builder.setIngredient('A', new RecipeIngredient(honeyBlock, 1));
         registry.registerRecipe(new NamespacedKey("progression", "speedy_bait"), builder.build());
     }
