@@ -67,10 +67,11 @@ public class LootSessionController implements Listener {
 
     /**
      * Resolve a loot session for the given table, or create a new one if none exists.
+     * When the supplier is invoked, the produced session is pushed onto the player's scope
+     * stack, so suppliers must return a session intended for per-player ownership.
      * @param player  The player to resolve the session for.
      * @param table The table to resolve the session for.
-     * @param supplier A supplier for a new session if one does not exist. You are in charge of pushing this scope
-     *                 when it is generated.
+     * @param supplier A supplier for a new session if one does not exist.
      * @return The loot session for the given table.
      */
     public @NotNull LootSession resolve(Player player, LootTable table, Supplier<LootSession> supplier) {
@@ -84,7 +85,9 @@ public class LootSessionController implements Listener {
             }
         }
 
-        return supplier.get();
+        final LootSession created = supplier.get();
+        pushScope(player, created);
+        return created;
     }
 
     /**

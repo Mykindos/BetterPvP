@@ -32,11 +32,7 @@ public class LootSession {
     private Instant end;
 
     public static LootSession newSession(@NotNull List<LootTable> lootTable, @NotNull Audience audience) {
-        final LootSession session = new LootSession(new ArrayList<>(lootTable), audience);
-        final LootSessionController controller = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(LootSessionController.class);
-        audience.filterAudience(Player.class::isInstance)
-                .forEachAudience(single -> controller.pushScope((Player) single, session));
-        return session;
+        return new LootSession(new ArrayList<>(lootTable), audience);
     }
 
     public static LootSession newSession(@NotNull LootTable lootTable, @NotNull Audience audience) {

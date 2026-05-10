@@ -23,14 +23,14 @@ import java.util.Optional;
 @Singleton
 @BPvPListener
 @PluginAdapter("Progression")
-public class BaseFishingListener implements Listener {
+public class FishingListener implements Listener {
 
     private final ClanManager clanManager;
     private final ProfessionProfileManager professionProfileManager;
     private final ProfessionNodeManager progressionSkillManager;
 
     @Inject
-    public BaseFishingListener(ClanManager clanManager) {
+    public FishingListener(ClanManager clanManager) {
         this.clanManager = clanManager;
         final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
@@ -40,24 +40,29 @@ public class BaseFishingListener implements Listener {
     @EventHandler
     public void onStartFishing(PlayerStartFishingEvent event) {
         Player player = event.getPlayer();
-        if (hasBaseFishing(player)) return;
-
-        Optional<Clan> playerClan = clanManager.getClanByPlayer(player);
-        Optional<Clan> hookClan = clanManager.getClanByLocation(event.getHook().getLocation());
-        Optional<Clan> standClan = clanManager.getClanByLocation(player.getLocation());
-
-        // Standing or hooking inside the player's own clan territory requires Base Fishing.
-        if (playerClan.isPresent()) {
-            Clan own = playerClan.get();
-            if (standClan.map(own::equals).orElse(false) || hookClan.map(own::equals).orElse(false)) {
-                denyFishing(event, player, "You must unlock <green>Base Fishing</green> to fish in your own territory");
-                return;
-            }
+        if (clanManager.isInSafeZone(player)) {
+            denyFishing(event, player, "You cannot fish in the <red>Safe Zone</red>.");
+            return;
         }
 
-        // Hook landing in any non-Fields clan territory is gated.
-        if (hookClan.isPresent() && !hookClan.get().getName().equalsIgnoreCase("Fields")) {
-            denyFishing(event, player, "You can only fish at <yellow>Fields</yellow> or in the <yellow>Wilderness</yellow>.");
+        if (!hasBaseFishing(player)) {
+            Optional<Clan> playerClan = clanManager.getClanByPlayer(player);
+            Optional<Clan> hookClan = clanManager.getClanByLocation(event.getHook().getLocation());
+            Optional<Clan> standClan = clanManager.getClanByLocation(player.getLocation());
+
+            // Standing or hooking inside the player's own clan territory requires Base Fishing.
+            if (playerClan.isPresent()) {
+                Clan own = playerClan.get();
+                if (standClan.map(own::equals).orElse(false) || hookClan.map(own::equals).orElse(false)) {
+                    denyFishing(event, player, "You must unlock <green>Base Fishing</green> to fish in your own territory");
+                    return;
+                }
+            }
+
+            // Hook landing in any non-Fields clan territory is gated.
+            if (hookClan.isPresent() && !hookClan.get().getName().equalsIgnoreCase("Fields")) {
+                denyFishing(event, player, "You can only fish at <yellow>Fields</yellow> or in the <yellow>Wilderness</yellow>.");
+            }
         }
     }
 
