@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -45,5 +47,25 @@ public class DefaultSmartBlockFactory implements SmartBlockFactory {
     @Override
     public BlockData createBlockData(SmartBlock type) {
         return Material.STONE.createBlockData();
+    }
+
+    @Override
+    public Optional<SmartBlockInstance> fromTarget(Player player) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean isTargetSmartBlock(@NotNull Player player) {
+        return false;
+    }
+
+    @Override
+    public boolean breakBlock(Player player, SmartBlockInstance instance) {
+        return false;
+    }
+
+    @Override
+    public void displayBreakProgress(@NotNull Player player, @NotNull Block block, double progress) {
+        // Vanilla blocks already get the client-side destruction-stage overlay.
     }
 }
