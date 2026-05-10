@@ -194,7 +194,7 @@ public class EffectManager extends Manager<String, ConcurrentHashMap<String, Lis
             ConcurrentHashMap<String, List<Effect>> effects = effectsOptional.get();
             List<Effect> effectList = effects.get(type.getName());
             if (effectList != null) {
-                return effectList.stream().filter(effect -> effect.getUuid().equalsIgnoreCase(target.getUniqueId().toString())
+                return new java.util.ArrayList<>(effectList).stream().filter(effect -> effect.getUuid().equalsIgnoreCase(target.getUniqueId().toString())
                                 && effect.getEffectType() == type)
                         .max(Comparator.comparingInt(Effect::getAmplifier));
 
