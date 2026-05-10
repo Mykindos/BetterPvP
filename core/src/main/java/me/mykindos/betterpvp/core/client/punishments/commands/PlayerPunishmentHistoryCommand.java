@@ -53,8 +53,9 @@ public class PlayerPunishmentHistoryCommand extends Command {
                             .sorted(Comparator.comparing(Punishment::isActive).reversed())
                             .map(punishment -> new PunishmentItem(punishment, punishmentHandler, client.hasRank(Rank.TRIAL_MOD), null))
                             .map(Item.class::cast).toList();
+                    ViewCollectionMenu viewCollectionMenu = new ViewCollectionMenu(target.getName() + "'s Punish History", items, null);
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                        new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
+                        viewCollectionMenu.show(player);
                     });
                 });
             });

@@ -100,6 +100,7 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
                 "And you take " + getValueString(this::getDamageReduction, level) + " less damage",
                 "",
                 "Damage can be altered by a maximum of " + getValueString(this::getMaxEnemies, level),
+                "Non-player enemies are counted as 0.5 enemies each",
                 "",
                 "Radius: " + getValueString(this::getRadius, level),
         };
@@ -154,10 +155,25 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
         }
     }
 
+    private int getEffectiveNearbyEnemies(List<LivingEntity> nearbyEnemiesList) {
+        int playerEnemies = 0;
+        int nonPlayerEnemies = 0;
+
+        for (LivingEntity enemy : nearbyEnemiesList) {
+            if (enemy instanceof Player) {
+                playerEnemies++;
+            } else {
+                nonPlayerEnemies++;
+            }
+        }
+
+        return playerEnemies + (nonPlayerEnemies / 2);
+    }
+
     private void processLevelFieldSkill(Player relevantPlayer, DamageEvent event, boolean isAttacker, int level) {
         List<LivingEntity> nearbyEnemiesList = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius);
         nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || UtilEntity.isPlayerSpawned(e) || e.getPersistentDataContainer().has(CoreNamespaceKeys.OWNER, CustomDataType.UUID));
-        int nearbyEnemies = nearbyEnemiesList.size();
+        int nearbyEnemies = getEffectiveNearbyEnemies(nearbyEnemiesList);;
         int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size() + 1;
         int nearbyDifference = nearbyEnemies - nearbyAllies;
 
@@ -190,7 +206,17 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
                     LivingEntity e = livingEnt.get();
                     return e instanceof Chicken || e.hasMetadata("AlmPet") || UtilEntity.isPlayerSpawned(e) || e.getPersistentDataContainer().has(CoreNamespaceKeys.OWNER, CustomDataType.UUID);
                 });
-                int nearbyEnemies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).count();
+
+                int playerEnemies = (int) nearbyEntities.stream()
+                        .filter(k -> k.getValue() == EntityProperty.ENEMY)
+                        .filter(k -> k.get() instanceof Player)
+                        .count();
+                int nonPlayerEnemies = (int) nearbyEntities.stream()
+                        .filter(k -> k.getValue() == EntityProperty.ENEMY)
+                        .filter(k -> !(k.get() instanceof Player))
+                        .count();
+                int nearbyEnemies = playerEnemies + (nonPlayerEnemies / 2);
+
                 int nearbyAllies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.FRIENDLY).count() + 1;
                 int nearbyDifference = nearbyEnemies - nearbyAllies;
 

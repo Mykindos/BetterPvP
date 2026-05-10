@@ -43,6 +43,7 @@ public class AutoReplantAttributeListener implements Listener {
     public void onPlayerChopLog(PlayerChopLogEvent event) {
         if (blockTagManager.isPlayerPlaced(event.getChoppedLogBlock())) return;
         if (!roll(autoReplantAttribute.getChance(event.getPlayer()))) return;
+        if (event.getChoppedLogBlock().getType().name().toLowerCase().contains("mangrove")) return;
 
         Block logBlock = event.getChoppedLogBlock();
         Material sapling = getSapling(event.getLogType());
