@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -48,6 +49,7 @@ public class Bow extends WeaponItem implements Listener, Reloadable {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onShootBow(EntityShootBowEvent event) {
         if (event.getBow() == null) return;
+        if (!(event.getEntity() instanceof Player)) return;
         Optional<ItemInstance> itemInstanceOptional = itemFactory.fromItemStack(event.getBow());
         if (itemInstanceOptional.isPresent() && itemInstanceOptional.get().getBaseItem() != this) return;
 
