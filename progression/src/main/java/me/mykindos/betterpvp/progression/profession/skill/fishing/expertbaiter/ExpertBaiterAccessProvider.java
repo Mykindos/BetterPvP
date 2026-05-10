@@ -24,7 +24,6 @@ public class ExpertBaiterAccessProvider implements ItemAccessProvider {
 
     private static final Key SOURCE = Key.key("progression", "expert_baiter");
     private static final Set<AccessScope> GATED = Set.of(AccessScope.CRAFT);
-    private static final Set<String> GATED_KEYS = Set.of("speedy_bait", "event_bait");
     private static final Component LORE = Component.text("Requires ", NamedTextColor.GRAY)
             .append(Component.text("Expert Baiter", NamedTextColor.GREEN));
 
@@ -38,7 +37,7 @@ public class ExpertBaiterAccessProvider implements ItemAccessProvider {
     @Override
     public Optional<AccessRequirement> evaluate(Player player, Key itemKey) {
         if (!"progression".equals(itemKey.namespace())) return Optional.empty();
-        if (!GATED_KEYS.contains(itemKey.value())) return Optional.empty();
+        if (!itemKey.value().toLowerCase().contains("_bait")) return Optional.empty();
 
         boolean satisfied = player != null && skill.isUnlocked(player);
         return Optional.of(new AccessRequirement(SOURCE, LORE, GATED, satisfied));

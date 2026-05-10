@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -280,7 +281,7 @@ public class FishingListener implements Listener {
                 if (fish != null) {
                     fishingHandler.addFish(player, fish);
                     UtilMessage.message(player, "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!",
-                            fish.getTypeName(), me.mykindos.betterpvp.core.utilities.UtilFormat.formatNumber(fish.getWeight()));
+                            fish.getTypeName(), UtilFormat.formatNumber(fish.getWeight()));
                 }
             }
 

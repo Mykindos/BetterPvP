@@ -92,9 +92,10 @@ public class Progression extends BPvPPlugin {
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 
+            this.registerItems();
+
             final ItemLoader itemLoader = new ItemLoader(this);
             itemLoader.load(adapters, reflections.getTypesAnnotatedWith(ItemKey.class));
-            this.registerItems();
 
             var skillManager = injector.getInstance(ProfessionNodeManager.class);
             skillManager.loadNodeRegistry();

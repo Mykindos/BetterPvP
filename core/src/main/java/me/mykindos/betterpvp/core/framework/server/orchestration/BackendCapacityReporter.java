@@ -65,7 +65,7 @@ public class BackendCapacityReporter implements Listener {
         reportCapacityAsync();
     }
 
-    @UpdateEvent(delay = 2_000L, isAsync = true)
+    @UpdateEvent(delay = 2_000L)
     public void reportTick() {
         reportCapacityAsync();
     }
@@ -75,16 +75,18 @@ public class BackendCapacityReporter implements Listener {
             return;
         }
 
-        try {
-            orchestrationGateway.updateCapacity(buildSnapshot()).join();
+
+        orchestrationGateway.updateCapacity(buildSnapshot()).thenRunAsync(() -> {
             if (orchestrationUnavailable.compareAndSet(true, false)) {
                 log.info("Reconnected to orchestration service for backend capacity reporting").submit();
             }
-        } catch (Exception ex) {
+        }).exceptionally(ex -> {
             if (orchestrationUnavailable.compareAndSet(false, true)) {
                 log.warn("Failed to report backend capacity to orchestration service", ex).submit();
             }
-        }
+            return null;
+        });
+
     }
 
     private ServerCapacitySnapshot buildSnapshot() {

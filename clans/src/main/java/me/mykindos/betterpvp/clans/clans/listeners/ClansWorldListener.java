@@ -692,7 +692,7 @@ public class ClansWorldListener extends ClanListener {
     public void onLapisPlace(final BlockPlaceEvent event) {
         BaseItem waterBlock = itemRegistry.getItem(new NamespacedKey(clans, "water_block"));
         final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(event.getItemInHand());
-        if (itemOpt.isEmpty() || !itemOpt.get().getBaseItem().equals(waterBlock)) {
+        if (event.getBlock().getType() != Material.LAPIS_BLOCK || itemOpt.isEmpty() || !itemOpt.get().getBaseItem().equals(waterBlock)) {
             return;
         }
 

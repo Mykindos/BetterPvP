@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
@@ -29,8 +31,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @BPvPListener
 @Singleton
@@ -40,16 +44,18 @@ public class TreasureChanceListener implements Listener, Reloadable {
     private final FishingTreasureChanceAttribute treasureChanceAttribute;
     private final LootTableRegistry lootTableRegistry;
     private final LootSessionController sessionController;
+    private final ItemFactory itemFactory;
 
     private LootTable treasureLootTable;
 
     @Inject
     public TreasureChanceListener(FishingTreasureChanceAttribute treasureChanceAttribute,
                                   LootTableRegistry lootTableRegistry,
-                                  LootSessionController sessionController) {
+                                  LootSessionController sessionController, ItemFactory itemFactory) {
         this.treasureChanceAttribute = treasureChanceAttribute;
         this.lootTableRegistry = lootTableRegistry;
         this.sessionController = sessionController;
+        this.itemFactory = itemFactory;
     }
 
     @Override
@@ -90,6 +96,21 @@ public class TreasureChanceListener implements Listener, Reloadable {
     private void awardTreasure(Player player, Location location, Loot<?, ?> loot, LootContext context) {
         final Object award = loot.award(context);
         if (award instanceof Item item) {
+            // Reel-in vector pointing from the hook back toward the player, mirroring the
+            // velocity Minecraft applies to the natural fishing-rod caught Item entity.
+            final Vector reelVelocity;
+            if (player != null) {
+                reelVelocity = player.getLocation().toVector()
+                        .subtract(context.getLocation().toVector())
+                        .multiply(0.1)
+                        .add(new Vector(0, 0.2, 0));
+            } else {
+                reelVelocity = new Vector(0, 0.2, 0);
+            }
+            if (item.isValid()) {
+                item.setVelocity(reelVelocity);
+            }
+
             sendMessage(player, location, item.getItemStack());
         } else if (award instanceof ItemStack itemStack) {
             sendMessage(player, location, itemStack);
@@ -98,11 +119,17 @@ public class TreasureChanceListener implements Listener, Reloadable {
 
     private void sendMessage(Player player, Location location, ItemStack itemStack) {
         final Component name;
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
-            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+        Optional<ItemInstance> itemInstanceOptional = itemFactory.fromItemStack(itemStack);
+        if(itemInstanceOptional.isPresent()) {
+            ItemInstance itemInstance = itemInstanceOptional.get();
+            name = itemInstance.getView().getName();
         } else {
-            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
-                    Component.translatable(itemStack.getType().translationKey()));
+            if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
+                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+            } else {
+                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                        Component.translatable(itemStack.getType().translationKey()));
+            }
         }
 
         TextComponent message = Component.text("You found ")
