@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -70,35 +72,14 @@ public class ClansCombatListener implements Listener {
         }
 
         if (!event.isDamageeLiving()) return;
-        LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
-        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(damagee.getLocation());
-        if (locationClanOptional.isPresent()) {
-            Clan locationClan = locationClanOptional.get();
-            if (locationClan.isAdmin() && locationClan.isSafe()) {
+        handleSafezone(event, Objects.requireNonNull(event.getLivingDamagee()), event.getDamager());
+    }
 
-                if(damagee instanceof Player damageePlayer && event.getDamager() instanceof Player damagerPlayer) {
-                    Clan damageeClan = clanManager.getClanByPlayer(damageePlayer).orElse(null);
-                    Clan damagerClan = clanManager.getClanByPlayer(damagerPlayer).orElse(null);
-                    if(damageeClan != null && damagerClan != null) {
-                        if (clanManager.getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(damagerClan.getName())
-                                || pillage.getPillaged().getName().equals(damageeClan.getName()))) {
-                            return;
-                        }
-                    }
-                }
-
-
-                if (damagee instanceof Player player) {
-                    Gamer gamer = clientManager.search().online(player).getGamer();
-                    if (!gamer.isInCombat()) {
-                        event.setCancelled(true);
-                    }
-                } else {
-                    event.setCancelled(true);
-                }
-            }
-        }
-
+    @EventHandler(ignoreCancelled = true)
+    public void onVelocity(CustomEntityVelocityEvent event) {
+        if (event.getSource() == event.getEntity()) return;
+        if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
+        handleSafezone(event, livingEntity, event.getSource());
     }
 
     @EventHandler
@@ -168,6 +149,58 @@ public class ClansCombatListener implements Listener {
         final Gamer gamer = client.getGamer();
         if (gamer.isInCombat()) {
             UtilMessage.message(event.getPlayer(), "Clans", "You cannot join a clan while in combat!");
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Shared safezone logic: cancels {@code event} if the location is safe and the
+     * acting entity is not in combat, unless the two players are involved in an active pillage.
+     */
+    private void handleSafezone(Cancellable event, LivingEntity acted, Entity source) {
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(acted.getLocation());
+        if (locationClanOptional.isEmpty()) return;
+        if (!locationClanOptional.get().isSafe()) return;
+
+        if (acted instanceof Player actedPlayer && source instanceof Player sourcePlayer) {
+            if (playersInActivePillage(sourcePlayer, actedPlayer)) {
+                return;
+            }
+        }
+
+        cancelIfNotInCombat(event, acted);
+    }
+
+    /**
+     * Returns true if the two players' clans are involved in an active pillage
+     * (source as pillager, acted as pillaged). Returns false if either player has no clan.
+     */
+    private boolean playersInActivePillage(Player source, Player acted) {
+        Clan sourceClan = clanManager.getClanByPlayer(source).orElse(null);
+        Clan actedClan = clanManager.getClanByPlayer(acted).orElse(null);
+        return sourceClan != null && actedClan != null && isInActivePillage(sourceClan, actedClan);
+    }
+
+    /**
+     * Returns true if the pillager clan is actively pillaging the pillaged clan.
+     */
+    private boolean isInActivePillage(Clan pillager, Clan pillaged) {
+        return clanManager.getPillageHandler().getActivePillages().stream()
+                .anyMatch(pillage -> pillage.getPillager().getName().equals(pillager.getName())
+                        || pillage.getPillaged().getName().equals(pillaged.getName()));
+    }
+
+    /**
+     * Cancels {@code event} if {@code entity} is not a Player currently in combat,
+     * or if {@code entity} is not a Player at all.
+     */
+    private void cancelIfNotInCombat(Cancellable event, LivingEntity entity) {
+        if (entity instanceof Player player) {
+            Gamer gamer = clientManager.search().online(player).getGamer();
+            if (!gamer.isInCombat()) {
+                event.setCancelled(true);
+            }
+        } else {
             event.setCancelled(true);
         }
     }

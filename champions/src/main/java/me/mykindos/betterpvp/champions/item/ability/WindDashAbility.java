@@ -184,7 +184,11 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
 
             // Velocity
             Vector upwardVelocity = new Vector(0, 1, 0).multiply(dashImpactVelocity);
-            UtilVelocity.velocity(target, player, new VelocityData(upwardVelocity, 1.0, 0.0, 10.0, false));
+            boolean actualHit = UtilVelocity.velocity(target, player, new VelocityData(upwardVelocity, 1.0, 0.0, 10.0, false));
+
+            if (!actualHit) {
+                continue;
+            }
 
             // SFX & VFX
             new SoundEffect(Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 2).play(target.getLocation());
