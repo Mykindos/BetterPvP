@@ -196,28 +196,22 @@ public class Punishment {
 
     /**
      *
-     * @param clientManager the clientManager
+     * @param punisherName the name of the punisher
+     * @param revokerName the name of the revoker
      * @param showPunisher should the punisher and revoker be shown?
      * @return the ItemView of this punishment
      */
-    public ItemView getItemView(ClientManager clientManager, boolean showPunisher) {
-        String punisherName = "SERVER";
-        if (this.getPunisher() != null) {
-            Optional<Client> punisherOptional = clientManager.search().offline(this.getPunisher()).join();
-            if(punisherOptional.isPresent()) {
-                punisherName = punisherOptional.get().getName();
-            }
+    public ItemView getItemView(@Nullable String punisherName, @Nullable String revokerName, boolean showPunisher) {
+
+        String punisherNameVar = punisherName;
+        if(punisherNameVar == null) {
+            punisherNameVar = "SERVER";
         }
 
-        String revokerName = "SERVER";
-
-        if (this.getRevoker() != null) {
-            Optional<Client> revokerOptional = clientManager.search().offline(this.getRevoker()).join();
-            if(revokerOptional.isPresent()) {
-                revokerName = revokerOptional.get().getName();
-            }
+        String revokerNameVar = revokerName;
+        if(revokerNameVar == null) {
+            revokerNameVar = "SERVER";
         }
-
 
         Rule rule = this.getRule();
 
@@ -247,7 +241,7 @@ public class Punishment {
                 this.getReason()));
         if (showPunisher) {
             lore.add(UtilMessage.deserialize("<gray>Punisher:</gray> <yellow>%s</yellow>",
-                    punisherName));
+                    punisherNameVar));
         }
 
         if (this.isRevoked()) {
@@ -260,7 +254,7 @@ public class Punishment {
                     UtilTime.getTime(System.currentTimeMillis() - this.getRevokeTime(), 1)));
             if (showPunisher) {
                 lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
-                        revokerName));
+                        revokerNameVar));
             }
             lore.add(UtilMessage.deserialize("<gray>Revoke Type:</gray> <green>%s</green>",
                     getRevokeType() != null ? this.getRevokeType().name() : null));

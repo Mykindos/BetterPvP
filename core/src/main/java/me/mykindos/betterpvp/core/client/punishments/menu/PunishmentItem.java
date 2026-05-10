@@ -19,6 +19,8 @@ public class PunishmentItem extends AbstractItem {
 
     private final Punishment punishment;
     private final PunishmentHandler punishmentHandler;
+    private final String punisherName;
+    private final String revokerName;
     private final boolean showPunisher;
     private final String revokeReason;
 
@@ -32,8 +34,8 @@ public class PunishmentItem extends AbstractItem {
      * @param punishmentHandler the punishment manager
      * @param showPunisher whether to show the punisher and revoker or not
      */
-    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, boolean showPunisher, Windowed previous) {
-        this(punishment, punishmentHandler, showPunisher, null, previous);
+    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, boolean showPunisher, Windowed previous, String punisherName, String revokerName) {
+        this(punishment, punishmentHandler, revokerName, punisherName, showPunisher, null, previous);
     }
 
     /**
@@ -43,8 +45,8 @@ public class PunishmentItem extends AbstractItem {
      * @param punishmentHandler the punishment manager
      * @param revokeReason the reason for this revoke
      */
-    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, @NotNull String revokeReason, Windowed previous) {
-        this(punishment, punishmentHandler, true, revokeReason, previous);
+    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, @NotNull String revokeReason, Windowed previous, String punisherName, String revokerName) {
+        this(punishment, punishmentHandler, revokerName, punisherName, true, revokeReason, previous);
     }
 
     /**
@@ -55,9 +57,11 @@ public class PunishmentItem extends AbstractItem {
      * @param showPunisher whether to show the punisher and revoker or not
      * @param revokeReason the reason for this revoke, null if not revoking
      */
-    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, boolean showPunisher, @Nullable String revokeReason, Windowed previous) {
+    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, String punisherName, String revokerName, boolean showPunisher, @Nullable String revokeReason, Windowed previous) {
         this.punishment = punishment;
         this.punishmentHandler = punishmentHandler;
+        this.punisherName = punisherName;
+        this.revokerName = revokerName;
         this.showPunisher = showPunisher;
         this.revokeReason = revokeReason;
         this.previous = previous;
@@ -71,7 +75,7 @@ public class PunishmentItem extends AbstractItem {
      */
     @Override
     public ItemProvider getItemProvider() {
-        return punishment.getItemView(punishmentHandler.getClientManager(), showPunisher);
+        return punishment.getItemView(punisherName, revokerName, showPunisher);
     }
 
     /**

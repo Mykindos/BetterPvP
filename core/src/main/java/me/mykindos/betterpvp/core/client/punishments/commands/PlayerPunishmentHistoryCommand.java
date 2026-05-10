@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class PlayerPunishmentHistoryCommand extends Command {
@@ -51,7 +52,14 @@ public class PlayerPunishmentHistoryCommand extends Command {
                     List<Item> items = target.getPunishments().stream()
                             .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
                             .sorted(Comparator.comparing(Punishment::isActive).reversed())
-                            .map(punishment -> new PunishmentItem(punishment, punishmentHandler, client.hasRank(Rank.TRIAL_MOD), null))
+                            .map(punishment -> new PunishmentItem(
+                                    punishment,
+                                    punishmentHandler,
+                                    punishmentHandler.getClientManager().search().offline(punishment.getPunisher()).join().map(Client::getName).orElse(null),
+                                    punishmentHandler.getClientManager().search().offline(punishment.getRevoker()).join().map(Client::getName).orElse(null),
+                                    client.hasRank(Rank.TRIAL_MOD),
+                                    punishment.getRevokeReason(),
+                                    null))
                             .map(Item.class::cast).toList();
                     ViewCollectionMenu viewCollectionMenu = new ViewCollectionMenu(target.getName() + "'s Punish History", items, null);
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
@@ -60,14 +68,24 @@ public class PlayerPunishmentHistoryCommand extends Command {
                 });
             });
         } else {
-            List<Item> items = client.getPunishments().stream()
-                    .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
-                    .sorted(Comparator.comparing(Punishment::isActive).reversed())
-                    .map(punishment -> new PunishmentItem(punishment, punishmentHandler, false, null))
-                    .map(Item.class::cast).toList();
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);
+            CompletableFuture.runAsync(() -> {
+                    List<Item> items = client.getPunishments().stream()
+                            .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
+                            .sorted(Comparator.comparing(Punishment::isActive).reversed())
+                            .map(punishment -> new PunishmentItem(
+                                    punishment,
+                                    punishmentHandler,
+                                    punishmentHandler.getClientManager().search().offline(punishment.getPunisher()).join().map(Client::getName).orElse(null),
+                                    punishmentHandler.getClientManager().search().offline(punishment.getRevoker()).join().map(Client::getName).orElse(null),
+                                    client.hasRank(Rank.TRIAL_MOD),
+                                    punishment.getRevokeReason(),
+                                    null))
+                            .map(Item.class::cast).toList();
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                        new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);
+                    });
             });
+
         }
 
 
