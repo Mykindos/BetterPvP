@@ -21,6 +21,13 @@ public interface FieldsOre extends FieldsInteractable {
      */
     @NotNull ItemStack @NotNull [] generateDrops(final @NotNull FieldsBlock fieldsBlock);
 
+    default void deliver(Player player, FieldsBlock block, ItemFactory itemFactory) {
+        final ItemStack[] itemStacks = generateDrops(block);
+        for (ItemStack itemStack : itemStacks) {
+            UtilItem.insert(player, itemFactory.convertItemStack(itemStack).orElse(itemStack));
+        }
+    }
+
     @Override
     default boolean processInteraction(ClientManager clientManager, TerritoryInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
         if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.BREAK)) {
@@ -30,10 +37,7 @@ public interface FieldsOre extends FieldsInteractable {
         final Player player = event.getPlayer();
 
         // Drop the items
-        final ItemStack[] itemStacks = generateDrops(block);
-        for (ItemStack itemStack : itemStacks) {
-            UtilItem.insert(player, itemFactory.convertItemStack(itemStack).orElse(itemStack));
-        }
+        deliver(player, block, itemFactory);
         FieldsInteractableStat stat = FieldsInteractableStat.builder().name(getName()).build();
         clientManager.incrementStat(event.getPlayer(), stat, 1);
         return true;

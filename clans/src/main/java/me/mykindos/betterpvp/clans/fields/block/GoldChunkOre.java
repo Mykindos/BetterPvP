@@ -9,10 +9,12 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -75,6 +77,15 @@ public class GoldChunkOre extends CustomOre implements Listener {
     @Override
     public ItemStack @NotNull [] generateDrops(@NotNull FieldsBlock fieldsBlock) {
         return new ItemStack[] { getGoldChunk(minCoins, maxCoins) };
+    }
+
+    @Override
+    public void deliver(Player player, FieldsBlock block, ItemFactory itemFactory) {
+        final ItemStack[] drops = generateDrops(block);
+        final Location location = block.getLocation().toCenterLocation();
+        for (ItemStack drop : drops) {
+            location.getWorld().dropItemNaturally(location, drop);
+        }
     }
 
     private ItemStack getGoldChunk(int minCoinsIn, int maxCoinsIn) {
