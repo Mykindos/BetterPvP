@@ -80,6 +80,9 @@ public class BlockTagManager {
                 CompletableFuture.runAsync(() -> {
                     Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
                     BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
+                }).exceptionally(ex -> {
+                    log.error("Failed to load block tags for chunk " + chunk, ex).submit();
+                    return null;
                 });
 
                 return true;
@@ -103,6 +106,9 @@ public class BlockTagManager {
             CompletableFuture.runAsync(() -> {
                 Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
                 BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
+            }).exceptionally(ex -> {
+                log.error("Failed to load block tags for chunk " + chunk, ex).submit();
+                return null;
             });
 
             return null;
@@ -130,6 +136,9 @@ public class BlockTagManager {
             CompletableFuture.runAsync(() -> {
                 Map<Long, Map<String, BlockTag>> blockTags = blockTagRepository.getBlockTagsForChunk(chunk);
                 BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
+            }).exceptionally(ex -> {
+                log.error("Failed to load block tags for chunk " + chunkIdentifier, ex).submit();
+                return null;
             });
         }
     }

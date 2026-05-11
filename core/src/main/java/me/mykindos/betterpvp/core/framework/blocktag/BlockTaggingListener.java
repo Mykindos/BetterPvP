@@ -171,7 +171,10 @@ public class BlockTaggingListener implements Listener {
         // Use the existing TAG_EXECUTOR to avoid blocking main thread
         CompletableFuture.runAsync(() -> {
             BlockTagManager.BLOCKTAG_CACHE.invalidate(UtilWorld.chunkToFile(event.getChunk()));
-        }, BlockTagManager.TAG_EXECUTOR); // Use the single-threaded executor
+        }, BlockTagManager.TAG_EXECUTOR).exceptionally(ex -> {
+            log.error("Failed to invalidate block tag cache for chunk", ex).submit();
+            return null;
+        }); // Use the single-threaded executor
 
     }
 

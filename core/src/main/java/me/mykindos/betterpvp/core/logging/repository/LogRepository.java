@@ -122,6 +122,9 @@ public class LogRepository {
                     }
                 }
             }
+        }).exceptionally(ex -> {
+            log.error("Failed to purge logs", ex).submit();
+            return null;
         });
 
     }

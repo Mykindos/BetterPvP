@@ -191,10 +191,19 @@ public class ClientSQLLayer {
      */
     private void loadAdditionalClientData(Client client) {
         CompletableFuture<List<Punishment>> punishmentsFuture = CompletableFuture.supplyAsync(() ->
-                punishmentRepository.getPunishmentsForClient(client));
+                punishmentRepository.getPunishmentsForClient(client)).exceptionally(ex -> {
+            log.error("Error loading punishments for client {}", client.getUuid(), ex).submit();
+            return new ArrayList<>();
+        });
         CompletableFuture<Set<UUID>> ignoresFuture = CompletableFuture.supplyAsync(() ->
-                getIgnoresForClient(client));
-        CompletableFuture<Void> propertiesFuture = loadAllPropertiesConcurrently(client);
+                getIgnoresForClient(client)).exceptionally(ex -> {
+            log.error("Error loading ignores for client {}", client.getUuid(), ex).submit();
+            return new HashSet<>();
+        });
+        CompletableFuture<Void> propertiesFuture = loadAllPropertiesConcurrently(client).exceptionally(ex -> {
+            log.error("Error loading properties for client {}", client.getUuid(), ex).submit();
+            return null;
+        });
         CompletableFuture.allOf(punishmentsFuture, ignoresFuture, propertiesFuture).join();
         client.getPunishments().addAll(punishmentsFuture.join());
         client.getIgnores().addAll(ignoresFuture.join());

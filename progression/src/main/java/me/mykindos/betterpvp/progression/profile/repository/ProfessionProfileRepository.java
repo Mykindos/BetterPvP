@@ -222,6 +222,9 @@ public class ProfessionProfileRepository {
                     .set(PROGRESSION_PROPERTIES.VALUE, value.toString());
 
             queuedStatUpdates.get().put(gamer + property, query);
+        }).exceptionally(ex -> {
+            log.error("Failed to save progression property for " + gamer + " " + profession + " " + property, ex).submit();
+            return null;
         });
     }
 
