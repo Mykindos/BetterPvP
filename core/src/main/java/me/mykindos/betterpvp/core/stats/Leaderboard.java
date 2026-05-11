@@ -116,10 +116,16 @@ public abstract class Leaderboard<E, T> implements Describable {
                 log.error("Failed to fetch leaderboard data for " + options + "!", ex).submit();
                 return null;
             }).whenComplete((set, ex) -> {
-                if (ex != null) {
+                if (ex != null || set == null) {
                     log.error("Failed to fetch leaderboard data for " + options + "!", ex).submit();
                     return;
                 }
+
+                if (set.isEmpty() && !topTen.getOrDefault(options, new ConcurrentSkipListSet<>()).isEmpty()) {
+                    log.warn("Fetched empty leaderboard data for " + getName() + " (" + options + "), skipping update to prevent reset.").submit();
+                    return;
+                }
+
                 topTen.put(options, set);
             });
         }

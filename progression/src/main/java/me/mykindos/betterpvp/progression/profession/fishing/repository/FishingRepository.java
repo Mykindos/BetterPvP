@@ -62,6 +62,7 @@ public class FishingRepository {
 
         fishToSave.add(database.getDslContext().insertInto(PROGRESSION_FISHING)
                 .set(PROGRESSION_FISHING.CLIENT, client.getId())
+                .set(PROGRESSION_FISHING.SEASON, Core.getCurrentRealm().getSeason().getId())
                 .set(PROGRESSION_FISHING.TYPE, fish.getTypeName())
                 .set(PROGRESSION_FISHING.WEIGHT, fish.getWeight()));
 
@@ -75,6 +76,9 @@ public class FishingRepository {
         if (async) {
             database.getAsyncDslContext().executeAsyncVoid(ctx -> {
                 ctx.batch(statements).execute();
+            }).exceptionally(e -> {
+                log.error("Failed to save fishing data", e).submit();
+                return null;
             });
         } else {
             database.getDslContext().batch(statements).execute();

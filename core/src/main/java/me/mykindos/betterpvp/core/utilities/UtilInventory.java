@@ -332,7 +332,8 @@ public class UtilInventory {
         Inventory inventory = serverPlayer.getInventory();
 
         inventory.load(loadedData.listOrEmpty("Inventory", ItemStackWithSlot.CODEC));
-
+        loadedData.read("equipment", net.minecraft.world.entity.EntityEquipment.CODEC)
+                .ifPresent(inventory.equipment::setAll);
 
         //return the BukkitPlayerInventory (same one you get from player#getInventory())
         return new CraftInventoryPlayer(inventory);
