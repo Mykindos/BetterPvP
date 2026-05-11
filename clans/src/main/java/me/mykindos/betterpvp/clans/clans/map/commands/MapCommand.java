@@ -9,8 +9,10 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
@@ -37,14 +39,15 @@ public class MapCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if(!UtilInventory.contains(player, Material.FILLED_MAP, 1)) {
+        new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0f, 1f).play(player);
+        if (!UtilInventory.contains(player, Material.FILLED_MAP, 1)) {
             ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
             MapMeta meta = (MapMeta) itemStack.getItemMeta();
             meta.setMapView(Bukkit.getMap(0));
             itemStack.setItemMeta(meta);
             player.getInventory().addItem(itemFactory.convertItemStack(itemStack).orElse(itemStack));
-        }else{
-            UtilMessage.message(player, "Clans", "You already have a map in your inventory");
+        } else {
+            UtilMessage.message(player, "Clans", "<red>You already have a map in your inventory!");
         }
 
     }

@@ -68,6 +68,9 @@ public class RewardsCommand extends Command {
                                 });
                     });
                 });
+            }).exceptionally(ex -> {
+                log.error("Error while opening rewards menu for " + player.getName(), ex).submit();
+                return null;
             });
         } else {
             UtilMessage.simpleMessage(player, "Inventory", "You have checked your inventory recently, please wait a bit before checking again.");

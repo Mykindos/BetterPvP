@@ -53,6 +53,9 @@ public class MiningRepository {
             }
 
             return 0;
+        }).exceptionally(ex -> {
+            log.error("Failed to load mining data for " + player, ex).submit();
+            return 0;
         });
 
     }

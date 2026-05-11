@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Objects;
@@ -57,6 +58,19 @@ public class HealthListener implements Listener {
     @EventHandler
     void onJoin(PlayerJoinEvent event) {
         updateHealth(event.getPlayer());
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerRegen(EntityRegainHealthEvent event) {
+        if (event.getRegainReason() != EntityRegainHealthEvent.RegainReason.SATIATED) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof LivingEntity livingEntity)) {
+            return;
+        }
+
+        event.setAmount(entityHealthService.getMaxHealth(livingEntity) / 20);
     }
 
     private void updateHealth(LivingEntity entity) {

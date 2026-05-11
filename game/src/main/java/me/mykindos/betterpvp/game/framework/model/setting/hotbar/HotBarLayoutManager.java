@@ -173,6 +173,9 @@ public class HotBarLayoutManager {
                 });
 
                 hotBarLayouts.put(client.getUniqueId(), layouts);
+            }).exceptionally(ex -> {
+                log.error("Failed to load hotbar layout for " + client.getName(), ex).submit();
+                return null;
             });
 
 
@@ -214,6 +217,9 @@ public class HotBarLayoutManager {
                     log.error("Failed to save layout for {}", client.getId(), ex).submit();
                 }
             });
+        }).exceptionally(ex -> {
+            log.error("Failed to save layout for " + player.getName(), ex).submit();
+            return null;
         });
 
     }

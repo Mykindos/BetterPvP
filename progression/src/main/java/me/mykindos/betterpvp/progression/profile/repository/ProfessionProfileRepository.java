@@ -191,7 +191,7 @@ public class ProfessionProfileRepository {
                         .set(PROGRESSION_BUILDS.PROFESSION, build.getProfession())
                         .set(PROGRESSION_BUILDS.SKILL, skill.getName())
                         .set(PROGRESSION_BUILDS.LEVEL, level)
-                        .onConflict()
+                        .onConflict(PROGRESSION_BUILDS.CLIENT, PROGRESSION_BUILDS.SEASON, PROGRESSION_BUILDS.PROFESSION, PROGRESSION_BUILDS.SKILL)
                         .doUpdate()
                         .set(PROGRESSION_BUILDS.LEVEL, level);
                 queries.add(query);
@@ -200,6 +200,9 @@ public class ProfessionProfileRepository {
             if (!queries.isEmpty()) {
                 ctx.batch(queries).execute();
             }
+        }).exceptionally(ex -> {
+            log.error("Failed to update builds for " + uuid, ex).submit();
+            return null;
         });
 
     }
@@ -217,11 +220,14 @@ public class ProfessionProfileRepository {
                     .set(PROGRESSION_PROPERTIES.PROFESSION, profession)
                     .set(PROGRESSION_PROPERTIES.PROPERTY, property)
                     .set(PROGRESSION_PROPERTIES.VALUE, value.toString())
-                    .onConflict()
+                    .onConflict(PROGRESSION_PROPERTIES.CLIENT, PROGRESSION_PROPERTIES.SEASON, PROGRESSION_PROPERTIES.PROFESSION, PROGRESSION_PROPERTIES.PROPERTY)
                     .doUpdate()
                     .set(PROGRESSION_PROPERTIES.VALUE, value.toString());
 
             queuedStatUpdates.get().put(gamer + property, query);
+        }).exceptionally(ex -> {
+            log.error("Failed to save progression property for " + gamer + " " + profession + " " + property, ex).submit();
+            return null;
         });
     }
 
@@ -252,9 +258,12 @@ public class ProfessionProfileRepository {
     }
 
     public void deleteBuildsForClient(Client client) {
-        database.getAsyncDslContext().executeAsync(ctx -> ctx.deleteFrom(PROGRESSION_BUILDS)
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.deleteFrom(PROGRESSION_BUILDS)
                 .where(PROGRESSION_BUILDS.CLIENT.eq(client.getId()))
-                .execute());
+                .execute()).exceptionally(ex -> {
+            log.error("Failed to delete builds for " + client.getName(), ex).submit();
+            return null;
+        });
     }
 
 }

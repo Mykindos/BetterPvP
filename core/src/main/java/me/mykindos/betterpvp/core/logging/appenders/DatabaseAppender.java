@@ -98,6 +98,9 @@ public class DatabaseAppender implements LogAppender {
                 log.error("Failed to process batched logs", e).submit();
 
             }
+        }).exceptionally(ex -> {
+            log.error("Failed to process batched logs", ex).submit();
+            return null;
         });
     }
 
@@ -155,7 +158,10 @@ public class DatabaseAppender implements LogAppender {
             } catch (Exception ex) {
                 log.error("Failed to insert batched logs", ex).submit();
             }
-        }, LOG_EXECUTOR);
+        }, LOG_EXECUTOR).exceptionally(ex -> {
+            log.error("Failed to insert batched logs in executor", ex).submit();
+            return null;
+        });
     }
 
     /**

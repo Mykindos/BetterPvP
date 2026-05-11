@@ -182,6 +182,9 @@ public class ClientManager extends PlayerManager<Client> {
             final Client client = loaded.get();
             this.storeNewClient(client, true).join();
             return Optional.of(client);
+        }).exceptionally(throwable -> {
+            log.error("Failed to load online client " + uuid + " (" + name + ")", throwable).submit();
+            return Optional.empty();
         });
     }
 

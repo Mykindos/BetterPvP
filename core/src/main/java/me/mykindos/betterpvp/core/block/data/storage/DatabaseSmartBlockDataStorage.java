@@ -100,7 +100,7 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
                         .set(SMART_BLOCK_DATA.BLOCK_TYPE, instance.getType().getKey())
                         .set(SMART_BLOCK_DATA.DATA_TYPE_CLASS, data.getDataType().getName())
                         .set(SMART_BLOCK_DATA.DATA, serializedData)
-                        .onConflict()
+                        .onConflict(SMART_BLOCK_DATA.REALM, SMART_BLOCK_DATA.WORLD, SMART_BLOCK_DATA.CHUNK_KEY, SMART_BLOCK_DATA.BLOCK_KEY)
                         .doUpdate()
                         .set(SMART_BLOCK_DATA.BLOCK_TYPE, instance.getType().getKey())
                         .set(SMART_BLOCK_DATA.DATA_TYPE_CLASS, data.getDataType().getName())

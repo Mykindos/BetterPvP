@@ -118,6 +118,9 @@ public class WorldLogHandler extends Manager<String, WorldLogSession> {
                 pageComponent = pageComponent.append(Component.text(")", NamedTextColor.GRAY));
                 UtilMessage.message(player, pageComponent);
             }
+        }).exceptionally(ex -> {
+            log.error("Failed to display world log results for " + player.getName(), ex).submit();
+            return null;
         });
     }
 

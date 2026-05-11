@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Setter
 @Getter
@@ -99,8 +100,8 @@ public abstract class CombatData extends PlayerData {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
-
+    protected CompletableFuture<Void> prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
+        return CompletableFuture.completedFuture(null);
     }
 
     public final float getKillDeathRatio() {

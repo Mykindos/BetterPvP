@@ -143,6 +143,9 @@ public class DatabaseFilterService implements IFilterService {
             // Also check normalized message
             String normalized = UtilFormat.normalize(message);
             return pattern.matcher(normalized).find();
+        }).exceptionally(ex -> {
+            log.error("Error filtering message", ex).submit();
+            return false;
         });
     }
 
@@ -221,6 +224,9 @@ public class DatabaseFilterService implements IFilterService {
             }
 
             return new String(resultChars);
+        }).exceptionally(ex -> {
+            log.error("Error filtering message", ex).submit();
+            return message;
         });
     }
 
@@ -235,6 +241,9 @@ public class DatabaseFilterService implements IFilterService {
                             .children(textComponent.children());
                 }
             }
+            return message;
+        }).exceptionally(ex -> {
+            log.error("Error filtering message", ex).submit();
             return message;
         });
     }

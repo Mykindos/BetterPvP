@@ -44,6 +44,9 @@ public class ShadowChatFilterManager extends Manager<String, String> {
             } catch (DataAccessException e) {
                 log.error("Error loading filtered words", e).submit();
             }
+        }).exceptionally(ex -> {
+            log.error("Error loading filtered words", ex).submit();
+            return null;
         });
 
     }
@@ -80,6 +83,9 @@ public class ShadowChatFilterManager extends Manager<String, String> {
             }
 
             return false;
+        }).exceptionally(ex -> {
+            log.error("Failed to save filtered word: {}", word, ex).submit();
+            return false;
         });
     }
 
@@ -112,6 +118,9 @@ public class ShadowChatFilterManager extends Manager<String, String> {
                 log.error("Failed to delete filtered words matching: {}", lowercaseWord, ex).submit();
             }
 
+            return false;
+        }).exceptionally(ex -> {
+            log.error("Failed to delete filtered words matching: {}", lowercaseWord, ex).submit();
             return false;
         });
 

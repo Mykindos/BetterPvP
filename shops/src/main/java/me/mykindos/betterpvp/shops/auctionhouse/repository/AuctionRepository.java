@@ -93,6 +93,7 @@ public class AuctionRepository implements IRepository<Auction> {
             ctx.insertInto(AUCTIONS)
                     .set(AUCTIONS.ID, auction.getAuctionID())
                     .set(AUCTIONS.REALM, Core.getCurrentRealm().getId())
+                    .set(AUCTIONS.CLIENT, ctx.select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(auction.getSeller().toString())))
                     .set(AUCTIONS.ITEM, Base64.getEncoder().encodeToString(itemStack.serializeAsBytes()))
                     .set(AUCTIONS.PRICE, auction.getSellPrice())
                     .set(AUCTIONS.EXPIRY, auction.getExpiryTime())
@@ -100,6 +101,9 @@ public class AuctionRepository implements IRepository<Auction> {
                     .set(AUCTIONS.CANCELLED, auction.isCancelled())
                     .set(AUCTIONS.DELIVERED, false)
                     .execute();
+        }).exceptionally(throwable -> {
+            log.error("Failed to save auction to database", throwable).submit();
+            return null;
         });
     }
 
@@ -110,6 +114,9 @@ public class AuctionRepository implements IRepository<Auction> {
                     .set(AUCTION_TRANSACTION_HISTORY.BUYER, ctx.select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(buyer.toString())))
                     .set(AUCTION_TRANSACTION_HISTORY.TIME_SOLD, Instant.now().toEpochMilli())
                     .execute();
+        }).exceptionally(throwable -> {
+            log.error("Failed to save auction transaction to database", throwable).submit();
+            return null;
         });
     }
 
@@ -119,6 +126,9 @@ public class AuctionRepository implements IRepository<Auction> {
                     .set(AUCTIONS.SOLD, sold)
                     .where(AUCTIONS.ID.eq(auction.getAuctionID()))
                     .execute();
+        }).exceptionally(throwable -> {
+            log.error("Failed to update auction sold status in database", throwable).submit();
+            return null;
         });
     }
 
@@ -128,6 +138,9 @@ public class AuctionRepository implements IRepository<Auction> {
                     .set(AUCTIONS.CANCELLED, cancelled)
                     .where(AUCTIONS.ID.eq(auction.getAuctionID()))
                     .execute();
+        }).exceptionally(throwable -> {
+            log.error("Failed to update auction cancelled status in database", throwable).submit();
+            return null;
         });
     }
 
@@ -137,6 +150,9 @@ public class AuctionRepository implements IRepository<Auction> {
                     .set(AUCTIONS.DELIVERED, delivered)
                     .where(AUCTIONS.ID.eq(auction.getAuctionID()))
                     .execute();
+        }).exceptionally(throwable -> {
+            log.error("Failed to update auction delivered status in database", throwable).submit();
+            return null;
         });
     }
 }

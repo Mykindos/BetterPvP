@@ -41,6 +41,9 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
                     .set(OFFLINE_MESSAGES.MESSAGE, offlineMessage.getRawContent())
                     .execute();
             log.info("Saved offline message {} to database", offlineMessage).submit();
+        }).exceptionally(ex -> {
+            log.error("Failed to save offline message for client " + offlineMessage.getClient(), ex).submit();
+            return null;
         });
     }
 
@@ -87,6 +90,9 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
             return offlineMessages;
 
 
+        }).exceptionally(ex -> {
+            log.error("Failed to retrieve offline messages for client " + clientID, ex).submit();
+            return new ArrayList<>();
         });
     }
 }

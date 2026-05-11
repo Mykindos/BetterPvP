@@ -15,6 +15,7 @@ import org.jooq.impl.DSL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.COMBAT_STATS;
@@ -29,7 +30,7 @@ public class GlobalCombatData extends CombatData {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
+    protected CompletableFuture<Void> prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
         List<Query> killQueries = new ArrayList<>();
         List<Query> contributionQueries = new ArrayList<>();
 
@@ -61,7 +62,6 @@ public class GlobalCombatData extends CombatData {
                 contributionQueries.add(
                         database.getDslContext()
                                 .insertInto(KILL_CONTRIBUTIONS)
-                                .set(KILL_CONTRIBUTIONS.ID, contribution.getId())
                                 .set(KILL_CONTRIBUTIONS.KILL_ID, killId)
                                 .set(KILL_CONTRIBUTIONS.CONTRIBUTOR, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(contribution.getContributor().toString())))
                                 .set(KILL_CONTRIBUTIONS.CONTRIBUTION, contribution.getPercentage())
@@ -75,7 +75,7 @@ public class GlobalCombatData extends CombatData {
             attachment.prepareUpdates(this, database);
         }
 
-// Prepare combat stats query with ON DUPLICATE KEY UPDATE (MySQL) or ON CONFLICT (PostgreSQL)
+        // Prepare combat stats query with ON DUPLICATE KEY UPDATE (MySQL) or ON CONFLICT (PostgreSQL)
         Query combatStatsQuery = database.getDslContext()
                 .insertInto(COMBAT_STATS)
                 .set(COMBAT_STATS.CLIENT, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
@@ -83,13 +83,14 @@ public class GlobalCombatData extends CombatData {
                 .set(COMBAT_STATS.RATING, getRating())
                 .set(COMBAT_STATS.KILLSTREAK, getKillStreak())
                 .set(COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
-                .onDuplicateKeyUpdate()
+                .onConflict(COMBAT_STATS.CLIENT, COMBAT_STATS.REALM)
+                .doUpdate()
                 .set(COMBAT_STATS.RATING, getRating())
                 .set(COMBAT_STATS.KILLSTREAK, getKillStreak())
                 .set(COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak());
 
         // Execute batches sequentially
-        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+        return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
 
             ctx.transaction(configuration -> {
                 DSLContext ctxl = DSL.using(configuration);
