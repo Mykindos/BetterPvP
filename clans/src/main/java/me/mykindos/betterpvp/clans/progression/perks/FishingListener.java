@@ -41,7 +41,7 @@ public class FishingListener implements Listener {
     public void onStartFishing(PlayerStartFishingEvent event) {
         Player player = event.getPlayer();
         if (clanManager.isInSafeZone(player)) {
-            denyFishing(event, player, "You cannot fish in the <red>Safe Zone</red>.");
+            denyFishing(event, player, "You cannot fish in a <aqua>Safe Zone</aqua>.");
             return;
         }
 

@@ -28,7 +28,7 @@ public class RecoveryRuneHandler implements Listener {
         this.componentLookupService = lookupService;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onHeal(EntityRegainHealthEvent event) {
         if (event.getRegainReason() != EntityRegainHealthEvent.RegainReason.SATIATED) {
             return;
