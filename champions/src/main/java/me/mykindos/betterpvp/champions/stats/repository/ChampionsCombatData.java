@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.stats.repository;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.*;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 
+@CustomLog
 public class ChampionsCombatData extends CombatData {
 
     private final RoleManager roleManager;
@@ -110,11 +112,15 @@ public class ChampionsCombatData extends CombatData {
                     .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
                     .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
                     .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
-                    .onDuplicateKeyUpdate()
+                    .onConflict()
+                    .doUpdate()
                     .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
                     .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
                     .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to save champions combat stats", ex).submit();
+            return null;
         });
 
         pendingKills.clear();

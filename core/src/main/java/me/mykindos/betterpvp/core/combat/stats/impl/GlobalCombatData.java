@@ -75,7 +75,7 @@ public class GlobalCombatData extends CombatData {
             attachment.prepareUpdates(this, database);
         }
 
-// Prepare combat stats query with ON DUPLICATE KEY UPDATE (MySQL) or ON CONFLICT (PostgreSQL)
+        // Prepare combat stats query with ON DUPLICATE KEY UPDATE (MySQL) or ON CONFLICT (PostgreSQL)
         Query combatStatsQuery = database.getDslContext()
                 .insertInto(COMBAT_STATS)
                 .set(COMBAT_STATS.CLIENT, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
@@ -83,7 +83,8 @@ public class GlobalCombatData extends CombatData {
                 .set(COMBAT_STATS.RATING, getRating())
                 .set(COMBAT_STATS.KILLSTREAK, getKillStreak())
                 .set(COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
-                .onDuplicateKeyUpdate()
+                .onConflict()
+                .doUpdate()
                 .set(COMBAT_STATS.RATING, getRating())
                 .set(COMBAT_STATS.KILLSTREAK, getKillStreak())
                 .set(COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak());
