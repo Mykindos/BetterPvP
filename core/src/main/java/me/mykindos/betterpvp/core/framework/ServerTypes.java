@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 public final class ServerTypes {
 
     public static final ClansServerType CLANS_CLASSIC = new ClansServerType(
-            "Clans Classic", 6, "clans",
+            "Clans Classic", 8, "clans",
             Component.text("Clans Classic", NamedTextColor.RED, TextDecoration.BOLD));
 
     public static final ClansServerType CLANS_SQUADS = new ClansServerType(

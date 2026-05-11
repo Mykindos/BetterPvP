@@ -105,4 +105,8 @@ public class DeathsCurseEffect extends VanillaEffectType {
         return "<white>Death's Curse</white> will take the life of the target upon expiring.";
     }
 
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }
