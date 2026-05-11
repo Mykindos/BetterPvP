@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
+import me.mykindos.betterpvp.core.item.component.impl.DescriptionComponent;
 import me.mykindos.betterpvp.core.item.impl.CutStone;
 import me.mykindos.betterpvp.core.item.impl.EternalFlame;
 import me.mykindos.betterpvp.core.item.impl.RunicPlate;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.item.impl.ShadowQuill;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -35,6 +37,8 @@ public class ImbuementPedestalItem extends BaseItem implements NexoItem {
     @Inject
     private ImbuementPedestalItem() {
         super("Imbuement Pedestal", model, ItemGroup.BLOCK, ItemRarity.RARE);
+        addBaseComponent(new DescriptionComponent(1,
+                Component.text("Place and right-click with ingredients to imbue them.")));
     }
 
     @Override
