@@ -64,6 +64,9 @@ public class WoodcuttingRepository {
                     .set(PROGRESSION_WOODCUTTING.LOCATION, UtilWorld.locationToString(location))
                     .set(PROGRESSION_WOODCUTTING.AMOUNT, amount)
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to save chopped log for " + playerUUID, ex).submit();
+            return null;
         });
 
     }
@@ -114,6 +117,9 @@ public class WoodcuttingRepository {
                 log.error("Error fetching woodcutting leaderboard data", ex).submit();
             }
             return leaderboard;
+        }).exceptionally(ex -> {
+            log.error("Error fetching woodcutting leaderboard data", ex).submit();
+            return new HashMap<>();
         });
     }
 

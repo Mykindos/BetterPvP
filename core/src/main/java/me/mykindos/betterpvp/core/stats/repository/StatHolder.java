@@ -4,9 +4,10 @@ import me.mykindos.betterpvp.core.database.Database;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class StatHolder {
 
-    protected abstract void prepareUpdates(@NotNull UUID uuid, @NotNull Database database);
+    protected abstract CompletableFuture<Void> prepareUpdates(@NotNull UUID uuid, @NotNull Database database);
 
 }

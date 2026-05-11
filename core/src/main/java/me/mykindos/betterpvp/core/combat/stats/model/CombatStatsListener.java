@@ -63,7 +63,14 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
             victimData.killed(event.getKillId(), killerData, contributorData);
 
             // Save everybody's stats
-            getAssignedRepository().saveAsync(victim);
+            getAssignedRepository().saveNowAsync(victim.getUniqueId()).whenComplete((v, t) -> {
+                if (t != null) {
+                    event.getSavePromise().completeExceptionally(t);
+                } else {
+                    event.getSavePromise().complete(null);
+                }
+            });
+
             statsRepositories.forEach((player, repository) -> repository.saveAsync(player));
 
             // Update leaderboard

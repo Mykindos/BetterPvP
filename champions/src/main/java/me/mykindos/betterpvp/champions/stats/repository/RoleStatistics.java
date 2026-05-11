@@ -8,8 +8,11 @@ import me.mykindos.betterpvp.core.stats.repository.StatHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class RoleStatistics extends StatHolder {
 
@@ -33,7 +36,9 @@ public class RoleStatistics extends StatHolder {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
-        combatData.values().forEach(data -> data.prepareUpdates(uuid, database));
+    protected CompletableFuture<Void> prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        combatData.values().forEach(data -> futures.add(data.prepareUpdates(uuid, database)));
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 }

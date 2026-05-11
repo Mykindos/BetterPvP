@@ -44,10 +44,8 @@ public class GildedDiscovery extends ProfessionSkill {
     public String[] getDescription(int level) {
         double chance = UtilMath.round(getTriggerChance(level) * 100.0, 2);
         return new String[]{
-                "When mining stone-based blocks, you have a",
-                "<green>" + chance + "% <reset>chance to get coins,",
-                "",
-                "Does not trigger on actual ore blocks or player-placed blocks."
+                "When mining stone blocks, you have a",
+                "<green>" + chance + "% <reset>chance to get coins."
         };
     }
 

@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemArmorTrim;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.item.component.armor.RoleArmorComponent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
@@ -33,6 +35,7 @@ public class ReinforcedWarlockHelmet extends ArmorItem {
         super(champions, "Reinforced Warlock Helmet", Item.builder(Material.NETHERITE_HELMET)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
+        addBaseComponent(new RoleArmorComponent(Role.WARLOCK));
     }
 
     @Inject

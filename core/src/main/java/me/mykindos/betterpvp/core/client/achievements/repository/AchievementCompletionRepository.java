@@ -76,6 +76,9 @@ public class AchievementCompletionRepository {
                     return;
                 }
             });
+        }).exceptionally(ex -> {
+            log.error("Error saving achievement completion for client " + object.getClient().getName(), ex).submit();
+            return null;
         });
     }
 
@@ -176,7 +179,7 @@ public class AchievementCompletionRepository {
     }
 
     public CompletableFuture<Void> updateTotalCompletions(ConcurrentMap<NamespacedKey, Integer> allMap, ConcurrentMap<Season, ConcurrentMap<NamespacedKey, Integer>> seasonMap, ConcurrentMap<Realm, ConcurrentMap<NamespacedKey, Integer>> realmMap) {
-        return database.getAsyncDslContext().executeAsync(context -> {
+        return database.getAsyncDslContext().executeAsyncVoid(context -> {
             try {
                 Tables.GET_TOTAL_ACHIEVEMENT_COMPLETIONS(context.configuration())
                         .forEach(achievementTotal -> {
@@ -195,11 +198,12 @@ public class AchievementCompletionRepository {
                                 }
                             }
                         });
-                return null;
             } catch (Exception e) {
                 log.error("Error loading total achievement completions", e).submit();
-                return null;
             }
+        }).exceptionally(ex -> {
+            log.error("Error loading total achievement completions", ex).submit();
+            return null;
         });
     }
 

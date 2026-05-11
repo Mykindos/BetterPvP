@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.champions.champions.roles;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.Database;
 
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLDEATH_DATA;
 
 @Singleton
+@CustomLog
 public class RoleRepository {
 
     private final Database database;
@@ -31,7 +33,8 @@ public class RoleRepository {
                     .set(CHAMPIONS_KILLDEATH_DATA.MATCHUP, killKey)
                     .set(CHAMPIONS_KILLDEATH_DATA.METRIC, "Kills")
                     .set(CHAMPIONS_KILLDEATH_DATA.VALUE, 1)
-                    .onDuplicateKeyUpdate()
+                    .onConflict(CHAMPIONS_KILLDEATH_DATA.MATCHUP, CHAMPIONS_KILLDEATH_DATA.METRIC)
+                    .doUpdate()
                     .set(CHAMPIONS_KILLDEATH_DATA.VALUE, CHAMPIONS_KILLDEATH_DATA.VALUE.plus(1))
                     .execute();
 
@@ -40,9 +43,13 @@ public class RoleRepository {
                     .set(CHAMPIONS_KILLDEATH_DATA.MATCHUP, deathKey)
                     .set(CHAMPIONS_KILLDEATH_DATA.METRIC, "Deaths")
                     .set(CHAMPIONS_KILLDEATH_DATA.VALUE, 1)
-                    .onDuplicateKeyUpdate()
+                    .onConflict(CHAMPIONS_KILLDEATH_DATA.MATCHUP, CHAMPIONS_KILLDEATH_DATA.METRIC)
+                    .doUpdate()
                     .set(CHAMPIONS_KILLDEATH_DATA.VALUE, CHAMPIONS_KILLDEATH_DATA.VALUE.plus(1))
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to save kill/death data for roles: {} vs {}", killerRoleName, killedRoleName, ex).submit();
+            return null;
         });
     }
 }

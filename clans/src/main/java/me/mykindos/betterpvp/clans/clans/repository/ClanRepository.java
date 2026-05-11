@@ -189,7 +189,11 @@ public class ClanRepository implements IRepository<Clan> {
 
         List<Query> statementList = statements.values().stream().toList();
         if (async) {
-            database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.batch(statementList).execute());
+            database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.batch(statementList).execute())
+                    .exceptionally(ex -> {
+                        log.error("Failed to process clan property updates", ex).submit();
+                        return null;
+                    });
         } else {
             database.getDslContext().batch(statementList).execute();
         }
@@ -219,6 +223,9 @@ public class ClanRepository implements IRepository<Clan> {
                 saveClanMember(clan, member);
             }
 
+        }).exceptionally(ex -> {
+            log.error("Failed to save clan {}", clan.getName(), ex).submit();
+            return null;
         });
 
     }
@@ -227,7 +234,11 @@ public class ClanRepository implements IRepository<Clan> {
         database.getAsyncDslContext()
                 .executeAsyncVoid(ctx -> ctx.deleteFrom(CLANS)
                         .where(CLANS.ID.eq(clan.getId()))
-                        .execute());
+                        .execute())
+                .exceptionally(ex -> {
+                    log.error("Failed to delete clan {}", clan.getName(), ex).submit();
+                    return null;
+                });
         // The other tables cascade deletes
     }
 

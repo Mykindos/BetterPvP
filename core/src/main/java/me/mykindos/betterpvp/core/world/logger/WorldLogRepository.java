@@ -160,6 +160,9 @@ public class WorldLogRepository {
             } catch (Exception ex) {
                 log.error("Failed to save world logs", ex).submit();
             }
+        }).exceptionally(ex -> {
+            log.error("Failed to save world logs", ex).submit();
+            return null;
         });
 
     }
@@ -262,6 +265,9 @@ public class WorldLogRepository {
             } catch (Exception ex) {
                 log.error("Failed to purge world_logs", ex).submit();
             }
+        }).exceptionally(ex -> {
+            log.error("Failed to purge world logs", ex).submit();
+            return null;
         });
 
     }

@@ -84,6 +84,9 @@ public class PlayerPunishmentHistoryCommand extends Command {
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                         new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);
                     });
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                return null;
             });
 
         }

@@ -92,6 +92,9 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
                     .and(CLANS_FIELDS_ORES.Y.eq(y))
                     .and(CLANS_FIELDS_ORES.Z.eq(z))
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to delete fields ore at {} {} {} {}", x, y, z, world, ex).submit();
+            return null;
         });
     }
 
@@ -104,6 +107,9 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             getQueryForBlockEntry(ctx, ore).execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to save fields ore at {} {} {} {}", ore.getX(), ore.getY(), ore.getZ(), ore.getWorld(), ex).submit();
+            return null;
         });
     }
 
@@ -124,6 +130,9 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
             database.getAsyncDslContext().executeAsyncVoid(actx -> {
                 actx.batch(statements).execute();
+            }).exceptionally(ex -> {
+                log.error("Failed to save fields batch", ex).submit();
+                return null;
             });
         } catch (Exception ex) {
             log.error("Failed saving fields batch", ex).submit();

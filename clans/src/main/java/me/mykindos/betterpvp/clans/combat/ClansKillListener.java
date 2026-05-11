@@ -49,7 +49,10 @@ public class ClansKillListener implements Listener {
             }
         }
 
+        double finalDominance = dominance;
+        event.getSavePromise().thenRunAsync(() -> {
+            clanManager.getRepository().addClanKill(event.getKillId(), killerClan, victimClan, finalDominance);
+        });
 
-        clanManager.getRepository().addClanKill(event.getKillId(), killerClan, victimClan, dominance);
     }
 }
