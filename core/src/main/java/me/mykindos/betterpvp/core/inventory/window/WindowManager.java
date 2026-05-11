@@ -115,7 +115,7 @@ public class WindowManager implements Listener {
         return getWindows();
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void handleInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         AbstractWindow window = (AbstractWindow) getOpenWindow(player);

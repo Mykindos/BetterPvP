@@ -414,10 +414,10 @@ public class InteractionListener implements Listener, PacketListener {
         event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onInventoryLeftClick(InventoryClickEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
-        if (event.getClick() != ClickType.LEFT && event.getClick() != ClickType.SHIFT_LEFT) return;
+        if (event.getClick() != ClickType.LEFT && event.getClick() != ClickType.SHIFT_LEFT && event.getClick() != ClickType.RIGHT && event.getClick() != ClickType.SHIFT_RIGHT) return;
 
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || clicked.getType().isAir()) return;
@@ -426,7 +426,8 @@ public class InteractionListener implements Listener, PacketListener {
         if (contextOpt.isEmpty()) return;
 
         InteractionItemContext ctx = contextOpt.get();
-        InteractionInput input = InteractionInputs.INVENTORY_LEFT_CLICK;
+        InteractionInput input = (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.SHIFT_LEFT)
+                ? InteractionInputs.INVENTORY_LEFT_CLICK : InteractionInputs.INVENTORY_RIGHT_CLICK;
 
         if (processInput(player, input, ctx.itemInstance(), ctx.itemStack(), null)) {
             event.setCancelled(true);
