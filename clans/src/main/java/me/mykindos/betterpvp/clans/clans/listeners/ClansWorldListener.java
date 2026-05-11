@@ -66,6 +66,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -1168,6 +1169,18 @@ public class ClansWorldListener extends ClanListener {
 
             event.setCancelled(true);
             event.getBlock().setType(Material.AIR);
+        }
+    }
+
+    @EventHandler
+    public void onBlockGrow(BlockGrowEvent event) {
+        final Clan clan = clanManager.getClanByLocation(event.getBlock().getLocation()).orElse(null);
+        if (clan == null) {
+            return; // no clan
+        }
+
+        if (clan.isAdmin()) {
+            event.setCancelled(true);
         }
     }
 
