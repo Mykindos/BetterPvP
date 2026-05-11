@@ -25,7 +25,7 @@ public class SalvagersTouchAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "chance to recover an extra materials from stone blocks";
+        return "chance to recover extra materials from stone blocks";
     }
 
     @Override

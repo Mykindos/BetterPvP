@@ -21,6 +21,6 @@ public class BuildSelector extends BaseItem {
     public BuildSelector() {
         super("Build Editor", ItemStack.of(Material.ENCHANTING_TABLE), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
         addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and click on this selector to edit your build.")));
+                Component.text("Place and right-click this to edit your build.")));
     }
 }

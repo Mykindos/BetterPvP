@@ -213,11 +213,7 @@ public class ClansMovementListener extends ClanListener {
 
         clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin() && clan.isSafe()) {
-                if (clan.getName().toLowerCase().contains("spawn")) {
-                    event.setDelayInSeconds(0);
-                } else {
-                    event.setDelayInSeconds(20);
-                }
+                event.setDelayInSeconds(0);
                 return;
             }
 
@@ -252,8 +248,10 @@ public class ClansMovementListener extends ClanListener {
 
                 if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
                     event.setDelayInSeconds(60);
-                } else {
+                } else if (!clan.isAdmin()) {
                     event.setDelayInSeconds(30);
+                } else {
+                    event.setDelayInSeconds(20);
                 }
 
             } else {

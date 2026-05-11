@@ -21,6 +21,6 @@ public class ClassSelector extends BaseItem {
     public ClassSelector() {
         super("Class Selector", ItemStack.of(Material.SCULK_SHRIEKER), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
         addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and stand on this selector to change your class.")));
+                Component.text("Place and right-click this to change your class.")));
     }
 }
