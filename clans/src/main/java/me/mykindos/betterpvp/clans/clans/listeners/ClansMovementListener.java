@@ -213,11 +213,7 @@ public class ClansMovementListener extends ClanListener {
 
         clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
             if (clan.isAdmin() && clan.isSafe()) {
-                if (clan.getName().toLowerCase().contains("spawn")) {
-                    event.setDelayInSeconds(0);
-                } else {
-                    event.setDelayInSeconds(20);
-                }
+                event.setDelayInSeconds(0);
                 return;
             }
 
