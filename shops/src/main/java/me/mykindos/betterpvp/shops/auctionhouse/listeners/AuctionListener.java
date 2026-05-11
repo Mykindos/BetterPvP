@@ -118,7 +118,7 @@ public class AuctionListener implements Listener {
     public void onMoveCancelSearch(PlayerMoveEvent event) {
         if (event.hasChangedBlock()) {
             if (event.getPlayer().hasMetadata("auction-search")) {
-                UtilMessage.simpleMessage(event.getPlayer(), "Auction House", "Search cancelled.");
+                UtilMessage.simpleMessage(event.getPlayer(), "Auction House", "Search cancelled due to movement.");
                 event.getPlayer().removeMetadata("auction-search", JavaPlugin.getPlugin(Shops.class));
             }
         }
