@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.menu.button.filter.NameSearchButton;
+import me.mykindos.betterpvp.core.menu.button.filter.RaritySearchButton;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -27,7 +28,6 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -115,7 +115,7 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
             refresh();
         }));
         setItem(46, new CustomOnlyButton());
-        setItem(47, new RaritySearchButton());
+        setItem(47, new RaritySearchButton(() -> raritySearch, newRarity -> raritySearch = newRarity, this::refresh));
         setItem(52, new AutoUpdateItem(1, () -> {
             if (!searchFuture.isDone()) {
                 return ItemView.builder()
@@ -273,56 +273,6 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
         @Override
         public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
             customOnly = !customOnly;
-            refresh();
-            notifyWindows();
-        }
-
-        @Override
-        public double getCooldown() {
-            return 0.4;
-        }
-    }
-
-    private class RaritySearchButton extends AbstractItem implements CooldownButton {
-
-        private final ItemRarity[] pool;
-        private int index = 0;
-
-        private RaritySearchButton() {
-            this.pool = new ItemRarity[ItemRarity.values().length + 1];
-            this.pool[0] = null;
-            System.arraycopy(ItemRarity.values(), 0, pool, 1, ItemRarity.values().length);
-        }
-
-        @Override
-        public ItemProvider getItemProvider() {
-            final ItemView.ItemViewBuilder builder = ItemView.builder();
-            builder.material(Material.PAPER);
-            builder.itemModel(Key.key("betterpvp", "menu/icon/regular/crown_icon"));
-
-            boolean titled = false;
-            for (ItemRarity itemRarity : pool) {
-                TextColor color = raritySearch == itemRarity ? TextColor.color(0xFFD700) : NamedTextColor.GRAY;
-                String name = itemRarity == null ? "All Rarities" : itemRarity.getName();
-                if (!titled) {
-                    builder.displayName(Component.text(name, color));
-                    titled = true;
-                } else {
-                    builder.lore(Component.text(name, color));
-                }
-            }
-
-            return builder.build();
-        }
-
-        @Override
-        public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-            if (clickType.isLeftClick()) {
-                index = (index + 1) % pool.length;
-            } else {
-                index = (index - 1 + pool.length) % pool.length;
-            }
-            raritySearch = pool[index];
             refresh();
             notifyWindows();
         }
