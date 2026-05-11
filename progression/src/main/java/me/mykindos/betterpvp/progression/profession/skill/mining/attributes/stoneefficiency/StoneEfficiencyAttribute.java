@@ -25,7 +25,7 @@ public class StoneEfficiencyAttribute implements IProfessionAttribute {
 
     @Override
     public String getDescription() {
-        return "increased mining speed against stone-based blocks";
+        return "increased mining speed against stone blocks";
     }
 
     @Override
