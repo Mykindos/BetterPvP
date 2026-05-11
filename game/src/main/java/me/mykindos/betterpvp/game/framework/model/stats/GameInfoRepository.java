@@ -63,6 +63,9 @@ public class GameInfoRepository implements IRepository<GameInfo> {
                 DSLContext ctxl = DSL.using(config);
                 ctxl.batch(queries).execute();
             });
+        }).exceptionally(throwable -> {
+            log.error("Failed to save game info", throwable).submit();
+            return null;
         });
     }
 }

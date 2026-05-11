@@ -91,6 +91,9 @@ public class ShopItemRepository {
                 }
 
                 return shopItems;
+            }).exceptionally(ex -> {
+                log.error("Failed to load shop items", ex).submit();
+                return null;
             }).join();
 
         } catch (Exception ex) {
@@ -112,6 +115,9 @@ public class ShopItemRepository {
             }
 
             ctx.batch(queries).execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to update stock for dynamic shop items", ex).submit();
+            return null;
         });
     }
 
@@ -150,6 +156,9 @@ public class ShopItemRepository {
                     .onConflict(SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID, SHOPITEMS_DYNAMIC_PRICING.REALM)
                     .doNothing()
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to copy templated dynamic prices", ex).submit();
+            return null;
         }).join();
     }
 
