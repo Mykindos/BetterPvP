@@ -81,6 +81,9 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
                 ctxl.update(COMBAT_STATS).set(COMBAT_STATS.VALID, isValid).where(COMBAT_STATS.CLIENT.eq(client.getId())).execute();
                 ctxl.update(CHAMPIONS_COMBAT_STATS).set(CHAMPIONS_COMBAT_STATS.VALID, isValid).where(CHAMPIONS_COMBAT_STATS.CLIENT.eq(client.getId())).execute();
             });
+        }).exceptionally(ex -> {
+            log.error("Failed to validate combat stats for " + client.getName(), ex).submit();
+            return null;
         });
     }
 }

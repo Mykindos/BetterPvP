@@ -63,6 +63,9 @@ public class ProfessionRepository {
                         .fetchOne(PROGRESSION_EXP.EXPERIENCE);
 
                 return experience != null ? experience : 0L;
+            }).exceptionally(ex -> {
+                log.error("Error fetching experience for player {} in profession {}", player, profession, ex).submit();
+                return 0L;
             });
         } catch (Exception e) {
             log.error("Error fetching leaderboard data for player {}", player, e).submit();
@@ -90,6 +93,9 @@ public class ProfessionRepository {
                         });
 
                 return leaderboard;
+            }).exceptionally(ex -> {
+                log.error("Error fetching experience leaderboard for profession {}", profession, ex).submit();
+                return new HashMap<>();
             });
         } catch (Exception e) {
             log.error("Error fetching leaderboard data", e).submit();

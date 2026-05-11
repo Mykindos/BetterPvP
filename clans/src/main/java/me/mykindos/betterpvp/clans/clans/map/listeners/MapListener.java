@@ -65,7 +65,7 @@ public class MapListener implements Listener {
         clanMapService.loadChunks(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.FILLED_MAP);
     }

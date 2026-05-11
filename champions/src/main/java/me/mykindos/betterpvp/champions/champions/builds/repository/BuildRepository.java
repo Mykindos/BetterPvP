@@ -141,6 +141,9 @@ public class BuildRepository implements IRepository<RoleBuild> {
                     .set(CHAMPIONS_BUILDS.ACTIVE, build.isActive() ? 1 : 0)
                     .onConflict(CHAMPIONS_BUILDS.CLIENT, CHAMPIONS_BUILDS.ROLE, CHAMPIONS_BUILDS.ID).doNothing()
                     .execute();
+        }).exceptionally(ex -> {
+            log.error("Failed to save build for client " + build.getClientId(), ex).submit();
+            return null;
         });
     }
 
@@ -173,6 +176,9 @@ public class BuildRepository implements IRepository<RoleBuild> {
                     .execute();
 
             log.info("Saved build for {} role {}", build.getClientId(), build.getRole().getName()).submit();
+        }).exceptionally(ex -> {
+            log.error("Failed to update build for client " + build.getClientId(), ex).submit();
+            return null;
         });
     }
 

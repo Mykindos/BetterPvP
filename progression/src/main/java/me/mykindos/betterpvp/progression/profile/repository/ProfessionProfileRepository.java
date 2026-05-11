@@ -200,6 +200,9 @@ public class ProfessionProfileRepository {
             if (!queries.isEmpty()) {
                 ctx.batch(queries).execute();
             }
+        }).exceptionally(ex -> {
+            log.error("Failed to update builds for " + uuid, ex).submit();
+            return null;
         });
 
     }
@@ -255,9 +258,12 @@ public class ProfessionProfileRepository {
     }
 
     public void deleteBuildsForClient(Client client) {
-        database.getAsyncDslContext().executeAsync(ctx -> ctx.deleteFrom(PROGRESSION_BUILDS)
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.deleteFrom(PROGRESSION_BUILDS)
                 .where(PROGRESSION_BUILDS.CLIENT.eq(client.getId()))
-                .execute());
+                .execute()).exceptionally(ex -> {
+            log.error("Failed to delete builds for " + client.getName(), ex).submit();
+            return null;
+        });
     }
 
 }

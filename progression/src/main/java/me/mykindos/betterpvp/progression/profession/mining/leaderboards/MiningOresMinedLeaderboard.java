@@ -95,7 +95,10 @@ public class MiningOresMinedLeaderboard extends PlayerLeaderboard<Integer> {
             } catch (DataAccessException ex) {
                 log.error("Error fetching leaderboard data", ex).submit();
             }
-        });
+        }).exceptionally(ex -> {
+            log.error("Error fetching mining leaderboard data", ex).submit();
+            return null;
+        }).join();
 
         return leaderboard;
     }

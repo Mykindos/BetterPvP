@@ -125,7 +125,10 @@ public class FishingRepository {
             }
 
             return null;
-        }));
+        })).exceptionally(ex -> {
+            log.error("Failed to fetch biggest catch for {}", player.toString(), ex).submit();
+            return null;
+        });
 
     }
 
@@ -151,6 +154,9 @@ public class FishingRepository {
             }
 
             return leaderboard;
+        }).exceptionally(ex -> {
+            log.error("Error fetching fishing leaderboard data", ex).submit();
+            return new HashMap<>();
         });
     }
 
@@ -173,6 +179,9 @@ public class FishingRepository {
                 log.error("Error fetching leaderboard data", ex).submit();
             }
             return leaderboard;
+        }).exceptionally(ex -> {
+            log.error("Error fetching fishing leaderboard data", ex).submit();
+            return new HashMap<>();
         });
     }
 
@@ -195,6 +204,9 @@ public class FishingRepository {
                 log.error("Error fetching leaderboard data", ex).submit();
             }
             return leaderboard;
+        }).exceptionally(ex -> {
+            log.error("Error fetching fishing leaderboard data", ex).submit();
+            return new HashMap<>();
         });
     }
 

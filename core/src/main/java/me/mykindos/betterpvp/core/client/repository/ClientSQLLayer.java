@@ -259,6 +259,9 @@ public class ClientSQLLayer {
                     .where(CLIENT_PROPERTIES.CLIENT.eq(client.getId()))
                     .fetch();
             loadPropertiesAsync(result, client);
+        }).exceptionally(ex -> {
+            log.error("Error loading client properties for " + client.getUuid(), ex).submit();
+            return null;
         });
     }
 
@@ -277,6 +280,9 @@ public class ClientSQLLayer {
                     .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getId()))
                     .fetch();
             loadPropertiesAsync(result, gamer);
+        }).exceptionally(ex -> {
+            log.error("Error loading gamer properties for " + client.getUuid(), ex).submit();
+            return null;
         });
     }
 
@@ -299,6 +305,9 @@ public class ClientSQLLayer {
                         }
                     });
             statContainer.getStats().copyFrom(tempMap);
+        }).exceptionally(ex -> {
+            log.error("Error loading stats for " + client.getUuid(), ex).submit();
+            return null;
         });
     }
 
@@ -353,14 +362,20 @@ public class ClientSQLLayer {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.insertInto(IGNORES)
                 .set(IGNORES.CLIENT, client.getId())
                 .set(IGNORES.IGNORED, ignored.getId())
-                .execute());
+                .execute()).exceptionally(ex -> {
+            log.error("Error saving ignore for " + client.getUuid() + " (ignored: " + ignored.getUuid() + ")", ex).submit();
+            return null;
+        });
     }
 
     public void removeIgnore(Client client, Client ignored) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.deleteFrom(IGNORES)
                 .where(IGNORES.CLIENT.eq(client.getId()))
                 .and(IGNORES.IGNORED.eq(ignored.getId()))
-                .execute());
+                .execute()).exceptionally(ex -> {
+            log.error("Error removing ignore for " + client.getUuid() + " (ignored: " + ignored.getUuid() + ")", ex).submit();
+            return null;
+        });
     }
 
     public void saveProperty(Client client, String property, Object value) {
@@ -520,6 +535,9 @@ public class ClientSQLLayer {
                         DSLContext ctxl = DSL.using(config);
                         ctxl.batch(queries).execute();
                     });
+                }).exceptionally(ex -> {
+                    log.error("Error executing queries as transaction with {} queries", queries.size(), ex).submit();
+                    return null;
                 });
             } else {
                 database.getDslContext().transaction(config -> {
@@ -576,6 +594,9 @@ public class ClientSQLLayer {
                         .doNothing()
                         .execute();
             });
+        }).exceptionally(ex -> {
+            log.error("Error updating client name for " + client.getUuid(), ex).submit();
+            return null;
         });
 
 
