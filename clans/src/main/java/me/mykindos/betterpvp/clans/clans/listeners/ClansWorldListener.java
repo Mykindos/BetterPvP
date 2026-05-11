@@ -37,7 +37,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import me.mykindos.betterpvp.core.world.events.PlayerUseStonecutterEvent;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -1203,15 +1202,6 @@ public class ClansWorldListener extends ClanListener {
         if (clan.isOnline()) return;
 
         event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onSalvage(PlayerUseStonecutterEvent event) {
-        Material material = event.getItem().getType();
-        if (material == Material.DIAMOND_AXE || material == Material.GOLDEN_AXE
-                || material == Material.DIAMOND_SWORD || material == Material.GOLDEN_SWORD) {
-            event.cancel("Cannot salvage this item");
-        }
     }
 
     @EventHandler
