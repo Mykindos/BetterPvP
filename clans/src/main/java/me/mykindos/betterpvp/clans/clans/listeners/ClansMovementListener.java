@@ -248,8 +248,10 @@ public class ClansMovementListener extends ClanListener {
 
                 if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
                     event.setDelayInSeconds(60);
-                } else {
+                } else if (!clan.isAdmin()) {
                     event.setDelayInSeconds(30);
+                } else {
+                    event.setDelayInSeconds(20);
                 }
 
             } else {
