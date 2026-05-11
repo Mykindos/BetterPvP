@@ -16,12 +16,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.*;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
@@ -60,7 +63,7 @@ public class ChampionsCombatData extends CombatData {
     }
 
     @Override
-    protected void prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
+    protected CompletableFuture<Void> prepareUpdates(@NotNull UUID uuid, @NotNull Database database) {
         List<ChampionsKillsRecord> killRecords = new ArrayList<>();
         List<ChampionsKillContributionsRecord> contributionRecords = new ArrayList<>();
 
@@ -93,37 +96,42 @@ public class ChampionsCombatData extends CombatData {
         }
 
         // Save self-rating (this saves independently for each player)
-        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            // Batch insert kills
-            if (!killRecords.isEmpty()) {
-                ctx.batchInsert(killRecords).execute();
-            }
+        CompletableFuture<Void> future = database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            ctx.transaction(configuration -> {
+                DSLContext ctxl = DSL.using(configuration);
 
-            // Batch insert contributions
-            if (!contributionRecords.isEmpty()) {
-                ctx.batchInsert(contributionRecords).execute();
-            }
+                // Batch insert kills
+                if (!killRecords.isEmpty()) {
+                    ctxl.batchInsert(killRecords).execute();
+                }
 
-            // Insert/update victim rating using INSERT ... ON DUPLICATE KEY UPDATE
-            ctx.insertInto(CHAMPIONS_COMBAT_STATS)
-                    .set(CHAMPIONS_COMBAT_STATS.CLIENT, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
-                    .set(CHAMPIONS_COMBAT_STATS.REALM, Core.getCurrentRealm().getId())
-                    .set(CHAMPIONS_COMBAT_STATS.CLASS, role == null ? "" : role.toString())
-                    .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
-                    .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
-                    .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
-                    .onConflict()
-                    .doUpdate()
-                    .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
-                    .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
-                    .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
-                    .execute();
+                // Batch insert contributions
+                if (!contributionRecords.isEmpty()) {
+                    ctxl.batchInsert(contributionRecords).execute();
+                }
+
+                // Insert/update victim rating using INSERT ... ON DUPLICATE KEY UPDATE
+                ctxl.insertInto(CHAMPIONS_COMBAT_STATS)
+                        .set(CHAMPIONS_COMBAT_STATS.CLIENT, ctxl.select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(getHolder().toString())))
+                        .set(CHAMPIONS_COMBAT_STATS.REALM, Core.getCurrentRealm().getId())
+                        .set(CHAMPIONS_COMBAT_STATS.CLASS, role == null ? "" : role.toString())
+                        .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
+                        .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
+                        .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
+                        .onConflict(CHAMPIONS_COMBAT_STATS.CLIENT, CHAMPIONS_COMBAT_STATS.REALM, CHAMPIONS_COMBAT_STATS.CLASS)
+                        .doUpdate()
+                        .set(CHAMPIONS_COMBAT_STATS.RATING, getRating())
+                        .set(CHAMPIONS_COMBAT_STATS.KILLSTREAK, getKillStreak())
+                        .set(CHAMPIONS_COMBAT_STATS.HIGHEST_KILLSTREAK, getHighestKillStreak())
+                        .execute();
+            });
         }).exceptionally(ex -> {
             log.error("Failed to save champions combat stats", ex).submit();
             return null;
         });
 
         pendingKills.clear();
+        return future;
     }
 
 }

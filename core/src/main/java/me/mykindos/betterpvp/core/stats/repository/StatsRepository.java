@@ -47,6 +47,15 @@ public abstract class StatsRepository<T extends StatHolder> {
         });
     }
 
+    public final CompletableFuture<Void> saveNowAsync(UUID player) {
+        final CompletableFuture<T> future = dataCache.getIfPresent(player);
+        if (future != null && future.isDone()) {
+            T data = future.join();
+            return data.prepareUpdates(player, database);
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
     /**
      * Called after all data is saved, before the save queue is cleared.
      */

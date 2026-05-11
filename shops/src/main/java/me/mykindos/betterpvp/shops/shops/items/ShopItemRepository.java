@@ -147,7 +147,7 @@ public class ShopItemRepository {
                                     .from(SHOPITEMS_DYNAMIC_PRICING)
                                     .where(SHOPITEMS_DYNAMIC_PRICING.REALM.eq(0))
                     )
-                    .onConflict()
+                    .onConflict(SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID, SHOPITEMS_DYNAMIC_PRICING.REALM)
                     .doNothing()
                     .execute();
         }).join();

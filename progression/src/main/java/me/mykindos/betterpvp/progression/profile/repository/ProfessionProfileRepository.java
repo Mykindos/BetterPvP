@@ -191,7 +191,7 @@ public class ProfessionProfileRepository {
                         .set(PROGRESSION_BUILDS.PROFESSION, build.getProfession())
                         .set(PROGRESSION_BUILDS.SKILL, skill.getName())
                         .set(PROGRESSION_BUILDS.LEVEL, level)
-                        .onConflict()
+                        .onConflict(PROGRESSION_BUILDS.CLIENT, PROGRESSION_BUILDS.SEASON, PROGRESSION_BUILDS.PROFESSION, PROGRESSION_BUILDS.SKILL)
                         .doUpdate()
                         .set(PROGRESSION_BUILDS.LEVEL, level);
                 queries.add(query);
@@ -217,7 +217,7 @@ public class ProfessionProfileRepository {
                     .set(PROGRESSION_PROPERTIES.PROFESSION, profession)
                     .set(PROGRESSION_PROPERTIES.PROPERTY, property)
                     .set(PROGRESSION_PROPERTIES.VALUE, value.toString())
-                    .onConflict()
+                    .onConflict(PROGRESSION_PROPERTIES.CLIENT, PROGRESSION_PROPERTIES.SEASON, PROGRESSION_PROPERTIES.PROFESSION, PROGRESSION_PROPERTIES.PROPERTY)
                     .doUpdate()
                     .set(PROGRESSION_PROPERTIES.VALUE, value.toString());
 
