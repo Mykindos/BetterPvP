@@ -171,6 +171,10 @@ public class UtilEntity {
         Preconditions.checkNotNull(destination, "Destination cannot be null");
         Preconditions.checkArgument(destination.getWorld() == lastLocation.getWorld(), "Locations must be in the same world");
 
+        if(!destination.getWorld().equals(lastLocation.getWorld())) {
+            return Optional.empty();
+        }
+
         final Vector directionRaw = destination.toVector().subtract(lastLocation.toVector());
         final double distance = directionRaw.length();
         final Vector direction = distance < 1e-6 ? lastLocation.getDirection() : directionRaw.normalize();

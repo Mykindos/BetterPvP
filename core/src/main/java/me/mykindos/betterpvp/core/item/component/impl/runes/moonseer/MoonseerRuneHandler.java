@@ -3,8 +3,10 @@ package me.mykindos.betterpvp.core.item.component.impl.runes.moonseer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent;
+import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -55,5 +57,32 @@ public class MoonseerRuneHandler implements Listener {
         }
 
         this.effectManager.removeEffect(entity, EffectTypes.NIGHT_VISION, "Moonseer");
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onBlindOrDarkness(EffectReceiveEvent event) {
+        final LivingEntity entity = event.getTarget();
+        final Effect effect = event.getEffect();
+
+        if (effect.getEffectType() == EffectTypes.BLINDNESS || effect.getEffectType() == EffectTypes.DARKNESS) {
+            final EntityEquipment equipment = entity.getEquipment();
+            if (equipment == null) {
+                return;
+            }
+
+            for (ItemStack armorContent : equipment.getArmorContents()) {
+                final Optional<RuneContainerComponent> container = componentLookupService.getComponent(armorContent, RuneContainerComponent.class);
+                if (container.isEmpty()) {
+                    continue; // No runes present
+                }
+
+                final RuneContainerComponent runeContainer = container.get();
+                // has moonseer
+                if (runeContainer.hasRune(moonseerRune)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
     }
 }
