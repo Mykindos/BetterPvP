@@ -6,8 +6,8 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -20,9 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +37,10 @@ public class MinecraftCraftingRecipeAdapter {
 
     private final Provider<ItemFactory> itemFactory;
     private final Provider<CraftingRecipeRegistry> registry;
-    private final Set<Recipe> disabledRecipes = new HashSet<>();
+    // Track disables by NamespacedKey, NOT by Recipe object. Paper's recipe iterator and
+    // Bukkit.getRecipesFor return distinct wrapper instances for the same underlying recipe,
+    // and Recipe has no equals/hashCode override — so a Set<Recipe> would silently never hit.
+    private final Set<NamespacedKey> disabledRecipeKeys = new HashSet<>();
 
     @Inject
     private MinecraftCraftingRecipeAdapter(Provider<ItemFactory> itemFactory, Provider<CraftingRecipeRegistry> registry) {
@@ -48,7 +51,8 @@ public class MinecraftCraftingRecipeAdapter {
     public Map<NamespacedKey, CraftingRecipe> getRecipes() {
         Map<NamespacedKey, CraftingRecipe> recipes = new HashMap<>();
         Bukkit.recipeIterator().forEachRemaining(recipe -> {
-            if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe && !disabledRecipes.contains(craftingRecipe)) {
+            if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe
+                    && !disabledRecipeKeys.contains(craftingRecipe.getKey())) {
                 CraftingRecipe convertedRecipe = convertToCustomRecipe(craftingRecipe);
                 if (convertedRecipe != null) {
                     recipes.put(craftingRecipe.getKey(), convertedRecipe);
@@ -76,19 +80,21 @@ public class MinecraftCraftingRecipeAdapter {
         }
     }
 
-    public Map<NamespacedKey, CraftingRecipe> disableRecipesFor(Material material) {
+    /**
+     * Marks every vanilla recipe that produces {@code material} as disabled, so the next
+     * {@link #registerDefaults} pass on {@link org.bukkit.event.server.ServerLoadEvent} skips
+     * them. Also clears any matching entries already in the registry (no-op on first boot,
+     * relevant on {@code /reload}).
+     */
+    public void disableRecipesFor(Material material) {
         final List<Recipe> mcRecipes = Bukkit.getRecipesFor(new ItemStack(material));
-        final Map<NamespacedKey, CraftingRecipe> recipes = new HashMap<>();
-        disabledRecipes.addAll(mcRecipes);
-
         final CraftingRecipeRegistry recipeRegistry = registry.get();
         for (Recipe recipe : mcRecipes) {
             if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe) {
+                disabledRecipeKeys.add(craftingRecipe.getKey());
                 recipeRegistry.clearRecipe(craftingRecipe.getKey());
-                recipes.put(craftingRecipe.getKey(), convertToCustomRecipe(craftingRecipe));
             }
         }
-        return recipes;
     }
     
     /**
@@ -99,7 +105,6 @@ public class MinecraftCraftingRecipeAdapter {
      * @return Our shaped recipe format
      */
     private ShapedCraftingRecipe convertShapedRecipe(org.bukkit.inventory.ShapedRecipe shapedRecipe, ItemStack result) {
-        // Get the recipe shape and choice map
         String[] shape = shapedRecipe.getShape();
         Map<Character, RecipeChoice> choiceMap = shapedRecipe.getChoiceMap();
 
@@ -109,26 +114,14 @@ public class MinecraftCraftingRecipeAdapter {
                 instance -> instance.getItemStack().setAmount(amount),
                 shape,
                 itemFactory.get());
-        
-        // Add the ingredients
+
         for (Map.Entry<Character, RecipeChoice> entry : choiceMap.entrySet()) {
-            char key = entry.getKey();
-            RecipeChoice choice = entry.getValue();
-            
-            if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
-                // Use the first material as the ingredient
-                Material material = materialChoice.getChoices().getFirst();
-                ItemStack itemStack = new ItemStack(material);
-                ItemInstance instance = itemFactory.get().fromItemStack(itemStack).orElseThrow();
-                builder.setIngredient(key, new RecipeIngredient(instance.getBaseItem(), 1));
-            } else if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
-                // Use the first item as the ingredient
-                ItemStack item = exactChoice.getChoices().getFirst();
-                ItemInstance instance = itemFactory.get().fromItemStack(item).orElseThrow();
-                builder.setIngredient(key, new RecipeIngredient(instance.getBaseItem(), 1));
+            RecipeIngredient ingredient = ingredientFromChoice(entry.getValue());
+            if (ingredient != null) {
+                builder.setIngredient(entry.getKey(), ingredient);
             }
         }
-        
+
         return builder.build();
     }
     
@@ -140,29 +133,15 @@ public class MinecraftCraftingRecipeAdapter {
      * @return Our shapeless recipe format
      */
     private ShapelessCraftingRecipe convertShapelessRecipe(org.bukkit.inventory.ShapelessRecipe shapelessRecipe, ItemStack result) {
-        List<RecipeIngredient> ingredients = new ArrayList<>();
-
-        // Convert each choice to an ingredient
+        Map<Integer, RecipeIngredient> ingredientMap = new HashMap<>();
+        int index = 0;
         for (RecipeChoice choice : shapelessRecipe.getChoiceList()) {
-            if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
-                // Use the first material as the ingredient
-                Material material = materialChoice.getChoices().getFirst();
-                ItemStack itemStack = new ItemStack(material);
-                ItemInstance instance = itemFactory.get().fromItemStack(itemStack).orElseThrow();
-                ingredients.add(new RecipeIngredient(instance.getBaseItem(), 1));
-            } else if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
-                // Use the first item as the ingredient
-                ItemStack item = exactChoice.getChoices().getFirst();
-                ItemInstance instance = itemFactory.get().fromItemStack(item).orElseThrow();
-                ingredients.add(new RecipeIngredient(instance.getBaseItem(), 1));
+            RecipeIngredient ingredient = ingredientFromChoice(choice);
+            if (ingredient != null) {
+                ingredientMap.put(index++, ingredient);
             }
         }
-        
-        Map<Integer, RecipeIngredient> ingredientMap = new HashMap<>();
-        for (int i = 0; i < ingredients.size(); i++) {
-            ingredientMap.put(i, ingredients.get(i));
-        }
-        
+
         final int amount = result.getAmount();
         return new ShapelessCraftingRecipe(
                 itemFactory.get().getFallbackItem(result),
@@ -170,6 +149,35 @@ public class MinecraftCraftingRecipeAdapter {
                 ingredientMap,
                 itemFactory.get(),
                 false);
+    }
+
+    /**
+     * Flattens a Bukkit {@link RecipeChoice} (which represents a vanilla item tag or exact-stack list)
+     * into a {@link RecipeIngredient} that accepts every {@link BaseItem} in the choice.
+     * <p>
+     * Previously this code took {@code choices.getFirst()} and discarded every alternative, which
+     * silently broke any recipe whose ingredient was a tag (chest planks, torch coals, etc.).
+     */
+    private RecipeIngredient ingredientFromChoice(RecipeChoice choice) {
+        Set<BaseItem> baseItems = new LinkedHashSet<>();
+        if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
+            for (Material material : materialChoice.getChoices()) {
+                itemFactory.get().fromItemStack(new ItemStack(material))
+                        .ifPresent(instance -> baseItems.add(instance.getBaseItem()));
+            }
+        } else if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
+            for (ItemStack stack : exactChoice.getChoices()) {
+                itemFactory.get().fromItemStack(stack)
+                        .ifPresent(instance -> baseItems.add(instance.getBaseItem()));
+            }
+        } else {
+            return null;
+        }
+
+        if (baseItems.isEmpty()) {
+            return null;
+        }
+        return new RecipeIngredient(baseItems, 1);
     }
 
     /**

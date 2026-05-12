@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.recipe.crafting;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.access.AccessScope;
@@ -20,10 +18,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -88,44 +88,41 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
 
     @Override
     public boolean matches(@NotNull Map<Integer, ItemStack> items) {
-        Map<BaseItem, Integer> requiredIngredients = new HashMap<>();
-        for (RecipeIngredient ingredient : ingredients.values()) {
-            requiredIngredients.merge(ingredient.getBaseItem(), ingredient.getAmount(), Integer::sum);
+        List<Integer> nonAirSlots = new ArrayList<>();
+        for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+            ItemStack stack = entry.getValue();
+            if (stack != null && !stack.getType().isAir()) {
+                nonAirSlots.add(entry.getKey());
+            }
         }
 
-        Multimap<BaseItem, Integer> availableIngredients = ArrayListMultimap.create();
-        for (ItemStack stack : items.values()) {
-            if (stack == null || stack.getType().isAir()) {
-                continue;
-            }
-
-            itemFactory.fromItemStack(stack).ifPresent(instance -> {
-                BaseItem baseItem = instance.getBaseItem();
-                availableIngredients.put(baseItem, stack.getAmount());
-            });
-        }
-
-        outer:
-        for (Map.Entry<BaseItem, Integer> entry : requiredIngredients.entrySet()) {
-            BaseItem baseItem = entry.getKey();
-            int requiredAmount = entry.getValue();
-
-            if (!availableIngredients.containsKey(baseItem)) {
-                return false;
-            }
-
-            Collection<Integer> availableAmounts = availableIngredients.get(baseItem);
-            for (int availableAmount : availableAmounts) {
-                if (availableAmount >= requiredAmount) {
-                    availableIngredients.remove(baseItem, availableAmount);
-                    continue outer;
-                }
-            }
-
+        if (nonAirSlots.size() != ingredients.size()) {
             return false;
         }
 
-        return availableIngredients.isEmpty();
+        // Greedy per-ingredient slot claim: each ingredient must find an unclaimed grid slot it accepts.
+        // Order ingredients by acceptance breadth (most-restrictive first) so a narrow ingredient
+        // doesn't lose its only viable slot to a broader one that had alternatives.
+        List<RecipeIngredient> orderedIngredients = new ArrayList<>(ingredients.values());
+        orderedIngredients.sort(Comparator.comparingInt(a -> a.getBaseItems().size()));
+
+        Set<Integer> claimed = new HashSet<>();
+        for (RecipeIngredient ingredient : orderedIngredients) {
+            boolean matched = false;
+            for (int slot : nonAirSlots) {
+                if (claimed.contains(slot)) continue;
+                if (ingredient.matches(items.get(slot), itemFactory)) {
+                    claimed.add(slot);
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -156,34 +153,45 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
     public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         List<Integer> consumedSlots = new ArrayList<>();
 
-        Map<BaseItem, Integer> requiredIngredients = new HashMap<>();
-        for (RecipeIngredient ingredient : getIngredients().values()) {
-            if (ingredient.isConsumeOnCraft()) {
-                requiredIngredients.merge(ingredient.getBaseItem(), ingredient.getAmount(), Integer::sum);
-            }
-        }
+        // Order ingredients narrowest-first so we don't strand a single-item ingredient
+        // by greedily claiming its only viable slot for a broader one.
+        List<RecipeIngredient> orderedIngredients = new ArrayList<>(getIngredients().values());
+        orderedIngredients.sort((a, b) -> Integer.compare(a.getBaseItems().size(), b.getBaseItems().size()));
 
-        for (Map.Entry<BaseItem, Integer> entry : requiredIngredients.entrySet()) {
-            BaseItem baseItem = entry.getKey();
-            int amountToConsume = entry.getValue();
+        Set<Integer> claimed = new HashSet<>();
+        for (RecipeIngredient ingredient : orderedIngredients) {
+            int amountToConsume = ingredient.getAmount();
 
-            for (Map.Entry<Integer, ItemInstance> matrixEntry : new HashMap<>(ingredients).entrySet()) {
+            for (Map.Entry<Integer, ItemInstance> matrixEntry : ingredients.entrySet()) {
                 if (amountToConsume <= 0) {
                     break;
                 }
 
                 int slot = matrixEntry.getKey();
-                ItemInstance instance = matrixEntry.getValue();
-
-                if (instance == null) {
+                if (claimed.contains(slot)) {
                     continue;
                 }
 
-                if (!instance.getBaseItem().equals(baseItem)) {
+                ItemInstance instance = matrixEntry.getValue();
+                if (instance == null) {
+                    continue;
+                }
+                if (!ingredient.accepts(instance.getBaseItem())) {
                     continue;
                 }
 
                 ItemStack stack = instance.createItemStack();
+                if (stack.getAmount() < amountToConsume) {
+                    continue;
+                }
+
+                claimed.add(slot);
+
+                if (!ingredient.isConsumeOnCraft()) {
+                    amountToConsume = 0;
+                    break;
+                }
+
                 int amountFromThisStack = Math.min(stack.getAmount(), amountToConsume);
                 amountToConsume -= amountFromThisStack;
 
@@ -197,6 +205,7 @@ public class ShapelessCraftingRecipe implements CraftingRecipe {
                 }
 
                 consumedSlots.add(slot);
+                break;
             }
         }
 

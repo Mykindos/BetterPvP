@@ -3,27 +3,22 @@ package me.mykindos.betterpvp.core.item;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftCraftingRecipeAdapter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
-import java.util.Map;
 import java.util.Set;
 
 @CustomLog
 public final class ItemLoader {
 
     private final ItemRegistry itemRegistry;
-    private final CraftingRecipeRegistry craftingRecipeRegistry;
     private final MinecraftCraftingRecipeAdapter adapter;
     private final BPvPPlugin plugin;
 
     public ItemLoader(BPvPPlugin plugin) {
         this.itemRegistry = plugin.getInjector().getInstance(ItemRegistry.class);
         this.adapter = plugin.getInjector().getInstance(MinecraftCraftingRecipeAdapter.class);
-        this.craftingRecipeRegistry = plugin.getInjector().getInstance(CraftingRecipeRegistry.class);
         this.plugin = plugin;
     }
 
@@ -74,15 +69,11 @@ public final class ItemLoader {
 
     public void registerFallbackItem(NamespacedKey namespacedKey, BaseItem baseItem, Material material, boolean keepRecipe) {
         itemRegistry.registerFallbackItem(namespacedKey, material, baseItem);
-        final Map<NamespacedKey, CraftingRecipe> disabled = adapter.disableRecipesFor(material);
-        if (keepRecipe) {
-            for (Map.Entry<NamespacedKey, CraftingRecipe> entry : disabled.entrySet()) {
-                craftingRecipeRegistry.registerRecipe(entry.getKey(), entry.getValue());
-            }
-        } else {
-            for (Map.Entry<NamespacedKey, CraftingRecipe> entry : disabled.entrySet()) {
-                craftingRecipeRegistry.clearRecipe(entry.getKey());
-            }
+        // keepRecipe=true: do nothing — the ServerLoad pass in CraftingRecipeRegistry.registerMinecraftDefaults()
+        // will convert this material's recipes against the final fallback registry, which is what we want.
+        // keepRecipe=false: mark the recipes as disabled so the ServerLoad pass skips them.
+        if (!keepRecipe) {
+            adapter.disableRecipesFor(material);
         }
     }
 
