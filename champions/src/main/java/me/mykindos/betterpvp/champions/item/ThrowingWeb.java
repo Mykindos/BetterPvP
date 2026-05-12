@@ -10,13 +10,19 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.Rope;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
@@ -24,6 +30,7 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = false)
 public class ThrowingWeb extends BaseItem implements Reloadable {
 
+    private transient boolean registered;
     private final ThrowingWebAbility throwingWebAbility;
 
     @Inject
@@ -45,5 +52,22 @@ public class ThrowingWeb extends BaseItem implements Reloadable {
         throwingWebAbility.setDuration(duration);
         throwingWebAbility.setThrowableExpiry(throwableExpiry);
         throwingWebAbility.setCooldown(cooldown);
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
+        final BaseItem string = itemFactory.getFallbackItem(Material.STRING);
+
+        String[] pattern = new String[] {
+                "S S",
+                " S ",
+                "S S "
+        };
+
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('S', new RecipeIngredient(string, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "throwing_web"), builder.build());
     }
 }
