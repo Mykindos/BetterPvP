@@ -63,6 +63,9 @@ public final class ItemLoader {
             }
 
         }
+
+        // Apply any recipe disables declared in items/recipes.yml for this plugin
+        adapter.disableRecipesFromConfig(plugin);
     }
 
     private void registerFallbackItem(NamespacedKey namespacedKey, BaseItem item, FallbackItem annotation) {

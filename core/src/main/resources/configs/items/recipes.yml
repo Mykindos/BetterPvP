@@ -1,0 +1,8 @@
+disabled:
+  # Disable vanilla recipes that produce these materials (disables ALL recipes for that material).
+  # Use Bukkit Material enum names, e.g.: OAK_BOAT, DIAMOND_SWORD
+  materials: []
+
+  # Disable specific vanilla recipes by their full NamespacedKey, e.g.: minecraft:oak_boat
+  keys: []
+

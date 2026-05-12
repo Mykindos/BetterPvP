@@ -34,12 +34,10 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRules;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.reflections.Reflections;
@@ -143,8 +141,6 @@ public class Clans extends BPvPPlugin {
             final ItemLoader itemLoader = new ItemLoader(this);
             itemLoader.load(adapters, reflectionAdapters.getTypesAnnotatedWith(ItemKey.class));
             this.registerItems();
-
-            clearCraftingRecipes();
         }
     }
 
@@ -167,17 +163,6 @@ public class Clans extends BPvPPlugin {
         this.injector.getInstance(ExplosiveResistanceBootstrap.class).register();
     }
 
-    private void clearCraftingRecipes() {
-        CraftingRecipeRegistry recipeRegistry = injector.getInstance(CraftingRecipeRegistry.class);
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:oak_boat"));
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:spruce_boat"));
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:jungle_boat"));
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:acacia_boat"));
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:dark_oak_boat"));
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:mangrove_boat"));
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:cherry_boat"));
-        recipeRegistry.clearRecipe(NamespacedKey.fromString("minecraft:pale_oak_boat"));
-    }
 
     @Override
     public void onDisable() {

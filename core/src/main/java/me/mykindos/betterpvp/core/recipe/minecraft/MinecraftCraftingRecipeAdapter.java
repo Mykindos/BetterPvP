@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
@@ -168,6 +170,50 @@ public class MinecraftCraftingRecipeAdapter {
                 ingredientMap,
                 itemFactory.get(),
                 false);
+    }
+
+    /**
+     * Reads {@code items/recipes.yml} from the given plugin's data folder and disables any recipes
+     * listed there.  Two sections are supported:
+     * <ul>
+     *   <li>{@code disabled.materials} – list of {@link Material} enum names; every vanilla recipe
+     *       that produces the material is disabled via {@link #disableRecipesFor(Material)}.</li>
+     *   <li>{@code disabled.keys} – list of full {@link NamespacedKey} strings (e.g.
+     *       {@code minecraft:oak_boat}); each recipe is removed directly from the registry.</li>
+     * </ul>
+     * If the plugin does not ship {@code configs/items/recipes.yml} the method returns silently.
+     *
+     * @param plugin the plugin whose {@code items/recipes.yml} should be processed
+     */
+    public void disableRecipesFromConfig(BPvPPlugin plugin) {
+        // Only proceed if the plugin ships this config file
+
+        final ExtendedYamlConfiguration config = plugin.getConfig("items/recipes");
+        final CraftingRecipeRegistry recipeRegistry = registry.get();
+
+        // --- material-based disabling ---
+        List<String> materials = config.getStringList("disabled.materials");
+        for (String materialName : materials) {
+            Material material = Material.matchMaterial(materialName);
+            if (material == null) {
+                log.warn("items/recipes.yml [{}]: unknown material '{}', skipping", plugin.getName(), materialName).submit();
+                continue;
+            }
+            disableRecipesFor(material);
+        }
+
+        // --- key-based disabling ---
+        List<String> keys = config.getStringList("disabled.keys");
+        for (String keyStr : keys) {
+            NamespacedKey key = NamespacedKey.fromString(keyStr);
+            if (key == null) {
+                log.warn("items/recipes.yml [{}]: invalid NamespacedKey '{}', skipping", plugin.getName(), keyStr).submit();
+                continue;
+            }
+            recipeRegistry.clearRecipe(key);
+        }
+
+        plugin.saveConfig();
     }
 
     public void registerDefaults(Map<NamespacedKey, CraftingRecipe> craftingRecipes) {
