@@ -24,11 +24,18 @@ public class AchievementCategories {
 
     public static final NamespacedKey EVENT = new NamespacedKey("events", "event_category");
     public static final NamespacedKey EVENT_UNDEAD_CHESTS = new NamespacedKey("events", "undead_chests");
+    public static final NamespacedKey EVENT_BOSS_SKELETON_KING = new NamespacedKey("events", "boss_skeleton_king");
+    public static final NamespacedKey EVENT_BOSS_DREADBEARD = new NamespacedKey("events", "boss_dreadbeard");
+    public static final NamespacedKey EVENT_BOSS_DEEP_CREATURE = new NamespacedKey("events", "boss_deep_creature");
+    public static final NamespacedKey EVENT_BOSS_ZANZUL = new NamespacedKey("events", "boss_zanzul");
+    public static final NamespacedKey EVENT_BOSS_SOUL_KNIGHT = new NamespacedKey("events", "boss_soul_knight");
 
     public static final NamespacedKey CHAMPIONS = new NamespacedKey("champions", "champions_category");
 
     public static final NamespacedKey DUNGEONS = new NamespacedKey("dungeons", "dungeons_category");
     public static final NamespacedKey DUNGEONS_BRAEWOOD_CAVERNS_PERIOD = new NamespacedKey("dungeons", "braewood_caverns_period");
+    public static final NamespacedKey DUNGEONS_DUSKMIRE_PINNACLE_PERIOD = new NamespacedKey("dungeons", "duskmire_pinnacle_period");
+    public static final NamespacedKey DUNGEONS_OAKMIST_VALLEY_PERIOD = new NamespacedKey("dungeons", "oakmist_valley_period");
 
 
 }
