@@ -43,10 +43,14 @@ public class PlayerInteractionListener implements Listener {
             return;
         }
 
+        if(player.getOpenInventory().getType() != InventoryType.CRAFTING) {
+            return;
+        }
+
         switch (serverController.getCurrentState()) {
             case WAITING, STARTING -> event.setCancelled(true);
             case IN_GAME, ENDING -> {
-                if (!getInteractionSettings().isInventoryClick() && player.getOpenInventory().getType() == InventoryType.CRAFTING) {
+                if (!getInteractionSettings().isInventoryClick()) {
                     event.setCancelled(true);
                 }
             }
