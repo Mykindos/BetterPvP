@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerInteractionSettings;
 import me.mykindos.betterpvp.game.framework.state.GameState;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
@@ -33,6 +35,10 @@ public class PlayerInteractionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {
+        if(!(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
+
         if (!(event.getClickedInventory() instanceof PlayerInventory)) {
             return;
         }
@@ -40,7 +46,7 @@ public class PlayerInteractionListener implements Listener {
         switch (serverController.getCurrentState()) {
             case WAITING, STARTING -> event.setCancelled(true);
             case IN_GAME, ENDING -> {
-                if (!getInteractionSettings().isInventoryClick()) {
+                if (!getInteractionSettings().isInventoryClick() && player.getOpenInventory().getType() == InventoryType.CRAFTING) {
                     event.setCancelled(true);
                 }
             }
