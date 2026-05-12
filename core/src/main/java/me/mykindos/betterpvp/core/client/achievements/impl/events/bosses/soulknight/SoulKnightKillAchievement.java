@@ -51,4 +51,3 @@ public class SoulKnightKillAchievement extends SingleSimpleAchievement {
         return List.of("<gray>Kill the <white>Soul Knight</white> <yellow>" + getGoal().intValue() + "</yellow> times");
     }
 }
-

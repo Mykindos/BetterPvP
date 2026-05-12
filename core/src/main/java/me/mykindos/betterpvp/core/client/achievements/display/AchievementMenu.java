@@ -112,6 +112,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements IAbstract
                         return Boolean.TRUE;
                     })
             );
+            seasonButton.onChangeSeason();
         }
 
         setContent(getItems());

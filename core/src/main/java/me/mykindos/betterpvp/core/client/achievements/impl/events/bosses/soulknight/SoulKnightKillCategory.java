@@ -25,4 +25,3 @@ public class SoulKnightKillCategory extends AchievementCategory {
                 .build();
     }
 }
-

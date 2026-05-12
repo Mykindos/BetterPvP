@@ -27,4 +27,3 @@ public class SoulKnightAchievementLoader extends SingleSimpleAchievementConfigLo
         return new SoulKnightKillAchievement(key, goal.intValue());
     }
 }
-
