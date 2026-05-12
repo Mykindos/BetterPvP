@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.DescriptionComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @Singleton
 @ItemKey("progression:tree_bark")
@@ -16,6 +17,14 @@ public class TreeBark extends BaseItem {
     public TreeBark() {
         super("Tree Bark", Item.model("tree_bark", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
         addBaseComponent(new DescriptionComponent(1,
-                Component.text("A currency used to purchase items from the Lumberjack at Shops.")));
+                Component.text("A currency used to purchase items.")
+                        .append(Component.text("\n"))
+                        .append(Component.text("\n"))
+                        .append(
+                                Component.text("See the" + " ")
+                                        .append(Component.text("Lumberjack").color(NamedTextColor.AQUA))
+                                        .append(Component.text(" " + "at Shops."))
+                        )
+        ));
     }
 }
