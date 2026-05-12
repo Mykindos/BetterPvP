@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.combat.stats.model;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
+import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
@@ -46,7 +47,7 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
                 final Player contributor = contribution.getKey();
                 // We can join because we are already on an async thread
                 CombatData otherData = getCombatData(contributor).join();
-                if (contributor.getUniqueId() == killer.getUniqueId()) {
+                if (contributor.getUniqueId().equals(killer.getUniqueId())) {
                     killerData = otherData;
                 }
                 contributorData.put(otherData, contribution.getValue());
@@ -63,15 +64,27 @@ public abstract class CombatStatsListener<T extends CombatData> implements Liste
             victimData.killed(event.getKillId(), killerData, contributorData);
 
             // Save everybody's stats
-            getAssignedRepository().saveNowAsync(victim.getUniqueId()).whenComplete((v, t) -> {
-                if (t != null) {
-                    event.getSavePromise().completeExceptionally(t);
-                } else {
-                    event.getSavePromise().complete(null);
-                }
-            });
-
-            statsRepositories.forEach((player, repository) -> repository.saveAsync(player));
+            if (!(getAssignedRepository() instanceof GlobalCombatStatsRepository)) {
+                event.getSavePromise().thenRun(() -> {
+                    getAssignedRepository().saveNowAsync(victim.getUniqueId());
+                    statsRepositories.forEach((player, repository) -> repository.saveAsync(player));
+                }).exceptionally(ex -> {
+                    log.error("Failed to save combat stats", ex).submit();
+                    return null;
+                });
+            } else {
+                getAssignedRepository().saveNowAsync(victim.getUniqueId()).whenComplete((v, t) -> {
+                    if (t != null) {
+                        event.getSavePromise().completeExceptionally(t);
+                    } else {
+                        event.getSavePromise().complete(null);
+                    }
+                }).exceptionally(ex -> {
+                    log.error("Failed to save combat stats", ex).submit();
+                    return null;
+                });
+                statsRepositories.forEach((player, repository) -> repository.saveAsync(player));
+            }
 
             // Update leaderboard
             final Map<SearchOptions, Integer> killerUpdate = leaderboard.compute(killer.getUniqueId(), killerData);

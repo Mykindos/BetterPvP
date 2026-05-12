@@ -81,7 +81,7 @@ public class ChampionsCombatData extends CombatData {
             killRecord.setVictimClass(championsKill.getVictimRole() == null ? "" : championsKill.getVictimRole().toString());
             killRecords.add(killRecord);
 
-            contributions.entrySet().removeIf(entry -> entry.getKey().getContributor() == kill.getKiller());
+            contributions.entrySet().removeIf(entry -> entry.getKey().getContributor().equals(kill.getKiller()));
             contributions.forEach((contribution, cRole) -> {
                 ChampionsKillContributionsRecord contributionRecord = database.getDslContext().newRecord(CHAMPIONS_KILL_CONTRIBUTIONS);
                 contributionRecord.setContributionId(contribution.getId());
