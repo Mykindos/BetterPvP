@@ -62,7 +62,7 @@ public class ThrowingWeb extends BaseItem implements Reloadable {
         String[] pattern = new String[] {
                 "S S",
                 " S ",
-                "S S "
+                "S S"
         };
 
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
