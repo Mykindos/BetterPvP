@@ -127,7 +127,11 @@ public abstract class Projectile {
             return Optional.of(new RayTraceResult(location.toVector()));
         }
 
-        if (velocity == null || velocity.lengthSquared() == 0) {
+        if (velocity == null || !velocity.toVector3d().isFinite() || velocity.lengthSquared() == 0) {
+            return Optional.empty();
+        }
+
+        if (!location.toVector().toVector3d().isFinite()) {
             return Optional.empty();
         }
 

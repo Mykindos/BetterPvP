@@ -136,7 +136,10 @@ public class VineSnareAbility extends AbstractInteraction implements DisplayedIn
                     entangleAmplifier,
                     (long) (entangleSeconds * 1000L)
             );
-            final Vector direction = event.getProjectile().getVelocity().normalize();
+            final Vector direction = event.getProjectile().getVelocity().clone();
+            if (direction.lengthSquared() > 0) {
+                direction.normalize();
+            }
             projectile.redirect(direction.multiply(event.getForce() * speed));
             projectiles.add(projectile);
             new SoundEffect(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 1f).play(projectile.getLocation());

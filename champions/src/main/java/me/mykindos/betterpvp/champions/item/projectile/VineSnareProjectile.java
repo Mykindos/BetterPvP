@@ -82,6 +82,7 @@ public class VineSnareProjectile extends Projectile {
 
     @Override
     protected void onTick() {
+        if (getVelocity().lengthSquared() <= 0) return;
         final Vector axis = getVelocity().clone().normalize(); // direction of flight
         final double angle = Math.toRadians(3); // spin step per tick
 
