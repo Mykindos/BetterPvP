@@ -187,6 +187,9 @@ public class MinecraftCraftingRecipeAdapter {
      */
     public void disableRecipesFromConfig(BPvPPlugin plugin) {
         // Only proceed if the plugin ships this config file
+        if (plugin.getResource("configs/items/recipes.yml") == null) {
+            return;
+        }
 
         final ExtendedYamlConfiguration config = plugin.getConfig("items/recipes");
         final CraftingRecipeRegistry recipeRegistry = registry.get();
