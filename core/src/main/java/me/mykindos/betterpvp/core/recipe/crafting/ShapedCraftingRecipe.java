@@ -111,7 +111,7 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
     public boolean matches(@NotNull Map<Integer, ItemStack> items) {
         for (int startRow = 0; startRow <= 3 - height; startRow++) {
             for (int startCol = 0; startCol <= 3 - width; startCol++) {
-                if (matchesAt(items, startRow, startCol)) {
+                if (matchesAt(items, startRow, startCol, false) || matchesAt(items, startRow, startCol, true)) {
                     return true;
                 }
             }
@@ -119,13 +119,13 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
         return false;
     }
 
-    private boolean matchesAt(@NotNull Map<Integer, ItemStack> items, int startRow, int startCol) {
+    private boolean matchesAt(@NotNull Map<Integer, ItemStack> items, int startRow, int startCol, boolean mirrored) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 int gridSlot = row * 3 + col;
 
                 int recipeRow = row - startRow;
-                int recipeCol = col - startCol;
+                int recipeCol = mirrored ? (width - 1) - (col - startCol) : (col - startCol);
                 int recipeSlot = recipeRow * 3 + recipeCol;
 
                 if (recipeRow < 0 || recipeRow >= height || recipeCol < 0 || recipeCol >= width) {
@@ -193,18 +193,22 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
         }
 
         int startRow = 0, startCol = 0;
+        boolean mirrored = false;
         boolean found = false;
 
-        for (int row = 0; row <= 3 - height; row++) {
-            for (int col = 0; col <= 3 - width; col++) {
-                if (matchesAt(itemStackMatrix, row, col)) {
+        for (int row = 0; row <= 3 - height && !found; row++) {
+            for (int col = 0; col <= 3 - width && !found; col++) {
+                if (matchesAt(itemStackMatrix, row, col, false)) {
                     startRow = row;
                     startCol = col;
                     found = true;
-                    break;
+                } else if (matchesAt(itemStackMatrix, row, col, true)) {
+                    startRow = row;
+                    startCol = col;
+                    mirrored = true;
+                    found = true;
                 }
             }
-            if (found) break;
         }
 
         if (!found) {
@@ -218,7 +222,7 @@ public class ShapedCraftingRecipe implements CraftingRecipe {
             int recipeRow = recipeSlot / 3;
             int recipeCol = recipeSlot % 3;
             int gridRow = recipeRow + startRow;
-            int gridCol = recipeCol + startCol;
+            int gridCol = (mirrored ? (width - 1) - recipeCol : recipeCol) + startCol;
             int gridSlot = gridRow * 3 + gridCol;
 
             ItemInstance instance = ingredients.get(gridSlot);

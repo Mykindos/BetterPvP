@@ -27,13 +27,26 @@ import java.util.Set;
 public class CraftingRecipeRegistry implements RecipeRegistry<CraftingRecipe> {
 
     private final RecipeResolver<CraftingRecipe> resolver;
+    private final MinecraftCraftingRecipeAdapter minecraftAdapter;
     private final Map<NamespacedKey, CraftingRecipe> craftingRecipes = new HashMap<>();
 
     @Inject
     private CraftingRecipeRegistry(RecipeRegistries registries, MinecraftCraftingRecipeAdapter minecraftAdapter) {
         this.resolver = new RecipeResolver<>(this);
-        minecraftAdapter.registerDefaults(craftingRecipes);
+        this.minecraftAdapter = minecraftAdapter;
         registries.register(new NamespacedKey("betterpvp", "crafting"), this);
+    }
+
+    /**
+     * Converts every vanilla Bukkit recipe into our custom format. Must run after every module's
+     * {@code ItemLoader.load(...)} has registered its {@link me.mykindos.betterpvp.core.item.FallbackItem}
+     * overrides — otherwise recipes referencing those materials pin to transient {@code VanillaItem}
+     * instances and never match real custom items at craft time. Core schedules this via
+     * {@code Bukkit.getScheduler().runTask} so it fires on the tick after all plugins have enabled.
+     */
+    public void registerMinecraftDefaults() {
+        minecraftAdapter.registerDefaults(craftingRecipes);
+        resolver.invalidate();
     }
 
     @Override
