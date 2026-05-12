@@ -122,6 +122,10 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
             final Gamer gamer = clientManager.search().online(player).getGamer();
             return new AegisData(UtilPlayer.getMidpoint(player), gamer, 0, System.currentTimeMillis());
         });
+
+        if (!data.getLastLocation().getWorld().equals(player.getWorld())) {
+            data.setLastLocation(UtilPlayer.getMidpoint(player));
+        }
         
         // Check if grounded
         if (!UtilBlock.isGrounded(player)) {

@@ -169,9 +169,8 @@ public class UtilEntity {
     public static Optional<RayTraceResult> interpolateCollision(@NotNull Location lastLocation, @NotNull Location destination, float raySize, @Nullable Predicate<Entity> entityFilter) {
         Preconditions.checkNotNull(lastLocation, "Last location cannot be null");
         Preconditions.checkNotNull(destination, "Destination cannot be null");
-        Preconditions.checkArgument(destination.getWorld() == lastLocation.getWorld(), "Locations must be in the same world");
 
-        if(!destination.getWorld().equals(lastLocation.getWorld())) {
+        if (!destination.getWorld().equals(lastLocation.getWorld())) {
             return Optional.empty();
         }
 

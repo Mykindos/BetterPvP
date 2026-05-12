@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.GameMode;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.HumanEntity;
@@ -232,7 +233,8 @@ public class DamageEventProcessor implements Listener {
      * Creates our custom damage event from the vanilla event
      */
     private DamageEvent createDamageEvent(EntityDamageEvent event, DamageSource source, VanillaDamageCause cause) {
-        LivingEntity damager = (LivingEntity) (source.isIndirect() ? source.getCausingEntity() : source.getDirectEntity());
+        Entity damagerEntity = (source.isIndirect() ? source.getCausingEntity() : source.getDirectEntity());
+        LivingEntity damager = damagerEntity instanceof LivingEntity living ? living : null;
         
         // Determine knockback setting
         boolean knockback = cause.allowsKnockback();

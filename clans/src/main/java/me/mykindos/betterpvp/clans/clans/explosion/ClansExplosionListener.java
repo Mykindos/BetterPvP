@@ -105,7 +105,11 @@ public class ClansExplosionListener extends ClanListener {
 
     private boolean hasLineOfSight(final @NotNull Location origin, final @NotNull Location target) {
         Preconditions.checkArgument(origin.getWorld().equals(target.getWorld()), "Locations must be in the same world");
-        Preconditions.checkArgument(!origin.equals(target), "Locations must not be the same");
+
+        if(origin.getWorld().equals(target.getWorld())) {
+            return false;
+        }
+
         final Vector direction = target.toVector().subtract(origin.toVector());
         final double distance = direction.length();
         final RayTraceResult result = origin.getWorld().rayTraceBlocks(origin, direction, distance, FluidCollisionMode.NEVER, true);
