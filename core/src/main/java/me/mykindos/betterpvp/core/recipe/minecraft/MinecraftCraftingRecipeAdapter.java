@@ -37,7 +37,10 @@ public class MinecraftCraftingRecipeAdapter {
 
     private final Provider<ItemFactory> itemFactory;
     private final Provider<CraftingRecipeRegistry> registry;
-    private final Set<Recipe> disabledRecipes = new HashSet<>();
+    // Track disables by NamespacedKey, NOT by Recipe object. Paper's recipe iterator and
+    // Bukkit.getRecipesFor return distinct wrapper instances for the same underlying recipe,
+    // and Recipe has no equals/hashCode override — so a Set<Recipe> would silently never hit.
+    private final Set<NamespacedKey> disabledRecipeKeys = new HashSet<>();
 
     @Inject
     private MinecraftCraftingRecipeAdapter(Provider<ItemFactory> itemFactory, Provider<CraftingRecipeRegistry> registry) {
@@ -48,7 +51,8 @@ public class MinecraftCraftingRecipeAdapter {
     public Map<NamespacedKey, CraftingRecipe> getRecipes() {
         Map<NamespacedKey, CraftingRecipe> recipes = new HashMap<>();
         Bukkit.recipeIterator().forEachRemaining(recipe -> {
-            if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe && !disabledRecipes.contains(craftingRecipe)) {
+            if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe
+                    && !disabledRecipeKeys.contains(craftingRecipe.getKey())) {
                 CraftingRecipe convertedRecipe = convertToCustomRecipe(craftingRecipe);
                 if (convertedRecipe != null) {
                     recipes.put(craftingRecipe.getKey(), convertedRecipe);
@@ -76,19 +80,21 @@ public class MinecraftCraftingRecipeAdapter {
         }
     }
 
-    public Map<NamespacedKey, CraftingRecipe> disableRecipesFor(Material material) {
+    /**
+     * Marks every vanilla recipe that produces {@code material} as disabled, so the next
+     * {@link #registerDefaults} pass on {@link org.bukkit.event.server.ServerLoadEvent} skips
+     * them. Also clears any matching entries already in the registry (no-op on first boot,
+     * relevant on {@code /reload}).
+     */
+    public void disableRecipesFor(Material material) {
         final List<Recipe> mcRecipes = Bukkit.getRecipesFor(new ItemStack(material));
-        final Map<NamespacedKey, CraftingRecipe> recipes = new HashMap<>();
-        disabledRecipes.addAll(mcRecipes);
-
         final CraftingRecipeRegistry recipeRegistry = registry.get();
         for (Recipe recipe : mcRecipes) {
             if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe) {
+                disabledRecipeKeys.add(craftingRecipe.getKey());
                 recipeRegistry.clearRecipe(craftingRecipe.getKey());
-                recipes.put(craftingRecipe.getKey(), convertToCustomRecipe(craftingRecipe));
             }
         }
-        return recipes;
     }
     
     /**
