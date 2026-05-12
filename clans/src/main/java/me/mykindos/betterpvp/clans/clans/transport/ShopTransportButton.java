@@ -53,6 +53,7 @@ public class ShopTransportButton extends ControlItem<ClanTravelHubMenu> {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         if (clickType.isLeftClick() && clan.getCore().isSet()) {
             clan.getCore().teleport(player, client, false);
+            player.closeInventory();
             Component component = Component.empty().append(Component.text("Teleported to "))
                     .append(Component.text(clan.getName(), namedTextColor));
             UtilMessage.message(player, "Clans", component);

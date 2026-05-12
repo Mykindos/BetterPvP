@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.ReplacementStrategy;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.function.Predicate;
@@ -80,7 +83,18 @@ public abstract sealed class ItemLoot<T> extends Loot<ItemInstance, T> permits G
 
     @Override
     public ItemView getIcon() {
-        return ItemView.of(this.getReward().getView().get());
+        ItemStack itemStack = this.getReward().getView().get();
+        final ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
+        if(minAmount != maxAmount) {
+            builder.lore(Component.empty());
+            builder.lore(Component.empty()
+                    .append(Component.text("Minimum Amount: ", NamedTextColor.GRAY))
+                    .append(Component.text(minAmount, NamedTextColor.WHITE)));
+            builder.lore(Component.empty()
+                    .append(Component.text("Maximum Amount: ", NamedTextColor.GRAY))
+                    .append(Component.text(maxAmount, NamedTextColor.WHITE)));
+        }
+        return builder.build();
     }
 
     @Override

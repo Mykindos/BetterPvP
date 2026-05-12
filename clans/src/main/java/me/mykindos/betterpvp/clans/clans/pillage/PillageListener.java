@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -207,6 +208,19 @@ public class PillageListener implements Listener {
             checkActivePillages();
         }
 
+    }
+
+    @EventHandler
+    public void onTeleportCore(ClanCoreTeleportEvent event) {
+        Clan clan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+        if(clan == null) {
+            return;
+        }
+
+        if(clanManager.getPillageHandler().isBeingPillaged(clan) && clan.getCore().isDead()) {
+            UtilMessage.message(event.getPlayer(), "Clans", "Your clan core has been destroyed by raiders, you will need to find another way home...");
+            event.setCancelled(true);
+        }
     }
 
     private void notifyPillageTime(Pillage pillage) {

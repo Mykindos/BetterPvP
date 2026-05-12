@@ -53,7 +53,7 @@ public class WoodcuttingListener implements Listener {
         this.blockTagManager = blockTagManager;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreakReplaceWithLootTable(BlockBreakEvent event) {
         Material blockType = event.getBlock().getType();
 

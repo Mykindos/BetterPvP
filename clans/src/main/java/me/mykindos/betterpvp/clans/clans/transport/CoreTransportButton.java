@@ -4,9 +4,11 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -42,7 +44,12 @@ public class CoreTransportButton extends ControlItem<ClanTravelHubMenu> {
         if (clickType.isLeftClick()) {
             if (clan.getCore().isSet()) {
                 final Client client = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClientManager.class).search().online(player);
-                clan.getCore().teleport(player, client, true);
+
+                UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> {
+                    clan.getCore().teleport(player, client, true);
+                }));
+
+                player.closeInventory();
             } else {
                 UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a core set!");
             }
