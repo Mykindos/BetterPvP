@@ -74,21 +74,21 @@ public class BlockTagManager {
      */
     public boolean isPlayerPlaced(Block block) {
 
-            String chunk = UtilWorld.chunkToFile(block.getChunk());
+        String chunk = UtilWorld.chunkToFile(block.getChunk());
         Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
-            if (blockTags == null) {
-                CompletableFuture.runAsync(() -> {
-                    Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
-                    BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
-                }).exceptionally(ex -> {
-                    log.error("Failed to load block tags for chunk " + chunk, ex).submit();
-                    return null;
-                });
+        if (blockTags == null) {
+            CompletableFuture.runAsync(() -> {
+                Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
+                BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
+            }).exceptionally(ex -> {
+                log.error("Failed to load block tags for chunk " + chunk, ex).submit();
+                return null;
+            });
 
-                return true;
-            }
+            return false;
+        }
 
-            return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey(BlockTags.PLAYER_MANIPULATED.getTag());
+        return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey(BlockTags.PLAYER_MANIPULATED.getTag());
 
     }
 
