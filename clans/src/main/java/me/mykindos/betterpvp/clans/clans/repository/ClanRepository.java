@@ -699,8 +699,8 @@ public class ClanRepository implements IRepository<Clan> {
         return clans;
     }
 
-    public void addClanKill(long killID, @Nullable Clan killerClan, @Nullable Clan victimClan, double dominance) {
-        database.getAsyncDslContext()
+    public CompletableFuture<Void> addClanKill(long killID, @Nullable Clan killerClan, @Nullable Clan victimClan, double dominance) {
+        return database.getAsyncDslContext()
                 .executeAsyncVoid(ctx -> ctx.insertInto(CLANS_KILLS)
                         .set(CLANS_KILLS.KILL_ID, killID)
                         .set(CLANS_KILLS.KILLER_CLAN, killerClan != null ? killerClan.getId() : null)

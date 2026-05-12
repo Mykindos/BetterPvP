@@ -62,6 +62,7 @@ public class GlobalCombatData extends CombatData {
                 contributionQueries.add(
                         database.getDslContext()
                                 .insertInto(KILL_CONTRIBUTIONS)
+                                .set(KILL_CONTRIBUTIONS.ID, contribution.getId())
                                 .set(KILL_CONTRIBUTIONS.KILL_ID, killId)
                                 .set(KILL_CONTRIBUTIONS.CONTRIBUTOR, database.getDslContext().select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(contribution.getContributor().toString())))
                                 .set(KILL_CONTRIBUTIONS.CONTRIBUTION, contribution.getPercentage())
