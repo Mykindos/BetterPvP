@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.MeridianOrb;
@@ -106,6 +107,7 @@ public class TheRift extends BaseItem implements Reloadable {
         addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT, AccessScope.USE, AccessScope.DAMAGE)));
 
         addSerializableComponent(new DurabilityComponent(3584));
+        addSerializableComponent(new RuneContainerComponent());
     }
 
     @Override
