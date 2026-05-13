@@ -126,18 +126,17 @@ public class QuickCraftingButton extends ControlItem<Gui> {
 
             player.getInventory().setStorageContents(contents);
 
-            // Place the ingredients for the recipe in the matrix
+            // Place the ingredients for the recipe in the matrix.
+            // Using setItem(reason, ...) fires the post-update handler so the
+            // result slot refreshes; the handler debounces to a single lookup.
+            final PlayerUpdateReason reason = new PlayerUpdateReason(player, event);
             for (Map.Entry<Integer, RecipeIngredient> entry : recipe.getIngredients().entrySet()) {
                 final Integer matrixSlot = entry.getKey();
                 final RecipeIngredient ingredient = entry.getValue();
                 final ItemInstance itemInstance = workbenchGui.itemFactory.create(ingredient.getBaseItem());
                 itemInstance.getItemStack().setAmount(ingredient.getAmount());
-                craftingMatrix.setItemSilently(matrixSlot, itemInstance.getItemStack());
+                craftingMatrix.setItem(reason, matrixSlot, itemInstance.getItemStack());
             }
-
-            // Call the update
-            final PlayerUpdateReason reason = new PlayerUpdateReason(player, event);
-            craftingMatrix.setItemAmount(reason, 0, craftingMatrix.getItemAmount(0));
         }
 
         // Set the current tab to the crafter, independent of where we are
