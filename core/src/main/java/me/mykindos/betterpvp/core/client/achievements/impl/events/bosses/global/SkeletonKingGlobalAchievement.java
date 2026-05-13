@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
 import me.mykindos.betterpvp.core.server.Period;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -36,12 +38,32 @@ public class SkeletonKingGlobalAchievement extends SingleSimpleAchievement {
     }
 
     @Override
+    public Component getDisplayName(StatContainer container, StatFilterType type, Period period) {
+        final GenericStat skeletonKingStat = new GenericStat(BossStat.builder()
+                .action(BossStat.Action.KILL)
+                .bossName("Skeleton King")
+                .build()
+        );
+        boolean killedSkeletonKing = skeletonKingStat.getStat(container, StatFilterType.ALL, null) >= 1;
+        return Component.text(killedSkeletonKing ? getName() : "???", NamedTextColor.WHITE);
+    }
+
+    @Override
     public Material getMaterial(StatContainer container, StatFilterType type, Period period) {
-        return Material.WITHER_SKELETON_SKULL;
+        return Material.SKELETON_SKULL;
     }
 
     @Override
     public List<String> getStringDescription(StatContainer container, StatFilterType type, Period period) {
+        final GenericStat skeletonKingStat = new GenericStat(BossStat.builder()
+                .action(BossStat.Action.KILL)
+                .bossName("Skeleton King")
+                .build()
+        );
+        boolean killedSkeletonKing = skeletonKingStat.getStat(container, StatFilterType.ALL, null) >= 1;
+        if (!killedSkeletonKing) {
+            return List.of("<gray>???");
+        }
         return List.of("Kill the Skeleton King");
     }
 }

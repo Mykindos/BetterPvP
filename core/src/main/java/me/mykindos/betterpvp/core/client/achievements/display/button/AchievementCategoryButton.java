@@ -49,7 +49,7 @@ public class AchievementCategoryButton extends AbstractItem {
      */
     @Override
     public ItemProvider getItemProvider() {
-            ItemView itemView = achievementCategory.getItemView();
+            ItemView itemView = achievementCategory.getItemView(client.getStatContainer(), type, period);
             if (!achievementCategory.getChildren().isEmpty()) {
                 return itemView.toBuilder()
                         .action(ClickActions.ALL, Component.text("Show Sub-Category"))
