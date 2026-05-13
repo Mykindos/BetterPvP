@@ -38,6 +38,13 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
     private final List<Rune> runes;
     
     /**
+     * Creates a new rune container with no rune sockets.
+     */
+    public RuneContainerComponent() {
+        this(0, 0, new ArrayList<>());
+    }
+
+    /**
      * Creates a new rune container with the specified number of sockets.
      * For backwards compatibility, sets maxSockets equal to sockets.
      *
