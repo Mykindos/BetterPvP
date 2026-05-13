@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapelessCraftingRecipe;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -27,10 +28,16 @@ public class Cloth extends BaseItem {
     }
 
     @Inject
-    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory, TornCloth tornCloth) {
         if (registered) return;
         registered = true;
 
+        registry.registerRecipe(new NamespacedKey("core", "cloth_from_wool"), getWoolRecipe(itemFactory));
+        registry.registerRecipe(new NamespacedKey("core", "cloth_from_torn_cloth"),
+                getTornClothRecipe(itemFactory, tornCloth));
+    }
+
+    private @NotNull ShapelessCraftingRecipe getWoolRecipe(ItemFactory itemFactory) {
         final BaseItem wool = itemFactory.getFallbackItem(Material.WHITE_WOOL);
         final RecipeIngredient woolIngredient = new RecipeIngredient(wool, 1);
         final Map<Integer, RecipeIngredient> ingredients = Map.of(
@@ -39,11 +46,18 @@ public class Cloth extends BaseItem {
                 2, woolIngredient
         );
 
-        final ShapelessCraftingRecipe recipe = new ShapelessCraftingRecipe(
-                this, ingredients, itemFactory, false
-        );
-
-        registry.registerRecipe(new NamespacedKey("core", "cloth"), recipe);
+        return new ShapelessCraftingRecipe(this, ingredients, itemFactory, false);
     }
 
+    private @NotNull ShapelessCraftingRecipe getTornClothRecipe(ItemFactory itemFactory, TornCloth tornCloth) {
+        final RecipeIngredient clothIngredient = new RecipeIngredient(tornCloth, 1);
+        final Map<Integer, RecipeIngredient> ingredients = Map.of(
+                0, clothIngredient,
+                1, clothIngredient,
+                2, clothIngredient,
+                3, clothIngredient
+        );
+
+        return new ShapelessCraftingRecipe(this, ingredients, itemFactory, false);
+    }
 }
