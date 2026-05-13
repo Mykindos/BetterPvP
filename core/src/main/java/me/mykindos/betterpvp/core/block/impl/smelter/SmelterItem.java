@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
 import me.mykindos.betterpvp.core.item.component.impl.DescriptionComponent;
+import me.mykindos.betterpvp.core.item.impl.CharcoalItem;
 import me.mykindos.betterpvp.core.item.impl.CutStone;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -49,7 +50,7 @@ public class SmelterItem extends BaseItem implements NexoItem {
     }
 
     @Inject
-    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory, CutStone cutStone) {
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory, CharcoalItem charcoalItem, CutStone cutStone) {
         if (registered) return;
         registered = true;
         String[] pattern = new String[] {
@@ -58,11 +59,10 @@ public class SmelterItem extends BaseItem implements NexoItem {
                 "COC"
         };
         final BaseItem blastFurnace = itemFactory.getFallbackItem(Material.BLAST_FURNACE);
-        final BaseItem charcoal = itemFactory.getFallbackItem(Material.CHARCOAL);
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('C', new RecipeIngredient(cutStone, 1));
         builder.setIngredient('F', new RecipeIngredient(blastFurnace, 1));
-        builder.setIngredient('O', new RecipeIngredient(charcoal, 1));
+        builder.setIngredient('O', new RecipeIngredient(charcoalItem, 1));
         registry.registerRecipe(new NamespacedKey("core", "smelter"), builder.build());
     }
 }
