@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.loot;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 
@@ -15,6 +16,7 @@ import java.util.function.Predicate;
  *           As some rewards have an in-world type representation.
  */
 @Data
+@AllArgsConstructor
 public abstract class Loot<T, R> {
 
     /**
@@ -24,8 +26,10 @@ public abstract class Loot<T, R> {
 
     /**
      * The condition for this loot. If the condition is not met, the loot will not be awarded.
+     * <p>
+     * Mutable to allow deserializers to attach expression-based conditions after construction.
      */
-    private final Predicate<LootContext> condition;
+    private Predicate<LootContext> condition;
 
     /**
      * The reward for this loot.

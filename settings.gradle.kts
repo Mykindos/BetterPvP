@@ -116,6 +116,7 @@ dependencyResolutionManagement {
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
             library("zip4j", "net.lingala.zip4j", "zip4j").version("2.11.5")
             library("json", "org.json", "json").version("20250107")
+            library("jexl3", "org.apache.commons", "commons-jexl3").version("3.4.0")
 
             // Library - Mapper
             library("mapper", "com.github.BetterPvP", "Mapper").version("1.0.9")
@@ -174,7 +175,8 @@ dependencyResolutionManagement {
                     "reflections",
                     "okhttp",
                     "zip4j",
-                    "json"))
+                    "json",
+                    "jexl3"))
             bundle("data", listOf("flyway-core", "flyway-mysql", "flyway-postgres"))
             bundle("mixins", listOf("mixin"))
         }
