@@ -22,9 +22,9 @@ public class MangrovePropagule extends VanillaItem {
         super("Mangrove Propagule", Material.MANGROVE_PROPAGULE, ItemRarity.UNCOMMON);
 
         addBaseComponent(new DescriptionComponent(1,
-                Component.text("Mangrove Trees grant more" + " ")
+                Component.text("Mangrove Trees grant more ")
                         .append(Component.text("Woodcutting Experience").color(NamedTextColor.AQUA))
-                        .append(Component.text(" " + "than any other tree."))
+                        .append(Component.text(" than any other tree."))
         ));
 
     }
