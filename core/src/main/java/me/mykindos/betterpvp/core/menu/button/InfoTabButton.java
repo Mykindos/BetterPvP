@@ -10,11 +10,9 @@ import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -79,25 +77,25 @@ public class InfoTabButton extends AbstractItem {
             return builder.build();
         }
 
-        builder.lore(Component.empty());
-        final TextComponent header = Component.empty()
-                .append(Component.text("<glyph:book_icon>").font(Resources.Font.NEXO))
-                .appendSpace()
-                .append(Component.text("Relevant articles:", TextColor.color(191, 191, 191)));
-        if (!started) builder.displayName(header);
-        else builder.lore(header);
+//        builder.lore(Component.empty());
+//        final TextComponent header = Component.empty()
+//                .append(Component.text("<glyph:book_icon>").font(Resources.Font.NEXO))
+//                .appendSpace()
+//                .append(Component.text("Relevant articles:", TextColor.color(191, 191, 191)));
+//        if (!started) builder.displayName(header);
+//        else builder.lore(header);
+//
+//        for (String wikiEntry : wikiEntries.keySet()) {
+//            URL url = wikiEntries.get(wikiEntry);
+//            String prefix = wikiEntry.isEmpty() ? "" : wikiEntry + ": ";
+//            final Component text = Component.text("● " + prefix, TextColor.color(191, 191, 191))
+//                    .append(Component.text(url.toString(), TextColor.color(201, 165, 0)));
+//            builder.lore(text);
+//        }
 
-        for (String wikiEntry : wikiEntries.keySet()) {
-            URL url = wikiEntries.get(wikiEntry);
-            String prefix = wikiEntry.isEmpty() ? "" : wikiEntry + ": ";
-            final Component text = Component.text("● " + prefix, TextColor.color(191, 191, 191))
-                    .append(Component.text(url.toString(), TextColor.color(201, 165, 0)));
-            builder.lore(text);
-        }
-
-        builder.action(ClickActions.ALL, Component.empty()
-                .append(Component.text("<glyph:magnifying_glass_icon>").font(Resources.Font.NEXO))
-                .append(Component.text("View Articles")));
+//        builder.action(ClickActions.ALL, Component.empty()
+//                .append(Component.text("<glyph:magnifying_glass_icon>").font(Resources.Font.NEXO))
+//                .append(Component.text("View Articles")));
         return builder.build();
     }
 
