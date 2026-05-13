@@ -238,7 +238,7 @@ public class FishingListener implements Listener {
                 PlayerCaughtFishEvent caughtFishEvent = new PlayerCaughtFishEvent(
                         player, bundle, primaryFishLoot, event.getHook());
 
-                Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
+                Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("base_fishing");
                 progressionSkillOptional.ifPresent(progressionSkill ->
                         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
                             var profession = profile.getProfessionDataMap().get("Fishing");

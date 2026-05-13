@@ -67,8 +67,10 @@ public class FishingListener implements Listener {
     }
 
     private boolean hasBaseFishing(Player player) {
-        Optional<ProfessionNode> skill = progressionSkillManager.getSkill("Base Fishing");
-        if (skill.isEmpty()) return true; // skill node missing — fail-open so fishing isn't blocked
+        Optional<ProfessionNode> skill = progressionSkillManager.getSkill("base_fishing");
+        if (skill.isEmpty()) {
+            return true; // skill node missing — fail-open so fishing isn't blocked
+        }
         return professionProfileManager.getObject(player.getUniqueId().toString())
                 .map(profile -> profile.getProfessionDataMap().get("Fishing"))
                 .map(data -> data.getBuild().getSkillLevel(skill.get()) >= 1)
