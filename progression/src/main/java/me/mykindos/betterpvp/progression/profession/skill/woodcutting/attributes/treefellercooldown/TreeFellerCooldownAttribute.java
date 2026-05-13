@@ -26,7 +26,12 @@ public class TreeFellerCooldownAttribute implements IProfessionAttribute, TreeFe
 
     @Override
     public String getDescription() {
-        return "Tree Feller cooldown reduction";
+        return "ability cooldown";
+    }
+
+    @Override
+    public double getDisplayValue(double value) {
+        return -value;
     }
 
     @Override

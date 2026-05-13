@@ -47,9 +47,19 @@ public class ProfessionAttributeNode extends ProfessionNode {
     public String[] getDescription(int level) {
         List<String> desc = new ArrayList<>();
         attributes.forEach((attribute, config) -> {
-            double value = config.getBaseValue() + (Math.max(level-1, 0) * config.getPerLevel());
+            final double value = config.getBaseValue() + (Math.max(level-1, 0) * config.getPerLevel());
+            final double displayValue = attribute.getDisplayValue(value);
 
-            desc.add("<green> +" + UtilFormat.formatNumber(attribute.getDisplayValue(value), 3) + attribute.getOperation() + "<white> " + attribute.getDescription());
+            String valueStr = UtilFormat.formatNumber(displayValue, 3) + attribute.getOperation();
+            if (displayValue > 0) {
+                valueStr = "<green>+" + valueStr + "</green>";
+            } else if (displayValue < 0) {
+                valueStr = "<red>" + valueStr + "</red>";
+            } else {
+                valueStr = "<yellow>" + valueStr + "</yellow>";
+            }
+
+            desc.add(valueStr + " <white>" + attribute.getDescription() + "</white>");
         });
         return desc.toArray(new String[0]);
     }

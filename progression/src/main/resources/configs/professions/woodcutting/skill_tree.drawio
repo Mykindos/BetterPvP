@@ -976,7 +976,7 @@
         <mxCell id="FIcQe-DjJEKsFRLBZIb6-10" edge="1" parent="1" source="tree_feller_cooldown_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_1">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_1">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="3540" as="geometry" />
           </mxCell>
@@ -987,7 +987,7 @@
         <mxCell id="FIcQe-DjJEKsFRLBZIb6-12" edge="1" parent="1" source="tree_feller_cooldown_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_5">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_2">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_2">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="300" y="3540" as="geometry" />
           </mxCell>
@@ -995,7 +995,7 @@
         <mxCell id="FIcQe-DjJEKsFRLBZIb6-13" edge="1" parent="1" source="tree_feller_cooldown_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_3">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_3">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="180" y="3540" as="geometry" />
           </mxCell>
@@ -1003,7 +1003,7 @@
         <mxCell id="FIcQe-DjJEKsFRLBZIb6-15" edge="1" parent="1" source="tree_feller_cooldown_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_5">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_4">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_4">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="180" y="3660" as="geometry" />
           </mxCell>
@@ -1011,7 +1011,7 @@
         <mxCell id="FIcQe-DjJEKsFRLBZIb6-16" edge="1" parent="1" source="tree_feller_cooldown_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_5">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_5">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="300" y="3660" as="geometry" />
           </mxCell>
@@ -1022,7 +1022,7 @@
         <mxCell id="FIcQe-DjJEKsFRLBZIb6-17" edge="1" parent="1" source="tree_feller_cooldown_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_6">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_6">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="3660" as="geometry" />
           </mxCell>
@@ -1030,12 +1030,12 @@
         <mxCell id="FIcQe-DjJEKsFRLBZIb6-18" edge="1" parent="1" source="tree_feller_cooldown_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="tree_feller_cooldown_8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_7">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_7">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="3780" as="geometry" />
           </mxCell>
         </object>
-        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="1.0" per_level="0" max_level="1" id="tree_feller_cooldown_8">
+        <object label="Tree Feller&#xa;Cooldown" attribute_id="tree_feller_cooldown" base="2.0" per_level="0" max_level="1" id="tree_feller_cooldown_8">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="300" y="3780" as="geometry" />
           </mxCell>
