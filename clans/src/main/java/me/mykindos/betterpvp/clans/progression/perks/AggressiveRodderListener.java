@@ -52,7 +52,6 @@ public class AggressiveRodderListener implements Listener {
 
         if(hasAggressiveRodder(caster)) {
             caster.setMetadata(ClansWorldListener.AGGRESSIVE_RODDER_UNLOCKED, new FixedMetadataValue(clans, true));
-            return;
         }
     }
 
