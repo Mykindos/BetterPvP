@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;
+import me.mykindos.betterpvp.core.loot.expression.ExpressionEngine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,12 +53,10 @@ public class LootTable {
     @NotNull List<@NotNull Loot<?, ?>> guaranteedLoot = new ArrayList<>();
 
     /**
-     * The weighted loot entries. These entries will be generated based on their weight.
-     * <p>
-     * Higher weights will result in a higher chance of being generated.
+     * The weighted loot entries.
      */
     @Builder.Default
-    @NotNull Multimap<@NotNull Integer, @NotNull Loot<?, ?>> weightedLoot = ArrayListMultimap.create();
+    @NotNull List<@NotNull WeightedEntry> weightedEntries = new ArrayList<>();
 
     /**
      * The pity rules for this loot table. See {@link PityRule}.
@@ -83,72 +82,42 @@ public class LootTable {
 
     /**
      * Generates a loot bundle based on this loot table.
-     * <p>
-     *     Two types of loot are generated:
-     *     <ul>
-     *         <li>Guaranteed loot: that is always generated regardless of the roll count.</li>
-     *         <li>Weighted loot: that is generated based on their weight.</li>
-     *     </ul>
-     * </p>
-     * <br>
-     * <p>
-     *     The steps to generate loot are the following:
-     *     <ol>
-     *         <li>Generate guaranteed loot.</li>
-     *         <li>Call the {@link #rollCountFunction} to get the number of loot entries to generate.</li>
-     *         <li>Make an aggregate list of weighted loot entries based on their weight.</li>
-     *         <li>Sum the weights of all weighted loot entries.</li>
-     *         <li>Generate a random number between 0 and the sum of all weighted loot entry weights.</li>
-     *         <li>Iterate over the aggregate list and pick the first entry whose weight is greater than the random number.</li>
-     *         <li>Add the picked entry to the generated loot bundle.</li>
-     *         <li>Repeat steps 5-7 until the roll count has been reached.</li>
-     *     </ol>
-     * </p>
      *
      * @param context The context in which the loot is being generated.
-     *
      * @return The generated loot bundle, not guaranteed to be populated with any entries.
      */
     public @NotNull LootBundle generateLoot(@NotNull LootContext context) {
         // 1. Guaranteed loot
-        final List<Loot<? ,?>> loot = new ArrayList<>(guaranteedLoot);
+        final List<Loot<?, ?>> loot = new ArrayList<>(guaranteedLoot);
         loot.removeIf(l -> !l.getCondition().test(context));
 
         // 2. Roll count
         int rolls = rollCountFunction.apply(context);
         if (rolls <= 0) {
-            final LootBundle bundle = new LootBundle(context, awardStrategy, loot);
-            context.getSession().getProgress().history.add(bundle);
-            return bundle;
+            return finalizeBundle(context, loot);
         }
 
-        // 3. Flatten weighted loot into entries with base weight
-        List<Loot<? ,?>> candidates = new ArrayList<>();
-        List<Integer> baseWeights = new ArrayList<>();
-        for (var entry : weightedLoot.entries()) {
-            int weight = entry.getKey();
-            Loot<? ,?> l = entry.getValue();
-            if (weight <= 0) continue;
-            candidates.add(l);
-            baseWeights.add(weight);
-        }
-
+        // 3. Snapshot candidates
+        final List<WeightedEntry> candidates = new ArrayList<>(weightedEntries);
         if (candidates.isEmpty()) {
-            final LootBundle bundle = new LootBundle(context,awardStrategy, loot);
-            context.getSession().getProgress().history.add(bundle);
-            return bundle;
+            return finalizeBundle(context, loot);
         }
 
         // 4. Perform rolls
         for (int i = 0; i < rolls; i++) {
-            // copy base -> effective, then apply distribution for this moment-in-bundle
-            final List<Integer> effectiveWeights = new ArrayList<>(baseWeights);
-            applyWeightDistribution(candidates, effectiveWeights, context.getSession().getProgress(), loot);
+            final LootContext rollContext = context.withInput(ExpressionEngine.VAR_ROLL_INDEX, i)
+                    .withInput(ExpressionEngine.VAR_BUNDLE_SIZE, loot.size());
 
-            // total must be from effective weights
+            // base weights for this roll, then distribution adjustments
+            final List<Integer> effectiveWeights = new ArrayList<>(candidates.size());
+            for (WeightedEntry entry : candidates) {
+                effectiveWeights.add(Math.max(0, entry.getWeight().applyAsInt(rollContext)));
+            }
+            applyWeightDistribution(candidates, effectiveWeights, rollContext.getSession().getProgress(), loot);
+
             int totalWeight = 0;
             for (int j = 0; j < candidates.size(); j++) {
-                if (candidates.get(j).getCondition().test(context)) {
+                if (candidates.get(j).getLoot().getCondition().test(rollContext)) {
                     totalWeight += effectiveWeights.get(j);
                 }
             }
@@ -157,10 +126,10 @@ public class LootTable {
             int r = ThreadLocalRandom.current().nextInt(totalWeight);
             int cumulative = 0;
             for (int j = 0; j < candidates.size(); j++) {
-                final Loot<?, ?> candidate = candidates.get(j);
+                final WeightedEntry entry = candidates.get(j);
+                final Loot<?, ?> candidate = entry.getLoot();
 
-                // do not count weight for candidates that fail the condition
-                if (!candidate.getCondition().test(context)) continue;
+                if (!candidate.getCondition().test(rollContext)) continue;
 
                 cumulative += effectiveWeights.get(j);
                 if (r < cumulative) {
@@ -170,7 +139,6 @@ public class LootTable {
                             .orElse(this.replacementStrategy);
                     if (strategy == ReplacementStrategy.WITHOUT_REPLACEMENT) {
                         candidates.remove(j);
-                        baseWeights.remove(j); // <-- remove from base, not effective
                     }
                     break;
                 }
@@ -178,12 +146,16 @@ public class LootTable {
             if (candidates.isEmpty()) break;
         }
 
-        final LootBundle bundle = new LootBundle(context,awardStrategy, loot);
+        return finalizeBundle(context, loot);
+    }
+
+    private LootBundle finalizeBundle(LootContext context, List<Loot<?, ?>> loot) {
+        final LootBundle bundle = new LootBundle(context, awardStrategy, loot);
         context.getSession().getProgress().history.add(bundle);
         return bundle;
     }
 
-    private void applyWeightDistribution(List<Loot<? ,?>> candidates, List<Integer> weights,
+    private void applyWeightDistribution(List<WeightedEntry> candidates, List<Integer> weights,
                                          @Nullable LootProgress progress, List<Loot<?, ?>> awardedInThisBundle) {
         switch (weightDistributionStrategy) {
             case STATIC -> {
@@ -192,7 +164,7 @@ public class LootTable {
             case PITY -> {
                 if (progress == null) return;
                 for (int i = 0; i < candidates.size(); i++) {
-                    Loot<? ,?> candidate = candidates.get(i);
+                    Loot<?, ?> candidate = candidates.get(i).getLoot();
 
                     // suppress pity if this bundle already contains this loot
                     if (awardedInThisBundle.contains(candidate)) continue;
@@ -214,7 +186,6 @@ public class LootTable {
             case PROGRESSIVE -> {
                 if (progress == null || weights.isEmpty()) return;
 
-                // mean of active weights (>=0)
                 long sum = 0;
                 int n = 0;
                 for (int w : weights) { if (w > 0) { sum += w; n++; } }
@@ -229,12 +200,12 @@ public class LootTable {
                     int w = weights.get(j);
                     if (w <= 0) continue;
 
-                    double delta = avg - w;                  // move toward mean
-                    double shift = delta * factor;           // base shift
+                    double delta = avg - w;
+                    double shift = delta * factor;
                     if (scaleVar) {
                         double spread = Math.abs(delta);
                         double scale = (avg == 0.0) ? 1.0 : (spread / avg);
-                        shift *= scale;                      // variance scaling
+                        shift *= scale;
                     }
                     if (maxShift > 0) {
                         if (shift >  maxShift) shift =  maxShift;
@@ -248,20 +219,32 @@ public class LootTable {
         }
     }
 
+    /**
+     * Returns a snapshot of the weighted entries keyed by {@link WeightedEntry#getDefaultWeight()}.
+     * Intended for menu previews and persistence; runtime rolls use {@link #weightedEntries} directly.
+     */
     public @NotNull Multimap<@NotNull Integer, @NotNull Loot<?, ?>> getWeightedLoot() {
-        return ArrayListMultimap.create(weightedLoot);
+        final Multimap<Integer, Loot<?, ?>> out = ArrayListMultimap.create();
+        for (WeightedEntry entry : weightedEntries) {
+            out.put(entry.getDefaultWeight(), entry.getLoot());
+        }
+        return out;
     }
 
+    /**
+     * Returns the static drop-chance preview based on {@link WeightedEntry#getDefaultWeight()}.
+     * Expression-driven weights are represented by their default value here.
+     */
     public Map<Loot<?, ?>, Float> getChances() {
-        int sumWeights = this.weightedLoot.keys().stream().mapToInt(Integer::intValue).sum();
+        int sumWeights = 0;
+        for (WeightedEntry entry : weightedEntries) sumWeights += entry.getDefaultWeight();
         final Map<Loot<?, ?>, Float> chances = new HashMap<>();
         for (Loot<?, ?> loot : this.guaranteedLoot) {
             chances.put(loot, 1.0f);
         }
-
-        for (Map.Entry<@NotNull Integer, @NotNull Loot<?, ?>> entry : this.weightedLoot.entries()) {
-            float chance = (float) entry.getKey() / sumWeights;
-            chances.put(entry.getValue(), chance);
+        if (sumWeights <= 0) return chances;
+        for (WeightedEntry entry : weightedEntries) {
+            chances.put(entry.getLoot(), (float) entry.getDefaultWeight() / sumWeights);
         }
         return chances;
     }

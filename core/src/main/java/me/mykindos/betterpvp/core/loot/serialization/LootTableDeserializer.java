@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.loot.serialization;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -12,12 +10,15 @@ import com.google.gson.JsonParseException;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.loot.AwardStrategy;
 import me.mykindos.betterpvp.core.loot.Loot;
+import me.mykindos.betterpvp.core.loot.LootConditions;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.PityRule;
 import me.mykindos.betterpvp.core.loot.ProgressiveWeightConfig;
 import me.mykindos.betterpvp.core.loot.ReplacementStrategy;
 import me.mykindos.betterpvp.core.loot.RollCountFunction;
 import me.mykindos.betterpvp.core.loot.WeightDistributionStrategy;
+import me.mykindos.betterpvp.core.loot.WeightFunction;
+import me.mykindos.betterpvp.core.loot.WeightedEntry;
 import me.mykindos.betterpvp.core.loot.chest.BigLootChest;
 import me.mykindos.betterpvp.core.loot.chest.LootChest;
 import me.mykindos.betterpvp.core.loot.chest.SmallLootChest;
@@ -74,19 +75,19 @@ public class LootTableDeserializer implements JsonDeserializer<LootTable> {
         // Parse entries
         JsonArray entriesArray = obj.getAsJsonArray("entries");
         Map<String, Loot<?, ?>> lootById = new HashMap<>();
-        Multimap<Integer, Loot<?, ?>> weightedLoot = ArrayListMultimap.create();
+        List<WeightedEntry> weightedEntries = new ArrayList<>();
 
         for (JsonElement entryElement : entriesArray) {
             JsonObject entryObj = entryElement.getAsJsonObject();
             String entryId = entryObj.get("id").getAsString();
-            int weight = entryObj.get("weight").getAsInt();
             Optional<Loot<?, ?>> loot = parseLootEntry(entryObj);
             if (loot.isEmpty()) {
                 continue;
             }
 
+            applyCondition(entryObj, loot.get());
             lootById.put(entryId, loot.get());
-            weightedLoot.put(weight, loot.get());
+            weightedEntries.add(parseWeightedEntry(entryObj, loot.get()));
         }
 
         // Parse guaranteed entries
@@ -99,6 +100,7 @@ public class LootTableDeserializer implements JsonDeserializer<LootTable> {
                 if (loot.isEmpty()) {
                     continue;
                 }
+                applyCondition(guaranteedObj, loot.get());
                 guaranteedLoot.add(loot.get());
             }
         }
@@ -130,7 +132,7 @@ public class LootTableDeserializer implements JsonDeserializer<LootTable> {
                 .awardStrategy(awardStrategy)
                 .replacementStrategy(replacementStrategy)
                 .rollCountFunction(rollCountFunction)
-                .weightedLoot(weightedLoot)
+                .weightedEntries(weightedEntries)
                 .guaranteedLoot(guaranteedLoot)
                 .pityRules(pityRules)
                 .weightDistributionStrategy(weightDistributionStrategy)
@@ -199,8 +201,52 @@ public class LootTableDeserializer implements JsonDeserializer<LootTable> {
                 int maxRolls = rollStrategyObj.get("maxRolls").getAsInt();
                 yield RollCountFunction.progressive(baseRolls, incrementPerProgress, maxRolls);
             }
+            case "EXPRESSION" -> {
+                String expr = rollStrategyObj.get("expression").getAsString();
+                int fallback = rollStrategyObj.has("fallback") ? rollStrategyObj.get("fallback").getAsInt() : 0;
+                yield RollCountFunction.expression(expr, fallback);
+            }
             default -> throw new JsonParseException("Unknown roll strategy type: " + type);
         };
+    }
+
+    /**
+     * Parses an entry's weight, which may be a plain integer or an object of the form
+     * {@code {"type":"EXPRESSION","expression":"...","fallback":N}}.
+     */
+    private @NotNull WeightedEntry parseWeightedEntry(@NotNull JsonObject entryObj, @NotNull Loot<?, ?> loot) {
+        JsonElement weightEl = entryObj.get("weight");
+        if (weightEl == null) {
+            return WeightedEntry.of(loot, 0);
+        }
+        if (weightEl.isJsonPrimitive()) {
+            return WeightedEntry.of(loot, weightEl.getAsInt());
+        }
+        if (weightEl.isJsonObject()) {
+            JsonObject weightObj = weightEl.getAsJsonObject();
+            String type = weightObj.get("type").getAsString();
+            return switch (type) {
+                case "CONSTANT" -> WeightedEntry.of(loot, weightObj.get("value").getAsInt());
+                case "EXPRESSION" -> {
+                    String expr = weightObj.get("expression").getAsString();
+                    int fallback = weightObj.has("fallback") ? weightObj.get("fallback").getAsInt() : 0;
+                    int preview = weightObj.has("preview") ? weightObj.get("preview").getAsInt() : fallback;
+                    yield WeightedEntry.of(loot, WeightFunction.expression(expr, fallback), preview);
+                }
+                default -> throw new JsonParseException("Unknown weight type: " + type);
+            };
+        }
+        throw new JsonParseException("Invalid weight value");
+    }
+
+    /**
+     * Applies a JEXL {@code condition} expression from {@code entryObj} to the loot, if present.
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void applyCondition(@NotNull JsonObject entryObj, @NotNull Loot<?, ?> loot) {
+        if (!entryObj.has("condition")) return;
+        String expr = entryObj.get("condition").getAsString();
+        ((Loot) loot).setCondition(LootConditions.expression(expr));
     }
 
     private Optional<Loot<?, ?>> parseLootEntry(@NotNull JsonObject entryObj) {

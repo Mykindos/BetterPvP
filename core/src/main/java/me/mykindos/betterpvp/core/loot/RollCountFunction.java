@@ -1,5 +1,8 @@
 package me.mykindos.betterpvp.core.loot;
 
+import me.mykindos.betterpvp.core.loot.expression.ExpressionEngine;
+
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
@@ -73,6 +76,22 @@ public interface RollCountFunction extends Function<LootContext, Integer> {
         return context -> {
             // Use ThreadLocalRandom for thread-safe random number generation
             return ThreadLocalRandom.current().nextInt(minRolls, maxRolls + 1);
+        };
+    }
+
+    /**
+     * Creates a roll count function that evaluates {@code expression} against the context's
+     * inputs. The result is coerced to a non-negative integer; {@code fallback} is used if
+     * the expression fails to evaluate.
+     *
+     * @param expression a JEXL expression returning a numeric value, e.g.
+     *                   {@code "clamp(4 - slayer_standing, 1, 3)"}
+     * @param fallback the value to return on evaluation failure
+     */
+    static RollCountFunction expression(String expression, int fallback) {
+        return context -> {
+            double v = ExpressionEngine.evalDouble(expression, context, Map.of(), fallback);
+            return Math.max(0, (int) Math.round(v));
         };
     }
 
