@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessCom
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DivineAmulet;
-import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.VoidSphere;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
@@ -94,20 +93,22 @@ public class DeepResonator extends BaseItem implements Reloadable {
                                 ItemFactory itemFactory,
                                 DivineAmulet divineAmulet,
                                 VoidSphere voidSphere,
-                                DurakHandle durakHandle,
                                 OverchargedCrystal overchargedCrystal) {
         if (registered) return;
         registered = true;
         String[] pattern = new String[] {
                 "VVV",
-                "ADO",
-                " D ",
+                "ASO",
+                " S ",
         };
+
+        final BaseItem stick = itemFactory.getFallbackItem(Material.STICK);
+
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('V', new RecipeIngredient(voidSphere, 1));
         builder.setIngredient('A', new RecipeIngredient(divineAmulet, 1));
         builder.setIngredient('O', new RecipeIngredient(overchargedCrystal, 1));
-        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        builder.setIngredient('S', new RecipeIngredient(stick, 1));
         registry.registerRecipe(new NamespacedKey("progression", "deep_resonator"), builder.build());
     }
 }
