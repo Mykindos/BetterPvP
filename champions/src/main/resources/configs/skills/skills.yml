@@ -921,6 +921,19 @@ skills:
       damageResetTime: 2.0
       slownessStrength: 1
       slowDuration: 1.0
+    resonancerelay:
+      enabled: true
+      maxlevel: 3
+      hitBoxSize: 1.5
+      aliveTime: 2000
+      speed: 100.0
+      damage: 3.0
+      allyBuffDuration: 3.0
+      allyBuffAmplifier: 1
+      allyEnergyRestored: 10.0
+      maxDistance: 32.0
+      energyPerShot: 40.0
+      energyPerShotDecreasePerLevel: 5.0
     volley:
       enabled: true
       maxlevel: 5
