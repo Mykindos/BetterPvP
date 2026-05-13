@@ -85,7 +85,7 @@ public class BlockTagManager {
                 return null;
             });
 
-            return true;
+            return false;
         }
 
         return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey(BlockTags.PLAYER_MANIPULATED.getTag());
