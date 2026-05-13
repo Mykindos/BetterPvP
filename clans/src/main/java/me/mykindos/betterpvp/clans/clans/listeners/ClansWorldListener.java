@@ -175,6 +175,17 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (event.getEntity() instanceof Player) {
+            return;
+        }
+
+        if (event.getBlock().getType() == Material.FARMLAND && event.getTo() == Material.DIRT) {
+            event.setCancelled(true);
+        }
+    }
+
     /**
      * Access gate for {@link ScriptedBlockPlaceEvent}. Runs at NORMAL — earlier listeners
      * (e.g. {@code FieldsListener} at LOW) get a chance to set

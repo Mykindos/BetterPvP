@@ -54,12 +54,12 @@ public class ClansChatListener extends ClanListener {
             }
         } else if (event.getChannel() == ChatChannel.ALLIANCE) {
             if (senderClan != null) {
-                event.setPrefix(Component.text(senderClan.getName() + " " + playerName + " ", NamedTextColor.DARK_GREEN));
+                event.setPrefix(Component.text(senderClan.getName() + " " + playerName + " ").color(NamedTextColor.DARK_GREEN));
                 event.setMessage(event.getMessage().color(NamedTextColor.GREEN));
             }
         } else if (event.getChannel() == ChatChannel.CLAN) {
             if (senderClan != null) {
-                event.setPrefix(Component.text(playerName + " ", NamedTextColor.AQUA));
+                event.setPrefix(Component.text(playerName + " ").color(NamedTextColor.AQUA));
                 event.setMessage(event.getMessage().color(NamedTextColor.DARK_AQUA));
             }
         }

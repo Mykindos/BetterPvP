@@ -138,9 +138,10 @@ public class ChatListener implements Listener {
     public void onChatReceived(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
 
-        event.setPrefix(event.getPrefix().color(NamedTextColor.YELLOW));
+
 
         if (event.getChannel() == ChatChannel.SERVER) {
+            event.setPrefix(event.getPrefix().color(NamedTextColor.YELLOW));
             Component rankPrefix = event.getClient().getTag(true);
             String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
             if (!mediaChannel.isEmpty()) {
