@@ -134,12 +134,12 @@
         <mxCell id="vSJpPm3wwYhSkPHHRFYX-39" edge="1" parent="1" source="treasure_chance_node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_treasure_chance_1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="treasure_chance_node">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="treasure_chance_node">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="1080" as="geometry" />
           </mxCell>
         </object>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="double_treasure_chance_node">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="double_treasure_chance_node">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="1020" as="geometry" />
           </mxCell>
@@ -175,7 +175,7 @@
         <mxCell id="e24" edge="1" parent="1" source="treasure_chance_node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="double_treasure_chance_node">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="vSJpPm3wwYhSkPHHRFYX-17">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="vSJpPm3wwYhSkPHHRFYX-17">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="660" as="geometry" />
           </mxCell>
@@ -358,7 +358,7 @@
         <mxCell id="vSJpPm3wwYhSkPHHRFYX-44" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_double_treasure_chance_1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_1">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_1">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="1200" as="geometry" />
           </mxCell>
@@ -369,7 +369,7 @@
         <mxCell id="vSJpPm3wwYhSkPHHRFYX-79" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_treasure_chance_3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_2">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_2">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="1440" as="geometry" />
           </mxCell>
@@ -377,7 +377,7 @@
         <mxCell id="vSJpPm3wwYhSkPHHRFYX-80" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_woodcutting_double_treasure_chance_3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_3">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_3">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="1560" as="geometry" />
           </mxCell>
@@ -385,12 +385,12 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-34" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="bonus_woodcutting_double_treasure_chance_4" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_4">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_4">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="2940" as="geometry" />
           </mxCell>
         </object>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_5">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_5">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="3180" as="geometry" />
           </mxCell>
@@ -398,7 +398,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-92" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="bonus_woodcutting_double_treasure_chance_6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_6">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_6">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="120" y="4800" as="geometry" />
           </mxCell>
@@ -406,7 +406,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-94" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_double_treasure_chance_7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_7">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_7">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="5040" as="geometry" />
           </mxCell>
@@ -420,7 +420,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-149" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_woodcutting_increased_experience_10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_8">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_8">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5280" as="geometry" />
           </mxCell>
@@ -428,7 +428,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-106" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="bonus_woodcutting_treasure_chance_10" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_9">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_9">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5400" as="geometry" />
           </mxCell>
@@ -436,7 +436,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-151" edge="1" parent="1" source="bonus_woodcutting_treasure_chance_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_double_treasure_chance_8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_treasure_chance_10">
+        <object label="Treasure&#xa;Chance" attribute_id="woodcutting_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_treasure_chance_10">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5520" as="geometry" />
           </mxCell>
@@ -447,7 +447,7 @@
         <mxCell id="vSJpPm3wwYhSkPHHRFYX-67" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_woodcutting_increased_experience_4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_1">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_1">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="1320" as="geometry" />
           </mxCell>
@@ -455,7 +455,7 @@
         <mxCell id="vSJpPm3wwYhSkPHHRFYX-70" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_woodcutting_double_treasure_chance_3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_2">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_2">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="300" y="1560" as="geometry" />
           </mxCell>
@@ -463,7 +463,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-3" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_extra_logs_2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_3">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_3">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="1680" as="geometry" />
           </mxCell>
@@ -471,12 +471,12 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-45" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="bonus_woodcutting_treasure_chance_5" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_4">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_4">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="3060" as="geometry" />
           </mxCell>
         </object>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_5">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_5">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="360" y="3300" as="geometry" />
           </mxCell>
@@ -484,7 +484,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-93" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_treasure_chance_7">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_6">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_6">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="4920" as="geometry" />
           </mxCell>
@@ -492,7 +492,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-146" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bonus_woodcutting_treasure_chance_8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_7">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_7">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="120" y="5160" as="geometry" />
           </mxCell>
@@ -500,7 +500,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-112" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="bonus_woodcutting_double_treasure_chance_9" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_8">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_8">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5640" as="geometry" />
           </mxCell>
@@ -508,7 +508,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-113" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="bonus_woodcutting_double_treasure_chance_10" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_9">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_9">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5760" as="geometry" />
           </mxCell>
@@ -519,7 +519,7 @@
         <mxCell id="VzMWBcZ4hqjyc5J0G1za-154" edge="1" parent="1" source="bonus_woodcutting_double_treasure_chance_10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bonus_bark_chance_10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="1.0" per_level="1.0" max_level="1" id="bonus_woodcutting_double_treasure_chance_10">
+        <object label="Double&#xa;Treasure&#xa;Chance" attribute_id="woodcutting_double_treasure_chance" base="0.01" per_level="0.01" max_level="1" id="bonus_woodcutting_double_treasure_chance_10">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5880" as="geometry" />
           </mxCell>
