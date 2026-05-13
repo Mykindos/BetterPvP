@@ -7,11 +7,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTags;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
@@ -40,13 +42,15 @@ import java.util.function.DoubleUnaryOperator;
 @Singleton
 public class WoodcuttingListener implements Listener {
 
+    private final Progression progression;
     private final ClientManager clientManager;
     private final WoodcuttingHandler woodcuttingHandler;
     private final WorldBlockHandler worldBlockHandler;
     private final BlockTagManager blockTagManager;
 
     @Inject
-    public WoodcuttingListener(ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler, BlockTagManager blockTagManager) {
+    public WoodcuttingListener(Progression progression, ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler, BlockTagManager blockTagManager) {
+        this.progression = progression;
         this.clientManager = clientManager;
         this.woodcuttingHandler = woodcuttingHandler;
         this.worldBlockHandler = worldBlockHandler;
@@ -122,6 +126,13 @@ public class WoodcuttingListener implements Listener {
             return;
         }
 
-        UtilServer.callEvent(new PlayerStripLogEvent(player, block, event.useInteractedBlock(), event.useItemInHand()));
+        blockTagManager.removeBlockTag(block, BlockTags.PLAYER_MANIPULATED.getTag());
+        UtilServer.runTaskLater(progression, () -> {
+            if (block.getType().name().toLowerCase().contains("stripped")) {
+                UtilServer.callEvent(new PlayerStripLogEvent(player, block, event.useInteractedBlock(), event.useItemInHand()));
+
+            }
+        }, 2);
+
     }
 }

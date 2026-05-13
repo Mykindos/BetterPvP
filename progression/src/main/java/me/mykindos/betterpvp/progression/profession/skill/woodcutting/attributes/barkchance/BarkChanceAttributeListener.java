@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTags;
 import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -14,7 +15,6 @@ import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStri
 import me.mykindos.betterpvp.progression.profession.woodcutting.item.TreeBark;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,15 +45,15 @@ public class BarkChanceAttributeListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerStripLog(PlayerStripLogEvent event) {
         if (event.wasEventDeniedAndCancelled()) return;
+        blockTagManager.removeBlockTag(event.getStrippedLog(), BlockTags.PLAYER_MANIPULATED.getTag());
 
         Player player = event.getPlayer();
+
         if (player.getGameMode() == GameMode.ADVENTURE) return;
         if (!player.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) return;
 
-        Block block = event.getStrippedLog();
-        if (blockTagManager.isPlayerPlaced(block)) return;
-
         double chance = barkChanceAttribute.getChance(player);
+
         if (chance <= 0) return;
         if (Math.random() >= chance) return;
 
