@@ -109,4 +109,9 @@ public class DeathsCurseEffect extends VanillaEffectType {
     public boolean isSpecial() {
         return true;
     }
+
+    @Override
+    public boolean mustBeManuallyRemoved() {
+        return true;
+    }
 }

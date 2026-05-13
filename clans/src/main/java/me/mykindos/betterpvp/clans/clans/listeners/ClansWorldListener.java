@@ -111,6 +111,7 @@ public class ClansWorldListener extends ClanListener {
     private final WorldBlockHandler worldBlockHandler;
     private final ItemRegistry itemRegistry;
     private final ItemFactory itemFactory;
+    public static final String AGGRESSIVE_RODDER_UNLOCKED = "aggressive_rodder_unlocked";
 
     @Inject
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
@@ -881,10 +882,15 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFishMechanics(final PlayerFishEvent event) {
 
         if (event.getCaught() instanceof final Player player) {
+            final boolean aggressiveRodderUnlocked = hasAggressiveRodderUnlocked(event.getPlayer());
+            if (aggressiveRodderUnlocked) {
+                event.getPlayer().removeMetadata(AGGRESSIVE_RODDER_UNLOCKED, this.clans);
+            }
+
             if (!this.energyService.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
                 event.setCancelled(true);
                 return;
@@ -910,7 +916,8 @@ public class ClansWorldListener extends ClanListener {
             Clan targetClan = targetClanOptional.get();
             Clan playerClan = playerClanoptional.get();
 
-            if (!targetClan.equals(playerClan) && !targetClan.isAllied(playerClan)) {
+            final boolean friendly = targetClan.equals(playerClan) || targetClan.isAllied(playerClan);
+            if (!friendly && !aggressiveRodderUnlocked) {
                 return;
             }
 
@@ -930,6 +937,10 @@ public class ClansWorldListener extends ClanListener {
             player.setVelocity(trajectory.multiply(2).setY(Math.min(20, trajectory.getY())));
 
         }
+    }
+
+    private boolean hasAggressiveRodderUnlocked(final Player player) {
+        return player.hasMetadata(AGGRESSIVE_RODDER_UNLOCKED);
     }
 
     @EventHandler
@@ -1256,7 +1267,7 @@ public class ClansWorldListener extends ClanListener {
         Clan playerLocationClan = playerLocationClanOptional.get();
 
         ClanRelation relation = clanManager.getRelation(playerLocationClan, playerClanOptional.orElse(null));
-        if(relation != ClanRelation.SELF && relation != ClanRelation.ALLY) {
+        if (relation != ClanRelation.SELF && relation != ClanRelation.ALLY) {
             playerMountEvent.cancel("You cannot mount while in another clans territory");
         }
     }
