@@ -47,6 +47,11 @@ clans:core_destroy:
   enabled: true
   notifyThresholds:
   doRewards: true
+clans:cannoneer:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+  doRewards: true
 champions:agility_100:
   enabled: true
   notifyThresholds:
@@ -63,6 +68,14 @@ champions:cast_fireball_100:
   enabled: true
   notifyThresholds:
     - 0.5
+    - 0.9
+  doRewards: true
+champions:jack_of_all_trades:
+  enabled: true
+  notifyThresholds:
+    - 0.25
+    - 0.5
+    - 0.75
     - 0.9
   doRewards: true
 dungeons:braewood_caverns_global_1:
@@ -630,6 +643,138 @@ loadable:
     events:zanzul_kill_1000:
       enabled: true
       goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_cannon_block_damage_type:
+    clans:demolisher_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:demolisher_250:
+      enabled: true
+      goal: 250
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:demolisher_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:demolisher_5000:
+      enabled: true
+      goal: 5000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_dominance_gained_type:
+    clans:dominator_100:
+      enabled: true
+      goal: 100.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:dominator_500:
+      enabled: true
+      goal: 500.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:dominator_2000:
+      enabled: true
+      goal: 2000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:dominator_10000:
+      enabled: true
+      goal: 10000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_energy_collected_type:
+    clans:upkeeper_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:upkeeper_500:
+      enabled: true
+      goal: 500
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:upkeeper_2000:
+      enabled: true
+      goal: 2000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:upkeeper_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_core_damage_type:
+    clans:core_breaker_100:
+      enabled: true
+      goal: 100.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:core_breaker_500:
+      enabled: true
+      goal: 500.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:core_breaker_2000:
+      enabled: true
+      goal: 2000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:core_breaker_10000:
+      enabled: true
+      goal: 10000.0
       notifyThresholds:
         - 0.25
         - 0.5

@@ -14,6 +14,10 @@ public class AchievementCategories {
     public static final NamespacedKey HEALING_DEALT_TYPE = new NamespacedKey("core", "healing_dealt_category");
 
     public static final NamespacedKey CLANS = new NamespacedKey("clans", "clans_category");
+    public static final NamespacedKey CLANS_CANNON_BLOCK_DAMAGE_TYPE = new NamespacedKey("clans", "clans_cannon_block_damage_type");
+    public static final NamespacedKey CLANS_DOMINANCE_GAINED_TYPE = new NamespacedKey("clans", "clans_dominance_gained_type");
+    public static final NamespacedKey CLANS_ENERGY_COLLECTED_TYPE = new NamespacedKey("clans", "clans_energy_collected_type");
+    public static final NamespacedKey CLANS_CORE_DAMAGE_TYPE = new NamespacedKey("clans", "clans_core_damage_type");
 
     //game categories
     public static final NamespacedKey GAME = new NamespacedKey("game", "game_category");
