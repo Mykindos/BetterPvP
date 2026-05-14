@@ -74,6 +74,27 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                 )
                 .build();
 
+        final ClanWrapperStat braewoodWinsStat = clanStatBuilder
+                .wrappedStat(DungeonNativeStat.builder()
+                        .action(DungeonNativeStat.Action.WIN)
+                        .dungeonName("Braewood Caverns")
+                        .build()
+                ).build();
+
+        final ClanWrapperStat duskmireWinsStat = clanStatBuilder
+                .wrappedStat(DungeonNativeStat.builder()
+                        .action(DungeonNativeStat.Action.WIN)
+                        .dungeonName("Duskmire Pinnacle")
+                        .build()
+                ).build();
+
+        final ClanWrapperStat oakmistWinsStat = clanStatBuilder
+                .wrappedStat(DungeonNativeStat.builder()
+                        .action(DungeonNativeStat.Action.WIN)
+                        .dungeonName("Oakmist Valley")
+                        .build()
+                ).build();
+
         final int dungeonWins = dungeonWinsStat.getStat(statContainer, type, period).intValue();
         final int dungeonEnters = dungeonEntersStat.getStat(statContainer, type, period).intValue();
         final int dungeonLosses = dungeonLossesStat.getStat(statContainer, type, period).intValue();
@@ -81,13 +102,21 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
 
         final Duration timePlayed = Duration.of(dungeonTimePlayedStat.getStat(statContainer, type, period), ChronoUnit.MILLIS);
 
+        final int braewoodWins = braewoodWinsStat.getStat(statContainer, type, period).intValue();
+        final int duskmireWins = duskmireWinsStat.getStat(statContainer, type, period).intValue();
+        final int oakmistWins = oakmistWinsStat.getStat(statContainer, type, period).intValue();
+
         return new ArrayList<>(
                 List.of(
                         StatFormatterUtility.formatStat("Dungeon Wins", dungeonWins),
                         StatFormatterUtility.formatStat("Dungeon Losses", dungeonLosses),
                         StatFormatterUtility.formatStat("Dungeons Played", dungeonEnters),
                         StatFormatterUtility.formatStat("Dungeon Win Rate", dungeonWinRate),
-                        StatFormatterUtility.formatStat("Dungeon Time Played", UtilTime.humanReadableFormat(timePlayed))
+                        StatFormatterUtility.formatStat("Dungeon Time Played", UtilTime.humanReadableFormat(timePlayed)),
+                        Component.empty(),
+                        StatFormatterUtility.formatStat("Braewood Caverns Wins", braewoodWins),
+                        StatFormatterUtility.formatStat("Duskmire Pinnacle Wins", duskmireWins),
+                        StatFormatterUtility.formatStat("Oakmist Valley Wins", oakmistWins)
 
                 )
         );
