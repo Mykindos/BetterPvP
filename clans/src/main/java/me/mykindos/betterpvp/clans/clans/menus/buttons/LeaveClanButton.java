@@ -25,7 +25,7 @@ public class LeaveClanButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder provider = ItemView.builder()
                 .material(Material.PAPER)
-                .itemModel(Key.key("betterpvp", "menu/icon/regular/leave"))
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/cross_icon"))
                 .displayName(Component.text("Leave", NamedTextColor.RED))
                 .action(ClickActions.ALL, Component.text("Leave Clan"));
         if (leader) {

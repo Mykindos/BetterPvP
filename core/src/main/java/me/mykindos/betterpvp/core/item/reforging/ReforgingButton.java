@@ -75,17 +75,45 @@ public class ReforgingButton extends ControlItem<Gui> {
                 builder.lore(Component.text("Stats:", NamedTextColor.YELLOW, TextDecoration.BOLD));
                 deltaPreview.forEach(builder::lore);
                 builder.lore(Component.empty());
-                builder.lore(Component.empty()
-                        .append(Component.text("WARNING:", NamedTextColor.RED, TextDecoration.BOLD))
-                        .appendSpace()
-                        .append(Component.text("All stats will be randomized!", NamedTextColor.RED, TextDecoration.ITALIC)));
             }
 
-            ItemRarity rarity = itemFactory.fromItemStack(Objects.requireNonNull(itemInventory.getItem(0))).orElseThrow().getRarity();
+            final ItemInstance item = itemFactory.fromItemStack(Objects.requireNonNull(itemInventory.getItem(0))).orElseThrow();
+            ItemRarity rarity = item.getRarity();
+
+            // Cost
+            final long cost = getReforgingCost(rarity);
+            final String currency = cost == 1 ? "Gold Bar" : "Gold Bars";
             builder.lore(Component.empty()
                     .append(Component.text("Cost:", NamedTextColor.GOLD, TextDecoration.BOLD))
                     .appendSpace()
-                    .append(Component.text(getReforgingCost(rarity) + " gold", NamedTextColor.YELLOW)));
+                    .append(Component.text(cost + "x " + currency, NamedTextColor.YELLOW)));
+
+            // Indicators
+            final PurityComponent purityComponent = item.getComponent(PurityComponent.class).orElse(null);
+            final Component purity = purityComponent == null || !purityComponent.isAttuned()
+                    ? Component.text("None", NamedTextColor.RED)
+                    : Component.text(purityComponent.getPurity().getDisplayName(), purityComponent.getPurity().getColor());
+            builder.lore(Component.empty());
+            builder.lore(Component.empty()
+                    .append(Component.text("[", NamedTextColor.GRAY))
+                    .append(Component.text("!", NamedTextColor.YELLOW, TextDecoration.BOLD))
+                    .append(Component.text("]", NamedTextColor.GRAY))
+                    .appendSpace()
+                    .append(Component.text("Stronger purities yield better results!", NamedTextColor.GRAY)));
+            builder.lore(Component.empty()
+                    .append(Component.text("➙ Item Purity:"))
+                    .appendSpace()
+                    .append(purity));
+
+            builder.lore(Component.empty());
+            builder.lore(Component.empty()
+                    .append(Component.text("WARNING:", NamedTextColor.RED, TextDecoration.BOLD))
+                    .appendSpace()
+                    .append(Component.text("All", NamedTextColor.GRAY, TextDecoration.ITALIC))
+                    .appendSpace()
+                    .append(Component.text("stats", NamedTextColor.RED, TextDecoration.ITALIC, TextDecoration.UNDERLINED))
+                    .appendSpace()
+                    .append(Component.text("will be randomized!", NamedTextColor.GRAY, TextDecoration.ITALIC)));
             return builder.build();
         } else {
             // Error state

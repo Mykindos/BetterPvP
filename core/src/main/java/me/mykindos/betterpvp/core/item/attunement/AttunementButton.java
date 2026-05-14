@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistribution;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
+import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -63,10 +64,29 @@ public class AttunementButton extends ControlItem<Gui> {
 
             builder.lore(Component.empty());
             ItemRarity rarity = itemFactory.fromItemStack(Objects.requireNonNull(itemInventory.getItem(0))).orElseThrow().getRarity();
+
+            // description
+            final Component description = Component.empty()
+                    .append(Component.text("Attuning reveals your item's hidden purity. Higher", NamedTextColor.GRAY))
+                    .appendSpace()
+                    .append(Component.text("Purity", NamedTextColor.YELLOW))
+                    .appendSpace()
+                    .append(Component.text("grants stronger reforge ranges and increases your chance of gaining extra", NamedTextColor.GRAY))
+                    .appendSpace()
+                    .append(Component.text("Rune Sockets", NamedTextColor.LIGHT_PURPLE))
+                    .append(Component.text(".", NamedTextColor.GRAY));
+            for (Component component : ComponentWrapper.wrapLine(description, 40)) {
+                builder.lore(component);
+            }
+            builder.lore(Component.empty());
+
+            // cost
+            final long cost = getAttunementCost(rarity);
+            final String currency = cost == 1 ? "Gold Bar" : "Gold Bars";
             builder.lore(Component.empty()
                     .append(Component.text("Cost:", NamedTextColor.GOLD, TextDecoration.BOLD))
                     .appendSpace()
-                    .append(Component.text(getAttunementCost(rarity) + " gold", NamedTextColor.YELLOW)));
+                    .append(Component.text(cost + "x " + currency, NamedTextColor.YELLOW)));
 
             return builder.build();
         } else {

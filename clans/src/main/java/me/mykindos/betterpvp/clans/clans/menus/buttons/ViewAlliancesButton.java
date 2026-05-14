@@ -25,7 +25,7 @@ public class ViewAlliancesButton extends ViewClanCollectionButton {
     private final Clan viewerClan;
 
     public ViewAlliancesButton(Clan clan, Windowed parent, Clan viewerClan) {
-        super(ItemView.builder().material(Material.PAPER).itemModel(Key.key("betterpvp", "menu/icon/regular/alliances")).build(),
+        super(ItemView.builder().material(Material.PAPER).itemModel(Key.key("betterpvp", "menu/icon/regular/shield_icon")).build(),
                 "Alliances", parent);
         this.clan = clan;
         this.viewerClan = viewerClan;

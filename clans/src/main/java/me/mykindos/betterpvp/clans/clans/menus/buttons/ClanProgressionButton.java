@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -48,6 +49,7 @@ public class ClanProgressionButton extends ControlItem<ClanMenu> {
 
         this.itemProvider = ItemView.builder().material(Material.BEACON)
                 .displayName(Component.text("Clan Level", NamedTextColor.BLUE))
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/level_up_icon"))
                 .lore(progressBarFinal)
                 .lore(Component.empty())
                 .lore(Component.text("Level: ", NamedTextColor.GRAY).append(Component.text(currentLevel, NamedTextColor.YELLOW)))

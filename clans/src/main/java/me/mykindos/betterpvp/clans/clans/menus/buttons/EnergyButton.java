@@ -55,7 +55,7 @@ public class EnergyButton extends AbstractItem {
         final TextColor highlight = TextColor.color(227, 156, 255);
         final ItemView.ItemViewBuilder builder = ItemView.builder()
                 .material(Material.PAPER)
-                .itemModel(Key.key("betterpvp", "menu/icon/regular/energy"))
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/sun_icon"))
                 .displayName(Component.text("Energy", TextColor.color(179, 79, 255), TextDecoration.BOLD))
                 .frameLore(true)
                 .lore(Component.text("Energy is required to upkeep your", NamedTextColor.GRAY))

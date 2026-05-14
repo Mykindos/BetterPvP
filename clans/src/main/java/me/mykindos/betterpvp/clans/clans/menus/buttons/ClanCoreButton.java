@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -26,6 +27,7 @@ public class ClanCoreButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder provider = ItemView.builder().material(ClanCore.CORE_BLOCK)
                 .displayName(Component.text("Clan Core", NamedTextColor.YELLOW, TextDecoration.BOLD))
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/house_icon"))
                 .action(ClickActions.ALL, Component.text("Teleport to Core"));
         if (admin) {
             provider.action(ClickActions.SHIFT, Component.text("Set Core"));

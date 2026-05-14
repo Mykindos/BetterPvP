@@ -30,7 +30,7 @@ public class TerritoryButton extends AbstractItem {
     @Override
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.PAPER)
-                .itemModel(Key.key("betterpvp", "menu/icon/regular/territory"))
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/flag_icon"))
                 .displayName(Component.text("Territory", NamedTextColor.DARK_GREEN))
                 .lore(UtilMessage.deserialize("<white>%d</white>/%d claimed", clan.getTerritory().size(), Math.min(clan.getMembers().size() + 3, 9)))
                 .frameLore(true);
