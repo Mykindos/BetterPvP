@@ -42,24 +42,6 @@ public class MythicMobsDamageAdapter implements Listener {
         this.core = core;
     }
 
-    @EventHandler
-    public void onServerStart(ServerStartEvent event) { // Cleanse fresh loaded worlds of any mythic mobs
-        UtilServer.runTaskLater(core, () -> {
-            Iterator<ActiveMob> iterator = MythicBukkit.inst().getMobManager().getMobRegistry().values().iterator();
-            while (iterator.hasNext()) {
-                ActiveMob am = iterator.next();
-                am.setDespawned();
-                MythicBukkit.inst().getMobManager().unregisterActiveMob(am);
-                if (am.getEntity() != null) {
-                    am.getEntity().remove();
-                }
-                iterator.remove();
-
-            }
-
-        }, 5L);
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void processDamageModifiers(DamageEvent event) {
         var mobManager = MythicBukkit.inst().getMobManager();

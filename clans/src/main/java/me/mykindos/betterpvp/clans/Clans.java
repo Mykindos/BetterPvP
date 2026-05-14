@@ -154,6 +154,7 @@ public class Clans extends BPvPPlugin {
             Location spawnPoint = new Location(voidWorld, 0.5, 1, 0.5);
             spawnPoint.getChunk().setForceLoaded(true);
             voidWorld.setSpawnLocation(spawnPoint);
+            voidWorld.setGameRule(GameRules.SHOW_ADVANCEMENT_MESSAGES, false);
             voidWorld.setGameRule(GameRules.ADVANCE_TIME, false);
             voidWorld.setGameRule(GameRules.KEEP_INVENTORY, true);
         }
