@@ -1,10 +1,14 @@
 package me.mykindos.betterpvp.core.client.achievements.category;
 
-import java.util.Collection;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatFilterType;
+import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 public interface IAchievementCategory {
     /**
@@ -33,4 +37,8 @@ public interface IAchievementCategory {
     Collection<IAchievementCategory> getChildren();
 
     ItemView getItemView();
+
+    default ItemView getItemView(StatContainer container, StatFilterType type, @Nullable Period period) {
+        return getItemView();
+    }
 }

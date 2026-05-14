@@ -43,6 +43,24 @@ public class DefeatAllBossesOnceAchievement extends NSingleGoalSimpleAchievement
                         .action(BossStat.Action.KILL)
                         .bossName("Dreadbeard")
                         .build()
+                ),
+                new GenericStat(
+                        BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Deep Creature")
+                        .build()
+                ),
+                new GenericStat(
+                        BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Zanzul")
+                        .build()
+                ),
+                new GenericStat(
+                        BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Soul Knight")
+                        .build()
                 )
         );
     }
@@ -83,6 +101,21 @@ public class DefeatAllBossesOnceAchievement extends NSingleGoalSimpleAchievement
                 .bossName("Dreadbeard")
                 .build()
         );
+        final GenericStat deepCreatureStat = new GenericStat(BossStat.builder()
+                .action(BossStat.Action.KILL)
+                .bossName("Deep Creature")
+                .build()
+        );
+        final GenericStat zanzulStat = new GenericStat(BossStat.builder()
+                .action(BossStat.Action.KILL)
+                .bossName("Zanzul")
+                .build()
+        );
+        final GenericStat soulKnightStat = new GenericStat(BossStat.builder()
+                .action(BossStat.Action.KILL)
+                .bossName("Soul Knight")
+                .build()
+        );
         boolean killedSkeletonKing = skeletonKingStat.getStat(container, type, period) >= 1;
         List<Component> bar = super.getProgressComponent(container, type, period);
         bar.addAll(List.of(
@@ -92,7 +125,16 @@ public class DefeatAllBossesOnceAchievement extends NSingleGoalSimpleAchievement
                         UtilMessage.deserialize("<white>%s</white>: (<green>%s</green>/<yellow>%s</yellow>)",
                                 killedSkeletonKing ? "Skeleton King" : "???",
                                 skeletonKingStat.getStat(container, type, period),
-                                statGoals.get(skeletonKingStat))
+                                statGoals.get(skeletonKingStat)),
+                        UtilMessage.deserialize("<white>Deep Creature</white>: (<green>%s</green>/<yellow>%s</yellow>)",
+                                deepCreatureStat.getStat(container, type, period),
+                                statGoals.get(deepCreatureStat)),
+                        UtilMessage.deserialize("<white>Zanzul</white>: (<green>%s</green>/<yellow>%s</yellow>)",
+                                zanzulStat.getStat(container, type, period),
+                                statGoals.get(zanzulStat)),
+                        UtilMessage.deserialize("<white>Soul Knight</white>: (<green>%s</green>/<yellow>%s</yellow>)",
+                                soulKnightStat.getStat(container, type, period),
+                                statGoals.get(soulKnightStat))
                         )
         );
         return bar;

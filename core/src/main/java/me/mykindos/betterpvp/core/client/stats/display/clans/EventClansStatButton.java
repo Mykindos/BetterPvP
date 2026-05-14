@@ -44,10 +44,44 @@ public class EventClansStatButton extends ControlItem<IAbstractClansStatMenu> {
                 .clanName(clanName)
                 .clanId(clanId);
 
-        //todo manually put normal event bosses i.e. dreadbeard
         final ClanWrapperStat eventBossesKilledStat = clanStatBuilder
                 .wrappedStat(BossStat.builder()
                         .action(BossStat.Action.KILL)
+                        .build()
+                ).build();
+
+        final ClanWrapperStat dreadbeardKillsStat = clanStatBuilder
+                .wrappedStat(BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Dreadbeard")
+                        .build()
+                ).build();
+
+        final ClanWrapperStat skeletonKingKillsStat = clanStatBuilder
+                .wrappedStat(BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Skeleton King")
+                        .build()
+                ).build();
+
+        final ClanWrapperStat deepCreatureKillsStat = clanStatBuilder
+                .wrappedStat(BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Deep Creature")
+                        .build()
+                ).build();
+
+        final ClanWrapperStat zanzulKillsStat = clanStatBuilder
+                .wrappedStat(BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Zanzul")
+                        .build()
+                ).build();
+
+        final ClanWrapperStat soulKnightKillsStat = clanStatBuilder
+                .wrappedStat(BossStat.builder()
+                        .action(BossStat.Action.KILL)
+                        .bossName("Soul Knight")
                         .build()
                 ).build();
 
@@ -56,11 +90,21 @@ public class EventClansStatButton extends ControlItem<IAbstractClansStatMenu> {
                 .build();
 
         final int eventBossesKilled = eventBossesKilledStat.getStat(statContainer, type, period).intValue();
+        final int dreadbeardKills = dreadbeardKillsStat.getStat(statContainer, type, period).intValue();
+        final int deepCreatureKills = deepCreatureKillsStat.getStat(statContainer, type, period).intValue();
+        final int zanzulKills = zanzulKillsStat.getStat(statContainer, type, period).intValue();
+        final int soulKnightKills = soulKnightKillsStat.getStat(statContainer, type, period).intValue();
         final int undeadChestsOpened = undeadChestsOpenedStat.getStat(statContainer, type, period).intValue();
 
         return new ArrayList<>(
                 List.of(
                         StatFormatterUtility.formatStat("Total Bosses Killed", eventBossesKilled),
+                        Component.empty(),
+                        StatFormatterUtility.formatStat("Dreadbeard Kills", dreadbeardKills),
+                        StatFormatterUtility.formatStat("Deep Creature Kills", deepCreatureKills),
+                        StatFormatterUtility.formatStat("Zanzul Kills", zanzulKills),
+                        StatFormatterUtility.formatStat("Soul Knight Kills", soulKnightKills),
+                        Component.empty(),
                         StatFormatterUtility.formatStat("Undead City Chests Opened", undeadChestsOpened)
                 )
         );

@@ -1,14 +1,10 @@
 champions:set_core:
   enabled: true
   notifyThresholds:
-    - 0.5
-    - 0.9
   doRewards: true
 champions:magnetic_axe_100:
   enabled: true
   notifyThresholds:
-    - 0.5
-    - 0.9
   doRewards: true
 champions:flesh_hook_100:
   enabled: true
@@ -19,14 +15,11 @@ champions:flesh_hook_100:
 clans:pillage_attack:
   enabled: true
   notifyThresholds:
-    - 0.5
-    - 0.9
   doRewards: true
 events:defeat_all_bosses:
   enabled: true
   notifyThresholds:
     - 0.5
-    - 0.9
   doRewards: true
 champions:clone_100:
   enabled: true
@@ -37,32 +30,27 @@ champions:clone_100:
 clans:pillage_defend:
   enabled: true
   notifyThresholds:
-    - 0.5
-    - 0.9
   doRewards: true
 clans:unclaim_other:
   enabled: true
   notifyThresholds:
-    - 0.5
-    - 0.9
   doRewards: true
 clans:set_core:
   enabled: true
   notifyThresholds:
-    - 0.5
-    - 0.9
   doRewards: true
 clans:teleport_core:
   enabled: true
   notifyThresholds:
-    - 0.5
-    - 0.9
   doRewards: true
 clans:core_destroy:
   enabled: true
   notifyThresholds:
+  doRewards: true
+clans:cannoneer:
+  enabled: true
+  notifyThresholds:
     - 0.5
-    - 0.9
   doRewards: true
 champions:agility_100:
   enabled: true
@@ -82,7 +70,47 @@ champions:cast_fireball_100:
     - 0.5
     - 0.9
   doRewards: true
+champions:jack_of_all_trades:
+  enabled: true
+  notifyThresholds:
+    - 0.25
+    - 0.5
+    - 0.75
+    - 0.9
+  doRewards: true
 dungeons:braewood_caverns_global_1:
+  enabled: true
+  notifyThresholds:
+  doRewards: true
+dungeons:duskmire_pinnacle_global_1:
+  enabled: true
+  notifyThresholds:
+  doRewards: true
+dungeons:oakmist_valley_global_1:
+  enabled: true
+  notifyThresholds:
+  doRewards: true
+events:skeleton_king_global_1:
+  enabled: true
+  notifyThresholds:
+  doRewards: true
+events:dreadbeard_global_1:
+  enabled: true
+  notifyThresholds:
+  doRewards: true
+events:deep_creature_global_1:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+events:zanzul_global_1:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+events:soul_knight_global_1:
   enabled: true
   notifyThresholds:
     - 0.5
@@ -95,7 +123,6 @@ loadable:
       goal: 5
       notifyThresholds:
         - 0.5
-        - 0.9
       doRewards: true
     core:death_20:
       goal: 20
@@ -133,7 +160,6 @@ loadable:
       goal: 5
       notifyThresholds:
         - 0.5
-        - 0.9
       doRewards: true
     core:player_kills_20:
       enabled: true
@@ -252,15 +278,12 @@ loadable:
       enabled: true
       goal: 1
       notifyThresholds:
-        - 0.5
-        - 0.9
       doRewards: true
     game:flag_captures_5:
       enabled: true
       goal: 5
       notifyThresholds:
         - 0.5
-        - 0.9
       doRewards: true
     game:flag_captures_10:
       enabled: true
@@ -274,12 +297,23 @@ loadable:
       enabled: true
       goal: 1
       notifyThresholds:
+      doRewards: true
+    dungeons:braewood_caverns_period_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
         - 0.5
-        - 0.9
       doRewards: true
     dungeons:braewood_caverns_period_10:
       enabled: true
       goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_caverns_period_25:
+      enabled: true
+      goal: 25
       notifyThresholds:
         - 0.5
         - 0.9
@@ -289,5 +323,512 @@ loadable:
       goal: 50
       notifyThresholds:
         - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_caverns_period_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    dungeons:braewood_caverns_period_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  dungeons:duskmire_pinnacle_period:
+    dungeons:duskmire_pinnacle_period_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+      doRewards: true
+    dungeons:duskmire_pinnacle_period_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    dungeons:duskmire_pinnacle_period_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:duskmire_pinnacle_period_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:duskmire_pinnacle_period_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:duskmire_pinnacle_period_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    dungeons:duskmire_pinnacle_period_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  dungeons:oakmist_valley_period:
+    dungeons:oakmist_valley_period_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+      doRewards: true
+    dungeons:oakmist_valley_period_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    dungeons:oakmist_valley_period_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:oakmist_valley_period_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:oakmist_valley_period_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:oakmist_valley_period_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    dungeons:oakmist_valley_period_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  events:boss_skeleton_king:
+    events:skeleton_king_kill_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+      doRewards: true
+    events:skeleton_king_kill_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    events:skeleton_king_kill_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:skeleton_king_kill_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:skeleton_king_kill_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:skeleton_king_kill_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    events:skeleton_king_kill_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  events:boss_dreadbeard:
+    events:dreadbeard_kill_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+      doRewards: true
+    events:dreadbeard_kill_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    events:dreadbeard_kill_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:dreadbeard_kill_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:dreadbeard_kill_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:dreadbeard_kill_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    events:dreadbeard_kill_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  events:boss_deep_creature:
+    events:deep_creature_kill_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+      doRewards: true
+    events:deep_creature_kill_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    events:deep_creature_kill_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:deep_creature_kill_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:deep_creature_kill_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:deep_creature_kill_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    events:deep_creature_kill_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  events:boss_zanzul:
+    events:zanzul_kill_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+      doRewards: true
+    events:zanzul_kill_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    events:zanzul_kill_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:zanzul_kill_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:zanzul_kill_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:zanzul_kill_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    events:zanzul_kill_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_cannon_block_damage_type:
+    clans:demolisher_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:demolisher_250:
+      enabled: true
+      goal: 250
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:demolisher_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:demolisher_5000:
+      enabled: true
+      goal: 5000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_dominance_gained_type:
+    clans:dominator_100:
+      enabled: true
+      goal: 100.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:dominator_500:
+      enabled: true
+      goal: 500.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:dominator_2000:
+      enabled: true
+      goal: 2000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:dominator_10000:
+      enabled: true
+      goal: 10000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_energy_collected_type:
+    clans:upkeeper_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:upkeeper_500:
+      enabled: true
+      goal: 500
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:upkeeper_2000:
+      enabled: true
+      goal: 2000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:upkeeper_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  clans:clans_core_damage_type:
+    clans:core_breaker_100:
+      enabled: true
+      goal: 100.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:core_breaker_500:
+      enabled: true
+      goal: 500.0
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    clans:core_breaker_2000:
+      enabled: true
+      goal: 2000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    clans:core_breaker_10000:
+      enabled: true
+      goal: 10000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  events:boss_soul_knight:
+    events:soul_knight_kill_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+      doRewards: true
+    events:soul_knight_kill_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    events:soul_knight_kill_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:soul_knight_kill_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:soul_knight_kill_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    events:soul_knight_kill_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    events:soul_knight_kill_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
         - 0.9
       doRewards: true

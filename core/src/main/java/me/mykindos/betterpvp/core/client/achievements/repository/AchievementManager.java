@@ -113,8 +113,11 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> imp
                 .thenAccept(completions -> {
                     try {
                         completions.forEach(completion -> {
-                            int total = getTotalCompletion(getObject(completion.getKey()).orElseThrow(), completion.getPeriod());
-                            completion.setTotalCompletions(total);
+                            getObject(completion.getKey()).ifPresentOrElse(achievement -> {
+                                int total = getTotalCompletion(achievement, completion.getPeriod());
+                                completion.setTotalCompletions(total);
+                            }, () -> log.warn("Achievement {} not found for completion, skipping total update for {}",
+                                    completion.getKey(), client.getName()).submit());
                         });
                         client.getStatContainer().getAchievementCompletions().fromOther(completions);
                     } catch (Exception e) {
@@ -133,9 +136,23 @@ public class AchievementManager extends Manager<NamespacedKey, IAchievement> imp
     }
     public int getTotalCompletion(IAchievement achievement, Period period) {
         return switch (achievement.getAchievementFilterType()) {
-            case ALL -> totalAllAchievementCompletions.get(achievement.getNamespacedKey());
-            case SEASON -> totalSeasonCompletions.get((Season) period).get(achievement.getNamespacedKey());
-            case REALM -> totalRealmCompletions.get((Realm) period).get(achievement.getNamespacedKey());
+            case ALL -> totalAllAchievementCompletions.getOrDefault(achievement.getNamespacedKey(), 0);
+            case SEASON -> {
+                if (period == null) {
+                    log.warn("SEASON achievement {} has a null period, defaulting total to 0", achievement.getNamespacedKey()).submit();
+                    yield 0;
+                }
+                ConcurrentMap<NamespacedKey, Integer> seasonMap = totalSeasonCompletions.get((Season) period);
+                yield seasonMap == null ? 0 : seasonMap.getOrDefault(achievement.getNamespacedKey(), 0);
+            }
+            case REALM -> {
+                if (period == null) {
+                    log.warn("REALM achievement {} has a null period, defaulting total to 0", achievement.getNamespacedKey()).submit();
+                    yield 0;
+                }
+                ConcurrentMap<NamespacedKey, Integer> realmMap = totalRealmCompletions.get((Realm) period);
+                yield realmMap == null ? 0 : realmMap.getOrDefault(achievement.getNamespacedKey(), 0);
+            }
         };
     }
     public void updateTotalCompletions(IAchievement achievement, Period period) {
