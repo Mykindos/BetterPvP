@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
@@ -33,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @BPvPListener
 @Singleton
@@ -107,11 +109,17 @@ public class WoodcuttingDoubleTreasureChanceListener implements Listener, Reload
 
     private void sendMessage(Player player, Location location, ItemStack itemStack) {
         final Component name;
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
-            name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+        Optional<ItemInstance> itemInstanceOptional = itemFactory.fromItemStack(itemStack);
+        if(itemInstanceOptional.isPresent()) {
+            ItemInstance itemInstance = itemInstanceOptional.get();
+            name = itemInstance.getView().getName();
         } else {
-            name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
-                    Component.translatable(itemStack.getType().translationKey()));
+            if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
+                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+            } else {
+                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                        Component.translatable(itemStack.getType().translationKey()));
+            }
         }
 
         TextComponent message = Component.text("You found ")

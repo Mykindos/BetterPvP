@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -138,7 +137,6 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
                 try {
                     if (isBreakableLog(blockToFell, initialLogLocation)) {
                         UtilBlock.breakBlock(player, blockToFell);
-                        UtilItem.damageItem(player, itemInMainHand, 1);
                     }
                 } finally {
                     blocksBeingFelled.remove(fellLocation);

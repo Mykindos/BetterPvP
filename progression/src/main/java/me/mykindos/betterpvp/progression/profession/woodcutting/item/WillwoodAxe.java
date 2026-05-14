@@ -31,7 +31,7 @@ public class WillwoodAxe extends BaseItem {
     @Inject
     private WillwoodAxe(TreeFellerInteraction interaction) {
         super("Willwood Axe", Item.model(Material.IRON_AXE, "willwood_axe"), ItemGroup.TOOL, ItemRarity.RARE);
-        addSerializableComponent(new DurabilityComponent(500));
+        addSerializableComponent(new DurabilityComponent(2000));
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.BLOCK_BREAK, interaction)
                 .build());
