@@ -36,7 +36,7 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
     private final Clan viewerClan;
 
     public ViewEnemiesButton(Clan clan, Windowed parent, Clan viewerClan) {
-        super(ItemView.builder().material(Material.PAPER).itemModel(Key.key("betterpvp", "menu/icon/regular/enemies")).build(),
+        super(ItemView.builder().material(Material.PAPER).itemModel(Key.key("betterpvp", "menu/icon/regular/sword_icon")).build(),
                 "Enemies", parent);
         this.clan = clan;
         this.viewerClan = viewerClan;
