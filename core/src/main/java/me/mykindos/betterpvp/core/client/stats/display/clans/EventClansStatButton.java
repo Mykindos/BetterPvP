@@ -57,12 +57,6 @@ public class EventClansStatButton extends ControlItem<IAbstractClansStatMenu> {
                         .build()
                 ).build();
 
-        final ClanWrapperStat skeletonKingKillsStat = clanStatBuilder
-                .wrappedStat(BossStat.builder()
-                        .action(BossStat.Action.KILL)
-                        .bossName("Skeleton King")
-                        .build()
-                ).build();
 
         final ClanWrapperStat deepCreatureKillsStat = clanStatBuilder
                 .wrappedStat(BossStat.builder()

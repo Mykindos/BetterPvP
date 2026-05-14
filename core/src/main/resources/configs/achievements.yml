@@ -1,6 +1,6 @@
 champions:set_core:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 champions:magnetic_axe_100:
   enabled: true
@@ -33,19 +33,19 @@ clans:pillage_defend:
   doRewards: true
 clans:unclaim_other:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:set_core:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:teleport_core:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:core_destroy:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:cannoneer:
   enabled: true
@@ -80,41 +80,31 @@ champions:jack_of_all_trades:
   doRewards: true
 dungeons:braewood_caverns_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 dungeons:duskmire_pinnacle_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 dungeons:oakmist_valley_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 events:skeleton_king_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 events:dreadbeard_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 events:deep_creature_global_1:
   enabled: true
-  notifyThresholds:
-    - 0.5
-    - 0.9
+  notifyThresholds:  []
   doRewards: true
 events:zanzul_global_1:
   enabled: true
-  notifyThresholds:
-    - 0.5
-    - 0.9
-  doRewards: true
-events:soul_knight_global_1:
-  enabled: true
-  notifyThresholds:
-    - 0.5
-    - 0.9
+  notifyThresholds: []
   doRewards: true
 loadable:
   core:death_category:
@@ -277,7 +267,7 @@ loadable:
     game:flag_captures_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     game:flag_captures_5:
       enabled: true
@@ -296,7 +286,7 @@ loadable:
     dungeons:braewood_caverns_period_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds:  []
       doRewards: true
     dungeons:braewood_caverns_period_5:
       enabled: true
@@ -347,7 +337,7 @@ loadable:
     dungeons:duskmire_pinnacle_period_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     dungeons:duskmire_pinnacle_period_5:
       enabled: true
@@ -398,7 +388,7 @@ loadable:
     dungeons:oakmist_valley_period_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     dungeons:oakmist_valley_period_5:
       enabled: true
@@ -449,7 +439,7 @@ loadable:
     events:skeleton_king_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:skeleton_king_kill_5:
       enabled: true
@@ -500,7 +490,7 @@ loadable:
     events:dreadbeard_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:dreadbeard_kill_5:
       enabled: true
@@ -551,7 +541,7 @@ loadable:
     events:deep_creature_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:deep_creature_kill_5:
       enabled: true
@@ -602,7 +592,7 @@ loadable:
     events:zanzul_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:zanzul_kill_5:
       enabled: true
