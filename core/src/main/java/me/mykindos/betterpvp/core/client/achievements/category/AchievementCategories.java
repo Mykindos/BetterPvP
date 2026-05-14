@@ -38,6 +38,7 @@ public class AchievementCategories {
 
     public static final NamespacedKey DUNGEONS = new NamespacedKey("dungeons", "dungeons_category");
     public static final NamespacedKey DUNGEONS_BRAEWOOD_CAVERNS_PERIOD = new NamespacedKey("dungeons", "braewood_caverns_period");
+    public static final NamespacedKey DUNGEONS_BRAEWOOD_CITADEL_PERIOD = new NamespacedKey("dungeons", "braewood_citadel_period");
     public static final NamespacedKey DUNGEONS_DUSKMIRE_PINNACLE_PERIOD = new NamespacedKey("dungeons", "duskmire_pinnacle_period");
     public static final NamespacedKey DUNGEONS_OAKMIST_VALLEY_PERIOD = new NamespacedKey("dungeons", "oakmist_valley_period");
 

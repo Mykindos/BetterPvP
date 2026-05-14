@@ -82,6 +82,10 @@ dungeons:braewood_caverns_global_1:
   enabled: true
   notifyThresholds: []
   doRewards: true
+dungeons:braewood_citadel_global_1:
+  enabled: true
+  notifyThresholds: []
+  doRewards: true
 dungeons:duskmire_pinnacle_global_1:
   enabled: true
   notifyThresholds: []
@@ -376,6 +380,57 @@ loadable:
         - 0.9
       doRewards: true
     dungeons:duskmire_pinnacle_period_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  dungeons:braewood_citadel_period:
+    dungeons:braewood_citadel_period_1:
+      enabled: true
+      goal: 1
+      notifyThresholds: []
+      doRewards: true
+    dungeons:braewood_citadel_period_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    dungeons:braewood_citadel_period_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_1000:
       enabled: true
       goal: 1000
       notifyThresholds:
