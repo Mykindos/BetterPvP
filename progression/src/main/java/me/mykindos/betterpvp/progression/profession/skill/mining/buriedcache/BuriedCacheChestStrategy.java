@@ -16,9 +16,9 @@ public final class BuriedCacheChestStrategy {
     private BuriedCacheChestStrategy() {}
 
     public static void fillChest(Block block, LootBundle bundle, LootContext context) {
-        if (!(block.getState() instanceof Chest chest)) return;
+        if (!(block.getState(false) instanceof Chest chest)) return;
 
-        Inventory inventory = chest.getInventory();
+        Inventory inventory = chest.getBlockInventory();
         for (Loot<?, ?> loot : bundle) {
             Object awarded = loot.award(context);
             ItemStack itemStack = null;
