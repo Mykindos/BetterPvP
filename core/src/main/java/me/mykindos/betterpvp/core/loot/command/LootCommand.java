@@ -58,7 +58,7 @@ public class LootCommand extends Command {
     @Override
     public List<String> processTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return new ArrayList<>(lootTableRegistry.getLoaded().keySet());
+            return new ArrayList<>(lootTableRegistry.getLoaded().keySet().stream().filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).toList());
         } else {
             return super.processTabComplete(sender, args);
         }

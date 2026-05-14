@@ -37,7 +37,7 @@ public class SetAdminCommand extends ClanSubCommand {
         if (args.length == 1) {
             Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
             boolean isAdmin = Boolean.parseBoolean(args[0]);
-            clan.setSafe(isAdmin);
+            clan.setAdmin(isAdmin);
             UtilMessage.message(player, "Clans", "Updated clan admin status to " + isAdmin);
             clanManager.getRepository().updateClanAdmin(clan);
             clientManager.sendMessageToRank("Clans", UtilMessage.deserialize( "<yellow>%s<gray> set <yellow>%s<gray> as an admin clan: <green>%s",
