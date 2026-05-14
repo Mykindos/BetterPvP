@@ -924,15 +924,15 @@ skills:
     resonancerelay:
       enabled: true
       maxlevel: 3
-      hitBoxSize: 1.5
+      hitBoxSize: 0.5
       aliveTime: 2000
       speed: 100.0
       damage: 3.0
-      allyBuffDuration: 3.0
+      allyBuffDuration: 5.0
       allyBuffAmplifier: 1
       allyEnergyRestored: 10.0
       maxDistance: 32.0
-      energyPerShot: 40.0
+      energyPerShot: 50.0
       energyPerShotDecreasePerLevel: 5.0
     volley:
       enabled: true
