@@ -71,6 +71,6 @@ public class LootTableRegistry implements Reloadable {
 
         final Collection<LootTable> tables = this.lootTables.values();
         GLOBAL_SCOPE.clear();
-        tables.forEach(table -> GLOBAL_SCOPE.put(table, LootSession.newSession(table, Audience.audience(Bukkit.getOnlinePlayers()))));
+        tables.forEach(table -> GLOBAL_SCOPE.put(table.getId(), LootSession.newSession(table, Audience.audience(Bukkit.getOnlinePlayers()))));
     }
 }

@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 @BPvPListener
 public class LootSessionController implements Listener {
 
-    public static final Map<LootTable, LootSession> GLOBAL_SCOPE = new HashMap<>();
+    public static final Map<String, LootSession> GLOBAL_SCOPE = new HashMap<>();
     private final Map<UUID, Deque<LootSession>> playerScopes = new HashMap<>();
 
     /** Push a new scope on top (takes precedence). */
@@ -42,7 +42,7 @@ public class LootSessionController implements Listener {
     }
 
     public @NotNull LootSession getGlobalScope(LootTable table) {
-        final LootSession session = GLOBAL_SCOPE.get(table);
+        final LootSession session = GLOBAL_SCOPE.get(table.getId());
         Preconditions.checkNotNull(session, "No global session for table %s", table.getId());
         return session;
     }
@@ -62,7 +62,7 @@ public class LootSessionController implements Listener {
             }
         }
 
-        return GLOBAL_SCOPE.get(table);
+        return GLOBAL_SCOPE.get(table.getId());
     }
 
     /**
