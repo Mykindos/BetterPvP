@@ -94,9 +94,9 @@ public class PurityDistributionRegistry {
      */
     private PurityDistribution createFallbackDistribution() {
         Map<ItemPurity, Integer> weights = new HashMap<>();
-        weights.put(ItemPurity.PITIFUL, 5);
+        weights.put(ItemPurity.PITIFUL, 15);
         weights.put(ItemPurity.FRAGILE, 25);
-        weights.put(ItemPurity.MODERATE, 40);
+        weights.put(ItemPurity.MODERATE, 30);
         weights.put(ItemPurity.POLISHED, 20);
         weights.put(ItemPurity.PRISTINE, 8);
         weights.put(ItemPurity.PERFECT, 2);
