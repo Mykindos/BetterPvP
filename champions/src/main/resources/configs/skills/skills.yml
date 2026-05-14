@@ -930,7 +930,6 @@ skills:
       damage: 3.0
       allyBuffDuration: 5.0
       allyBuffAmplifier: 1
-      allyEnergyRestored: 10.0
       maxDistance: 32.0
       energyPerShot: 50.0
       energyPerShotDecreasePerLevel: 5.0

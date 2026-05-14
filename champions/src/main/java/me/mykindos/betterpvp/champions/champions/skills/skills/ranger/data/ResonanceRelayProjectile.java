@@ -3,12 +3,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
-import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
-import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -17,15 +14,11 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -40,29 +33,25 @@ public class ResonanceRelayProjectile extends Projectile {
 
     private final ChampionsManager championsManager;
     private final @NotNull Location locationShotFrom;
-    private final double resistanceDuration;
-    private final int resistanceLevel;
+    private final double buffDuration;
+    private final int buffAmplifier;
     private final double damage;
     private final double maxDistance;
-    private final @NotNull Arrow shotArrow;
     private final @NotNull Skill skill;
-    private final double energyToRestore;
 
 
     public ResonanceRelayProjectile(@NotNull Player caster, double hitboxSize, @NotNull Location location, long aliveTime,
-                                    ChampionsManager championsManager, double resistanceDuration,
-                                    int resistanceLevel, double damage, double maxDistance, @NotNull Arrow shotArrow,
-                                    @NotNull Skill skill, double energyToRestore) {
+                                    ChampionsManager championsManager, double buffDuration,
+                                    int buffAmplifier, double damage, double maxDistance,
+                                    @NotNull Skill skill) {
         super(caster, hitboxSize, location, aliveTime);
         this.championsManager = championsManager;
         this.locationShotFrom = location.clone();
-        this.resistanceDuration = resistanceDuration;
-        this.resistanceLevel = resistanceLevel;
+        this.buffDuration = buffDuration;
+        this.buffAmplifier = buffAmplifier;
         this.damage = damage;
         this.maxDistance = maxDistance;
-        this.shotArrow = shotArrow;
         this.skill = skill;
-        this.energyToRestore = energyToRestore;
     }
 
     @Override
@@ -159,59 +148,30 @@ public class ResonanceRelayProjectile extends Projectile {
             doDamageToEnemy(target);
         }
 
+        final @NotNull String classTypeName = skill.getClassType().getName();
+
+        UtilMessage.simpleMessage(caster, classTypeName,
+                "You hit <alt>" + target.getName() + "</alt> with <alt>" + skill.getName());
+
+        UtilMessage.simpleMessage(target, classTypeName,
+                "<alt>" + caster.getName() + "</alt> hit you with <alt>" + skill.getName());
+
+
         return CollisionResult.CONTINUE;  // Ray projectile; always continues until block
     }
 
     private void doBuffForAlly(LivingEntity ally) {
         championsManager.getEffects().addEffect(ally,
                 caster,
-                EffectTypes.RESISTANCE,
+                EffectTypes.STRENGTH,
                 skill.getName(),
-                resistanceLevel,
-                (long) (resistanceDuration * 1000L));
-
-        if (ally instanceof Player allyPlayer) {
-            championsManager.getEnergy().regenerateEnergy(allyPlayer, energyToRestore, EnergyEvent.Cause.CUSTOM);
-        }
+                buffAmplifier,
+                (long) (buffDuration * 1000L));
     }
 
     private void doDamageToEnemy(LivingEntity enemy) {
-        final @NotNull String classTypeName = skill.getClassType().getName();
-
-        UtilMessage.simpleMessage(caster, classTypeName,
-                "You hit <alt>" + enemy.getName() + "</alt> with <alt>" + skill.getName());
-
-        UtilMessage.simpleMessage(enemy, classTypeName,
-                "<alt>" + caster.getName() + "</alt> hit you with <alt>" + skill.getName());
-
         UtilDamage.doDamage(new DamageEvent(
                 enemy, caster, null, new SkillDamageCause(skill), damage, skill.getName())
         );
-
-        shootFakeArrow(enemy);
-    }
-
-    private void shootFakeArrow(@NotNull LivingEntity enemy) {
-
-        final DamageSource source = DamageSource.builder(DamageType.GENERIC)
-                .withCausingEntity(caster)
-                .withDirectEntity(shotArrow)
-                .withDamageLocation(caster.getLocation())
-                .build();
-
-        final DamageEvent damageEvent = new DamageEvent(
-                enemy,
-                caster,
-                shotArrow,
-                source,
-                new VanillaDamageCause(EntityDamageEvent.DamageCause.PROJECTILE),
-                0.0,
-                skill.getName()
-        );
-
-        damageEvent.setKnockback(false);
-        damageEvent.setHurtAnimation(false);
-
-        UtilDamage.doDamage(damageEvent);
     }
 }

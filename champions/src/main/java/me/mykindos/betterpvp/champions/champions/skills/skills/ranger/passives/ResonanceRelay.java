@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -25,7 +24,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +43,6 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
     private double damage;
     private double allyBuffDuration;
     private int allyBuffAmplifier;
-    private double allyEnergyRestored;
     private double maxDistance;
     private double energyPerShot;
     private double energyPerShotIncreasePerLevel;
@@ -58,11 +55,10 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Every other shot, your bow shoots ",
+                "Every other shot, your bow shoots",
                 "a beam that deals " + getValueString(this::getDamage, level) + " damage to enemies.",
                 "",
-                "Allies gain <effect>Resistance</effect> for " + getValueString(this::getAllyBuffDuration, level) + " seconds,",
-                "and restore " + getValueString(this::getAllyEnergyRestored, level) + " energy.",
+                "Allies gain <effect>Strength</effect> for " + getValueString(this::getAllyBuffDuration, level) + " seconds.",
                 "",
                 "Energy per shot: " + getValueString(this::getEnergyPerShot, level)
         };
@@ -74,10 +70,6 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
 
     public double getAllyBuffDuration(int level) {
         return allyBuffDuration;
-    }
-
-    public double getAllyEnergyRestored(int level) {
-        return allyEnergyRestored;
     }
 
     public double getEnergyPerShot(int level) {
@@ -101,27 +93,22 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
         }
 
         final double energyCost = getEnergyPerShot(level);
-        if (!championsManager.getEnergy().use(player, getName(), energyCost, true)) {
-            event.setCancelled(true);
+        if (!championsManager.getEnergy().use(player, getName(), energyCost, false)) {
             return;
         }
 
         // Cleanup to ensure no memory leaks from old projectiles
-        abilityData.removeProjectileAndArrow();
+        abilityData.removeOldProjectile();
 
-        final @NotNull ResonanceRelayProjectile projectile = shootProjectile(player, level, arrow);
+        // Remove current arrow
+        arrow.remove();
+
+        final @NotNull ResonanceRelayProjectile projectile = shootProjectile(player, level);
         abilityData.setProjectile(projectile);
         abilityData.setShootBeamNextShot(false);
-
-        // So arrow still needs to exist but we don't want it to be visible so tp it up in the sky and disable gravity
-        abilityData.setShotArrow(arrow);
-
-        arrow.setGravity(false);
-        arrow.setVelocity(new Vector(0, 0, 0));
-        UtilServer.runTask(champions, () -> arrow.teleport(arrow.getLocation().add(0, 1000, 0)));
     }
 
-    private @NotNull ResonanceRelayProjectile shootProjectile(Player player, int level, @NotNull Arrow shotArrow) {
+    private @NotNull ResonanceRelayProjectile shootProjectile(Player player, int level) {
         final @NotNull Location eyeLocation = player.getEyeLocation();
         final ResonanceRelayProjectile projectile = new ResonanceRelayProjectile(
                 player,
@@ -133,9 +120,7 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
                 allyBuffAmplifier,
                 getDamage(level),
                 maxDistance,
-                shotArrow,
-                this,
-                getAllyEnergyRestored(level)
+                this
         );
 
         projectile.redirect(eyeLocation.getDirection().multiply(speed));
@@ -151,7 +136,6 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
             final @NotNull ResonanceRelayData abilityData = playersUsingSkill.get(player);
 
             if (!player.isOnline() || !hasSkill(player) || player.isDead() || !player.isValid()) {
-                abilityData.removeProjectileAndArrow();
                 iterator.remove();
                 continue;
             }
@@ -163,7 +147,7 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
 
             final @Nullable ResonanceRelayProjectile projectile = abilityData.getProjectile();
             if (projectile == null || projectile.isMarkForRemoval() || projectile.isExpired()) {
-                abilityData.removeProjectileAndArrow();
+                abilityData.removeOldProjectile();
                 iterator.remove();
                 continue;
             }
@@ -209,7 +193,6 @@ public class ResonanceRelay extends Skill implements PassiveSkill, DamageSkill, 
         damage = getConfig("damage", 3.0, Double.class);
         allyBuffDuration = getConfig("allyBuffDuration", 5.0, Double.class);
         allyBuffAmplifier = getConfig("allyBuffAmplifier", 1, Integer.class);
-        allyEnergyRestored = getConfig("allyEnergyRestored", 10.0, Double.class);
         maxDistance = getConfig("maxDistance", 32.0, Double.class);
         energyPerShot = getConfig("energyPerShot", 50.0, Double.class);
         energyPerShotIncreasePerLevel = getConfig("energyPerShotIncreasePerLevel", 5.0, Double.class);
