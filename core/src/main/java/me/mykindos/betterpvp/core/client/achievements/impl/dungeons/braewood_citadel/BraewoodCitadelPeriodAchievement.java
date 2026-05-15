@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.impl.dungeons.oakmist;
+package me.mykindos.betterpvp.core.client.achievements.impl.dungeons.braewood_citadel;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
@@ -15,25 +15,26 @@ import org.bukkit.NamespacedKey;
 import java.util.List;
 
 @CustomLog
+// Config loaded achievement, this class will be skipped by reflection
 @NoReflection
 /**
- * Super class, is either extended or loaded by a loader {@link OakmistAchievementLoader}
+ * Super class, is either extended or loaded by a loader {@link BraewoodCitadelAchievementLoader}
  */
-public class OakmistValleyAchievement extends SingleSimpleAchievement {
+public class BraewoodCitadelPeriodAchievement extends SingleSimpleAchievement {
 
-    public OakmistValleyAchievement(String key, int goal) {
+    public BraewoodCitadelPeriodAchievement(String key, int goal) {
         this(new NamespacedKey("dungeons", key), goal);
     }
 
-    public OakmistValleyAchievement(NamespacedKey key, int goal) {
-        super("Beat the Oakmist Valley", key,
-                AchievementCategories.DUNGEONS_OAKMIST_VALLEY_PERIOD,
+    public BraewoodCitadelPeriodAchievement(NamespacedKey key, int goal) {
+        super("Beat the Braewood Citadel", key,
+                AchievementCategories.DUNGEONS_BRAEWOOD_CITADEL_PERIOD,
                 StatFilterType.SEASON,
                 (long) goal,
                 new GenericStat(
                         DungeonNativeStat.builder()
                                 .action(DungeonNativeStat.Action.WIN)
-                                .dungeonName("Oakmist Valley")
+                                .dungeonName("Braewood Citadel")
                                 .build()
                 )
         );
@@ -41,17 +42,17 @@ public class OakmistValleyAchievement extends SingleSimpleAchievement {
 
     @Override
     public String getName() {
-        return "Beat the Oakmist Valley " + getGoal().intValue();
+        return "Beat the Braewood Citadel " + getGoal().intValue();
     }
 
     @Override
     public Material getMaterial(StatContainer container, StatFilterType type, Period period) {
-        return Material.OAK_LEAVES;
+        return Material.CHISELED_STONE_BRICKS;
     }
 
     @Override
     public List<String> getStringDescription(StatContainer container, StatFilterType type, Period period) {
-        return List.of("<gray>Beat the Oakmist Valley <yellow>" + getGoal().intValue() + "</yellow> times");
+        return List.of("<gray>Beat the Braewood Citadel <yellow>" + getGoal().intValue() + "</yellow> times");
     }
 }
 

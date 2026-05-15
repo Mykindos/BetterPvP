@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
@@ -82,6 +83,8 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
 
         long fishCaught = (long) professionData.getProperties().getOrDefault("TOTAL_FISH_CAUGHT", 0L);
         professionData.getProperties().put("TOTAL_FISH_CAUGHT", fishCaught + 1);
+
+        clientManager.incrementStat(player, ClientStat.FISH_CAUGHT, 1L);
 
         long weightCaught = (long) professionData.getProperties().getOrDefault("TOTAL_WEIGHT_CAUGHT", 0L);
         professionData.getProperties().put("TOTAL_WEIGHT_CAUGHT", weightCaught + fish.getWeight());

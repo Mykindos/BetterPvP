@@ -117,6 +117,16 @@ public enum ClientStat implements IClientStat {
                     ),
             "All Healing you have ever done"),
 
+    //progression
+    FISH_CAUGHT(StatValueType.LONG, "Fish Caught", "Number of fish you have caught"),
+    FISHING_XP(StatValueType.DOUBLE, "Fishing XP", "Fishing experience you have gained"),
+
+    LOG_CHOPPED(StatValueType.LONG, "Logs Chopped", "Number of logs you have chopped"),
+    WOODCUTTING_XP(StatValueType.DOUBLE, "Woodcutting XP", "Woodcutting experience you have gained"),
+
+    ORE_MINED(StatValueType.LONG, "Ores Mined", "Number of ores you have mined"),
+    MINING_XP(StatValueType.DOUBLE, "Mining XP", "Mining experience you have gained"),
+
     //events
     //todo undead city keys collected
 

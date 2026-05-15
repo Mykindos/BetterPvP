@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.client.achievements.impl.game.wins;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
-import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
@@ -18,7 +17,7 @@ import java.util.List;
 //Config loaded achievement, this class will be skipped by reflaction
 @NoReflection
 /**
- * Super class, is either extended or loaded by a loader {@link DeathAchievementLoader}
+ * Super class, is either extended or loaded by a loader {@link ChampionsWinAchievementLoader}
  */
 public class ChampionsWinAchievement extends SingleSimpleAchievement {
 

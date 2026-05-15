@@ -1,6 +1,6 @@
 champions:set_core:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 champions:magnetic_axe_100:
   enabled: true
@@ -33,19 +33,19 @@ clans:pillage_defend:
   doRewards: true
 clans:unclaim_other:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:set_core:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:teleport_core:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:core_destroy:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 clans:cannoneer:
   enabled: true
@@ -80,41 +80,35 @@ champions:jack_of_all_trades:
   doRewards: true
 dungeons:braewood_caverns_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
+  doRewards: true
+dungeons:braewood_citadel_global_1:
+  enabled: true
+  notifyThresholds: []
   doRewards: true
 dungeons:duskmire_pinnacle_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 dungeons:oakmist_valley_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 events:skeleton_king_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 events:dreadbeard_global_1:
   enabled: true
-  notifyThresholds:
+  notifyThresholds: []
   doRewards: true
 events:deep_creature_global_1:
   enabled: true
-  notifyThresholds:
-    - 0.5
-    - 0.9
+  notifyThresholds:  []
   doRewards: true
 events:zanzul_global_1:
   enabled: true
-  notifyThresholds:
-    - 0.5
-    - 0.9
-  doRewards: true
-events:soul_knight_global_1:
-  enabled: true
-  notifyThresholds:
-    - 0.5
-    - 0.9
+  notifyThresholds: []
   doRewards: true
 loadable:
   core:death_category:
@@ -277,7 +271,7 @@ loadable:
     game:flag_captures_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     game:flag_captures_5:
       enabled: true
@@ -296,7 +290,7 @@ loadable:
     dungeons:braewood_caverns_period_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds:  []
       doRewards: true
     dungeons:braewood_caverns_period_5:
       enabled: true
@@ -347,7 +341,7 @@ loadable:
     dungeons:duskmire_pinnacle_period_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     dungeons:duskmire_pinnacle_period_5:
       enabled: true
@@ -394,11 +388,62 @@ loadable:
         - 0.75
         - 0.9
       doRewards: true
+  dungeons:braewood_citadel_period:
+    dungeons:braewood_citadel_period_1:
+      enabled: true
+      goal: 1
+      notifyThresholds: []
+      doRewards: true
+    dungeons:braewood_citadel_period_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+      doRewards: true
+    dungeons:braewood_citadel_period_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_25:
+      enabled: true
+      goal: 25
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_100:
+      enabled: true
+      goal: 100
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    dungeons:braewood_citadel_period_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
   dungeons:oakmist_valley_period:
     dungeons:oakmist_valley_period_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     dungeons:oakmist_valley_period_5:
       enabled: true
@@ -449,7 +494,7 @@ loadable:
     events:skeleton_king_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:skeleton_king_kill_5:
       enabled: true
@@ -500,7 +545,7 @@ loadable:
     events:dreadbeard_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:dreadbeard_kill_5:
       enabled: true
@@ -551,7 +596,7 @@ loadable:
     events:deep_creature_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:deep_creature_kill_5:
       enabled: true
@@ -602,7 +647,7 @@ loadable:
     events:zanzul_kill_1:
       enabled: true
       goal: 1
-      notifyThresholds:
+      notifyThresholds: []
       doRewards: true
     events:zanzul_kill_5:
       enabled: true
@@ -775,6 +820,132 @@ loadable:
     clans:core_breaker_10000:
       enabled: true
       goal: 10000.0
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  progression:fishing_category:
+    progression:fish_caught_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:fish_caught_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:fish_caught_100000:
+      enabled: true
+      goal: 100000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:fish_caught_500000:
+      enabled: true
+      goal: 500000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:fish_caught_1000000:
+      enabled: true
+      goal: 1000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  progression:woodcutting_category:
+    progression:logs_chopped_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_100000:
+      enabled: true
+      goal: 100000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_1000000:
+      enabled: true
+      goal: 1000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_5000000:
+      enabled: true
+      goal: 5000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_10000000:
+      enabled: true
+      goal: 10000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  progression:mining_category:
+    progression:ores_mined_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:ores_mined_100000:
+      enabled: true
+      goal: 100000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:ores_mined_1000000:
+      enabled: true
+      goal: 1000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:ores_mined_5000000:
+      enabled: true
+      goal: 5000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:ores_mined_10000000:
+      enabled: true
+      goal: 10000000
       notifyThresholds:
         - 0.25
         - 0.5

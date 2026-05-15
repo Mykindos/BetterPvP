@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
@@ -149,6 +150,8 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
 
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
+
+        clientManager.incrementStat(player, ClientStat.LOG_CHOPPED, (long) amountChopped);
 
         ItemStack toolUsed = chopLogEvent.getToolUsed();
 

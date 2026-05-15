@@ -95,6 +95,13 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                         .build()
                 ).build();
 
+        final ClanWrapperStat braewoodCitadelWinsStat = clanStatBuilder
+                .wrappedStat(DungeonNativeStat.builder()
+                        .action(DungeonNativeStat.Action.WIN)
+                        .dungeonName("Braewood Citadel")
+                        .build()
+                ).build();
+
         final int dungeonWins = dungeonWinsStat.getStat(statContainer, type, period).intValue();
         final int dungeonEnters = dungeonEntersStat.getStat(statContainer, type, period).intValue();
         final int dungeonLosses = dungeonLossesStat.getStat(statContainer, type, period).intValue();
@@ -105,6 +112,7 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
         final int braewoodWins = braewoodWinsStat.getStat(statContainer, type, period).intValue();
         final int duskmireWins = duskmireWinsStat.getStat(statContainer, type, period).intValue();
         final int oakmistWins = oakmistWinsStat.getStat(statContainer, type, period).intValue();
+        final int braewoodCitadelWins = braewoodCitadelWinsStat.getStat(statContainer, type, period).intValue();
 
         return new ArrayList<>(
                 List.of(
@@ -116,7 +124,8 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                         Component.empty(),
                         StatFormatterUtility.formatStat("Braewood Caverns Wins", braewoodWins),
                         StatFormatterUtility.formatStat("Duskmire Pinnacle Wins", duskmireWins),
-                        StatFormatterUtility.formatStat("Oakmist Valley Wins", oakmistWins)
+                        StatFormatterUtility.formatStat("Oakmist Valley Wins", oakmistWins),
+                        StatFormatterUtility.formatStat("Braewood Citadel Wins", braewoodCitadelWins)
 
                 )
         );

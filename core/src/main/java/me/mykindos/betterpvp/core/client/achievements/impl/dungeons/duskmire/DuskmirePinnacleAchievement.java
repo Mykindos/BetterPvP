@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.client.achievements.impl.dungeons.duskmire;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
-import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
@@ -18,7 +17,7 @@ import java.util.List;
 @CustomLog
 @NoReflection
 /**
- * Super class, is either extended or loaded by a loader {@link DeathAchievementLoader}
+ * Super class, is either extended or loaded by a loader {@link DuskmireAchievementLoader}
  */
 public class DuskmirePinnacleAchievement extends SingleSimpleAchievement {
 
