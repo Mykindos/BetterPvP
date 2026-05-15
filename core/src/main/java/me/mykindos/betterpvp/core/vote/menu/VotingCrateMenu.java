@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.ItemWrapper;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
@@ -35,12 +37,16 @@ public class VotingCrateMenu extends AbstractGui {
     private static final int COLUMNS = 9;
     private static final int MIDDLE_ROW_START = 9;
 
-    private final LootTable lootTable;
-    private final List<ItemStack> rollItems = new ArrayList<>();
-    private final Random random = new Random();
+    private record RollItem(ItemStack displayItem, ItemStack rewardItem) {}
 
-    public VotingCrateMenu(LootTableRegistry lootTableRegistry) {
+    private final LootTable lootTable;
+    private final List<RollItem> rollItems = new ArrayList<>();
+    private final Random random = new Random();
+    private final ItemRegistry itemRegistry;
+
+    public VotingCrateMenu(ItemRegistry itemRegistry, LootTableRegistry lootTableRegistry) {
         super(COLUMNS, ROWS);
+        this.itemRegistry = itemRegistry;
         this.lootTable = lootTableRegistry.loadLootTable("voting_crate");
 
         // Fill borders
@@ -58,27 +64,35 @@ public class VotingCrateMenu extends AbstractGui {
         // Pre-fill roll items
         if (!lootTable.getWeightedLoot().isEmpty()) {
             for (int i = 0; i < 9; i++) {
-                rollItems.add(getItemStack(getRandomWeightedLoot()));
+                rollItems.add(createRollItem(getRandomWeightedLoot()));
             }
         }
     }
 
-    private ItemStack getItemStack(Loot<?, ?> loot) {
-        ItemStack itemStack = loot.getIcon().get();
+    private RollItem createRollItem(Loot<?, ?> loot) {
+        ItemStack displayItem = loot.getIcon().get();
+        ItemStack rewardItem = displayItem.clone();
         if (loot instanceof ItemLoot<?> itemLoot) {
+            final BaseItem baseItem = itemRegistry.getItem(itemLoot.getItemKey());
+            if (baseItem != null) {
+                rewardItem = baseItem.getModel();
+            }
             int amount = itemLoot.getMinAmount();
             if (itemLoot.getMaxAmount() > itemLoot.getMinAmount()) {
                 amount = random.nextInt(itemLoot.getMaxAmount() - itemLoot.getMinAmount() + 1) + itemLoot.getMinAmount();
             }
-            itemStack.setAmount(amount);
+            displayItem.setAmount(amount);
+            rewardItem.setAmount(amount);
         } else if (loot instanceof CoinLoot<?> coinLoot) {
             int amount = coinLoot.getMinAmount();
             if (coinLoot.getMaxAmount() > coinLoot.getMinAmount()) {
                 amount = random.nextInt(coinLoot.getMaxAmount() - coinLoot.getMinAmount() + 1) + coinLoot.getMinAmount();
             }
-            itemStack = coinLoot.getCoinType().generateItem(amount);
+            ItemStack coinItem = coinLoot.getCoinType().generateItem(amount);
+            displayItem = coinItem;
+            rewardItem = coinItem.clone();
         }
-        return itemStack;
+        return new RollItem(displayItem, rewardItem);
     }
 
     private Loot<?, ?> getRandomWeightedLoot() {
@@ -141,7 +155,8 @@ public class VotingCrateMenu extends AbstractGui {
                 ticks++;
 
                 if (count > 43) {
-                    ItemStack winner = rollItems.get(4); // Winning slot is at index 4 (middle of 9)
+                    RollItem winningRoll = rollItems.get(4);
+                    ItemStack winner = winningRoll.rewardItem(); // Winning slot is at index 4 (middle of 9)
                     if (winner != null) {
                         Component name;
                         if (winner.getItemMeta().hasDisplayName()) {
@@ -170,10 +185,10 @@ public class VotingCrateMenu extends AbstractGui {
             rollItems.set(i, rollItems.get(i + 1));
         }
 
-        rollItems.set(8, getItemStack(getRandomWeightedLoot()));
+        rollItems.set(8, createRollItem(getRandomWeightedLoot()));
 
         for (int i = 0; i < 9; i++) {
-            ItemStack item = rollItems.get(i);
+            ItemStack item = rollItems.get(i).displayItem();
             setSlotElement(MIDDLE_ROW_START + i, new SlotElement.ItemSlotElement(new SimpleItem(new ItemWrapper(item))));
         }
     }

@@ -21,8 +21,8 @@ public class ProgressionCategory extends AchievementCategory {
     @Override
     public ItemView getItemView() {
         return ItemView.builder()
-                .displayName(Component.text("Progression"))
-                .lore(List.of(Component.text("Progression related achievements")))
+                .displayName(Component.text("Professions"))
+                .lore(List.of(Component.text("Profession related achievements")))
                 .material(Material.EXPERIENCE_BOTTLE)
                 .build();
     }
