@@ -338,15 +338,20 @@ public class ClanManager extends Manager<Long, Clan> {
         double minBorderZ = center.getZ() - halfSize;
         double maxBorderZ = center.getZ() + halfSize;
 
-        int minChunkX = chunk.getX() << 4;
-        int maxChunkX = minChunkX + 15;
-        int minChunkZ = chunk.getZ() << 4;
-        int maxChunkZ = minChunkZ + 15;
+        int westBorderChunkX = getInnerBorderChunk(minBorderX, false);
+        int eastBorderChunkX = getInnerBorderChunk(maxBorderX, true);
+        int northBorderChunkZ = getInnerBorderChunk(minBorderZ, false);
+        int southBorderChunkZ = getInnerBorderChunk(maxBorderZ, true);
 
-        return minChunkX - 1 < minBorderX
-                || maxChunkX + 1 > maxBorderX
-                || minChunkZ - 1 < minBorderZ
-                || maxChunkZ + 1 > maxBorderZ;
+        return chunk.getX() == westBorderChunkX
+                || chunk.getX() == eastBorderChunkX
+                || chunk.getZ() == northBorderChunkZ
+                || chunk.getZ() == southBorderChunkZ;
+    }
+
+    private int getInnerBorderChunk(double borderCoordinate, boolean positiveSide) {
+        double innerCoordinate = positiveSide ? Math.nextDown(borderCoordinate) : Math.nextUp(borderCoordinate);
+        return (int) Math.floor(innerCoordinate / 16.0D);
     }
 
     /**

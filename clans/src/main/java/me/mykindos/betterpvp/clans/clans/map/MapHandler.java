@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.map.data.MapPixel;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.renderer.ClanMapRenderer;
 import me.mykindos.betterpvp.clans.clans.map.renderer.MinimapRenderer;
+import me.mykindos.betterpvp.clans.clans.map.renderer.PointOfInterestRenderer;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -138,15 +139,18 @@ public class MapHandler {
 
         MinimapRenderer minimapRenderer = clans.getInjector().getInstance(MinimapRenderer.class);
         ClanMapRenderer clanMapRenderer = clans.getInjector().getInstance(ClanMapRenderer.class);
+        PointOfInterestRenderer pointOfInterestRenderer = clans.getInjector().getInstance(PointOfInterestRenderer.class);
 
         clans.getInjector().injectMembers(minimapRenderer);
         clans.getInjector().injectMembers(clanMapRenderer);
+        clans.getInjector().injectMembers(pointOfInterestRenderer);
 
         clans.getListeners().add(minimapRenderer);
         clans.saveConfig();
 
         map.addRenderer(minimapRenderer);
         map.addRenderer(clanMapRenderer);
+        map.addRenderer(pointOfInterestRenderer);
     }
 
     /**
