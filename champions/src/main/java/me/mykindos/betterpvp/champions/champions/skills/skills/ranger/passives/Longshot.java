@@ -138,8 +138,8 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 2.5, Number.class).doubleValue();
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Number.class).doubleValue();
+        baseDamage = getConfig("baseDamage", 3, Number.class).doubleValue();
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Number.class).doubleValue();
         baseDistance = getConfig("baseDistance", 24.0, Number.class).doubleValue();
         distanceDecreasePerLevel = getConfig("distanceDecreasePerLevel", 0.0, Number.class).doubleValue();
     }
