@@ -24,10 +24,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -61,6 +64,12 @@ public class DropProtectionListener implements Listener {
     private final ItemFactory itemFactory;
 
     /**
+     * Tracks players whose most recent drop originated from an inventory click (not the hotbar).
+     * Drop protection only applies to hotbar drops, so these players are bypassed.
+     */
+    private final HashSet<UUID> inventoryDrop = new HashSet<>();
+
+    /**
      * Constructs the listener with required dependencies. This is injected by Guice.
      *
      * @param controller   drop protection controller
@@ -75,9 +84,28 @@ public class DropProtectionListener implements Listener {
     }
 
     /**
+     * Tracks drops that originate from inventory click actions (e.g. double-tap drop key inside inventory).
+     * These are NOT hotbar drops and should bypass drop protection.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInventoryDrop(InventoryClickEvent event) {
+        if (event.getAction().name().contains("DROP")) {
+            if (event.getWhoClicked() instanceof Player player) {
+                inventoryDrop.add(player.getUniqueId());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        inventoryDrop.remove(event.getPlayer().getUniqueId());
+    }
+
+    /**
      * Handle player drop events.
      *
      * This method will:
+     * - Ignore drops that originated from an inventory click (not the hotbar).
      * - Ignore stackable items (only cares about unstackable items with max stack size 1).
      * - Convert the dropped ItemStack to an ItemInstance and check for a UUIDProperty.
      * - If the item has no UUIDProperty it is not protected and the method returns.
@@ -88,8 +116,18 @@ public class DropProtectionListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrop(PlayerDropItemEvent event) {
-        final ItemStack itemStack = event.getItemDrop().getItemStack();
         final Player player = event.getPlayer();
+
+        // Drop protection only applies to hotbar drops, not inventory drops
+        if (inventoryDrop.contains(player.getUniqueId())) {
+            inventoryDrop.remove(player.getUniqueId());
+            return;
+        }
+
+        //dont trigger on already canceled events, we still need to remove from the map
+        if (event.isCancelled()) return;
+
+        final ItemStack itemStack = event.getItemDrop().getItemStack();
 
         if (itemStack.getMaxStackSize() != 1) {
             return; // We only care about unstackable items
