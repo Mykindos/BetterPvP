@@ -826,3 +826,129 @@ loadable:
         - 0.75
         - 0.9
       doRewards: true
+  progression:fishing_category:
+    progression:fish_caught_1000:
+      enabled: true
+      goal: 1000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:fish_caught_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:fish_caught_100000:
+      enabled: true
+      goal: 100000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:fish_caught_500000:
+      enabled: true
+      goal: 500000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:fish_caught_1000000:
+      enabled: true
+      goal: 1000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  progression:woodcutting_category:
+    progression:logs_chopped_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_100000:
+      enabled: true
+      goal: 100000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_1000000:
+      enabled: true
+      goal: 1000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_5000000:
+      enabled: true
+      goal: 5000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:logs_chopped_10000000:
+      enabled: true
+      goal: 10000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  progression:mining_category:
+    progression:ores_mined_10000:
+      enabled: true
+      goal: 10000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:ores_mined_100000:
+      enabled: true
+      goal: 100000
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    progression:ores_mined_1000000:
+      enabled: true
+      goal: 1000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:ores_mined_5000000:
+      enabled: true
+      goal: 5000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+    progression:ores_mined_10000000:
+      enabled: true
+      goal: 10000000
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true

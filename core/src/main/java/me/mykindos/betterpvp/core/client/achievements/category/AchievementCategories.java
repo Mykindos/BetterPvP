@@ -42,5 +42,9 @@ public class AchievementCategories {
     public static final NamespacedKey DUNGEONS_DUSKMIRE_PINNACLE_PERIOD = new NamespacedKey("dungeons", "duskmire_pinnacle_period");
     public static final NamespacedKey DUNGEONS_OAKMIST_VALLEY_PERIOD = new NamespacedKey("dungeons", "oakmist_valley_period");
 
+    public static final NamespacedKey PROGRESSION = new NamespacedKey("progression", "progression_category");
+    public static final NamespacedKey PROGRESSION_FISHING = new NamespacedKey("progression", "fishing_category");
+    public static final NamespacedKey PROGRESSION_WOODCUTTING = new NamespacedKey("progression", "woodcutting_category");
+    public static final NamespacedKey PROGRESSION_MINING = new NamespacedKey("progression", "mining_category");
 
 }
