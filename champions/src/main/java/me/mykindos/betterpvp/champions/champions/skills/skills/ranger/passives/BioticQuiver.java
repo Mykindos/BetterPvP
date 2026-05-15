@@ -97,7 +97,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     // Figure out how to track the arrows
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onFriendly(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(event.getHitEntity() instanceof LivingEntity damagee)) return;;
@@ -119,7 +119,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     // Figure out how to track the arrows
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEnemy(DamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!event.isDamageeLiving()) return;;
@@ -139,9 +139,8 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         }
     }
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler (priority = EventPriority.LOW, ignoreCancelled = true)
     public void onArrowShoot(ProjectileLaunchEvent event) {
-        if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player shooter)) return;
 
@@ -154,9 +153,8 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
      * Handles adding arrows to the upwardsArrows collection.
      * UpwardsArrows is used to modify the hitbox of the arrows.
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
-        if (event.isCancelled()) return;
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
             Vector initialVelocity = arrow.getVelocity();
             int level = getLevel(shooter);
@@ -210,7 +208,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         arrows.removeIf(arrow -> arrow.isOnGround() || !arrow.isValid() || arrow.isInsideVehicle());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity().getShooter() instanceof Player player)) return;
         Arrow upwardsArrow = upwardsArrows.get(player);
