@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -152,6 +153,11 @@ public class ClansDeathListener extends ClanListener implements Listener {
             killed.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_LOST, dominance);
         }
         return dominance;
+    }
+
+    @EventHandler
+    public void onDeath(EntityDeathEvent event) {
+        event.setDroppedExp(0);
     }
 
 }
