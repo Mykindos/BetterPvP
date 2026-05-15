@@ -873,8 +873,8 @@ skills:
     longshot:
       enabled: true
       maxlevel: 3
-      baseDamage: 2.5
-      damageIncreasePerLevel: 0.75
+      baseDamage: 3
+      damageIncreasePerLevel: 1.5
       baseDistance: 24.0
       distanceDecreasePerLevel: 0.0
     farshot:
@@ -1016,7 +1016,7 @@ skills:
       cooldown: 5.0
       cooldownDecreasePerLevel: 0.5
       baseFriendlyHealthRestoredOnHit: 6.0
-      friendlyHealthRestoredOnHitIncreasedPerLevel: 6.0
+      friendlyHealthRestoredOnHitIncreasedPerLevel: 4.0
       baseNaturalRegenerationDisabledDuration: 3.0
       increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
     stormsphere:
