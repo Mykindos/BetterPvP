@@ -23,7 +23,7 @@ public interface IProfessionAttribute {
                         .filter(e -> e.getKey() instanceof ProfessionAttributeNode && e.getValue() > 0)
                         .mapToDouble(e -> computeNodeContribution((ProfessionAttributeNode) e.getKey(), e.getValue(), attribute))
                         .sum())
-                .orElseThrow();
+                .orElse(0.0);
     }
 
     private static double computeNodeContribution(ProfessionAttributeNode node, int level, IProfessionAttribute attribute) {
