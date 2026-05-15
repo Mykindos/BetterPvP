@@ -38,6 +38,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Door;
@@ -319,6 +320,33 @@ public class ClanManager extends Manager<Long, Clan> {
             }
         }
         return false;
+    }
+
+    /**
+     * Checks whether the specified chunk sits directly next to the world's border.
+     *
+     * @param chunk the chunk to check
+     * @return true if the chunk borders the world border on any side, false otherwise
+     */
+    public boolean adjacentToWorldBorder(@NotNull Chunk chunk) {
+        WorldBorder worldBorder = chunk.getWorld().getWorldBorder();
+        Location center = worldBorder.getCenter();
+        double halfSize = worldBorder.getSize() / 2.0;
+
+        double minBorderX = center.getX() - halfSize;
+        double maxBorderX = center.getX() + halfSize;
+        double minBorderZ = center.getZ() - halfSize;
+        double maxBorderZ = center.getZ() + halfSize;
+
+        int minChunkX = chunk.getX() << 4;
+        int maxChunkX = minChunkX + 15;
+        int minChunkZ = chunk.getZ() << 4;
+        int maxChunkZ = minChunkZ + 15;
+
+        return minChunkX - 1 < minBorderX
+                || maxChunkX + 1 > maxBorderX
+                || minChunkZ - 1 < minBorderZ
+                || maxChunkZ + 1 > maxBorderZ;
     }
 
     /**

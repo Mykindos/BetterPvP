@@ -102,6 +102,11 @@ public class ClaimSubCommand extends ClanSubCommand {
         }
 
         if (!clan.isAdmin()) {
+            if (clanManager.adjacentToWorldBorder(chunk)) {
+                UtilMessage.message(player, "Clans", "You cannot claim territory next to the world border.");
+                return;
+            }
+
             if (clanManager.adjacentOtherClans(player.getChunk(), clan)) {
                 UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
                 return;
