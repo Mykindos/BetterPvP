@@ -27,6 +27,7 @@ public class ClansStatMenu extends AbstractClansStatMenu {
         setItem(1, 2, new PersonalClansStatButton());
         setItem(2, 2, new PillageClansStatButton());
         setItem(4, 2, new ClansStatButton<IAbstractClansStatMenu>());
+        setItem(5, 2, new ProgressionClansStatButton());
         setItem(6, 2, new EventClansStatButton());
         setItem(7, 2, new DungeonClansStatButton());
     }

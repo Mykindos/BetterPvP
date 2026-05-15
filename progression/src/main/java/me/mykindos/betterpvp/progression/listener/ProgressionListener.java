@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -53,6 +54,19 @@ public class ProgressionListener implements Listener {
             data.setExperience(data.getExperience() + amount);
             professionProfileManager.getRepository().saveExperience(player.getUniqueId(), event.getProfession(), data.getExperience());
         });
+
+        // Track XP gained as a client stat
+        if (amount > 0) {
+            final ClientStat xpStat = switch (event.getProfession()) {
+                case "Fishing" -> ClientStat.FISHING_XP;
+                case "Woodcutting" -> ClientStat.WOODCUTTING_XP;
+                case "Mining" -> ClientStat.MINING_XP;
+                default -> null;
+            };
+            if (xpStat != null) {
+                clientManager.incrementStat(player, xpStat, amount);
+            }
+        }
 
         // Action bar XP
         final String tree = event.getProfession();

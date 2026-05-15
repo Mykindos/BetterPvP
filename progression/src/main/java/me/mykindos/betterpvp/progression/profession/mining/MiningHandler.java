@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.progression.Progression;
@@ -93,6 +94,8 @@ public class MiningHandler extends ProfessionHandler {
         log.info("{} mined {} for {} experience", player.getName(), block.getType(), finalExperience)
                 .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
                 .addContext("Experience", finalExperience + "").submit();
+
+        clientManager.incrementStat(player, ClientStat.ORE_MINED, 1L);
 
         if (!getLeaderboardBlocks().contains(block.getType())) {
             return;
