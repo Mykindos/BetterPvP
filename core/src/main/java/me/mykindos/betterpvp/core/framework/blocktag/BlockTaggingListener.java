@@ -6,7 +6,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -24,6 +23,7 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFertilizeEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -34,7 +34,6 @@ import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -95,6 +94,12 @@ public class BlockTaggingListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockForm(BlockFormEvent event) {
+        if (!isLavaConversion(event.getBlock(), event.getNewState().getType())) return;
+        tagBlock(event.getBlock(), UUID.randomUUID());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockFertilize(BlockFertilizeEvent event) {
         tagBlock(event.getBlock(), event.getPlayer() != null ? event.getPlayer().getUniqueId() : null);
     }
@@ -149,6 +154,29 @@ public class BlockTaggingListener implements Listener {
         final Block relative = block.getRelative(direction);
         untagBlock(block);
         tagBlock(relative, player);
+    }
+
+    private boolean isLavaConversion(Block block, Material newType) {
+        if (!(newType == Material.COBBLESTONE || newType == Material.STONE || newType == Material.OBSIDIAN || newType == Material.BASALT)) {
+            return false;
+        }
+
+        if (isFluid(block.getType())) {
+            return true;
+        }
+
+        for (BlockFace face : BlockFace.values()) {
+            if (!face.isCartesian()) continue;
+            if (isFluid(block.getRelative(face).getType())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isFluid(Material material) {
+        return material == Material.WATER || material == Material.LAVA;
     }
 
     // Run next tick to allow other plugins to read the block
