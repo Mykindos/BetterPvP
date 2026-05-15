@@ -41,7 +41,7 @@ public class BackendRankReporter implements Listener {
     @EventHandler
     public void onQuit(ClientQuitEvent event) {
         try {
-            orchestrationGateway.removePlayerRank(event.getPlayer().getUniqueId()).join();
+            orchestrationGateway.removePlayerRank(event.getPlayer().getUniqueId());
         } catch (Exception ex) {
             log.debug("Failed to remove rank snapshot for {}", event.getClient().getName(), ex).submit();
         }
@@ -58,22 +58,23 @@ public class BackendRankReporter implements Listener {
     }
 
     private void syncClient(String uuid, String playerName, String rank) {
-        try {
-            orchestrationGateway.upsertPlayerRank(new PlayerRankSnapshot(
-                    java.util.UUID.fromString(uuid),
-                    playerName,
-                    rank,
-                    Core.getCurrentRealm().getServer().getName(),
-                    Instant.now()
-            )).join();
-
-            if (orchestrationUnavailable.compareAndSet(true, false)) {
-                log.info("Reconnected to orchestration service for player rank reporting").submit();
+        orchestrationGateway.upsertPlayerRank(new PlayerRankSnapshot(
+                java.util.UUID.fromString(uuid),
+                playerName,
+                rank,
+                Core.getCurrentRealm().getServer().getName(),
+                Instant.now()
+        )).whenComplete((ignored, ex) -> {
+            if (ex == null) {
+                if (orchestrationUnavailable.compareAndSet(true, false)) {
+                    log.info("Reconnected to orchestration service for player rank reporting").submit();
+                }
+                return;
             }
-        } catch (Exception ex) {
+
             if (orchestrationUnavailable.compareAndSet(false, true)) {
                 log.warn("Failed to sync player ranks to orchestration service", ex).submit();
             }
-        }
+        });
     }
 }

@@ -33,9 +33,11 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
     private final URI baseUri;
     private final HttpClient client;
     private final ObjectMapper objectMapper;
+    private final Duration requestTimeout;
 
     public HttpOrchestrationGateway(URI baseUri, Duration requestTimeout) {
         this.baseUri = Objects.requireNonNull(baseUri, "baseUri");
+        this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout");
         this.client = HttpClient.newBuilder()
                 .connectTimeout(requestTimeout)
                 .build();
@@ -49,7 +51,7 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
 
     @Override
     public CompletableFuture<Void> leaveQueue(UUID playerUuid) {
-        final HttpRequest request = HttpRequest.newBuilder(resolve("/api/v1/queue/player/" + playerUuid))
+        final HttpRequest request = requestBuilder("/api/v1/queue/player/" + playerUuid)
                 .DELETE()
                 .header("Accept", "application/json")
                 .build();
@@ -82,7 +84,7 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
 
     @Override
     public CompletableFuture<Void> removePlayerRank(UUID playerUuid) {
-        final HttpRequest request = HttpRequest.newBuilder(resolve("/api/v1/rank/" + playerUuid))
+        final HttpRequest request = requestBuilder("/api/v1/rank/" + playerUuid)
                 .DELETE()
                 .header("Accept", "application/json")
                 .build();
@@ -95,7 +97,7 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
 
     @Override
     public CompletableFuture<Optional<PlayerRankSnapshot>> getPlayerRank(UUID playerUuid) {
-        final HttpRequest request = HttpRequest.newBuilder(resolve("/api/v1/rank/" + playerUuid))
+        final HttpRequest request = requestBuilder("/api/v1/rank/" + playerUuid)
                 .GET()
                 .header("Accept", "application/json")
                 .build();
@@ -113,7 +115,7 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
 
     @Override
     public CompletableFuture<Optional<QueueStatusUpdate>> getPlayerQueueStatus(UUID playerUuid) {
-        final HttpRequest request = HttpRequest.newBuilder(resolve("/api/v1/queue/player/" + playerUuid))
+        final HttpRequest request = requestBuilder("/api/v1/queue/player/" + playerUuid)
                 .GET()
                 .header("Accept", "application/json")
                 .build();
@@ -134,7 +136,7 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
         final String query = "?targetId=" + encode(target.targetId())
                 + "&targetType=" + encode(target.targetType().name())
                 + "&serverName=" + encode(target.serverName());
-        final HttpRequest request = HttpRequest.newBuilder(resolve("/api/v1/queue/target" + query))
+        final HttpRequest request = requestBuilder("/api/v1/queue/target" + query)
                 .GET()
                 .header("Accept", "application/json")
                 .build();
@@ -169,7 +171,7 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
             return CompletableFuture.failedFuture(ex);
         }
 
-        final HttpRequest request = HttpRequest.newBuilder(resolve(path))
+        final HttpRequest request = requestBuilder(path)
                 .method(method, HttpRequest.BodyPublishers.ofByteArray(payload))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
@@ -187,6 +189,11 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
 
     private URI resolve(String path) {
         return baseUri.resolve(path);
+    }
+
+    private HttpRequest.Builder requestBuilder(String path) {
+        return HttpRequest.newBuilder(resolve(path))
+                .timeout(requestTimeout);
     }
 
     private String encode(String value) {
