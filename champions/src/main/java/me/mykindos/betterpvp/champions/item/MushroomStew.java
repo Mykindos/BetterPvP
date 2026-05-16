@@ -10,13 +10,20 @@ import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComp
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.FallbackItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapelessCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
 
 @Singleton
 @ItemKey("champions:mushroom_stew")
@@ -32,6 +39,8 @@ public class MushroomStew extends BaseItem implements Reloadable {
         model.setData(DataComponentTypes.MAX_STACK_SIZE, 64);
         model.unsetData(DataComponentTypes.CONSUMABLE);
     }
+
+    private transient boolean registered;
 
     @Inject
     private MushroomStew(RegenerationAbility regenerationAbility) {
@@ -52,5 +61,21 @@ public class MushroomStew extends BaseItem implements Reloadable {
         regenerationAbility.setDuration(duration);
         regenerationAbility.setCooldown(cooldown);
         regenerationAbility.setLevel(level);
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
+        final Map<Integer, RecipeIngredient> ingredients = Map.of(
+                0, new RecipeIngredient(itemFactory.getFallbackItem(Material.BROWN_MUSHROOM), 1),
+                1, new RecipeIngredient(itemFactory.getFallbackItem(Material.RED_MUSHROOM), 1));
+        final ShapelessCraftingRecipe recipe = new ShapelessCraftingRecipe(
+                this,
+                ingredients,
+                itemFactory,
+                false
+        );
+        registry.registerRecipe(new NamespacedKey("champions", "mushroom_stew"), recipe);
     }
 }
