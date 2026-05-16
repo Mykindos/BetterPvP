@@ -69,7 +69,8 @@ public class MushroomStew extends BaseItem implements Reloadable {
         registered = true;
         final Map<Integer, RecipeIngredient> ingredients = Map.of(
                 0, new RecipeIngredient(itemFactory.getFallbackItem(Material.BROWN_MUSHROOM), 1),
-                1, new RecipeIngredient(itemFactory.getFallbackItem(Material.RED_MUSHROOM), 1));
+                1, new RecipeIngredient(itemFactory.getFallbackItem(Material.RED_MUSHROOM), 1),
+                2, new RecipeIngredient(itemFactory.getFallbackItem(Material.BOWL), 1));
         final ShapelessCraftingRecipe recipe = new ShapelessCraftingRecipe(
                 this,
                 ingredients,
