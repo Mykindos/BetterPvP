@@ -51,7 +51,9 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.EntityType;
@@ -777,6 +779,18 @@ public class ClansWorldListener extends ClanListener {
                 event.setCancelled(true);
             }
 
+            BlockData data = event.getBlock().getBlockData();
+
+            // Check if the block is actually a leaf block
+            if (data instanceof Leaves leaves) {
+                // If persistent is false, the leaf is natural
+                if(leaves.isPersistent()) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+
         });
 
     }
@@ -1075,6 +1089,16 @@ public class ClansWorldListener extends ClanListener {
     public void onRedstoneItemPlace(BlockPlaceEvent event) {
 
         Block block = event.getBlockPlaced();
+        BlockData data = block.getBlockData();
+
+        // TODO remove this when players are given persistent leaves again
+        // Check if the block is actually a leaf block
+        if (data instanceof Leaves leaves) {
+            // If persistent is false, the leaf is natural
+            leaves.setPersistent(true);
+            block.setBlockData(leaves);
+        }
+
 
         if (UtilBlock.isRedstone(block)) {
 
