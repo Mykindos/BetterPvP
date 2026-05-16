@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
@@ -190,23 +191,33 @@ public class ClientSQLLayer {
      * @param client The client to load data for
      */
     private void loadAdditionalClientData(Client client) {
-        CompletableFuture<List<Punishment>> punishmentsFuture = CompletableFuture.supplyAsync(() ->
-                punishmentRepository.getPunishmentsForClient(client)).exceptionally(ex -> {
-            log.error("Error loading punishments for client {}", client.getUuid(), ex).submit();
-            return new ArrayList<>();
-        });
-        CompletableFuture<Set<UUID>> ignoresFuture = CompletableFuture.supplyAsync(() ->
-                getIgnoresForClient(client)).exceptionally(ex -> {
-            log.error("Error loading ignores for client {}", client.getUuid(), ex).submit();
-            return new HashSet<>();
-        });
-        CompletableFuture<Void> propertiesFuture = loadAllPropertiesConcurrently(client).exceptionally(ex -> {
-            log.error("Error loading properties for client {}", client.getUuid(), ex).submit();
-            return null;
-        });
+        CompletableFuture<List<Punishment>> punishmentsFuture = CompletableFuture
+                .supplyAsync(() -> punishmentRepository.getPunishmentsForClient(client))
+                .orTimeout(3, TimeUnit.SECONDS)
+                .exceptionally(ex -> {
+                    log.error("Error loading punishments for client {}", client.getUuid(), ex).submit();
+                    return List.of();
+                });
+
+        CompletableFuture<Set<UUID>> ignoresFuture = CompletableFuture
+                .supplyAsync(() -> getIgnoresForClient(client))
+                .orTimeout(3, TimeUnit.SECONDS)
+                .exceptionally(ex -> {
+                    log.error("Error loading ignores for client {}", client.getUuid(), ex).submit();
+                    return Set.of();
+                });
+
+        CompletableFuture<Void> propertiesFuture = loadAllPropertiesConcurrently(client)
+                .orTimeout(5, TimeUnit.SECONDS)
+                .exceptionally(ex -> {
+                    log.error("Error loading properties for client {}", client.getUuid(), ex).submit();
+                    return null;
+                });
+
         CompletableFuture.allOf(punishmentsFuture, ignoresFuture, propertiesFuture).join();
-        client.getPunishments().addAll(punishmentsFuture.join());
-        client.getIgnores().addAll(ignoresFuture.join());
+
+        client.getPunishments().addAll(punishmentsFuture.getNow(List.of()));
+        client.getIgnores().addAll(ignoresFuture.getNow(Set.of()));
     }
 
     private Set<UUID> getIgnoresForClient(Client client) {

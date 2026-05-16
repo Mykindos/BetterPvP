@@ -27,8 +27,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_BUILDS;
 import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_EXP;
 import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_PROPERTIES;
@@ -45,6 +48,8 @@ public class ProfessionProfileRepository {
             new AtomicReference<>(new ConcurrentHashMap<>());
     private final AtomicReference<ConcurrentHashMap<String, Query>> queuedExpUpdates =
             new AtomicReference<>(new ConcurrentHashMap<>());
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     @Inject
     public ProfessionProfileRepository(Database database, ClientManager clientManager,
@@ -89,13 +94,16 @@ public class ProfessionProfileRepository {
     public void saveExperience(UUID gamer, String profession, double experience) {
 
         CompletableFuture.runAsync(() -> {
-            Client client = clientManager.search().offline(gamer).join().orElse(null);
-            if (client == null) return;
-
             DSLContext ctx = database.getDslContext();
 
+            Long clientId = ctx.select(CLIENTS.ID)
+                    .from(CLIENTS)
+                    .where(CLIENTS.UUID.eq(gamer.toString()))
+                    .fetchOne(CLIENTS.ID);
+            if (clientId == null) return;
+
             org.jooq.Query query = ctx.insertInto(PROGRESSION_EXP)
-                    .set(PROGRESSION_EXP.CLIENT, client.getId())
+                    .set(PROGRESSION_EXP.CLIENT, clientId)
                     .set(PROGRESSION_EXP.SEASON, Core.getCurrentRealm().getSeason().getId())
                     .set(PROGRESSION_EXP.PROFESSION, profession)
                     .set(PROGRESSION_EXP.EXPERIENCE, (long) experience)
@@ -104,7 +112,7 @@ public class ProfessionProfileRepository {
                     .set(PROGRESSION_EXP.EXPERIENCE, (long) experience);
 
             queuedExpUpdates.get().put(gamer + profession, query);
-        }).exceptionally(ex -> {
+        }, executorService).exceptionally(ex -> {
             log.error("Failed to save fishing xp for " + gamer + " " + profession + " " + experience + ": " + ex.getMessage()).submit();
             return null;
         });
@@ -179,18 +187,26 @@ public class ProfessionProfileRepository {
 
     public void updateBuildForGamer(UUID uuid, ProfessionBuild build) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            Client client = clientManager.search().offline(uuid).join().orElse(null);
-            if (client == null) return;
-
             List<Query> queries = new ArrayList<>();
 
             build.getNodes().forEach((skill, level) -> {
-                Query query = ctx.insertInto(PROGRESSION_BUILDS)
-                        .set(PROGRESSION_BUILDS.CLIENT, client.getId())
-                        .set(PROGRESSION_BUILDS.SEASON, Core.getCurrentRealm().getSeason().getId())
-                        .set(PROGRESSION_BUILDS.PROFESSION, build.getProfession())
-                        .set(PROGRESSION_BUILDS.SKILL, skill.getName())
-                        .set(PROGRESSION_BUILDS.LEVEL, level)
+                Query query = ctx.insertInto(
+                                PROGRESSION_BUILDS,
+                                PROGRESSION_BUILDS.CLIENT,
+                                PROGRESSION_BUILDS.SEASON,
+                                PROGRESSION_BUILDS.PROFESSION,
+                                PROGRESSION_BUILDS.SKILL,
+                                PROGRESSION_BUILDS.LEVEL
+                        )
+                        .select(ctx.select(
+                                        CLIENTS.ID,
+                                        DSL.val(Core.getCurrentRealm().getSeason().getId()),
+                                        DSL.val(build.getProfession()),
+                                        DSL.val(skill.getName()),
+                                        DSL.val(level)
+                                )
+                                .from(CLIENTS)
+                                .where(CLIENTS.UUID.eq(uuid.toString())))
                         .onConflict(PROGRESSION_BUILDS.CLIENT, PROGRESSION_BUILDS.SEASON, PROGRESSION_BUILDS.PROFESSION, PROGRESSION_BUILDS.SKILL)
                         .doUpdate()
                         .set(PROGRESSION_BUILDS.LEVEL, level);
