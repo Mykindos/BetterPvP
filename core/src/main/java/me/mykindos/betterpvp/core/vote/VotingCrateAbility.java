@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
@@ -20,12 +21,14 @@ import org.jetbrains.annotations.Nullable;
 @Singleton
 public class VotingCrateAbility extends AbstractInteraction implements DisplayedInteraction {
 
+    private final ItemFactory itemFactory;
     private final ItemRegistry itemRegistry;
     private final LootTableRegistry lootTableRegistry;
 
     @Inject
-    public VotingCrateAbility(ItemRegistry itemRegistry, LootTableRegistry lootTableRegistry) {
+    public VotingCrateAbility(ItemFactory itemFactory, ItemRegistry itemRegistry, LootTableRegistry lootTableRegistry) {
         super("Open Voting Crate");
+        this.itemFactory = itemFactory;
         this.itemRegistry = itemRegistry;
         this.lootTableRegistry = lootTableRegistry;
         setConsumesItem(true);
@@ -45,7 +48,7 @@ public class VotingCrateAbility extends AbstractInteraction implements Displayed
     @Override
     protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context, @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         if (actor.getEntity() instanceof Player player) {
-            new VotingCrateMenu(itemRegistry, lootTableRegistry).show(player);
+            new VotingCrateMenu(itemFactory, itemRegistry, lootTableRegistry).show(player);
             return InteractionResult.Success.ADVANCE;
         }
 

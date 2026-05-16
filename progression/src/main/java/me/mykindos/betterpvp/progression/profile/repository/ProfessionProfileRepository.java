@@ -49,7 +49,7 @@ public class ProfessionProfileRepository {
     private final AtomicReference<ConcurrentHashMap<String, Query>> queuedExpUpdates =
             new AtomicReference<>(new ConcurrentHashMap<>());
 
-    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Inject
     public ProfessionProfileRepository(Database database, ClientManager clientManager,

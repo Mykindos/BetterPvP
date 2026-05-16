@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.vote.menu;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -8,6 +9,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemWrapper;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootTable;
@@ -23,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -43,11 +46,14 @@ public class VotingCrateMenu extends AbstractGui {
     private final List<RollItem> rollItems = new ArrayList<>();
     private final Random random = new Random();
     private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
 
-    public VotingCrateMenu(ItemRegistry itemRegistry, LootTableRegistry lootTableRegistry) {
+
+    public VotingCrateMenu(ItemFactory itemFactory, ItemRegistry itemRegistry, LootTableRegistry lootTableRegistry) {
         super(COLUMNS, ROWS);
         this.itemRegistry = itemRegistry;
         this.lootTable = lootTableRegistry.loadLootTable("voting_crate");
+        this.itemFactory = itemFactory;
 
         // Fill borders
         ItemProvider border = new ItemWrapper(ItemView.builder().material(Material.GRAY_STAINED_GLASS_PANE).displayName(Component.text(" ")).build().toItemStack());
@@ -73,9 +79,10 @@ public class VotingCrateMenu extends AbstractGui {
         ItemStack displayItem = loot.getIcon().get();
         ItemStack rewardItem = displayItem.clone();
         if (loot instanceof ItemLoot<?> itemLoot) {
+            ItemFactory itemFactory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
             final BaseItem baseItem = itemRegistry.getItem(itemLoot.getItemKey());
             if (baseItem != null) {
-                rewardItem = baseItem.getModel();
+                rewardItem = itemFactory.create(baseItem).createItemStack();
             }
             int amount = itemLoot.getMinAmount();
             if (itemLoot.getMaxAmount() > itemLoot.getMinAmount()) {
