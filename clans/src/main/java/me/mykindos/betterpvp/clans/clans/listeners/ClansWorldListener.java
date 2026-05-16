@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -111,6 +112,7 @@ public class ClansWorldListener extends ClanListener {
     private final WorldBlockHandler worldBlockHandler;
     private final ItemRegistry itemRegistry;
     private final ItemFactory itemFactory;
+    private final BlockTagManager blockTagHandler;
     public static final String AGGRESSIVE_RODDER_UNLOCKED = "aggressive_rodder_unlocked";
 
     @Inject
@@ -126,7 +128,7 @@ public class ClansWorldListener extends ClanListener {
     @Inject
     public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans,
                               final EffectManager effectManager, final EnergyService energyService, final CooldownManager cooldownManager,
-                              final WorldBlockHandler worldBlockHandler, ItemRegistry itemRegistry, ItemFactory itemFactory) {
+                              final WorldBlockHandler worldBlockHandler, ItemRegistry itemRegistry, ItemFactory itemFactory, BlockTagManager blockTagHandler) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
@@ -135,6 +137,7 @@ public class ClansWorldListener extends ClanListener {
         this.worldBlockHandler = worldBlockHandler;
         this.itemRegistry = itemRegistry;
         this.itemFactory = itemFactory;
+        this.blockTagHandler = blockTagHandler;
     }
 
     @EventHandler
@@ -770,8 +773,9 @@ public class ClansWorldListener extends ClanListener {
         }
         final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(event.getBlock().getLocation());
         clanOptional.ifPresent(clan -> {
-
+            if(clan.isAdmin() || blockTagHandler.isPlayerPlaced(event.getBlock())) {
                 event.setCancelled(true);
+            }
 
         });
 

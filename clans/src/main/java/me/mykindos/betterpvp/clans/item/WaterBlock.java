@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @ItemKey("clans:water_block")
-@FallbackItem(Material.LAPIS_LAZULI)
+@FallbackItem(Material.LAPIS_BLOCK)
 public class WaterBlock extends BaseItem {
 
     public WaterBlock() {
