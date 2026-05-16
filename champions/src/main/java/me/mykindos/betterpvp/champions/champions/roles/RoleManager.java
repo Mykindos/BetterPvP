@@ -1,4 +1,4 @@
- package me.mykindos.betterpvp.champions.champions.roles;
+package me.mykindos.betterpvp.champions.champions.roles;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
