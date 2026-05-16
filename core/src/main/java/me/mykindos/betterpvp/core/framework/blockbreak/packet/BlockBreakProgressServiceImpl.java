@@ -199,6 +199,11 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
             return;
         }
 
+        if(player.getGameMode() == GameMode.ADVENTURE) {
+            cancelSessionFor(session.getPlayerId());
+            return;
+        }
+
         final World world = Bukkit.getWorld(session.getWorldUid());
         if (world == null) {
             cancelSessionFor(session.getPlayerId());
