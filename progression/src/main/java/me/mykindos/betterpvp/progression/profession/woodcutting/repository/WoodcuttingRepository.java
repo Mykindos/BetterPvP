@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
@@ -53,9 +54,9 @@ public class WoodcuttingRepository {
         }
     }
 
-    public void saveChoppedLog(UUID playerUUID, Material material, Location location, int amount) {
+    public void saveChoppedLog(Player player, Material material, Location location, int amount) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            Client client = clientManager.search().offline(playerUUID).join().orElseThrow();
+            Client client = clientManager.search().online(player);
 
             ctx.insertInto(PROGRESSION_WOODCUTTING)
                     .set(PROGRESSION_WOODCUTTING.CLIENT, client.getId())
@@ -65,7 +66,7 @@ public class WoodcuttingRepository {
                     .set(PROGRESSION_WOODCUTTING.AMOUNT, amount)
                     .execute();
         }).exceptionally(ex -> {
-            log.error("Failed to save chopped log for " + playerUUID, ex).submit();
+            log.error("Failed to save chopped log for " + player.getUniqueId(), ex).submit();
             return null;
         });
 
@@ -75,20 +76,13 @@ public class WoodcuttingRepository {
      * Gets the total chopped logs for a player given a unique ID
      */
     public Long getTotalChoppedLogsForPlayer(UUID playerUUID) {
-        return database.getAsyncDslContext().executeAsync(ctx -> {
-            Client client = clientManager.search().offline(playerUUID).join().orElse(null);
-
-            if (client == null) {
-                return 0L;
-            }
-
-            Long totalAmount = ctx.select(DSL.coalesce(DSL.sum(PROGRESSION_WOODCUTTING.AMOUNT), 0L))
-                    .from(PROGRESSION_WOODCUTTING)
-                    .where(PROGRESSION_WOODCUTTING.CLIENT.eq(client.getId()))
-                    .fetchOne(0, Long.class);
-
-            return totalAmount != null ? totalAmount : 0L;
-        }).join();
+        return database.getAsyncDslContext().executeAsync(ctx ->
+                ctx.select(DSL.coalesce(DSL.sum(PROGRESSION_WOODCUTTING.AMOUNT), 0L))
+                        .from(PROGRESSION_WOODCUTTING)
+                        .join(CLIENTS).on(PROGRESSION_WOODCUTTING.CLIENT.eq(CLIENTS.ID))
+                        .where(CLIENTS.UUID.eq(playerUUID.toString()))
+                        .fetchOne(0, Long.class)
+        ).join();
     }
 
     /**
