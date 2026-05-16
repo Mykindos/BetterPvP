@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HttpOrchestrationGateway implements OrchestrationGateway {
 
@@ -34,12 +36,14 @@ public class HttpOrchestrationGateway implements OrchestrationGateway {
     private final HttpClient client;
     private final ObjectMapper objectMapper;
     private final Duration requestTimeout;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     public HttpOrchestrationGateway(URI baseUri, Duration requestTimeout) {
         this.baseUri = Objects.requireNonNull(baseUri, "baseUri");
         this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout");
         this.client = HttpClient.newBuilder()
                 .connectTimeout(requestTimeout)
+                .executor(executorService)
                 .build();
         this.objectMapper = OrchestrationObjectMapperFactory.create();
     }
