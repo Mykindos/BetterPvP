@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,6 +42,9 @@ public class DatabaseFilterService implements IFilterService {
     private volatile Pattern combinedPattern = null;
     private final Set<String> filteredWords = ConcurrentHashMap.newKeySet();
     private final OkHttpClient httpClient = new OkHttpClient();
+    private static final long FILTER_TIMEOUT_MILLIS = 500L;
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     @Inject
     public DatabaseFilterService(Core core, Database database) {
@@ -143,7 +150,13 @@ public class DatabaseFilterService implements IFilterService {
             // Also check normalized message
             String normalized = UtilFormat.normalize(message);
             return pattern.matcher(normalized).find();
-        }).exceptionally(ex -> {
+        }, executorService).orTimeout(FILTER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS).exceptionally(ex -> {
+            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+            if (cause instanceof TimeoutException) {
+                log.error("Timed out filtering message after {} ms", FILTER_TIMEOUT_MILLIS).submit();
+                return false;
+            }
+
             log.error("Error filtering message", ex).submit();
             return false;
         });

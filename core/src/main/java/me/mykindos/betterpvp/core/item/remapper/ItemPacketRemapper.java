@@ -17,7 +17,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPlayerInventory;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
@@ -120,8 +119,12 @@ public class ItemPacketRemapper implements PacketListener {
 
         // Stops duplication
         if (packet.getCarriedItemStack().isEmpty()) {
-            final ItemStack carried = mapFrom(getItem(player, packet.getWindowId(), -100));
-            packet.setCarriedHashedStack(HashedStack.fromItemStack(carried));
+            final ItemStack carried = getItem(player, packet.getWindowId(), -100);
+            if (carried == null) {
+                return;
+            }
+
+            packet.setCarriedHashedStack(HashedStack.fromItemStack(mapFrom(carried)));
         }
 
         final Optional<Map<Integer, ItemStack>> slotsOpt = packet.getSlots();
@@ -230,13 +233,24 @@ public class ItemPacketRemapper implements PacketListener {
             return netPlayer.inventoryMenu;
         }
 
-        Preconditions.checkState(netPlayer.containerMenu != null, "Player has no open container");
-        Preconditions.checkState(netPlayer.containerMenu.containerId == id, "Container ID does not match");
-        return netPlayer.containerMenu;
+        final AbstractContainerMenu containerMenu = netPlayer.containerMenu;
+        if (containerMenu == null) {
+            return null;
+        }
+
+        if (containerMenu.containerId != id) {
+            return null;
+        }
+
+        return containerMenu;
     }
 
     private ItemStack getItem(Player player, int windowId, int slot) {
         final AbstractContainerMenu window = getWindow(player, windowId);
+        if (window == null) {
+            return null;
+        }
+
         net.minecraft.world.item.ItemStack netStack = slot == -100
                 ? window.getCarried()
                 : window.getSlot(slot).getItem();

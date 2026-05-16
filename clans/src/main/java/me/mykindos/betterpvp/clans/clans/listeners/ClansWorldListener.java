@@ -770,9 +770,9 @@ public class ClansWorldListener extends ClanListener {
         }
         final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(event.getBlock().getLocation());
         clanOptional.ifPresent(clan -> {
-            if (clan.isAdmin()) {
+
                 event.setCancelled(true);
-            }
+
         });
 
     }

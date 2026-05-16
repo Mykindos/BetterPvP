@@ -21,9 +21,11 @@ import org.jooq.impl.DSL;
 import java.util.List;
 
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLANS;
+import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLANS_FIELDS_ORES;
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_METADATA;
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_PROPERTIES;
 import static me.mykindos.betterpvp.clans.database.jooq.Tables.CLAN_TERRITORY;
+import static me.mykindos.betterpvp.core.Core.getCurrentRealm;
 import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 
 @CustomLog
@@ -116,6 +118,27 @@ public class CopyAdminClansSubCommand extends ClanSubCommand {
 
                         count++;
                     }
+
+                    ctxl.insertInto(CLANS_FIELDS_ORES,
+                                    CLANS_FIELDS_ORES.REALM,
+                                    CLANS_FIELDS_ORES.WORLD,
+                                    CLANS_FIELDS_ORES.X,
+                                    CLANS_FIELDS_ORES.Y,
+                                    CLANS_FIELDS_ORES.Z,
+                                    CLANS_FIELDS_ORES.TYPE,
+                                    CLANS_FIELDS_ORES.DATA)
+                            .select(ctxl.select(
+                                            DSL.val(realmId),
+                                            CLANS_FIELDS_ORES.WORLD,
+                                            CLANS_FIELDS_ORES.X,
+                                            CLANS_FIELDS_ORES.Y,
+                                            CLANS_FIELDS_ORES.Z,
+                                            CLANS_FIELDS_ORES.TYPE,
+                                            CLANS_FIELDS_ORES.DATA)
+                                    .from(CLANS_FIELDS_ORES)
+                                    .where(CLANS_FIELDS_ORES.REALM.eq(getCurrentRealm().getId())))
+                            .onDuplicateKeyIgnore()
+                            .execute();
 
                     final int finalCount = count;
                     player.sendMessage(UtilMessage.deserialize("<green>Successfully copied <white>%d <green>admin clans to realm <white>%s", finalCount, realmId));
