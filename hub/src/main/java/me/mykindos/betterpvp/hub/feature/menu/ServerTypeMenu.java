@@ -34,7 +34,7 @@ public class ServerTypeMenu extends AbstractGui implements Windowed {
         // Filter to servers matching this type's name prefix, sorted alphabetically
         final Map<String, Integer> counts = networkService.getServerPlayerCounts();
         final List<String> servers = counts.keySet().stream()
-                .filter(name -> name.startsWith(serverType.getServerNamePrefix()))
+                .filter(name -> name.split("-")[0].equalsIgnoreCase(serverType.getServerNamePrefix()))
                 .sorted()
                 .toList();
 
