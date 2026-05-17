@@ -72,7 +72,7 @@ public class DeepResonator extends BaseItem implements Reloadable {
 
         addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT, AccessScope.USE, AccessScope.DAMAGE)));
 
-        addSerializableComponent(new DurabilityComponent(2560));
+        addSerializableComponent(new DurabilityComponent(3584));
         addSerializableComponent(new RuneContainerComponent());
     }
 

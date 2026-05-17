@@ -66,12 +66,12 @@ public class ClansKills extends TableImpl<ClansKillsRecord> {
     /**
      * The column <code>public.clans_kills.killer_clan</code>.
      */
-    public final TableField<ClansKillsRecord, Long> KILLER_CLAN = createField(DSL.name("killer_clan"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<ClansKillsRecord, Long> KILLER_CLAN = createField(DSL.name("killer_clan"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.clans_kills.victim_clan</code>.
      */
-    public final TableField<ClansKillsRecord, Long> VICTIM_CLAN = createField(DSL.name("victim_clan"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<ClansKillsRecord, Long> VICTIM_CLAN = createField(DSL.name("victim_clan"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.clans_kills.dominance</code>.

@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Looks up recipes based on a given set of parameters.
@@ -28,7 +30,7 @@ public class RecipeResolver<T extends Recipe<?>> {
 
     private final RecipeRegistry<T> registry;
     private final ConcurrentHashMap<List<LookupParameter>, CompletableFuture<List<T>>> cache = new ConcurrentHashMap<>();
-
+    private static final ExecutorService executor = Executors.newFixedThreadPool(2);
     /**
      * Creates a new recipe resolver.
      * @param registry the backing collection of recipes. Must not be a copy.
@@ -51,7 +53,7 @@ public class RecipeResolver<T extends Recipe<?>> {
 
         final List<LookupParameter> key = List.of(parameters);
         final CompletableFuture<List<T>> shared = cache.computeIfAbsent(key, k ->
-                CompletableFuture.supplyAsync(() -> filter(k)));
+                CompletableFuture.supplyAsync(() -> filter(k), executor));
 
         // Defensive copy: callers receive a mutable LinkedList they may drain or modify.
         return shared.thenApply(LinkedList::new);
@@ -68,7 +70,7 @@ public class RecipeResolver<T extends Recipe<?>> {
         Preconditions.checkArgument(parameters.length > 0, "At least one parameter must be provided");
 
         final List<LookupParameter> key = List.of(parameters);
-        return CompletableFuture.supplyAsync(() -> filter(key))
+        return CompletableFuture.supplyAsync(() -> filter(key), executor)
                 .thenApply(LinkedList::new);
     }
 

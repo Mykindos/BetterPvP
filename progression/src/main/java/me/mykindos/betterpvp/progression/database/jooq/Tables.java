@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.progression.database.jooq.tables.GetClientOresMined
 import me.mykindos.betterpvp.progression.database.jooq.tables.GetTopFishingByCount;
 import me.mykindos.betterpvp.progression.database.jooq.tables.GetTopFishingByWeight;
 import me.mykindos.betterpvp.progression.database.jooq.tables.GetTopMiningByOre;
+import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionBoosters;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionBuilds;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionExp;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionFishing;
@@ -451,6 +452,11 @@ public class Tables {
             blocks
         );
     }
+
+    /**
+     * The table <code>public.progression_boosters</code>.
+     */
+    public static final ProgressionBoosters PROGRESSION_BOOSTERS = ProgressionBoosters.PROGRESSION_BOOSTERS;
 
     /**
      * The table <code>public.progression_builds</code>.

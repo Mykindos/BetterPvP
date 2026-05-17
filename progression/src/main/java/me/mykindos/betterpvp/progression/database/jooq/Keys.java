@@ -4,12 +4,14 @@
 package me.mykindos.betterpvp.progression.database.jooq;
 
 
+import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionBoosters;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionBuilds;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionExp;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionFishing;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionMining;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionProperties;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionWoodcutting;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionBoostersRecord;
 import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionBuildsRecord;
 import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionExpRecord;
 import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionFishingRecord;
@@ -34,6 +36,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ProgressionBoostersRecord> PROGRESSION_BOOSTERS_PKEY = Internal.createUniqueKey(ProgressionBoosters.PROGRESSION_BOOSTERS, DSL.name("progression_boosters_pkey"), new TableField[] { ProgressionBoosters.PROGRESSION_BOOSTERS.CLIENT }, true);
     public static final UniqueKey<ProgressionBuildsRecord> PROGRESSION_BUILDS_PK = Internal.createUniqueKey(ProgressionBuilds.PROGRESSION_BUILDS, DSL.name("progression_builds_pk"), new TableField[] { ProgressionBuilds.PROGRESSION_BUILDS.CLIENT, ProgressionBuilds.PROGRESSION_BUILDS.SEASON, ProgressionBuilds.PROGRESSION_BUILDS.PROFESSION, ProgressionBuilds.PROGRESSION_BUILDS.SKILL }, true);
     public static final UniqueKey<ProgressionExpRecord> PROGRESSION_EXP_PKEY = Internal.createUniqueKey(ProgressionExp.PROGRESSION_EXP, DSL.name("progression_exp_pkey"), new TableField[] { ProgressionExp.PROGRESSION_EXP.CLIENT, ProgressionExp.PROGRESSION_EXP.SEASON, ProgressionExp.PROGRESSION_EXP.PROFESSION }, true);
     public static final UniqueKey<ProgressionFishingRecord> PROGRESSION_FISHING_PKEY = Internal.createUniqueKey(ProgressionFishing.PROGRESSION_FISHING, DSL.name("progression_fishing_pkey"), new TableField[] { ProgressionFishing.PROGRESSION_FISHING.ID, ProgressionFishing.PROGRESSION_FISHING.SEASON }, true);

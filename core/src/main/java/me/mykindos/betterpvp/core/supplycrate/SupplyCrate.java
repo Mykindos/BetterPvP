@@ -183,7 +183,8 @@ public class SupplyCrate extends Projectile {
         // Award the loot and stop moving
         final LootTable lootTable = type.getLootTable();
         final LootSession session = LootSession.newSession(lootTable, Bukkit.getServer());
-        this.lootContext = new LootContext(session, this.location.clone().add(0, hitboxSize, 0), this.type.getDisplayName());
+        this.lootContext = new LootContext(session, this.location.clone().add(0, hitboxSize, 0), this.type.getDisplayName())
+                .withInput("player_count", Bukkit.getOnlinePlayers().size());
         this.lootIterator = lootTable.generateLoot(lootContext).iterator();
 
         // Sounds

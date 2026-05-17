@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.progression.database.jooq.tables.GetClientOresMined
 import me.mykindos.betterpvp.progression.database.jooq.tables.GetTopFishingByCount;
 import me.mykindos.betterpvp.progression.database.jooq.tables.GetTopFishingByWeight;
 import me.mykindos.betterpvp.progression.database.jooq.tables.GetTopMiningByOre;
+import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionBoosters;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionBuilds;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionExp;
 import me.mykindos.betterpvp.progression.database.jooq.tables.ProgressionFishing;
@@ -466,6 +467,11 @@ public class Public extends SchemaImpl {
     }
 
     /**
+     * The table <code>public.progression_boosters</code>.
+     */
+    public final ProgressionBoosters PROGRESSION_BOOSTERS = ProgressionBoosters.PROGRESSION_BOOSTERS;
+
+    /**
      * The table <code>public.progression_builds</code>.
      */
     public final ProgressionBuilds PROGRESSION_BUILDS = ProgressionBuilds.PROGRESSION_BUILDS;
@@ -519,6 +525,7 @@ public class Public extends SchemaImpl {
             GetTopFishingByCount.GET_TOP_FISHING_BY_COUNT,
             GetTopFishingByWeight.GET_TOP_FISHING_BY_WEIGHT,
             GetTopMiningByOre.GET_TOP_MINING_BY_ORE,
+            ProgressionBoosters.PROGRESSION_BOOSTERS,
             ProgressionBuilds.PROGRESSION_BUILDS,
             ProgressionExp.PROGRESSION_EXP,
             ProgressionFishing.PROGRESSION_FISHING,

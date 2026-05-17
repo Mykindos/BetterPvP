@@ -19,6 +19,8 @@ import org.bukkit.GameRules;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.ArmorStand;
@@ -68,7 +70,7 @@ public class CoreWorldListener implements Listener {
     @EventHandler
     public void onLoadWorld(WorldLoadEvent event) {
         World world = event.getWorld();
-        if(world.getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
+        if (world.getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
             worldHandler.loadSpawnLocations();
         }
 
@@ -104,7 +106,7 @@ public class CoreWorldListener implements Listener {
         world.setSpawnLimit(SpawnCategory.MONSTER, 8);
         world.setSpawnLimit(SpawnCategory.ANIMAL, 4);
         world.setSpawnLimit(SpawnCategory.WATER_AMBIENT, 1);
-        world.setSpawnLimit(SpawnCategory.WATER_ANIMAL,1);
+        world.setSpawnLimit(SpawnCategory.WATER_ANIMAL, 1);
         world.setSpawnLimit(SpawnCategory.WATER_UNDERGROUND_CREATURE, 1);
         world.setSpawnLimit(SpawnCategory.AMBIENT, 1);
         world.setSpawnLimit(SpawnCategory.AXOLOTL, 1);
@@ -118,14 +120,14 @@ public class CoreWorldListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if(!event.getPlayer().hasPlayedBefore()) {
+        if (!event.getPlayer().hasPlayedBefore()) {
             event.getPlayer().teleport(worldHandler.getSpawnLocation());
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSuicide(PlayerSuicideEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
         Client client = clientManager.search().online(player);
@@ -153,23 +155,35 @@ public class CoreWorldListener implements Listener {
 
     @EventHandler
     public void onTreeGrow(StructureGrowEvent event) {
-        if(BIG_TREES.contains(event.getSpecies())) {
+        if (BIG_TREES.contains(event.getSpecies())) {
             event.setCancelled(true);
+            return;
+        }
+
+        BlockState first = event.getBlocks().getFirst();
+        Block block = first.getBlock();
+        for(int i = -1; i <= 1; i++) {
+            for(int j = -1; j <= 1; j++) {
+                if(block.getRelative(i, 0, j).getType().name().contains("LOG")) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
     }
 
     @EventHandler
     public void onSaplingDrop(ItemSpawnEvent event) {
-        if(event.getEntity().getItemStack().getType() == Material.CHERRY_SAPLING) {
+        if (event.getEntity().getItemStack().getType() == Material.CHERRY_SAPLING) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onInteractInvisArmorStand(PlayerInteractEntityEvent event) {
-        if(event.getRightClicked() instanceof ArmorStand){
+        if (event.getRightClicked() instanceof ArmorStand) {
             ArmorStand armorStand = (ArmorStand) event.getRightClicked();
-            if(armorStand.isInvisible()){
+            if (armorStand.isInvisible()) {
                 event.setCancelled(true);
             }
         }

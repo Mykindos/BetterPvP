@@ -53,9 +53,8 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
         return damage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntDamage(DamageEvent event) {
-        if (event.isCancelled()) return;
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 

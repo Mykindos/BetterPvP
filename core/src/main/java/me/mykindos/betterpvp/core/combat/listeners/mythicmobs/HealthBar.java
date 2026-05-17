@@ -15,10 +15,10 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.Nullable;
 import org.bukkit.util.Vector;
 
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 
 @Getter
 public class HealthBar {
@@ -34,24 +34,45 @@ public class HealthBar {
         this.model = new WeakReference<>(model);
         this.bone = new WeakReference<>(bone);
 
-        final Location entityLocation = getEntity().getLocation();
+        final LivingEntity entity = getEntity();
+        final Location entityLocation = entity != null ? entity.getLocation() : bone.getLocation();
         final Location boneLocation = bone.getLocation();
         this.delta = boneLocation.toVector().subtract(entityLocation.toVector());
     }
 
+    @Nullable
     private LivingEntity getEntity() {
-        return (LivingEntity) ((BukkitEntity) Objects.requireNonNull(this.model.get()).getModeledEntity().getBase()).getOriginal();
+        if (this.model == null) {
+            return null;
+        }
+
+        final ActiveModel activeModel = this.model.get();
+        if (activeModel == null || activeModel.isRemoved()) {
+            return null;
+        }
+
+        if (!(activeModel.getModeledEntity().getBase() instanceof BukkitEntity bukkitEntity)) {
+            return null;
+        }
+
+        if (!(bukkitEntity.getOriginal() instanceof LivingEntity livingEntity)) {
+            return null;
+        }
+
+        return livingEntity;
     }
 
-    public void update() {
+    public boolean update() {
         final LivingEntity entity = this.getEntity();
         if (entity == null) {
-            return;
+            despawn();
+            return false;
         }
 
         ModelBone modelBone = bone.get();
         if (modelBone != null && modelBone.getActiveModel().isRemoved()) {
-            return; // Stop if model is removed or chunk is not loaded
+            despawn();
+            return false;
         }
 
         if (display == null) {
@@ -68,7 +89,12 @@ public class HealthBar {
 
         // Update health if alive
         if (isValid()) {
-            double maxHealth = Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
+            final var maxHealthAttribute = entity.getAttribute(Attribute.MAX_HEALTH);
+            if (maxHealthAttribute == null) {
+                return false;
+            }
+
+            double maxHealth = maxHealthAttribute.getValue();
             float percentage = (float) (entity.getHealth() / maxHealth);
             if (percentage != lastPercentage) {
                 final TextComponent health = Component.text((int) entity.getHealth(), ProgressColor.of(percentage).getTextColor());
@@ -78,7 +104,10 @@ public class HealthBar {
             }
 
             display.teleport(entity.getLocation().add(delta));
+            return true;
         }
+
+        return false;
     }
 
     public boolean isValid() {
@@ -89,7 +118,6 @@ public class HealthBar {
     public void despawn() {
         if (display != null && !UtilEntity.isRemoved(display)) {
             display.remove();
-            return;
         }
         display = null;
         model = null;
