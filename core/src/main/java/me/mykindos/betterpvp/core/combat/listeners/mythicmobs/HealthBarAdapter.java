@@ -29,7 +29,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.Optional;
 
@@ -74,6 +76,22 @@ public class HealthBarAdapter implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRemove(final EntityRemoveEvent event) {
         this.healthBars.removeAll(event.getEntity()).forEach(HealthBar::despawn);
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void entityDeathEvent(EntityDeathEvent event) {
+        this.healthBars.removeAll(event.getEntity()).forEach(HealthBar::despawn);
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onWorldUnload(WorldUnloadEvent event) {
+        healthBars.entries().removeIf(entry -> {
+            if(entry.getKey().getWorld().equals(event.getWorld())) {
+                entry.getValue().despawn();
+                return true;
+            }
+            return false;
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

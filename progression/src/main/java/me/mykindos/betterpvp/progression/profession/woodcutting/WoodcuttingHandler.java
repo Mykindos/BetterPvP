@@ -99,6 +99,17 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
         this.logLootTables.put("PALE_OAK_LOG", lootTableRegistry.loadLootTable("woodcutting_pale_oak_log"));
         this.logLootTables.put("CRIMSON_STEM", lootTableRegistry.loadLootTable("woodcutting_crimson_stem"));
         this.logLootTables.put("WARPED_STEM", lootTableRegistry.loadLootTable("woodcutting_warped_stem"));
+
+        // stripped logs
+        this.logLootTables.put("STRIPPED_OAK_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_oak_log"));
+        this.logLootTables.put("STRIPPED_SPRUCE_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_spruce_log"));
+        this.logLootTables.put("STRIPPED_BIRCH_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_birch_log"));
+        this.logLootTables.put("STRIPPED_JUNGLE_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_jungle_log"));
+        this.logLootTables.put("STRIPPED_ACACIA_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_acacia_log"));
+        this.logLootTables.put("STRIPPED_DARK_OAK_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_dark_oak_log"));
+        this.logLootTables.put("STRIPPED_MANGROVE_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_mangrove_log"));
+        this.logLootTables.put("STRIPPED_CHERRY_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_cherry_log"));
+        this.logLootTables.put("STRIPPED_PALE_OAK_LOG", lootTableRegistry.loadLootTable("woodcutting_stripped_pale_oak_log"));
         this.lootTable = lootTableRegistry.loadLootTable("woodcutting");
     }
 
@@ -178,6 +189,10 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
                     log.error("Failed to add chopped logs to leaderboard for player " + player.getName(), throwable).submit();
                 }
 
+                if(true) {
+                    return;
+                }
+
                 totalLogsChoppedLeaderboard.attemptAnnounce(player, result);
             });
         });
@@ -190,7 +205,7 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
 
     public void processLogDropReplacement(Player player, Block block) {
         boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
-        LootTable logLootTable = logLootTables.get(block.getType().name().replace("STRIPPED_", ""));
+        LootTable logLootTable = logLootTables.get(block.getType().name());
         LootSession lootSession = sessionController.resolve(player, logLootTable, () -> LootSession.newSession(logLootTable, player));
         LootContext lootContext = new LootContext(lootSession, block.getLocation(), "Woodcutting");
         LootBundle loot = logLootTable.generateLoot(lootContext);

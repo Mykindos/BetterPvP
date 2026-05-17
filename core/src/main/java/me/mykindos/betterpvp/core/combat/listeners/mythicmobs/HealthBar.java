@@ -17,21 +17,22 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Vector;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 @Getter
 public class HealthBar {
 
     private TextDisplay display;
-    private ActiveModel model;
-    private ModelBone bone;
+    private WeakReference<ActiveModel> model;
+    private WeakReference<ModelBone> bone;
     private final Vector delta;
 
     private float lastPercentage = 100;
 
     public HealthBar(ActiveModel model, ModelBone bone) {
-        this.model = model;
-        this.bone = bone;
+        this.model = new WeakReference<>(model);
+        this.bone = new WeakReference<>(bone);
 
         final Location entityLocation = getEntity().getLocation();
         final Location boneLocation = bone.getLocation();
@@ -39,7 +40,7 @@ public class HealthBar {
     }
 
     private LivingEntity getEntity() {
-        return (LivingEntity) ((BukkitEntity) this.model.getModeledEntity().getBase()).getOriginal();
+        return (LivingEntity) ((BukkitEntity) Objects.requireNonNull(this.model.get()).getModeledEntity().getBase()).getOriginal();
     }
 
     public void update() {
@@ -48,7 +49,8 @@ public class HealthBar {
             return;
         }
 
-        if (bone.getActiveModel().isRemoved()) {
+        ModelBone modelBone = bone.get();
+        if (modelBone != null && modelBone.getActiveModel().isRemoved()) {
             return; // Stop if model is removed or chunk is not loaded
         }
 
