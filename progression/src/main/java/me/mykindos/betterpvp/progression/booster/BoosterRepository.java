@@ -3,17 +3,15 @@ package me.mykindos.betterpvp.progression.booster;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
+import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_BOOSTERS;
 
 @Singleton
 @CustomLog
@@ -37,10 +35,10 @@ public class BoosterRepository {
             
             if (clientId == null) return Optional.empty();
 
-            Long expiry = ctx.select(DSL.field("expiry", Long.class))
-                    .from(DSL.table("progression_boosters"))
-                    .where(DSL.field("client").eq(clientId))
-                    .fetchOne(DSL.field("expiry", Long.class));
+            Long expiry = ctx.select(PROGRESSION_BOOSTERS.EXPIRY)
+                    .from(PROGRESSION_BOOSTERS)
+                    .where(PROGRESSION_BOOSTERS.CLIENT.eq(clientId.intValue()))
+                    .fetchOne(PROGRESSION_BOOSTERS.EXPIRY);
 
             return Optional.ofNullable(expiry);
         });
@@ -55,12 +53,12 @@ public class BoosterRepository {
 
             if (clientId == null) return;
 
-            ctx.insertInto(DSL.table("progression_boosters"))
-                    .set(DSL.field("client"), clientId.intValue())
-                    .set(DSL.field("expiry"), expiry)
-                    .onConflict(DSL.field("client"))
+            ctx.insertInto(PROGRESSION_BOOSTERS)
+                    .set(PROGRESSION_BOOSTERS.CLIENT, clientId.intValue())
+                    .set(PROGRESSION_BOOSTERS.EXPIRY, expiry)
+                    .onConflict(PROGRESSION_BOOSTERS.CLIENT)
                     .doUpdate()
-                    .set(DSL.field("expiry"), expiry)
+                    .set(PROGRESSION_BOOSTERS.EXPIRY, expiry)
                     .execute();
         });
     }
