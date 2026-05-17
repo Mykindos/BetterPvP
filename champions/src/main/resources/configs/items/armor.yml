@@ -1,28 +1,28 @@
 # Assassin
-# +12 health (set total)
+# +8 health (set total)
 reinforced_assassin_helmet:
   health:
-    base: 2.5
+    base: 1.5
     min: 0.0
-    max: 5.5
+    max: 4.5
   durability: 1020
 reinforced_assassin_chestplate:
   health:
-    base: 3.5
-    min: 0.0
-    max: 6.5
-  durability: 1020
-reinforced_assassin_leggings:
-  health:
-    base: 3.5
-    min: 0.0
-    max: 6.5
-  durability: 1020
-reinforced_assassin_boots:
-  health:
     base: 2.5
     min: 0.0
     max: 5.5
+  durability: 1020
+reinforced_assassin_leggings:
+  health:
+    base: 1.5
+    min: 0.0
+    max: 5.5
+  durability: 1020
+reinforced_assassin_boots:
+  health:
+    base: 1.5
+    min: 0.0
+    max: 4.5
   durability: 1020
 
 # Knight
