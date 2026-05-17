@@ -166,7 +166,7 @@ public class InstantMineInteraction extends CooldownInteraction implements Displ
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Instantly destroy any breakable block at no durability cost.");
+        return Component.text("Instantly destroy any breakable block.");
     }
 
     private class InstantMineListener implements Listener {

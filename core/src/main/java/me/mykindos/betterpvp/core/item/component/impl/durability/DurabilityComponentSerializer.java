@@ -8,6 +8,8 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 public class DurabilityComponentSerializer implements ComponentSerializer<DurabilityComponent>, ComponentDeserializer<DurabilityComponent> {
 
     private static final NamespacedKey KEY = new NamespacedKey("betterpvp", "durability");
@@ -44,7 +46,16 @@ public class DurabilityComponentSerializer implements ComponentSerializer<Durabi
         }
 
         int maxDamage = durabilityContainer.getOrDefault(MAX_DAMAGE, PersistentDataType.INTEGER, 0);
+        final Optional<DurabilityComponent> component = item.getBaseItem().getComponent(DurabilityComponent.class);
+        if (component.isPresent()) {
+            maxDamage = component.get().getMaxDamage();
+        }
+
         int damage = durabilityContainer.getOrDefault(DAMAGE, PersistentDataType.INTEGER, 0);
+        if (damage > maxDamage) {
+            damage = maxDamage;
+        }
+
         final DurabilityComponent durabilityComponent = new DurabilityComponent(maxDamage);
         durabilityComponent.setDamage(damage);
         return durabilityComponent;
