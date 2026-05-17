@@ -95,7 +95,7 @@ public class ProfessionProfileRepository {
         // task scheduling. The old per-call SELECT + single-thread executor flooded
         // under fast mining and was the dominant lag source.
         final Client online = clientManager.search().online(gamer).orElse(null);
-        if (online != null && online.getId() > 0) {
+        if (online != null) {
             queuedExpUpdates.get().put(gamer + profession,
                     buildExperienceUpsert(online.getId(), profession, experience));
             return;
