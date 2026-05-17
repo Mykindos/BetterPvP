@@ -32,7 +32,7 @@ public class DamageListener implements Listener {
     }
 
     // Disable PvP outside FFA
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onDamage(DamageEvent event) {
         if (event.getDamagee() instanceof Player player && zoneService.getZone(player) != Zone.FFA) {
             event.setCancelled(true);
