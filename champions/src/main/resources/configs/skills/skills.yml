@@ -123,7 +123,7 @@ skills:
       enabled: true
       maxlevel: 5
       baseMaxCharges: 5
-      baseRechargeSeconds: 9.0
+      baseRechargeSeconds: 11.0
       teleportDistance: 5.0
       canUseWhileSlowed: false
       chargeIncreasePerLevel: 0
@@ -159,11 +159,11 @@ skills:
       maxlevel: 3
       cooldown: 15.0
       cooldownDecreasePerLevel: 2.0
-      activeBaseDuration: 0.7
+      activeBaseDuration: 0.6
       activeDurationIncreasePerLevel: 0.0
       baseDamageDelay: 0.4
       damageDelayIncreasePerLevel: 0.0
-      successBaseCooldown: 0.7
+      successBaseCooldown: 0.8
       successCooldownDecreasePerLevel: 0.1
       channelTimeCooldownMultiplier: 1.0
       channelTimeCooldownMultiplierDecreasePerLevel: 0.0
