@@ -40,7 +40,7 @@ skills:
       maxlevel: 3
       damageIncreasePerLevel: 1.5
       baseDamage: 1.5
-      increasePerLevel: 1.5
+      increasePerLevel: 1.0
     smokebomb:
       enabled: true
       cooldown: 40.0
