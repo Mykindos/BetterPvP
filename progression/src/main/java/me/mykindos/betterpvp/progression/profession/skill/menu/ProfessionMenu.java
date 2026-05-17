@@ -29,6 +29,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class ProfessionMenu extends AbstractScrollGui<Item> implements Windowed {
 
@@ -66,8 +69,34 @@ public abstract class ProfessionMenu extends AbstractScrollGui<Item> implements 
         // Initialize the content with an empty list
         setContent(loadSkillTree());
 
+        // Scroll to the deepest unlocked node so new nodes are easy to find
+        setCurrentLine(getInitialScrollLine());
+
         // Add scroll handler to update content when scrolled
         addScrollHandler((oldLine, newLine) -> updateContent());
+    }
+
+    private int getInitialScrollLine() {
+        SkillTreeLayout layout = professionHandler.getSkillTree();
+        if (layout == null) return 0;
+
+        Set<String> unlockedNodeNames = professionData.getBuild().getNodes().entrySet().stream()
+                .filter(e -> e.getValue() > 0)
+                .map(e -> e.getKey().getName())
+                .collect(Collectors.toSet());
+
+        if (unlockedNodeNames.isEmpty()) return 0;
+
+        int deepestRow = 0;
+        for (Map.Entry<Integer, SkillTreeCell> entry : layout.cells().entrySet()) {
+            if (entry.getValue() instanceof SkillTreeCell.Skill(String skillId)) {
+                if (unlockedNodeNames.contains(skillId)) {
+                    int row = entry.getKey() / 9;
+                    deepestRow = Math.max(deepestRow, row);
+                }
+            }
+        }
+        return deepestRow;
     }
 
     private List<Item> loadSkillTree() {
