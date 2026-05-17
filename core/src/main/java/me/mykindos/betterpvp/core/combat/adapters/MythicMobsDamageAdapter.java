@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -45,6 +46,7 @@ public class MythicMobsDamageAdapter implements Listener {
     @EventHandler
     public void onServerStart(ServerStartEvent event) { // Cleanse fresh loaded worlds of any mythic mobs
         UtilServer.runTaskLater(core, () -> {
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "mm reload"); // Weirdly fixes things.
             Iterator<ActiveMob> iterator = MythicBukkit.inst().getMobManager().getMobRegistry().values().iterator();
             while (iterator.hasNext()) {
                 ActiveMob am = iterator.next();
