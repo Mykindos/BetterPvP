@@ -13,6 +13,16 @@ disabled:
     - minecraft:mangrove_boat
     - minecraft:cherry_boat
     - minecraft:pale_oak_boat
+    - minecraft:bamboo_raft
+    - minecraft:oak_chest_boat
+    - minecraft:spruce_chest_boat
+    - minecraft:jungle_chest_boat
+    - minecraft:acacia_chest_boat
+    - minecraft:dark_oak_chest_boat
+    - minecraft:mangrove_chest_boat
+    - minecraft:cherry_chest_boat
+    - minecraft:pale_oak_chest_boat
+    - minecraft:bamboo_chest_raft
     - minecraft:shield
     - minecraft:golden_apple
     - minecraft:anvil
