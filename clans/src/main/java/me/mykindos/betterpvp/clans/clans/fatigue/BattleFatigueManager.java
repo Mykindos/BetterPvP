@@ -106,8 +106,6 @@ public class BattleFatigueManager extends Manager<String, BattleFatigue> impleme
         final FatigueTier newTier = resolveTier(state.getScore());
         state.setTier(newTier);
 
-        Bukkit.broadcastMessage("Score for " + player.getName() + ": " + state.getScore());
-
         if (newTier != previousTier) {
             UtilServer.callEvent(new PlayerFatigueTierChangeEvent(player, previousTier, newTier));
         } else {
