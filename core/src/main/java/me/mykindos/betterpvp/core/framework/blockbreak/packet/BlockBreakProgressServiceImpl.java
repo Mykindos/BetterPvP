@@ -38,6 +38,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -215,19 +216,36 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         final ItemStack held = player.getInventory().getItemInMainHand();
 
-        // Resolve the merged SmartBlock override (own-fields ∘ Nexo Breakable defaults) once
-        // per tick. We use it for two things: hardness (the tick-loop owns this) and the
-        // empty-air guard. Speed multipliers ride through the resolver path below.
+        // Resolve the merged SmartBlock override (own-fields ∘ Nexo Breakable defaults),
+        // breakability/speed, and smart-block status. These depend only on the block's
+        // BlockData (the held item already ends the session on change), so we memoize
+        // them on the session and recompute only when the BlockData changes — Vein Echo
+        // respawn, falling block landing, turning to AIR, etc. Without this the whole
+        // chain (incl. an O(n) Oraxen registry scan) ran every tick per dig.
         // Nexo blocks often appear as AIR or BARRIER, so we must not rely on getType().
-        final SmartBlockBreakOverride smartOverride =
-                SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
+        final BlockData blockData = block.getBlockData();
+        if (!session.isResolvedFor(blockData)) {
+            final SmartBlockBreakOverride resolvedOverride =
+                    SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
+            final boolean smart = !block.getType().isAir() && smartBlockFactory.isSmartBlock(block);
+            session.cacheResolve(blockData, resolvedOverride, smart);
+        }
+
+        final SmartBlockBreakOverride smartOverride = session.getCachedSmartOverride();
         final OptionalDouble smartHardness = smartOverride.hardness();
 
         if (smartHardness.isEmpty() && block.getType().isAir()) {
             return;
         }
 
-        final BlockBreakProperties props = resolver.resolve(player, block, held);
+        // Lazily resolve props *after* the air guard so its ordering (and any global
+        // rule that matches AIR) is preserved exactly. Cached per BlockData alongside
+        // the override; cleared whenever the override cache is recomputed.
+        BlockBreakProperties props = session.getCachedProps();
+        if (props == null) {
+            props = resolver.resolve(player, block, held);
+            session.setCachedProps(props);
+        }
         if (!props.isBreakable()) {
             cancelSessionFor(session.getPlayerId());
             return;
@@ -274,7 +292,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         // Provider-specific break-progress HUD (action bar overlay for Nexo/Oraxen blocks;
         // no-op for vanilla, which already shows the destruction-stage overlay).
-        if (smartBlockFactory.isSmartBlock(block)) {
+        if (session.isCachedIsSmartBlock()) {
             smartBlockFactory.displayBreakProgress(player, block, Math.min(1.0, session.getProgress()));
         }
 

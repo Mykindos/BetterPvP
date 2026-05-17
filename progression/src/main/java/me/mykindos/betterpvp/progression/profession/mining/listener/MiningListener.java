@@ -37,7 +37,7 @@ public class MiningListener implements Listener {
         }
 
         final Material type = event.getBlock().getType();
-        if (!UtilBlock.isOre(type) && !Tag.MINEABLE_PICKAXE.getValues().contains(type)) {
+        if (!UtilBlock.isOre(type) && !Tag.MINEABLE_PICKAXE.isTagged(type)) {
             return;
         }
 

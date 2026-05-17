@@ -36,6 +36,8 @@ import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -49,6 +51,10 @@ public class OraxenSmartBlockFactory implements SmartBlockFactory {
     private final SmartBlockRegistry smartBlockRegistry;
     private final SmartBlockDataManager dataManager;
     private final ClientManager clientManager;
+
+    /** Reverse index Oraxen-id → SmartBlock, rebuilt only when the registry grows. */
+    private final Map<String, SmartBlock> oraxenIdIndex = new HashMap<>();
+    private int indexedRegistrySize = -1;
 
     @Inject
     private OraxenSmartBlockFactory(SmartBlockRegistry smartBlockRegistry,
@@ -91,13 +97,18 @@ public class OraxenSmartBlockFactory implements SmartBlockFactory {
                 .or(() -> Optional.ofNullable(OraxenFurniture.getFurnitureMechanic(block)));
     }
 
-    // todo: make this O(1)
     private SmartBlock getBlock(@NotNull String oraxenId) {
-        return smartBlockRegistry.getAllBlocks().values().stream()
-                .filter(OraxenBlock.class::isInstance)
-                .filter(oraxenBlock -> ((OraxenBlock) oraxenBlock).getId().equals(oraxenId))
-                .findFirst()
-                .orElse(null);
+        final Map<String, SmartBlock> all = smartBlockRegistry.getAllBlocks();
+        if (all.size() != indexedRegistrySize) {
+            oraxenIdIndex.clear();
+            for (SmartBlock block : all.values()) {
+                if (block instanceof OraxenBlock oraxenBlock) {
+                    oraxenIdIndex.putIfAbsent(oraxenBlock.getId(), block);
+                }
+            }
+            indexedRegistrySize = all.size();
+        }
+        return oraxenIdIndex.get(oraxenId);
     }
 
     public Optional<Mechanic> mechanic(Entity entity) {
