@@ -64,7 +64,7 @@ public class ProgressionListener implements Listener {
                 default -> null;
             };
             if (xpStat != null) {
-                clientManager.incrementStat(player, xpStat, amount);
+                client.getStatContainer().incrementStat(xpStat, amount);
             }
         }
 
