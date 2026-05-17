@@ -519,6 +519,7 @@ public class SkillListener implements Listener {
             return;
         }
         final Gamer gamer = this.clientManager.search().online(player).getGamer();
+        event.getOldBuild().getActiveSkills().forEach(skill -> skill.getSkill().invalidatePlayer(player, gamer));
         event.getNewBuild().getActiveSkills().forEach(skill -> skill.getSkill().trackPlayer(player, gamer));
     }
 

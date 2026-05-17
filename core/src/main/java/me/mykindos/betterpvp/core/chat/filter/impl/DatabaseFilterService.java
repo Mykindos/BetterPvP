@@ -44,13 +44,13 @@ public class DatabaseFilterService implements IFilterService {
     private final OkHttpClient httpClient = new OkHttpClient();
     private static final long FILTER_TIMEOUT_MILLIS = 500L;
 
-    private final ExecutorService executorService = Executors.newFixedThreadPool(5);
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Inject
     public DatabaseFilterService(Core core, Database database) {
         this.database = database;
         loadFilteredWords();
-        UtilServer.runTaskTimerAsync(core, this::loadFilteredWords, 20L * 60, 20L * 60 * 10);
+        UtilServer.runTaskTimerAsync(core, this::loadFilteredWords, 20L * 60, 20L * 60 * 60);
     }
 
     public void loadFilteredWords() {
@@ -139,10 +139,10 @@ public class DatabaseFilterService implements IFilterService {
 
     @Override
     public CompletableFuture<Boolean> isFiltered(String message) {
-        return CompletableFuture.supplyAsync(() -> {
-            Pattern pattern = combinedPattern;
-            if (pattern == null) return false;
+        Pattern pattern = combinedPattern;
+        if (pattern == null) return CompletableFuture.completedFuture(false);
 
+        return CompletableFuture.supplyAsync(() -> {
             if (pattern.matcher(message).find()) {
                 return true;
             }
@@ -153,7 +153,7 @@ public class DatabaseFilterService implements IFilterService {
         }, executorService).orTimeout(FILTER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS).exceptionally(ex -> {
             Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
             if (cause instanceof TimeoutException) {
-                log.error("Timed out filtering message after {} ms", FILTER_TIMEOUT_MILLIS).submit();
+                log.error("Timed out filtering message after {} ms. Input length: {}", FILTER_TIMEOUT_MILLIS, message.length()).submit();
                 return false;
             }
 
@@ -212,10 +212,10 @@ public class DatabaseFilterService implements IFilterService {
 
     @Override
     public CompletableFuture<String> filterMessage(String message) {
-        return CompletableFuture.supplyAsync(() -> {
-            Pattern pattern = combinedPattern;
-            if (pattern == null) return message;
+        Pattern pattern = combinedPattern;
+        if (pattern == null) return CompletableFuture.completedFuture(message);
 
+        return CompletableFuture.supplyAsync(() -> {
             char[] resultChars = message.toCharArray();
 
             // First pass: Direct regex match on original string
@@ -237,28 +237,30 @@ public class DatabaseFilterService implements IFilterService {
             }
 
             return new String(resultChars);
-        }).exceptionally(ex -> {
-            log.error("Error filtering message", ex).submit();
+        }, executorService).orTimeout(FILTER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS).exceptionally(ex -> {
+            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+            if (cause instanceof TimeoutException) {
+                log.error("Timed out filtering message after {} ms. Input length: {}", FILTER_TIMEOUT_MILLIS, message.length()).submit();
+            } else {
+                log.error("Error filtering message", ex).submit();
+            }
             return message;
         });
     }
 
     @Override
     public CompletableFuture<Component> filterMessage(Component message) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (message instanceof TextComponent textComponent) {
-                String plainText = textComponent.content();
-                String filteredText = filterMessage(plainText).join();
+        if (message instanceof TextComponent textComponent) {
+            String plainText = textComponent.content();
+            return filterMessage(plainText).thenApply(filteredText -> {
                 if (!plainText.equals(filteredText)) {
                     return Component.text(filteredText).style(textComponent.style())
                             .children(textComponent.children());
                 }
-            }
-            return message;
-        }).exceptionally(ex -> {
-            log.error("Error filtering message", ex).submit();
-            return message;
-        });
+                return message;
+            });
+        }
+        return CompletableFuture.completedFuture(message);
     }
 
     @Override

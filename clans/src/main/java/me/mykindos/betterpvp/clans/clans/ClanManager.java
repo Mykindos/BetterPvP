@@ -1070,7 +1070,8 @@ public class ClanManager extends Manager<Long, Clan> {
     }
 
     public ClansStat.ClansStatBuilder<?, ?> addClanInfo(UUID id, ClansStat.ClansStatBuilder<?, ?> builder) {
-        this.getClanByPlayer(id).ifPresentOrElse((clan) -> {
+        Player player = Bukkit.getPlayer(id);
+        this.getClanByPlayer(player).ifPresentOrElse((clan) -> {
             builder.clanName(clan.getName());
             builder.clanId(clan.getId());
         },
