@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
@@ -48,8 +46,6 @@ public class ProfessionProfileRepository {
             new AtomicReference<>(new ConcurrentHashMap<>());
     private final AtomicReference<ConcurrentHashMap<String, Query>> queuedExpUpdates =
             new AtomicReference<>(new ConcurrentHashMap<>());
-
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Inject
     public ProfessionProfileRepository(Database database, ClientManager clientManager,
@@ -92,32 +88,45 @@ public class ProfessionProfileRepository {
     }
 
     public void saveExperience(UUID gamer, String profession, double experience) {
+        // Called once per block mined/chopped/fished. The actual DB write is already
+        // coalesced (last-write-wins per gamer+profession) and flushed in batch by
+        // processStatUpdates(). Hot path: the gatherer is online, so resolve the client
+        // id from the in-memory Client and just queue the upsert — no DB round-trip, no
+        // task scheduling. The old per-call SELECT + single-thread executor flooded
+        // under fast mining and was the dominant lag source.
+        final Client online = clientManager.search().online(gamer).orElse(null);
+        if (online != null && online.getId() > 0) {
+            queuedExpUpdates.get().put(gamer + profession,
+                    buildExperienceUpsert(online.getId(), profession, experience));
+            return;
+        }
 
+        // Rare path: admin XP commands target offline players (resolved via offline
+        // lookup). Resolve the client id from the DB off-thread; keep it correct.
         CompletableFuture.runAsync(() -> {
             DSLContext ctx = database.getDslContext();
-
             Long clientId = ctx.select(CLIENTS.ID)
                     .from(CLIENTS)
                     .where(CLIENTS.UUID.eq(gamer.toString()))
                     .fetchOne(CLIENTS.ID);
             if (clientId == null) return;
-
-            org.jooq.Query query = ctx.insertInto(PROGRESSION_EXP)
-                    .set(PROGRESSION_EXP.CLIENT, clientId)
-                    .set(PROGRESSION_EXP.SEASON, Core.getCurrentRealm().getSeason().getId())
-                    .set(PROGRESSION_EXP.PROFESSION, profession)
-                    .set(PROGRESSION_EXP.EXPERIENCE, (long) experience)
-                    .onConflict(PROGRESSION_EXP.CLIENT, PROGRESSION_EXP.SEASON, PROGRESSION_EXP.PROFESSION)
-                    .doUpdate()
-                    .set(PROGRESSION_EXP.EXPERIENCE, (long) experience);
-
-            queuedExpUpdates.get().put(gamer + profession, query);
-        }, executorService).exceptionally(ex -> {
-            log.error("Failed to save fishing xp for " + gamer + " " + profession + " " + experience + ": " + ex.getMessage()).submit();
+            queuedExpUpdates.get().put(gamer + profession,
+                    buildExperienceUpsert(clientId, profession, experience));
+        }).exceptionally(ex -> {
+            log.error("Failed to save xp for " + gamer + " " + profession + " " + experience + ": " + ex.getMessage()).submit();
             return null;
         });
+    }
 
-
+    private org.jooq.Query buildExperienceUpsert(long clientId, String profession, double experience) {
+        return database.getDslContext().insertInto(PROGRESSION_EXP)
+                .set(PROGRESSION_EXP.CLIENT, clientId)
+                .set(PROGRESSION_EXP.SEASON, Core.getCurrentRealm().getSeason().getId())
+                .set(PROGRESSION_EXP.PROFESSION, profession)
+                .set(PROGRESSION_EXP.EXPERIENCE, (long) experience)
+                .onConflict(PROGRESSION_EXP.CLIENT, PROGRESSION_EXP.SEASON, PROGRESSION_EXP.PROFESSION)
+                .doUpdate()
+                .set(PROGRESSION_EXP.EXPERIENCE, (long) experience);
     }
 
     private void loadExperience(Client client, ProfessionProfile profile) {
