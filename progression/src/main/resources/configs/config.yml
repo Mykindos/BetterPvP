@@ -104,6 +104,7 @@ mining:
   minLeaderboardBlockXp: 45
   xpPerBlock:
     STONE: 1
+    SANDSTONE: 1
     ANDESITE: 1
     GRANITE: 1
     COBBLESTONE: 1
