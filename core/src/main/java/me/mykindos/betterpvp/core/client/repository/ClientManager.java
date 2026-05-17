@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -42,7 +44,7 @@ import java.util.stream.Collectors;
 public class ClientManager extends PlayerManager<Client> {
 
     public static final long TIME_TO_LIVE = TimeUnit.MINUTES.toMillis(5);
-
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
     /**
      * A thread-safe cache used to store {@link Client} objects associated with their unique {@link UUID}s.
      * <p>
@@ -161,17 +163,20 @@ public class ClientManager extends PlayerManager<Client> {
     /**
      * Loads a Client to be online and stores it if it is not already loaded.
      * After function completes, the client will be stored in the cache.
+     *
      * @param uuid the unique identifier of the client to load
      * @param name the name of the client to load
      * @return a CompletableFuture that will complete with an Optional containing the loaded Client, or empty if loading failed
      */
     @Override
     protected CompletableFuture<Optional<Client>> loadOnline(final UUID uuid, final String name) {
+        final Optional<Client> storedUser = this.getStoredExact(uuid);
+        if (storedUser.isPresent()) {
+            return CompletableFuture.completedFuture(storedUser);
+        }
+
         return CompletableFuture.supplyAsync(() -> {
-            final Optional<Client> storedUser = this.getStoredExact(uuid);
-            if (storedUser.isPresent()) {
-                return storedUser;
-            }
+
 
             Optional<Client> loaded = this.sqlLayer.getAndUpdate(uuid);
 
@@ -182,7 +187,7 @@ public class ClientManager extends PlayerManager<Client> {
             final Client client = loaded.get();
             this.storeNewClient(client, true).join();
             return Optional.of(client);
-        }).exceptionally(throwable -> {
+        }, executor).exceptionally(throwable -> {
             log.error("Failed to load online client " + uuid + " (" + name + ")", throwable).submit();
             return Optional.empty();
         });
@@ -404,6 +409,7 @@ public class ClientManager extends PlayerManager<Client> {
 
     /**
      * Shortcut to increment the stat for a player
+     *
      * @param player the player
      * @param amount the amount to increment by
      */
@@ -411,19 +417,21 @@ public class ClientManager extends PlayerManager<Client> {
         search().online(player).getStatContainer().incrementStat(iStat, amount);
     }
 
-        /**
-         * Shortcut to increment the stat for a player
-         * @param player the player
-         * @param amount the amount to increment by
-         */
+    /**
+     * Shortcut to increment the stat for a player
+     *
+     * @param player the player
+     * @param amount the amount to increment by
+     */
     public void incrementStat(Player player, IStat iStat, long amount) {
         search().online(player).getStatContainer().incrementStat(iStat, amount);
     }
 
     /**
      * Shortcut to increment the stat for an offline player. Will load the client if not already loaded, but will not make them online.
-     * @param id the uuid of the player
-     * @param iStat the stat to increment
+     *
+     * @param id     the uuid of the player
+     * @param iStat  the stat to increment
      * @param amount the amount to increment by
      */
     public void incrementStatOffline(UUID id, IStat iStat, long amount) {
@@ -436,8 +444,9 @@ public class ClientManager extends PlayerManager<Client> {
 
     /**
      * Shortcut to increment the stat for an offline player. Will load the client if not already loaded, but will not make them online.
-     * @param id the uuid of the player
-     * @param iStat the stat to increment
+     *
+     * @param id     the uuid of the player
+     * @param iStat  the stat to increment
      * @param amount the amount to increment by
      */
     public void incrementStatOffline(UUID id, IStat iStat, double amount) {

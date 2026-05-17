@@ -70,7 +70,7 @@ public class HealthBarAdapter implements Listener {
             return;
         }
 
-        this.healthBars.get(event.getDamagee()).forEach(HealthBar::update);
+        this.healthBars.get(event.getDamagee()).removeIf(healthBar -> !healthBar.update());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -126,9 +126,7 @@ public class HealthBarAdapter implements Listener {
             return;
         }
 
-        for(HealthBar healthBar : healthBars.values()) {
-            healthBar.update();
-        }
+        healthBars.values().removeIf(healthBar -> !healthBar.update());
     }
 
     @EventHandler

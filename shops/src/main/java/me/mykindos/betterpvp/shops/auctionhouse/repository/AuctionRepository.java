@@ -2,12 +2,17 @@ package me.mykindos.betterpvp.shops.auctionhouse.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionTransaction;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.inventory.ItemStack;
 import org.jooq.DSLContext;
 
@@ -15,6 +20,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
@@ -26,10 +33,12 @@ import static me.mykindos.betterpvp.shops.database.jooq.Tables.AUCTION_TRANSACTI
 public class AuctionRepository implements IRepository<Auction> {
 
     private final Database database;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public AuctionRepository(Database database) {
+    public AuctionRepository(Database database, ItemFactory itemFactory) {
         this.database = database;
+        this.itemFactory = itemFactory;
     }
 
     @Override
@@ -89,11 +98,26 @@ public class AuctionRepository implements IRepository<Auction> {
     public void save(Auction auction) {
         ItemStack itemStack = auction.getItemStack().clone();
 
+        final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(itemStack);
+        final Component name;
+        if (instanceOpt.isPresent()) {
+            final ItemInstance instance = instanceOpt.get();
+            name = instance.getBaseItem().getItemNameRenderer().createName(instance);
+        } else {
+            if (itemStack.getItemMeta().hasDisplayName()) {
+                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+            } else {
+                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                        Component.translatable(itemStack.getType().translationKey()));
+            }
+        }
+
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ctx.insertInto(AUCTIONS)
                     .set(AUCTIONS.ID, auction.getAuctionID())
                     .set(AUCTIONS.REALM, Core.getCurrentRealm().getId())
                     .set(AUCTIONS.CLIENT, ctx.select(CLIENTS.ID).from(CLIENTS).where(CLIENTS.UUID.eq(auction.getSeller().toString())))
+                    .set(AUCTIONS.ITEM_NAME, PlainTextComponentSerializer.plainText().serialize(name))
                     .set(AUCTIONS.ITEM, Base64.getEncoder().encodeToString(itemStack.serializeAsBytes()))
                     .set(AUCTIONS.PRICE, auction.getSellPrice())
                     .set(AUCTIONS.EXPIRY, auction.getExpiryTime())
