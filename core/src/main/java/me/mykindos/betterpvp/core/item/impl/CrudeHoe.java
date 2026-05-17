@@ -2,24 +2,26 @@ package me.mykindos.betterpvp.core.item.impl;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.FallbackItem;
+import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.item.model.VanillaItem;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @ItemKey("core:crude_hoe")
 @FallbackItem(value = Material.STONE_HOE, keepRecipes = true)
-public class CrudeHoe extends VanillaItem implements Reloadable {
+public class CrudeHoe extends BaseItem implements Reloadable {
 
     private static final int DEFAULT_DURABILITY = 131;
 
     public CrudeHoe() {
-        super("Crude Hoe", Material.STONE_HOE, ItemRarity.COMMON);
+        super("Crude Hoe", ItemStack.of(Material.STONE_HOE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
     }
 
