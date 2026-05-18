@@ -191,16 +191,16 @@ public class ClientSQLLayer {
      * @param client The client to load data for
      */
     private void loadAdditionalClientData(Client client) {
-        CompletableFuture<List<Punishment>> punishmentsFuture = CompletableFuture
-                .supplyAsync(() -> punishmentRepository.getPunishmentsForClient(client))
+        CompletableFuture<List<Punishment>> punishmentsFuture = database.getAsyncDslContext()
+                .executeAsync(ctx -> punishmentRepository.getPunishmentsForClient(client))
                 .orTimeout(3, TimeUnit.SECONDS)
                 .exceptionally(ex -> {
                     log.error("Error loading punishments for client {}", client.getUuid(), ex).submit();
                     return List.of();
                 });
 
-        CompletableFuture<Set<UUID>> ignoresFuture = CompletableFuture
-                .supplyAsync(() -> getIgnoresForClient(client))
+        CompletableFuture<Set<UUID>> ignoresFuture = database.getAsyncDslContext()
+                .executeAsync(ctx -> getIgnoresForClient(client))
                 .orTimeout(3, TimeUnit.SECONDS)
                 .exceptionally(ex -> {
                     log.error("Error loading ignores for client {}", client.getUuid(), ex).submit();
