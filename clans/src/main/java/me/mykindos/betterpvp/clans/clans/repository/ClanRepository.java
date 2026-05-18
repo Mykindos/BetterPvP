@@ -732,18 +732,22 @@ public class ClanRepository implements IRepository<Clan> {
             killLogsRecords.forEach(killLogRecord -> {
                 long killerId = killLogRecord.getKiller();
                 String killerName = killLogRecord.getKillerName();
-                long killerClanId = killLogRecord.getKillerClan();
+                Long killerClanId = killLogRecord.getKillerClan();
 
-                Optional<Clan> killerClan = clanManager.getClanById(killerClanId);
+                Optional<Clan> killerClan = killerClanId == null
+                        ? Optional.empty()
+                        : clanManager.getClanById(killerClanId);
                 String killerClanName = killerClan
                         .map(Clan::getName)
                         .orElse("");
 
                 long victimId = killLogRecord.getVictim();
                 String victimName = killLogRecord.getVictimName();
-                long victimClanId = killLogRecord.getVictimClan();
+                Long victimClanId = killLogRecord.getVictimClan();
 
-                Optional<Clan> victimClan = clanManager.getClanById(victimClanId);
+                Optional<Clan> victimClan = victimClanId == null
+                        ? Optional.empty()
+                        : clanManager.getClanById(victimClanId);
                 String victimClanName = victimClan
                         .map(Clan::getName)
                         .orElse("");

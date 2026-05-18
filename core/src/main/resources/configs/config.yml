@@ -39,6 +39,7 @@ hunger:
   enabled: false
 discord:
   chatWebhook: ''
+  invite: https://discord.gg/qg2kmSffKA
 weather:
   enabled: false
 items:
@@ -245,6 +246,9 @@ command:
     requiredRank: MODERATOR
   daily:
     enabled: false
+    requiredRank: PLAYER
+  discord:
+    enabled: true
     requiredRank: PLAYER
   admin:
     enabled: true

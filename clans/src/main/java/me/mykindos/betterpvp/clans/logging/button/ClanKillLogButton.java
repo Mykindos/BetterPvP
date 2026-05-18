@@ -15,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -32,8 +31,9 @@ public class ClanKillLogButton extends AbstractItem {
     public ClanKillLogButton(Clan clan, KillClanLog killClanLog, ClanManager clanManager) {
         this.killClanLog = killClanLog;
 
-        Clan killerClan = clanManager.getClanById(killClanLog.getKillerClan().getId()).orElse(null);
-        Clan victimClan = clanManager.getClanById(killClanLog.getVictimClan().getId()).orElse(null);
+        Clan killerClan = killClanLog.getKillerClan();
+        Clan victimClan = killClanLog.getVictimClan();
+
 
         killerRelation = clan.getRelation(killerClan);
         victimRelation = clan.getRelation(victimClan);

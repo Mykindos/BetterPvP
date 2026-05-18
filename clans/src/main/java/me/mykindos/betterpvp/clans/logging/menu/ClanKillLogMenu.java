@@ -103,6 +103,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                     .map(Item.class::cast)
                     .toList();
         }).exceptionally(throwable -> {
+            throwable.printStackTrace();
             log.error("Error loading clan kill logs for clan: {}", clan.getName(), throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
