@@ -265,18 +265,9 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
                 .thenApply(v -> {
                     Map<Long, SmartBlockData<?>> resultMap = new HashMap<>();
                     for (CompletableFuture<Map.Entry<Long, SmartBlockData<?>>> future : futures) {
-                        try {
-                            Map.Entry<Long, SmartBlockData<?>> entry = future.get();
-                            if (entry != null) {
-                                resultMap.put(entry.getKey(), entry.getValue());
-                            }
-                        } catch (InterruptedException e) {
-                            log.warn("Interrupted while getting result from reconstruction future for chunk {},{}",
-                                    chunk.getX(), chunk.getZ(), e).submit();
-                            Thread.currentThread().interrupt();
-                        } catch (Exception e) {
-                            log.warn("Failed to get result from reconstruction future for chunk {},{}",
-                                    chunk.getX(), chunk.getZ(), e).submit();
+                        Map.Entry<Long, SmartBlockData<?>> entry = future.getNow(null);
+                        if (entry != null) {
+                            resultMap.put(entry.getKey(), entry.getValue());
                         }
                     }
                     return resultMap;

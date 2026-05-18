@@ -36,7 +36,7 @@ public class Database {
     private final Core core;
     private final IDatabaseConnection connection;
 
-    private static final Executor DB_EXECUTOR = Executors.newFixedThreadPool(10);
+    private static final Executor DB_EXECUTOR = Executors.newFixedThreadPool(20);
 
     @Getter
     private final DSLContext dslContext;
