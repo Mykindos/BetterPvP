@@ -43,7 +43,7 @@ public class BattleFatigueManager extends Manager<String, BattleFatigue> impleme
     private long deathHistoryWindowSeconds;
 
     @Inject
-    @Config(path = "clans.fatigue.threshold.worn", defaultValue = "35.0")
+    @Config(path = "clans.fatigue.threshold.worn", defaultValue = "30.0")
     private double thresholdWorn;
 
     @Inject
@@ -56,7 +56,7 @@ public class BattleFatigueManager extends Manager<String, BattleFatigue> impleme
 
     // --- combine() formula tunables (global to the algorithm, not per-factor) -------
     @Inject
-    @Config(path = "clans.fatigue.combine.baseGain", defaultValue = "2.0")
+    @Config(path = "clans.fatigue.combine.baseGain", defaultValue = "10.0")
     private double baseGain;
 
     /** A signal at/above this counts as an "active axis" for synergy. */
@@ -71,7 +71,7 @@ public class BattleFatigueManager extends Manager<String, BattleFatigue> impleme
 
     /** Hard cap on a single death's gain, so one death can't skip a whole tier. */
     @Inject
-    @Config(path = "clans.fatigue.combine.maxGainPerDeath", defaultValue = "28.0")
+    @Config(path = "clans.fatigue.combine.maxGainPerDeath", defaultValue = "50.0")
     private double maxGainPerDeath;
 
     @Inject

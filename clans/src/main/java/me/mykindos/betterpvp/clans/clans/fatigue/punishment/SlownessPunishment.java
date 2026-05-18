@@ -19,7 +19,7 @@ public class SlownessPunishment implements FatiguePunishment {
     private final EffectManager effectManager;
 
     @Inject
-    @Config(path = "clans.fatigue.slowness.secondsPerTier", defaultValue = "7.0")
+    @Config(path = "clans.fatigue.slowness.secondsPerTier", defaultValue = "0.0")
     private double secondsPerTier;
 
     @Inject
