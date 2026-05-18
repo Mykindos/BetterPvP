@@ -91,10 +91,6 @@ public class MiningHandler extends ProfessionHandler {
         professionData.grantExperience(finalExperience, player);
         //miningData.saveOreMined(block); // Save this block to the database
 
-        log.info("{} mined {} for {} experience", player.getName(), block.getType(), finalExperience)
-                .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
-                .addContext("Experience", finalExperience + "").submit();
-
         clientManager.incrementStat(player, ClientStat.ORE_MINED, 1L);
 
         if (!getLeaderboardBlocks().contains(block.getType())) {

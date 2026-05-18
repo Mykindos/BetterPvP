@@ -425,9 +425,10 @@ public class ClientSQLLayer {
 
 
     public void processPropertyUpdates(UUID uuid, boolean async) {
-        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedPropertyUpdates.updateAndGet(map -> {
-            map.remove(uuid.toString());
-            return map;
+        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedPropertyUpdates.getAndUpdate(map -> {
+            ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
+            updated.remove(uuid.toString());
+            return updated;
         }).get(uuid.toString());
 
         if (sharedQueries != null && !sharedQueries.isEmpty()) {
@@ -436,9 +437,10 @@ public class ClientSQLLayer {
         }
 
         // Process stat updates for this UUID
-        ConcurrentHashMap<String, Query> gamerQueries = queuedPropertyUpdates.updateAndGet(map -> {
-            map.remove(uuid.toString());
-            return map;
+        ConcurrentHashMap<String, Query> gamerQueries = queuedPropertyUpdates.getAndUpdate(map -> {
+            ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
+            updated.remove(uuid.toString());
+            return updated;
         }).get(uuid.toString());
 
         if (gamerQueries != null && !gamerQueries.isEmpty()) {
@@ -446,9 +448,10 @@ public class ClientSQLLayer {
             executeQueriesAsTransaction(queries, async);
         }
 
-        ConcurrentHashMap<String, Query> statQueries = queuedStatUpdates.updateAndGet(map -> {
-            map.remove(uuid.toString());
-            return map;
+        ConcurrentHashMap<String, Query> statQueries = queuedStatUpdates.getAndUpdate(map -> {
+            ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
+            updated.remove(uuid.toString());
+            return updated;
         }).get(uuid.toString());
 
         if (statQueries != null && statQueries.isEmpty()) {
@@ -536,9 +539,10 @@ public class ClientSQLLayer {
      */
     private CompletableFuture<Void> executeQueriesAsTransaction(@Nullable List<Query> queries, boolean async) {
         if (queries == null || queries.isEmpty()) {
+            System.out.println("B");
             return CompletableFuture.completedFuture(null);
         }
-
+        System.out.println("A");
         try {
             if (async) {
                 return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
@@ -547,7 +551,7 @@ public class ClientSQLLayer {
                         ctxl.batch(queries).execute();
                     });
                 }).exceptionally(ex -> {
-                    log.error("Error executing queries as transaction with {} queries", queries.size(), ex).submit();
+                    log.error("Error executing queries as transaction with {} queries", ex).submit();
                     return null;
                 });
             } else {

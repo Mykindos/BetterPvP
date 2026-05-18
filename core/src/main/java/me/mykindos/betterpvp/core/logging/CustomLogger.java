@@ -1,8 +1,9 @@
 package me.mykindos.betterpvp.core.logging;
 
-import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ReusableMessageFactory;
+
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 
 public class CustomLogger {
 

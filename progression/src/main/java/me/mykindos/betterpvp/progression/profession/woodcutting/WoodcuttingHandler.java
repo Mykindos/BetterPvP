@@ -155,10 +155,6 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
         professionData.grantExperience(finalExperience, player);
         woodcuttingRepository.saveChoppedLog(player, block.getType(), player.getLocation(), chopLogEvent.getAmountChopped());
 
-        log.info("{} chopped {} for {} experience", player.getName(), originalBlockType, finalExperience)
-                .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
-                .addContext("Experience", finalExperience + "").submit();
-
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
 
