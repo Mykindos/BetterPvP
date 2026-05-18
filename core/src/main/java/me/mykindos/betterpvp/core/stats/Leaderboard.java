@@ -229,7 +229,7 @@ public abstract class Leaderboard<E, T> implements Describable {
                 }
             }
             return types;
-        }).exceptionally(ex -> {
+        }, LEADERBOARD_UPDATER).exceptionally(ex -> {
             log.error("Failed to add " + entryName + " to leaderboard!", ex).submit();
             return null;
         });
@@ -306,7 +306,7 @@ public abstract class Leaderboard<E, T> implements Describable {
      */
     public final CompletableFuture<Optional<LeaderboardEntry<E, T>>> getPlayerData(@NotNull UUID player, @NotNull SearchOptions options) {
         // Fetch the player data
-        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database))).exceptionally(ex -> {
+        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database)), LEADERBOARD_UPDATER).exceptionally(ex -> {
             if (!(ex instanceof UnsupportedOperationException)) {
                 log.error("Failed to fetch leaderboard data for " + player + "!", ex).submit();
             }

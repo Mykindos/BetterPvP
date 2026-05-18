@@ -16,7 +16,10 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ClanMapRenderer extends MapRenderer {
 
@@ -25,12 +28,16 @@ public class ClanMapRenderer extends MapRenderer {
     private static final int CHUNK_WIDTH = 16;
 
     private final MapHandler mapHandler;
-    private int currentInterval;
+    private final Map<UUID, Integer> renderIntervals = new ConcurrentHashMap<>();
 
     @Inject
     public ClanMapRenderer(MapHandler mapHandler) {
         super(true);
         this.mapHandler = mapHandler;
+    }
+
+    public void removePlayerData(UUID playerId) {
+        renderIntervals.remove(playerId);
     }
 
     @SuppressWarnings("deprecation")
@@ -60,11 +67,11 @@ public class ClanMapRenderer extends MapRenderer {
         if (!mapHandler.isEnabled()) return false;
 
         // Handle update interval
-        currentInterval++;
+        final int currentInterval = renderIntervals.merge(player.getUniqueId(), 1, Integer::sum);
         if (currentInterval < mapHandler.getUpdateInterval()) {
             return false;
         }
-        currentInterval = 0;
+        renderIntervals.put(player.getUniqueId(), 0);
 
         // Check if player has map in hand
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return false;

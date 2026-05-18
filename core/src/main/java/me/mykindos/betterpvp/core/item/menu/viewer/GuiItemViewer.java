@@ -77,7 +77,7 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
         }
     }
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread thread = new Thread(r);
         thread.setName("gui-item-viewer-search");
         return thread;

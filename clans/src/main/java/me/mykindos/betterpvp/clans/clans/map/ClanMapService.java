@@ -9,6 +9,9 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
+import me.mykindos.betterpvp.clans.clans.map.renderer.ClanMapRenderer;
+import me.mykindos.betterpvp.clans.clans.map.renderer.MinimapRenderer;
+import me.mykindos.betterpvp.clans.clans.map.renderer.PointOfInterestRenderer;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
@@ -46,12 +49,20 @@ public class ClanMapService {
     private final Clans clans;
     private final MapHandler mapHandler;
     private final ClanManager clanManager;
+    private final MinimapRenderer minimapRenderer;
+    private final ClanMapRenderer clanMapRenderer;
+    private final PointOfInterestRenderer pointOfInterestRenderer;
 
     @Inject
-    public ClanMapService(Clans clans, MapHandler mapHandler, ClanManager clanManager) {
+    public ClanMapService(Clans clans, MapHandler mapHandler, ClanManager clanManager,
+                          MinimapRenderer minimapRenderer, ClanMapRenderer clanMapRenderer,
+                          PointOfInterestRenderer pointOfInterestRenderer) {
         this.clans = clans;
         this.mapHandler = mapHandler;
         this.clanManager = clanManager;
+        this.minimapRenderer = minimapRenderer;
+        this.clanMapRenderer = clanMapRenderer;
+        this.pointOfInterestRenderer = pointOfInterestRenderer;
 
         mapHandler.loadMap();
     }
@@ -65,8 +76,12 @@ public class ClanMapService {
      * @param player the player whose map-related data is to be removed
      */
     public void removePlayerMapData(Player player) {
-        mapHandler.getClanMapData().remove(player.getUniqueId());
-        mapHandler.getMapSettingsMap().remove(player.getUniqueId());
+        UUID playerId = player.getUniqueId();
+        mapHandler.getClanMapData().remove(playerId);
+        mapHandler.getMapSettingsMap().remove(playerId);
+        minimapRenderer.removePlayerData(playerId);
+        clanMapRenderer.removePlayerData(playerId);
+        pointOfInterestRenderer.removePlayerData(playerId);
     }
 
     /**

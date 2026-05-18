@@ -47,6 +47,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Singleton
@@ -75,7 +77,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     @Config(path = "clans.map.maxMapDistance", defaultValue = "645")
     private int maxDistance;
 
-    private int currentInterval = 1;
+    private final Map<UUID, Integer> renderIntervals = new ConcurrentHashMap<>();
 
     @Inject
     public MinimapRenderer(MapHandler mapHandler, Clans clans) {
@@ -84,6 +86,10 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         this.clans = clans;
         Bukkit.getPluginManager().registerEvents(this, clans);
         UtilServer.runTaskTimer(clans, this::processUpdateQueue, QUEUE_PROCESS_INTERVAL, QUEUE_PROCESS_INTERVAL);
+    }
+
+    public void removePlayerData(UUID playerId) {
+        renderIntervals.remove(playerId);
     }
 
     private void processUpdateQueue() {
@@ -129,11 +135,11 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         if (!mapHandler.isEnabled()) return;
 
         // Handle update interval
-        currentInterval++;
+        final int currentInterval = renderIntervals.merge(player.getUniqueId(), 1, Integer::sum);
         if (currentInterval < mapHandler.getUpdateInterval()) {
             return;
         }
-        currentInterval = 0;
+        renderIntervals.put(player.getUniqueId(), 0);
 
         // Only render for players holding maps
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;

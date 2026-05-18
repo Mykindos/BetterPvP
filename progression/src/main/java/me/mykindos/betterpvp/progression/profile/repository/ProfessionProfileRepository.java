@@ -103,8 +103,7 @@ public class ProfessionProfileRepository {
 
         // Rare path: admin XP commands target offline players (resolved via offline
         // lookup). Resolve the client id from the DB off-thread; keep it correct.
-        CompletableFuture.runAsync(() -> {
-            DSLContext ctx = database.getDslContext();
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             Long clientId = ctx.select(CLIENTS.ID)
                     .from(CLIENTS)
                     .where(CLIENTS.UUID.eq(gamer.toString()))

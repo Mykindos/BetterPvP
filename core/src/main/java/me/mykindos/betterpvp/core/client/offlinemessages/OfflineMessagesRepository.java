@@ -66,10 +66,10 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
      * @return the list of offline messages, sorted by most recent
      */
     public CompletableFuture<List<OfflineMessage>> getOfflineMessagesForClient(long clientID, long time) {
-        return CompletableFuture.supplyAsync(() -> {
+        return database.getAsyncDslContext().executeAsync(ctx -> {
             List<OfflineMessage> offlineMessages = new ArrayList<>();
             try {
-                Result<GetOfflineMessagesByTimeRecord> offlineMessageRecords = GET_OFFLINE_MESSAGES_BY_TIME(database.getDslContext().configuration(), clientID, time);
+                Result<GetOfflineMessagesByTimeRecord> offlineMessageRecords = GET_OFFLINE_MESSAGES_BY_TIME(ctx.configuration(), clientID, time);
                 offlineMessageRecords.forEach(result -> {
                     UUID clientUUID = UUID.fromString(result.getClientUuid());
                     long messageTime = result.getTimeSent();
@@ -88,8 +88,6 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
                 log.error("Error while retrieving offline messages for client {}", clientID, e).submit();
             }
             return offlineMessages;
-
-
         }).exceptionally(ex -> {
             log.error("Failed to retrieve offline messages for client " + clientID, ex).submit();
             return new ArrayList<>();

@@ -115,10 +115,8 @@ public class ClientListener implements Listener {
         final Player player = event.getPlayer();
         final Optional<Client> clientOpt = clientManager.getStoredExact(player.getUniqueId());
         clientOpt.ifPresent(client -> {
-            CompletableFuture.runAsync(() -> {
-                // Removing the client as they logged off
-                this.clientManager.unload(client);
-            });
+            // Removing the client as they logged off
+            this.clientManager.unload(client);
 
             final ClientQuitEvent quitEvent = new ClientQuitEvent(client, player);
             UtilServer.callEvent(quitEvent);

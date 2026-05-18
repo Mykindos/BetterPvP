@@ -20,6 +20,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class PointOfInterestRenderer extends MapRenderer {
@@ -32,7 +35,7 @@ public class PointOfInterestRenderer extends MapRenderer {
     private final MapHandler mapHandler;
     private final List<PointOfInterest> cachedPointsOfInterest = new ArrayList<>();
 
-    private int currentInterval = 1;
+    private final Map<UUID, Integer> renderIntervals = new ConcurrentHashMap<>();
 
     @Inject
     public PointOfInterestRenderer(MapHandler mapHandler, Clans clans) {
@@ -40,6 +43,10 @@ public class PointOfInterestRenderer extends MapRenderer {
         this.mapHandler = mapHandler;
         refreshPointsOfInterest();
         UtilServer.runTaskTimer(clans, this::refreshPointsOfInterest, CACHE_REFRESH_INTERVAL, CACHE_REFRESH_INTERVAL);
+    }
+
+    public void removePlayerData(UUID playerId) {
+        renderIntervals.remove(playerId);
     }
 
     @Override
@@ -51,11 +58,11 @@ public class PointOfInterestRenderer extends MapRenderer {
             cursors.removeCursor(cursors.getCursor(0));
         }
 
-        currentInterval++;
+        final int currentInterval = renderIntervals.merge(player.getUniqueId(), 1, Integer::sum);
         if (currentInterval < mapHandler.getUpdateInterval()) {
             return;
         }
-        currentInterval = 0;
+        renderIntervals.put(player.getUniqueId(), 0);
 
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
         if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) return;
