@@ -44,7 +44,7 @@ public class DatabaseFilterService implements IFilterService {
     private final OkHttpClient httpClient = new OkHttpClient();
     private static final long FILTER_TIMEOUT_MILLIS = 500L;
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     @Inject
     public DatabaseFilterService(Core core, Database database) {
@@ -60,14 +60,6 @@ public class DatabaseFilterService implements IFilterService {
         List<String> words = dsl.select(CHAT_FILTER.WORD)
                 .from(CHAT_FILTER)
                 .fetch(CHAT_FILTER.WORD);
-
-        if (words.isEmpty()) {
-            log.info("Database filter table is empty, fetching from GamerSafer...").submit();
-            words = fetchFromGamerSafer();
-            if (!words.isEmpty()) {
-                saveToDatabase(words);
-            }
-        }
 
         if (!words.isEmpty()) {
             filteredWords.clear();
@@ -86,31 +78,6 @@ public class DatabaseFilterService implements IFilterService {
             combinedPattern = null;
             log.info("No filtered words loaded.").submit();
         }
-    }
-
-    private List<String> fetchFromGamerSafer() {
-        Request request = new Request.Builder().url(GAMERSAFER_URL).build();
-        List<String> words = new ArrayList<>();
-
-        try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                log.error("Failed to load GamerSafer filtered words: {}", response.code()).submit();
-                return words;
-            }
-
-            String content = response.body().string();
-            String[] lines = content.split("\n");
-            for (String line : lines) {
-                if (line.isBlank()) continue;
-                String word = line.split(",")[0].trim().toLowerCase();
-                if (!word.isEmpty()) {
-                    words.add(word);
-                }
-            }
-        } catch (IOException e) {
-            log.error("Error loading GamerSafer filtered words", e).submit();
-        }
-        return words;
     }
 
     private void saveToDatabase(List<String> words) {

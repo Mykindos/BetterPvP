@@ -97,13 +97,11 @@ public class SearchEngineBase<T> {
      * @param uuid The {@link UUID} of the client to search for.
      */
     public CompletableFuture<Optional<T>> offline(@Nullable final UUID uuid) {
+        final Optional<T> clientOnline = this.online(uuid);
+        if (clientOnline.isPresent()) {
+            return CompletableFuture.completedFuture(clientOnline);
+        }
         return CompletableFuture.supplyAsync(() -> {
-            final Optional<T> clientOnline = this.online(uuid);
-            if (clientOnline.isPresent()) {
-                return clientOnline;
-            }
-
-
             return this.offlineUuidSearch.apply(uuid);
         }).exceptionally(throwable -> {
             log.error("Error searching for client by UUID", throwable).submit();
@@ -117,12 +115,12 @@ public class SearchEngineBase<T> {
      * @param playerName     The name of the player to search for.
      */
     public CompletableFuture<Optional<T>> offline(@Nullable final String playerName) {
-        return CompletableFuture.supplyAsync(() -> {
-            final Optional<T> clientOnline = this.online(playerName);
-            if (clientOnline.isPresent()) {
-                return clientOnline;
-            }
+        final Optional<T> clientOnline = this.online(playerName);
+        if (clientOnline.isPresent()) {
+            return CompletableFuture.completedFuture(clientOnline);
+        }
 
+        return CompletableFuture.supplyAsync(() -> {
             return this.offlineNameSearch.apply(playerName);
         }).exceptionally(throwable -> {
             log.error("Error searching for client by name", throwable).submit();
