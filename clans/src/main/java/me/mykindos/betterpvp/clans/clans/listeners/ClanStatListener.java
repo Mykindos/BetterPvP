@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.client.stats.events.WrapStatEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClansStat;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -26,7 +28,8 @@ public class ClanStatListener extends ClanListener {
         if (!event.getStat().wrappingAllowed()) return;
         final ClanWrapperStat.ClanWrapperStatBuilder<?, ?> builder = ClanWrapperStat.builder()
                 .wrappedStat(event.getStat());
-        final ClanWrapperStat wrappedStat = (ClanWrapperStat) clanManager.addClanInfo(event.getId(), builder).build();
+        final Player player = Bukkit.getPlayer(event.getId());
+        final ClanWrapperStat wrappedStat = (ClanWrapperStat) clanManager.addClanInfo(player, builder).build();
         event.setStat(wrappedStat);
     }
 

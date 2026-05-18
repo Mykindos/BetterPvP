@@ -26,6 +26,9 @@ import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakProperties
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -38,6 +41,8 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -106,6 +111,42 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
     private final ConcurrentHashMap<UUID, BreakSession> sessions = new ConcurrentHashMap<>();
     /** Wall-clock millis at which the player's next non-instant break may begin accumulating progress. */
     private final ConcurrentHashMap<UUID, Long> nextAllowedProgressMillis = new ConcurrentHashMap<>();
+    /**
+     * Latest dig-action prediction sequence per player. Because we cancel the vanilla
+     * {@code PLAYER_DIGGING} packet, the vanilla {@code ackBlockChangesUpTo} (fired by
+     * {@code ServerGamePacketListenerImpl} right after {@code handleBlockBreakAction})
+     * never runs. We replay it ourselves <i>after</i> the break so the client's
+     * prediction settles against the post-break (air) state in one round trip,
+     * exactly like vanilla — instead of reverting to the pre-break state first.
+     */
+    private final ConcurrentHashMap<UUID, Integer> lastDigSequence = new ConcurrentHashMap<>();
+
+    /** Soft cap for {@link #instantVerdict}; cleared wholesale when exceeded (entries are cheap to rebuild). */
+    private static final int INSTANT_CACHE_MAX = 2048;
+    /**
+     * Main-thread-written, netty-read verdict cache: was the last resolve of
+     * {@code (block Material, tool Material)} an instant break? Lets the packet
+     * thread flip the client to AIR immediately for repeats (mining a vein,
+     * clearing similar blocks) without touching the main-thread-only resolver.
+     * A {@code true} entry is always re-validated on the main thread before the
+     * authoritative break commits, so a stale entry only costs a brief flicker
+     * and self-heals on the next resolve. Keyed by packed Material ordinals.
+     */
+    private final ConcurrentHashMap<Long, Boolean> instantVerdict = new ConcurrentHashMap<>();
+
+    /** Outcome of a main-thread instant re-check; see {@link #resolveInstant}. */
+    private enum InstantDecision { INSTANT, NOT_INSTANT, UNBREAKABLE }
+
+    /**
+     * Vanilla blocks Nexo/Oraxen reuse as custom-block carriers. Their true break
+     * behaviour lives behind the main-thread-only smart factory, so the netty
+     * vanilla estimate ({@link #estimatesInstantVanilla}) must never guess for
+     * them — they fall back to the cache/tick path instead.
+     */
+    private static final java.util.Set<Material> NEXO_CARRIER_MATERIALS = java.util.EnumSet.of(
+            Material.BARRIER, Material.NOTE_BLOCK, Material.MUSHROOM_STEM,
+            Material.BROWN_MUSHROOM_BLOCK, Material.RED_MUSHROOM_BLOCK,
+            Material.TRIPWIRE, Material.CHORUS_PLANT, Material.CHORUS_FLOWER);
 
     @Inject
     public BlockBreakProgressServiceImpl(BlockBreakResolver resolver, SmartBlockFactory smartBlockFactory) {
@@ -113,8 +154,6 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         this.smartBlockFactory = smartBlockFactory;
         PacketEvents.getAPI().getEventManager().registerListener(new DigListener(), PacketListenerPriority.HIGH);
     }
-
-    // ─── Public API ──────────────────────────────────────────────────────────────
 
     @Override
     public void startSession(@NotNull Player player, @NotNull UUID worldUid, int x, int y, int z) {
@@ -179,8 +218,6 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
     }
 
-    // ─── Tick loop (main thread) ─────────────────────────────────────────────────
-
     @UpdateEvent(delay = 50) // 1 server tick
     public void tick() {
         if (sessions.isEmpty()) return;
@@ -196,6 +233,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         if (player == null || !player.isOnline()) {
             sessions.remove(session.getPlayerId());
             nextAllowedProgressMillis.remove(session.getPlayerId());
+            lastDigSequence.remove(session.getPlayerId());
             return;
         }
 
@@ -215,19 +253,36 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         final ItemStack held = player.getInventory().getItemInMainHand();
 
-        // Resolve the merged SmartBlock override (own-fields ∘ Nexo Breakable defaults) once
-        // per tick. We use it for two things: hardness (the tick-loop owns this) and the
-        // empty-air guard. Speed multipliers ride through the resolver path below.
+        // Resolve the merged SmartBlock override (own-fields ∘ Nexo Breakable defaults),
+        // breakability/speed, and smart-block status. These depend only on the block's
+        // BlockData (the held item already ends the session on change), so we memoize
+        // them on the session and recompute only when the BlockData changes — Vein Echo
+        // respawn, falling block landing, turning to AIR, etc. Without this the whole
+        // chain (incl. an O(n) Oraxen registry scan) ran every tick per dig.
         // Nexo blocks often appear as AIR or BARRIER, so we must not rely on getType().
-        final SmartBlockBreakOverride smartOverride =
-                SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
+        final BlockData blockData = block.getBlockData();
+        if (!session.isResolvedFor(blockData)) {
+            final SmartBlockBreakOverride resolvedOverride =
+                    SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
+            final boolean smart = !block.getType().isAir() && smartBlockFactory.isSmartBlock(block);
+            session.cacheResolve(blockData, resolvedOverride, smart);
+        }
+
+        final SmartBlockBreakOverride smartOverride = session.getCachedSmartOverride();
         final OptionalDouble smartHardness = smartOverride.hardness();
 
         if (smartHardness.isEmpty() && block.getType().isAir()) {
             return;
         }
 
-        final BlockBreakProperties props = resolver.resolve(player, block, held);
+        // Lazily resolve props *after* the air guard so its ordering (and any global
+        // rule that matches AIR) is preserved exactly. Cached per BlockData alongside
+        // the override; cleared whenever the override cache is recomputed.
+        BlockBreakProperties props = session.getCachedProps();
+        if (props == null) {
+            props = resolver.resolve(player, block, held);
+            session.setCachedProps(props);
+        }
         if (!props.isBreakable()) {
             cancelSessionFor(session.getPlayerId());
             return;
@@ -248,6 +303,9 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         // when the client doesn't continuously send digging packets (creative single-click).
         final boolean allowed = nextAllowedProgressMillis.getOrDefault(session.getPlayerId(), 0L) <= System.currentTimeMillis();
         if (hardness == 0f || isCreativeInstant(player, held)) {
+            if (!session.isCachedIsSmartBlock()) {
+                recordInstantVerdict(block.getType(), held.getType(), true);
+            }
             if (allowed) completeBreak(player, block, session, true);
             return;
         }
@@ -262,6 +320,14 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         // damage value in our scaled units, so this check is equivalent to speedMultiplier > 30 * hardness.
         final boolean instant = progressPerTick >= 1.0;
 
+        // Seed the netty-readable verdict cache from the authoritative resolve so a
+        // repeat of this (block, tool) can be predicted instantly on the packet
+        // thread. Storing the false case too lets a no-longer-instant key (lost
+        // Haste, swapped tool tier) stop being mispredicted after one block.
+        if (!session.isCachedIsSmartBlock()) {
+            recordInstantVerdict(block.getType(), held.getType(), instant);
+        }
+
         // Vanilla 6-tick post-completion delay. Successful instant breaks don't arm the
         // cooldown (so chains run freely), but a failed instant break does — the gate then
         // throttles the retry loop on listener-cancelled breaks.
@@ -274,7 +340,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         // Provider-specific break-progress HUD (action bar overlay for Nexo/Oraxen blocks;
         // no-op for vanilla, which already shows the destruction-stage overlay).
-        if (smartBlockFactory.isSmartBlock(block)) {
+        if (session.isCachedIsSmartBlock()) {
             smartBlockFactory.displayBreakProgress(player, block, Math.min(1.0, session.getProgress()));
         }
 
@@ -325,7 +391,8 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
             return;
         }
 
-        final boolean broke = breakBlock(player, block, targetSmartBlock);
+        final int sequence = lastDigSequence.getOrDefault(session.getPlayerId(), -1);
+        final boolean broke = breakBlock(player, block, targetSmartBlock, sequence);
 
         session.setProgress(0.0);
         session.setLastStageSent(-1);
@@ -351,13 +418,158 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
     }
 
-    private boolean breakBlock(Player player, Block block, boolean smartBlock) {
+    /**
+     * Performs the authoritative break and then closes the modern-protocol
+     * prediction loop the way vanilla does: world state is made authoritative
+     * <i>first</i>, then the dig sequence is acked. Because the block is already
+     * air (or restored, on a rejected break) when the client processes the ack,
+     * the client's predicted state is confirmed in a single round trip with no
+     * pre-break revert — the fix for the latency-scaled delay/flash.
+     *
+     * <p>We keep {@link UtilBlock#breakBlock} (which wraps
+     * {@code ServerPlayerGameMode.destroyBlock} <i>and</i> emits the {@code 2001}
+     * break particle/sound that {@code destroyBlock} alone omits) rather than
+     * calling NMS destroy directly, so no break feedback is lost.
+     */
+    private boolean breakBlock(Player player, Block block, boolean smartBlock, int sequence) {
+        final boolean broke;
         if (smartBlock) {
             final SmartBlockInstance smartBlockInstance = smartBlockFactory.from(block).orElseThrow();
-            return smartBlockFactory.breakBlock(player, smartBlockInstance);
+            broke = smartBlockFactory.breakBlock(player, smartBlockInstance);
         } else {
-            return UtilBlock.breakBlock(player, block);
+            broke = UtilBlock.breakBlock(player, block);
         }
+
+        final ServerPlayer handle = ((CraftPlayer) player).getHandle();
+        if (!broke) {
+            // Break rejected (protection plugin, cancelled BlockBreakEvent, plugin
+            // set air, etc.) — re-assert the real block state before we ack so the
+            // client reconciles to truth rather than a phantom air.
+            handle.connection.send(new ClientboundBlockUpdatePacket(
+                    handle.level(), new BlockPos(block.getX(), block.getY(), block.getZ())));
+        }
+        ackSequence(player, sequence);
+        return broke;
+    }
+
+    /**
+     * Vanilla's {@code ServerGamePacketListenerImpl#ackBlockChangesUpTo}: records
+     * the highest settled prediction sequence; the connection flushes a single
+     * {@code ClientboundBlockChangedAckPacket} for it at end of tick. Negative
+     * sequences are illegal in vanilla (they disconnect the player), so we skip
+     * acking when we never observed a real sequence.
+     */
+    private void ackSequence(Player player, int sequence) {
+        if (sequence < 0) return;
+        ((CraftPlayer) player).getHandle().connection.ackBlockChangesUpTo(sequence);
+    }
+
+    /** Re-assert the authoritative block state to one player and settle their prediction sequence. */
+    private void restoreAndAck(Player player, Block block, int sequence) {
+        final ServerPlayer handle = ((CraftPlayer) player).getHandle();
+        handle.connection.send(new ClientboundBlockUpdatePacket(
+                handle.level(), new BlockPos(block.getX(), block.getY(), block.getZ())));
+        ackSequence(player, sequence);
+    }
+
+    /** Packs two {@link Material} ordinals into a long so the netty lookup allocates nothing. */
+    private static long instantKey(Material block, Material tool) {
+        return ((long) block.ordinal() << 32) | (tool.ordinal() & 0xffffffffL);
+    }
+
+    private void recordInstantVerdict(Material block, Material tool, boolean instant) {
+        if (block.isAir()) return;
+        if (instantVerdict.size() >= INSTANT_CACHE_MAX) instantVerdict.clear();
+        instantVerdict.put(instantKey(block, tool), instant);
+    }
+
+    /**
+     * The cached main-thread verdict for this (block, tool) pair, or {@code null}
+     * if it has never been resolved. A non-null value is authoritative and
+     * <i>overrides</i> the off-thread vanilla estimate — so once a pair is known
+     * to be non-instant (custom rule/tool the estimate can't see) the estimate
+     * stops re-triggering a flicker every hit.
+     */
+    private Boolean cachedInstantVerdict(Material block, Material tool) {
+        return instantVerdict.get(instantKey(block, tool));
+    }
+
+    /**
+     * Main-thread authoritative answer to "would this break instantly right now?".
+     * Mirrors the resolve/instant math in {@link #tickOne} exactly (kept in sync by
+     * hand — both compute {@code progressPerTick = breakSpeed / (VANILLA_TICK_DIVISOR
+     * * hardness) * playerStateMultiplier}); used to re-validate a netty cache
+     * prediction before the irreversible break, and to re-seed the cache so a stale
+     * entry self-heals. Safe to call the resolver/smart-block factory here — this
+     * only runs on the main thread.
+     */
+    private InstantDecision resolveInstant(Player player, Block block, ItemStack held) {
+        final SmartBlockBreakOverride smartOverride =
+                SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
+        final boolean smart = !block.getType().isAir() && smartBlockFactory.isSmartBlock(block);
+        final OptionalDouble smartHardness = smartOverride.hardness();
+
+        if (smartHardness.isEmpty() && block.getType().isAir()) {
+            return InstantDecision.UNBREAKABLE;
+        }
+
+        final BlockBreakProperties props = resolver.resolve(player, block, held);
+        if (!props.isBreakable()) {
+            return InstantDecision.UNBREAKABLE;
+        }
+
+        final float hardness = smartHardness.isPresent()
+                ? (float) smartHardness.getAsDouble()
+                : block.getType().getHardness();
+        if (hardness < 0f) {
+            return InstantDecision.UNBREAKABLE;
+        }
+
+        if (hardness == 0f || isCreativeInstant(player, held)) {
+            if (!smart) recordInstantVerdict(block.getType(), held.getType(), true);
+            return InstantDecision.INSTANT;
+        }
+
+        final double basePerTick =
+                (double) props.getBreakSpeed() / (ToolMiningSpeed.VANILLA_TICK_DIVISOR * hardness);
+        final boolean instant = basePerTick * playerStateMultiplier(player) >= 1.0;
+        if (!smart) recordInstantVerdict(block.getType(), held.getType(), instant);
+        return instant ? InstantDecision.INSTANT : InstantDecision.NOT_INSTANT;
+    }
+
+    /**
+     * Cheap netty-thread estimate of "would this break instantly right now?",
+     * mirroring the resolver's <i>vanilla-fallback</i> path
+     * ({@code DefaultBlockBreakResolver#vanillaFallbackSpeed} folded into the
+     * {@link #tickOne} progress formula) using only off-thread chunk reads — the
+     * same accepted Paper risk as {@link #ackAndResync}. It deliberately cannot
+     * see custom {@code ToolComponent}s, per-player global rules or smart-block
+     * overrides (all main-thread-only), so it only ever guesses for plain
+     * vanilla-speed breaks; everything else falls through to the cache/tick path
+     * on first hit and is predicted thereafter. Every guess is re-validated by
+     * {@link #resolveInstant} on the main thread before the break commits, which
+     * restores + falls back on a miss and seeds {@link #instantVerdict}.
+     *
+     * <p>Caller wraps this in a {@code try/catch} (off-thread reads can race a
+     * concurrent write); it does not catch internally.
+     */
+    private boolean estimatesInstantVanilla(Player player, Block block, Material blockType, ItemStack held) {
+        if (NEXO_CARRIER_MATERIALS.contains(blockType)) return false;
+
+        final float hardness = blockType.getHardness();
+        if (hardness < 0f) return false; // unbreakable (bedrock, etc.)
+        if (hardness == 0f) return true; // grass/flowers/fire — always instant
+
+        float speed = block.getDestroySpeed(held); // vanilla tool speed vs this block
+        if (!block.isPreferredTool(held)) {
+            speed /= (100f / 30f); // vanilla "wrong tool for drops" speed penalty
+        }
+        final int scaled = Math.max(BlockBreakProperties.MIN_SPEED,
+                Math.round(speed * ToolMiningSpeed.SCALE));
+        final double progressPerTick = scaled
+                / (ToolMiningSpeed.VANILLA_TICK_DIVISOR * hardness)
+                * playerStateMultiplier(player);
+        return progressPerTick >= 1.0;
     }
 
     /**
@@ -419,13 +631,12 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         return helmet != null && helmet.containsEnchantment(Enchantment.AQUA_AFFINITY);
     }
 
-    // ─── Bukkit event hooks ──────────────────────────────────────────────────────
-
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         final UUID playerId = event.getPlayer().getUniqueId();
         cancelSessionFor(playerId);
         nextAllowedProgressMillis.remove(playerId);
+        lastDigSequence.remove(playerId);
     }
 
     @EventHandler
@@ -447,8 +658,6 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
     }
 
-    // ─── Animation helpers ───────────────────────────────────────────────────────
-
     private void clearOverlay(BreakSession session) {
         final World world = Bukkit.getWorld(session.getWorldUid());
         if (world == null) return;
@@ -469,8 +678,6 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
     }
 
-    // ─── PacketEvents listener (netty thread) ────────────────────────────────────
-
     private final class DigListener implements PacketListener {
         @Override
         public void onPacketReceive(PacketReceiveEvent event) {
@@ -482,6 +689,13 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
             final Vector3i pos = packet.getBlockPosition();
             final UUID worldUid = player.getWorld().getUID();
             final UUID playerId = player.getUniqueId();
+
+            // Track the client's prediction sequence for every dig action so the
+            // eventual (possibly many-ticks-later) break can ack it. Sequences are
+            // monotonic; acking the latest settles all earlier predictions too.
+            if (packet.getSequence() >= 0) {
+                lastDigSequence.put(playerId, packet.getSequence());
+            }
 
             switch (action) {
                 case START_DIGGING -> {
@@ -545,7 +759,15 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         if (damage.getInstaBreak()) {
             completeBreak(player, block, session, true);
+            return;
         }
+
+        // Collapse the second scheduler hop: instead of waiting for the next
+        // @UpdateEvent tick to first touch this session, advance it once right
+        // now. An instant break (progressPerTick ≥ 1) completes here — same tick
+        // the dig was dispatched — instead of one tick later; a non-instant break
+        // just gets its first progress increment early and continues normally.
+        tickOne(session);
     }
 
     /**
@@ -572,16 +794,42 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
             return false; // still in cooldown from a previous non-instant break; can't predict
         }
 
+        final Block block;
         final Material blockType;
         try {
-            blockType = player.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getType();
+            block = player.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
+            blockType = block.getType();
         } catch (Throwable t) {
             return false; // off-thread race; fall back to tick-bound flow
         }
 
+        if (blockType.isAir()) return false; // nothing to break; also excludes Nexo-as-AIR
+
         final ItemStack held = player.getInventory().getItemInMainHand();
-        final boolean predict = isCreativeInstant(player, held);
-//        final boolean predict = blockType.getHardness() == 0f || isCreativeInstant(player, held);
+        // Three escalating predicates, cheapest first. All are re-validated by
+        // resolveInstant in performPredictedBreak before the irreversible break, so
+        // an optimistic guess costs at most a one-block flicker (then self-heals via
+        // the cache) — never an unearned break or a wrong-speed mine:
+        //   1. Creative — unconditionally instant.
+        //   2. Cache hit — a prior main-thread resolve marked this (block,tool) instant.
+        //   3. Off-thread vanilla estimate — makes the *first* break of a pair
+        //      (e.g. leaves + shears) instant client-side without waiting for the
+        //      cache to warm. Mirrors the resolver's vanilla-fallback path exactly.
+        final boolean predict;
+        if (isCreativeInstant(player, held)) {
+            predict = true;
+        } else {
+            final Boolean cached = cachedInstantVerdict(blockType, held.getType());
+            if (cached != null) {
+                predict = cached; // authoritative; never second-guess with the estimate
+            } else {
+                try {
+                    predict = estimatesInstantVanilla(player, block, blockType, held);
+                } catch (Throwable ignored) {
+                    return false; // off-thread chunk read raced a write; fall back to tick flow
+                }
+            }
+        }
         if (!predict) return false;
 
         // Visual: ack + flip to AIR client-side immediately.
@@ -617,40 +865,54 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
             return; // can't restore anyway; client will resync on chunk reload
         }
         final Block block = world.getBlockAt(pos.getX(), pos.getY(), pos.getZ());
+        final int sequence = lastDigSequence.getOrDefault(player.getUniqueId(), -1);
 
         // If the block already changed (e.g. another player broke it, falling block landed),
-        // just send the current state to correct any drift from the speculative AIR.
+        // our prediction matched reality — just settle the sequence and bail.
         if (block.getType().isAir()) {
-            // Already air server-side — our prediction matched reality, nothing to do.
             nextAllowedProgressMillis.remove(player.getUniqueId());
+            ackSequence(player, sequence);
             return;
         }
 
         final ItemStack held = player.getInventory().getItemInMainHand();
+
+        // Authoritative re-validation. The netty predicate is a cheap cached guess;
+        // a stale entry (e.g. player lost Haste since the cache was seeded) must NOT
+        // be allowed to instant-break a block that should take time. resolveInstant
+        // also re-seeds the cache, so a misprediction self-heals after one block.
+        final InstantDecision decision = resolveInstant(player, block, held);
+        if (decision == InstantDecision.UNBREAKABLE) {
+            restoreAndAck(player, block, sequence);
+            return;
+        }
+        if (decision == InstantDecision.NOT_INSTANT) {
+            // Not actually instant — undo the speculative AIR and fall back to the
+            // normal progress-driven session so the player mines it legitimately.
+            restoreAndAck(player, block, sequence);
+            startSession(player, worldUid, pos.getX(), pos.getY(), pos.getZ());
+            Bukkit.getScheduler().runTask(
+                    JavaPlugin.getProvidingPlugin(BlockBreakProgressServiceImpl.class),
+                    () -> dispatchBlockDamage(player, pos, face));
+            return;
+        }
+
         final BlockDamageEvent damage = new BlockDamageEvent(player, block, face, held, true);
         Bukkit.getPluginManager().callEvent(damage);
 
         if (damage.isCancelled()) {
-            sendBlockState(player, block);
+            restoreAndAck(player, block, sequence);
             return;
         }
 
-        if (!breakBlock(player, block, smartBlockFactory.isTargetSmartBlock(player))) {
-            sendBlockState(player, block);
+        // breakBlock handles both the post-break ack and the fail-restore+ack.
+        if (!breakBlock(player, block, smartBlockFactory.isTargetSmartBlock(player), sequence)) {
             return;
         }
 
         // Successful instant break: clear any cooldown, cancel anyone else digging this block.
         nextAllowedProgressMillis.remove(player.getUniqueId());
         cancelSessionsAt(world.getUID(), pos.getX(), pos.getY(), pos.getZ());
-    }
-
-    /** Re-send the authoritative block state to a single player; used to revert a failed prediction. */
-    private void sendBlockState(Player player, Block block) {
-        final var user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-        user.sendPacket(new WrapperPlayServerBlockChange(
-                new Vector3i(block.getX(), block.getY(), block.getZ()),
-                SpigotConversionUtil.fromBukkitBlockData(block.getBlockData())));
     }
 
     /**

@@ -35,6 +35,8 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -47,6 +49,10 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
     private final SmartBlockRegistry smartBlockRegistry;
     private final SmartBlockDataManager dataManager;
     private final ClientManager clientManager;
+
+    /** Reverse index Nexo-id → SmartBlock, rebuilt only when the registry grows. */
+    private final Map<String, SmartBlock> nexoIdIndex = new HashMap<>();
+    private int indexedRegistrySize = -1;
 
     @Inject
     private NexoSmartBlockFactory(SmartBlockRegistry smartBlockRegistry,
@@ -96,13 +102,18 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
                 .or(() -> Optional.ofNullable(NexoFurniture.furnitureMechanic(block)));
     }
 
-    // todo: make this O(1)
     private SmartBlock getBlock(@NotNull String nexoId) {
-        return smartBlockRegistry.getAllBlocks().values().stream()
-                .filter(block -> block instanceof NexoBlock)
-                .filter(nexoBlock -> ((NexoBlock) nexoBlock).getId().equals(nexoId))
-                .findFirst()
-                .orElse(null);
+        final Map<String, SmartBlock> all = smartBlockRegistry.getAllBlocks();
+        if (all.size() != indexedRegistrySize) {
+            nexoIdIndex.clear();
+            for (SmartBlock block : all.values()) {
+                if (block instanceof NexoBlock nexoBlock) {
+                    nexoIdIndex.putIfAbsent(nexoBlock.getId(), block);
+                }
+            }
+            indexedRegistrySize = all.size();
+        }
+        return nexoIdIndex.get(nexoId);
     }
 
     public Optional<Mechanic> mechanic(Entity entity) {
