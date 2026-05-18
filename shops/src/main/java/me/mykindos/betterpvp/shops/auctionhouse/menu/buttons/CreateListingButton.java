@@ -44,8 +44,13 @@ public class CreateListingButton extends ControlItem<AuctionHouseMenu> {
             return;
         }
 
-        if(itemInMainHand.getType().isBlock()) {
+        if (itemInMainHand.getType().isBlock()) {
             UtilMessage.simpleMessage(player, "Auction House", "You cannot list blocks on the Auction House.");
+            return;
+        }
+
+        if (itemInMainHand.getType() == Material.MAP || itemInMainHand.getType() == Material.FILLED_MAP) {
+            UtilMessage.simpleMessage(player, "Auction House", "You cannot list maps on the Auction House.");
             return;
         }
 
