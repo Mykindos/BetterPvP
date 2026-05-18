@@ -77,6 +77,9 @@ public class ClansFishingListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onTreasureAwarded(LootAwardedEvent event) {
+        if(true) {
+            return;
+        }
         if (!"Fishing".equals(event.getContext().getSource())) return;
         if (!(event.getLoot() instanceof DroppedItemLoot droppedLoot)) return;
 
