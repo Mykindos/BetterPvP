@@ -84,14 +84,12 @@ public class LogRepository {
 
         long daysToMillis = days * (24L * 60L * 60L * 1000L);
 
-        CompletableFuture.runAsync(() -> {
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             int maxRetries = 3;
             int batchSize = limit;
 
             for (int attempt = 0; attempt < maxRetries; attempt++) {
                 try {
-                    DSLContext ctx = database.getDslContext();
-
                     int deletedRows = ctx.deleteFrom(LOGS)
                             .where(LOGS.REALM.eq(Core.getCurrentRealm().getId()))
                             .and(LOGS.ACTION.eq(""))

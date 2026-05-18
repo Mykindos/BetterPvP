@@ -224,7 +224,7 @@ public class BlockTaggingListener implements Listener {
     public void purgeBlockTags() {
         CompletableFuture.runAsync(() -> {
             blockTagManager.getBlockTagRepository().purgeOldBlockTags();
-        }).exceptionally(ex -> {
+        }, BlockTagManager.TAG_EXECUTOR).exceptionally(ex -> {
             log.error("Failed to purge old block tags", ex).submit();
             return null;
         });
@@ -234,7 +234,7 @@ public class BlockTaggingListener implements Listener {
     public void processBlockTagUpdates() {
         CompletableFuture.runAsync(() -> {
             blockTagManager.getBlockTagRepository().processBlockTagUpdates();
-        }).exceptionally(ex -> {
+        }, BlockTagManager.TAG_EXECUTOR).exceptionally(ex -> {
             log.error("Failed to process block tag updates", ex).submit();
             return null;
         });

@@ -38,14 +38,11 @@ public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCom
 
     @Override
     public CompletableFuture<GlobalCombatData> fetchDataAsync(UUID player) {
-        return CompletableFuture.supplyAsync(() -> {
-
-
-
+        return database.getAsyncDslContext().executeAsync(ctx -> {
             final GlobalCombatData data = new GlobalCombatData(player);
 
             try {
-                GetCombatDataRecord combatRecord = GET_COMBAT_DATA(database.getDslContext().configuration(),
+                GetCombatDataRecord combatRecord = GET_COMBAT_DATA(ctx.configuration(),
                         player.toString(),
                         Core.getCurrentRealm().getId())
                         .getFirst();

@@ -49,7 +49,7 @@ public class BlockTagManager {
                 return blockTags;
             }
             return BLOCKTAG_CACHE.get(chunkIdentifier, key -> blockTagRepository.getBlockTagsForChunk(chunk));
-        }).exceptionally(e -> {
+        }, TAG_EXECUTOR).exceptionally(e -> {
             log.error("Failed to get block tags for chunk {}: {}", UtilWorld.chunkToFile(chunk), e).submit();
             return new HashMap<>();
         });
@@ -59,7 +59,7 @@ public class BlockTagManager {
         return CompletableFuture.supplyAsync(() -> {
             Map<Long, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
             return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey("PlayerManipulated");
-        }).exceptionally(e -> {
+        }, TAG_EXECUTOR).exceptionally(e -> {
             log.error("Failed to check if block is player manipulated", e).submit();
             return false;
         });
@@ -80,7 +80,7 @@ public class BlockTagManager {
             CompletableFuture.runAsync(() -> {
                 Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
                 BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
-            }).exceptionally(ex -> {
+            }, TAG_EXECUTOR).exceptionally(ex -> {
                 log.error("Failed to load block tags for chunk " + chunk, ex).submit();
                 return null;
             });
@@ -106,7 +106,7 @@ public class BlockTagManager {
             CompletableFuture.runAsync(() -> {
                 Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
                 BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
-            }).exceptionally(ex -> {
+            }, TAG_EXECUTOR).exceptionally(ex -> {
                 log.error("Failed to load block tags for chunk " + chunk, ex).submit();
                 return null;
             });
@@ -136,7 +136,7 @@ public class BlockTagManager {
             CompletableFuture.runAsync(() -> {
                 Map<Long, Map<String, BlockTag>> blockTags = blockTagRepository.getBlockTagsForChunk(chunk);
                 BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
-            }).exceptionally(ex -> {
+            }, TAG_EXECUTOR).exceptionally(ex -> {
                 log.error("Failed to load block tags for chunk " + chunkIdentifier, ex).submit();
                 return null;
             });

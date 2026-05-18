@@ -98,16 +98,15 @@ public class DatabaseAppender implements LogAppender {
                 log.error("Failed to process batched logs", e).submit();
 
             }
-        }).exceptionally(ex -> {
+        }, LOG_EXECUTOR).exceptionally(ex -> {
             log.error("Failed to process batched logs", ex).submit();
             return null;
         });
     }
 
     private void insertBatchedLogs(List<PendingLogEntry> logEntries) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                database.getDslContext().transaction(config -> {
+        try {
+            database.getDslContext().transaction(config -> {
                     DSLContext ctx = DSL.using(config);
 
                     // Prepare log records
@@ -158,10 +157,6 @@ public class DatabaseAppender implements LogAppender {
             } catch (Exception ex) {
                 log.error("Failed to insert batched logs", ex).submit();
             }
-        }, LOG_EXECUTOR).exceptionally(ex -> {
-            log.error("Failed to insert batched logs in executor", ex).submit();
-            return null;
-        });
     }
 
     /**
