@@ -91,9 +91,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
         valueButton.setSelectedContext(categoryButton.getSelectedFilter().getContext());
         valueButton.getContextValues().clear();
 
-        return CompletableFuture.supplyAsync(() -> {
-            List<KillClanLog> logs = clanManager.getRepository().getClanKillLogs(clan, clanManager);
-
+        return clanManager.getRepository().getClanKillLogs(clan, clanManager).thenApply(logs -> {
             // Populate filter values
             populateFilterValues(logs);
 
@@ -103,8 +101,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                     .map(Item.class::cast)
                     .toList();
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
-            log.error("Error loading clan kill logs for clan: {}", clan.getName(), throwable).submit();
+            log.error("Error loading clan kill logs for clan", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
                     .displayName(Component.text("Error! Check console!"))

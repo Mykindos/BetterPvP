@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.clans.logging.menu;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.logging.button.PlayerButton;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -16,8 +14,8 @@ import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
-import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
+import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -25,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
@@ -70,28 +66,29 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
 
     private CompletableFuture<Boolean> refresh() {
 
-        return CompletableFuture.supplyAsync(() -> {
-            List<UUID> players = clanManager.getRepository().getPlayersByClan(id);
-            List<Client> clients = new ArrayList<>();
-            players.forEach(playerID -> {
-                Optional<Client> clientOptional = clientManager.search().offline(playerID).join();
-                clientOptional.ifPresent(clients::add);
-
-            });
-            return clients.stream()
-                    .map(client -> new PlayerButton(client, clanManager, clientManager, this))
-                    .map(Item.class::cast).toList();
-        }).exceptionally(throwable -> {
-            log.error("Error Players of Clan", throwable).submit();
-            return List.of(new SimpleItem(ItemView.builder()
-                    .material(Material.BARRIER)
-                    .displayName(Component.text("Error! Check console!"))
-                    .lore(Component.text("Please inform staff if you see this"))
-                    .build()));
-        }).thenApply(logs -> {
-            setContent(logs);
-            return true;
-        });
+        return CompletableFuture.completedFuture(true);
+        // TODO this needs to be changed
+        //return clanManager.getRepository().getPlayersByClan(id).thenApply(players -> {
+        //    List<Client> clients = new ArrayList<>();
+        //    players.forEach(playerID -> {
+        //        Optional<Client> clientOptional = clientManager.search().offline(playerID).join();
+        //        clientOptional.ifPresent(clients::add);
+//
+        //    });
+        //    return clients.stream()
+        //            .map(client -> new PlayerButton(client, clanManager, clientManager, this))
+        //            .map(Item.class::cast).toList();
+        //}).exceptionally(throwable -> {
+        //    log.error("Error Players of Clan", throwable).submit();
+        //    return List.of(new SimpleItem(ItemView.builder()
+        //            .material(Material.BARRIER)
+        //            .displayName(Component.text("Error! Check console!"))
+        //            .lore(Component.text("Please inform staff if you see this"))
+        //            .build()));
+        //}).thenApply(logs -> {
+        //    setContent(logs);
+        //    return true;
+        //});
     }
 
     @Override

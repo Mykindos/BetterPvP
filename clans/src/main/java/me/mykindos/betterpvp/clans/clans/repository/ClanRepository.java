@@ -668,19 +668,21 @@ public class ClanRepository implements IRepository<Clan> {
     }
 //endregion
 
-    public List<UUID> getPlayersByClan(long clanID) {
-        List<UUID> playerIDs = new ArrayList<>();
+    public CompletableFuture<List<UUID>> getPlayersByClan(long clanID) {
+        return database.getAsyncDslContext().executeAsync(ctx -> {
+            List<UUID> playerIDs = new ArrayList<>();
 
-        List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLAN, clanID + "", "CLAN_");
-        logs.removeIf(cachedLog -> !cachedLog.getAction().equalsIgnoreCase("CLAN_CREATE")
-                && !cachedLog.getAction().equalsIgnoreCase("CLAN_JOIN"));
+            List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLAN, clanID + "", "CLAN_");
+            logs.removeIf(cachedLog -> !cachedLog.getAction().equalsIgnoreCase("CLAN_CREATE")
+                    && !cachedLog.getAction().equalsIgnoreCase("CLAN_JOIN"));
 
-        logs.forEach(cachedLog -> {
-            String playerID = cachedLog.getContext().get(LogContext.CLIENT);
-            playerIDs.add(UUID.fromString(playerID));
+            logs.forEach(cachedLog -> {
+                String playerID = cachedLog.getContext().get(LogContext.CLIENT);
+                playerIDs.add(UUID.fromString(playerID));
+            });
+
+            return playerIDs;
         });
-
-        return playerIDs;
     }
 
     public Map<Long, String> getClansByPlayer(UUID playerID) {
@@ -722,49 +724,50 @@ public class ClanRepository implements IRepository<Clan> {
      * @param clanManager the ClanManager instance used to fetch clan details and names
      * @return a list of {@code KillClanLog} objects containing detailed information about the clan's kill history
      */
-    public List<KillClanLog> getClanKillLogs(Clan clan, ClanManager clanManager) {
+    public CompletableFuture<List<KillClanLog>> getClanKillLogs(Clan clan, ClanManager clanManager) {
+        return database.getAsyncDslContext().executeAsync(ctx -> {
+            List<KillClanLog> killLogs = Collections.synchronizedList(new ArrayList<>());
 
-        List<KillClanLog> killLogs = Collections.synchronizedList(new ArrayList<>());
+            try {
+                Result<GetClanKillLogsRecord> killLogsRecords = GET_CLAN_KILL_LOGS(ctx.configuration(), clan.getId());
 
-        try {
-            Result<GetClanKillLogsRecord> killLogsRecords = GET_CLAN_KILL_LOGS(database.getDslContext().configuration(), clan.getId());
+                killLogsRecords.forEach(killLogRecord -> {
+                    long killerId = killLogRecord.getKiller();
+                    String killerName = killLogRecord.getKillerName();
+                    Long killerClanId = killLogRecord.getKillerClan();
 
-            killLogsRecords.forEach(killLogRecord -> {
-                long killerId = killLogRecord.getKiller();
-                String killerName = killLogRecord.getKillerName();
-                Long killerClanId = killLogRecord.getKillerClan();
+                    Optional<Clan> killerClan = killerClanId == null
+                            ? Optional.empty()
+                            : clanManager.getClanById(killerClanId);
+                    String killerClanName = killerClan
+                            .map(Clan::getName)
+                            .orElse("");
 
-                Optional<Clan> killerClan = killerClanId == null
-                        ? Optional.empty()
-                        : clanManager.getClanById(killerClanId);
-                String killerClanName = killerClan
-                        .map(Clan::getName)
-                        .orElse("");
+                    long victimId = killLogRecord.getVictim();
+                    String victimName = killLogRecord.getVictimName();
+                    Long victimClanId = killLogRecord.getVictimClan();
 
-                long victimId = killLogRecord.getVictim();
-                String victimName = killLogRecord.getVictimName();
-                Long victimClanId = killLogRecord.getVictimClan();
+                    Optional<Clan> victimClan = victimClanId == null
+                            ? Optional.empty()
+                            : clanManager.getClanById(victimClanId);
+                    String victimClanName = victimClan
+                            .map(Clan::getName)
+                            .orElse("");
 
-                Optional<Clan> victimClan = victimClanId == null
-                        ? Optional.empty()
-                        : clanManager.getClanById(victimClanId);
-                String victimClanName = victimClan
-                        .map(Clan::getName)
-                        .orElse("");
+                    double dominance = killLogRecord.getDominance();
+                    long time = killLogRecord.getTimeVal();
 
-                double dominance = killLogRecord.getDominance();
-                long time = killLogRecord.getTimeVal();
-
-                killLogs.add(new KillClanLog(killerName, killerId, killerClanName, killerClan.orElse(null),
-                        victimName, victimId, victimClanName, victimClan.orElse(null),
-                        dominance, time));
-            });
+                    killLogs.add(new KillClanLog(killerName, killerId, killerClanName, killerClan.orElse(null),
+                            victimName, victimId, victimClanName, victimClan.orElse(null),
+                            dominance, time));
+                });
 
 
-        } catch (DataAccessException ex) {
-            log.error("Failed to get ClanUUID logs", ex).submit();
-        }
+            } catch (DataAccessException ex) {
+                log.error("Failed to get ClanUUID logs", ex).submit();
+            }
 
-        return killLogs;
+            return killLogs;
+        });
     }
 }
