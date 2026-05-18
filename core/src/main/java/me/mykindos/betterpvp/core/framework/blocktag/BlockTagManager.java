@@ -56,10 +56,9 @@ public class BlockTagManager {
     }
 
     public CompletableFuture<Boolean> isPlayerManipulated(Block block) {
-        return CompletableFuture.supplyAsync(() -> {
-            Map<Long, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
+        return getBlockTags(block.getChunk()).thenApply(blockTags -> {
             return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey("PlayerManipulated");
-        }, TAG_EXECUTOR).exceptionally(e -> {
+        }).exceptionally(e -> {
             log.error("Failed to check if block is player manipulated", e).submit();
             return false;
         });
@@ -151,12 +150,10 @@ public class BlockTagManager {
      * @param blockTag The tag that will be associated with the block.
      */
     public void addBlockTag(Block block, BlockTag blockTag) {
-        CompletableFuture.runAsync(() -> {
-            Map<Long, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
+        getBlockTags(block.getChunk()).thenAccept(blockTags -> {
             blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).put(blockTag.getTag(), blockTag);
-
-             blockTagRepository.addBlockTag(block, blockTag);
-        }, TAG_EXECUTOR).exceptionally(ex -> {
+            blockTagRepository.addBlockTag(block, blockTag);
+        }).exceptionally(ex -> {
             log.error("Failed to add block tag", ex).submit();
             return null;
         });
@@ -171,11 +168,10 @@ public class BlockTagManager {
      * @param tag The tag to remove from the specified block.
      */
     public void removeBlockTag(Block block, String tag) {
-        CompletableFuture.runAsync(() -> {
-            Map<Long, Map<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
+        getBlockTags(block.getChunk()).thenAccept(blockTags -> {
             blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).remove(tag);
             blockTagRepository.removeBlockTag(block, tag);
-        }, TAG_EXECUTOR).exceptionally(ex -> {
+        }).exceptionally(ex -> {
             log.error("Failed to remove block tag", ex).submit();
             return null;
         });

@@ -251,20 +251,14 @@ public class WorldLogRepository {
     public void purgeLogs(int days) {
         Instant cutoff = Instant.now().minusSeconds(days * 24L * 60L * 60L);
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                DSLContext ctx = database.getDslContext();
+        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+            int deletedRows = ctx.deleteFrom(WORLD_LOGS)
+                    .where(WORLD_LOGS.REALM.eq(Core.getCurrentRealm().getId()))
+                    .and(WORLD_LOGS.TIME.le(cutoff.toEpochMilli()))
+                    .limit(50000)
+                    .execute();
 
-                int deletedRows = ctx.deleteFrom(WORLD_LOGS)
-                        .where(WORLD_LOGS.REALM.eq(Core.getCurrentRealm().getId()))
-                        .and(WORLD_LOGS.TIME.le(cutoff.toEpochMilli()))
-                        .limit(50000)
-                        .execute();
-
-                log.info("Finished purging world_logs, deleted {} rows", deletedRows).submit();
-            } catch (Exception ex) {
-                log.error("Failed to purge world_logs", ex).submit();
-            }
+            log.info("Finished purging world_logs, deleted {} rows", deletedRows).submit();
         }).exceptionally(ex -> {
             log.error("Failed to purge world logs", ex).submit();
             return null;
