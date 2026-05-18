@@ -380,7 +380,10 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
      * client-side break attempts.
      */
     private void completeBreak(Player player, Block block, BreakSession session, boolean instant) {
-        final boolean targetSmartBlock = smartBlockFactory.isTargetSmartBlock(player);
+        final boolean targetSmartBlock = smartBlockFactory.isSmartBlock(block);
+        session.setProgress(0.0);
+        session.setLastStageSent(-1);
+        clearOverlay(session);
 
         // Idempotency guard: tick() and the runTask-scheduled dispatchBlockDamage can both
         // try to complete the same instant break on the same tick. Whoever runs first
@@ -393,11 +396,6 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
 
         final int sequence = lastDigSequence.getOrDefault(session.getPlayerId(), -1);
         final boolean broke = breakBlock(player, block, targetSmartBlock, sequence);
-
-        session.setProgress(0.0);
-        session.setLastStageSent(-1);
-        clearOverlay(session);
-
         if (!instant || !broke) {
             nextAllowedProgressMillis.put(
                     session.getPlayerId(),
@@ -906,7 +904,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         }
 
         // breakBlock handles both the post-break ack and the fail-restore+ack.
-        if (!breakBlock(player, block, smartBlockFactory.isTargetSmartBlock(player), sequence)) {
+        if (!breakBlock(player, block, smartBlockFactory.isSmartBlock(block), sequence)) {
             return;
         }
 

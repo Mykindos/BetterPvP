@@ -11,8 +11,6 @@ import org.bukkit.Chunk;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Manages the caching layer for SmartBlock data.
@@ -91,25 +89,5 @@ public class SmartBlockDataCache {
                 .toList();
     }
 
-    /**
-     * Processes loaded chunk data and adds it to the cache.
-     * @param chunkData the chunk data to process
-     * @param validator function to validate block instances
-     */
-    public void processLoadedChunkData(Map<Long, SmartBlockData<?>> chunkData,
-                                     Function<SmartBlockInstance, Boolean> validator) {
-        for (Map.Entry<Long, SmartBlockData<?>> entry : chunkData.entrySet()) {
-            SmartBlockData<?> data = entry.getValue();
-            SmartBlockInstance instance = data.getBlockInstance();
-            if (validator.apply(instance)) {
-                String cacheKey = getCacheKey(instance);
-                dataCache.put(cacheKey, data);
-            } else {
-                // Invalid data - remove from storage
-                dataStorage.remove(instance);
-                log.info("Deleted invalid smart block data at {}", instance.getHandle().getLocation()).submit();
-            }
-        }
-    }
 }
 
