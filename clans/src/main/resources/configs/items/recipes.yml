@@ -1,7 +1,7 @@
 disabled:
   # Disable vanilla recipes that produce these materials (disables ALL recipes for that material).
   # Use Bukkit Material enum names, e.g.: OAK_BOAT, DIAMOND_SWORD
-  materials: []
+  materials:
 
   # Disable specific vanilla recipes by their full NamespacedKey, e.g.: minecraft:oak_boat
   keys:
@@ -26,4 +26,11 @@ disabled:
     - minecraft:shield
     - minecraft:golden_apple
     - minecraft:anvil
-
+    - minecraft:crosbow
+    - minecraft:wooden_spear
+    - minecraft:stone_spear
+    - minecraft:golden_spear
+    - minecraft:iron_spear
+    - minecraft:diamond_spear
+    - minecraft:copper_spear
+    - minecraft:netherite_spear
