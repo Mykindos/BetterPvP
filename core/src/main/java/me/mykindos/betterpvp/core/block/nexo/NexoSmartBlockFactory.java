@@ -4,9 +4,17 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nexomc.nexo.api.NexoBlocks;
 import com.nexomc.nexo.api.NexoFurniture;
+import com.nexomc.nexo.api.events.custom_block.NexoBlockBreakEvent;
+import com.nexomc.nexo.api.events.custom_block.chorusblock.NexoChorusBlockBreakEvent;
+import com.nexomc.nexo.api.events.custom_block.noteblock.NexoNoteBlockBreakEvent;
+import com.nexomc.nexo.api.events.custom_block.stringblock.NexoStringBlockBreakEvent;
+import com.nexomc.nexo.api.events.furniture.NexoFurnitureBreakEvent;
 import com.nexomc.nexo.mechanics.Mechanic;
 import com.nexomc.nexo.mechanics.breakable.Breakable;
 import com.nexomc.nexo.mechanics.custom_block.CustomBlockMechanic;
+import com.nexomc.nexo.mechanics.custom_block.chorusblock.ChorusBlockMechanic;
+import com.nexomc.nexo.mechanics.custom_block.noteblock.NoteBlockMechanic;
+import com.nexomc.nexo.mechanics.custom_block.stringblock.StringBlockMechanic;
 import com.nexomc.nexo.mechanics.furniture.FurnitureMechanic;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockBreakOverride;
@@ -30,6 +38,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -133,6 +142,13 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
         });
     }
 
+    public Optional<SmartBlockInstance> from(Entity entity) {
+        return mechanic(entity).map(mechanic -> {
+            final SmartBlock smartBlock = getBlock(mechanic.getItemID());
+            return create(smartBlock, entity.getLocation(), mechanic);
+        });
+    }
+
     @Override
     public Optional<SmartBlockInstance> fromTarget(Player player) {
         final AttributeInstance attribute = Objects.requireNonNull(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE));
@@ -168,13 +184,6 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
             double distB = b.getLocation().distanceSquared(block.getLocation());
             return Double.compare(distA, distB);
         }).flatMap(this::from);
-    }
-
-    public Optional<SmartBlockInstance> from(Entity entity) {
-        return mechanic(entity).map(mechanic -> {
-            final SmartBlock smartBlock = getBlock(mechanic.getItemID());
-            return create(smartBlock, entity.getLocation(), mechanic);
-        });
     }
 
     @Override
@@ -306,7 +315,10 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
         }
 
         final Location location = instance.getLocation();
-        final CustomBlockMechanic customBlockMechanic = NexoBlocks.customBlockMechanic(location.getBlock());
+        final Block block = location.getBlock();
+        final BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+
+        final CustomBlockMechanic customBlockMechanic = NexoBlocks.customBlockMechanic(block);
         if (customBlockMechanic != null) {
             if (customBlockMechanic.hasBlockSounds() && Objects.requireNonNull(customBlockMechanic.getBlockSounds()).hasBreakSound()) {
                 final String sound = Objects.requireNonNull(customBlockMechanic.getBlockSounds().getBreakSound());
@@ -314,16 +326,48 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
                 final float volume = customBlockMechanic.getBlockSounds().getBreakVolume();
                 player.playSound(location, sound, pitch, volume);
             }
+
+            blockBreakEvent.callEvent();
+            if (blockBreakEvent.isCancelled()) {
+                return false;
+            }
+
+            NexoBlockBreakEvent nexoEvent;
+            if (customBlockMechanic instanceof ChorusBlockMechanic chorusBlockMechanic) {
+                nexoEvent = new NexoChorusBlockBreakEvent(chorusBlockMechanic, block, player);
+            } else if (customBlockMechanic instanceof NoteBlockMechanic noteBlockMechanic) {
+                nexoEvent = new NexoNoteBlockBreakEvent(noteBlockMechanic, block, player);
+            } else if (customBlockMechanic instanceof StringBlockMechanic stringBlockMechanic) {
+                nexoEvent = new NexoStringBlockBreakEvent(stringBlockMechanic, block, player);
+            } else {
+                nexoEvent = new NexoBlockBreakEvent(customBlockMechanic, block, player);
+            }
+            nexoEvent.callEvent();
+            if (nexoEvent.isCancelled()) {
+                return false;
+            }
             return NexoBlocks.remove(location, player);
         }
 
-        final FurnitureMechanic mechanic = NexoFurniture.furnitureMechanic(location.getBlock());
+        final ItemDisplay display = NexoFurniture.baseEntity(block);
+        final FurnitureMechanic mechanic = NexoFurniture.furnitureMechanic(display);
         if (mechanic != null) {
             if (mechanic.getHasBlockSounds() && Objects.requireNonNull(mechanic.getBlockSounds()).hasBreakSound()) {
                 final String sound = Objects.requireNonNull(mechanic.getBlockSounds().getBreakSound());
                 final float pitch = mechanic.getBlockSounds().getBreakPitch();
                 final float volume = mechanic.getBlockSounds().getBreakVolume();
                 player.playSound(location, sound, pitch, volume);
+            }
+
+            blockBreakEvent.callEvent();
+            if (blockBreakEvent.isCancelled()) {
+                return false;
+            }
+
+            final NexoFurnitureBreakEvent event = new NexoFurnitureBreakEvent(mechanic, display, player);
+            event.callEvent();
+            if (event.isCancelled()) {
+                return false;
             }
             return NexoFurniture.remove(location, player);
         }

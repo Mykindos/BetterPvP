@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
 import me.mykindos.betterpvp.core.block.data.RemovalHandler;
@@ -37,11 +36,11 @@ public class SmartBlockDataManager {
     private final SmartBlockDataProvider provider;
 
     @Inject
-    private SmartBlockDataManager(SmartBlockDataStorage dataStorage, SmartBlockFactory blockFactory, Core plugin) {
+    private SmartBlockDataManager(SmartBlockDataStorage dataStorage, Core plugin) {
         this.dataStorage = dataStorage;
         this.plugin = plugin;
         this.cache = new SmartBlockDataCache(dataStorage);
-        this.chunkManager = new SmartBlockDataChunkManager(cache, dataStorage, blockFactory, plugin);
+        this.chunkManager = new SmartBlockDataChunkManager(cache, dataStorage, plugin);
         this.provider = new SmartBlockDataProvider(cache, this);
     }
 

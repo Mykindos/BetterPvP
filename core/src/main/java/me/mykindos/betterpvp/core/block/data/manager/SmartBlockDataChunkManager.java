@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.block.data.manager;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.LoadHandler;
 import me.mykindos.betterpvp.core.block.data.SmartBlockData;
@@ -13,9 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,19 +24,16 @@ public class SmartBlockDataChunkManager {
 
     private final SmartBlockDataCache cache;
     private final SmartBlockDataStorage storage;
-    private final SmartBlockFactory blockFactory;
     private final Core plugin;
-    
+
     // Track chunks currently being loaded to prevent duplicate loading operations
     private final Set<Long> loadingChunks = ConcurrentHashMap.newKeySet();
 
-    public SmartBlockDataChunkManager(SmartBlockDataCache cache, 
-                                    SmartBlockDataStorage storage, 
-                                    SmartBlockFactory blockFactory, 
+    public SmartBlockDataChunkManager(SmartBlockDataCache cache,
+                                    SmartBlockDataStorage storage,
                                     Core plugin) {
         this.cache = cache;
         this.storage = storage;
-        this.blockFactory = blockFactory;
         this.plugin = plugin;
     }
 
@@ -81,24 +75,25 @@ public class SmartBlockDataChunkManager {
      * @param chunk the chunk to load
      */
     private void loadChunkAsync(Chunk chunk) {
-        long chunkKey = chunk.getChunkKey();
-        
-        storage.loadChunk(chunk).thenAcceptAsync(chunkData -> {
-            try {
-                processLoadedChunkData(chunkData);
-            } finally {
-                // Always remove from loading set when done
-                loadingChunks.remove(chunkKey);
-            }
-        }).exceptionally(ex -> {
-            try {
-                log.error("Failed to load chunk data for chunk {},{}", chunk.getX(), chunk.getZ(), ex).submit();
-                return null;
-            } finally {
-                // Always remove from loading set when done
-                loadingChunks.remove(chunkKey);
-            }
-        });
+        final long chunkKey = chunk.getChunkKey();
+
+        // Process on the main thread once the data future settles. Post-load processing needs
+        // the main thread anyway (block/entity access, display spawning), and doing it here
+        // deterministically — rather than on a pooled thread that then blocks on the main
+        // thread — both removes the runTask+join anti-pattern and guarantees onLoad runs.
+        storage.loadChunk(chunk).whenComplete((chunkData, throwable) ->
+                UtilServer.runTask(plugin, () -> {
+                    try {
+                        if (throwable != null) {
+                            log.error("Failed to load chunk data for chunk {},{}",
+                                    chunk.getX(), chunk.getZ(), throwable).submit();
+                        } else {
+                            processLoadedChunkData(chunkData);
+                        }
+                    } finally {
+                        loadingChunks.remove(chunkKey);
+                    }
+                }));
     }
 
     /**
@@ -165,28 +160,18 @@ public class SmartBlockDataChunkManager {
      * @param chunkData the chunk data to process
      */
     private void processLoadedChunkData(Map<Long, SmartBlockData<?>> chunkData) {
-        cache.processLoadedChunkData(chunkData, this::verifySmartBlock);
-        
-        // Trigger load handlers for valid blocks
+        // Runs on the main thread (see loadChunkAsync). Every instance here was already
+        // resolved against the live world while loading (furniture entity present + stored
+        // type matched + DataHolder) — see DatabaseSmartBlockDataStorage#resolveRow. A second
+        // resolution here would only reintroduce the entity-load timing / resolver-identity
+        // race, so we trust the resolved instance: cache it and fire its load handler.
         for (SmartBlockData<?> data : chunkData.values()) {
-            SmartBlockInstance instance = data.getBlockInstance();
-            if (verifySmartBlock(instance) && data.get() instanceof LoadHandler loadHandler) {
-                UtilServer.runTask(plugin, () -> loadHandler.onLoad(instance));
+            final SmartBlockInstance instance = data.getBlockInstance();
+            cache.getCache().put(cache.getCacheKey(instance), data);
+            if (data.get() instanceof LoadHandler loadHandler) {
+                loadHandler.onLoad(instance);
             }
         }
-    }
-
-    /**
-     * Verifies that a smart block instance is still valid.
-     * @param instance the instance to verify
-     * @return true if valid, false otherwise
-     */
-    private boolean verifySmartBlock(SmartBlockInstance instance) {
-        var block = instance.getHandle();
-        final CompletableFuture<Optional<SmartBlockInstance>> future = new CompletableFuture<>();
-        UtilServer.runTask(plugin, () -> future.complete(blockFactory.load(block)));
-        Optional<SmartBlockInstance> currentInstance = future.join();
-        return currentInstance.isPresent() && currentInstance.get().getType().equals(instance.getType());
     }
 
     /**

@@ -5,11 +5,12 @@ import lombok.CustomLog;
 import org.bukkit.Chunk;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 
 /**
@@ -20,18 +21,19 @@ import java.util.function.Function;
 @CustomLog
 public class SmartBlockChunkLoadingService {
 
-    // Semaphore to limit concurrent chunk loading operations to prevent thread exhaustion
-    private final Semaphore chunkLoadingSemaphore;
-    
+    // Throttles concurrent chunk loading. Acquisition is non-blocking (returns a future) so that
+    // no pooled thread is ever parked here while the permit-release path also needs that pool.
+    private final AsyncSemaphore chunkLoadingSemaphore;
+
     // Track chunks currently being loaded to prevent duplicate loading operations
     private final Set<Long> loadingChunks = ConcurrentHashMap.newKeySet();
-    
+
     // Track in-flight loading futures to avoid duplicate work
     private final Map<Long, CompletableFuture<?>> loadingFutures = new ConcurrentHashMap<>();
 
     public SmartBlockChunkLoadingService() {
         // Limit to 10 concurrent chunk loading operations to prevent thread pool exhaustion
-        this.chunkLoadingSemaphore = new Semaphore(10);
+        this.chunkLoadingSemaphore = new AsyncSemaphore(10);
     }
 
     /**
@@ -72,33 +74,25 @@ public class SmartBlockChunkLoadingService {
     }
 
     /**
-     * Acquires a semaphore permit and performs the chunk loading.
-     * 
+     * Acquires a permit (without blocking any thread) and performs the chunk loading,
+     * releasing the permit once the whole pipeline settles.
+     *
      * @param chunk the chunk to load
      * @param loader the loader function
      * @return CompletableFuture containing the result
      * @param <T> the return type
      */
-    private <T> CompletableFuture<T> acquirePermitAndLoad(@NotNull Chunk chunk, 
-                                                         @NotNull Function<Chunk, CompletableFuture<T>> loader) {
-        long chunkKey = chunk.getChunkKey();
-        
-        return CompletableFuture
-            .supplyAsync(() -> {
-                try {
-                    chunkLoadingSemaphore.acquire();
-                    loadingChunks.add(chunkKey);
-                    return null;
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Interrupted while waiting for chunk loading permit", e);
-                }
-            })
+    private <T> CompletableFuture<T> acquirePermitAndLoad(@NotNull Chunk chunk,
+                                                          @NotNull Function<Chunk, CompletableFuture<T>> loader) {
+        final long chunkKey = chunk.getChunkKey();
+
+        return chunkLoadingSemaphore.acquire()
             .thenCompose(ignored -> {
+                loadingChunks.add(chunkKey);
                 try {
                     return loader.apply(chunk);
                 } catch (Exception e) {
-                    return CompletableFuture.failedFuture(e);
+                    return CompletableFuture.<T>failedFuture(e);
                 }
             })
             .whenComplete((result, throwable) -> {
@@ -148,5 +142,56 @@ public class SmartBlockChunkLoadingService {
     public CompletableFuture<Void> waitForAllLoading() {
         CompletableFuture<?>[] futures = loadingFutures.values().toArray(new CompletableFuture[0]);
         return CompletableFuture.allOf(futures);
+    }
+
+    /**
+     * A counting semaphore whose {@link #acquire()} hands back a {@link CompletableFuture} instead
+     * of blocking the caller. This is essential here: permits are released from pooled threads, and
+     * blocking a pool thread inside {@code acquire()} while the release path also depends on that
+     * pool produces a thread-starvation deadlock. A permit is transferred directly to the next
+     * waiter on {@link #release()}, so a runnable waiter is never starved by the permit count.
+     */
+    private static final class AsyncSemaphore {
+
+        private final int maxPermits;
+        private final Deque<CompletableFuture<Void>> waiters = new ArrayDeque<>();
+        private int permits;
+
+        AsyncSemaphore(int permits) {
+            this.maxPermits = permits;
+            this.permits = permits;
+        }
+
+        CompletableFuture<Void> acquire() {
+            synchronized (this) {
+                if (permits > 0) {
+                    permits--;
+                    return CompletableFuture.completedFuture(null);
+                }
+                final CompletableFuture<Void> waiter = new CompletableFuture<>();
+                waiters.addLast(waiter);
+                return waiter;
+            }
+        }
+
+        void release() {
+            final CompletableFuture<Void> next;
+            synchronized (this) {
+                next = waiters.pollFirst();
+                if (next == null) {
+                    if (permits < maxPermits) {
+                        permits++;
+                    }
+                    return;
+                }
+            }
+            // Completed outside the lock so the waiter's continuation (the chunk loader) never
+            // runs while this monitor is held.
+            next.complete(null);
+        }
+
+        synchronized int availablePermits() {
+            return permits;
+        }
     }
 }
