@@ -22,7 +22,7 @@ import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessCom
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.ElderwoodCore;
 import me.mykindos.betterpvp.core.item.impl.MagicEssence;
 import me.mykindos.betterpvp.core.item.impl.MagicSeal;
 import me.mykindos.betterpvp.core.item.impl.PolariteChunk;
@@ -93,7 +93,7 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
                                 ItemFactory itemFactory,
                                 MagicEssence magicEssence,
                                 MagicSeal magicSeal,
-                                DurakHandle durakHandle,
+                                ElderwoodCore elderwoodCore,
                                 PolariteChunk polariteChunk) {
         if (registered) return;
         registered = true;
@@ -106,7 +106,7 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
         builder.setIngredient('P', new RecipeIngredient(polariteChunk, 1));
         builder.setIngredient('E', new RecipeIngredient(magicEssence, 1));
         builder.setIngredient('S', new RecipeIngredient(magicSeal, 1));
-        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        builder.setIngredient('D', new RecipeIngredient(elderwoodCore, 1));
         registry.registerRecipe(new NamespacedKey("progression", "runed_pickaxe"), builder.build());
     }
 }
