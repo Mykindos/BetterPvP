@@ -30,7 +30,7 @@ public class GoldenYieldAttribute implements IProfessionAttribute {
 
     @Override
     public String getOperation() {
-        return "";
+        return "%";
     }
 
     public double getBonusYield(Player player) {
