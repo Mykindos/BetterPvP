@@ -85,8 +85,12 @@ public class WoodcuttingListener implements Listener {
 
         if (!woodcuttingHandler.getExperiencePerWood().containsKey(blockType)) return;
 
-        ItemStack toolUsed = event.getPlayer().getInventory().getItemInMainHand();
         Block choppedLogBlock = event.getBlock();
+
+        // Only grant XP and trigger drops for naturally generated logs, not player-placed ones
+        if (blockTagManager.isPlayerPlaced(choppedLogBlock)) return;
+
+        ItemStack toolUsed = event.getPlayer().getInventory().getItemInMainHand();
         PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(
                 new PlayerChopLogEvent(event.getPlayer(), blockType, choppedLogBlock, toolUsed));
 
