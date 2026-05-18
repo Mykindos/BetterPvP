@@ -7,7 +7,10 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.database.jooq.tables.records.ProgressionWoodcuttingRecord;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,9 +20,13 @@ import org.jooq.impl.DSL;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENTS;
 import static me.mykindos.betterpvp.progression.database.jooq.Tables.PROGRESSION_WOODCUTTING;
@@ -31,13 +38,40 @@ public class WoodcuttingRepository {
     private final Database database;
     private final ClientManager clientManager;
     private final ProfessionProfileManager profileManager;
+    private final Queue<ProgressionWoodcuttingRecord> queuedChoppedLogs = new ConcurrentLinkedQueue<>();
 
     @Inject
-    public WoodcuttingRepository(Database database, ClientManager clientManager, ProfessionProfileManager profileManager) {
+    public WoodcuttingRepository(Database database, ClientManager clientManager, ProfessionProfileManager profileManager, Progression progression) {
         this.database = database;
         this.clientManager = clientManager;
         this.profileManager = profileManager;
         createPartitions();
+
+        UtilServer.runTaskTimer(progression, () -> processQueuedChoppedLogs(true), 600L, 600L);
+    }
+
+    public void processQueuedChoppedLogs(boolean async) {
+        if (queuedChoppedLogs.isEmpty()) {
+            return;
+        }
+
+        List<ProgressionWoodcuttingRecord> logsToSave = new ArrayList<>();
+        while (!queuedChoppedLogs.isEmpty() && logsToSave.size() < 500) {
+            logsToSave.add(queuedChoppedLogs.poll());
+        }
+
+        if (async) {
+            database.getAsyncDslContext().executeAsyncVoid(ctx -> {
+                ctx.batchInsert(logsToSave).execute();
+                log.info("Saved {} chopped logs asynchronously", logsToSave.size());
+            }).exceptionally(ex -> {
+                log.error("Failed to batch insert chopped logs", ex).submit();
+                return null;
+            });
+        } else {
+            database.getDslContext().batchInsert(logsToSave).execute();
+        }
+
     }
 
     public void createPartitions() {
@@ -55,21 +89,18 @@ public class WoodcuttingRepository {
     }
 
     public void saveChoppedLog(Player player, Material material, Location location, int amount) {
-        database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            Client client = clientManager.search().online(player);
+        Client client = clientManager.search().online(player);
+        if (client == null) return;
 
-            ctx.insertInto(PROGRESSION_WOODCUTTING)
-                    .set(PROGRESSION_WOODCUTTING.CLIENT, client.getId())
-                    .set(PROGRESSION_WOODCUTTING.SEASON, Core.getCurrentRealm().getSeason().getId())
-                    .set(PROGRESSION_WOODCUTTING.MATERIAL, material.name())
-                    .set(PROGRESSION_WOODCUTTING.LOCATION, UtilWorld.locationToString(location))
-                    .set(PROGRESSION_WOODCUTTING.AMOUNT, amount)
-                    .execute();
-        }).exceptionally(ex -> {
-            log.error("Failed to save chopped log for " + player.getUniqueId(), ex).submit();
-            return null;
-        });
+        ProgressionWoodcuttingRecord record = new ProgressionWoodcuttingRecord();
+        record.setClient(client.getId());
+        record.setSeason(Core.getCurrentRealm().getSeason().getId());
+        record.setMaterial(material.name());
+        record.setLocation(UtilWorld.locationToString(location));
+        record.setAmount(amount);
+        record.setTimestamp(System.currentTimeMillis());
 
+        queuedChoppedLogs.add(record);
     }
 
     /**

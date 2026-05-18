@@ -539,10 +539,8 @@ public class ClientSQLLayer {
      */
     private CompletableFuture<Void> executeQueriesAsTransaction(@Nullable List<Query> queries, boolean async) {
         if (queries == null || queries.isEmpty()) {
-            System.out.println("B");
             return CompletableFuture.completedFuture(null);
         }
-        System.out.println("A");
         try {
             if (async) {
                 return database.getAsyncDslContext().executeAsyncVoid(ctx -> {

@@ -28,6 +28,7 @@ import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoad
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.FishLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
+import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.SkillTreeAccessProvider;
 import me.mykindos.betterpvp.progression.profession.skill.fishing.expertbaiter.ExpertBaiterAccessProvider;
@@ -136,6 +137,7 @@ public class Progression extends BPvPPlugin {
     public void onDisable() {
         injector.getInstance(FishingRepository.class).saveAllFish(false);
         injector.getInstance(ProfessionProfileRepository.class).processStatUpdates(false);
+        injector.getInstance(WoodcuttingRepository.class).processQueuedChoppedLogs(false);
     }
 
 }
