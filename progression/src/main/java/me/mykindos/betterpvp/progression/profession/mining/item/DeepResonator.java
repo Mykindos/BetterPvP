@@ -22,7 +22,7 @@ import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityCompo
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DivineAmulet;
-import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.ElderwoodCore;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.VoidSphere;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
@@ -96,7 +96,7 @@ public class DeepResonator extends BaseItem implements Reloadable {
                                 ItemFactory itemFactory,
                                 DivineAmulet divineAmulet,
                                 VoidSphere voidSphere,
-                                DurakHandle durakHandle,
+                                ElderwoodCore elderwoodCore,
                                 OverchargedCrystal overchargedCrystal) {
         if (registered) return;
         registered = true;
@@ -109,7 +109,7 @@ public class DeepResonator extends BaseItem implements Reloadable {
         builder.setIngredient('V', new RecipeIngredient(voidSphere, 1));
         builder.setIngredient('A', new RecipeIngredient(divineAmulet, 1));
         builder.setIngredient('O', new RecipeIngredient(overchargedCrystal, 1));
-        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        builder.setIngredient('D', new RecipeIngredient(elderwoodCore, 1));
         registry.registerRecipe(new NamespacedKey("progression", "deep_resonator"), builder.build());
     }
 }

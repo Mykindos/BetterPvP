@@ -9,13 +9,13 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.ElderwoodCore;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.RazorEdge;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
@@ -85,7 +85,8 @@ public class HyperAxe extends WeaponItem implements Reloadable {
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
-                                RazorEdge razorEdge, OverchargedCrystal overchargedCrystal) {
+                                RazorEdge razorEdge, OverchargedCrystal overchargedCrystal,
+                                ElderwoodCore elderwoodCore) {
         if (registered) return;
         registered = true;
         String[] pattern = new String[] {
@@ -93,11 +94,10 @@ public class HyperAxe extends WeaponItem implements Reloadable {
                 " SR",
                 "S"
         };
-        final BaseItem stick = itemFactory.getFallbackItem(Material.STICK);
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('R', new RecipeIngredient(razorEdge, 1));
         builder.setIngredient('O', new RecipeIngredient(overchargedCrystal, 1));
-        builder.setIngredient('S', new RecipeIngredient(stick, 1));
+        builder.setIngredient('S', new RecipeIngredient(elderwoodCore, 1));
         registry.registerRecipe(new NamespacedKey("champions", "hyper_axe"), builder.build());
     }
 } 
