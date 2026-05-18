@@ -784,16 +784,25 @@ public class UtilBlock {
     }
 
     /**
-     * Retrieves a block from the world using a unique key.
-     * @param key the unique key representing the block's coordinates, must not be negative
+     * Retrieves a block from the world using a key produced by {@link #getBlockKey(Block)}.
+     * <p>
+     * {@code getBlockKey} packs {@code block.getX() % 16} / {@code block.getZ() % 16} (Java's
+     * {@code %} keeps the sign, so blocks in negative chunks store a negative remainder) and the
+     * raw (possibly negative) {@code block.getY()}. Decoding therefore must sign-interpret each
+     * field and {@link Math#floorMod} the horizontal components back into {@code 0-15}; reading
+     * them as unsigned (the previous behaviour) yields out-of-range coordinates for any block in
+     * a negative-coordinate chunk or below {@code y=0}. This is backward compatible: the encoding
+     * is unchanged, so existing stored keys decode correctly.
+     *
+     * @param key the unique key representing the block's coordinates
      * @param chunk the chunk in which the block is located, must not be null
-     * @return the block corresponding to the given key, or null if the key is invalid
+     * @return the block corresponding to the given key
      */
     public static Block getBlockByKey(long key, Chunk chunk) {
-        final long y = key & 0xFFFF;
-        final long x = (key >> 16) & 0xFF;
-        final long z = (key >> 24) & 0xFF;
-        return chunk.getBlock((int) x, (int) y, (int) z);
+        final int y = (short) (key & 0xFFFF);
+        final int x = Math.floorMod((byte) ((key >> 16) & 0xFF), 16);
+        final int z = Math.floorMod((byte) ((key >> 24) & 0xFF), 16);
+        return chunk.getBlock(x, y, z);
     }
 
     public static void playBlockEffect(@NotNull Block block, @NotNull BlockData data) {
