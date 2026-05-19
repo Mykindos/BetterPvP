@@ -18,15 +18,11 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
@@ -168,7 +164,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             double damage = calculateDamage(player, target, data);
             UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), damage, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("<yellow>%s</yellow> hit you with <green>%s %s</green>", player.getName(), getName(), level));
+                UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <green>%s %s</green>", UtilServer.callEvent(new DisplayNameEvent(player, damagee)).getDisplayName(), getName(), level);
             }
         }
 

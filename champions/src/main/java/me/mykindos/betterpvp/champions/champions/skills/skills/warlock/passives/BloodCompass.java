@@ -9,28 +9,19 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkil
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -78,7 +69,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
         return (numLines + (level - 1));
     }
 
-    public int getEffectDuration(int level){
+    public int getEffectDuration(int level) {
         return effectDuration + level * effectDurationIncreasePerLevel;
     }
 
@@ -249,8 +240,9 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                     show(player, nearbyAllies, target);
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    UtilMessage.message(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + "</alt>.");
-                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
+
+                    UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(player, target)).getDisplayName(), getName(), level);
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(target, player)).getDisplayName(), getName(), level);
 
                     new BukkitRunnable() {
                         @Override

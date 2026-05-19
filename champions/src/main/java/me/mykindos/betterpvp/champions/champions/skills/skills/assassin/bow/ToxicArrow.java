@@ -10,11 +10,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -100,9 +102,9 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         championsManager.getEffects().addEffect(target, EffectTypes.POISON, poisonStrength, (long) ((baseDuration + level) * 1000L));
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <green>%s %s</green>.", UtilServer.callEvent(new DisplayNameEvent(target, damager)).getDisplayName(), getName(), level);
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damager, damagee)).getDisplayName(), getName(), level);
     }
 
     @Override

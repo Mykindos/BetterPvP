@@ -20,10 +20,12 @@ import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -136,7 +138,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
             if (ent instanceof Player target) {
-                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used <green>%s %d</green>", player.getName(), getName(), level);
+                UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> used <green>%s %d</green>", UtilServer.callEvent(new DisplayNameEvent(player, target)).getDisplayName(), getName(), level);
             }
 
             active.remove(player.getUniqueId());

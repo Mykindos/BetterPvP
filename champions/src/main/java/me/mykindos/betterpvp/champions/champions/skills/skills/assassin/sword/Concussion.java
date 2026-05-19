@@ -14,9 +14,11 @@ import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -86,14 +88,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         if (active.contains(damager.getUniqueId())) {
             event.addReason("Concussion");
             if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
-                UtilMessage.simpleMessage(damager, getName(), "<alt>%s</alt> is already concussed.", damagee.getName());
+                UtilMessage.simpleMessage(damager, getName(), "%s<gray> is already concussed.", UtilServer.callEvent(new DisplayNameEvent(damagee, damager)).getDisplayName());
                 return;
             }
 
             championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
 
-            UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
-            UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
+            UtilMessage.simpleMessage(damager, getName(), "You gave %s<gray> a concussion.", UtilServer.callEvent(new DisplayNameEvent(damagee, damager)).getDisplayName());
+            UtilMessage.simpleMessage(damagee, getName(), "%s<gray> gave you a concussion.", UtilServer.callEvent(new DisplayNameEvent(damager, damagee)).getDisplayName());
             active.remove(damager.getUniqueId());
         }
     }

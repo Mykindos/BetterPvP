@@ -5,22 +5,19 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -34,11 +31,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 
 @Singleton
@@ -100,7 +93,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onFriendly(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
-        if (!(event.getHitEntity() instanceof LivingEntity damagee)) return;;
+        if (!(event.getHitEntity() instanceof LivingEntity damagee)) return;
         if (!(arrow.getShooter() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
         if (!UtilEntity.isEntityFriendly(damager, damagee)) return; // Only friendly targets
@@ -122,7 +115,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEnemy(DamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        if (!event.isDamageeLiving()) return;;
+        if (!event.isDamageeLiving()) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
         if (UtilEntity.isEntityFriendly(damager, event.getLivingDamagee())) return; // Only non-friendly targets
@@ -139,7 +132,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         }
     }
 
-    @EventHandler (priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onArrowShoot(ProjectileLaunchEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player shooter)) return;
@@ -224,7 +217,6 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false, true, isCancellable());
 
 
-
         if (UtilEntity.isEntityFriendly(damager, target)) {
             final StatContainer damagerContainer = championsManager.getClientManager().search().online(damager).getStatContainer();
             final StatContainer targetContainer = championsManager.getClientManager().search().online(damager).getStatContainer();
@@ -232,24 +224,25 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
             double actualHealth = UtilEntity.health(target, getFriendlyHealthRestoredOnHit(level));
 
             if (damagerContainer.getUniqueId().equals(targetContainer.getUniqueId())) {
-                damagerContainer.incrementStat(ClientStat.HEAL_SELF_BIOTIC_QUIVER,actualHealth);
+                damagerContainer.incrementStat(ClientStat.HEAL_SELF_BIOTIC_QUIVER, actualHealth);
             } else {
-                damagerContainer.incrementStat(ClientStat.HEAL_DEALT_BIOTIC_QUIVER,actualHealth);
-                targetContainer.incrementStat(ClientStat.HEAL_RECEIVED_BIOTIC_QUIVER,actualHealth);
+                damagerContainer.incrementStat(ClientStat.HEAL_DEALT_BIOTIC_QUIVER, actualHealth);
+                targetContainer.incrementStat(ClientStat.HEAL_RECEIVED_BIOTIC_QUIVER, actualHealth);
             }
 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
 
-            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(target, damager)).getDisplayName(), getName(), level);
             if (!damager.equals(target)) {
-                UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+                UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damager, target)).getDisplayName(), getName(), level);
             }
 
         } else {
             championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration(level) * 1000));
-            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green>.", target.getName(), getName(), level));
-            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green>.", damager.getName(), getName(), level));
+
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(target, damager)).getDisplayName(), getName(), level);
+            UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damager, target)).getDisplayName(), getName(), level);
         }
 
     }

@@ -16,13 +16,11 @@ import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
@@ -128,10 +126,10 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
                 if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + " " + level + "</green>.");
+                    UtilMessage.simpleMessage(damaged, getClassType().getName(), UtilServer.callEvent(new DisplayNameEvent(damager, damaged)).getDisplayName() + "<gray> hit you with <green>" + getName() + " " + level + "</green>.");
                 }
 
-                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + event.getDamagee().getName() + "</yellow> with <green>" + getName() + " " + level + "</green>.");
+                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit " + UtilServer.callEvent(new DisplayNameEvent(event.getDamagee(), damager)).getDisplayName() + "<gray> with <green>" + getName() + " " + level + "</green>.");
                 running.remove(damager.getUniqueId());
             }
         }

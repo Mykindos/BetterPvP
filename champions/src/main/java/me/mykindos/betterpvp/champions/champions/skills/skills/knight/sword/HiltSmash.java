@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -141,9 +142,9 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 1.0F, 0.0F);
         } else {
-            UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
+            UtilMessage.simpleMessage(ent, getClassType().getName(), "%s<gray> hit you with <green>%s %d<gray>.", UtilServer.callEvent(new DisplayNameEvent(player, ent)).getDisplayName(), getName(), level);
             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <green>%s %d<gray>.", UtilServer.callEvent(new DisplayNameEvent(ent, player)).getDisplayName(), getName(), level);
             UtilDamage.doDamage(new DamageEvent(ent, player, null, new SkillDamageCause(this), getDamage(level), getName()));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
         }

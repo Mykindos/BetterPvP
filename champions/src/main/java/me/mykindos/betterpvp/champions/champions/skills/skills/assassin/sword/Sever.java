@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -114,18 +115,20 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
 
         if (ent == null) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s</green>.", getName(), level);
             return;
         }
 
         boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
         if (UtilPlayer.isCreativeOrSpectator(ent) || UtilEntity.getRelation(player, ent) == EntityProperty.FRIENDLY || !withinRange) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s</green>.", getName(), level);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {
             championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
-            UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed %s.", UtilServer.callEvent(new DisplayNameEvent(ent, player)).getDisplayName());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You have been severed by %s.", UtilServer.callEvent(new DisplayNameEvent(player, ent)).getDisplayName());
+
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
         }
 

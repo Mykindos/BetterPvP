@@ -16,14 +16,11 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -168,7 +165,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
 
             if (ent instanceof Player temp) {
-                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used <green>%s %s</green>!", player.getName(), getName(), level);
+                UtilMessage.simpleMessage(temp, getClassType().getName(), "%s<gray> used <green>%s %s</green>!", UtilServer.callEvent(new DisplayNameEvent(player, temp)).getDisplayName(), getName(), level);
             }
 
             active.remove(player.getUniqueId());

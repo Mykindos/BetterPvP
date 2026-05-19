@@ -20,14 +20,11 @@ import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -195,8 +192,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doDamage(new DamageEvent(livingEntity, fissureCast.getPlayer(), null, new SkillDamageCause(this), damage, "Fissure"));
 
-            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit <alt2>" + livingEntity.getName() + "</alt2> with <alt>" + getName());
-            UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "<alt2>" + fissureCast.getPlayer().getName() + "</alt2> hit you with <alt>" + getName());
+            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(livingEntity, fissureCast.getPlayer())).getDisplayName(), getName(), fissureCast.getLevel());
+            UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(fissureBlock.getPlayer(), livingEntity)).getDisplayName(), getName(), fissureCast.getLevel());
 
             fissureCast.getEntitiesHit().add(livingEntity.getUniqueId());
         }

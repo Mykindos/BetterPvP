@@ -5,13 +5,9 @@ import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -326,12 +322,12 @@ public final class BlockTossObject {
                         new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
                         damage,
                         skill.getName()));
-                UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
+                UtilMessage.simpleMessage(ent, skill.getName(), "%s<gray> hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(caster, ent)).getDisplayName(), skill.getName());
             }
         }
 
         if (!damaged.isEmpty()) {
-            final String nameList = damaged.stream().map(player -> "<alt2>" + player.getName() + "</alt2>").collect(Collectors.joining(", "));
+            final String nameList = damaged.stream().map(player -> UtilServer.callEvent(new DisplayNameEvent(player, caster)).getDisplayName()).collect(Collectors.joining(", "));
             UtilMessage.simpleMessage(caster, skill.getName(), "You hit %s with <alt>%s</alt>.", nameList, skill.getName());
             caster.playSound(caster.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0F, 1.0F);
         }

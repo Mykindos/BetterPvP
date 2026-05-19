@@ -122,7 +122,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
             Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
             block.restore();
         }
-        UtilMessage.message(player, getClassType().getName(), "You destroyed your <alt>" + getName() + "</alt>.");
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You destroyed your <alt>" + getName() + "</alt>.");
     }
 
     private void handleIcePrisonCollision(ThrowableItem throwableItem) {
@@ -211,7 +211,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
                 block.restore();
             }
 
-            UtilMessage.message(player, getClassType().getName(), "Your <alt>Ice Prison</alt> shattered upon your death.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Your <alt>%s</alt> shattered upon your death.", getName());
         }
     }
 }

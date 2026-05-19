@@ -11,10 +11,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -85,9 +87,9 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
     public void onHit(Player damager, LivingEntity target, int level) {
 
         championsManager.getEffects().addEffect(target, damager, EffectTypes.LEVITATION, levitationStrength, (int) (getDuration(level) * 1000));
-        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level));
-        UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
 
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(target, damager)).getDisplayName(), getName(), level);
+        UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damager, target)).getDisplayName(), getName(), level);
     }
 
     @Override

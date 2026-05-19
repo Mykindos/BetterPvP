@@ -18,11 +18,9 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import org.bukkit.Location;
@@ -137,8 +135,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.8f, 2f);
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.8f, 1.5f);
 
-            UtilMessage.message(caster, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", hit.getName(), getName());
-            UtilMessage.message(hit, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), getName());
+            UtilMessage.message(caster, getClassType().getName(), "You hit %s with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(hit, caster)).getDisplayName(), getName());
+            UtilMessage.message(hit, getClassType().getName(), "%s hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(caster, hit)).getDisplayName(), getName());
         }
     }
 

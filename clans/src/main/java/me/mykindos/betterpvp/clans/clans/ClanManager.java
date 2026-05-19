@@ -623,7 +623,7 @@ public class ClanManager extends Manager<Long, Clan> {
         if (!clan.getAlliances().isEmpty()) {
             for (ClanAlliance enemy : clan.getAlliances()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                allies.add(relation.getPrimaryMiniColor() + enemy.getClan().getName());
+                allies.add(relation.getPrimaryMiniColorOpening() + enemy.getClan().getName());
             }
         }
         return String.join("<gray>, ", allies);
@@ -643,7 +643,7 @@ public class ClanManager extends Manager<Long, Clan> {
         if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                enemies.add(relation.getPrimaryMiniColor() + enemy.getClan().getName());
+                enemies.add(relation.getPrimaryMiniColorOpening() + enemy.getClan().getName());
             }
         }
         return String.join("<gray>, ", enemies);
@@ -663,7 +663,7 @@ public class ClanManager extends Manager<Long, Clan> {
         if (!clan.getEnemies().isEmpty()) {
             for (ClanEnemy enemy : clan.getEnemies()) {
                 ClanRelation relation = getRelation(playerClan, enemy.getClan());
-                enemies.add((relation.getPrimaryMiniColor() + enemy.getClan().getName() + " " + getDominanceString(clan, enemy.getClan())).trim());
+                enemies.add((relation.getPrimaryMiniColorOpening() + enemy.getClan().getName() + " " + getDominanceString(clan, enemy.getClan())).trim());
             }
         }
         return String.join("<gray>, ", enemies);

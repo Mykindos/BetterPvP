@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -215,8 +216,9 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
         UtilDamage.doDamage(ev);
 
         // Cues
-        UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + " " + level + "</alt>.");
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + hit.getName() + "</alt2> with <alt>" + getName() + " " + level + "</alt>.");
+        UtilMessage.simpleMessage(hit, getClassType().getName(), "%s<gray> pulled you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(player, hit)).getDisplayName(), getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(hit, player)).getDisplayName(), getName(), level);
+        
         new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 
         throwableItem.getItem().remove();

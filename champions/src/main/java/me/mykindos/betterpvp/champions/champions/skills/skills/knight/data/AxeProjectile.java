@@ -6,8 +6,10 @@ import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.cause.DamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -133,8 +135,8 @@ public class AxeProjectile extends Projectile {
                 new SkillDamageCause(skill, false, DamageCause.DEFAULT_DELAY, true).withBukkitCause(PROJECTILE),
                 damage,
                 skill.getName()));
-        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), skill.getName());
-        UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
+        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit %s<gray> with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damagee, caster)).getDisplayName(), skill.getName());
+        UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "%s<gray> hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(caster, damagee)).getDisplayName(), skill.getName());
     }
 
     @Override
