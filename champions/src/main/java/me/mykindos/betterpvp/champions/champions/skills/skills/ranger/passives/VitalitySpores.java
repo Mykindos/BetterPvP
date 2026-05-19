@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -60,8 +61,8 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     @Inject
-    public VitalitySpores(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public VitalitySpores(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

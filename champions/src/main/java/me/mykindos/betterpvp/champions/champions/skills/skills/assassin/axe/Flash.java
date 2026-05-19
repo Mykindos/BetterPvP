@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -66,8 +67,8 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     private double teleportDistance;
 
     @Inject
-    public Flash(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Flash(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

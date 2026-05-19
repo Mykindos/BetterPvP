@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -63,8 +64,8 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     private double randomSiphonHealthGainChance;
 
     @Inject
-    public Siphon(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Siphon(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

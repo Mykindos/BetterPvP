@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -33,8 +34,8 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
     public double durationIncreasePerLevel;
 
     @Inject
-    public HolyLight(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public HolyLight(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

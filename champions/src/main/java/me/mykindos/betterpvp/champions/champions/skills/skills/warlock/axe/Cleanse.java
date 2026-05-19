@@ -12,8 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -46,8 +46,8 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     private double healthReductionPerPlayerAffectedDecreasePerLevel;
 
     @Inject
-    public Cleanse(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Cleanse(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             healthReduction += getHealthReductionPerPlayerAffected(level);
 
             championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
-            UtilMessage.simpleMessage(ally, getName(), "You were cleansed of negative effects by %s.", UtilServer.callEvent(new DisplayNameEvent(player, ally)).getDisplayName());
+            UtilMessage.simpleMessage(ally, getName(), "You were cleansed of negative effects by %s.", displayNameProvider.getDisplayName(player, ally));
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
 

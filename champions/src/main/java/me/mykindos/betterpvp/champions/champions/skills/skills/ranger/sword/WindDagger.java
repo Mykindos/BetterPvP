@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -45,8 +46,8 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
     private double speed;
 
     @Inject
-    public WindDagger(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public WindDagger(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

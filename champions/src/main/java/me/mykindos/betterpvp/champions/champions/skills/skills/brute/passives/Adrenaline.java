@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -34,8 +35,8 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     private final Set<Player> trackedPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 
     @Inject
-    public Adrenaline(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Adrenaline(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

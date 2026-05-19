@@ -5,7 +5,6 @@ import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -322,12 +321,12 @@ public final class BlockTossObject {
                         new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
                         damage,
                         skill.getName()));
-                UtilMessage.simpleMessage(ent, skill.getName(), "%s<gray> hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(caster, ent)).getDisplayName(), skill.getName());
+                UtilMessage.simpleMessage(ent, skill.getName(), "%s<gray> hit you with <alt>%s</alt>.", skill.getDisplayNameProvider().getDisplayName(caster, ent), skill.getName());
             }
         }
 
         if (!damaged.isEmpty()) {
-            final String nameList = damaged.stream().map(player -> UtilServer.callEvent(new DisplayNameEvent(player, caster)).getDisplayName()).collect(Collectors.joining(", "));
+            final String nameList = damaged.stream().map(player -> skill.getDisplayNameProvider().getDisplayName(player, caster)).collect(Collectors.joining(", "));
             UtilMessage.simpleMessage(caster, skill.getName(), "You hit %s with <alt>%s</alt>.", nameList, skill.getName());
             caster.playSound(caster.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0F, 1.0F);
         }

@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,8 +36,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     public int slownessStrength;
 
     @Inject
-    public Void(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Void(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

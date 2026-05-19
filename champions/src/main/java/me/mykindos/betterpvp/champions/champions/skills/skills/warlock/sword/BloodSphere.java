@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -50,8 +51,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     private double mobHealthModifier;
 
     @Inject
-    private BloodSphere(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    private BloodSphere(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

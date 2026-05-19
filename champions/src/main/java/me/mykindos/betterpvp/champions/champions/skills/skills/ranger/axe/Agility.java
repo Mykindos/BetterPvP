@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -57,8 +58,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     private double missedSwingsIncreasePerLevel;
 
     @Inject
-    public Agility(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Agility(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

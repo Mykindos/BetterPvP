@@ -12,11 +12,11 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -52,8 +52,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     private int slownessStrength;
 
     @Inject
-    public BullsCharge(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public BullsCharge(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -126,10 +126,10 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
                 if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.simpleMessage(damaged, getClassType().getName(), UtilServer.callEvent(new DisplayNameEvent(damager, damaged)).getDisplayName() + "<gray> hit you with <green>" + getName() + " " + level + "</green>.");
+                    UtilMessage.simpleMessage(damaged, getClassType().getName(), displayNameProvider.getDisplayName(damager, damaged) + "<gray> hit you with <green>" + getName() + " " + level + "</green>.");
                 }
 
-                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit " + UtilServer.callEvent(new DisplayNameEvent(event.getDamagee(), damager)).getDisplayName() + "<gray> with <green>" + getName() + " " + level + "</green>.");
+                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit " + displayNameProvider.getDisplayName(event.getDamagee(), damager) + "<gray> with <green>" + getName() + " " + level + "</green>.");
                 running.remove(damager.getUniqueId());
             }
         }

@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Animals;
@@ -46,8 +47,8 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
     private double health;
 
     @Inject
-    public Bloodlust(Champions champions, ChampionsManager championsManager, DamageLogManager damageLogManager) {
-        super(champions, championsManager);
+    public Bloodlust(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, DamageLogManager damageLogManager) {
+        super(champions, championsManager, displayNameProvider);
         this.damageLogManager = damageLogManager;
     }
 

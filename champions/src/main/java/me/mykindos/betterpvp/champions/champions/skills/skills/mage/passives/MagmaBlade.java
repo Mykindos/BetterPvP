@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,8 +32,8 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
     private double damageIncreasePerLevel;
 
     @Inject
-    public MagmaBlade(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public MagmaBlade(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

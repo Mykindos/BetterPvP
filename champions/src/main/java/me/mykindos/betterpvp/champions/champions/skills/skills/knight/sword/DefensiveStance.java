@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -57,8 +58,8 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     private double frontalBlockAngleIncreasePerLevel;
 
     @Inject
-    public DefensiveStance(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public DefensiveStance(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
 

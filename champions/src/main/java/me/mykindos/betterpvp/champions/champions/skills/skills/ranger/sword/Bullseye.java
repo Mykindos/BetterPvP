@@ -15,14 +15,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -64,8 +63,8 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
 
     @Inject
-    public Bullseye(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Bullseye(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -218,7 +217,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             event.addModifier(new SkillDamageModifier.Flat(this, getBonusDamage(playerLevel)));
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
             if (damagee != null) {
-                UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damager, damagee)).getDisplayName(), getName(), playerLevel);
+                UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, damagee), getName(), playerLevel);
             }
 
             //apply cooldown

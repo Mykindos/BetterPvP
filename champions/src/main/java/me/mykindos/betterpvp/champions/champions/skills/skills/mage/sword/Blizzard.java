@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -52,8 +53,8 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     private double initialEnergyCost;
 
     @Inject
-    public Blizzard(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Blizzard(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
 

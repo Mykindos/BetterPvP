@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -52,8 +53,8 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     private double velocityStrength;
 
     @Inject
-    public LightningOrb(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public LightningOrb(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

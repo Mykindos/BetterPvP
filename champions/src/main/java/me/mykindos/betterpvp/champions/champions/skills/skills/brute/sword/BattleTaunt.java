@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -40,8 +41,8 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     private double radiusIncreasePerLevel;
 
     @Inject
-    public BattleTaunt(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public BattleTaunt(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

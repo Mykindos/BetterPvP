@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -69,8 +70,8 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
     private double hitBoxSize;
 
     @Inject
-    public BlockToss(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public BlockToss(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

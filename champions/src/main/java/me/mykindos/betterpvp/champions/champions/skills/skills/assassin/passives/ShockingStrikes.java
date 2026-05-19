@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,8 +42,8 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
     private double timeSpan;
 
     @Inject
-    public ShockingStrikes(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public ShockingStrikes(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

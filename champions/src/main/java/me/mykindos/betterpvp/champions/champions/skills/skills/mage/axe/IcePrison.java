@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.blocks.RestoreBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -50,8 +51,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     private double variance;
 
     @Inject
-    public IcePrison(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(champions, championsManager);
+    public IcePrison(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
+        super(champions, championsManager, displayNameProvider);
         this.blockHandler = blockHandler;
     }
 

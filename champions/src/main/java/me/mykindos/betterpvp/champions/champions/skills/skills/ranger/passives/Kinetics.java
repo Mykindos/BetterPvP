@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -82,8 +83,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     });
 
     @Inject
-    public Kinetics(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
-        super(champions, championsManager);
+    public Kinetics(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
+        super(champions, championsManager, displayNameProvider);
         this.taskScheduler = taskScheduler;
     }
 

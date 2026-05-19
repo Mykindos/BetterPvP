@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -51,8 +52,8 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     private boolean allowPickupItems;
 
     @Inject
-    public SmokeBomb(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public SmokeBomb(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

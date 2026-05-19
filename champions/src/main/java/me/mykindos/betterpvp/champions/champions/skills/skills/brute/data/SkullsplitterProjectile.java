@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -190,8 +189,8 @@ public class SkullsplitterProjectile extends Projectile {
                     new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
                     bleedSeconds,
                     skill.getName()));
-            UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit %s<gray> with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damagee, caster)).getDisplayName(), skill.getName());
-            UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "%s<gray> hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(caster, damagee)).getDisplayName(), skill.getName());
+            UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit %s<gray> with <alt>%s</alt>.", skill.getDisplayNameProvider().getDisplayName(damagee, caster), skill.getName());
+            UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "%s<gray> hit you with <alt>%s</alt>.", skill.getDisplayNameProvider().getDisplayName(caster, damagee), skill.getName());
         }
     }
 }

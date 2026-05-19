@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -42,8 +43,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     private int deblinkTimeIncreasePerLevel;
 
     @Inject
-    public Blink(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Blink(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
 

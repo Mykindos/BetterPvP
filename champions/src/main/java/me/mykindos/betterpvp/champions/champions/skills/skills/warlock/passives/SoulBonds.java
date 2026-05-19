@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -46,8 +47,8 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     private final HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
 
     @Inject
-    public SoulBonds(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public SoulBonds(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

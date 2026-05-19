@@ -9,14 +9,13 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -38,8 +37,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     private int slownessStrength;
 
     @Inject
-    public SmokeArrow(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public SmokeArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -106,8 +105,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .receivers(60)
                 .spawn();
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damager, target)).getDisplayName(), getName(), level);
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(target, damager)).getDisplayName(), getName(), level);
+        UtilMessage.simpleMessage(target, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, target), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, damager), getName(), level);
     }
 
     @Override

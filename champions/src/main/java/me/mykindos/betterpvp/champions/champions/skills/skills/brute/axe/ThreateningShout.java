@@ -14,9 +14,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -56,8 +56,8 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     private final Map<Player, ThreateningShoutData> playerDataMap;
 
     @Inject
-    public ThreateningShout(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public ThreateningShout(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
         playerDataMap = new WeakHashMap<>();
     }
 
@@ -161,7 +161,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                                         getDamage(level),
                                         "Threatening Shout"));
                                 championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                                UtilMessage.simpleMessage(player, getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(target, player)).getDisplayName(), getName(), level);
+                                UtilMessage.simpleMessage(player, getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, player), getName(), level);
                                 damagedEntities.add(target);
                             }
                         }

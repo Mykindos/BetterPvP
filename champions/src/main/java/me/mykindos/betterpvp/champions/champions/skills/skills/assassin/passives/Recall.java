@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -45,8 +46,8 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
     private double durationIncreasePerLevel;
 
     @Inject
-    public Recall(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Recall(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -45,8 +46,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private int vulnerabilityStrength;
 
     @Inject
-    public Immolate(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Immolate(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

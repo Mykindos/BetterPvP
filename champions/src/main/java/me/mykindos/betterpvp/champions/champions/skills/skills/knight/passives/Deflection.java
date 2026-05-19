@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,8 +43,8 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     private final HashMap<UUID, Integer> charges = new HashMap<>();
 
     @Inject
-    public Deflection(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Deflection(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

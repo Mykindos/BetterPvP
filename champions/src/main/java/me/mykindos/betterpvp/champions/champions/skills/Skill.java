@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
@@ -35,6 +36,7 @@ import me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -42,6 +44,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -56,6 +59,9 @@ public abstract class Skill implements IChampionsSkill {
 
     protected final Champions champions;
     protected final ChampionsManager championsManager;
+
+    @Getter
+    protected final DisplayNameProvider displayNameProvider;
 
     private boolean enabled;
     private int maxLevel;
@@ -79,9 +85,10 @@ public abstract class Skill implements IChampionsSkill {
     private boolean canUseInLiquid;
 
     @Inject
-    public Skill(Champions champions, ChampionsManager championsManager) {
+    public Skill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
         this.champions = champions;
         this.championsManager = championsManager;
+        this.displayNameProvider = displayNameProvider;
         loadConfig();
     }
 

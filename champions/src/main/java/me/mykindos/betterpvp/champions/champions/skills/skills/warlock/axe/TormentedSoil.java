@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -56,8 +57,8 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     private double healthReductionDecreasePerLevel;
 
     @Inject
-    public TormentedSoil(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public TormentedSoil(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
 

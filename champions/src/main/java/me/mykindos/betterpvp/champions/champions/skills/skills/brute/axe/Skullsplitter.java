@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,8 +47,8 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
     private double projectileSpeed;
 
     @Inject
-    public Skullsplitter(Champions champions, ChampionsManager championsManager, EffectManager effectManager) {
-        super(champions, championsManager);
+    public Skullsplitter(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, EffectManager effectManager) {
+        super(champions, championsManager, displayNameProvider);
         this.effectManager = effectManager;
     }
 

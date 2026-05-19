@@ -16,16 +16,15 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -68,8 +67,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     private double healingIncreasePerLevel;
 
     @Inject
-    public Riposte(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Riposte(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -138,7 +137,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
             if (ent instanceof Player target) {
-                UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> used <green>%s %d</green>", UtilServer.callEvent(new DisplayNameEvent(player, target)).getDisplayName(), getName(), level);
+                UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> used <green>%s %d</green>", displayNameProvider.getDisplayName(player, target), getName(), level);
             }
 
             active.remove(player.getUniqueId());

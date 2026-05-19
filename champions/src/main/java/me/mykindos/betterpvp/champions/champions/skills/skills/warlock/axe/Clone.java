@@ -42,6 +42,7 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -87,8 +88,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     private int slownessLevel;
 
     @Inject
-    public Clone(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Clone(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

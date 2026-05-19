@@ -14,11 +14,11 @@ import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
@@ -50,8 +50,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     private double damageIncreasePerLevel;
 
     @Inject
-    public Slash(Champions champions, ChampionsManager championsManager, DamageLogManager damageLogManager) {
-        super(champions, championsManager);
+    public Slash(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, DamageLogManager damageLogManager) {
+        super(champions, championsManager, displayNameProvider);
         this.damageLogManager = damageLogManager;
     }
 
@@ -135,8 +135,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.8f, 2f);
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.8f, 1.5f);
 
-            UtilMessage.message(caster, getClassType().getName(), "You hit %s with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(hit, caster)).getDisplayName(), getName());
-            UtilMessage.message(hit, getClassType().getName(), "%s hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(caster, hit)).getDisplayName(), getName());
+            UtilMessage.message(caster, getClassType().getName(), "You hit %s with <alt>%s</alt>.", displayNameProvider.getDisplayName(hit, caster), getName());
+            UtilMessage.message(hit, getClassType().getName(), "%s hit you with <alt>%s</alt>.", displayNameProvider.getDisplayName(caster, hit), getName());
         }
     }
 

@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -55,8 +56,8 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     private int maximumEnemiesIncreasePerLevel;
 
     @Inject
-    public Leech(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Leech(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
 

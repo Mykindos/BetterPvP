@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -56,8 +57,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     private double slowDurationIncreasePerLevel;
 
     @Inject
-    public ArcticArmour(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(champions, championsManager);
+    public ArcticArmour(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
+        super(champions, championsManager, displayNameProvider);
         this.blockHandler = blockHandler;
     }
 

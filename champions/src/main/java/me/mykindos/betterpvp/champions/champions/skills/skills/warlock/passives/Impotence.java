@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -31,8 +32,8 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
     private int maxEnemies;
 
     @Inject
-    public Impotence(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Impotence(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

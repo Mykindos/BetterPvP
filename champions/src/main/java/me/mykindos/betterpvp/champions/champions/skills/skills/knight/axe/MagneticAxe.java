@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -62,8 +63,8 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     private double speed;
 
     @Inject
-    public MagneticAxe(Champions champions, ChampionsManager championsManager, ItemFactory itemFactory, ItemRegistry registry) {
-        super(champions, championsManager);
+    public MagneticAxe(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, ItemFactory itemFactory, ItemRegistry registry) {
+        super(champions, championsManager, displayNameProvider);
         this.itemFactory = itemFactory;
 
         final BaseItem baseItem = new BaseItem("Magnetic Axe Placeholder",

@@ -15,10 +15,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -60,8 +60,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     private double bonusDamagePerTenBlocks;
 
     @Inject
-    public SeismicSlam(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public SeismicSlam(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
 
@@ -164,7 +164,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             double damage = calculateDamage(player, target, data);
             UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), damage, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <green>%s %s</green>", UtilServer.callEvent(new DisplayNameEvent(player, damagee)).getDisplayName(), getName(), level);
+                UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <green>%s %s</green>", displayNameProvider.getDisplayName(player, damagee), getName(), level);
             }
         }
 

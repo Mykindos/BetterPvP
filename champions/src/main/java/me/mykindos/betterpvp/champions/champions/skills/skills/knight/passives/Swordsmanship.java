@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,8 +43,8 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
     @Inject
-    public Swordsmanship(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Swordsmanship(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

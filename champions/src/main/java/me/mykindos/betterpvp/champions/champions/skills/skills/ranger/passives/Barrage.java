@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -55,8 +56,8 @@ public class Barrage extends BowChargeSkill implements Listener, PassiveSkill, D
     private static final double FULL_CHARGE_VELOCITY = 3.0;
 
     @Inject
-    public Barrage(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Barrage(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

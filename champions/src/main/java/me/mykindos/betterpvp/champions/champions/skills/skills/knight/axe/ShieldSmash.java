@@ -11,12 +11,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -57,8 +57,8 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     private double fov;
 
     @Inject
-    public ShieldSmash(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public ShieldSmash(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             }
 
             // Inform them
-            UtilMessage.simpleMessage(ent, "Skill", "%s<gray> hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(player, ent)).getDisplayName(), getName());
+            UtilMessage.simpleMessage(ent, "Skill", "%s<gray> hit you with <alt>%s</alt>.", displayNameProvider.getDisplayName(player, ent), getName());
         }
 
         if (hit) { // entity hit

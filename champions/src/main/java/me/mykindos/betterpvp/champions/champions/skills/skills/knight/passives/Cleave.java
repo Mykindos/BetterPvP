@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,8 +38,8 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
     private int maxEnemiesHitIncreasePerLevel;
 
     @Inject
-    public Cleave(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Cleave(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

@@ -3,10 +3,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -84,8 +82,8 @@ public class DaggerProjectile extends Projectile {
                 damage,
                 skill.getName()));
 
-        UtilMessage.simpleMessage(hit, skill.getClassType().getName(), "%s<gray> hit you with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(caster, hit)).getDisplayName(), skill.getName());
-        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit %s<gray> with <alt>%s</alt>.", UtilServer.callEvent(new DisplayNameEvent(hit, caster)).getDisplayName(), skill.getName());
+        UtilMessage.simpleMessage(hit, skill.getClassType().getName(), "%s<gray> hit you with <alt>%s</alt>.", skill.getDisplayNameProvider().getDisplayName(caster, hit), skill.getName());
+        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit %s<gray> with <alt>%s</alt>.", skill.getDisplayNameProvider().getDisplayName(hit, caster), skill.getName());
     }
 
     public void remove() {

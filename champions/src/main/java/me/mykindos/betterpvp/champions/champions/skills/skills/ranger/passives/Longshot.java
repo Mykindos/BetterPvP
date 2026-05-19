@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -44,8 +45,8 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
     private double distanceDecreasePerLevel;
 
     @Inject
-    public Longshot(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Longshot(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

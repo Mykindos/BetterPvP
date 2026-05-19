@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -60,8 +61,8 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
     private final Map<UUID, Arrow> explosiveArrows = new HashMap<>();
 
     @Inject
-    public ExplosiveArrow(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public ExplosiveArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

@@ -3,14 +3,11 @@ package me.mykindos.betterpvp.clans.injector;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.fatigue.factor.DeathFrequencyFactor;
-import me.mykindos.betterpvp.clans.clans.fatigue.factor.DeathLocalityFactor;
-import me.mykindos.betterpvp.clans.clans.fatigue.factor.DistanceFromSafetyFactor;
-import me.mykindos.betterpvp.clans.clans.fatigue.factor.FatigueFactor;
-import me.mykindos.betterpvp.clans.clans.fatigue.factor.PlayerDeathFactor;
-import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
+import me.mykindos.betterpvp.clans.clans.fatigue.factor.*;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
+import me.mykindos.betterpvp.clans.displayname.ClansDisplayNameProvider;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 
 public class ClansInjectorModule extends AbstractModule {
 
@@ -24,6 +21,8 @@ public class ClansInjectorModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Clans.class).toInstance(plugin);
+
+        bind(DisplayNameProvider.class).to(ClansDisplayNameProvider.class);
 
         // Battle fatigue strategies. Adding/removing a factor or punishment is a
         // single line here — the manager and hold service never name a concrete

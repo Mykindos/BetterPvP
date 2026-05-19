@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -69,8 +70,8 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     private final Random random = new Random();
 
     @Inject
-    public NapalmArrow(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public NapalmArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

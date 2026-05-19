@@ -10,13 +10,12 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -38,8 +37,8 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     private int vulnerabilityIncreasePerLevel;
 
     @Inject
-    public MarkedForDeath(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public MarkedForDeath(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
 
@@ -83,10 +82,10 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <green>%s %s</green>.", UtilServer.callEvent(new DisplayNameEvent(target, damager)).getDisplayName(), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <green>%s %s</green>.", displayNameProvider.getDisplayName(target, damager), getName(), level);
         championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, getVulnerabilityStrength(level), (long) (getDuration(level) * 1000L));
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(damager, damagee)).getDisplayName(), getName(), level);
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, damagee), getName(), level);
     }
 
     @Override

@@ -13,10 +13,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
@@ -47,8 +47,8 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     private int healthBoostStrength;
 
     @Inject
-    public DefensiveAura(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public DefensiveAura(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.MAX_HEALTH);
                 if (targetMaxHealth != null) {
                     double targetHeal = UtilEntity.health(target, 4d * healthBoostStrength);
-                    UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> cast <green>%s</green> on you!", UtilServer.callEvent(new DisplayNameEvent(player, target)).getDisplayName(), getName());
+                    UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> cast <green>%s</green> on you!", displayNameProvider.getDisplayName(player, target), getName());
                     target.playSound(target, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 1.1f);
                     target.spawnParticle(Particle.HEART, target.getLocation().add(new Vector(0, 1, 0)), 6, 0.5, 0.5, 0.5);
 

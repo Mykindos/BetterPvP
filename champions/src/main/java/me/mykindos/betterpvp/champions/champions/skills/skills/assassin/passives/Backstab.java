@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -31,8 +32,8 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
     private double damage;
 
     @Inject
-    public Backstab(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Backstab(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

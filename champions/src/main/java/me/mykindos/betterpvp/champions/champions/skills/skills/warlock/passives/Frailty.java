@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -46,8 +47,8 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     private double damagePercentIncreasePerLevel;
 
     @Inject
-    public Frailty(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Frailty(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

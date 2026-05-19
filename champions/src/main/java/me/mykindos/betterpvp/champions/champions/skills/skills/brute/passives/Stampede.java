@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -57,8 +58,8 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     private double knockbackIncreasePerLevel;
 
     @Inject
-    public Stampede(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Stampede(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,8 +33,8 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener, D
     public List<SilencingStrikesData> data = new ArrayList<>();
 
     @Inject
-    public SilencingStrikes(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public SilencingStrikes(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     private int hitsNeeded;

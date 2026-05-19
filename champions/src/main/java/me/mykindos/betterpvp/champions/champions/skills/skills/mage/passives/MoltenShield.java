@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,8 +24,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 public class MoltenShield extends Skill implements PassiveSkill, BuffSkill, DefensiveSkill {
 
     @Inject
-    public MoltenShield(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public MoltenShield(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

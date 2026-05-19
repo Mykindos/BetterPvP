@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.energy.events.UpdateMaxEnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
@@ -24,8 +25,8 @@ public class EnergyPool extends Skill implements PassiveSkill, BuffSkill {
     private double energyPoolIncreasePerLevel;
 
     @Inject
-    public EnergyPool(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public EnergyPool(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

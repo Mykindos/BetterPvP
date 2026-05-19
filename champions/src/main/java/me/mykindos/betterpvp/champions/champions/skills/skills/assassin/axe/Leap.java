@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -42,8 +43,8 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     private double fallDamageLimit;
 
     @Inject
-    public Leap(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
-        super(champions, championsManager);
+    public Leap(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
+        super(champions, championsManager, displayNameProvider);
         this.taskScheduler = taskScheduler;
     }
 

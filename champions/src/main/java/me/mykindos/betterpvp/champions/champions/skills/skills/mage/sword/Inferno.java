@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -58,8 +59,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     private double immuneTime;
 
     @Inject
-    public Inferno(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Inferno(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

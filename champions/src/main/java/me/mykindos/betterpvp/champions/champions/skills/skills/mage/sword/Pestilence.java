@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -52,8 +53,8 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
     private double expirySeconds;
 
     @Inject
-    public Pestilence(Champions champions, ChampionsManager championsManager, EffectManager effectManager) {
-        super(champions, championsManager);
+    public Pestilence(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, EffectManager effectManager) {
+        super(champions, championsManager, displayNameProvider);
         this.effectManager = effectManager;
     }
 

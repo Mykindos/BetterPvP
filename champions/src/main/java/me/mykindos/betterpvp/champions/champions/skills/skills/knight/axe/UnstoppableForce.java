@@ -31,6 +31,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -57,8 +58,8 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     private double hitboxExpansion;
 
     @Inject
-    public UnstoppableForce(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public UnstoppableForce(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

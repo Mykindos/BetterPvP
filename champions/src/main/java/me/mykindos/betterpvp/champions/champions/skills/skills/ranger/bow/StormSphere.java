@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -54,8 +55,8 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     private double burstDuration;
 
     @Inject
-    public StormSphere(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public StormSphere(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

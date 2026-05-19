@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -128,8 +129,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     private double noDamageAbsorbedMessageDuration;
 
     @Inject
-    public VanguardsMight(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public VanguardsMight(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

@@ -10,13 +10,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -59,8 +59,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     private CooldownManager cooldownManager;
 
     @Inject
-    public Evade(Champions champions, ChampionsManager championsManager, DamageDelayManager damageDelayManager) {
-        super(champions, championsManager);
+    public Evade(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, DamageDelayManager damageDelayManager) {
+        super(champions, championsManager, displayNameProvider);
         this.damageDelayManager = damageDelayManager;
     }
 
@@ -165,7 +165,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
 
             if (ent instanceof Player temp) {
-                UtilMessage.simpleMessage(temp, getClassType().getName(), "%s<gray> used <green>%s %s</green>!", UtilServer.callEvent(new DisplayNameEvent(player, temp)).getDisplayName(), getName(), level);
+                UtilMessage.simpleMessage(temp, getClassType().getName(), "%s<gray> used <green>%s %s</green>!", displayNameProvider.getDisplayName(player, temp), getName(), level);
             }
 
             active.remove(player.getUniqueId());

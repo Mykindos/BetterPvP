@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -44,8 +45,8 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
     private double healthReductionPerPlayerAffectedDecreasePerLevel;
 
     @Inject
-    public Bloodshed(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Bloodshed(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

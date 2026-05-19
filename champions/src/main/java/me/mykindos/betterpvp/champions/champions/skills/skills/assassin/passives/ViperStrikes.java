@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,8 +32,8 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener, Debuf
     private int poisonStrength;
 
     @Inject
-    public ViperStrikes(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public ViperStrikes(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

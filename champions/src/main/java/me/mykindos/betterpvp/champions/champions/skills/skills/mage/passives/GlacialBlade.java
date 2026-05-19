@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,8 +49,8 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     private final List<Item> iceShards = new ArrayList<>();
 
     @Inject
-    public GlacialBlade(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public GlacialBlade(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

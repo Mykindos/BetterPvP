@@ -14,10 +14,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -61,8 +61,8 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     private double fallDamageLimit;
 
     @Inject
-    public Takedown(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
-        super(champions, championsManager);
+    public Takedown(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
+        super(champions, championsManager, displayNameProvider);
         this.taskScheduler = taskScheduler;
     }
 
@@ -166,10 +166,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>", UtilServer.callEvent(new DisplayNameEvent(target, player)).getDisplayName(), getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>", displayNameProvider.getDisplayName(target, player), getName(), level);
         UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), "Takedown"));
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>", UtilServer.callEvent(new DisplayNameEvent(player, target)).getDisplayName(), getName(), level);
+        UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>", displayNameProvider.getDisplayName(player, target), getName(), level);
         UtilDamage.doDamage(new DamageEvent(player, target, null, new SkillDamageCause(this), getRecoilDamage(level), "Takedown Recoil"));
 
         long duration = (long) (getDuration(level) * 1000L);

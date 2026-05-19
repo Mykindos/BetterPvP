@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -38,8 +39,8 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
     private final WeakHashMap<Player, Set<Player>> trackedEnemies = new WeakHashMap<>();
 
     @Inject
-    public Intimidation(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Intimidation(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -31,8 +32,8 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
     private int speedStrength;
 
     @Inject
-    public Bloodthirst(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Bloodthirst(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

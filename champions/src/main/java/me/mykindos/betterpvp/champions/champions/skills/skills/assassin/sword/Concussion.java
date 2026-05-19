@@ -11,14 +11,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,8 +33,8 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
     private int concussionStrength;
 
     @Inject
-    public Concussion(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Concussion(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -88,14 +87,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         if (active.contains(damager.getUniqueId())) {
             event.addReason("Concussion");
             if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
-                UtilMessage.simpleMessage(damager, getName(), "%s<gray> is already concussed.", UtilServer.callEvent(new DisplayNameEvent(damagee, damager)).getDisplayName());
+                UtilMessage.simpleMessage(damager, getName(), "%s<gray> is already concussed.", displayNameProvider.getDisplayName(damagee, damager));
                 return;
             }
 
             championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
 
-            UtilMessage.simpleMessage(damager, getName(), "You gave %s<gray> a concussion.", UtilServer.callEvent(new DisplayNameEvent(damagee, damager)).getDisplayName());
-            UtilMessage.simpleMessage(damagee, getName(), "%s<gray> gave you a concussion.", UtilServer.callEvent(new DisplayNameEvent(damager, damagee)).getDisplayName());
+            UtilMessage.simpleMessage(damager, getName(), "You gave %s<gray> a concussion.", displayNameProvider.getDisplayName(damagee, damager));
+            UtilMessage.simpleMessage(damagee, getName(), "%s<gray> gave you a concussion.", displayNameProvider.getDisplayName(damager, damagee));
             active.remove(damager.getUniqueId());
         }
     }

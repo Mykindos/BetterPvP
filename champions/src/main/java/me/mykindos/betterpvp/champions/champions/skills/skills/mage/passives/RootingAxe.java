@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Effect;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -41,8 +42,8 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     private final WorldBlockHandler blockHandler;
 
     @Inject
-    public RootingAxe(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(champions, championsManager);
+    public RootingAxe(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
+        super(champions, championsManager, displayNameProvider);
         this.blockHandler = blockHandler;
     }
 

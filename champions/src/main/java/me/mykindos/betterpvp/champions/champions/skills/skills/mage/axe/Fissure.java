@@ -18,9 +18,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.displayname.DisplayNameEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -61,8 +61,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private final List<FissureCast> activeCasts = new ArrayList<>();
 
     @Inject
-    public Fissure(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
-        super(champions, championsManager);
+    public Fissure(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
+        super(champions, championsManager, displayNameProvider);
         this.blockHandler = blockHandler;
     }
 
@@ -192,8 +192,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doDamage(new DamageEvent(livingEntity, fissureCast.getPlayer(), null, new SkillDamageCause(this), damage, "Fissure"));
 
-            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(livingEntity, fissureCast.getPlayer())).getDisplayName(), getName(), fissureCast.getLevel());
-            UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", UtilServer.callEvent(new DisplayNameEvent(fissureBlock.getPlayer(), livingEntity)).getDisplayName(), getName(), fissureCast.getLevel());
+            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(livingEntity, fissureCast.getPlayer()), getName(), fissureCast.getLevel());
+            UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(fissureBlock.getPlayer(), livingEntity), getName(), fissureCast.getLevel());
 
             fissureCast.getEntitiesHit().add(livingEntity.getUniqueId());
         }

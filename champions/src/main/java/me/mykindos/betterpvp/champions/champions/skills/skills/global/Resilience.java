@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,8 +33,8 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
     private double durationReductionPerLevel;
 
     @Inject
-    public Resilience(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Resilience(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

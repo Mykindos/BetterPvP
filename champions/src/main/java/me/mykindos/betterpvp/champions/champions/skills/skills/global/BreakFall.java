@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,8 +27,8 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
     private double damageReductionIncreasePerLevel;
 
     @Inject
-    public BreakFall(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public BreakFall(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
         return SkillType.GLOBAL;
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFall(DamageEvent e) {
         if (!(e.getDamagee() instanceof Player player)) return;
         if (e.getBukkitCause() != DamageCause.FALL) return;

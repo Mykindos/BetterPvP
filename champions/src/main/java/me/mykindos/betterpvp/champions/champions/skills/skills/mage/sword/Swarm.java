@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -57,8 +58,8 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     private double batDamage;
 
     @Inject
-    public Swarm(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Swarm(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

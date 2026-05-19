@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -60,8 +61,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     private int slowStrength;
 
     @Inject
-    public Rupture(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Rupture(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override

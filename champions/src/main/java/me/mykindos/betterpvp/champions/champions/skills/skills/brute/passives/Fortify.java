@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -33,8 +34,8 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
 
 
     @Inject
-    public Fortify(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public Fortify(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
         numParticles = 8;
         particleRadius = 0.5;
 
