@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +70,7 @@ public abstract class Command implements ICommand {
                             .filter(player -> {
                                 if (!(sender instanceof Player runner)) return true;
                                 return runner.isListed(player);
-                            })
+                            }).filter(player -> !player.isOp() && !player.hasPotionEffect(PotionEffectType.INVISIBILITY))
                             .map(Player::getName)
                             .filter(name -> name.toLowerCase().
                             startsWith(lowercaseArg)).toList());

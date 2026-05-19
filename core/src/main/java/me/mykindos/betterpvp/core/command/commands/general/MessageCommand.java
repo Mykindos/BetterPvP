@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +56,11 @@ public class MessageCommand extends Command {
 
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
+                UtilMessage.message(player, "Command", "Player not found.");
+                return;
+            }
+
+            if(target.isOp() && target.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                 UtilMessage.message(player, "Command", "Player not found.");
                 return;
             }

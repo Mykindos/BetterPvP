@@ -24,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -256,20 +255,6 @@ public class RespawnHoldService implements Listener {
             } else if (taskDead) {
                 release(player, session);
             }
-        }
-    }
-
-    /**
-     * Decoupled compatibility with {@code VoidWorldListener}: it tries to open
-     * the clan travel-hub menu for every non-op in the void every 500ms. While
-     * a player is in our hold, we veto any GUI open so the recovery title/chat
-     * is the only thing they see. Neither listener references the other — they
-     * coordinate purely through this Bukkit event.
-     */
-    @EventHandler
-    public void onInventoryOpen(InventoryOpenEvent event) {
-        if (event.getPlayer() instanceof Player player && isHeld(player)) {
-            event.setCancelled(true);
         }
     }
 

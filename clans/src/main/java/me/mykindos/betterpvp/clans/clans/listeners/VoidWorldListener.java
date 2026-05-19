@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.fatigue.RespawnHoldService;
 import me.mykindos.betterpvp.clans.clans.transport.ClanTravelHubMenu;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -33,11 +34,13 @@ public class VoidWorldListener implements Listener {
     private final ClientManager clientManager;
     private final ClanManager clanManager;
     private final World voidWorld;
+    private final RespawnHoldService respawnHoldService;
 
     @Inject
-    public VoidWorldListener(ClientManager clientManager, ClanManager clanManager) {
+    public VoidWorldListener(ClientManager clientManager, ClanManager clanManager, RespawnHoldService respawnHoldService) {
         this.clientManager = clientManager;
         this.clanManager = clanManager;
+        this.respawnHoldService = respawnHoldService;
         voidWorld = new BPvPWorld(BPvPWorld.VOID_WORLD_NAME).getWorld();
     }
 
@@ -66,6 +69,10 @@ public class VoidWorldListener implements Listener {
     public void checkTransportMenu() {
         for (Player player : voidWorld.getPlayers()) {
             if (!player.isOp()) {
+                if (respawnHoldService.isHeld(player)) {
+                    continue;
+                }
+
                 if (player.getOpenInventory().getType() == InventoryType.CRAFTING) {
                     new ClanTravelHubMenu(player, clientManager.search().online(player), clanManager).show(player);
                 }
