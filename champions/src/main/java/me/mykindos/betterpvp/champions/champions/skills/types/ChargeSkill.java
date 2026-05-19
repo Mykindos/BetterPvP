@@ -4,16 +4,19 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import org.bukkit.entity.Player;
 
 import java.util.Iterator;
 import java.util.WeakHashMap;
+
 @CustomLog
 public abstract class ChargeSkill extends ChannelSkill {
     protected final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
-    protected ChargeSkill(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+
+    protected ChargeSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @Override
@@ -68,6 +71,7 @@ public abstract class ChargeSkill extends ChannelSkill {
 
     /**
      * Use the skill
+     *
      * @param player
      * @param chargeData
      * @param level
@@ -79,6 +83,7 @@ public abstract class ChargeSkill extends ChannelSkill {
 
     /**
      * Whether this should cancel the charge of the skill
+     *
      * @param player
      * @return
      */
@@ -93,6 +98,7 @@ public abstract class ChargeSkill extends ChannelSkill {
     /**
      * Whether this charge should tick
      * Use shouldCancelCharge if you want the charge to cancel entirely
+     *
      * @param player
      * @return
      */
@@ -102,6 +108,7 @@ public abstract class ChargeSkill extends ChannelSkill {
 
     /**
      * The charge of the skill at a given level
+     *
      * @param level
      * @return
      */

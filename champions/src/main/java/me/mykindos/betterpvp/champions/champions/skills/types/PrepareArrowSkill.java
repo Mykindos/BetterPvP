@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.types;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,18 +16,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public abstract class PrepareArrowSkill extends PrepareSkill implements CooldownSkill {
 
     protected final Set<Arrow> arrows = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public PrepareArrowSkill(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public PrepareArrowSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @EventHandler
@@ -56,7 +53,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
         int level = getLevel(player);
         if (level > 0) {
-            if(championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), true, isCancellable(), this::shouldDisplayActionBar)) {
+            if (championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), true, isCancellable(), this::shouldDisplayActionBar)) {
                 processEntityShootBowEvent(event, player, level, arrow);
                 active.remove(player.getUniqueId());
                 onFire(player);

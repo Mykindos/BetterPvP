@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -28,8 +29,8 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     protected final HashMap<UUID, HashMap<String, Long>> updaterCooldowns = new HashMap<>();
 
-    protected ActiveToggleSkill(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    protected ActiveToggleSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @EventHandler

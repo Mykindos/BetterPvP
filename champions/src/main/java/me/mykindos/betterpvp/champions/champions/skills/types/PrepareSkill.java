@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +18,8 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
 
     protected final Set<UUID> active = new HashSet<>();
 
-    public PrepareSkill(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    public PrepareSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @EventHandler

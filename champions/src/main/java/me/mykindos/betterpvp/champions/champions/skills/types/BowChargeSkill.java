@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -28,8 +29,8 @@ public abstract class BowChargeSkill extends ChargeSkill {
     private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
     private final WeakHashMap<Player, Long> timeSinceChargeStart = new WeakHashMap<>();
 
-    protected BowChargeSkill(Champions champions, ChampionsManager championsManager) {
-        super(champions, championsManager);
+    protected BowChargeSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
+        super(champions, championsManager, displayNameProvider);
     }
 
     @EventHandler
@@ -96,6 +97,7 @@ public abstract class BowChargeSkill extends ChargeSkill {
             }
         }
     }
+
     @Override
     public boolean isHolding(Player player) {
         return hasSkill(player) && UtilItem.isRanged(player.getInventory().getItemInMainHand());
