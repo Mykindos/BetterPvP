@@ -8,10 +8,15 @@ import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.IntFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilServer {
+
+    public static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 
     /**
      * Shorter version of doing Bukkit.getPluginManager().callEvent()
@@ -31,7 +36,7 @@ public class UtilServer {
     public static void runTask(BPvPPlugin plugin, boolean async, Runnable task) {
         if (plugin.isEnabled()) {
             if (async) {
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, task);
+                CompletableFuture.runAsync(task, EXECUTOR_SERVICE);
             } else {
                 Bukkit.getScheduler().runTask(plugin, task);
             }

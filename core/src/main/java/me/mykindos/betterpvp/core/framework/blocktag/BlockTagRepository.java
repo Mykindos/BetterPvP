@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CHUNK_BLOCK_TAGGING;
 
@@ -51,29 +52,29 @@ public class BlockTagRepository {
         }
     }
 
-    public Map<Long, Map<String, BlockTag>> getBlockTagsForChunk(Chunk chunk) {
-        Map<Long, Map<String, BlockTag>> blockTags = new HashMap<>();
+    public CompletableFuture<Map<Long, Map<String, BlockTag>>> getBlockTagsForChunk(Chunk chunk) {
         String chunkString = UtilWorld.chunkToFile(chunk);
+        return database.getAsyncDslContext().executeAsync(ctx -> {
+           Map<Long, Map<String, BlockTag>> blockTags = new HashMap<>();
 
-        try {
-            database.getDslContext()
-                    .selectFrom(CHUNK_BLOCK_TAGGING)
-                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm().getId()))
-                    .and(CHUNK_BLOCK_TAGGING.CHUNK.eq(chunkString))
-                    .fetch()
-                    .forEach(record -> {
-                        long blockKey = record.get(CHUNK_BLOCK_TAGGING.BLOCK_KEY);
-                        String tag = record.get(CHUNK_BLOCK_TAGGING.TAG);
-                        String value = record.get(CHUNK_BLOCK_TAGGING.VALUE);
+           ctx.selectFrom(CHUNK_BLOCK_TAGGING)
+                   .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm().getId()))
+                   .and(CHUNK_BLOCK_TAGGING.CHUNK.eq(chunkString))
+                   .fetch()
+                   .forEach(record -> {
+                       long blockKey = record.get(CHUNK_BLOCK_TAGGING.BLOCK_KEY);
+                       String tag = record.get(CHUNK_BLOCK_TAGGING.TAG);
+                       String value = record.get(CHUNK_BLOCK_TAGGING.VALUE);
 
-                        blockTags.computeIfAbsent(blockKey, key -> new HashMap<>())
-                                .put(tag, new BlockTag(tag, value));
-                    });
-        } catch (Exception e) {
-            log.error("Failed to get block tags for chunk {}: {}", chunkString, e).submit();
-        }
+                       blockTags.computeIfAbsent(blockKey, key -> new HashMap<>())
+                               .put(tag, new BlockTag(tag, value));
+                   });
 
-        return blockTags;
+           return blockTags;
+       }).exceptionally(ex -> {
+           log.error("Failed to get block tags for chunk {}: {}", chunkString, ex);
+           return new HashMap<>();
+       });
     }
 
     public void addBlockTag(Block block, BlockTag blockTag) {

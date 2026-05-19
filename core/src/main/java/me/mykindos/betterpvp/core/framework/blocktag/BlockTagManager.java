@@ -40,15 +40,15 @@ public class BlockTagManager {
     }
 
     public CompletableFuture<Map<Long, Map<String, BlockTag>>> getBlockTags(Chunk chunk) {
+        String chunkIdentifier = UtilWorld.chunkToFile(chunk);
+        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
+        if (blockTags != null) {
+            // Manually update the entry to refresh the expiry
+            BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
+            return CompletableFuture.completedFuture(blockTags);
+        }
         return CompletableFuture.supplyAsync(() -> {
-            String chunkIdentifier = UtilWorld.chunkToFile(chunk);
-            Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
-            if (blockTags != null) {
-                // Manually update the entry to refresh the expiry
-                BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
-                return blockTags;
-            }
-            return BLOCKTAG_CACHE.get(chunkIdentifier, key -> blockTagRepository.getBlockTagsForChunk(chunk));
+            return BLOCKTAG_CACHE.get(chunkIdentifier, key -> blockTagRepository.getBlockTagsForChunk(chunk).join());
         }, TAG_EXECUTOR).exceptionally(e -> {
             log.error("Failed to get block tags for chunk {}: {}", UtilWorld.chunkToFile(chunk), e).submit();
             return new HashMap<>();
@@ -76,13 +76,8 @@ public class BlockTagManager {
         String chunk = UtilWorld.chunkToFile(block.getChunk());
         Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
         if (blockTags == null) {
-            CompletableFuture.runAsync(() -> {
-                Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
-                BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
-            }, TAG_EXECUTOR).exceptionally(ex -> {
-                log.error("Failed to load block tags for chunk " + chunk, ex).submit();
-                return null;
-            });
+            blockTagRepository.getBlockTagsForChunk(block.getChunk())
+                    .thenAccept(blockTagsForChunk -> BLOCKTAG_CACHE.put(chunk, blockTagsForChunk));
 
             return false;
         }
@@ -102,13 +97,8 @@ public class BlockTagManager {
         String chunk = UtilWorld.chunkToFile(block.getChunk());
         Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
         if (blockTags == null) {
-            CompletableFuture.runAsync(() -> {
-                Map<Long, Map<String, BlockTag>> blockTagsForChunk = blockTagRepository.getBlockTagsForChunk(block.getChunk());
-                BLOCKTAG_CACHE.put(chunk, blockTagsForChunk);
-            }, TAG_EXECUTOR).exceptionally(ex -> {
-                log.error("Failed to load block tags for chunk " + chunk, ex).submit();
-                return null;
-            });
+            blockTagRepository.getBlockTagsForChunk(block.getChunk())
+                    .thenAccept(blockTagsForChunk -> BLOCKTAG_CACHE.put(chunk, blockTagsForChunk));
 
             return null;
         }
@@ -132,13 +122,7 @@ public class BlockTagManager {
     public void loadChunkIfAbsent(Chunk chunk) {
         String chunkIdentifier = UtilWorld.chunkToFile(chunk);
         if (BLOCKTAG_CACHE.getIfPresent(chunkIdentifier) == null) {
-            CompletableFuture.runAsync(() -> {
-                Map<Long, Map<String, BlockTag>> blockTags = blockTagRepository.getBlockTagsForChunk(chunk);
-                BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
-            }, TAG_EXECUTOR).exceptionally(ex -> {
-                log.error("Failed to load block tags for chunk " + chunkIdentifier, ex).submit();
-                return null;
-            });
+            blockTagRepository.getBlockTagsForChunk(chunk).thenAccept(blockTags -> BLOCKTAG_CACHE.put(chunkIdentifier, blockTags));
         }
     }
 
