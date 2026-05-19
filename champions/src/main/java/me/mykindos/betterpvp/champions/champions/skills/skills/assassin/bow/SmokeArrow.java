@@ -37,8 +37,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     private int slownessStrength;
 
     @Inject
-    public SmokeArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public SmokeArrow(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -105,8 +105,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .receivers(60)
                 .spawn();
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, target), getName(), level);
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, damager), getName(), level);
+        UtilMessage.simpleMessage(target, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damager, target), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(target, damager), getName(), level);
     }
 
     @Override

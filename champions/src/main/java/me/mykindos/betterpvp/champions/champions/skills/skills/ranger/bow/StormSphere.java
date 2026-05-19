@@ -55,8 +55,8 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     private double burstDuration;
 
     @Inject
-    public StormSphere(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public StormSphere(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

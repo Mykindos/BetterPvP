@@ -32,8 +32,8 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
     private double damageIncreasePerLevel;
 
     @Inject
-    public MagmaBlade(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public MagmaBlade(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

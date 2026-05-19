@@ -29,8 +29,8 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
     private double damageIncreasePerLevel;
 
     @Inject
-    public Precision(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Precision(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -30,8 +30,8 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
     private double internalCooldown;
 
     @Inject
-    public Swim(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Swim(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

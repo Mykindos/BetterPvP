@@ -38,8 +38,8 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
     private int maxEnemiesHitIncreasePerLevel;
 
     @Inject
-    public Cleave(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Cleave(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

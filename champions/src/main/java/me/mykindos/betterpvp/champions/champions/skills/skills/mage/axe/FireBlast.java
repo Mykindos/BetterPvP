@@ -73,8 +73,8 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
 
     @Inject
-    public FireBlast(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public FireBlast(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

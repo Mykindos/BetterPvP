@@ -41,8 +41,8 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     private double radiusIncreasePerLevel;
 
     @Inject
-    public BattleTaunt(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BattleTaunt(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

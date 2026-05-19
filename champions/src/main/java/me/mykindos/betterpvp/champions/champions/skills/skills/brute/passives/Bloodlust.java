@@ -47,8 +47,8 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
     private double health;
 
     @Inject
-    public Bloodlust(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, DamageLogManager damageLogManager) {
-        super(champions, championsManager, displayNameProvider);
+    public Bloodlust(Champions champions, ChampionsManager championsManager, DamageLogManager damageLogManager) {
+        super(champions, championsManager);
         this.damageLogManager = damageLogManager;
     }
 

@@ -48,8 +48,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     private double missedSwingsIncreasePerLevel;
 
     @Inject
-    public WolfsFury(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public WolfsFury(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

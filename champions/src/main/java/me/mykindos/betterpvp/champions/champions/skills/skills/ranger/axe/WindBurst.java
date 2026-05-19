@@ -66,8 +66,8 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
     private final Random random = new Random();
 
     @Inject
-    public WindBurst(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
-        super(champions, championsManager, displayNameProvider);
+    public WindBurst(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
+        super(champions, championsManager);
         this.taskScheduler = taskScheduler;
     }
 

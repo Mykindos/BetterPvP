@@ -43,8 +43,8 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
     private double speed;
 
     @Inject
-    public Battlebind(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Battlebind(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

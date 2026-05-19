@@ -56,8 +56,8 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     private double slowDuration;
 
     @Inject
-    public BarbedArrows(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BarbedArrows(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

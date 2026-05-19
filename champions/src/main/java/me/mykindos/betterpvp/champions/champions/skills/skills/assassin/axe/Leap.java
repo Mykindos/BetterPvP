@@ -43,8 +43,8 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     private double fallDamageLimit;
 
     @Inject
-    public Leap(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
-        super(champions, championsManager, displayNameProvider);
+    public Leap(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
+        super(champions, championsManager);
         this.taskScheduler = taskScheduler;
     }
 

@@ -51,8 +51,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     private double variance;
 
     @Inject
-    public IcePrison(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
-        super(champions, championsManager, displayNameProvider);
+    public IcePrison(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
+        super(champions, championsManager);
         this.blockHandler = blockHandler;
     }
 

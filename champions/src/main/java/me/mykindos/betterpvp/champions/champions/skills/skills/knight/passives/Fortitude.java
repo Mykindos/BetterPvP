@@ -39,8 +39,8 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     private double healInterval;
 
     @Inject
-    public Fortitude(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Fortitude(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

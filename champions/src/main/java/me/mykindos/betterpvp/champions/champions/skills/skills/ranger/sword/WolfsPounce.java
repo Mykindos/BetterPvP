@@ -56,8 +56,8 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
     private int slowStrength;
 
     @Inject
-    public WolfsPounce(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public WolfsPounce(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -162,8 +162,8 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
         championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
         // Cues
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damagee, damager), getName(), level);
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, damagee), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damagee, damager), getName(), level);
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damager, damagee), getName(), level);
         damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 0.5f);
     }
 

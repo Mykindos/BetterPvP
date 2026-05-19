@@ -72,8 +72,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     private double slowDurationIncreasePerLevel;
 
     @Inject
-    public TetherShot(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public TetherShot(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -362,8 +362,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
         player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(enemy, player), getName(), level);
-        UtilMessage.simpleMessage(enemy, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(player, enemy), getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(enemy, player), getName(), level);
+        UtilMessage.simpleMessage(enemy, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(player, enemy), getName(), level);
     }
 
     @EventHandler

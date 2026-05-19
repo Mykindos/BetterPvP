@@ -63,8 +63,8 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     private double speed;
 
     @Inject
-    public MagneticAxe(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, ItemFactory itemFactory, ItemRegistry registry) {
-        super(champions, championsManager, displayNameProvider);
+    public MagneticAxe(Champions champions, ChampionsManager championsManager, ItemFactory itemFactory, ItemRegistry registry) {
+        super(champions, championsManager);
         this.itemFactory = itemFactory;
 
         final BaseItem baseItem = new BaseItem("Magnetic Axe Placeholder",

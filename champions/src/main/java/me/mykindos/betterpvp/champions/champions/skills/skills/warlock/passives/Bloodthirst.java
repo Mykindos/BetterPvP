@@ -32,8 +32,8 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
     private int speedStrength;
 
     @Inject
-    public Bloodthirst(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Bloodthirst(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -47,8 +47,8 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
     private double projectileSpeed;
 
     @Inject
-    public Skullsplitter(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, EffectManager effectManager) {
-        super(champions, championsManager, displayNameProvider);
+    public Skullsplitter(Champions champions, ChampionsManager championsManager, EffectManager effectManager) {
+        super(champions, championsManager);
         this.effectManager = effectManager;
     }
 

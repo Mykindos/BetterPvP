@@ -32,8 +32,8 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener, Debuf
     private int poisonStrength;
 
     @Inject
-    public ViperStrikes(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ViperStrikes(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -27,8 +27,8 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
     private double reductionPerLevel;
 
     @Inject
-    public Colossus(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Colossus(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

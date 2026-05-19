@@ -51,8 +51,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     private int slowStrength;
 
     @Inject
-    public Disengage(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Disengage(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

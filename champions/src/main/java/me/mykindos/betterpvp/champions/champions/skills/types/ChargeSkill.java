@@ -15,8 +15,8 @@ import java.util.WeakHashMap;
 public abstract class ChargeSkill extends ChannelSkill {
     protected final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
 
-    protected ChargeSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    protected ChargeSkill(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

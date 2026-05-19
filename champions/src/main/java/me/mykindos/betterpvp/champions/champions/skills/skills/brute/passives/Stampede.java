@@ -58,8 +58,8 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     private double knockbackIncreasePerLevel;
 
     @Inject
-    public Stampede(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Stampede(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

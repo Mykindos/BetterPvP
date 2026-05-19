@@ -59,8 +59,8 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     private CooldownManager cooldownManager;
 
     @Inject
-    public Evade(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, DamageDelayManager damageDelayManager) {
-        super(champions, championsManager, displayNameProvider);
+    public Evade(Champions champions, ChampionsManager championsManager, DamageDelayManager damageDelayManager) {
+        super(champions, championsManager);
         this.damageDelayManager = damageDelayManager;
     }
 
@@ -165,7 +165,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
 
             if (ent instanceof Player temp) {
-                UtilMessage.simpleMessage(temp, getClassType().getName(), "%s<gray> used <green>%s %s</green>!", displayNameProvider.getDisplayName(player, temp), getName(), level);
+                UtilMessage.simpleMessage(temp, getClassType().getName(), "%s<gray> used <green>%s %s</green>!", championsManager.getDisplayNameProvider().getDisplayName(player, temp), getName(), level);
             }
 
             active.remove(player.getUniqueId());

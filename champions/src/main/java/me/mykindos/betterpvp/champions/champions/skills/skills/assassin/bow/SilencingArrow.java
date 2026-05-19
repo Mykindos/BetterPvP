@@ -31,8 +31,8 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
     private double durationIncreasePerLevel;
 
     @Inject
-    public SilencingArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public SilencingArrow(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -80,12 +80,12 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) (getDuration(level)) * 1000L);
         if (championsManager.getEffects().hasEffect(target, EffectTypes.IMMUNE)) {
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "%s<gray> is immune to your silence!", displayNameProvider.getDisplayName(target, damager));
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "%s<gray> is immune to your silence!", championsManager.getDisplayNameProvider().getDisplayName(target, damager));
             return;
         }
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <green>%s %s</green>.", displayNameProvider.getDisplayName(target, damager), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <green>%s %s</green>.", championsManager.getDisplayNameProvider().getDisplayName(target, damager), getName(), level);
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, damagee), getName(), level);
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damager, damagee), getName(), level);
     }
 
     @Override

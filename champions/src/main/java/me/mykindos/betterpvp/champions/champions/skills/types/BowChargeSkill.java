@@ -29,8 +29,8 @@ public abstract class BowChargeSkill extends ChargeSkill {
     private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
     private final WeakHashMap<Player, Long> timeSinceChargeStart = new WeakHashMap<>();
 
-    protected BowChargeSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    protected BowChargeSkill(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @EventHandler

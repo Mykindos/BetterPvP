@@ -41,8 +41,8 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
     private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
 
     @Inject
-    public Sever(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Sever(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -126,8 +126,8 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
         } else {
             championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed %s.", displayNameProvider.getDisplayName(ent, player));
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You have been severed by %s.", displayNameProvider.getDisplayName(player, ent));
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed %s.", championsManager.getDisplayNameProvider().getDisplayName(ent, player));
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You have been severed by %s.", championsManager.getDisplayNameProvider().getDisplayName(player, ent));
 
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
         }

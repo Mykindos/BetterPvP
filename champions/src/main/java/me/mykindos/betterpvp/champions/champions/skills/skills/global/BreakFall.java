@@ -27,8 +27,8 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
     private double damageReductionIncreasePerLevel;
 
     @Inject
-    public BreakFall(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BreakFall(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

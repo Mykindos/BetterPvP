@@ -57,8 +57,8 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     private double fov;
 
     @Inject
-    public ShieldSmash(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ShieldSmash(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             }
 
             // Inform them
-            UtilMessage.simpleMessage(ent, "Skill", "%s<gray> hit you with <alt>%s</alt>.", displayNameProvider.getDisplayName(player, ent), getName());
+            UtilMessage.simpleMessage(ent, "Skill", "%s<gray> hit you with <alt>%s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(player, ent), getName());
         }
 
         if (hit) { // entity hit

@@ -52,8 +52,8 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     private boolean allowPickupItems;
 
     @Inject
-    public SmokeBomb(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public SmokeBomb(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

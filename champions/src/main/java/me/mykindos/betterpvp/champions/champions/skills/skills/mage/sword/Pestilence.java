@@ -53,8 +53,8 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
     private double expirySeconds;
 
     @Inject
-    public Pestilence(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, EffectManager effectManager) {
-        super(champions, championsManager, displayNameProvider);
+    public Pestilence(Champions champions, ChampionsManager championsManager, EffectManager effectManager) {
+        super(champions, championsManager);
         this.effectManager = effectManager;
     }
 

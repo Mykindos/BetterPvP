@@ -50,8 +50,8 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
 
     @Inject
-    public ComboAttack(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ComboAttack(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

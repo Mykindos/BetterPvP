@@ -60,8 +60,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     private double bonusDamagePerTenBlocks;
 
     @Inject
-    public SeismicSlam(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public SeismicSlam(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 
@@ -164,7 +164,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             double damage = calculateDamage(player, target, data);
             UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), damage, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <green>%s %s</green>", displayNameProvider.getDisplayName(player, damagee), getName(), level);
+                UtilMessage.simpleMessage(damagee, getClassType().getName(), "%s hit you with <green>%s %s</green>", championsManager.getDisplayNameProvider().getDisplayName(player, damagee), getName(), level);
             }
         }
 

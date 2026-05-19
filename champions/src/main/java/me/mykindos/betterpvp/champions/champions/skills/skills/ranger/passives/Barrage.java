@@ -56,8 +56,8 @@ public class Barrage extends BowChargeSkill implements Listener, PassiveSkill, D
     private static final double FULL_CHARGE_VELOCITY = 3.0;
 
     @Inject
-    public Barrage(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Barrage(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

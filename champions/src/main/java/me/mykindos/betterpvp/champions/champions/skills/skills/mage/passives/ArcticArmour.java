@@ -57,8 +57,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     private double slowDurationIncreasePerLevel;
 
     @Inject
-    public ArcticArmour(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
-        super(champions, championsManager, displayNameProvider);
+    public ArcticArmour(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
+        super(champions, championsManager);
         this.blockHandler = blockHandler;
     }
 

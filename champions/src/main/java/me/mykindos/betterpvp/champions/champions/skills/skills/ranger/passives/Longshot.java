@@ -45,8 +45,8 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
     private double distanceDecreasePerLevel;
 
     @Inject
-    public Longshot(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Longshot(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

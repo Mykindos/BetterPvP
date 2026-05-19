@@ -46,8 +46,8 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
 
     @Inject
-    public BioticQuiver(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BioticQuiver(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -232,16 +232,16 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
 
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, damager), getName(), level);
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(target, damager), getName(), level);
             if (!damager.equals(target)) {
-                UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, target), getName(), level);
+                UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damager, target), getName(), level);
             }
 
         } else {
             championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration(level) * 1000));
 
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, damager), getName(), level);
-            UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, target), getName(), level);
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(target, damager), getName(), level);
+            UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damager, target), getName(), level);
         }
 
     }

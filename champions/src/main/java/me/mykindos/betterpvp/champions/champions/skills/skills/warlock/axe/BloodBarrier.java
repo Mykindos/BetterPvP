@@ -63,8 +63,8 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     private double healthReductionPerPlayerAffectedDecreasePerLevel;
 
     @Inject
-    public BloodBarrier(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BloodBarrier(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

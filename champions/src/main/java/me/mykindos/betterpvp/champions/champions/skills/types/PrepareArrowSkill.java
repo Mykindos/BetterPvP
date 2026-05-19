@@ -22,8 +22,8 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
     protected final Set<Arrow> arrows = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public PrepareArrowSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public PrepareArrowSkill(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @EventHandler

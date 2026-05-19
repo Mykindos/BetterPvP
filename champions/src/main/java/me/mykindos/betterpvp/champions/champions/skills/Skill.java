@@ -60,9 +60,6 @@ public abstract class Skill implements IChampionsSkill {
     protected final Champions champions;
     protected final ChampionsManager championsManager;
 
-    @Getter
-    protected final DisplayNameProvider displayNameProvider;
-
     private boolean enabled;
     private int maxLevel;
     protected double cooldown;
@@ -85,10 +82,9 @@ public abstract class Skill implements IChampionsSkill {
     private boolean canUseInLiquid;
 
     @Inject
-    public Skill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
+    public Skill(Champions champions, ChampionsManager championsManager) {
         this.champions = champions;
         this.championsManager = championsManager;
-        this.displayNameProvider = displayNameProvider;
         loadConfig();
     }
 

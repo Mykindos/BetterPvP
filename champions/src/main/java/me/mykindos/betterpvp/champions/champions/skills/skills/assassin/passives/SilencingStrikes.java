@@ -33,8 +33,8 @@ public class SilencingStrikes extends Skill implements PassiveSkill, Listener, D
     public List<SilencingStrikesData> data = new ArrayList<>();
 
     @Inject
-    public SilencingStrikes(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public SilencingStrikes(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     private int hitsNeeded;

@@ -53,8 +53,8 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     private double initialEnergyCost;
 
     @Inject
-    public Blizzard(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Blizzard(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

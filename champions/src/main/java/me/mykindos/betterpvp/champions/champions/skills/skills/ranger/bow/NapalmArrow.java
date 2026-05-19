@@ -70,8 +70,8 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     private final Random random = new Random();
 
     @Inject
-    public NapalmArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public NapalmArrow(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -42,8 +42,8 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
     private double timeSpan;
 
     @Inject
-    public ShockingStrikes(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ShockingStrikes(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

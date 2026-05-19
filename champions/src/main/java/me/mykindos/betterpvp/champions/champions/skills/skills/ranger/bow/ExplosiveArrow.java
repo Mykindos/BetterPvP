@@ -61,8 +61,8 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
     private final Map<UUID, Arrow> explosiveArrows = new HashMap<>();
 
     @Inject
-    public ExplosiveArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ExplosiveArrow(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

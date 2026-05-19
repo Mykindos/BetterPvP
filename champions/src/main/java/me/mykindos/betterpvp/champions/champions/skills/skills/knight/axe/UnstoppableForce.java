@@ -58,8 +58,8 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     private double hitboxExpansion;
 
     @Inject
-    public UnstoppableForce(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public UnstoppableForce(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

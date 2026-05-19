@@ -44,8 +44,8 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     private double lifespan;
 
     @Inject
-    public Ride(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Ride(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

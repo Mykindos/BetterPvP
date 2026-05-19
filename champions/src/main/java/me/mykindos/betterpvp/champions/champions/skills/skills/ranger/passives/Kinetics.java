@@ -83,8 +83,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     });
 
     @Inject
-    public Kinetics(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
-        super(champions, championsManager, displayNameProvider);
+    public Kinetics(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
+        super(champions, championsManager);
         this.taskScheduler = taskScheduler;
     }
 

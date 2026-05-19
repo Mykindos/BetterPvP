@@ -86,8 +86,8 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
     });
 
     @Inject
-    public Wreath(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Wreath(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -61,8 +61,8 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     private double fallDamageLimit;
 
     @Inject
-    public Takedown(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
-        super(champions, championsManager, displayNameProvider);
+    public Takedown(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
+        super(champions, championsManager);
         this.taskScheduler = taskScheduler;
     }
 
@@ -166,10 +166,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>", displayNameProvider.getDisplayName(target, player), getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>", championsManager.getDisplayNameProvider().getDisplayName(target, player), getName(), level);
         UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), "Takedown"));
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>", displayNameProvider.getDisplayName(player, target), getName(), level);
+        UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>", championsManager.getDisplayNameProvider().getDisplayName(player, target), getName(), level);
         UtilDamage.doDamage(new DamageEvent(player, target, null, new SkillDamageCause(this), getRecoilDamage(level), "Takedown Recoil"));
 
         long duration = (long) (getDuration(level) * 1000L);

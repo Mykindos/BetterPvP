@@ -32,8 +32,8 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
     private double damage;
 
     @Inject
-    public Backstab(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Backstab(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

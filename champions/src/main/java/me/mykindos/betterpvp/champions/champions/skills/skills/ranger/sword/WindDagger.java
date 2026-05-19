@@ -46,8 +46,8 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
     private double speed;
 
     @Inject
-    public WindDagger(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public WindDagger(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

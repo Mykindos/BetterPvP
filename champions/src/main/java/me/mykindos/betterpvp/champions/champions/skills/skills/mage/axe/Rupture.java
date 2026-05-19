@@ -61,8 +61,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     private int slowStrength;
 
     @Inject
-    public Rupture(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Rupture(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

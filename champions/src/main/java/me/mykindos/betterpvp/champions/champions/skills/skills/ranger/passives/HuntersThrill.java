@@ -43,8 +43,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
 
     @Inject
-    public HuntersThrill(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public HuntersThrill(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

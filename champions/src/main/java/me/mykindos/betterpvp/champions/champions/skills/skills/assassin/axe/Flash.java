@@ -67,8 +67,8 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     private double teleportDistance;
 
     @Inject
-    public Flash(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Flash(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -64,8 +64,8 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     private double randomSiphonHealthGainChance;
 
     @Inject
-    public Siphon(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Siphon(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -46,8 +46,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private int vulnerabilityStrength;
 
     @Inject
-    public Immolate(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Immolate(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

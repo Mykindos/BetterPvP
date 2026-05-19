@@ -32,8 +32,8 @@ public class CripplingBlow extends Skill implements PassiveSkill, DebuffSkill {
     private int slownessStrength;
 
     @Inject
-    public CripplingBlow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public CripplingBlow(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -47,8 +47,8 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     private final HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
 
     @Inject
-    public SoulBonds(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public SoulBonds(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

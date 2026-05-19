@@ -62,8 +62,8 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
     private double damageIncreasePerLevel;
 
     @Inject
-    public FleshHook(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public FleshHook(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -216,8 +216,8 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
         UtilDamage.doDamage(ev);
 
         // Cues
-        UtilMessage.simpleMessage(hit, getClassType().getName(), "%s<gray> pulled you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(player, hit), getName(), level);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(hit, player), getName(), level);
+        UtilMessage.simpleMessage(hit, getClassType().getName(), "%s<gray> pulled you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(player, hit), getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(hit, player), getName(), level);
         
         new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 

@@ -33,8 +33,8 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
     private double maxDamageIncreasePerLevel;
 
     @Inject
-    public Overwhelm(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Overwhelm(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

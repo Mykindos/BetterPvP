@@ -58,8 +58,8 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     private double frontalBlockAngleIncreasePerLevel;
 
     @Inject
-    public DefensiveStance(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public DefensiveStance(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

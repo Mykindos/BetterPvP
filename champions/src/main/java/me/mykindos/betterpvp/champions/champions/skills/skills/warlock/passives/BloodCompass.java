@@ -40,8 +40,8 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     private final Map<Player, Integer> playerTaskIdMap = new WeakHashMap<>();
 
     @Inject
-    public BloodCompass(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BloodCompass(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -240,8 +240,8 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
 
-                    UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(player, target), getName(), level);
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, player), getName(), level);
+                    UtilMessage.simpleMessage(target, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(player, target), getName(), level);
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(target, player), getName(), level);
 
                     new BukkitRunnable() {
                         @Override

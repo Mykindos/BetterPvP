@@ -53,8 +53,8 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     private double velocityStrength;
 
     @Inject
-    public LightningOrb(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public LightningOrb(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

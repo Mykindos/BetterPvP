@@ -35,8 +35,8 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     private final Set<Player> trackedPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 
     @Inject
-    public Adrenaline(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Adrenaline(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

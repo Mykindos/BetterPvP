@@ -45,8 +45,8 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
 
     @Inject
-    public HoldPosition(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public HoldPosition(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

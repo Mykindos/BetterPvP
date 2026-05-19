@@ -56,8 +56,8 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     private final Map<Player, ThreateningShoutData> playerDataMap;
 
     @Inject
-    public ThreateningShout(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ThreateningShout(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
         playerDataMap = new WeakHashMap<>();
     }
 
@@ -161,7 +161,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                                         getDamage(level),
                                         "Threatening Shout"));
                                 championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                                UtilMessage.simpleMessage(player, getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, player), getName(), level);
+                                UtilMessage.simpleMessage(player, getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(target, player), getName(), level);
                                 damagedEntities.add(target);
                             }
                         }

@@ -57,8 +57,8 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     private double healthReductionDecreasePerLevel;
 
     @Inject
-    public TormentedSoil(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public TormentedSoil(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

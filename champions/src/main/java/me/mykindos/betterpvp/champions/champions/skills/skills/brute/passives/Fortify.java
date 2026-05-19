@@ -34,8 +34,8 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
 
 
     @Inject
-    public Fortify(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Fortify(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
         numParticles = 8;
         particleRadius = 0.5;
 

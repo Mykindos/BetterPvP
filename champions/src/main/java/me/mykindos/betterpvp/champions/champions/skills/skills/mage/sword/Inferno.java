@@ -59,8 +59,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     private double immuneTime;
 
     @Inject
-    public Inferno(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Inferno(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

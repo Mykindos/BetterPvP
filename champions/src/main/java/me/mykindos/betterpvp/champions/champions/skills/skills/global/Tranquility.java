@@ -29,8 +29,8 @@ public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSk
     private int regenerationStrength;
 
     @Inject
-    public Tranquility(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Tranquility(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

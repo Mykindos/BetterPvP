@@ -47,8 +47,8 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     private double damagePercentIncreasePerLevel;
 
     @Inject
-    public Frailty(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Frailty(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

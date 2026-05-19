@@ -46,8 +46,8 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     private double healthReductionPerPlayerAffectedDecreasePerLevel;
 
     @Inject
-    public Cleanse(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Cleanse(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             healthReduction += getHealthReductionPerPlayerAffected(level);
 
             championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
-            UtilMessage.simpleMessage(ally, getName(), "You were cleansed of negative effects by %s.", displayNameProvider.getDisplayName(player, ally));
+            UtilMessage.simpleMessage(ally, getName(), "You were cleansed of negative effects by %s.", championsManager.getDisplayNameProvider().getDisplayName(player, ally));
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
 

@@ -49,8 +49,8 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
     private double duration;
 
     @Inject
-    public Sharpshooter(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Sharpshooter(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

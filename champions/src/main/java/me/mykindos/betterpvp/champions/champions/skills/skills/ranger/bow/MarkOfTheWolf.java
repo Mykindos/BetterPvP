@@ -71,8 +71,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @Inject
-    public MarkOfTheWolf(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public MarkOfTheWolf(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -199,9 +199,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             championsManager.getEffects().addEffect(target, damager, EffectTypes.SPEED, getSpeedStrength(level), (long) (getDuration(level) * 1000L));
         }
 
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(target, damager), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(target, damager), getName(), level);
         if (!damager.equals(target) && target instanceof Player targetPlayer) {
-            UtilMessage.simpleMessage(targetPlayer, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(damager, targetPlayer), getName(), level);
+            UtilMessage.simpleMessage(targetPlayer, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damager, targetPlayer), getName(), level);
         }
 
     }

@@ -129,8 +129,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     private double noDamageAbsorbedMessageDuration;
 
     @Inject
-    public VanguardsMight(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public VanguardsMight(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

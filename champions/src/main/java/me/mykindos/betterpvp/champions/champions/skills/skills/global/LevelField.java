@@ -83,8 +83,8 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
     });
 
     @Inject
-    public LevelField(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public LevelField(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

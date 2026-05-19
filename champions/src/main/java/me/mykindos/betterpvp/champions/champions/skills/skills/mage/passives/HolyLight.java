@@ -34,8 +34,8 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
     public double durationIncreasePerLevel;
 
     @Inject
-    public HolyLight(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public HolyLight(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

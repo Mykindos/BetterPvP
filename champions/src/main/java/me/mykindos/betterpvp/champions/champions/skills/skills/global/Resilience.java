@@ -33,8 +33,8 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
     private double durationReductionPerLevel;
 
     @Inject
-    public Resilience(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Resilience(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

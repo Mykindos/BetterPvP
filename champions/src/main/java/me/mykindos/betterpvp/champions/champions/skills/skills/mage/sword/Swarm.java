@@ -58,8 +58,8 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     private double batDamage;
 
     @Inject
-    public Swarm(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Swarm(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

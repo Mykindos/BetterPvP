@@ -26,8 +26,8 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
     private double energySiphonedIncreasePerLevel;
 
     @Inject
-    public NullBlade(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public NullBlade(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

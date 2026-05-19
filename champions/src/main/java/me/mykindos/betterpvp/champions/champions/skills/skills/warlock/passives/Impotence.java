@@ -32,8 +32,8 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
     private int maxEnemies;
 
     @Inject
-    public Impotence(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Impotence(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

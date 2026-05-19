@@ -42,8 +42,8 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     private final WorldBlockHandler blockHandler;
 
     @Inject
-    public RootingAxe(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
-        super(champions, championsManager, displayNameProvider);
+    public RootingAxe(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
+        super(champions, championsManager);
         this.blockHandler = blockHandler;
     }
 

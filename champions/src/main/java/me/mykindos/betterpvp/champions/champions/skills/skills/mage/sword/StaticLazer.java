@@ -56,8 +56,8 @@ public class StaticLazer extends ChargeSkill implements InteractSkill, EnergyCha
     private double explosionRadius;
 
     @Inject
-    public StaticLazer(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public StaticLazer(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

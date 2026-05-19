@@ -36,8 +36,8 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     public int slownessStrength;
 
     @Inject
-    public Void(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Void(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

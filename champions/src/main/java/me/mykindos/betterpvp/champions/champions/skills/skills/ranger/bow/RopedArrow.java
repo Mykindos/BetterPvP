@@ -40,8 +40,8 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     private double velocityStrength;
 
     @Inject
-    public RopedArrow(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, TaskScheduler taskScheduler) {
-        super(champions, championsManager, displayNameProvider);
+    public RopedArrow(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
+        super(champions, championsManager);
         this.taskScheduler = taskScheduler;
     }
 

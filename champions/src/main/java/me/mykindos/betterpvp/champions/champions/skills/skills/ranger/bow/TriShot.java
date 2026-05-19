@@ -82,8 +82,8 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
 
     @Inject
-    public TriShot(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public TriShot(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

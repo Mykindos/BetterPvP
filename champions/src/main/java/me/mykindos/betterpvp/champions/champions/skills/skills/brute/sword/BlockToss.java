@@ -70,8 +70,8 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
     private double hitBoxSize;
 
     @Inject
-    public BlockToss(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BlockToss(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

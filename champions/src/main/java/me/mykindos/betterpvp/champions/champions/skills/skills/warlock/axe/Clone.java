@@ -88,8 +88,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     private int slownessLevel;
 
     @Inject
-    public Clone(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Clone(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

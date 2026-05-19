@@ -23,8 +23,8 @@ public abstract class ChannelSkill extends Skill implements Listener {
 
     protected final Set<UUID> active = new HashSet<>();
 
-    public ChannelSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ChannelSkill(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @EventHandler

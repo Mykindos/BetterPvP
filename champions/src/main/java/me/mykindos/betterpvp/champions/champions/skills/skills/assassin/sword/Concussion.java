@@ -33,8 +33,8 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
     private int concussionStrength;
 
     @Inject
-    public Concussion(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Concussion(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -87,14 +87,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         if (active.contains(damager.getUniqueId())) {
             event.addReason("Concussion");
             if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
-                UtilMessage.simpleMessage(damager, getName(), "%s<gray> is already concussed.", displayNameProvider.getDisplayName(damagee, damager));
+                UtilMessage.simpleMessage(damager, getName(), "%s<gray> is already concussed.", championsManager.getDisplayNameProvider().getDisplayName(damagee, damager));
                 return;
             }
 
             championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
 
-            UtilMessage.simpleMessage(damager, getName(), "You gave %s<gray> a concussion.", displayNameProvider.getDisplayName(damagee, damager));
-            UtilMessage.simpleMessage(damagee, getName(), "%s<gray> gave you a concussion.", displayNameProvider.getDisplayName(damager, damagee));
+            UtilMessage.simpleMessage(damager, getName(), "You gave %s<gray> a concussion.", championsManager.getDisplayNameProvider().getDisplayName(damagee, damager));
+            UtilMessage.simpleMessage(damagee, getName(), "%s<gray> gave you a concussion.", championsManager.getDisplayNameProvider().getDisplayName(damager, damagee));
             active.remove(damager.getUniqueId());
         }
     }

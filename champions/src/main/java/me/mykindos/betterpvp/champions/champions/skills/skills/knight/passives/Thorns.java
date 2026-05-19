@@ -36,8 +36,8 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
     private double damageIncreasePerLevel;
 
     @Inject
-    public Thorns(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Thorns(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -43,8 +43,8 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     private final HashMap<UUID, Integer> charges = new HashMap<>();
 
     @Inject
-    public Deflection(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Deflection(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

@@ -51,8 +51,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     private double mobHealthModifier;
 
     @Inject
-    private BloodSphere(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    private BloodSphere(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

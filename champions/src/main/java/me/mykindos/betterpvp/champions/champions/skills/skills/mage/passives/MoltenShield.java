@@ -24,8 +24,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 public class MoltenShield extends Skill implements PassiveSkill, BuffSkill, DefensiveSkill {
 
     @Inject
-    public MoltenShield(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public MoltenShield(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

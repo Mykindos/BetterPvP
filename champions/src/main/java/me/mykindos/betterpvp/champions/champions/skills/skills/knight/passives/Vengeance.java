@@ -38,8 +38,8 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     private double expirationTimeIncreasePerLevel;
 
     @Inject
-    public Vengeance(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Vengeance(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

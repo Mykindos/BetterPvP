@@ -25,8 +25,8 @@ public class EnergyPool extends Skill implements PassiveSkill, BuffSkill {
     private double energyPoolIncreasePerLevel;
 
     @Inject
-    public EnergyPool(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public EnergyPool(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

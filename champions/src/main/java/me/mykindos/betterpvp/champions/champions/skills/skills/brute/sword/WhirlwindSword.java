@@ -35,8 +35,8 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     private double damageIncreasePerLevel;
 
     @Inject
-    public WhirlwindSword(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public WhirlwindSword(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                     VelocityData velocityData = new VelocityData(velocity, 1.0D, true, 0.0D, 0.25D, 4.0D, true);
                     UtilVelocity.velocity(target, player, velocityData);
                     UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), getName()));
-                    UtilMessage.simpleMessage(target, getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(player, target), getName(), level);
+                    UtilMessage.simpleMessage(target, getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(player, target), getName(), level);
                 }
 
             }

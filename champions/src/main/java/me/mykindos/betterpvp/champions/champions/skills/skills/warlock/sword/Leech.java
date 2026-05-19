@@ -56,8 +56,8 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     private int maximumEnemiesIncreasePerLevel;
 
     @Inject
-    public Leech(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Leech(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

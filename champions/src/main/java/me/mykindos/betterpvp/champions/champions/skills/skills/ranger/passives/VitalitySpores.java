@@ -61,8 +61,8 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     @Inject
-    public VitalitySpores(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public VitalitySpores(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

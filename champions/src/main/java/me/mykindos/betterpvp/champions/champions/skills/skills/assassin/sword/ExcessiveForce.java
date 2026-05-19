@@ -82,8 +82,8 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     private double durationIncreasePerLevel;
 
     @Inject
-    public ExcessiveForce(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public ExcessiveForce(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

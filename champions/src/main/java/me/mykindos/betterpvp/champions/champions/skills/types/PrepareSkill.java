@@ -18,8 +18,8 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
 
     protected final Set<UUID> active = new HashSet<>();
 
-    public PrepareSkill(Champions champions, ChampionsManager championsManager, final DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public PrepareSkill(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @EventHandler

@@ -49,8 +49,8 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     private final List<Item> iceShards = new ArrayList<>();
 
     @Inject
-    public GlacialBlade(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public GlacialBlade(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

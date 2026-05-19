@@ -52,8 +52,8 @@ public class Farshot extends Skill implements PassiveSkill, DamageSkill, Offensi
     private double baseArrowDamage;
 
     @Inject
-    public Farshot(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Farshot(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

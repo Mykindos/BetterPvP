@@ -24,8 +24,8 @@ public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
     private double percentagePerLevel;
 
     @Inject
-    public FastRecovery(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public FastRecovery(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

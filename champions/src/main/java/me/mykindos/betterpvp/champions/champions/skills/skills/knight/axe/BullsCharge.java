@@ -52,8 +52,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     private int slownessStrength;
 
     @Inject
-    public BullsCharge(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public BullsCharge(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override
@@ -126,10 +126,10 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
                 if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.simpleMessage(damaged, getClassType().getName(), displayNameProvider.getDisplayName(damager, damaged) + "<gray> hit you with <green>" + getName() + " " + level + "</green>.");
+                    UtilMessage.simpleMessage(damaged, getClassType().getName(), championsManager.getDisplayNameProvider().getDisplayName(damager, damaged) + "<gray> hit you with <green>" + getName() + " " + level + "</green>.");
                 }
 
-                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit " + displayNameProvider.getDisplayName(event.getDamagee(), damager) + "<gray> with <green>" + getName() + " " + level + "</green>.");
+                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit " + championsManager.getDisplayNameProvider().getDisplayName(event.getDamagee(), damager) + "<gray> with <green>" + getName() + " " + level + "</green>.");
                 running.remove(damager.getUniqueId());
             }
         }

@@ -46,8 +46,8 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
     private double durationIncreasePerLevel;
 
     @Inject
-    public Recall(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Recall(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

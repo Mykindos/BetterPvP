@@ -58,8 +58,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     private double missedSwingsIncreasePerLevel;
 
     @Inject
-    public Agility(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Agility(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

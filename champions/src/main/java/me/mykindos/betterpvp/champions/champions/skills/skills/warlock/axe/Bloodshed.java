@@ -45,8 +45,8 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
     private double healthReductionPerPlayerAffectedDecreasePerLevel;
 
     @Inject
-    public Bloodshed(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Bloodshed(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

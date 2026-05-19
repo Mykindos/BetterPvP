@@ -39,8 +39,8 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
     private final WeakHashMap<Player, Set<Player>> trackedEnemies = new WeakHashMap<>();
 
     @Inject
-    public Intimidation(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Intimidation(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

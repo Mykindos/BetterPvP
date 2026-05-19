@@ -48,8 +48,8 @@ public class HeavyArrows extends BowChargeSkill implements DamageSkill, PassiveS
     private double pushBackIncreasePerLevel;
 
     @Inject
-    public HeavyArrows(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public HeavyArrows(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

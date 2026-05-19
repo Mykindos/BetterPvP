@@ -28,8 +28,8 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
     private double percentageIncreasePerLevel;
 
     @Inject
-    public Sacrifice(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Sacrifice(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
     @Override

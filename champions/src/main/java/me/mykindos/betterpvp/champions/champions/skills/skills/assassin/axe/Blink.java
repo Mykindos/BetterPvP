@@ -43,8 +43,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     private int deblinkTimeIncreasePerLevel;
 
     @Inject
-    public Blink(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider) {
-        super(champions, championsManager, displayNameProvider);
+    public Blink(Champions champions, ChampionsManager championsManager) {
+        super(champions, championsManager);
     }
 
 

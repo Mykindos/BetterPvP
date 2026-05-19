@@ -61,8 +61,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     private final List<FissureCast> activeCasts = new ArrayList<>();
 
     @Inject
-    public Fissure(Champions champions, ChampionsManager championsManager, DisplayNameProvider displayNameProvider, WorldBlockHandler blockHandler) {
-        super(champions, championsManager, displayNameProvider);
+    public Fissure(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
+        super(champions, championsManager);
         this.blockHandler = blockHandler;
     }
 
@@ -192,8 +192,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doDamage(new DamageEvent(livingEntity, fissureCast.getPlayer(), null, new SkillDamageCause(this), damage, "Fissure"));
 
-            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(livingEntity, fissureCast.getPlayer()), getName(), fissureCast.getLevel());
-            UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", displayNameProvider.getDisplayName(fissureBlock.getPlayer(), livingEntity), getName(), fissureCast.getLevel());
+            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit %s<gray> with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(livingEntity, fissureCast.getPlayer()), getName(), fissureCast.getLevel());
+            UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "%s<gray> hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(fissureBlock.getPlayer(), livingEntity), getName(), fissureCast.getLevel());
 
             fissureCast.getEntitiesHit().add(livingEntity.getUniqueId());
         }
