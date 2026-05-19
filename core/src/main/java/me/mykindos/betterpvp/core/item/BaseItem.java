@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.renderer.ItemNameRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameRarityRenderer;
+import me.mykindos.betterpvp.core.item.renderer.RarityTooltipStyleRenderer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -75,6 +76,7 @@ public class BaseItem implements Item {
         this.instanceRarityProvider = rarityProvider;
         this.modelBytes = model.serializeAsBytes();
         addItemStackRenderer(new DurabilityRenderer());
+        addItemStackRenderer(new RarityTooltipStyleRenderer());
     }
 
     public final @NotNull ItemStack getModel() {
