@@ -185,10 +185,12 @@ public class ClientListener implements Listener {
             }
         }
 
-        String hostAddress = event.getAddress().getHostAddress();
-        String hashedAddress = UtilFormat.hashWithSalt(hostAddress, pepper);
+        if(pepper != null && !pepper.isEmpty()) {
+            String hostAddress = event.getAddress().getHostAddress();
+            String hashedAddress = UtilFormat.hashWithSalt(hostAddress, pepper);
 
-        clientManager.getSqlLayer().saveClientAddress(client, hashedAddress);
+            clientManager.getSqlLayer().saveClientAddress(client, hashedAddress);
+        }
         log.info("{} ({}) logged in", event.getName(), event.getUniqueId())
                 .setAction("CLIENT_LOGIN")
                 .submit();
