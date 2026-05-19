@@ -31,6 +31,9 @@ public class PlayerChopLogEvent extends ProgressionWoodcuttingEvent {
     private int amountChopped = 0;
 
     @Setter
+    private boolean treeFeller = false;
+
+    @Setter
     private int additionalLogsDropped = 0;
 
     public PlayerChopLogEvent(Player player, Material logType, Block choppedLogBlock, ItemStack toolUsed) {

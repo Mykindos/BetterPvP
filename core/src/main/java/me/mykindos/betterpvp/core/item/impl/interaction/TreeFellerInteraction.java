@@ -58,6 +58,10 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
 
     private final Set<Location> blocksBeingFelled = new HashSet<>();
 
+    public boolean isFelling(Block block) {
+        return blocksBeingFelled.contains(block.getLocation());
+    }
+
     @Nullable
     private TreeFellerCooldownModifier cooldownModifier;
 

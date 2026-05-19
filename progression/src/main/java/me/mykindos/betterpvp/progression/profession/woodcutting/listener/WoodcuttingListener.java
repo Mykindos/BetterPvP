@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTags;
+import me.mykindos.betterpvp.core.item.impl.interaction.TreeFellerInteraction;
+import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -47,14 +49,26 @@ public class WoodcuttingListener implements Listener {
     private final WoodcuttingHandler woodcuttingHandler;
     private final WorldBlockHandler worldBlockHandler;
     private final BlockTagManager blockTagManager;
+    private final TreeFellerInteraction treeFellerInteraction;
 
     @Inject
-    public WoodcuttingListener(Progression progression, ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler, BlockTagManager blockTagManager) {
+    public WoodcuttingListener(Progression progression, ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler, BlockTagManager blockTagManager, TreeFellerInteraction treeFellerInteraction) {
         this.progression = progression;
         this.clientManager = clientManager;
         this.woodcuttingHandler = woodcuttingHandler;
         this.worldBlockHandler = worldBlockHandler;
         this.blockTagManager = blockTagManager;
+        this.treeFellerInteraction = treeFellerInteraction;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onTreeFell(TreeFellerEvent event) {
+        if (event.getBlocks().isEmpty()) return;
+
+        woodcuttingHandler.getWoodcuttingRepository().saveChoppedLog(event.getPlayer(),
+                event.getInitialLogType(),
+                event.getInitialLogLocation(),
+                event.getBlocks().size());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -87,8 +101,9 @@ public class WoodcuttingListener implements Listener {
 
         ItemStack toolUsed = event.getPlayer().getInventory().getItemInMainHand();
         Block choppedLogBlock = event.getBlock();
-        PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(
-                new PlayerChopLogEvent(event.getPlayer(), blockType, choppedLogBlock, toolUsed));
+        PlayerChopLogEvent chopLogEvent = new PlayerChopLogEvent(event.getPlayer(), blockType, choppedLogBlock, toolUsed);
+        chopLogEvent.setTreeFeller(treeFellerInteraction.isFelling(choppedLogBlock));
+        UtilServer.callEvent(chopLogEvent);
 
         // if the player doesn't have tree feller, then add the log that was chopped manually here
         if (chopLogEvent.getAmountChopped() <= 0) {
