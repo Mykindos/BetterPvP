@@ -146,7 +146,6 @@ public class RespawnHoldService implements Listener {
                 }
                 player.teleport(voidWorld.getSpawnLocation());
                 player.setGameMode(GameMode.ADVENTURE);
-                player.setInvulnerable(true);
                 startCountdown(player, session);
             }
         }.runTaskLater(plugin, 1L);
@@ -276,6 +275,7 @@ public class RespawnHoldService implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        event.getPlayer().setInvulnerable(false);
         final HoldSession session = sessions.remove(event.getPlayer().getUniqueId());
         if (session != null) {
             if (session.task != null) {
