@@ -51,7 +51,7 @@ public interface ICommand {
 
         switch (getArgumentType(args.length)) {
             case "PLAYER" -> tabCompletions.addAll(Bukkit.getOnlinePlayers().stream()
-                    .filter(player -> !player.isOp() && player.hasPotionEffect(PotionEffectType.INVISIBILITY))
+                    .filter(player -> !(player.isOp() && player.hasPotionEffect(PotionEffectType.INVISIBILITY)))
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                     .toList());

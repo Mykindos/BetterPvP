@@ -70,7 +70,7 @@ public abstract class Command implements ICommand {
                             .filter(player -> {
                                 if (!(sender instanceof Player runner)) return true;
                                 return runner.isListed(player);
-                            }).filter(player -> !player.isOp() && !player.hasPotionEffect(PotionEffectType.INVISIBILITY))
+                            }).filter(player -> !(player.isOp() && player.hasPotionEffect(PotionEffectType.INVISIBILITY)))
                             .map(Player::getName)
                             .filter(name -> name.toLowerCase().
                             startsWith(lowercaseArg)).toList());
