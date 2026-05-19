@@ -65,7 +65,17 @@ public class Database {
      * @return A functional interface that wraps queries with automatic async execution
      */
     public AsyncDSLContext getAsyncDslContext() {
-        return new AsyncDSLContext(this.connection, DB_EXECUTOR);
+        return getAsyncDslContext(DB_EXECUTOR);
+    }
+
+    /**
+     * Returns a DSLContext wrapper that executes queries asynchronously on a provided executor.
+     *
+     * @param executor The executor to run the queries on
+     * @return A functional interface that wraps queries with automatic async execution
+     */
+    public AsyncDSLContext getAsyncDslContext(Executor executor) {
+        return new AsyncDSLContext(this.connection, executor);
     }
 
 

@@ -33,7 +33,7 @@ public class SaplingGrowListener implements Listener {
         if (event.isCancelled()) return;
         Block block = event.getLocation().getBlock();
 
-        UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> {
+        UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Progression.class), () -> {
             blockTagManager.removeBlockTag(block, BlockTags.PLAYER_MANIPULATED.getTag());
         }, 1L);
     }

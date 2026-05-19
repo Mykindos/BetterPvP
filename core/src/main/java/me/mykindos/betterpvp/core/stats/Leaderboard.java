@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
@@ -191,48 +192,52 @@ public abstract class Leaderboard<E, T> implements Describable {
      *        If the element was already in the same position, it will not be present in the map.
      */
     public CompletableFuture<Map<SearchOptions, Integer>> add(@NotNull E entryName, @NotNull T add) {
-        return CompletableFuture.supplyAsync(() -> {
-            Map<SearchOptions, Integer> types = new HashMap<>();
-            for (SearchOptions options : validSearchOptions) {
-                final ConcurrentSkipListSet<LeaderboardEntry<E, T>> set = topTen.get(options);
-                if (set == null) {
-                    continue;
-                }
+        Map<SearchOptions, Integer> types = new HashMap<>();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-                final ArrayList<LeaderboardEntry<E, T>> list = new ArrayList<>(set);
-                LeaderboardEntry<E, T> entry = LeaderboardEntry.of(entryName, add);
-                final T existingData;
-                final Optional<LeaderboardEntry<E, T>> match = set.stream().filter(e -> e.getKey().equals(entry.getKey())).findFirst();
-                if (match.isPresent()) {
-                    existingData = match.orElseThrow().getValue();
-                } else {
-                    existingData = entryCache.get(LeaderboardEntryKey.of(options, entryName)).join(); // Reason for this to be async
-                }
-
-                if(existingData != null) {
-                    entry.setValue(join(existingData, add));
-                }
-
-                int indexBefore = list.contains(entry) ? list.indexOf(entry) + 1 : -1;
-                set.removeIf(existing -> existing.getKey().equals(entry.getKey())); // Remove entry if cloned
-                set.add(entry);
-                if (set.size() > 10) {
-                    set.pollLast(); // Remove last entry to keep the same size, only if we updated the size
-                }
-
-                // Only return this type if the entry was added
-                var newList = new ArrayList<>(set);
-
-                int indexNow = newList.indexOf(entry) + 1;
-                if (set.contains(entry) && indexBefore != indexNow) {
-                    types.put(options, indexNow);
-                }
+        for (SearchOptions options : validSearchOptions) {
+            final ConcurrentSkipListSet<LeaderboardEntry<E, T>> set = topTen.get(options);
+            if (set == null) {
+                continue;
             }
-            return types;
-        }).exceptionally(ex -> {
-            log.error("Failed to add " + entryName + " to leaderboard!", ex).submit();
-            return null;
-        });
+
+            final Optional<LeaderboardEntry<E, T>> match = set.stream().filter(e -> e.getKey().equals(entryName)).findFirst();
+            if (match.isPresent()) {
+                T existingData = match.get().getValue();
+                updateSet(set, entryName, join(existingData, add), options, types);
+            } else {
+                futures.add(entryCache.get(LeaderboardEntryKey.of(options, entryName)).thenAccept(existingData -> {
+                    T finalData = add;
+                    if (existingData != null) {
+                        finalData = join(existingData, add);
+                    }
+                    updateSet(set, entryName, finalData, options, types);
+                }));
+            }
+        }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> types);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateSet(ConcurrentSkipListSet<LeaderboardEntry<E, T>> set, E entryName, T finalData, SearchOptions options, Map<SearchOptions, Integer> types) {
+        final ArrayList<LeaderboardEntry<E, T>> list = new ArrayList<>(set);
+        LeaderboardEntry<E, T> entry = LeaderboardEntry.of(entryName, finalData);
+
+        int indexBefore = list.indexOf(entry) + 1;
+        set.removeIf(existing -> existing.getKey().equals(entryName));
+        set.add(entry);
+        if (set.size() > 10) {
+            set.pollLast();
+        }
+
+        var newList = new ArrayList<>(set);
+        int indexNow = newList.indexOf(entry) + 1;
+        if (set.contains(entry) && indexBefore != indexNow) {
+            synchronized (types) {
+                types.put(options, indexNow);
+            }
+        }
     }
 
     /**

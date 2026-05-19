@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CHUNK_BLOCK_TAGGING;
 
@@ -53,8 +54,13 @@ public class BlockTagRepository {
     }
 
     public CompletableFuture<Map<Long, Map<String, BlockTag>>> getBlockTagsForChunk(Chunk chunk) {
+        return getBlockTagsForChunk(chunk, null);
+    }
+
+    public CompletableFuture<Map<Long, Map<String, BlockTag>>> getBlockTagsForChunk(Chunk chunk, Executor executor) {
         String chunkString = UtilWorld.chunkToFile(chunk);
-        return database.getAsyncDslContext().executeAsync(ctx -> {
+        var async = executor == null ? database.getAsyncDslContext() : database.getAsyncDslContext(executor);
+        return async.executeAsync(ctx -> {
            Map<Long, Map<String, BlockTag>> blockTags = new HashMap<>();
 
            ctx.selectFrom(CHUNK_BLOCK_TAGGING)

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -26,11 +27,15 @@ import java.util.concurrent.TimeUnit;
 public class BlockTagManager {
 
     public static final Executor TAG_EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final Executor TAG_LOAD_EXECUTOR = Executors.newFixedThreadPool(3);
 
     public static final Cache<String, Map<Long, Map<String, BlockTag>>> BLOCKTAG_CACHE = Caffeine.newBuilder()
             .scheduler(Scheduler.systemScheduler())
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
+
+    private final Map<String, CompletableFuture<Map<Long, Map<String, BlockTag>>>> inFlightLoads = new ConcurrentHashMap<>();
+
 
     private final BlockTagRepository blockTagRepository;
 
@@ -41,18 +46,20 @@ public class BlockTagManager {
 
     public CompletableFuture<Map<Long, Map<String, BlockTag>>> getBlockTags(Chunk chunk) {
         String chunkIdentifier = UtilWorld.chunkToFile(chunk);
-        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
-        if (blockTags != null) {
-            // Manually update the entry to refresh the expiry
-            BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
-            return CompletableFuture.completedFuture(blockTags);
+        Map<Long, Map<String, BlockTag>> cached = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
+        if (cached != null) {
+            return CompletableFuture.completedFuture(cached);
         }
 
-        return blockTagRepository.getBlockTagsForChunk(chunk).thenApplyAsync(bt -> {
-            BLOCKTAG_CACHE.put(chunkIdentifier, bt);
-            return bt;
-        }, TAG_EXECUTOR).exceptionally(e -> {
-            log.error("Failed to get block tags for chunk {}: {}", UtilWorld.chunkToFile(chunk), e).submit();
+        return inFlightLoads.computeIfAbsent(chunkIdentifier, k -> {
+            return blockTagRepository.getBlockTagsForChunk(chunk, TAG_LOAD_EXECUTOR)
+                    .thenApply(tags -> {
+                        BLOCKTAG_CACHE.put(chunkIdentifier, tags);
+                        return tags;
+                    })
+                    .whenComplete((res, ex) -> inFlightLoads.remove(chunkIdentifier));
+        }).exceptionally(e -> {
+            log.error("Failed to get block tags for chunk {}: {}", chunkIdentifier, e).submit();
             return new HashMap<>();
         });
     }
@@ -74,18 +81,14 @@ public class BlockTagManager {
      * @return True if the block is player placed, or not present in the cache
      */
     public boolean isPlayerPlaced(Block block) {
-
-        String chunk = UtilWorld.chunkToFile(block.getChunk());
-        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
+        String chunkIdentifier = UtilWorld.chunkToFile(block.getChunk());
+        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
         if (blockTags == null) {
-            blockTagRepository.getBlockTagsForChunk(block.getChunk())
-                    .thenAccept(blockTagsForChunk -> BLOCKTAG_CACHE.put(chunk, blockTagsForChunk));
-
+            getBlockTags(block.getChunk());
             return false;
         }
 
         return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey(BlockTags.PLAYER_MANIPULATED.getTag());
-
     }
 
     /**
@@ -96,17 +99,15 @@ public class BlockTagManager {
      * @return The UUID of the player who placed the block, or null if not present
      */
     public UUID getPlayerPlaced(Block block) {
-        String chunk = UtilWorld.chunkToFile(block.getChunk());
-        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunk);
+        String chunkIdentifier = UtilWorld.chunkToFile(block.getChunk());
+        Map<Long, Map<String, BlockTag>> blockTags = BLOCKTAG_CACHE.getIfPresent(chunkIdentifier);
         if (blockTags == null) {
-            blockTagRepository.getBlockTagsForChunk(block.getChunk())
-                    .thenAccept(blockTagsForChunk -> BLOCKTAG_CACHE.put(chunk, blockTagsForChunk));
-
+            getBlockTags(block.getChunk());
             return null;
         }
 
         Map<String, BlockTag> stringBlockTagHashMap = blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>());
-        if(!stringBlockTagHashMap.containsKey(BlockTags.PLAYER_MANIPULATED.getTag())){
+        if (!stringBlockTagHashMap.containsKey(BlockTags.PLAYER_MANIPULATED.getTag())) {
             return null;
         }
 
@@ -122,10 +123,7 @@ public class BlockTagManager {
      * @param chunk The chunk whose block tags should be loaded into the cache if absent.
      */
     public void loadChunkIfAbsent(Chunk chunk) {
-        String chunkIdentifier = UtilWorld.chunkToFile(chunk);
-        if (BLOCKTAG_CACHE.getIfPresent(chunkIdentifier) == null) {
-            blockTagRepository.getBlockTagsForChunk(chunk).thenAccept(blockTags -> BLOCKTAG_CACHE.put(chunkIdentifier, blockTags));
-        }
+        getBlockTags(chunk);
     }
 
     /**
@@ -136,10 +134,10 @@ public class BlockTagManager {
      * @param blockTag The tag that will be associated with the block.
      */
     public void addBlockTag(Block block, BlockTag blockTag) {
-        getBlockTags(block.getChunk()).thenAccept(blockTags -> {
+        getBlockTags(block.getChunk()).thenAcceptAsync(blockTags -> {
             blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).put(blockTag.getTag(), blockTag);
             blockTagRepository.addBlockTag(block, blockTag);
-        }).exceptionally(ex -> {
+        }, TAG_EXECUTOR).exceptionally(ex -> {
             log.error("Failed to add block tag", ex).submit();
             return null;
         });
@@ -154,10 +152,10 @@ public class BlockTagManager {
      * @param tag The tag to remove from the specified block.
      */
     public void removeBlockTag(Block block, String tag) {
-        getBlockTags(block.getChunk()).thenAccept(blockTags -> {
+        getBlockTags(block.getChunk()).thenAcceptAsync(blockTags -> {
             blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).remove(tag);
             blockTagRepository.removeBlockTag(block, tag);
-        }).exceptionally(ex -> {
+        }, TAG_EXECUTOR).exceptionally(ex -> {
             log.error("Failed to remove block tag", ex).submit();
             return null;
         });
