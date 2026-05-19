@@ -425,11 +425,7 @@ public class ClientSQLLayer {
 
 
     public void processPropertyUpdates(UUID uuid, boolean async) {
-        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedPropertyUpdates.getAndUpdate(map -> {
-            ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
-            updated.remove(uuid.toString());
-            return updated;
-        }).get(uuid.toString());
+        ConcurrentHashMap<String, Query> sharedQueries = queuedSharedPropertyUpdates.get().remove(uuid.toString());
 
         if (sharedQueries != null && !sharedQueries.isEmpty()) {
             List<Query> queries = new ArrayList<>(sharedQueries.values());
@@ -437,24 +433,16 @@ public class ClientSQLLayer {
         }
 
         // Process stat updates for this UUID
-        ConcurrentHashMap<String, Query> gamerQueries = queuedPropertyUpdates.getAndUpdate(map -> {
-            ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
-            updated.remove(uuid.toString());
-            return updated;
-        }).get(uuid.toString());
+        ConcurrentHashMap<String, Query> gamerQueries = queuedPropertyUpdates.get().remove(uuid.toString());
 
         if (gamerQueries != null && !gamerQueries.isEmpty()) {
             List<Query> queries = new ArrayList<>(gamerQueries.values());
             executeQueriesAsTransaction(queries, async);
         }
 
-        ConcurrentHashMap<String, Query> statQueries = queuedStatUpdates.getAndUpdate(map -> {
-            ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> updated = new ConcurrentHashMap<>(map);
-            updated.remove(uuid.toString());
-            return updated;
-        }).get(uuid.toString());
+        ConcurrentHashMap<String, Query> statQueries = queuedStatUpdates.get().remove(uuid.toString());
 
-        if (statQueries != null && statQueries.isEmpty()) {
+        if (statQueries != null && !statQueries.isEmpty()) {
             List<Query> queries = new ArrayList<>(statQueries.values());
             executeQueriesAsTransaction(queries, async);
         }

@@ -47,8 +47,10 @@ public class BlockTagManager {
             BLOCKTAG_CACHE.put(chunkIdentifier, blockTags);
             return CompletableFuture.completedFuture(blockTags);
         }
-        return CompletableFuture.supplyAsync(() -> {
-            return BLOCKTAG_CACHE.get(chunkIdentifier, key -> blockTagRepository.getBlockTagsForChunk(chunk).join());
+
+        return blockTagRepository.getBlockTagsForChunk(chunk).thenApplyAsync(bt -> {
+            BLOCKTAG_CACHE.put(chunkIdentifier, bt);
+            return bt;
         }, TAG_EXECUTOR).exceptionally(e -> {
             log.error("Failed to get block tags for chunk {}: {}", UtilWorld.chunkToFile(chunk), e).submit();
             return new HashMap<>();

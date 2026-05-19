@@ -16,7 +16,7 @@ import java.util.function.IntFunction;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilServer {
 
-    public static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
+    public static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(16);
 
     /**
      * Shorter version of doing Bukkit.getPluginManager().callEvent()
