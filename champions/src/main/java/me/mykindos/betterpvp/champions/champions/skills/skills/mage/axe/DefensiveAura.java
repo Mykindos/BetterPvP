@@ -114,7 +114,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.MAX_HEALTH);
                 if (targetMaxHealth != null) {
                     double targetHeal = UtilEntity.health(target, 4d * healthBoostStrength);
-                    UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s</yellow> casted <green>%s</green> on you!", player.getName(), getName());
+                    UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s</yellow> cast <green>%s</green> on you!", player.getName(), getName());
                     target.playSound(target, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 1.1f);
                     target.spawnParticle(Particle.HEART, target.getLocation().add(new Vector(0, 1, 0)), 6, 0.5, 0.5, 0.5);
 

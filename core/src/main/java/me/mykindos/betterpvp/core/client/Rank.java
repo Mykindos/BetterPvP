@@ -8,7 +8,9 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 public enum Rank {
@@ -51,7 +53,7 @@ public enum Rank {
             NamedTextColor.AQUA,
             Component.text("Mod", NamedTextColor.AQUA),
             UtilMessage.StudioPrefix.appendSpace().append(Component.text("Mod", NamedTextColor.AQUA)),
-            List.of("A BetterPvP Moderator",
+            List.of("<white>A BetterPvP Moderator",
                     "This person is responsible",
                     "For enforcing BetterPvP chat rules",
                     "and to help players!"),
@@ -77,6 +79,14 @@ public enum Rank {
                     "They create and maintain the games",
                     "BetterPvP offers."),
             6);
+
+    private static final Map<Integer, Rank> BY_ID_MAP = new HashMap<>();
+
+    static {
+        for (Rank rank : values()) {
+            BY_ID_MAP.put(rank.id, rank);
+        }
+    }
 
     @Getter
     private final String name;
@@ -124,12 +134,7 @@ public enum Rank {
     }
 
     public static Rank getRank(int id) {
-        for (Rank rank : Rank.values()) {
-            if (rank.getId() == id) {
-                return rank;
-            }
-        }
-        return null;
+        return BY_ID_MAP.getOrDefault(id, null);
     }
 
     public enum ShowTag {
