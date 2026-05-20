@@ -87,9 +87,9 @@ public class SupplyCrate extends Projectile {
                     .spawn();
 
             if (Bukkit.getCurrentTick() % 2 == 0) {
-                new SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 0.4f, 3.5f).play(location);
-                new SoundEffect(Sound.BLOCK_PISTON_EXTEND, 0.4f, 3.5f).play(location);
-                new SoundEffect(Sound.BLOCK_CHEST_CLOSE, 0.4f, 2.5f).play(location);
+                new SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 0.4f, 0.5f).play(location);
+                new SoundEffect(Sound.BLOCK_PISTON_EXTEND, 0.4f, 0.5f).play(location);
+                new SoundEffect(Sound.BLOCK_CHEST_CLOSE, 0.4f, 0.5f).play(location);
             }
             return;
         }
