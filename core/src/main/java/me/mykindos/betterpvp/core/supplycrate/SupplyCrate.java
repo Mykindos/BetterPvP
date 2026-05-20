@@ -95,7 +95,7 @@ public class SupplyCrate extends Projectile {
         }
 
         if (Bukkit.getCurrentTick() % 30 == 0) {
-            new SoundEffect(Sound.BLOCK_BEACON_ACTIVATE, 0.4f, 2.5f).play(location);
+            new SoundEffect(Sound.BLOCK_BEACON_ACTIVATE, 0.4f, 0.5f).play(location);
 
             // Particle walls every tick.
             final double half = hitboxSize / 2.0;
