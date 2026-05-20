@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
@@ -132,7 +133,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             healthReduction += getHealthReductionPerPlayerAffected(level);
 
             championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
-            UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative effects by <alt>" + player.getName());
+            UtilMessage.simpleMessage(ally, getName(), "You were cleansed of negative effects by %s.", championsManager.getDisplayNameProvider().getDisplayName(player, ally));
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
 

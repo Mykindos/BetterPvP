@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;

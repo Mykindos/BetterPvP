@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;

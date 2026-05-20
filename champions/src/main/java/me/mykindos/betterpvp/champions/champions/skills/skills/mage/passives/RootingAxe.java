@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Effect;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;

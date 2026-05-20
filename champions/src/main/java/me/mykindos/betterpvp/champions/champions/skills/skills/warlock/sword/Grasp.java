@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;

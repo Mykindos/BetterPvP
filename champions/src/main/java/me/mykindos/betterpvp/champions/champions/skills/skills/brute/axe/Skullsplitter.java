@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;

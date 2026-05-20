@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;

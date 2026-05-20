@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;

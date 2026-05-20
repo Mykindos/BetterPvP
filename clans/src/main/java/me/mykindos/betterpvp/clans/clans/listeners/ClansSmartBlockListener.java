@@ -92,7 +92,7 @@ public class ClansSmartBlockListener implements Listener {
                 if (tie.isInform()) {
                     UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
                             UtilFormat.cleanString(smartBlockInstance.getType().getName()),
-                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                            relation.getPrimaryMiniColorOpening() + "Clan " + locationClan.getName()
                     );
                 }
             }

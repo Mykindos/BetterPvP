@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.types;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public abstract class ChannelSkill extends Skill implements Listener {
 
     protected final Set<UUID> active = new HashSet<>();
+
     public ChannelSkill(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
@@ -40,9 +42,9 @@ public abstract class ChannelSkill extends Skill implements Listener {
         active.remove(player.getUniqueId());
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onCustomEffect(EffectReceiveEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         if ((event.getTarget() instanceof Player player)) {
             if (!canUseWhileSilenced() && (event.getEffect().getEffectType() == EffectTypes.SILENCE)) {
                 cancel(player);
@@ -58,7 +60,7 @@ public abstract class ChannelSkill extends Skill implements Listener {
 
     @EventHandler
     public void onEnterWater(PlayerMoveEvent event) {
-        if(!event.hasChangedBlock()) return;
+        if (!event.hasChangedBlock()) return;
 
         if (UtilBlock.isInWater(event.getPlayer()) || UtilBlock.isWater(event.getTo().getBlock()) && !canUseInLiquid()) {
             cancel(event.getPlayer());

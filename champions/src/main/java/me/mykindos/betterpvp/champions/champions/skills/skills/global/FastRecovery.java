@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
@@ -35,7 +36,7 @@ public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
     @Override
     public String[] getDescription(int level) {
 
-        return new String[] {
+        return new String[]{
                 "Increase your energy regeneration",
                 "speed by " + getValueString(this::getPercentage, level, 100, "%", 0),
                 "",
@@ -82,7 +83,7 @@ public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         basePercentage = getConfig("basePercentage", 0.15, Double.class);
         percentagePerLevel = getConfig("percentagePerLevel", 0.10, Double.class);
     }

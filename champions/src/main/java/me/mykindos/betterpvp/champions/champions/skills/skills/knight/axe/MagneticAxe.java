@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;

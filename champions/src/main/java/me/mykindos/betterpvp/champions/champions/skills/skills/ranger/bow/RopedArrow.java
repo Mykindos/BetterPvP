@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;

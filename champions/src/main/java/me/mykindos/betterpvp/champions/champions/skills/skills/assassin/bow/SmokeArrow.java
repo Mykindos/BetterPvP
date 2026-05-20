@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -104,8 +105,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .receivers(60)
                 .spawn();
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", target.getName(), getName(), level);
+        UtilMessage.simpleMessage(target, getClassType().getName(), "%s hit you with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(damager, target), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit %s with <alt>%s %s</alt>.", championsManager.getDisplayNameProvider().getDisplayName(target, damager), getName(), level);
     }
 
     @Override

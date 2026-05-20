@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -86,14 +87,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         if (active.contains(damager.getUniqueId())) {
             event.addReason("Concussion");
             if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
-                UtilMessage.simpleMessage(damager, getName(), "<alt>%s</alt> is already concussed.", damagee.getName());
+                UtilMessage.simpleMessage(damager, getName(), "%s<gray> is already concussed.", championsManager.getDisplayNameProvider().getDisplayName(damagee, damager));
                 return;
             }
 
             championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
 
-            UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
-            UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
+            UtilMessage.simpleMessage(damager, getName(), "You gave %s<gray> a concussion.", championsManager.getDisplayNameProvider().getDisplayName(damagee, damager));
+            UtilMessage.simpleMessage(damagee, getName(), "%s<gray> gave you a concussion.", championsManager.getDisplayNameProvider().getDisplayName(damager, damagee));
             active.remove(damager.getUniqueId());
         }
     }

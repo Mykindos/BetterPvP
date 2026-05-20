@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -75,7 +76,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
 
         int level = getLevel(player);
         if (level > 0) {
-            if (championsManager.getCooldowns().use(player, getName(), internalCooldown, false)){
+            if (championsManager.getCooldowns().use(player, getName(), internalCooldown, false)) {
                 if (championsManager.getEnergy().use(player, getName(), getEnergy(level), true)) {
                     VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.6D, false, 0.0, 0.2D, 0.6D, false);
                     UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
@@ -93,7 +94,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         internalCooldown = getConfig("internalCooldown", 0.35, Double.class);
     }
 

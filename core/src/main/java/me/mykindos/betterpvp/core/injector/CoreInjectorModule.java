@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
+import me.mykindos.betterpvp.core.displayname.DefaultDisplayNameProvider;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRules;
 import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRulesImpl;
 import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgressService;
@@ -44,6 +46,7 @@ public class CoreInjectorModule extends AbstractModule {
         bind(GlobalBlockBreakRules.class).to(GlobalBlockBreakRulesImpl.class);
         bind(BlockBreakResolver.class).to(DefaultBlockBreakResolver.class);
         bind(BlockBreakProgressService.class).to(BlockBreakProgressServiceImpl.class);
+        bind(DisplayNameProvider.class).to(DefaultDisplayNameProvider.class);
         log.info("Using default integrations").submit();
     }
 }

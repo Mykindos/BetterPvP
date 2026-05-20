@@ -31,6 +31,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -92,7 +93,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
             return true;
         }
         if (championsManager.getCooldowns().hasCooldown(player, getName())) {
-            UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s %s</alt> for <alt>%s</alt> seconds.", getName(), level,
+            UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", getName(),
                     Math.max(0, championsManager.getCooldowns().getAbilityRecharge(player, getName()).getRemaining()));
             return false;
         }

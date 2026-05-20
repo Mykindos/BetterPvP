@@ -133,8 +133,8 @@ public class AxeProjectile extends Projectile {
                 new SkillDamageCause(skill, false, DamageCause.DEFAULT_DELAY, true).withBukkitCause(PROJECTILE),
                 damage,
                 skill.getName()));
-        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), skill.getName());
-        UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
+        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit %s<gray> with <alt>%s</alt>.", skill.getDisplayNameProvider().getDisplayName(damagee, caster), skill.getName());
+        UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "%s<gray> hit you with <alt>%s</alt>.", skill.getDisplayNameProvider().getDisplayName(caster, damagee), skill.getName());
     }
 
     @Override

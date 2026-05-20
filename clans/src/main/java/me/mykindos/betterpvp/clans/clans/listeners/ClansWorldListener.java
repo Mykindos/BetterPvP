@@ -280,7 +280,7 @@ public class ClansWorldListener extends ClanListener {
                 if (tie.isInform()) {
                     UtilMessage.simpleMessage(player, "Clans", "You cannot break <green>%s <gray>in %s<gray>.",
                             UtilFormat.cleanString(block.getType().name()),
-                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                            relation.getPrimaryMiniColorOpening() + "Clan " + locationClan.getName()
                     );
                 }
 
@@ -361,7 +361,7 @@ public class ClansWorldListener extends ClanListener {
 
                 if (tie.isInform()) {
                     UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.",
-                            UtilFormat.cleanString(block.getType().toString()), relation.getPrimaryMiniColor() + locationClan.getName());
+                            UtilFormat.cleanString(block.getType().toString()), relation.getPrimaryMiniColorOpening() + locationClan.getName());
                 }
                 return;
             }
@@ -391,7 +391,7 @@ public class ClansWorldListener extends ClanListener {
                 if (tie.isInform()) {
                     UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.",
                             UtilFormat.cleanString(block.getType().name()),
-                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                            relation.getPrimaryMiniColorOpening() + "Clan " + locationClan.getName()
                     );
                 }
             } else {
@@ -497,7 +497,7 @@ public class ClansWorldListener extends ClanListener {
                     if (tie.isInform()) {
                         UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
                                 UtilFormat.cleanString(material.toString()),
-                                relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+                                relation.getPrimaryMiniColorOpening() + "Clan " + locationClan.getName()
                         );
                     }
                 }
