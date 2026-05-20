@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityRenderer;
+import me.mykindos.betterpvp.core.item.renderer.AttunementEnchantRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemNameRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
@@ -77,6 +78,7 @@ public class BaseItem implements Item {
         this.modelBytes = model.serializeAsBytes();
         addItemStackRenderer(new DurabilityRenderer());
         addItemStackRenderer(new RarityTooltipStyleRenderer());
+        addItemStackRenderer(new AttunementEnchantRenderer());
     }
 
     public final @NotNull ItemStack getModel() {
