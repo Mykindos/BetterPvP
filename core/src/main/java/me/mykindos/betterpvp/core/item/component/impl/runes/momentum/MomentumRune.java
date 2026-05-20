@@ -30,6 +30,9 @@ public class MomentumRune implements Rune, Reloadable {
     private double scalar = 0.15;
 
     @Getter
+    private double maximumReduction = 0.75;
+
+    @Getter
     private double expirySeconds = 1.0;
 
     @Inject
@@ -45,8 +48,9 @@ public class MomentumRune implements Rune, Reloadable {
     @Override
     public @NotNull String getDescription() {
         return String.format(
-                "Melee attacks reduce the next attack's delay on that target by <damage>%s%%</damage>, stacking additively. Resets after not attacking for <time>%s</time> seconds.",
+                "Melee attacks reduce the next attack's delay on that target by <damage>%s%%</damage>, stacking additively, up to a maximum of <damage>%s%%</damage>. Resets after not attacking for <time>%s</time> seconds.",
                 UtilFormat.formatNumber(getScalar() * 100),
+                UtilFormat.formatNumber(getMaximumReduction() * 100),
                 UtilFormat.formatNumber(getExpirySeconds()));
     }
 
@@ -64,6 +68,7 @@ public class MomentumRune implements Rune, Reloadable {
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
         this.scalar = config.getConfig("scalar", 0.15, Double.class);
+        this.maximumReduction = config.getConfig("maximumReduction", 0.75, Double.class);
         this.expirySeconds = config.getConfig("expirySeconds", 1.0, Double.class);
     }
 }
