@@ -42,7 +42,7 @@ public class DatabaseAppender implements LogAppender {
     @SneakyThrows
     @Override
     public void append(PendingLog pendingLog) {
-
+        if(pendingLog == null) return;
         if(pendingLog.getContext().isEmpty()) {
             return;
         }
@@ -91,6 +91,7 @@ public class DatabaseAppender implements LogAppender {
         log.info("Processing {} batched log entries", logsToProcess.size()).submit();
 
         // Process asynchronously to avoid blocking the timer thread
+
         CompletableFuture.runAsync(() -> {
             try {
                 insertBatchedLogs(logsToProcess);

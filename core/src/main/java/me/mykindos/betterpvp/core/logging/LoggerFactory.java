@@ -36,10 +36,15 @@ public class LoggerFactory {
             if (appenders.isEmpty()) return;
             if (logs.isEmpty()) return;
 
-            PendingLog log = logs.poll();
-            appenders.forEach(appender -> appender.append(log));
 
-        }, 0, 25, TimeUnit.MILLISECONDS);
+            for (int i = 0; i < 100; i++) {
+                PendingLog log = logs.poll();
+                if(log == null) continue;
+                appenders.forEach(appender -> appender.append(log));
+            }
+
+
+        }, 0, 5, TimeUnit.MILLISECONDS);
 
         loadFormatters();
     }
@@ -77,6 +82,7 @@ public class LoggerFactory {
     }
 
     public void addLog(PendingLog log) {
+
         logs.add(log);
     }
 
@@ -94,15 +100,17 @@ public class LoggerFactory {
         return null;
     }
 
-    public Description getDescription(CachedLog cachedLog, LogRepository logRepository, Windowed previous) {if (cachedLog.getAction() != null && cachedLog.getContext() != null) {
-        for (ILogFormatter formatter : formatters) {
-            if (formatter.getAction().equals(cachedLog.getAction())) {
-                return formatter.getDescription(cachedLog, logRepository, previous);
+    public Description getDescription(CachedLog cachedLog, LogRepository logRepository, Windowed previous) {
+        if (cachedLog.getAction() != null && cachedLog.getContext() != null) {
+            for (ILogFormatter formatter : formatters) {
+                if (formatter.getAction().equals(cachedLog.getAction())) {
+                    return formatter.getDescription(cachedLog, logRepository, previous);
+                }
             }
+            throw new NoSuchElementException("No Formatter for " + cachedLog.getAction());
         }
-        throw new NoSuchElementException("No Formatter for " + cachedLog.getAction());
-    }
 
-        return null;}
+        return null;
+    }
 
 }

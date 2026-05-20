@@ -17,7 +17,6 @@ public class ForestFlourisherListener implements Listener {
 
     @EventHandler
     public void onPlayerPlantSapling(BlockPlaceEvent event) {
-        if (!attribute.doesPlayerHaveAttribute(event.getPlayer())) return;
         attribute.onPlayerPlantSapling(event);
     }
 
