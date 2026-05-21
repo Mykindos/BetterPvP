@@ -196,7 +196,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     @Override
     public void loadSkillConfig() {
         leapStrength = getConfig("leapStrength", 1.3, Double.class);
-        wallKickStrength = getConfig("wallKickStrength", 0.9, Double.class);
+        wallKickStrength = getConfig("wallKickStrength", 0.75, Double.class);
         wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 0.5, Double.class);
         wallkickEnergyCost = getConfig("wallkickEnergyCost", 35.0, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
