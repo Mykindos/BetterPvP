@@ -45,7 +45,7 @@ public class SendTipCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "Tips", UtilMessage.deserialize("<green>Usage: /tip send <player> <tipname>"));
+            UtilMessage.message(player, "Tips", UtilMessage.deserialize("<green>Usage: /sendtip <player> <tipname>"));
             return;
         }
 
