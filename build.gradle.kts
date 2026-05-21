@@ -39,7 +39,7 @@ plugins {
     kotlin("jvm") version libs.versions.kotlin apply true
     id("com.gradleup.shadow") version "9.4.1" apply false // Building fat jar
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
-    id("org.flywaydb.flyway") version "12.5.0" apply false // Flyway
+    id("org.flywaydb.flyway") version "12.6.2" apply false // Flyway
     id("me.champeau.jmh") version "0.7.3" apply false // JMH micro-benchmarks
     id("org.sonarqube") version "7.3.0.8198" apply true
 }
