@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.AddPriceButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.CurrentPriceButton;
-import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.ListingDurationButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.ListingItemButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.ResetPriceButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.SubmitListingButton;
@@ -30,7 +29,7 @@ public class ListingCreationMenu extends AbstractGui implements Windowed {
 
         setItem(10, new CurrentPriceButton(auction));
         setItem(19, new ListingItemButton(auction));
-        setItem(28, new ListingDurationButton(auction));
+        //setItem(28, new ListingDurationButton(auction));
 
         setItem(14, new ResetPriceButton(auction));
         setItem(21, new AddPriceButton(auction, Material.LIME_CONCRETE, 100));

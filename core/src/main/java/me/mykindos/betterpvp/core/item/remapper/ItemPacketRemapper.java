@@ -61,7 +61,7 @@ public class ItemPacketRemapper implements PacketListener {
             case PacketType.Play.Server.SET_CURSOR_ITEM -> this.onSetCursorItem(event);
             case PacketType.Play.Server.ENTITY_EQUIPMENT -> this.onEntityEquipment(event);
             case PacketType.Play.Server.COLLECT_ITEM -> this.onCollectItem(event);
-//            case PacketType.Play.Server.ENTITY_METADATA -> this.onEntityMetadata(event);
+            //case PacketType.Play.Server.ENTITY_METADATA -> //this.onEntityMetadata(event);
             default -> { }
         }
     }

@@ -10,6 +10,9 @@ import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -150,6 +153,16 @@ public class ImbuementPedestal extends SmartBlock implements NexoBlock, DataHold
 
         // Check if recipe is being executed
         if (data.getRecipeExecutor().isExecutingRecipe()) {
+            new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f).play(player);
+            return false;
+        }
+
+        boolean isRune = itemInstance.getBaseItem() instanceof RuneItem;
+        boolean isAttunedWithSockets = itemInstance.getComponent(PurityComponent.class).map(PurityComponent::isAttuned).orElse(false)
+                && itemInstance.getComponent(RuneContainerComponent.class).map(runeContainer -> runeContainer.getSockets() > 0).orElse(false);
+
+        if (!isRune && !isAttunedWithSockets) {
+            UtilMessage.message(player, "Imbuement", "<red>You can only place runes or attuned items with sockets on the pedestal.");
             new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f).play(player);
             return false;
         }
