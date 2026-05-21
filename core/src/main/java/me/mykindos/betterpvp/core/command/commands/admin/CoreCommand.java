@@ -10,6 +10,9 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
@@ -19,14 +22,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.CraftingRecipe;
-import org.bukkit.inventory.Recipe;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Optional;
 
 @Singleton
 public class CoreCommand extends Command implements IConsoleCommand {
@@ -43,28 +46,13 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final File serverFolder = Bukkit.getServer().getPluginsFolder().getParentFile();
-        final File recipes = new File(serverFolder, "recipes.txt");
-
-        try {
-            recipes.createNewFile();
-
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(recipes, false))) {
-                final Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
-
-                while (recipeIterator.hasNext()) {
-                    final Recipe recipe = recipeIterator.next();
-
-                    if (recipe instanceof CraftingRecipe craftingRecipe) {
-                        final NamespacedKey key = craftingRecipe.getKey();
-
-                        writer.write(key.toString());
-                        writer.newLine();
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        final ItemFactory factory = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ItemFactory.class);
+        final ItemInstance itemInstance = factory.fromItemStack(player.getItemInHand()).orElseThrow();
+        final Optional<DurabilityComponent> component = itemInstance.getComponent(DurabilityComponent.class);
+        if (component.isPresent()) {
+            final DurabilityComponent durability = component.get();
+            durability.setDamage(durability.getMaxDamage() / 2);
+            itemInstance.serializeAllComponentsToItemStack();
         }
     }
 

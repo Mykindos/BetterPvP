@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.core.block.impl.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.anvil.AnvilRecipeRegistry;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
+import me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperationResolver;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -29,16 +29,16 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
 
     private final ItemFactory itemFactory;
     private final ClientManager clientManager;
-    private final AnvilRecipeRegistry anvilRecipeRegistry;
+    private final AnvilOperationResolver operationResolver;
     private final AnvilDataSerializer dataSerializer;
 
     @Inject
-    private Anvil(ItemFactory itemFactory, AnvilRecipeRegistry anvilRecipeRegistry, ClientManager clientManager) {
+    private Anvil(ItemFactory itemFactory, AnvilOperationResolver operationResolver, ClientManager clientManager) {
         super("anvil", "Anvil");
         this.itemFactory = itemFactory;
         this.clientManager = clientManager;
-        this.anvilRecipeRegistry = anvilRecipeRegistry;
-        this.dataSerializer = new AnvilDataSerializer(itemFactory, anvilRecipeRegistry, clientManager);
+        this.operationResolver = operationResolver;
+        this.dataSerializer = new AnvilDataSerializer(itemFactory, operationResolver, clientManager);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
 
     @Override
     public AnvilData createDefaultData() {
-        return new AnvilData(itemFactory, anvilRecipeRegistry, clientManager);
+        return new AnvilData(itemFactory, operationResolver, clientManager);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
             return;
         }
 
-        if (data.getItemManager().getCurrentRecipe() == null) {
+        if (data.getItemManager().getCurrentOperation() == null) {
             new SoundEffect(Sound.BLOCK_ANVIL_BREAK, 0.5f, 0.5f).play(player);
             return;
         }
