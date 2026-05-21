@@ -35,6 +35,8 @@ gamer:
     coins: 5000
     fragments: 0
     pvpprotection: 3600.0
+ping:
+  onlyStaffCanSeeOthers: true
 hunger:
   enabled: false
 discord:
@@ -50,6 +52,9 @@ items:
     expiry-seconds: 2.0
 command:
   list:
+    enabled: true
+    requiredRank: PLAYER
+  ping:
     enabled: true
     requiredRank: PLAYER
   teleport:
