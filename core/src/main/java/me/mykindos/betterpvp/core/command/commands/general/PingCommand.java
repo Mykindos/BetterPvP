@@ -71,6 +71,8 @@ public class PingCommand extends Command {
         NamedTextColor namedTextColor = NamedTextColor.DARK_RED;
 
         if (ping <= 0) {
+            namedTextColor = NamedTextColor.WHITE;
+        } else if (ping < 25) {
             namedTextColor = NamedTextColor.DARK_GREEN;
         } else if (ping < 50) {
             namedTextColor = NamedTextColor.GREEN;
