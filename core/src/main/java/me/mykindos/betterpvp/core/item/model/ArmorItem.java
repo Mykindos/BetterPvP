@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
@@ -22,6 +23,7 @@ public abstract class ArmorItem extends BaseItem implements Reloadable {
         this.plugin = plugin;
         addSerializableComponent(new StatContainerComponent().withBaseStat(new ItemStat<>(StatTypes.HEALTH, 1d)));
         addSerializableComponent(new DurabilityComponent(500));
+        addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new RuneContainerComponent(0, 0));
     }
 

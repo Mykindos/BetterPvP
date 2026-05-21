@@ -2,15 +2,17 @@ package me.mykindos.betterpvp.core.block.impl.anvil;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import me.mykindos.betterpvp.core.anvil.AnvilRecipeRegistry;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
 import me.mykindos.betterpvp.core.block.data.LoadHandler;
 import me.mykindos.betterpvp.core.block.data.RemovalHandler;
+import me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperation;
+import me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperationResolver;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -20,14 +22,16 @@ import java.util.Map;
 
 /**
  * Main coordinator class for Anvil functionality.
- * Delegates responsibilities to specialized components.
+ * Delegates responsibilities to specialized components and is agnostic to whether the
+ * current job is crafting a recipe or repairing an item — that is decided by the
+ * resolved {@link AnvilOperation}.
  */
 @RequiredArgsConstructor
 @Getter
 public class AnvilData implements RemovalHandler, LoadHandler {
 
     private final ItemFactory itemFactory;
-    private final AnvilRecipeRegistry anvilRecipeRegistry;
+    private final AnvilOperationResolver operationResolver;
     private final ClientManager clientManager;
 
     // Component managers
@@ -37,20 +41,20 @@ public class AnvilData implements RemovalHandler, LoadHandler {
 
     // Constructor for dependency injection
     public AnvilData(@NotNull ItemFactory itemFactory,
-                     @NotNull AnvilRecipeRegistry anvilRecipeRegistry, ClientManager clientManager) {
+                     @NotNull AnvilOperationResolver operationResolver,
+                     ClientManager clientManager) {
         this.itemFactory = itemFactory;
-        this.anvilRecipeRegistry = anvilRecipeRegistry;
+        this.operationResolver = operationResolver;
         this.clientManager = clientManager;
 
         // Initialize component managers
-        this.itemManager = new AnvilItemManager(anvilRecipeRegistry);
-
+        this.itemManager = new AnvilItemManager(operationResolver);
         this.displayManager = new AnvilDisplayManager();
-        this.hammerExecutor = new AnvilHammerExecutor(itemFactory, clientManager);
+        this.hammerExecutor = new AnvilHammerExecutor();
     }
 
     /**
-     * Executes a hammer swing, incrementing the counter and checking for recipe completion.
+     * Executes a hammer swing, incrementing the counter and checking for operation completion.
      *
      * @param player   The player swinging the hammer
      * @param location The location to play effects at
@@ -64,10 +68,10 @@ public class AnvilData implements RemovalHandler, LoadHandler {
         updateHammerProgressDisplay();
         clientManager.incrementStat(player, ClientStat.ANVIL_SWING, 1L);
 
-        // Check if we have a current recipe and enough swings
-        if (itemManager.getCurrentRecipe() != null &&
-                hammerExecutor.hasEnoughSwings(itemManager.getCurrentRecipe())) {
-            executeRecipe(player, location);
+        // Check if we have a current operation and enough swings
+        final AnvilOperation operation = itemManager.getCurrentOperation();
+        if (operation != null && operation.isReady(hammerExecutor.getHammerSwings())) {
+            executeOperation(player, location);
         }
     }
 
@@ -115,49 +119,46 @@ public class AnvilData implements RemovalHandler, LoadHandler {
     }
 
     /**
-     * Executes the current recipe, consuming ingredients and producing results.
+     * Executes the current operation, consuming items and producing/repairing results.
      *
-     * @param player   The player who completed the recipe
+     * @param player   The player who completed the operation
      * @param location The location to play effects at
      */
-    private void executeRecipe(@NotNull Player player, @NotNull Location location) {
-        if (itemManager.getCurrentRecipe() == null) {
+    private void executeOperation(@NotNull Player player, @NotNull Location location) {
+        final AnvilOperation operation = itemManager.getCurrentOperation();
+        if (operation == null) {
             return;
         }
 
-        // Get items as map for recipe execution
+        // Get items as map for operation execution
         Map<Integer, ItemInstance> itemsMap = itemManager.getItemsAsMap();
 
-        // Execute recipe and get remaining items
-        List<ItemInstance> remainingItems = hammerExecutor.executeRecipe(
-                player, itemManager.getCurrentRecipe(), itemsMap, location
-        );
+        // Execute the operation and get remaining items
+        List<ItemInstance> remainingItems = operation.complete(player, itemsMap, location);
 
         // Update anvil items with remaining items
         itemManager.updateItemsAfterRecipe(remainingItems);
-        //todo stat with remaining items
 
         // Update display entities to match remaining items
         displayManager.updateDisplayEntitiesAfterRecipe(remainingItems);
+
+        // Reset hammer swings now the operation is done
+        hammerExecutor.reset();
 
         // Update progress display
         updateHammerProgressDisplay();
     }
 
     /**
-     * Updates the hammer progress display.
+     * Updates the hammer progress display, delegating the text content to the active operation.
      */
     private void updateHammerProgressDisplay() {
-        if (itemManager.getCurrentRecipe() != null) {
-            displayManager.updateHammerProgressDisplay(
-                    itemManager.hasRecipe(),
-                    itemManager.hasItems(),
-                    hammerExecutor.getHammerSwings(),
-                    itemManager.getCurrentRecipe().getRequiredHammerSwings()
-            );
-        } else {
-            displayManager.updateHammerProgressDisplay(false, itemManager.hasItems(), 0, 0);
+        final AnvilOperation operation = itemManager.getCurrentOperation();
+        if (operation == null || !itemManager.hasItems()) {
+            displayManager.updateHammerProgressDisplay(Component.empty());
+            return;
         }
+        displayManager.updateHammerProgressDisplay(operation.hologramText(hammerExecutor.getHammerSwings()));
     }
 
     /**
@@ -204,10 +205,11 @@ public class AnvilData implements RemovalHandler, LoadHandler {
     }
 
     public float getProgress() {
-        if (itemManager.getCurrentRecipe() == null) {
+        final AnvilOperation operation = itemManager.getCurrentOperation();
+        if (operation == null) {
             return 0.0f;
         }
-        return hammerExecutor.getProgress(itemManager.getCurrentRecipe());
+        return operation.progress(hammerExecutor.getHammerSwings());
     }
 
     @Override

@@ -2,9 +2,7 @@ package me.mykindos.betterpvp.core.block.impl.anvil;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -221,28 +219,18 @@ public class AnvilDisplayManager {
 
     /**
      * Updates the hammer progress text display.
+     * <br>
+     * The text content (swing count, "Not Repairable", etc.) is owned by the active
+     * {@link me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperation};
+     * this manager only renders whatever component it is handed.
+     *
+     * @param text the component to show above the anvil ({@link Component#empty()} hides it)
      */
-    public void updateHammerProgressDisplay(boolean hasRecipe, boolean hasItems, int hammerSwings, int requiredSwings) {
+    public void updateHammerProgressDisplay(@NotNull Component text) {
         if (hammerProgressDisplay == null) {
             return;
         }
-
-        if (!hasRecipe || !hasItems) {
-            // Hide the display when no recipe or no items
-            hammerProgressDisplay.text(Component.empty());
-            return;
-        }
-
-        int remaining = requiredSwings - hammerSwings;
-
-        // Create progress text with color coding
-        Component progressText = Component.empty();
-        if (remaining > 0) {
-            // Show remaining swings
-            final TextColor color = ProgressColor.of((float) hammerSwings / requiredSwings).getTextColor();
-            progressText = Component.text(remaining, color);
-        }
-        hammerProgressDisplay.text(progressText);
+        hammerProgressDisplay.text(text);
     }
 
     /**

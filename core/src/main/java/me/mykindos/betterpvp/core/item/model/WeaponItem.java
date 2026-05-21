@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
@@ -27,6 +28,7 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
         this.groups = groups;
         addSerializableComponent(new RuneContainerComponent(0, 0));
         addSerializableComponent(new DurabilityComponent(500));
+        addSerializableComponent(new RepairableComponent());
 
         if (groups.contains(Group.MELEE)) {
             addSerializableComponent(new StatContainerComponent()

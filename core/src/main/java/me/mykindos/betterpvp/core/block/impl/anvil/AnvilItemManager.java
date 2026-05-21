@@ -1,14 +1,16 @@
 package me.mykindos.betterpvp.core.block.impl.anvil;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.anvil.AnvilRecipe;
-import me.mykindos.betterpvp.core.anvil.AnvilRecipeRegistry;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
 import me.mykindos.betterpvp.core.block.data.RemovalHandler;
 import me.mykindos.betterpvp.core.block.data.LoadHandler;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockData;
+import me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperation;
+import me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperationResolver;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,17 +23,18 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Manages item storage and recipe matching for Anvil
+ * Manages item storage and resolves the active {@link AnvilOperation} (crafting or
+ * repair) for an anvil.
  */
 @Getter
 public class AnvilItemManager implements RemovalHandler, LoadHandler {
 
-    private final AnvilRecipeRegistry anvilRecipeRegistry;
+    private final AnvilOperationResolver operationResolver;
     private final StorageBlockData anvilItems;
-    private AnvilRecipe currentRecipe = null;
+    private AnvilOperation currentOperation = null;
 
-    public AnvilItemManager(@NotNull AnvilRecipeRegistry anvilRecipeRegistry) {
-        this.anvilRecipeRegistry = anvilRecipeRegistry;
+    public AnvilItemManager(@NotNull AnvilOperationResolver operationResolver) {
+        this.operationResolver = operationResolver;
         this.anvilItems = new StorageBlockData(AnvilConstants.MAX_ANVIL_ITEMS);
     }
 
@@ -49,7 +52,7 @@ public class AnvilItemManager implements RemovalHandler, LoadHandler {
 
         currentItems.add(item);
         anvilItems.setContent(currentItems);
-        checkForRecipe();
+        resolveOperation();
         return true;
     }
 
@@ -68,49 +71,49 @@ public class AnvilItemManager implements RemovalHandler, LoadHandler {
         ItemInstance removedItem = currentItems.removeLast();
         if (removedItem != null) {
             anvilItems.setContent(currentItems);
-            checkForRecipe();
+            resolveOperation();
             return removedItem;
         }
         return null;
     }
 
     /**
-     * Updates the items after recipe execution, keeping remaining items.
+     * Updates the items after operation completion, keeping remaining items.
      *
-     * @param newItems The items remaining after recipe execution
+     * @param newItems The items remaining after the operation
      */
     public void updateItemsAfterRecipe(@NotNull List<ItemInstance> newItems) {
         anvilItems.setContent(newItems);
-        checkForRecipe();
+        resolveOperation();
     }
 
     /**
-     * Checks for a matching recipe with current items.
+     * Re-resolves the active operation against the current items.
      */
-    private void checkForRecipe() {
-        currentRecipe = null;
+    private void resolveOperation() {
+        currentOperation = null;
 
-        if (anvilItems.getContent().isEmpty()) {
+        List<ItemInstance> items = anvilItems.getContent();
+        if (items.isEmpty()) {
             return;
         }
 
-        // Convert items to the format expected by recipe matching
-        Map<Integer, ItemStack> itemMap = new HashMap<>();
-        List<ItemInstance> items = anvilItems.getContent();
+        Map<Integer, ItemStack> stackMap = new HashMap<>();
+        Map<Integer, ItemInstance> instanceMap = new HashMap<>();
         for (int i = 0; i < items.size(); i++) {
             ItemInstance item = items.get(i);
             if (item != null) {
-                itemMap.put(i, item.createItemStack());
+                stackMap.put(i, item.createItemStack());
+                instanceMap.put(i, item);
             }
         }
 
-        // Find a matching recipe through the registry
-        Optional<AnvilRecipe> recipeOpt = anvilRecipeRegistry.findRecipe(itemMap);
-        recipeOpt.ifPresent(recipe -> currentRecipe = recipe);
+        operationResolver.resolve(stackMap, instanceMap)
+                .ifPresent(operation -> currentOperation = operation);
     }
 
     /**
-     * Gets the items as a map for recipe execution.
+     * Gets the items as a map for operation execution.
      */
     public Map<Integer, ItemInstance> getItemsAsMap() {
         Map<Integer, ItemInstance> itemInstanceMap = new HashMap<>();
@@ -137,8 +140,8 @@ public class AnvilItemManager implements RemovalHandler, LoadHandler {
         return getItemCount() > 0;
     }
 
-    public boolean hasRecipe() {
-        return currentRecipe != null;
+    public boolean hasOperation() {
+        return currentOperation != null;
     }
 
     public List<ItemInstance> getItems() {
@@ -156,4 +159,4 @@ public class AnvilItemManager implements RemovalHandler, LoadHandler {
             loadHandler.onUnload(instance);
         }
     }
-} 
+}
