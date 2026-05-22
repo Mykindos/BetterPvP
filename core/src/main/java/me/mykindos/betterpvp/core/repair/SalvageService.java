@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.ReinforcementComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
+import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
+import me.mykindos.betterpvp.core.item.impl.RunicDust;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +41,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SalvageService {
 
     private final ItemRegistry itemRegistry;
+    private final RunicDust runicDust;
     private volatile Map<ItemRarity, BaseItem> reinforcementByTier;
 
     /** Probability that a salvage yields the reinforcement of the next rarity tier instead of the item's own tier. */
@@ -72,8 +75,9 @@ public class SalvageService {
     private int purityBonusHigh;
 
     @Inject
-    private SalvageService(ItemRegistry itemRegistry) {
+    private SalvageService(ItemRegistry itemRegistry, RunicDust runicDust) {
         this.itemRegistry = itemRegistry;
+        this.runicDust = runicDust;
     }
 
     /**
@@ -83,6 +87,11 @@ public class SalvageService {
      * its tier has no registered reinforcement).
      */
     public @NotNull Optional<SalvagePlan> resolve(@NotNull ItemInstance instance, @NotNull ItemStack heldStack) {
+        if (instance.getBaseItem() instanceof RuneItem) {
+            final ItemRarity runeRarity = instance.getRarity();
+            return Optional.of(new SalvagePlan(instance, runicDust, runeRarity, rollRuneYield(runeRarity)));
+        }
+
         if (heldStack.getMaxStackSize() > 1) {
             return Optional.empty();
         }
@@ -130,6 +139,21 @@ public class SalvageService {
      */
     private int rollYield(double durabilityFraction) {
         return (int) Math.round(minYield + durabilityFraction * (maxYield - minYield));
+    }
+
+    /**
+     * Rune dust yield per rune rarity. Ranges are inclusive on both ends.
+     */
+    private int rollRuneYield(@NotNull ItemRarity rarity) {
+        final ThreadLocalRandom rng = ThreadLocalRandom.current();
+        return switch (rarity) {
+            case COMMON -> rng.nextInt(1, 3);
+            case UNCOMMON -> rng.nextInt(3, 5);
+            case RARE -> rng.nextInt(4, 6);
+            case EPIC -> rng.nextInt(5, 7);
+            case LEGENDARY -> rng.nextInt(10, 16);
+            case MYTHICAL -> rng.nextInt(20, 26);
+        };
     }
 
     /**

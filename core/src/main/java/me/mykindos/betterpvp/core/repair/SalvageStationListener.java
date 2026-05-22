@@ -129,9 +129,9 @@ public class SalvageStationListener implements Listener {
     }
 
     private void execute(Player player, ItemStack held, SalvagePlan plan) {
-        // maxStackSize == 1 is part of the salvage eligibility contract, so destroying
-        // the whole stack is exactly destroying the one unit the player clicked with.
-        held.setAmount(0);
+        // Consume a single unit. For gear (maxStackSize == 1) this empties the stack;
+        // for stackable items like runes only the one clicked unit is taken.
+        held.setAmount(held.getAmount() - 1);
 
         final ItemInstance produced = itemFactory.create(plan.getReinforcement());
         final ItemStack stack = produced.createItemStack();
