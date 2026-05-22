@@ -28,17 +28,19 @@ public class AttunementStone extends BaseItem {
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry,
                                 ItemFactory itemFactory,
-                                MagicSeal magicSeal) {
+                                MagicSeal magicSeal,
+                                RunicDust runicDust) {
         if (registered) return;
         registered = true;
         String[] pattern = new String[] {
-                "GGG",
-                "GMG",
-                "GGG",
+                "GDG",
+                "DMD",
+                "GDG",
         };
         final BaseItem goldIngot = itemFactory.getFallbackItem(Material.GOLD_INGOT);
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
         builder.setIngredient('G', new RecipeIngredient(goldIngot, 1));
+        builder.setIngredient('D', new RecipeIngredient(runicDust, 1));
         builder.setIngredient('M', new RecipeIngredient(magicSeal, 1));
         registry.registerRecipe(new NamespacedKey("core", "attunement_stone"), builder.build());
     }
