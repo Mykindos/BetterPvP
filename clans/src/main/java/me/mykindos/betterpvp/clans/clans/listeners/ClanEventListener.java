@@ -541,7 +541,7 @@ public class ClanEventListener extends ClanListener {
             this.clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
-            // Leave below as NEUTRAL for an after-effect, or SELF as a before-effect for clan join
+            // Leave below as NEUTRAL for an after-effect, or SELF as a before-effect for clan leave
             UtilMessage.simpleMessage(player, "Clans", "You left %s.", this.getClanFullName(ClanRelation.NEUTRAL, clan));
             clan.messageClan("%s left your Clan.".formatted(this.getPlayerName(ClanRelation.NEUTRAL, player)), null, true);
 
@@ -574,7 +574,7 @@ public class ClanEventListener extends ClanListener {
             this.clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
-            // Leave below as NEUTRAL for an after-effect, or SELF as a before-effect for clan join
+            // Leave below as NEUTRAL for an after-effect, or SELF as a before-effect for clan kick
             UtilMessage.simpleMessage(player, "Clans", "You kicked %s from your Clan.", this.getPlayerName(ClanRelation.NEUTRAL, target.getName()));
             clan.messageClan(String.format("%s was kicked from your Clan.", this.getPlayerName(ClanRelation.NEUTRAL, target.getName())), null, true);
 
