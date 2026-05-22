@@ -132,21 +132,11 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
 
         UtilServer.callEvent(new TreeFellerEvent(player, initialLogLocation, initialLogType, blocksToFell));
 
+        final UUID playerUUID = player.getUniqueId();
         final ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        for (int i = 0; i < blocksToFell.size(); i++) {
-            Block blockToFell = blocksToFell.get(i);
-            Location fellLocation = blockToFell.getLocation();
-            blocksBeingFelled.add(fellLocation);
-            UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
-                try {
-                    if (isBreakableLog(blockToFell, initialLogLocation)) {
-                        UtilBlock.breakBlock(player, blockToFell);
-                    }
-                } finally {
-                    blocksBeingFelled.remove(fellLocation);
-                }
-            }, (long) (i * 0.3));
-        }
+        final Iterator<Block> blockIterator = blocksToFell.iterator();
+        
+        treeFeller(playerUUID, blockIterator, initialLogLocation, itemInMainHand);
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
         UtilMessage.simpleMessage(player, "Woodcutting", "You used <alt>Tree Feller</alt>");
@@ -198,6 +188,32 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
             }
         }
 
+    }
+
+    private void treeFeller(UUID playerUUID, Iterator<Block> iterator, Location initialLogLocation, Material itemInMainHand) {
+        if (!iterator.hasNext()) return; 
+
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null || !player.isOnline()) return;
+
+        // Stop if the held item changes
+        if (player.getInventory().getItemInMainHand().getType() != itemInMainHand) return;
+
+        Block nextBlock = iterator.next();
+        Location fellLocation = nextBlock.getLocation();
+
+        blocksBeingFelled.add(fellLocation);
+        try {
+            if (isBreakableLog(nextBlock, initialLogLocation)) {
+                UtilBlock.breakBlock(player, nextBlock);
+            }
+        } finally {
+            blocksBeingFelled.remove(fellLocation);
+        }
+
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+            treeFeller(playerUUID, iterator, initialLogLocation, itemInMainHand);
+        }, 1L);
     }
 
     @Override
