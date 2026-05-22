@@ -195,14 +195,18 @@ public class ItemPacketRemapper implements PacketListener {
     private ItemStack mapTo(ItemStack protocolItemStack) {
         if (protocolItemStack == null) return null;
 
-        final org.bukkit.inventory.ItemStack previous = SpigotConversionUtil.toBukkitItemStack(protocolItemStack);
-        if (previous.isEmpty() || previous.hasItemMeta() && (previous.getItemMeta().hasLore() || previous.getItemMeta().hasDisplayName())) {
+        try {
+            final org.bukkit.inventory.ItemStack previous = SpigotConversionUtil.toBukkitItemStack(protocolItemStack);
+            if (previous.isEmpty() || previous.hasItemMeta() && (previous.getItemMeta().hasLore() || previous.getItemMeta().hasDisplayName())) {
+                return protocolItemStack;
+            }
+
+            final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(previous.clone());
+            final org.bukkit.inventory.ItemStack result = itemOpt.map(itemInstance -> itemInstance.getView().get()).orElse(previous).clone();
+            return SpigotConversionUtil.fromBukkitItemStack(result);
+        } catch (Exception e) {
             return protocolItemStack;
         }
-
-        final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(previous.clone());
-        final org.bukkit.inventory.ItemStack result = itemOpt.map(itemInstance -> itemInstance.getView().get()).orElse(previous).clone();
-        return SpigotConversionUtil.fromBukkitItemStack(result);
     }
 
     private ItemStack mapFrom(ItemStack protocolItemStack) {
@@ -254,7 +258,11 @@ public class ItemPacketRemapper implements PacketListener {
         net.minecraft.world.item.ItemStack netStack = slot == -100
                 ? window.getCarried()
                 : window.getSlot(slot).getItem();
-        return SpigotConversionUtil.fromBukkitItemStack(netStack.asBukkitCopy());
+        try {
+            return SpigotConversionUtil.fromBukkitItemStack(netStack.asBukkitCopy());
+        } catch (Exception e) {
+            return ItemStack.EMPTY;
+        }
     }
 
 }

@@ -46,15 +46,21 @@ public class RemapperOut implements PacketListener {
         }
 
         final List<ItemStack> items = packet.getItems();
-        items.set(5, this.controller.getHatItem(event.getPlayer())
-                .map(SpigotConversionUtil::fromBukkitItemStack)
-                .orElse(items.get(5)));
+        this.controller.getHatItem(event.getPlayer())
+                .ifPresent(hat -> {
+                    try {
+                        items.set(5, SpigotConversionUtil.fromBukkitItemStack(hat));
+                    } catch (Exception ignored) { }
+                });
         packet.setItems(items);
 
-        packet.setCarriedItem(packet.getCarriedItem()
-                .flatMap(stack -> this.controller.fromHatItem(SpigotConversionUtil.toBukkitItemStack(stack)))
-                .map(SpigotConversionUtil::fromBukkitItemStack)
-                .orElse(null));
+        packet.getCarriedItem().ifPresent(stack -> {
+            try {
+                this.controller.fromHatItem(SpigotConversionUtil.toBukkitItemStack(stack))
+                        .map(SpigotConversionUtil::fromBukkitItemStack)
+                        .ifPresent(packet::setCarriedItem);
+            } catch (Exception ignored) { }
+        });
     }
 
     private void onSetSlot(PacketSendEvent event) {
@@ -74,7 +80,11 @@ public class RemapperOut implements PacketListener {
         }
 
         // Replace helmet with hat
-        packet.setItem(SpigotConversionUtil.fromBukkitItemStack(hatItem.get()));
+        try {
+            packet.setItem(SpigotConversionUtil.fromBukkitItemStack(hatItem.get()));
+        } catch (Exception e) {
+            // Ignore
+        }
     }
 
     private void onEntityEquipment(PacketSendEvent event) {
@@ -113,7 +123,11 @@ public class RemapperOut implements PacketListener {
         }
 
         // Replace helmet with hat
-        slots.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(hatItem.get())));
-        packet.setEquipment(slots);
+        try {
+            slots.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(hatItem.get())));
+            packet.setEquipment(slots);
+        } catch (Exception e) {
+            // Ignore
+        }
     }
 }

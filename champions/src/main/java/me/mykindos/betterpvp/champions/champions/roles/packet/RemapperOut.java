@@ -116,11 +116,15 @@ public class RemapperOut implements PacketListener {
         final List<ItemStack> items = packet.getItems();
         for (int i = 5; i <= 8; i++) { // Armor slots
             final ItemStack current = items.get(i);
-            if (!SpigotConversionUtil.toBukkitItemStack(current).getType().isAir()) {
-                continue; // We don't want to override existing armor pieces
-            }
+            try {
+                if (!SpigotConversionUtil.toBukkitItemStack(current).getType().isAir()) {
+                    continue; // We don't want to override existing armor pieces
+                }
 
-            items.set(i, SpigotConversionUtil.fromBukkitItemStack(this.getRolePlaceholder(getSlot(i), role)));
+                items.set(i, SpigotConversionUtil.fromBukkitItemStack(this.getRolePlaceholder(getSlot(i), role)));
+            } catch (Exception e) {
+                // Ignore
+            }
         }
         packet.setItems(items);
     }
@@ -136,8 +140,12 @@ public class RemapperOut implements PacketListener {
             return; // Return if it's not an armor slot
         }
 
-        if (!SpigotConversionUtil.toBukkitItemStack(packet.getItem()).getType().isAir())  {
-            return; // We don't want to override existing armor pieces
+        try {
+            if (!SpigotConversionUtil.toBukkitItemStack(packet.getItem()).getType().isAir()) {
+                return; // We don't want to override existing armor pieces
+            }
+        } catch (Exception e) {
+            return;
         }
 
         if (!visibility.shouldRender(player)) {
@@ -147,7 +155,11 @@ public class RemapperOut implements PacketListener {
         // Replace air with role placeholder
         final Role role = this.roleManager.getRole(player);
         final org.bukkit.inventory.ItemStack placeholder = this.getRolePlaceholder(getSlot(packet.getSlot()), role);
-        packet.setItem(SpigotConversionUtil.fromBukkitItemStack(placeholder));
+        try {
+            packet.setItem(SpigotConversionUtil.fromBukkitItemStack(placeholder));
+        } catch (Exception e) {
+            // Ignore
+        }
     }
 
     private void onEntityEquipment(PacketSendEvent event) {
@@ -185,7 +197,11 @@ public class RemapperOut implements PacketListener {
             final EquipmentSlot equipmentSlot = equipment.getSlot();
             if (equipment.getItem().isEmpty() && toReplace.contains(equipmentSlot)) {
                 final org.bukkit.inventory.ItemStack rolePlaceholder = this.getRolePlaceholder(equipmentSlot, role);
-                equipment.setItem(SpigotConversionUtil.fromBukkitItemStack(rolePlaceholder));
+                try {
+                    equipment.setItem(SpigotConversionUtil.fromBukkitItemStack(rolePlaceholder));
+                } catch (Exception e) {
+                    // Ignore
+                }
             }
         }
 
