@@ -40,7 +40,12 @@ public class RemapperOut implements PacketListener {
     }
 
     private void onWindowItems(PacketSendEvent event) {
-        final WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event);
+        WrapperPlayServerWindowItems packet;
+        try {
+            packet = new WrapperPlayServerWindowItems(event);
+        } catch (Exception e) {
+            return;
+        }
         if (!UtilInventory.isPlayerInventory(event.getPlayer(), packet.getWindowId())) {
             return; // Not a player inventory
         }

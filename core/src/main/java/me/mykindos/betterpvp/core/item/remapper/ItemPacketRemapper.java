@@ -167,7 +167,12 @@ public class ItemPacketRemapper implements PacketListener {
     }
 
     private void onWindowItems(PacketSendEvent event) {
-        final WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event);
+        final WrapperPlayServerWindowItems packet;
+        try {
+            packet = new WrapperPlayServerWindowItems(event);
+        } catch (Exception e) {
+            return;
+        }
         final List<ItemStack> items = packet.getItems().stream()
                         .map(this::mapTo)
                         .toList();
@@ -176,7 +181,12 @@ public class ItemPacketRemapper implements PacketListener {
     }
 
     private void onSetSlot(PacketSendEvent event) {
-        final WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(event);
+        final WrapperPlayServerSetSlot packet;
+        try {
+            packet = new WrapperPlayServerSetSlot(event);
+        } catch (Exception e) {
+            return;
+        }
 
         // We have to do this for creative players because when they receive a SetSlot packet they take it as a true
         // source of truth. This means that the player does not send any feedback packets but the item that is seen
