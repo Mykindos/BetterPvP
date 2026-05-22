@@ -5,13 +5,14 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
+import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -82,11 +83,26 @@ public class SalvageStationListener implements Listener {
      * can see exactly what they will get — there's no second roll on confirm.
      */
     private void handlePlan(Player player, ItemStack held, SalvagePlan plan) {
-        if (plan.getTier().isAtLeast(ItemRarity.EPIC)) {
+        if (requiresConfirmation(plan)) {
             promptConfirmation(player, held, plan);
         } else {
             execute(player, held, plan);
         }
+    }
+
+    /**
+     * Whether salvaging this item is destructive enough to warrant a confirmation menu.
+     * Epic+ rarity items are scarce; attuned high-purity items are similarly hard to
+     * replace since purity rolls cannot be re-rolled once revealed.
+     */
+    private boolean requiresConfirmation(SalvagePlan plan) {
+        if (plan.getTier().isAtLeast(ItemRarity.EPIC)) {
+            return true;
+        }
+        return plan.getSource().getComponent(PurityComponent.class)
+                .filter(PurityComponent::isAttuned)
+                .map(component -> component.getPurity().isAtLeast(ItemPurity.PRISTINE))
+                .orElse(false);
     }
 
     private void promptConfirmation(Player player, ItemStack held, SalvagePlan plan) {
