@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.VanillaItem;
@@ -25,6 +26,7 @@ public class FishingRod extends VanillaItem implements Reloadable {
         super(Material.FISHING_ROD, ItemRarity.COMMON);
         addSerializableComponent(new RuneContainerComponent(0, 0));
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
+        addSerializableComponent(new RepairableComponent());
     }
 
     @Override

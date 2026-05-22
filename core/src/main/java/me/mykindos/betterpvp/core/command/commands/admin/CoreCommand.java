@@ -15,18 +15,8 @@ import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.CraftingRecipe;
-import org.bukkit.inventory.Recipe;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
 
 @Singleton
 public class CoreCommand extends Command implements IConsoleCommand {
@@ -43,29 +33,6 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final File serverFolder = Bukkit.getServer().getPluginsFolder().getParentFile();
-        final File recipes = new File(serverFolder, "recipes.txt");
-
-        try {
-            recipes.createNewFile();
-
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(recipes, false))) {
-                final Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
-
-                while (recipeIterator.hasNext()) {
-                    final Recipe recipe = recipeIterator.next();
-
-                    if (recipe instanceof CraftingRecipe craftingRecipe) {
-                        final NamespacedKey key = craftingRecipe.getKey();
-
-                        writer.write(key.toString());
-                        writer.newLine();
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

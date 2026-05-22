@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
@@ -23,6 +24,7 @@ public class AncientSword extends BaseItem implements Reloadable {
     public AncientSword() {
         super("Ancient Sword", ItemStack.of(Material.NETHERITE_SWORD), ItemGroup.WEAPON, ItemRarity.RARE);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
+        addSerializableComponent(new RepairableComponent());
     }
 
     @Override
