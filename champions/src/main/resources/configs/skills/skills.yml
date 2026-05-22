@@ -252,12 +252,10 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      baseDamage: 0.75
+      baseDamage: 0.5
       damageIncreasePerLevel: 0.25
-      baseMaxDamage: 1.5
-      maxDamageIncreasePerLevel: 0.5
+      maxStacks: 3
       expirationTime: 6.0
-      expirationTimeIncreasePerLevel: 0.0
     cleave:
       enabled: true
       maxlevel: 3
