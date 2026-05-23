@@ -62,6 +62,10 @@ public class Client extends PropertyContainer implements IMapListener, Unique {
         properties.registerListener(this);
     }
 
+    public Player getPlayer() {
+        return Bukkit.getServer().getPlayer(this.getUuid());
+    }
+
     public Component getTag(boolean bold) {
         String tagName = (String) getProperty(ClientProperty.SHOW_TAG).orElse(Rank.ShowTag.LONG.name());
         Rank.ShowTag showTag = Rank.ShowTag.valueOf(tagName);
