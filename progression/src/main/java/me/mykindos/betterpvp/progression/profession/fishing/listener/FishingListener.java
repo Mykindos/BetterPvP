@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
-import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -262,30 +261,9 @@ public class FishingListener implements Listener {
 
         splash(hook.getLocation());
 
-        // Award all loot entries in the bundle.
-        for (Loot<?, ?> loot : bundle) {
-            final LootContext context = bundle.getContext();
-            if (loot.award(context) instanceof Item item) {
-                UtilItem.reserveItem(item, player, 30);
-                UtilServer.runTaskLater(progression, () -> {
-                    if (item.isValid()) {
-                        item.remove();
-                    }
-                }, 20L * 60L);
-            }
-
-            if (loot instanceof FishLoot fishLoot) {
-                // rollFish() was already called in onFish CAUGHT_FISH before the event was fired.
-                // Skills may have mutated the weight. Now award and grant XP.
-                final Fish fish = fishLoot.getCurrentFish();
-                if (fish != null) {
-                    fishingHandler.addFish(player, fish);
-                    UtilMessage.message(player, "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!",
-                            fish.getTypeName(), UtilFormat.formatNumber(fish.getWeight()));
-                }
-            }
-
-        }
+        // Per-entry side effects (item reservation, lifetime, FishLoot bookkeeping) live in
+        // FishingCatchLootListener as LootAwardedEvent handlers filtered on source = "fishing:catch".
+        bundle.award();
 
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
         UtilServer.callEvent(new PlayerStopFishingEvent(player, bundle, PlayerStopFishingEvent.FishingResult.CATCH));

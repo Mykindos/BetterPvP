@@ -23,7 +23,7 @@ public final class GivenClanEnergyLoot extends ClanEnergyLoot<Map<Clan, Integer>
     }
 
     @Override
-    public Map<Clan, Integer> award(LootContext context) {
+    protected Map<Clan, Integer> award(LootContext context) {
         ClanManager clanManager = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClanManager.class);
         Map<Clan, Integer> results = new HashMap<>();
         context.getSession().getAudience().forEachAudience(audience -> {
@@ -32,7 +32,7 @@ public final class GivenClanEnergyLoot extends ClanEnergyLoot<Map<Clan, Integer>
             }
             clanManager.getClanByPlayer(player).ifPresent(clan -> {
                 int amount = (minAmount == maxAmount) ? minAmount : ThreadLocalRandom.current().nextInt(minAmount, maxAmount + 1);
-                clan.grantEnergy(player, amount, context.getSource());
+                clan.grantEnergy(player, amount, context.getSource().getDisplayName());
                 results.merge(clan, amount, Integer::sum);
             });
         });

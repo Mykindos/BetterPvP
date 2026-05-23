@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.loot.expression;
 
 import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.LootProgress;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,7 +25,7 @@ class ExpressionEngineTest {
         final Location location = new Location(world, 0, 0, 0);
         final LootSession session = Mockito.mock(LootSession.class);
         when(session.getProgress()).thenReturn(new LootProgress());
-        context = new LootContext(session, location, "test", Map.of(
+        context = new LootContext(session, location, LootSource.of("Test", "test"), Map.of(
                 "slayer_standing", 1,
                 "dungeon_score", 75,
                 "tier", "boss",

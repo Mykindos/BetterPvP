@@ -79,7 +79,7 @@ public final class ExpressionEngine {
         for (Map.Entry<String, Object> e : extras.entrySet()) {
             jc.set(e.getKey(), e.getValue());
         }
-        jc.set(VAR_SOURCE, context.getSource());
+        jc.set(VAR_SOURCE, context.getSource().getId());
         jc.set(VAR_HISTORY_SIZE, context.getSession().getProgress().getHistory().size());
 
         try {

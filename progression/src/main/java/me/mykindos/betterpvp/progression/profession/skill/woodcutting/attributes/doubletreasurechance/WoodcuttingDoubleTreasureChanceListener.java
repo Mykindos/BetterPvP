@@ -7,11 +7,12 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
+import me.mykindos.betterpvp.core.loot.event.LootAwardedEvent;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -22,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerWoodcuttingDoubleTreasureDropEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerWoodcuttingTreasureDropEvent;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
@@ -80,19 +82,17 @@ public class WoodcuttingDoubleTreasureChanceListener implements Listener, Reload
             return;
         }
 
-        for (Loot<?, ?> loot : bundle) {
-            awardTreasure(player, location, loot, bundle.getContext());
-        }
+        bundle.award();
     }
 
-    private LootBundle rollTreasure(Player player, Location location) {
-        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
-        final LootContext context = new LootContext(session, location, "Woodcutting");
-        return treasureLootTable.generateLoot(context);
-    }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDoubleTreasureLootAwarded(LootAwardedEvent event) {
+        if (!"woodcutting:treasure_double".equals(event.getContext().getSource().getId())) return;
+        final Audience audience = event.getContext().getSession().getAudience();
+        if (!(audience instanceof Player player)) return;
+        final Location location = event.getContext().getLocation();
+        final Object award = event.getRawResult();
 
-    private void awardTreasure(Player player, Location location, Loot<?, ?> loot, LootContext context) {
-        final Object award = loot.award(context);
         if (award instanceof Item item) {
             sendMessage(player, location, item.getItemStack());
         } else if (award instanceof ItemStack itemStack) {
@@ -105,6 +105,12 @@ public class WoodcuttingDoubleTreasureChanceListener implements Listener, Reload
                 sendMessage(player, location, itemStack);
             }
         }
+    }
+
+    private LootBundle rollTreasure(Player player, Location location) {
+        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
+        final LootContext context = new LootContext(session, location, LootSource.of("Woodcutting", "woodcutting:treasure_double"));
+        return treasureLootTable.generateLoot(context);
     }
 
     private void sendMessage(Player player, Location location, ItemStack itemStack) {

@@ -67,7 +67,7 @@ public final class EntitySpawnLoot extends Loot<EntityType, Entity> {
     }
 
     @Override
-    public Entity award(LootContext context) {
+    protected Entity award(LootContext context) {
         final Location location = context.getLocation();
 
         // Find the nearest player within 10 blocks to use as the launch target.

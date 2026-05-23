@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.loot;
 
-import com.google.common.base.Preconditions;
 import lombok.Value;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import org.bukkit.Location;
@@ -32,7 +31,7 @@ public class LootContext {
      */
     @NotNull LootSession session;
 
-    @NotNull String source;
+    @NotNull LootSource source;
 
     /**
      * Caller-supplied named values made available to expression-based roll counts, weights
@@ -40,12 +39,11 @@ public class LootContext {
      */
     @NotNull Map<String, Object> inputs;
 
-    public LootContext(@NotNull LootSession session, @NotNull Location location, @NotNull String source) {
+    public LootContext(@NotNull LootSession session, @NotNull Location location, @NotNull LootSource source) {
         this(session, location, source, Map.of());
     }
 
-    public LootContext(@NotNull LootSession session, @NotNull Location location, @NotNull String source, @NotNull Map<String, Object> inputs) {
-        Preconditions.checkArgument(!source.isEmpty(), "Source cannot be empty");
+    public LootContext(@NotNull LootSession session, @NotNull Location location, @NotNull LootSource source, @NotNull Map<String, Object> inputs) {
         this.location = location;
         this.session = session;
         this.source = source;

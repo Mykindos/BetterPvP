@@ -9,6 +9,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
@@ -97,9 +98,9 @@ public class BuriedCache extends ProfessionSkill {
             UtilServer.runTaskLater(getProgression(), () -> {
                 block.setType(Material.CHEST);
                 LootSession session = sessionController.resolve(player, table, () -> LootSession.newSession(table, player));
-                LootContext context = new LootContext(session, block.getLocation(), "Mining");
+                LootContext context = new LootContext(session, block.getLocation(), LootSource.of("Mining", "mining:buried_cache"));
                 LootBundle bundle = table.generateLoot(context);
-                BuriedCacheChestStrategy.fillChest(block, bundle, context);
+                BuriedCacheChestStrategy.fillChest(block, bundle);
                 activeCaches.put(block.getLocation(), block);
                 playAppearanceEffect(block.getLocation());
             }, 1L);

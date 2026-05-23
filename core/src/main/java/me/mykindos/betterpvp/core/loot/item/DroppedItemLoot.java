@@ -26,7 +26,7 @@ public final class DroppedItemLoot extends ItemLoot<Item> {
      * @param context The context to award the loot to.
      */
     @Override
-    public Item award(LootContext context) {
+    protected Item award(LootContext context) {
         final Location location = context.getLocation();
         final ItemInstance reward = this.getReward();
         int count;

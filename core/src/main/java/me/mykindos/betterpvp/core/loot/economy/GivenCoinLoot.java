@@ -25,7 +25,7 @@ public final class GivenCoinLoot extends CoinLoot<Map<Player, Integer>> {
     }
 
     @Override
-    public Map<Player, Integer> award(LootContext context) {
+    protected Map<Player, Integer> award(LootContext context) {
         Map<Player, Integer> results = new HashMap<>();
         ClientManager clientManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientManager.class);
         context.getSession().getAudience().forEachAudience(audience -> {

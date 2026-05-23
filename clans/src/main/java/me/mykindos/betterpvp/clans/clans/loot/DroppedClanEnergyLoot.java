@@ -18,7 +18,7 @@ public final class DroppedClanEnergyLoot extends ClanEnergyLoot<Item> {
     }
 
     @Override
-    public Item award(LootContext context) {
+    protected Item award(LootContext context) {
         int amount = (minAmount == maxAmount) ? minAmount : ThreadLocalRandom.current().nextInt(minAmount, maxAmount + 1);
         ItemStack item = energyType.generateItem(amount, autoDeposit);
         return context.getLocation().getWorld().dropItemNaturally(context.getLocation(), item);

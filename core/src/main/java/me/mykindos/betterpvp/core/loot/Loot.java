@@ -38,9 +38,16 @@ public abstract class Loot<T, R> {
 
     /**
      * Awards this loot to the given context.
+     * <p>
+     * Visibility is {@code protected} to force external callers to go through
+     * {@link AwardStrategy#awardLoot(LootBundle, Loot)} (or {@link LootBundle#award()}),
+     * which guarantees a {@link me.mykindos.betterpvp.core.loot.event.LootAwardedEvent}
+     * is fired for every awarded entry. Subclasses must override with the same or wider
+     * visibility ({@code protected}).
+     *
      * @param context The context to award the loot to.
      */
-    public abstract R award(LootContext context);
+    protected abstract R award(LootContext context);
 
     /**
      * Gets the icon for this loot in a menu
