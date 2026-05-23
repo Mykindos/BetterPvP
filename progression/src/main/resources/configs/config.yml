@@ -1,5 +1,4 @@
 woodcutting:
-  skillPointInterval: 5
   experiencePerWood:
     DARK_OAK_LOG: 10
     ACACIA_LOG: 10
@@ -9,6 +8,7 @@ woodcutting:
     SPRUCE_LOG: 10
     MANGROVE_LOG: 15
     CHERRY_LOG: 10
+    PALE_OAK_LOG: 10
     STRIPPED_CHERRY_LOG: 10
     STRIPPED_OAK_LOG: 10
     STRIPPED_DARK_OAK_LOG: 10
@@ -16,6 +16,7 @@ woodcutting:
     STRIPPED_JUNGLE_LOG: 10
     STRIPPED SPRUCE_LOG: 10
     STRIPPED_MANGROVE_LOG: 15
+    STRIPPED_PALE_OAK_LOG: 10
 
   loot:
     stick:
@@ -99,47 +100,49 @@ woodcutting:
       minAmount: 1
       maxAmount: 1
   enabled: true
+  skillPointInterval: 1
 
 mining:
   minLeaderboardBlockXp: 45
   xpPerBlock:
-    STONE: 1
-    SANDSTONE: 1
-    ANDESITE: 1
-    GRANITE: 1
-    COBBLESTONE: 1
-    DEEPSLATE: 1
-    TUFF: 1
-    DIORITE: 1
-    CALCITE: 1
-    DRIPSTONE_BLOCK: 1
-    AMETHYST_BLOCK: 1
-    AMETHYST_CLUSTER: 5
-    SMALL_AMETHYST_BUD: 5
-    MEDIUM_AMETHYST_BUD: 5
-    LARGE_AMETHYST_BUD: 5
-    REDSTONE_ORE: 10
-    DIAMOND_ORE: 10
-    GOLD_ORE: 10
-    COPPER_ORE: 10
-    IRON_ORE: 10
-    COAL_ORE: 10
-    LAPIS_ORE: 10
-    EMERALD_ORE: 10
-    GILDED_BLACKSTONE: 10
-    DEEPSLATE_REDSTONE_ORE: 10
-    DEEPSLATE_DIAMOND_ORE: 10
-    DEEPSLATE_GOLD_ORE: 10
-    DEEPSLATE_COPPER_ORE: 10
-    DEEPSLATE_IRON_ORE: 10
-    DEEPSLATE_COAL_ORE: 10
-    DEEPSLATE_LAPIS_ORE: 10
-    DEEPSLATE_EMERALD_ORE: 10
+    STONE: 2
+    SANDSTONE: 2
+    ANDESITE: 2
+    GRANITE: 2
+    COBBLESTONE: 2
+    DEEPSLATE: 2
+    TUFF: 2
+    DIORITE: 2
+    CALCITE: 2
+    DRIPSTONE_BLOCK: 2
+    AMETHYST_BLOCK: 2
+    AMETHYST_CLUSTER: 10
+    SMALL_AMETHYST_BUD: 10
+    MEDIUM_AMETHYST_BUD: 10
+    LARGE_AMETHYST_BUD: 10
+    REDSTONE_ORE: 20
+    DIAMOND_ORE: 20
+    GOLD_ORE: 20
+    COPPER_ORE: 20
+    IRON_ORE: 20
+    COAL_ORE: 20
+    LAPIS_ORE: 20
+    EMERALD_ORE: 20
+    GILDED_BLACKSTONE: 20
+    DEEPSLATE_REDSTONE_ORE: 20
+    DEEPSLATE_DIAMOND_ORE: 20
+    DEEPSLATE_GOLD_ORE: 20
+    DEEPSLATE_COPPER_ORE: 20
+    DEEPSLATE_IRON_ORE: 20
+    DEEPSLATE_COAL_ORE: 20
+    DEEPSLATE_LAPIS_ORE: 20
+    DEEPSLATE_EMERALD_ORE: 20
   enabled: true
 
 
   minWaitTime: 5.0
   maxWaitTime: 20.0
+  skillPointInterval: 1
 
 
 
@@ -148,6 +151,9 @@ command:
     enabled: true
     requiredRank: ADMIN
     reload:
+      enabled: true
+      requiredRank: ADMIN
+    wipe:
       enabled: true
       requiredRank: ADMIN
   fishing:
@@ -192,6 +198,9 @@ command:
     set:
       enabled: true
       requiredRank: ADMIN
+  booster:
+    enabled: true
+    requiredRank: PLAYER
 tips:
   woodcuttingexperiencetip:
     enabled: true
@@ -485,7 +494,8 @@ fishing:
       minWeight: 1000
       frequency: 200
       item: progression:sunfish
-  xpPerPound: 0.5
+  xpPerPound: 1.0
+  skillPointInterval: 1
 # Web Config settings
 # If enabled, the plugin will load from local files first,
 # then override any values found in the web configuration.
