@@ -29,8 +29,13 @@ public class GoldenYieldAttribute implements IProfessionAttribute {
     }
 
     @Override
+    public double getDisplayValue(double value) {
+        return value;
+    }
+
+    @Override
     public String getOperation() {
-        return "%";
+        return "g";
     }
 
     public double getBonusYield(Player player) {

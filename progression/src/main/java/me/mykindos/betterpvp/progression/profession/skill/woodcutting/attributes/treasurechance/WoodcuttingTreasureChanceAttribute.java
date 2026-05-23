@@ -29,6 +29,11 @@ public class WoodcuttingTreasureChanceAttribute implements IProfessionAttribute 
     }
 
     @Override
+    public double getDisplayValue(double value) {
+        return value * 100;
+    }
+
+    @Override
     public String getOperation() {
         return "%";
     }

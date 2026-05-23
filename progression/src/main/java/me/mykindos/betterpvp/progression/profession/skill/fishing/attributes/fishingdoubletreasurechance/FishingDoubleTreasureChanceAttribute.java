@@ -29,6 +29,11 @@ public class FishingDoubleTreasureChanceAttribute implements IProfessionAttribut
     }
 
     @Override
+    public double getDisplayValue(double value) {
+        return value * 100;
+    }
+
+    @Override
     public String getOperation() {
         return "%";
     }
