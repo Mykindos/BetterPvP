@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
@@ -125,7 +126,7 @@ public class FishingHandler extends ProfessionHandler implements Reloadable {
 
     public @NotNull LootBundle getRandomLoot(Player player, Location location) {
         final LootSession session = sessionController.resolve(player, lootTable, () -> LootSession.newSession(lootTable, player));
-        final LootContext context = new LootContext(session, location, "Fishing");
+        final LootContext context = new LootContext(session, location, LootSource.of("Fishing", "fishing:catch"));
         return this.lootTable.generateLoot(context);
     }
 

@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.loot.AwardStrategy;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
-import me.mykindos.betterpvp.core.loot.event.LootAwardedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Location;
@@ -22,7 +21,7 @@ import java.util.Iterator;
 import java.util.Objects;
 
 // Only usable with MythicMobs on
-public class LootChest implements AwardStrategy {
+public class LootChest extends AwardStrategy {
 
     private final String mythicMobName;
     private final SoundEffect dropSound;
@@ -73,14 +72,12 @@ public class LootChest implements AwardStrategy {
     private void dropItem(LootBundle bundle, Loot<?, ?> loot) {
         final LootContext context = bundle.getContext();
         dropSound.play(context.getLocation());
-        if (loot.award(context) instanceof Item item) {
+        if (awardSingle(bundle, loot) instanceof Item item) {
             final Vector direction = context.getLocation().clone().getDirection().clone().multiply(0.2 + Math.random() * 0.15);
             direction.rotateAroundY(Math.toRadians(Math.random() * 25));
             direction.setY(0.2 + Math.random() * 0.15);
             item.setVelocity(direction);
         }
-        // Fire event for loot awarded from chest
-        UtilServer.callEvent(new LootAwardedEvent(bundle, context, loot));
     }
 
 }

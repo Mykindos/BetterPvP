@@ -98,7 +98,7 @@ public final class FishLoot extends Loot<Fish, Item> {
      * @return The last dropped {@link Item} entity, or {@code null} if none was dropped.
      */
     @Override
-    public Item award(LootContext context) {
+    protected Item award(LootContext context) {
         final Audience audience = context.getSession().getAudience();
 
         Player player = null;

@@ -29,7 +29,7 @@ public final class GivenItemLoot extends ItemLoot<List<ItemStack>> {
      * @param context The context to award the loot to.
      */
     @Override
-    public List<ItemStack> award(LootContext context) {
+    protected List<ItemStack> award(LootContext context) {
         List<ItemStack> results = new ArrayList<>();
         context.getSession().getAudience().forEachAudience(audience -> {
             if (!(audience instanceof Player player)) {

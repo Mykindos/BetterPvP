@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.progression.profession.skill.mining.buriedcache;
 
+import me.mykindos.betterpvp.core.loot.AwardStrategy;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
-import me.mykindos.betterpvp.core.loot.LootContext;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Item;
@@ -15,27 +15,33 @@ public final class BuriedCacheChestStrategy {
 
     private BuriedCacheChestStrategy() {}
 
-    public static void fillChest(Block block, LootBundle bundle, LootContext context) {
+    public static void fillChest(Block block, LootBundle bundle) {
         if (!(block.getState(false) instanceof Chest chest)) return;
 
-        Inventory inventory = chest.getBlockInventory();
-        for (Loot<?, ?> loot : bundle) {
-            Object awarded = loot.award(context);
-            ItemStack itemStack = null;
-            if (awarded instanceof Item worldItem) {
-                itemStack = worldItem.getItemStack().clone();
-                worldItem.remove();
-            } else if (awarded instanceof ItemStack is) {
-                itemStack = is;
-            }
+        final Inventory inventory = chest.getBlockInventory();
+        bundle.setAwardStrategy(new AwardStrategy() {
+            @Override
+            public void award(LootBundle b) {
+                for (Loot<?, ?> loot : b) {
+                    final Object awarded = awardSingle(b, loot);
+                    ItemStack itemStack = null;
+                    if (awarded instanceof Item worldItem) {
+                        itemStack = worldItem.getItemStack().clone();
+                        worldItem.remove();
+                    } else if (awarded instanceof ItemStack is) {
+                        itemStack = is;
+                    }
 
-            if (itemStack == null) continue;
+                    if (itemStack == null) continue;
 
-            Map<Integer, ItemStack> overflow = inventory.addItem(itemStack);
-            for (ItemStack leftover : overflow.values()) {
-                block.getWorld().dropItemNaturally(block.getLocation(), leftover);
+                    final Map<Integer, ItemStack> overflow = inventory.addItem(itemStack);
+                    for (ItemStack leftover : overflow.values()) {
+                        block.getWorld().dropItemNaturally(block.getLocation(), leftover);
+                    }
+                }
             }
-        }
+        });
+        bundle.award();
         chest.update();
     }
 }

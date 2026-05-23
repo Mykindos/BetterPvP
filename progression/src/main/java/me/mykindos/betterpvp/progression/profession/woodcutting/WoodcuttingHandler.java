@@ -13,9 +13,9 @@ import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
-import me.mykindos.betterpvp.core.loot.item.DroppedItemLoot;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
@@ -202,20 +202,12 @@ public class WoodcuttingHandler extends ProfessionHandler implements Reloadable 
     }
 
     public void processLogDropReplacement(Player player, Block block) {
-        boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
         LootTable logLootTable = logLootTables.get(block.getType().name());
         LootSession lootSession = sessionController.resolve(player, logLootTable, () -> LootSession.newSession(logLootTable, player));
-        LootContext lootContext = new LootContext(lootSession, block.getLocation(), "Woodcutting");
+        LootContext lootContext = new LootContext(lootSession, block.getLocation(), LootSource.of("Woodcutting", "woodcutting:log_drop"));
         LootBundle loot = logLootTable.generateLoot(lootContext);
-
-        loot.getLoot().stream().filter(lootType -> lootType instanceof DroppedItemLoot)
-                .forEach(lootType -> {
-                    DroppedItemLoot droppedItemLoot = (DroppedItemLoot) lootType;
-                    Item item = droppedItemLoot.award(lootContext);
-                    if (isProtected) {
-                        UtilItem.reserveItem(item, player, 10);
-                    }
-                });
+        // Per-entry reservation lives in WoodcuttingLogDropLootListener (LootAwardedEvent).
+        loot.award();
     }
 
     /**
