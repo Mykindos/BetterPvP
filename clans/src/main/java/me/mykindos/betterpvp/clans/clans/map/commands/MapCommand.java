@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.MapMeta;
 
 @Singleton
@@ -23,7 +24,7 @@ public class MapCommand extends Command {
     private final ItemFactory itemFactory;
 
     @Inject
-    public MapCommand(ItemFactory itemFactory){
+    public MapCommand(ItemFactory itemFactory) {
         this.itemFactory = itemFactory;
     }
 
@@ -45,7 +46,18 @@ public class MapCommand extends Command {
             MapMeta meta = (MapMeta) itemStack.getItemMeta();
             meta.setMapView(Bukkit.getMap(0));
             itemStack.setItemMeta(meta);
-            player.getInventory().addItem(itemFactory.convertItemStack(itemStack).orElse(itemStack));
+
+            ItemStack mapItemStack = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+
+            PlayerInventory playerInventory = player.getInventory();
+
+            // Set the Map ItemStack to the last hotbar slot if available, otherwise give
+            ItemStack lastHotbarItemStack = playerInventory.getItem(8);
+            if (lastHotbarItemStack == null || lastHotbarItemStack.getType() == Material.AIR) {
+                playerInventory.setItem(8, mapItemStack);
+            } else {
+                player.getInventory().addItem(mapItemStack);
+            }
         } else {
             UtilMessage.message(player, "Clans", "<red>You already have a map in your inventory!");
         }
