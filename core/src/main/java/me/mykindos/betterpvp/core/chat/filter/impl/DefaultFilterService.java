@@ -31,17 +31,17 @@ public class DefaultFilterService implements IFilterService {
 
     @Override
     public CompletableFuture<Component> filterMessage(Component message) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (message instanceof TextComponent textComponent) {
-                String plainText = textComponent.content();
-                String filteredText = filterMessage(plainText).join();
+        if (message instanceof TextComponent textComponent) {
+            String plainText = textComponent.content();
+            return filterMessage(plainText).thenApply(filteredText -> {
                 if (!plainText.equals(filteredText)) {
                     return Component.text(filteredText).style(textComponent.style())
                             .children(textComponent.children());
                 }
-            }
-            return message;
-        });
+                return message;
+            });
+        }
+        return CompletableFuture.completedFuture(message);
     }
 
     @Override
