@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -16,8 +17,11 @@ import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 @Singleton
 public class ProgressionCommand extends Command implements IConsoleCommand {
@@ -98,6 +102,13 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
             woodcuttingHandler.loadConfig();
             miningHandler.loadConfig();
 
+            ProfessionProfileManager professionProfileRepository = progression.getInjector().getInstance(ProfessionProfileManager.class);
+            ClientManager clientManager = progression.getInjector().getInstance(ClientManager.class);
+
+
+            for (Client client : clientManager.getOnline()) {
+                professionProfileRepository.loadProfile(UUID.fromString(client.getUuid()));
+            }
 
             UtilMessage.message(sender, "Progression", "Successfully reloaded progression");
         }

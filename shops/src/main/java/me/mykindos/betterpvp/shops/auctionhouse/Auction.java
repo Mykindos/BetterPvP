@@ -2,11 +2,12 @@ package me.mykindos.betterpvp.shops.auctionhouse;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import me.mykindos.betterpvp.shops.auctionhouse.data.ListingDuration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
+
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 
 @Data
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class Auction {
     private final UUID seller;
     private final ItemStack itemStack;
     private int sellPrice;
-    private ListingDuration listingDuration = ListingDuration.ONE_DAY;
+    private ListingDuration listingDuration = ListingDuration.THREE_DAYS;
     private long expiryTime;
     private boolean sold;
     private boolean cancelled;

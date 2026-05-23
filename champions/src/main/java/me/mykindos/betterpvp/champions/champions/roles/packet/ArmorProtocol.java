@@ -85,7 +85,11 @@ public class ArmorProtocol implements Listener {
     private ItemStack getArmor(LivingEntity wearer, org.bukkit.inventory.EquipmentSlot equipmentSlot) {
         final EntityEquipment equipment = Objects.requireNonNull(wearer.getEquipment());
         final org.bukkit.inventory.ItemStack vanillaItem = equipment.getItem(equipmentSlot);
-        return SpigotConversionUtil.fromBukkitItemStack(vanillaItem);
+        try {
+            return SpigotConversionUtil.fromBukkitItemStack(vanillaItem);
+        } catch (Exception e) {
+            return ItemStack.EMPTY;
+        }
     }
 
     @EventHandler

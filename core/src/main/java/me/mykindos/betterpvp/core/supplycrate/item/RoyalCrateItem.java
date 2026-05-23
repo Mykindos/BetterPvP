@@ -39,6 +39,6 @@ public class RoyalCrateItem extends BaseItem {
 
     private Location getLocation(Client client) {
         final World world = Objects.requireNonNull(client.getGamer().getPlayer()).getWorld();
-        return new Location(world, 0, world.getMaxHeight() - 5, 0);
+        return new Location(world, -25, world.getMaxHeight() - 5, 20);
     }
 }

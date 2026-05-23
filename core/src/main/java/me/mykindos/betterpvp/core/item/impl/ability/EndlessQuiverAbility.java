@@ -134,11 +134,15 @@ public class EndlessQuiverAbility extends AbstractInteraction implements Listene
 
     private void takePacketArrow(Player player) {
         final ItemStack bukkitStack = player.getInventory().getItem(35);
-        final com.github.retrooper.packetevents.protocol.item.ItemStack item;
+        com.github.retrooper.packetevents.protocol.item.ItemStack item;
         if (bukkitStack == null) {
             item = com.github.retrooper.packetevents.protocol.item.ItemStack.builder().type(ItemTypes.AIR).build();
         } else {
-            item = SpigotConversionUtil.fromBukkitItemStack(bukkitStack);
+            try {
+                item = SpigotConversionUtil.fromBukkitItemStack(bukkitStack);
+            } catch (Exception e) {
+                item = com.github.retrooper.packetevents.protocol.item.ItemStack.builder().type(ItemTypes.AIR).build();
+            }
         }
         final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(35, item);
         PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
@@ -153,8 +157,10 @@ public class EndlessQuiverAbility extends AbstractInteraction implements Listene
             ItemStack content = player.getInventory().getContents()[i];
             if (content == null || !isAmmo(content)) continue;
 
-            final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(i, SpigotConversionUtil.fromBukkitItemStack(content));
-            PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
+            try {
+                final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(i, SpigotConversionUtil.fromBukkitItemStack(content));
+                PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
+            } catch (Exception ignored) { }
         }
     }
 
@@ -171,8 +177,10 @@ public class EndlessQuiverAbility extends AbstractInteraction implements Listene
                 mock.setData(DataComponentTypes.CUSTOM_MODEL_DATA, content.getData(DataComponentTypes.CUSTOM_MODEL_DATA));
             }
             mock.setAmount(content.getAmount());
-            final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(i, SpigotConversionUtil.fromBukkitItemStack(mock));
-            PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
+            try {
+                final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(i, SpigotConversionUtil.fromBukkitItemStack(mock));
+                PacketEvents.getAPI().getPlayerManager().getUser(player).sendPacket(packet);
+            } catch (Exception ignored) { }
         }
     }
 

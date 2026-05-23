@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -24,6 +25,7 @@ public class CrudePickaxe extends BaseItem implements Reloadable {
     public CrudePickaxe() {
         super("Crude Pickaxe", ItemStack.of(Material.STONE_PICKAXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
+        addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new RuneContainerComponent());
     }
 

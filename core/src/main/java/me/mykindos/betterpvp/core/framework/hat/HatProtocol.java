@@ -27,7 +27,12 @@ public class HatProtocol implements Listener {
     public void broadcast(Player wearer, boolean others) {
         // We broadcast player's helmet because RemapperOut maps it to the hat item after
         final org.bukkit.inventory.ItemStack vanillaItem = wearer.getInventory().getHelmet();
-        final ItemStack helmet = SpigotConversionUtil.fromBukkitItemStack(vanillaItem);
+        ItemStack helmet;
+        try {
+            helmet = SpigotConversionUtil.fromBukkitItemStack(vanillaItem);
+        } catch (Exception e) {
+            helmet = ItemStack.EMPTY;
+        }
 
         if (others) {
             // Others, including self

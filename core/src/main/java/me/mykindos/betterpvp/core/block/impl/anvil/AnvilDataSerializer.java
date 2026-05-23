@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.block.impl.anvil;
 
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.anvil.AnvilRecipeRegistry;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
+import me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperationResolver;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockData;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -20,13 +20,13 @@ public class AnvilDataSerializer implements SmartBlockDataSerializer<AnvilData> 
 
     private final StorageBlockDataSerializer<StorageBlockData> storageSerializer;
     private final ItemFactory itemFactory;
-    private final AnvilRecipeRegistry anvilRecipeRegistry;
+    private final AnvilOperationResolver operationResolver;
     private final ClientManager clientManager;
 
-    public AnvilDataSerializer(ItemFactory itemFactory, AnvilRecipeRegistry anvilRecipeRegistry, ClientManager clientManager) {
+    public AnvilDataSerializer(ItemFactory itemFactory, AnvilOperationResolver operationResolver, ClientManager clientManager) {
         this.storageSerializer = new StorageBlockDataSerializer<>(StorageBlockData.class, itemFactory, StorageBlockData::new);
         this.itemFactory = itemFactory;
-        this.anvilRecipeRegistry = anvilRecipeRegistry;
+        this.operationResolver = operationResolver;
         this.clientManager = clientManager;
     }
 
@@ -68,7 +68,7 @@ public class AnvilDataSerializer implements SmartBlockDataSerializer<AnvilData> 
             int hammerSwings = dis.readInt();
 
             // Create AnvilData with the new component structure
-            AnvilData anvilData = new AnvilData(itemFactory, anvilRecipeRegistry, clientManager);
+            AnvilData anvilData = new AnvilData(itemFactory, operationResolver, clientManager);
             
             // Set the anvil items in the item manager
             anvilData.getItemManager().getAnvilItems().setContent(anvilItems.getContent());

@@ -43,6 +43,7 @@ import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -54,6 +55,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.potion.PotionEffect;
@@ -341,10 +343,10 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
         // Copy player equipment
         clone.getEquipment().clear();
-        clone.getEquipment().setHelmet(playerInventory.getHelmet());
-        clone.getEquipment().setChestplate(playerInventory.getChestplate());
-        clone.getEquipment().setLeggings(playerInventory.getLeggings());
-        clone.getEquipment().setBoots(playerInventory.getBoots());
+        clone.getEquipment().setHelmet(new ItemStack(Material.NETHERITE_HELMET));
+        clone.getEquipment().setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
+        clone.getEquipment().setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
+        clone.getEquipment().setBoots(new ItemStack(Material.NETHERITE_BOOTS));
         clone.getEquipment().setItemInMainHand(playerInventory.getItemInMainHand());
     }
 

@@ -139,7 +139,11 @@ public class WorldLogRepository {
                                 metadataRecord.setLogId(id);
                                 metadataRecord.setRealm(Core.getCurrentRealm().getId());
                                 metadataRecord.setMetaKey(key);
-                                metadataRecord.setMetaValue(value);
+                                String val = value;
+                                if (val.length() > 255) {
+                                    val = val.substring(0, 252) + "...";
+                                }
+                                metadataRecord.setMetaValue(val);
                                 metadataRecords.add(metadataRecord);
                             });
                         }

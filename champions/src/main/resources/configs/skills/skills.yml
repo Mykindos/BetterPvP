@@ -3,14 +3,14 @@ skills:
   assassin:
     leap:
       enabled: true
-      cooldown: 8.0
+      cooldown: 9.0
       maxlevel: 5
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 0.5
       leapStrength: 1.3
-      wallKickStrength: 0.9
+      wallKickStrength: 0.75
       wallKickInternalCooldown: 0.5
-      wallkickEnergyCost: 25.0
+      wallkickEnergyCost: 35.0
       fallDamageLimit: 8.0
     sever:
       enabled: true
@@ -40,12 +40,12 @@ skills:
       maxlevel: 3
       damageIncreasePerLevel: 1.5
       baseDamage: 1.5
-      increasePerLevel: 1.5
+      increasePerLevel: 1.0
     smokebomb:
       enabled: true
       cooldown: 40.0
       maxlevel: 3
-      baseDuration: 4.0
+      baseDuration: 3.0
       blindDuration: 1.75
       blindRadius: 4.0
       cooldownDecreasePerLevel: 5.0
@@ -111,7 +111,7 @@ skills:
       durationPerLevel: 0.5
     blink:
       enabled: true
-      cooldown: 13.0
+      cooldown: 11.0
       maxlevel: 5
       maxTravelDistance: 14
       canUseWhileSlowed: false
@@ -123,7 +123,7 @@ skills:
       enabled: true
       maxlevel: 5
       baseMaxCharges: 5
-      baseRechargeSeconds: 9.0
+      baseRechargeSeconds: 10.0
       teleportDistance: 5.0
       canUseWhileSlowed: false
       chargeIncreasePerLevel: 0
@@ -150,7 +150,7 @@ skills:
       maxlevel: 3
       cooldown: 28.0
       percentHealthRecovered: 0.2
-      duration: 2.0
+      duration: 3.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
@@ -159,11 +159,11 @@ skills:
       maxlevel: 3
       cooldown: 15.0
       cooldownDecreasePerLevel: 2.0
-      activeBaseDuration: 0.7
+      activeBaseDuration: 0.6
       activeDurationIncreasePerLevel: 0.0
       baseDamageDelay: 0.4
       damageDelayIncreasePerLevel: 0.0
-      successBaseCooldown: 0.7
+      successBaseCooldown: 0.8
       successCooldownDecreasePerLevel: 0.1
       channelTimeCooldownMultiplier: 1.0
       channelTimeCooldownMultiplierDecreasePerLevel: 0.0

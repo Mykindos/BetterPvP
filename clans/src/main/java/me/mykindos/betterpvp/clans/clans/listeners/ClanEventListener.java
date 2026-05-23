@@ -46,6 +46,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -911,6 +912,11 @@ public class ClanEventListener extends ClanListener {
         Location highest = player.getLocation();
 
         final Block block = core.getSafest(highest).getBlock();
+        if(block.getType() == Material.BEDROCK) {
+            UtilMessage.simpleMessage(player, "Clans", "You cannot place the clan core here.");
+            return;
+        }
+
         core.removeBlock(); // Remove old core
         Location coreLocation = block.getLocation().toCenterLocation().setDirection(player.getLocation().getDirection());
         core.setPosition(coreLocation); // Set new core location

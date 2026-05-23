@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -114,6 +115,13 @@ public class GamerListener implements Listener {
         if (!event.hasChangedPosition()) return;
         final Gamer gamer = manager.search().online(event.getPlayer()).getGamer();
         gamer.setLastMovementNow();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBalanceUpdate(GamerPropertyUpdateEvent event) {
+        if (event.getProperty().equals(GamerProperty.BALANCE.name())) {
+            log.info("Balance updated for {}: {} -> {}", event.getContainer().getUniqueId(), event.getOldValue(), event.getNewValue()).submit();
+        }
     }
 
     private void checkUnsetProperties(Gamer gamer) {

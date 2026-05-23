@@ -1,90 +1,161 @@
 # Assassin
-# 31 health
-assassin_helmet:
-  health: 2
-  durability: 500
-assassin_chestplate:
-  health: 4
-  durability: 500
-assassin_leggings:
-  health: 3
-  durability: 500
-assassin_boots:
-  health: 2
-  durability: 500
+# +8 health (set total)
+reinforced_assassin_helmet:
+  health:
+    base: 1.5
+    min: 0.0
+    max: 4.5
+  durability: 1020
+reinforced_assassin_chestplate:
+  health:
+    base: 2.5
+    min: 0.0
+    max: 5.5
+  durability: 1020
+reinforced_assassin_leggings:
+  health:
+    base: 1.5
+    min: 0.0
+    max: 5.5
+  durability: 1020
+reinforced_assassin_boots:
+  health:
+    base: 1.5
+    min: 0.0
+    max: 4.5
+  durability: 1020
 
 # Knight
-# 50 health
-knight_helmet:
-  health: 6
-  durability: 500
-knight_chestplate:
-  health: 10
-  durability: 500
-knight_leggings:
-  health: 8
-  durability: 500
-knight_boots:
-  health: 6
-  durability: 500
-
+# +18 health (set total)
+reinforced_knight_helmet:
+  health:
+    base: 4.5
+    min: 0.0
+    max: 9.0
+  durability: 1020
+reinforced_knight_chestplate:
+  health:
+    base: 5.5
+    min: 2.5
+    max: 10.0
+  durability: 1020
+reinforced_knight_leggings:
+  health:
+    base: 5.5
+    min: 2.5
+    max: 10.0
+  durability: 1020
+reinforced_knight_boots:
+  health:
+    base: 2.5
+    min: 0.0
+    max: 5.5
+  durability: 1020
 
 # Brute
-# 50 health
-brute_helmet:
-  health: 6
-  durability: 500
-brute_chestplate:
-  health: 10
-  durability: 500
-brute_leggings:
-  health: 8
-  durability: 500
-brute_boots:
-  health: 6
-  durability: 500
+# +18 health (set total)
+reinforced_brute_helmet:
+  health:
+    base: 4.5
+    min: 0.0
+    max: 9.0
+  durability: 1020
+reinforced_brute_chestplate:
+  health:
+    base: 5.5
+    min: 2.5
+    max: 10.0
+  durability: 1020
+reinforced_brute_leggings:
+  health:
+    base: 5.5
+    min: 2.5
+    max: 10.0
+  durability: 1020
+reinforced_brute_boots:
+  health:
+    base: 2.5
+    min: 0.0
+    max: 5.5
+  durability: 1020
 
 # Ranger
-# 37 health
-ranger_helmet:
-  health: 3
-  durability: 500
-ranger_chestplate:
-  health: 6
-  durability: 500
-ranger_leggings:
-  health: 5
-  durability: 500
-ranger_boots:
-  health: 3
-  durability: 500
+# +14 health (set total)
+reinforced_ranger_helmet:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_ranger_chestplate:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_ranger_leggings:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_ranger_boots:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
 
 # Mage
-# 40 health
-mage_helmet:
-  health: 4
-  durability: 500
-mage_chestplate:
-  health: 7
-  durability: 500
-mage_leggings:
-  health: 5
-  durability: 500
-mage_boots:
-  health: 4
-  durability: 500
+# +14 health (set total)
+reinforced_mage_helmet:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_mage_chestplate:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_mage_leggings:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_mage_boots:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
 
 # Warlock
-# 40 health
-warlock_helmet:
-  health: 4
-  durability: 500
-warlock_chestplate:
-  health: 7
-  durability: 500
-warlock_leggings:
-  health: 5
-  durability: 500
-warlock_boots:
-  health: 4
-  durability: 500
+# +14 health (set total)
+reinforced_warlock_helmet:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_warlock_chestplate:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_warlock_leggings:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020
+reinforced_warlock_boots:
+  health:
+    base: 3.5
+    min: 0.0
+    max: 6.5
+  durability: 1020

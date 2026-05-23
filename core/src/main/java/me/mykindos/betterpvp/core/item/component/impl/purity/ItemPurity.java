@@ -74,6 +74,14 @@ public enum ItemPurity {
     }
 
     /**
+     * Returns true if this purity is at or above {@code other} in the ordered scale
+     * ({@link #PITIFUL} → {@link #PERFECT}). Mirrors {@code ItemRarity.isAtLeast}.
+     */
+    public boolean isAtLeast(@NotNull ItemPurity other) {
+        return this.ordinal() >= other.ordinal();
+    }
+
+    /**
      * Gets the name color override for this purity level.
      * Returns null if no override should be applied (use rarity color).
      * Currently only PERFECT purity overrides the name color.

@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Sound;
@@ -95,8 +97,16 @@ public class ProgressionListener implements Listener {
         final int level = event.getLevel();
         final int previous = event.getPreviousLevel();
 
+        final Component spendSkillPointsComponent = Component.text("Type ")
+                .append(Component.text("/" + tree.toLowerCase(), NamedTextColor.YELLOW)
+                        .decorate(TextDecoration.UNDERLINED)
+                        .clickEvent(ClickEvent.runCommand("/" + tree.toLowerCase()))
+                        .hoverEvent(HoverEvent.showText(Component.text("Click to spend your skill points!", NamedTextColor.GRAY)))
+                )
+                .append(Component.text(" to spend your skill points!", NamedTextColor.GRAY));
+
         UtilMessage.simpleMessage(player, tree, "You have leveled up to <green>%d <gray>in <green>%s<gray>!", level, tree);
-        UtilMessage.simpleMessage(player, tree, "Type <yellow>%s<gray> to spend your skill points!", "/" + tree.toLowerCase());
+        UtilMessage.simpleMessage(player, tree, spendSkillPointsComponent);
 
             Function<Gamer, Component> title = gmr -> Component.text(tree + " Level Up!", NamedTextColor.GREEN, TextDecoration.BOLD);
             Function<Gamer, Component> subtitle = gmr -> Component.text("Level " + previous + " \u279C " + level, NamedTextColor.DARK_GREEN);

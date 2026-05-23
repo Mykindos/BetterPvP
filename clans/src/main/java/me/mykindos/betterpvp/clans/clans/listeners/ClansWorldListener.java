@@ -78,6 +78,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -95,6 +96,11 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ArmorMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -140,6 +146,29 @@ public class ClansWorldListener extends ClanListener {
         this.itemRegistry = itemRegistry;
         this.itemFactory = itemFactory;
         this.blockTagHandler = blockTagHandler;
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPickupArmour(EntityPickupItemEvent event) {
+        if (event.getEntity() instanceof Player) {
+            ItemStack itemStack = event.getItem().getItemStack();
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta instanceof ArmorMeta armorMeta) {
+                ArmorTrim trim = armorMeta.getTrim();
+                if (trim != null) {
+
+                    final String material = String.valueOf(trim.getMaterial());
+
+                    if (material.contains("holder=Direct")) {
+                        armorMeta.setTrim(new ArmorTrim(TrimMaterial.LAPIS, TrimPattern.DUNE));
+                        log.warn("Modified armor trim for player: " + event.getEntity().getName()).submit();
+                    }
+
+                    itemStack.setItemMeta(armorMeta);
+                }
+            }
+
+        }
     }
 
     @EventHandler

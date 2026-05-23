@@ -69,7 +69,7 @@ public class MomentumRuneHandler implements Listener {
         final LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
         for (AttackEntry entry : attackSpeedMap.get(damager)) {
             if (entry != null && entry.victim == damagee) {
-                double scalar = Math.min(1 - momentumRune.getMaximumReduction(), 1 - entry.scalar);
+                double scalar = Math.max(1 - momentumRune.getMaximumReduction(), 1 - entry.scalar);
                 // Apply the scalar
                 event.setDamageDelay((long) (event.getDamageDelay() * scalar));
 
