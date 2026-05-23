@@ -57,12 +57,11 @@ public class FerocityRuneHandler implements Listener {
             return; // Rune not present
         }
 
-        // Check for chances
-        if (Math.random() <= ferocityRune.getChance()) {
-            final double delayReduction = ferocityRune.getDelayReduction();
-            event.setDamageDelay((long) Math.max(0, event.getDamageDelay() * (1 - delayReduction)));
-            new SoundEffect(Sound.ENTITY_RAVAGER_ROAR, 2f, 1f).play(damager.getLocation());
-            new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0f, 1f).play(damager.getLocation());
-        }
+
+        final double delayReduction = ferocityRune.getDelay();
+        event.setDamageDelay((long) Math.max(0, event.getDamageDelay() * (1 - delayReduction)));
+        new SoundEffect(Sound.ENTITY_RAVAGER_ROAR, 2f, 1f).play(damager.getLocation());
+        new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0f, 1f).play(damager.getLocation());
+
     }
 }

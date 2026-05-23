@@ -80,24 +80,22 @@ public class BrutalityRuneHandler implements Listener {
             return; // Slayer rune not present
         }
 
-        if (Math.random() < brutalityRune.getChance()) {
-            event.addModifier(new GenericModifier(
-                    brutalityRune.getName(),
-                    ModifierType.RUNE,
-                    DamageOperator.MULTIPLIER,
-                    1 + brutalityRune.getScalar())
-            );
+        event.addModifier(new GenericModifier(
+                brutalityRune.getName(),
+                ModifierType.RUNE,
+                DamageOperator.FLAT,
+                brutalityRune.getDamageIncrease())
+        );
 
-            final double width = event.getDamagee().getWidth();
-            new SoundEffect(Sound.ITEM_TRIDENT_HIT, 0.5f, 1f).play(event.getDamagee().getLocation());
-            new SoundEffect(Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1f, 1f).play(event.getDamagee().getLocation());
-            Particle.DUST_PILLAR.builder()
-                    .data(Material.REDSTONE_BLOCK.createBlockData())
-                    .location(event.getDamagee().getLocation())
-                    .offset(width / 2, width / 2, width / 2)
-                    .receivers(60)
-                    .count(100)
-                    .spawn();
-        }
+        final double width = event.getDamagee().getWidth();
+        new SoundEffect(Sound.ITEM_TRIDENT_HIT, 0.5f, 1f).play(event.getDamagee().getLocation());
+        new SoundEffect(Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1f, 1f).play(event.getDamagee().getLocation());
+        Particle.DUST_PILLAR.builder()
+                .data(Material.REDSTONE_BLOCK.createBlockData())
+                .location(event.getDamagee().getLocation())
+                .offset(width / 2, width / 2, width / 2)
+                .receivers(60)
+                .count(100)
+                .spawn();
     }
 }

@@ -28,10 +28,7 @@ public class FerocityRune implements Rune, Reloadable {
     private final Provider<FerocityRuneItem> itemProvider;
 
     @Getter
-    private double chance = 0.3;
-
-    @Getter
-    private double delayReduction = 0.6;
+    private double delay = 0.15;
 
     @Inject
     private FerocityRune(Provider<FerocityRuneItem> itemProvider) {
@@ -41,9 +38,8 @@ public class FerocityRune implements Rune, Reloadable {
     @Override
     public @NotNull String getDescription() {
         return String.format(
-                "Melee attacks have a <val>%s%%</val> chance to reduce the next attack's delay by <val>%s%%</val>.",
-                UtilFormat.formatNumber(chance * 100),
-                UtilFormat.formatNumber(delayReduction * 100)
+                "Reduces attack delay by <val>%s%%</val>.",
+                UtilFormat.formatNumber(delay * 100)
         );
     }
 
@@ -65,7 +61,6 @@ public class FerocityRune implements Rune, Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.chance = config.getConfig("chance", 0.3, Double.class);
-        this.delayReduction = config.getConfig("delayReduction", 0.6, Double.class);
+        this.delay = config.getConfig("delay", 0.15, Double.class);
     }
 }

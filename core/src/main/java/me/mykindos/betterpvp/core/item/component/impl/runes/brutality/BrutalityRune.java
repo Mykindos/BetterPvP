@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroup;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneGroups;
 import me.mykindos.betterpvp.core.item.config.Config;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,10 +26,7 @@ public class BrutalityRune implements Rune, Reloadable {
     private final Provider<BrutalityRuneItem> itemProvider;
 
     @Getter
-    private double scalar = 0.3;
-
-    @Getter
-    private double chance = 0.2;
+    private double damageIncrease = 1.0;
 
     @Inject
     private BrutalityRune(Provider<BrutalityRuneItem> itemProvider) {
@@ -45,9 +41,8 @@ public class BrutalityRune implements Rune, Reloadable {
     @Override
     public @NotNull String getDescription() {
         return String.format(
-                "Damage dealt has a <val>%s%%</val> chance to be increased by <damage>%s%%</damage>.",
-                UtilFormat.formatNumber(getChance() * 100),
-                UtilFormat.formatNumber(getScalar() * 100));
+                "Increases damage dealt by <damage>%.1f</damage>.", damageIncrease
+                );
     }
 
     @Override
@@ -63,7 +58,6 @@ public class BrutalityRune implements Rune, Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.chance = config.getConfig("chance", 0.2, Double.class);
-        this.scalar = config.getConfig("scalar", 0.3, Double.class);
+        this.damageIncrease = config.getConfig("damageIncrease", 1.0, Double.class);
     }
 }
