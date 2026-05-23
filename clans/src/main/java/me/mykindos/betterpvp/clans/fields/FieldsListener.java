@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -33,6 +34,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +60,11 @@ public class FieldsListener extends ClanListener {
         return clanManager.getClanByLocation(block.getLocation())
                 .map(c -> c.getName().equalsIgnoreCase("Fields"))
                 .orElse(false);
+    }
+
+    @EventHandler (ignoreCancelled = true)
+    public void onSuffocate(DamageEvent event) {
+        if(event.getBukkitCause() != EntityDamageEvent.DamageCause.SUFFOCATION) return;
     }
 
     @EventHandler
