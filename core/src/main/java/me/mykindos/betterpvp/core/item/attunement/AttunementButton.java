@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.currency.CurrencyUtils;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistribution;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
 import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
@@ -239,10 +239,10 @@ public class AttunementButton extends ControlItem<Gui> {
         ItemInstance attunedInstance = itemInstance.withComponent(attuned);
 
         // Roll rune slots based on purity (if item has RuneContainerComponent)
-        Optional<RuneContainerComponent> runeContainerOpt =
-            attunedInstance.getComponent(RuneContainerComponent.class);
+        Optional<SocketableContainerComponent> runeContainerOpt =
+            attunedInstance.getComponent(SocketableContainerComponent.class);
         if (runeContainerOpt.isPresent()) {
-            RuneContainerComponent existingContainer = runeContainerOpt.get();
+            SocketableContainerComponent existingContainer = runeContainerOpt.get();
 
             // Get distribution for this purity
             RuneSlotDistribution distribution = runeSlotRegistry.getDistribution(purity.getPurity());
@@ -251,10 +251,10 @@ public class AttunementButton extends ControlItem<Gui> {
             RuneSlotDistribution.RuneSlotRoll roll = distribution.roll();
 
             // Create new container with rolled values, preserving existing runes
-            RuneContainerComponent newContainer = new RuneContainerComponent(
+            SocketableContainerComponent newContainer = new SocketableContainerComponent(
                 roll.getSockets(),
                 roll.getMaxSockets(),
-                existingContainer.getRunes()
+                existingContainer.getSocketables()
             );
 
             // Apply the new container

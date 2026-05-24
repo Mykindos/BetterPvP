@@ -8,8 +8,11 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.Socketable;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
@@ -48,6 +51,18 @@ public class EntityHealthService {
             final StatContainerComponent container = componentOpt.get();
             if (container.hasStat(StatTypes.HEALTH)) {
                 health += container.getStat(StatTypes.HEALTH).orElseThrow().getValue();
+            }
+
+            final Optional<SocketableContainerComponent> socketableOpt = itemInstance.getComponent(SocketableContainerComponent.class);
+            if (socketableOpt.isPresent()) {
+                final SocketableContainerComponent socketableContainer = socketableOpt.get();
+                for (Socketable socketable : socketableContainer.getSocketables()) {
+                    for (ItemStat<?> stat : socketable.getStats()) {
+                        if (stat.getType().equals(StatTypes.HEALTH)) {
+                            health += (Double) stat.getValue();
+                        }
+                    }
+                }
             }
         }
         return health;

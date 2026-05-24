@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
@@ -22,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @ItemKey("champions:energy_apple")
+@FallbackItem(Material.APPLE)
 @EqualsAndHashCode(callSuper = false)
 public class EnergyApple extends BaseItem implements Reloadable {
 

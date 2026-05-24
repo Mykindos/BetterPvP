@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.VanillaItem;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -23,7 +23,7 @@ public class Bow extends VanillaItem implements Reloadable {
 
     public Bow() {
         super("Bow", ItemStack.of(Material.BOW), ItemRarity.COMMON);
-        addSerializableComponent(new RuneContainerComponent(0, 0));
+        addSerializableComponent(new SocketableContainerComponent(0, 0));
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

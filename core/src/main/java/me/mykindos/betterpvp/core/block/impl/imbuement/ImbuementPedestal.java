@@ -11,8 +11,9 @@ import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.gems.GemItem;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.RuneItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -157,9 +158,9 @@ public class ImbuementPedestal extends SmartBlock implements NexoBlock, DataHold
             return false;
         }
 
-        boolean isRune = itemInstance.getBaseItem() instanceof RuneItem;
+        boolean isRune = itemInstance.getBaseItem() instanceof RuneItem || itemInstance.getBaseItem() instanceof GemItem;
         boolean isAttunedWithSockets = itemInstance.getComponent(PurityComponent.class).map(PurityComponent::isAttuned).orElse(false)
-                && itemInstance.getComponent(RuneContainerComponent.class).map(runeContainer -> runeContainer.getSockets() > 0).orElse(false);
+                && itemInstance.getComponent(SocketableContainerComponent.class).map(runeContainer -> runeContainer.getSockets() > 0).orElse(false);
 
         if (!isRune && !isAttunedWithSockets) {
             UtilMessage.message(player, "Imbuement", "<red>You can only place runes or attuned items with sockets on the pedestal.");

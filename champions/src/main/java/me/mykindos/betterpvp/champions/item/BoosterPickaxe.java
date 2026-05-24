@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -36,7 +36,7 @@ public class BoosterPickaxe extends BaseItem implements Reloadable {
         super("Booster Pickaxe", ItemStack.of(Material.GOLDEN_PICKAXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DURABILITY));
         addSerializableComponent(new RepairableComponent());
-        addSerializableComponent(new RuneContainerComponent());
+        addSerializableComponent(new SocketableContainerComponent());
     }
 
     @Inject

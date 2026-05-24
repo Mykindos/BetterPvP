@@ -38,7 +38,7 @@ public class RewardBox {
 
     public String serialize() {
         try {
-            return UtilItem.serializeItemStackList(contents);
+            return UtilItem.serializeItemStackList(new ArrayList<>(contents));
         } catch (Exception e) {
             // Log the error but don't expose it to the client
             throw new IllegalStateException("Failed to serialize reward data");

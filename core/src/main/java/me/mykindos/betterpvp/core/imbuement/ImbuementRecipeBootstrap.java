@@ -6,8 +6,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableItem;
 import org.bukkit.NamespacedKey;
 import org.reflections.Reflections;
 
@@ -42,36 +42,36 @@ public class ImbuementRecipeBootstrap {
 
     public void register() {
         final Reflections reflections = new Reflections(PACKAGE);
-        final Set<Class<? extends RuneItem>> subTypes = reflections.getSubTypesOf(RuneItem.class);
-        final List<RuneItem> runes = new ArrayList<>();
-        for (Class<? extends RuneItem> runeClazz : subTypes) {
+        final Set<Class<? extends SocketableItem>> subTypes = reflections.getSubTypesOf(SocketableItem.class);
+        final List<SocketableItem> socketables = new ArrayList<>();
+        for (Class<? extends SocketableItem> runeClazz : subTypes) {
             if (runeClazz.isInterface() || Modifier.isAbstract(runeClazz.getModifiers())) {
                 continue;
             }
 
-            runes.add(core.getInjector().getInstance(runeClazz));
+            socketables.add(core.getInjector().getInstance(runeClazz));
         }
 
         for (BaseItem alreadyRegistered : itemRegistry.getItems().values()) {
-            registerRecipe(itemRegistry, alreadyRegistered, runes);
+            registerRecipe(itemRegistry, alreadyRegistered, socketables);
         }
 
-        itemRegistry.addRegisterCallback((key, item) -> registerRecipe(itemRegistry, item, runes));
+        itemRegistry.addRegisterCallback((key, item) -> registerRecipe(itemRegistry, item, socketables));
     }
 
-    private void registerRecipe(ItemRegistry itemRegistry, BaseItem baseItem, List<RuneItem> runes) {
-        final Optional<RuneContainerComponent> containerOpt = baseItem.getComponent(RuneContainerComponent.class);
+    private void registerRecipe(ItemRegistry itemRegistry, BaseItem baseItem, List<SocketableItem> socketables) {
+        final Optional<SocketableContainerComponent> containerOpt = baseItem.getComponent(SocketableContainerComponent.class);
         if (containerOpt.isEmpty()) {
             return;
         }
 
         final NamespacedKey itemKey = Objects.requireNonNull(itemRegistry.getKey(baseItem));
-        for (RuneItem runeItem : runes) {
-            if (runeItem.getRune().canApply(baseItem)) {
-                final NamespacedKey runeKey = Objects.requireNonNull(itemRegistry.getKey(runeItem));
-                final String key = itemKey.getKey() + "_" + runeKey.getKey();
+        for (SocketableItem socketableItem : socketables) {
+            if (socketableItem.getSocketable().canApply(baseItem)) {
+                final NamespacedKey socketableKey = Objects.requireNonNull(itemRegistry.getKey(socketableItem));
+                final String key = itemKey.getKey() + "_" + socketableKey.getKey();
                 final NamespacedKey combinationKey = new NamespacedKey(itemKey.getNamespace(), key);
-                imbuementRecipeRegistry.registerRecipe(combinationKey, new RuneImbuementRecipe(itemFactory, baseItem, runeItem));
+                imbuementRecipeRegistry.registerRecipe(combinationKey, new SocketableImbuementRecipe(itemFactory, baseItem, socketableItem));
             }
         }
     }
