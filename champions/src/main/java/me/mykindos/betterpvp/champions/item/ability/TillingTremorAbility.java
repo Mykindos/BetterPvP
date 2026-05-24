@@ -13,21 +13,24 @@ import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -76,11 +79,6 @@ public class TillingTremorAbility extends CooldownInteraction implements Display
                                                             @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         LivingEntity entity = actor.getEntity();
 
-        if (!UtilBlock.isGrounded(entity)) {
-            UtilMessage.simpleMessage(entity, "Rake", "You cannot use <alt>Tilling Tremor</alt> while airborne.");
-            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
-        }
-
         // Consume durability
         if (itemStack != null && entity instanceof Player player) {
             UtilItem.damageItem(player, itemStack, 1);
@@ -92,7 +90,27 @@ public class TillingTremorAbility extends CooldownInteraction implements Display
         World world = entity.getWorld();
         Location centerBlockLocation = playerLocation.clone().add(0, -0.4, 0);
 
-        int radius = 3;
+        int radius = 5;
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(entity, playerLocation, radius)) {
+            UtilDamage.doDamage(new DamageEvent(target, entity, null,
+                    new InteractionDamageCause(this), damage, "Tilling Tremor"));
+
+            Vector trajectory = UtilVelocity.getTrajectory2d(entity.getLocation().toVector(), target.getLocation().toVector());
+            VelocityData velocityData = new VelocityData(trajectory, 2.0, true, 0, 1.0, 1.0, false);
+            UtilVelocity.velocity(target, entity, velocityData);
+        }
+
+        BlockData belowMaterial = centerBlockLocation.getBlock().getType().isAir()
+                ? Material.GRASS_BLOCK.createBlockData()
+                : centerBlockLocation.getBlock().getBlockData();
+        Particle.BLOCK.builder()
+                .data(belowMaterial)
+                .location(playerLocation)
+                .offset(radius, radius, radius)
+                .count(100)
+                .receivers(60)
+                .spawn();
+        new SoundEffect(Sound.ENTITY_ZOMBIE_INFECT, 1f, 1f).play(playerLocation);
 
         final Set<Material> allowedCrops = EnumSet.of(
                 Material.WHEAT, Material.CARROTS, Material.POTATOES, Material.BEETROOTS,
@@ -161,15 +179,6 @@ public class TillingTremorAbility extends CooldownInteraction implements Display
                             continue;
                         }
                     }
-                }
-
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(entity, blockLocation, 1.5)) {
-                    UtilDamage.doDamage(new DamageEvent(target, entity, null,
-                            new InteractionDamageCause(this), damage, "Tilling Tremor"));
-
-                    Vector trajectory = UtilVelocity.getTrajectory2d(entity.getLocation().toVector(), target.getLocation().toVector());
-                    VelocityData velocityData = new VelocityData(trajectory, 1.0, true, 0, 1.0, 1.0, false);
-                    UtilVelocity.velocity(target, entity, velocityData);
                 }
             }
         }

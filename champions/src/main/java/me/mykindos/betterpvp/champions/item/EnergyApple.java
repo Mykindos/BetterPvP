@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.champions.item;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.EnergyBoost;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
@@ -40,7 +40,7 @@ public class EnergyApple extends BaseItem implements Reloadable {
 
     @Override
     public void reload() {
-        final Config config = Config.item(Core.class, this);
+        final Config config = Config.item(Champions.class, this);
         double energy = config.getConfig("energy", 25.0, Double.class);
         double cooldown = config.getConfig("cooldown", 10.0, Double.class);
         energyBoost.setEnergy(energy);
