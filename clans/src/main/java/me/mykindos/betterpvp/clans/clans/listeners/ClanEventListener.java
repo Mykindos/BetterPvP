@@ -95,24 +95,6 @@ public class ClanEventListener extends ClanListener {
         this.offlineMessagesHandler = offlineMessagesHandler;
     }
 
-    private String getClanFullName(final ClanRelation clanRelation, final IClan clan) {
-        String type = clan.isAdmin() ? "Admin Clan" : "Clan";
-
-        return clanRelation.getPrimaryMiniColor() + type + " " + clan.getName() + "<gray>";
-    }
-
-    private String getClanShortName(final ClanRelation clanRelation, final IClan clan) {
-        return clanRelation.getPrimaryMiniColor() + clan.getName() + "<gray>";
-    }
-
-    private String getPlayerName(final ClanRelation clanRelation, final String playerName) {
-        return clanRelation.getPrimaryMiniColor() + playerName + "<gray>";
-    }
-
-    private String getPlayerName(final ClanRelation clanRelation, final Player player) {
-        return this.getPlayerName(clanRelation, player.getName());
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChunkClaim(final ChunkClaimEvent event) {
         if (event.isCancelled()) {
@@ -135,7 +117,7 @@ public class ClanEventListener extends ClanListener {
         final String stringChunk = UtilWorld.chunkToPrettyString(chunk);
         UtilMessage.simpleMessage(player, "Clans", "You claimed Territory <yellow>" + stringChunk + "</yellow>.");
 
-        clan.messageClan(String.format("%s claimed territory <yellow>%s<gray>.", this.getPlayerName(ClanRelation.SELF, player),
+        clan.messageClan(String.format("%s claimed territory <yellow>%s<gray>.", this.clanManager.getPlayerName(ClanRelation.SELF, player),
                 stringChunk), player.getUniqueId(), true);
 
         this.blockHandler.outlineChunk(chunk);
@@ -223,7 +205,7 @@ public class ClanEventListener extends ClanListener {
 
         UtilMessage.simpleMessage(player, "Clans", "You unclaimed territory <alt2>" + chunkToPrettyString + "</alt2>.");
 
-        targetClan.messageClan(String.format("%s unclaimed territory <yellow>%s<gray>.", this.getPlayerName(this.clanManager.getRelation(targetClan, playerClan), player),
+        targetClan.messageClan(String.format("%s unclaimed territory <yellow>%s<gray>.", this.clanManager.getPlayerName(this.clanManager.getRelation(targetClan, playerClan), player),
                 chunkToPrettyString), player.getUniqueId(), true);
         this.clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
@@ -277,9 +259,9 @@ public class ClanEventListener extends ClanListener {
         clan.saveProperty(ClanProperty.BALANCE, 0);
         clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
 
-        UtilMessage.simpleMessage(player, "Clans", "Successfully created clan %s.", this.getClanShortName(ClanRelation.SELF, clan));
+        UtilMessage.simpleMessage(player, "Clans", "Successfully created clan %s.", this.clanManager.getClanShortName(ClanRelation.SELF, clan));
         if (clan.isAdmin()) {
-            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("%s created admin clan %s.", this.getPlayerName(ClanRelation.NEUTRAL, player), this.getClanShortName(ClanRelation.NEUTRAL, clan)), Rank.TRIAL_MOD);
+            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("%s created admin clan %s.", this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player), this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)), Rank.TRIAL_MOD);
 
             log.info("{} ({}) created admin clan {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
                     .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
@@ -309,12 +291,12 @@ public class ClanEventListener extends ClanListener {
             ClanRelation clanRelation = this.clanManager.getRelation(this.clanManager.getClanByPlayer(targetPlayer).orElse(null), clan);
 
             if (clan.getTerritory().isEmpty()) {
-                UtilMessage.simpleMessage(targetPlayer, "Clans", "%s has been disbanded.", this.getClanFullName(clanRelation, clan));
+                UtilMessage.simpleMessage(targetPlayer, "Clans", "%s has been disbanded.", this.clanManager.getClanFullName(clanRelation, clan));
             } else {
                 final Chunk chunk = UtilWorld.stringToChunk(clan.getTerritory().getFirst().getChunk());
                 if (chunk != null) {
                     UtilMessage.message(targetPlayer, "Clans", "%s has been disbanded. (<yellow>%s</yellow>)",
-                            this.getClanFullName(clanRelation, clan), (chunk.getX() * 16) + "<gray>,</gray> " + (chunk.getZ() * 16));
+                            this.clanManager.getClanFullName(clanRelation, clan), (chunk.getX() * 16) + "<gray>,</gray> " + (chunk.getZ() * 16));
                 }
             }
         }
@@ -379,7 +361,7 @@ public class ClanEventListener extends ClanListener {
                     offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                             OfflineMessage.Action.CLAN_DISBAND,
                             "Your clan %s was disbanded by %s.",
-                            this.getClanShortName(ClanRelation.SELF, clan), this.getPlayerName(this.clanManager.getRelation(clan, this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null)), event.getPlayer()));
+                            this.clanManager.getClanShortName(ClanRelation.SELF, clan), this.clanManager.getPlayerName(this.clanManager.getRelation(clan, this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null)), event.getPlayer()));
                 } else {
                     Objects.requireNonNull(clanMember.getPlayer()).closeInventory();
                 }
@@ -390,7 +372,7 @@ public class ClanEventListener extends ClanListener {
                     offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                             OfflineMessage.Action.CLAN_DISBAND,
                             "Your clan %s was disbanded due to running out of energy.",
-                            this.getClanShortName(ClanRelation.SELF, clan));
+                            this.clanManager.getClanShortName(ClanRelation.SELF, clan));
                 }
             });
         }
@@ -434,11 +416,11 @@ public class ClanEventListener extends ClanListener {
         final Player target = event.getTarget();
 
 
-        UtilMessage.simpleMessage(player, "Clans", "You invited %s to join your Clan.", this.getPlayerName(ClanRelation.NEUTRAL, target));
+        UtilMessage.simpleMessage(player, "Clans", "You invited %s to join your Clan.", this.clanManager.getPlayerName(ClanRelation.NEUTRAL, target));
 
-        clan.messageClan(String.format("%s invited %s to join your Clan.", this.getPlayerName(ClanRelation.SELF, player), this.getPlayerName(ClanRelation.NEUTRAL, target)), player.getUniqueId(), true);
+        clan.messageClan(String.format("%s invited %s to join your Clan.", this.clanManager.getPlayerName(ClanRelation.SELF, player), this.clanManager.getPlayerName(ClanRelation.NEUTRAL, target)), player.getUniqueId(), true);
 
-        UtilMessage.simpleMessage(target, "Clans", "%s invited you to join %s.", this.getPlayerName(ClanRelation.NEUTRAL, player), this.getClanFullName(ClanRelation.NEUTRAL, clan));
+        UtilMessage.simpleMessage(target, "Clans", "%s invited you to join %s.", this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player), this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan));
 
         final Component inviteMessage = Component.text("Click Here", NamedTextColor.GOLD, TextDecoration.UNDERLINED)
                 .clickEvent(ClickEvent.runCommand("/c join " + clan.getName()))
@@ -463,12 +445,12 @@ public class ClanEventListener extends ClanListener {
 
         if (!client.isAdministrating()) {
             if (!this.inviteHandler.isInvited(gamer, clan, "Invite")) {
-                UtilMessage.simpleMessage(player, "Clans", "You are not invited to %s.", this.getClanFullName(ClanRelation.NEUTRAL, clan));
+                UtilMessage.simpleMessage(player, "Clans", "You are not invited to %s.", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan));
                 return;
             }
 
             if (clan.getSquadCount() >= this.maxClanMembers) {
-                UtilMessage.simpleMessage(player, "Clans", "%s has too many members or allies", this.getClanFullName(ClanRelation.NEUTRAL, clan));
+                UtilMessage.simpleMessage(player, "Clans", "%s has too many members or allies", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan));
                 return;
             }
 
@@ -479,10 +461,10 @@ public class ClanEventListener extends ClanListener {
                 if (allianceClan.getSquadCount() + 1 > maxClanMembers) {
                     UtilMessage.message(player, "Clans",
                             "You cannot join %s, as it would cause %s to have too many allies.",
-                            this.getClanFullName(ClanRelation.NEUTRAL, clan), this.getClanFullName(ClanRelation.NEUTRAL, clanAlliance.getClan()));
+                            this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan), this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clanAlliance.getClan()));
 
                     clan.messageClan("%s tried to join your clan, but could not, as it would cause %s to have too many allies. You must either reduce your squad size, or have your ally reduce their squad to allow %s to join."
-                                    .formatted(this.getPlayerName(ClanRelation.NEUTRAL, player), this.getClanFullName(this.clanManager.getRelation(clan, allianceClan), clanAlliance.getClan()), this.getPlayerName(ClanRelation.NEUTRAL, player)),
+                                    .formatted(this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player), this.clanManager.getClanFullName(this.clanManager.getRelation(clan, allianceClan), clanAlliance.getClan()), this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player)),
                             null, true);
 
                     allySquadCountTooHigh = true;
@@ -498,7 +480,7 @@ public class ClanEventListener extends ClanListener {
                 return;
             }
         } else {
-            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("%s force joined %s.", this.getPlayerName(ClanRelation.NEUTRAL, player), this.getClanShortName(ClanRelation.NEUTRAL, clan)), Rank.TRIAL_MOD);
+            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("%s force joined %s.", this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player), this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)), Rank.TRIAL_MOD);
         }
 
         final ClanMember member = new ClanMember(player.getUniqueId(), client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT, player.getName());
@@ -513,8 +495,8 @@ public class ClanEventListener extends ClanListener {
 
         clan.setOnline(true);
         // Leave below as NEUTRAL for a before-effect, or SELF as an after-effect for clan join
-        clan.messageClan(String.format("%s has joined your Clan.", this.getPlayerName(ClanRelation.NEUTRAL, player)), player.getUniqueId(), true);
-        UtilMessage.simpleMessage(player, "Clans", "You joined %s.", this.getClanFullName(ClanRelation.NEUTRAL, clan));
+        clan.messageClan(String.format("%s has joined your Clan.", this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player)), player.getUniqueId(), true);
+        UtilMessage.simpleMessage(player, "Clans", "You joined %s.", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan));
 
         log.info("{} ({}) joined {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_JOIN")
                 .addClientContext(player)
@@ -542,8 +524,8 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             // Leave below as NEUTRAL for an after-effect, or SELF as a before-effect for clan join
-            UtilMessage.simpleMessage(player, "Clans", "You left %s.", this.getClanFullName(ClanRelation.NEUTRAL, clan));
-            clan.messageClan("%s left your Clan.".formatted(this.getPlayerName(ClanRelation.NEUTRAL, player)), null, true);
+            UtilMessage.simpleMessage(player, "Clans", "You left %s.", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan));
+            clan.messageClan("%s left your Clan.".formatted(this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player)), null, true);
 
             player.removeMetadata("clan", this.clans);
 
@@ -575,17 +557,17 @@ public class ClanEventListener extends ClanListener {
             clan.getMembers().remove(clanMember);
 
             // Leave below as NEUTRAL for an after-effect, or SELF as a before-effect for clan join
-            UtilMessage.simpleMessage(player, "Clans", "You kicked %s from your Clan.", this.getPlayerName(ClanRelation.NEUTRAL, target.getName()));
-            clan.messageClan(String.format("%s was kicked from your Clan.", this.getPlayerName(ClanRelation.NEUTRAL, target.getName())), null, true);
+            UtilMessage.simpleMessage(player, "Clans", "You kicked %s from your Clan.", this.clanManager.getPlayerName(ClanRelation.NEUTRAL, target.getName()));
+            clan.messageClan(String.format("%s was kicked from your Clan.", this.clanManager.getPlayerName(ClanRelation.NEUTRAL, target.getName())), null, true);
 
             final Player targetPlayer = target.getPlayer();
             if (targetPlayer != null) {
-                UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from %s.", this.getClanFullName(ClanRelation.NEUTRAL, clan));
+                UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from %s.", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan));
                 targetPlayer.closeInventory();
                 targetPlayer.removeMetadata("clan", this.clans);
 
             } else {
-                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "You were kicked from %s", this.getClanFullName(ClanRelation.NEUTRAL, clan));
+                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "You were kicked from %s", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan));
             }
         }
 
@@ -604,7 +586,7 @@ public class ClanEventListener extends ClanListener {
         final Clan target = event.getTargetClan();
 
         if (this.inviteHandler.isInvited(target, clan, "Alliance")) {
-            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending alliance request with %s.", this.getClanFullName(ClanRelation.NEUTRAL, target));
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending alliance request with %s.", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, target));
             return;
         }
 
@@ -615,8 +597,8 @@ public class ClanEventListener extends ClanListener {
         }
 
         this.inviteHandler.createInvite(clan, target, "Alliance", 10);
-        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested an alliance with %s.", this.getClanFullName(ClanRelation.NEUTRAL, target));
-        target.messageClan("%s has requested an alliance.".formatted(this.getClanFullName(ClanRelation.NEUTRAL, clan)), null, true);
+        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested an alliance with %s.", this.clanManager.getClanFullName(ClanRelation.NEUTRAL, target));
+        target.messageClan("%s has requested an alliance.".formatted(this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan)), null, true);
 
         log.info("{} ({}) of {} ({}) requested alliance with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_ALLIANCE_REQUEST")
@@ -640,8 +622,8 @@ public class ClanEventListener extends ClanListener {
         clan.getAlliances().add(clanAlliance);
         target.getAlliances().add(targetAlliance);
 
-        clan.messageClan("%s is now your ally.".formatted(this.getClanFullName(ClanRelation.ALLY, target)), null, true);
-        target.messageClan("%s is now your ally.".formatted(this.getClanFullName(ClanRelation.ALLY, clan)), null, true);
+        clan.messageClan("%s is now your ally.".formatted(this.clanManager.getClanFullName(ClanRelation.ALLY, target)), null, true);
+        target.messageClan("%s is now your ally.".formatted(this.clanManager.getClanFullName(ClanRelation.ALLY, clan)), null, true);
 
         this.clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
         this.clanManager.getRepository().saveClanAlliance(target, targetAlliance);
@@ -662,7 +644,7 @@ public class ClanEventListener extends ClanListener {
         final Clan target = event.getTargetClan();
 
         if (this.inviteHandler.isInvited(target, clan, "Trust")) {
-            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending trust request with %s.", this.getClanFullName(ClanRelation.ALLY, target));
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending trust request with %s.", this.clanManager.getClanFullName(ClanRelation.ALLY, target));
             return;
         }
 
@@ -673,8 +655,8 @@ public class ClanEventListener extends ClanListener {
         }
 
         this.inviteHandler.createInvite(clan, target, "Trust", 10);
-        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with %s.", this.getClanFullName(ClanRelation.ALLY, target));
-        target.messageClan("%s has requested to form a trust with your clan.".formatted(this.getClanFullName(ClanRelation.ALLY, clan)), null, true);
+        UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with %s.", this.clanManager.getClanFullName(ClanRelation.ALLY, target));
+        target.messageClan("%s has requested to form a trust with your clan.".formatted(this.clanManager.getClanFullName(ClanRelation.ALLY, clan)), null, true);
 
         log.info("{} ({}) of {} ({}) requested trust with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_TRUST_REQUEST")
@@ -698,8 +680,8 @@ public class ClanEventListener extends ClanListener {
         clanAlliance.setTrusted(true);
         targetAlliance.setTrusted(true);
 
-        clan.messageClan("%s is now a trusted ally.".formatted(this.getClanFullName(ClanRelation.ALLY_TRUST, target)), null, true);
-        target.messageClan("%s is now a trusted ally.".formatted(this.getClanFullName(ClanRelation.ALLY_TRUST, clan)), null, true);
+        clan.messageClan("%s is now a trusted ally.".formatted(this.clanManager.getClanFullName(ClanRelation.ALLY_TRUST, target)), null, true);
+        target.messageClan("%s is now a trusted ally.".formatted(this.clanManager.getClanFullName(ClanRelation.ALLY_TRUST, clan)), null, true);
 
         this.clanManager.getRepository().saveTrust(clan, clanAlliance);
         this.clanManager.getRepository().saveTrust(target, targetAlliance);
@@ -723,8 +705,8 @@ public class ClanEventListener extends ClanListener {
         clanAlliance.setTrusted(false);
         targetAlliance.setTrusted(false);
 
-        clan.messageClan("%s is no longer a trusted ally.".formatted(this.getClanFullName(ClanRelation.ALLY, target)), null, true);
-        target.messageClan("%s is no longer a trusted ally.".formatted(this.getClanFullName(ClanRelation.ALLY, clan)), null, true);
+        clan.messageClan("%s is no longer a trusted ally.".formatted(this.clanManager.getClanFullName(ClanRelation.ALLY, target)), null, true);
+        target.messageClan("%s is no longer a trusted ally.".formatted(this.clanManager.getClanFullName(ClanRelation.ALLY, clan)), null, true);
 
         this.clanManager.getRepository().saveTrust(clan, clanAlliance);
         this.clanManager.getRepository().saveTrust(target, targetAlliance);
@@ -747,7 +729,7 @@ public class ClanEventListener extends ClanListener {
         if (clan.isEnemy(target)) {
 
             if (this.inviteHandler.isInvited(target, clan, "Neutral")) {
-                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending neutral request with %s.", this.getClanFullName(ClanRelation.ENEMY, target));
+                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending neutral request with %s.", this.clanManager.getClanFullName(ClanRelation.ENEMY, target));
                 return;
             }
 
@@ -758,8 +740,8 @@ public class ClanEventListener extends ClanListener {
             }
 
             this.inviteHandler.createInvite(clan, target, "Neutral", 10);
-            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to neutral with %s.", this.getClanFullName(ClanRelation.ENEMY, target));
-            target.messageClan("%s has requested to neutral with your clan.".formatted(this.getClanFullName(ClanRelation.ENEMY, clan)), null, true);
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to neutral with %s.", this.clanManager.getClanFullName(ClanRelation.ENEMY, target));
+            target.messageClan("%s has requested to neutral with your clan.".formatted(this.clanManager.getClanFullName(ClanRelation.ENEMY, clan)), null, true);
 
             log.info("{} ({}) of {} ({}) requested neutral with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                             clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_NEUTRAL_REQUEST")
@@ -796,8 +778,8 @@ public class ClanEventListener extends ClanListener {
 
         }
 
-        clan.messageClan("%s is now neutral to your Clan.".formatted(this.getClanFullName(ClanRelation.NEUTRAL, target)), null, true);
-        target.messageClan("%s is now neutral to your Clan.".formatted(this.getClanFullName(ClanRelation.NEUTRAL, clan)), null, true);
+        clan.messageClan("%s is now neutral to your Clan.".formatted(this.clanManager.getClanFullName(ClanRelation.NEUTRAL, target)), null, true);
+        target.messageClan("%s is now neutral to your Clan.".formatted(this.clanManager.getClanFullName(ClanRelation.NEUTRAL, clan)), null, true);
 
     }
 
@@ -848,8 +830,8 @@ public class ClanEventListener extends ClanListener {
         this.clanManager.getRepository().saveClanEnemy(clan, clanEnemy);
         this.clanManager.getRepository().saveClanEnemy(target, targetEnemy);
 
-        clan.messageClan("%s is now your enemy.".formatted(this.getClanFullName(ClanRelation.ENEMY, target)), null, true);
-        target.messageClan("%s is now your enemy.".formatted(this.getClanFullName(ClanRelation.ENEMY, clan)), null, true);
+        clan.messageClan("%s is now your enemy.".formatted(this.clanManager.getClanFullName(ClanRelation.ENEMY, target)), null, true);
+        target.messageClan("%s is now your enemy.".formatted(this.clanManager.getClanFullName(ClanRelation.ENEMY, clan)), null, true);
 
         log.info("{} ({}) of {} ({}) enemied with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_ENEMY")
@@ -943,7 +925,7 @@ public class ClanEventListener extends ClanListener {
 
         this.clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
             result.ifPresent(client -> {
-                UtilMessage.simpleMessage(player, "Clans", "You promoted %s to <yellow>%s</yellow>.", this.getPlayerName(ClanRelation.SELF, clan.getName()), member.getRank().getName());
+                UtilMessage.simpleMessage(player, "Clans", "You promoted %s to <yellow>%s</yellow>.", this.clanManager.getPlayerName(ClanRelation.SELF, clan.getName()), member.getRank().getName());
 
                 log.info("{} ({}) was promoted by {} ({}) to {} in {} ({})", client.getName(), member.getUuid(), player.getName(),
                                 player.getUniqueId(), member.getRank().getName(), clan.getName(), clan.getId()).setAction("CLAN_PROMOTE")
@@ -976,7 +958,7 @@ public class ClanEventListener extends ClanListener {
 
         this.clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
             result.ifPresent(client -> {
-                UtilMessage.simpleMessage(player, "Clans", "You demoted %s to <yellow>%s</yellow>.", this.getPlayerName(ClanRelation.SELF, client.getName()), member.getRank().getName());
+                UtilMessage.simpleMessage(player, "Clans", "You demoted %s to <yellow>%s</yellow>.", this.clanManager.getPlayerName(ClanRelation.SELF, client.getName()), member.getRank().getName());
                 log.info("{} ({}) was demoted by {} ({}) to {} in {} ({})", client.getName(), member.getUuid(),
                                 player.getName(), player.getUniqueId(), member.getRank().getName(), clan.getName(), clan.getId())
                         .setAction("CLAN_DEMOTE").addClientContext(player).addClientContext(client, true).addClanContext(clan)

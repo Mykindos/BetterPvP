@@ -34,11 +34,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.WorldBorder;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Door;
@@ -49,15 +45,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
@@ -212,7 +200,7 @@ public class ClanManager extends Manager<Long, Clan> {
      *
      * @param uuid the unique identifier of the player whose clan is to be retrieved
      * @return an {@code Optional} containing the player's clan if found,
-     *         or an empty {@code Optional} if no associated clan exists
+     * or an empty {@code Optional} if no associated clan exists
      */
     public Optional<Clan> getClanByPlayer(UUID uuid) {
         final Player player = Bukkit.getPlayer(uuid);
@@ -229,7 +217,7 @@ public class ClanManager extends Manager<Long, Clan> {
      *
      * @param name the name of the clan to search for; this parameter is case-insensitive
      * @return an {@code Optional} containing the {@code Clan} if one exists with the specified name,
-     *         or an empty {@code Optional} if no such clan is found
+     * or an empty {@code Optional} if no such clan is found
      */
     public Optional<Clan> getClanByName(String name) {
         return objects.values().stream().filter(clan -> clan.getName().equalsIgnoreCase(name)).findFirst();
@@ -250,7 +238,7 @@ public class ClanManager extends Manager<Long, Clan> {
      *
      * @param chunk the chunk to check for clan ownership
      * @return an {@link Optional} containing the clan that owns the chunk, or an empty {@link Optional}
-     *         if the chunk is not owned by any clan
+     * if the chunk is not owned by any clan
      */
     public Optional<Clan> getClanByChunk(Chunk chunk) {
         PersistentDataContainer pdc = chunk.getPersistentDataContainer();
@@ -273,7 +261,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * Checks if the specified chunk is adjacent to any chunk claimed by other clans.
      *
      * @param chunk the chunk to check for adjacency
-     * @param clan the clan that owns the specified chunk
+     * @param clan  the clan that owns the specified chunk
      * @return true if the specified chunk is adjacent to a chunk claimed by other clans, false otherwise
      */
     public boolean adjacentOtherClans(@NotNull Chunk chunk, @NotNull Clan clan) {
@@ -298,7 +286,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * Checks if the specified chunk is adjacent to any chunk belonging to the given clan.
      *
      * @param chunk the chunk to check
-     * @param clan the clan whose territory to compare against
+     * @param clan  the clan whose territory to compare against
      * @return true if the given chunk is adjacent to a chunk owned by the specified clan, false otherwise
      */
     public boolean adjacentToOwnClan(@NotNull Chunk chunk, @NotNull Clan clan) {
@@ -367,7 +355,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * Sets a claim cooldown on the specified chunk by storing the cooldown expiration timestamp
      * in the chunk's persistent data container.
      *
-     * @param chunk the chunk for which the claim cooldown is being set
+     * @param chunk    the chunk for which the claim cooldown is being set
      * @param duration the cooldown duration in milliseconds to be added to the current time
      */
     public void setClaimCooldown(Chunk chunk, long duration) {
@@ -395,7 +383,7 @@ public class ClanManager extends Manager<Long, Clan> {
      *
      * @param serialized the serialized representation of a chunk to match against clan territories
      * @return an {@code Optional<Clan>} containing the clan whose territory matches the given chunk string,
-     *         or an empty {@code Optional} if no match is found
+     * or an empty {@code Optional} if no match is found
      */
     public Optional<Clan> getClanByChunkString(String serialized) {
         return objects.values().stream()
@@ -427,10 +415,10 @@ public class ClanManager extends Manager<Long, Clan> {
      * @param clanA The first clan to evaluate. Can be null.
      * @param clanB The second clan to evaluate. Can be null.
      * @return The relationship between the two clans as a {@link ClanRelation}.
-     *         If either clan is null, {@code ClanRelation.NEUTRAL} is returned.
-     *         If both clans are the same, {@code ClanRelation.SELF} is returned. Other
-     *         specific relationships (e.g., ally, enemy, pillage) are determined
-     *         based on their interactions.
+     * If either clan is null, {@code ClanRelation.NEUTRAL} is returned.
+     * If both clans are the same, {@code ClanRelation.SELF} is returned. Other
+     * specific relationships (e.g., ally, enemy, pillage) are determined
+     * based on their interactions.
      */
     public ClanRelation getRelation(@Nullable IClan clanA, @Nullable IClan clanB) {
         if (clanA == null || clanB == null) {
@@ -549,7 +537,7 @@ public class ClanManager extends Manager<Long, Clan> {
      *
      * @param player the player whose location and direction will be used to find wilderness
      * @return the closest wilderness location backwards from the player's current location,
-     *         or null if no wilderness location is found within the checked range
+     * or null if no wilderness location is found within the checked range
      */
     public Location closestWildernessBackwards(Player player) {
         List<Location> locations = new ArrayList<>();
@@ -633,7 +621,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * Retrieves and formats a list of enemy clans for the specified player's clan.
      *
      * @param player the player for whom the enemy list is being generated
-     * @param clan the clan whose enemies are being listed
+     * @param clan   the clan whose enemies are being listed
      * @return a formatted string containing the names of enemy clans, separated by commas
      */
     public String getEnemyList(Player player, Clan clan) {
@@ -653,7 +641,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * Generates a formatted string representation of the enemies of a specified clan, including their dominance-related information.
      *
      * @param player the player for whom the enemy list is being generated; used to determine the player's clan and its relation to enemy clans.
-     * @param clan the clan whose enemies are to be listed.
+     * @param clan   the clan whose enemies are to be listed.
      * @return a formatted string of the enemy list, including each enemy's display color and dominance information.
      */
     public String getEnemyListDom(Player player, Clan clan) {
@@ -681,10 +669,10 @@ public class ClanManager extends Manager<Long, Clan> {
         if (clan.getMembers() != null && !clan.getMembers().isEmpty()) {
             for (ClanMember member : clan.getMembers()) {
 
-                    membersString.append(!membersString.isEmpty() ? "<gray>, " : "").append("<yellow>")
-                            .append(member.getRoleIcon())
-                            .append(UtilFormat.getOnlineStatus(member.getUuid()))
-                            .append(UtilFormat.spoofNameForLunar(member.getClientName()));
+                membersString.append(!membersString.isEmpty() ? "<gray>, " : "").append("<yellow>")
+                        .append(member.getRoleIcon())
+                        .append(UtilFormat.getOnlineStatus(member.getUuid()))
+                        .append(UtilFormat.spoofNameForLunar(member.getClientName()));
 
             }
         }
@@ -720,7 +708,7 @@ public class ClanManager extends Manager<Long, Clan> {
      *
      * @param player the player whose allies are to be retrieved
      * @return a list of allies, including members of the player's clan and allied clans.
-     *         If the player does not belong to any clan, an empty list is returned.
+     * If the player does not belong to any clan, an empty list is returned.
      */
     public List<ClanMember> getAllies(Player player) {
         ArrayList<ClanMember> allyList = new ArrayList<>(List.of());
@@ -746,7 +734,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * @param player the player attempting to inflict damage
      * @param target the intended target player
      * @return true if the player can hurt the target under the given conditions,
-     *         false otherwise
+     * false otherwise
      */
     public boolean canHurt(Player player, Player target) {
         Clan playerClan = getClanByPlayer(player).orElse(null);
@@ -757,7 +745,7 @@ public class ClanManager extends Manager<Long, Clan> {
         if (targetLocationClan != null && targetLocationClan.isSafe()) {
 
             if (targetLocationClan.getName().toLowerCase().contains("shop")) {
-                if(relation == ClanRelation.PILLAGE) {
+                if (relation == ClanRelation.PILLAGE) {
                     return true;
                 }
             }
@@ -777,7 +765,7 @@ public class ClanManager extends Manager<Long, Clan> {
      *
      * @param player the player whose ability to cast is being checked
      * @return {@code true} if the player is allowed to cast abilities,
-     *          {@code false} otherwise
+     * {@code false} otherwise
      */
     public boolean canCast(Player player) {
         Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
@@ -823,7 +811,7 @@ public class ClanManager extends Manager<Long, Clan> {
 
     /**
      * Applies dominance changes between two clans based on a kill event.
-     *
+     * <p>
      * This method determines the dominance impact when one clan (killed) is defeated by another clan (killer).
      * It checks multiple conditions, such as whether both clans are valid, are enemies, and whether dominance settings allow for an increase.
      * Dominance is then adjusted accordingly for both clans, triggering events and updating the repository as necessary.
@@ -876,10 +864,10 @@ public class ClanManager extends Manager<Long, Clan> {
      * between two clans. The returned string includes the dominance value and indicates
      * any changes that may occur with the next kill, based on dominance thresholds.
      *
-     * @param clan the clan for which the dominance string is being calculated
+     * @param clan      the clan for which the dominance string is being calculated
      * @param enemyClan the enemy clan to compare dominance against
      * @return a string representation of the dominance status between the two clans,
-     *         or an empty string if no significant dominance relationship is found
+     * or an empty string if no significant dominance relationship is found
      */
     public String getDominanceString(IClan clan, IClan enemyClan) {
         Optional<ClanEnemy> enemyOptional = clan.getEnemy(enemyClan);
@@ -908,10 +896,10 @@ public class ClanManager extends Manager<Long, Clan> {
     /**
      * Generates a simple dominance string representation between two clans based on their dominance values.
      *
-     * @param clan the clan for which the dominance interaction is being calculated
+     * @param clan      the clan for which the dominance interaction is being calculated
      * @param enemyClan the enemy clan against which the dominance interaction is being calculated
      * @return a {@link Component} representing the dominance status, which may include a dominance percentage
-     *         with associated color codes indicating the state, or an empty component if dominance is not present
+     * with associated color codes indicating the state, or an empty component if dominance is not present
      */
     public Component getSimpleDominanceString(IClan clan, IClan enemyClan) {
         Optional<ClanEnemy> enemyOptional = clan.getEnemy(enemyClan);
@@ -940,8 +928,8 @@ public class ClanManager extends Manager<Long, Clan> {
     /**
      * Adds insurance for a clan based on the block and insurance type provided.
      *
-     * @param clan the clan for which insurance is being added
-     * @param block the block related to the insurance
+     * @param clan          the clan for which insurance is being added
+     * @param block         the block related to the insurance
      * @param insuranceType the type of insurance being applied
      */
     public void addInsurance(Clan clan, Block block, InsuranceType insuranceType) {
@@ -949,8 +937,8 @@ public class ClanManager extends Manager<Long, Clan> {
 
         Block targetBlock = block;
 
-        if(targetBlock.getBlockData() instanceof Door door) {
-            if(door.getHalf() == Bisected.Half.TOP) {
+        if (targetBlock.getBlockData() instanceof Door door) {
+            if (door.getHalf() == Bisected.Half.TOP) {
                 targetBlock = block.getRelative(0, -1, 0);
             }
         }
@@ -1071,14 +1059,43 @@ public class ClanManager extends Manager<Long, Clan> {
 
     public ClansStat.ClansStatBuilder<?, ?> addClanInfo(Player player, ClansStat.ClansStatBuilder<?, ?> builder) {
         this.getClanByPlayer(player).ifPresentOrElse((clan) -> {
-            builder.clanName(clan.getName());
-            builder.clanId(clan.getId());
-        },
+                    builder.clanName(clan.getName());
+                    builder.clanId(clan.getId());
+                },
                 () -> {
-            builder.clanName(ClansStat.NO_CLAN_NAME);
-            builder.clanId(null);
+                    builder.clanName(ClansStat.NO_CLAN_NAME);
+                    builder.clanId(null);
                 });
         return builder;
     }
 
+    public String getClanFullName(ClanRelation clanRelation, final IClan clan) {
+        if (clanRelation == null) {
+            clanRelation = ClanRelation.NEUTRAL;
+        }
+
+        final String type = clan.isAdmin() ? "Admin Clan" : "Clan";
+
+        return clanRelation.getPrimaryMiniColor() + type + " " + clan.getName() + "<gray>";
+    }
+
+    public String getClanShortName(ClanRelation clanRelation, final IClan clan) {
+        if (clanRelation == null) {
+            clanRelation = ClanRelation.NEUTRAL;
+        }
+
+        return clanRelation.getPrimaryMiniColor() + clan.getName() + "<gray>";
+    }
+
+    public String getPlayerName(ClanRelation clanRelation, final String playerName) {
+        if (clanRelation == null) {
+            clanRelation = ClanRelation.NEUTRAL;
+        }
+
+        return clanRelation.getPrimaryMiniColor() + playerName + "<gray>";
+    }
+
+    public String getPlayerName(final ClanRelation clanRelation, final Player player) {
+        return this.getPlayerName(clanRelation, player.getName());
+    }
 }
