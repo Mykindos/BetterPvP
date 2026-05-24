@@ -460,7 +460,7 @@ skills:
       baseDamage: 1.0
       damageIncreasePerLevel: 1.0
     moltenshield:
-      enabled: true
+      enabled: false
       maxlevel: 1
     defensiveaura:
       enabled: true
