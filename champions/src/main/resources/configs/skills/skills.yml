@@ -629,12 +629,11 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 1.5
       baseDistance: 5.0
       distanceIncreasePerLevel: 0.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
-      damage: 3.0
     skullsplitter:
       enabled: true
       maxlevel: 5
