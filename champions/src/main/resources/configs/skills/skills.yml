@@ -505,10 +505,10 @@ skills:
       enabled: true
       maxlevel: 3
       energy: 20
-      baseDamageReduction: 1.5
+      baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.5
       baseEnergyReduction: 3.5
-      energyReductionDecreasePerLevel: 0.2
+      energyReductionDecreasePerLevel: 0.25
       slownessStrength: 3
       energyDecreasePerLevel: 2.0
       energyStartCost: 10.0
