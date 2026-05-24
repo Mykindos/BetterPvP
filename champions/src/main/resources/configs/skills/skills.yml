@@ -479,7 +479,7 @@ skills:
       maxlevel: 3
       energy: 40
       baseSlowDuration: 2.0
-      slowDurationIncreasePerLevel: 0.0
+      slowDurationIncreasePerLevel: 0.25
       slowStrength: 1
       slowDuration: 2.0
       energyDecreasePerLevel: 5.0
@@ -491,6 +491,10 @@ skills:
       pushbackVerticalIncreasePerLevel: 0.0
       pushbackHorizontalStrength: 0.2
       pushbackHorizontalIncreasePerLevel: 0.0
+      horizontalSpread: 0.1
+      horizontalSpreadIncreasePerLevel: 0.0
+      verticalSpread: 0.05
+      verticalSpreadIncreasePerLevel: 0.0
     glacialblade:
       enabled: true
       maxlevel: 3
