@@ -654,7 +654,7 @@ skills:
     fleshhook:
       enabled: true
       maxlevel: 5
-      cooldown: 14.0
+      cooldown: 13.0
       cooldownDecreasePerLevel: 1.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
