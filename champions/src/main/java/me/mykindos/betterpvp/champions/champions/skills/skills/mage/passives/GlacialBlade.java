@@ -176,7 +176,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     public void loadSkillConfig() {
-        damage = getConfig("damage", 1.0, Double.class);
+        damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
 }
