@@ -536,8 +536,8 @@ skills:
     nullblade:
       enabled: true
       maxlevel: 3
-      energySiphoned: 7.0
-      energySiphonedIncreasePerLevel: 2.0
+      energySiphoned: 9.0
+      energySiphonedIncreasePerLevel: 3.0
     holylight:
       enabled: true
       maxlevel: 3
