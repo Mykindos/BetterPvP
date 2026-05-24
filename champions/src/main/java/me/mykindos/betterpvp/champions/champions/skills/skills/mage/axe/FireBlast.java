@@ -252,7 +252,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.4, Double.class);
         radius = getConfig("radius", 4.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
-        velocityMultiplier = getConfig("velocityMultiplier", 2.0, Double.class);
+        velocityMultiplier = getConfig("velocityMultiplier", 2.5, Double.class);
         yAdd = getConfig("yAdd", 0.4, Double.class);
         yMax = getConfig("yMax", 0.8, Double.class);
         groundBoost = getConfig("groundBoost", true, Boolean.class);

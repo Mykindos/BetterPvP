@@ -399,14 +399,14 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 12.0
-      speed: 0.2
-      baseDamage: 2.0
+      speed: 0.3
+      baseDamage: 3.0
       fireDurationIncreasePerLevel: 0.4
       cooldownDecreasePerLevel: 1.0
       damageIncreasePerLevel: 0.5
       radius: 4.0
       radiusIncreasePerLevel: 0.0
-      baseFireDuration: 0.8
+      baseFireDuration: 1.0
       velocityMultiplier: 2.0
       fallDamageLimit: 8.0
     iceprison:
