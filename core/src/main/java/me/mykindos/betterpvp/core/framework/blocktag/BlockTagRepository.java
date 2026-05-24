@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CHUNK_BLOCK_TAGGING;
@@ -61,7 +62,7 @@ public class BlockTagRepository {
         String chunkString = UtilWorld.chunkToFile(chunk);
         var async = executor == null ? database.getAsyncDslContext() : database.getAsyncDslContext(executor);
         return async.executeAsync(ctx -> {
-           Map<Long, Map<String, BlockTag>> blockTags = new HashMap<>();
+           Map<Long, Map<String, BlockTag>> blockTags = new ConcurrentHashMap<>();
 
            ctx.selectFrom(CHUNK_BLOCK_TAGGING)
                    .where(CHUNK_BLOCK_TAGGING.REALM.eq(Core.getCurrentRealm().getId()))
@@ -72,14 +73,14 @@ public class BlockTagRepository {
                        String tag = record.get(CHUNK_BLOCK_TAGGING.TAG);
                        String value = record.get(CHUNK_BLOCK_TAGGING.VALUE);
 
-                       blockTags.computeIfAbsent(blockKey, key -> new HashMap<>())
+                       blockTags.computeIfAbsent(blockKey, key -> new ConcurrentHashMap<>())
                                .put(tag, new BlockTag(tag, value));
                    });
 
            return blockTags;
        }).exceptionally(ex -> {
            log.error("Failed to get block tags for chunk {}: {}", chunkString, ex);
-           return new HashMap<>();
+           return new ConcurrentHashMap<>();
        });
     }
 

@@ -47,7 +47,7 @@ public final class ClanMailbox {
 
     @SneakyThrows
     public String serialize() {
-        return UtilItem.serializeItemStackList(contents);
+        return UtilItem.serializeItemStackList(new ArrayList<>(contents));
     }
 
     public void show(Player player, ItemFactory itemFactory, Windowed previous) throws IllegalStateException {
