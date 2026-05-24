@@ -104,6 +104,7 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -194,6 +195,26 @@ public class ClansWorldListener extends ClanListener {
             });
         }, 5L);
 
+    }
+
+    //TODO remove for season 2
+    private static final List<Material> SPEAR_MATERIALS = List.of(
+            Material.WOODEN_SPEAR,
+            Material.STONE_SPEAR,
+            Material.IRON_SPEAR,
+            Material.GOLDEN_SPEAR,
+            Material.COPPER_SPEAR,
+            Material.DIAMOND_SPEAR,
+            Material.NETHERITE_SPEAR
+    );
+
+    @UpdateEvent(delay = 30_000)
+    public void removeSpears() {
+        for (final Player player : Bukkit.getOnlinePlayers()) {
+            for (final Material spear : SPEAR_MATERIALS) {
+                player.getInventory().remove(spear);
+            }
+        }
     }
 
     @UpdateEvent(delay = 1000)
