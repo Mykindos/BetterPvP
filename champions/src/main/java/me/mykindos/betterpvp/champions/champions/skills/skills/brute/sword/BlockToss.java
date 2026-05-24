@@ -88,7 +88,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
                 "enemies.",
                 "",
                 "Boulder size increases at a rate",
-                "of " + getValueString(this::getChargePerSecond, level) + " per level.",
+                "of " + getValueString(this::getChargePerSecond, level, 100, "%", 2) + " per level.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };

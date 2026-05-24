@@ -665,13 +665,13 @@ skills:
       maxlevel: 5
       cooldown: 10.0
       cooldownDecreasePerLevel: 1.0
-      baseCharge: 0.55
-      chargeIncreasePerLevel: 0.15
-      baseDamage: 4.0
+      baseCharge: 0.60
+      chargeIncreasePerLevel: 0.20
+      baseDamage: 5.0
       damageIncreasePerLevel: 1.0
       baseRadius: 3.0
       radiusIncreasePerLevel: 0.0
-      baseSpeed: 1.4
+      baseSpeed: 1.5
       speedIncreasePerLevel: 0.1
       hitBoxSize: 1.0
       size: 0.6
@@ -689,8 +689,8 @@ skills:
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
       slownessStrength: 4
-      recoilDamage: 1.5
-      recoilDamageIncreasePerLevel: 0.5
+      recoilDamage: 0.0
+      recoilDamageIncreasePerLevel: 0.0
       damageIncreasePerLevel: 1.0
       velocityStrength: 1.2
       fallDamageLimit: 4.0
