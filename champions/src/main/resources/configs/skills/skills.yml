@@ -920,9 +920,9 @@ skills:
       maxlevel: 3
       baseDamage: 1.0
       damageIncreasePerLevel: 0.5
-      damageResetTime: 2.0
+      damageResetTime: 4.0
       slownessStrength: 1
-      slowDuration: 1.0
+      slowDuration: 1.5
     volley:
       enabled: true
       maxlevel: 5
