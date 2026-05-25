@@ -812,7 +812,7 @@ skills:
       maxlevel: 5
       cooldown: 16.0
       cooldownDecreasePerLevel: 2.0
-      baseDamage: 2.0
+      baseDamage: 3.0
       damageIncreasePerLevel: 0.5
       valocityMultiplier: 1.2
       radiusIncreasePerLevel: 0.0
