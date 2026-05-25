@@ -1115,7 +1115,7 @@ skills:
       rangeIncreasePerLevel: 0.5
       baseDamageIncrease: 0.33
       damageIncreasePerLevel: 0.0
-      baseHealthReduction: 12.0
+      baseHealthReduction: 9.0
       healthReductionDecreasePerLevel: 1.0
     cleanse:
       enabled: true
