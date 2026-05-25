@@ -1079,6 +1079,8 @@ skills:
       speedStrength: 2
       baseHealthReduction: 4.0
       healthReductionDecreasePerLevel: 0.5
+      baseHealthReductionPerPlayerAffected: 2.0
+      healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
     bloodthirst:
       enabled: true
       maxlevel: 3
