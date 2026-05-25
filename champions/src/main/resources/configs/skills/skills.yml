@@ -781,7 +781,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseNumTridents: 3
       numTridentsIncreasePerLevel: 0
-      baseDamage: 1.0
+      baseDamage: 1.5
       damageIncreasePerLevel: 0.75
       tridentDelay: 0.2
     tethershot:
