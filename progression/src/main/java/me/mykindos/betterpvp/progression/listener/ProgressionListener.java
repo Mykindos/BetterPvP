@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperi
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
@@ -20,6 +21,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -96,6 +98,15 @@ public class ProgressionListener implements Listener {
 
         final int level = event.getLevel();
         final int previous = event.getPreviousLevel();
+
+        if(level >= 99) {
+            UtilMessage.broadcast("Profession", "<yellow>%s <green>has reached level <yellow>%d</yellow><green> in %s!", player.getName(), level, tree);
+            for(Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2f, 1f, true);
+                UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 2f, 1f, true);
+                UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, 2f, 1f, true);
+            }
+        }
 
         final Component spendSkillPointsComponent = Component.text("Type ")
                 .append(Component.text("/" + tree.toLowerCase(), NamedTextColor.YELLOW)
