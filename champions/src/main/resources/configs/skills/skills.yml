@@ -1141,8 +1141,8 @@ skills:
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 8.0
-      healthReductionDecreasePerLevel: 1.5
+      baseHealthReduction: 0.0
+      healthReductionDecreasePerLevel: 0.0
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
       baseHealth: 10.0
