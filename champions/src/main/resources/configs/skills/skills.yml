@@ -1177,12 +1177,12 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
-      baseRange: 7.0
-      rangeIncreasePerLevel: 0.0
-      baseLeechedHealth: 1.0
+      baseRange: 6.0
+      rangeIncreasePerLevel: 0.5
+      baseLeechedHealth: 2.0
       leachedHealthIncreasePerLevel: 0.0
       leechedHealth: 2.0
-      maximumEnemies: 2
+      maximumEnemies: 4
       maximumEnemiesIncreasePerLevel: 0
     wreath:
       enabled: true
