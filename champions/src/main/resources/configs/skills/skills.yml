@@ -1066,6 +1066,10 @@ skills:
       healMultiplierIncreasePerLevel: 0.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
+      baseHealOnHit: 1.0
+      healOnHitIncreasePerLevel: 0.5
+      baseRecieveMultiplier: 1.2
+      recieveMultiplierIncreasePerLevel: 0.0
     bloodshed:
       enabled: true
       maxlevel: 5
