@@ -744,14 +744,14 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 8.0
-      cooldownDecreasePerLevel: 0.3
-      baseDamage: 4.0
+      cooldownDecreasePerLevel: 0.5
+      baseDamage: 5.0
       damagePerLevel: 1.0
       speed: 40.0
       duration: 1.0
       hitboxSize: 0.6
       cooldownReduction: 1.5
-      cooldownReductionPerLevel: 0.3
+      cooldownReductionPerLevel: 0.5
     bullseye:
       enabled: false
       maxlevel: 5
