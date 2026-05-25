@@ -1166,12 +1166,14 @@ skills:
     grasp:
       enabled: true
       maxlevel: 5
-      cooldown: 20.0
+      cooldown: 18.0
       cooldownDecreasePerLevel: 2.0
       baseDistance: 10.0
       distanceIncreasePerLevel: 5.0
-      baseDamage: 2.0
+      baseDamage: 3.0
       damageIncreasePerLevel: 1.0
+      baseSpeed: 0.3
+      speedIncreasePerLevel: 0.0
     leech:
       enabled: true
       maxlevel: 5

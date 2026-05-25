@@ -64,6 +64,9 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
     private double damageIncreasePerLevel;
 
+    private double speed;
+    private double speedIncreasePerLevel;
+
     @Inject
     public Grasp(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -95,6 +98,10 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
     public double getDamage(int level) {
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    }
+
+    public double getSpeed(int level) {
+        return speed + ((level - 1) * speedIncreasePerLevel);
     }
 
     @Override
@@ -161,7 +168,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         Block block = player.getTargetBlock(null, (int) getDistance(level));
         Location startPos = player.getLocation();
 
-        final Vector v = player.getLocation().toVector().subtract(block.getLocation().toVector()).normalize().multiply(0.2);
+        final Vector v = player.getLocation().toVector().subtract(block.getLocation().toVector()).normalize().multiply(getSpeed(level));
         v.setY(0);
 
         final Location loc = block.getLocation().add(v);
@@ -266,5 +273,8 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+
+        speed = getConfig("speed", 0.3, Double.class);
+        speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.0, Double.class);
     }
 }
