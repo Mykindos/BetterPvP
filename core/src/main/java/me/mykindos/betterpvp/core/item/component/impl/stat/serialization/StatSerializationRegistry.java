@@ -115,6 +115,7 @@ public class StatSerializationRegistry {
         deserializers.put(StatTypes.MELEE_DAMAGE.getKey(), doubleSerializer);
         deserializers.put(StatTypes.MELEE_ATTACK_SPEED.getKey(), doubleSerializer);
         deserializers.put(StatTypes.MOVEMENT.getKey(), doubleSerializer);
+        deserializers.put(StatTypes.ENERGY.getKey(), doubleSerializer);
 
         // Integer-based stats
         deserializers.put(StatTypes.HEALTH.getKey(), integerSerializer);

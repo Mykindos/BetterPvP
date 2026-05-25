@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.ReinforcementComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.RuneItem;
 import me.mykindos.betterpvp.core.item.impl.RunicDust;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;

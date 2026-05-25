@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Material;
@@ -26,7 +26,7 @@ public class CrudeAxe extends BaseItem implements Reloadable {
         super("Crude Axe", ItemStack.of(Material.STONE_AXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
-        addSerializableComponent(new RuneContainerComponent());
+        addSerializableComponent(new SocketableContainerComponent());
     }
 
     @Override
