@@ -1087,8 +1087,8 @@ skills:
     bloodthirst:
       enabled: true
       maxlevel: 3
-      baseHealthPercent: 0.3
-      healthPercentIncreasePerLevel: 0.05
+      baseHealthPercent: 0.4
+      healthPercentIncreasePerLevel: 0.1
       speedStrength: 2
     soulharvest:
       enabled: true
