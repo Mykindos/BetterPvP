@@ -10,16 +10,11 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
 import me.mykindos.betterpvp.core.loot.LootSource;
-import me.mykindos.betterpvp.core.loot.LootTable;
-import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.event.LootAwardedEvent;
-import me.mykindos.betterpvp.core.loot.session.LootSession;
-import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingDoubleTreasureDropEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingTreasureDropEvent;
 import net.kyori.adventure.audience.Audience;
@@ -40,28 +35,16 @@ import java.util.Optional;
 @BPvPListener
 @Singleton
 @CustomLog
-public class DoubleTreasureChanceListener implements Listener, Reloadable {
+public class DoubleTreasureChanceListener implements Listener {
 
     private final FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute;
-    private final LootTableRegistry lootTableRegistry;
-    private final LootSessionController sessionController;
     private final ItemFactory itemFactory;
-
-    private LootTable treasureLootTable;
 
     @Inject
     public DoubleTreasureChanceListener(FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute,
-                                        LootTableRegistry lootTableRegistry,
-                                        LootSessionController sessionController, ItemFactory itemFactory) {
+                                        ItemFactory itemFactory) {
         this.doubleTreasureChanceAttribute = doubleTreasureChanceAttribute;
-        this.lootTableRegistry = lootTableRegistry;
-        this.sessionController = sessionController;
         this.itemFactory = itemFactory;
-    }
-
-    @Override
-    public void reload() {
-        this.treasureLootTable = lootTableRegistry.loadLootTable("fishing_treasure_chance");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -74,13 +57,20 @@ public class DoubleTreasureChanceListener implements Listener, Reloadable {
             return;
         }
 
-        LootBundle bundle = rollTreasure(player, location);
-        PlayerFishingDoubleTreasureDropEvent doubleEvent = UtilServer.callEvent(new PlayerFishingDoubleTreasureDropEvent(player, location, bundle));
+        final LootBundle original = event.getBundle();
+        final LootContext doubleContext = new LootContext(
+                original.getContext().getSession(),
+                location,
+                LootSource.of("Fishing", "fishing:treasure_double")
+        );
+        final LootBundle doubled = original.duplicate(doubleContext);
+
+        PlayerFishingDoubleTreasureDropEvent doubleEvent = UtilServer.callEvent(new PlayerFishingDoubleTreasureDropEvent(player, location, doubled));
         if (doubleEvent.isCancelled()) {
             return;
         }
 
-        bundle.award();
+        doubled.award();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -106,16 +96,10 @@ public class DoubleTreasureChanceListener implements Listener, Reloadable {
         }
     }
 
-    private LootBundle rollTreasure(Player player, Location location) {
-        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
-        final LootContext context = new LootContext(session, location, LootSource.of("Fishing", "fishing:treasure_double"));
-        return treasureLootTable.generateLoot(context);
-    }
-
     private void sendMessage(Player player, Location location, ItemStack itemStack) {
         final Component name;
         Optional<ItemInstance> itemInstanceOptional = itemFactory.fromItemStack(itemStack);
-        if(itemInstanceOptional.isPresent()) {
+        if (itemInstanceOptional.isPresent()) {
             ItemInstance itemInstance = itemInstanceOptional.get();
             name = itemInstance.getView().getName();
         } else {

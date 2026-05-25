@@ -47,6 +47,20 @@ public final class LootBundle implements Iterable<Loot<?, ?>> {
     }
 
     /**
+     * Returns a new {@link LootBundle} containing the same loot entries and award strategy
+     * as this bundle, but bound to the supplied {@code context}.
+     * <p>
+     * Useful when the same set of items should be awarded a second time under a different
+     * {@link LootSource} (e.g. a "double treasure" proc) without re-rolling the loot table.
+     *
+     * @param context the context to bind the duplicate bundle to
+     * @return a new bundle with the same loot and strategy
+     */
+    public @NotNull LootBundle duplicate(@NotNull LootContext context) {
+        return new LootBundle(context, awardStrategy, new java.util.ArrayList<>(loot));
+    }
+
+    /**
      * Returns an iterator over elements of type {@code T}.
      *
      * @return an Iterator.
