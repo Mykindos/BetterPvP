@@ -243,22 +243,22 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
     public TickBehavior getTickBehavior(Player player, ChargeData data, int level) {
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         if (!(isHolding(player) && gamer.isHoldingRightClick())) {
-            if (!UtilBlock.isGrounded(player, 2)){
-                if (data.canSendMessage()) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
-                    data.messageSent();
-                }
-                return TickBehavior.PAUSE;
-            }
             return TickBehavior.USE;
+        }
+        if (!UtilBlock.isGrounded(player, 2)){
+            if (data.canSendMessage()) {
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
+                data.messageSent();
+            }
+            return TickBehavior.PAUSE;
         }
         return TickBehavior.TICK;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 3.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
 

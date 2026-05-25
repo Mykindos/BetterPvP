@@ -768,9 +768,9 @@ skills:
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       baseCharge: 0.40
-      chargeIncreasePerLevel: 0.10
-      baseDamage: 2.0
-      damageIncreasePerLevel: 1.0
+      chargeIncreasePerLevel: 0.15
+      baseDamage: 3.0
+      damageIncreasePerLevel: 1.5
       baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
