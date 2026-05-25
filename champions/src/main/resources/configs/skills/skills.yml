@@ -948,9 +948,9 @@ skills:
       maxlevel: 3
       maxSporeCharges: 2
       maxSporeChargesIncreasePerLevel: 1
-      sporeRemovalTime: 5.0
-      healingIncreasePerLevel: 0.0
-      healing: 1.5
+      sporeRemovalTime: 10.0
+      healingIncreasePerLevel: 0.5
+      healing: 2.0
     sharpshooter:
       enabled: true
       maxlevel: 3
