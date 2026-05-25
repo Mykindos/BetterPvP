@@ -978,8 +978,8 @@ skills:
       cooldownDecreasePerLevel: 5.0
       baseDuration: 5.0
       durationIncreasePerLevel: 0.0
-      baseMissedSwings: 2
-      missedSwingsIncreasePerLevel: 1.0
+      baseMissedSwings: 4
+      missedSwingsIncreasePerLevel: 2.0
       strengthLevel: 2
       strengthLevelIncreasePerLevel: 0
     windburst:
