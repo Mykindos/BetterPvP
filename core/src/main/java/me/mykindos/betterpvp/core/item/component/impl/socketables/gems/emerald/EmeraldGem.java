@@ -21,7 +21,7 @@ import java.util.List;
 @Singleton
 public class EmeraldGem implements Socketable, Reloadable {
 
-    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "emerald_gem");
+    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "flawless_emerald");
     private final Provider<EmeraldGemItem> itemProvider;
 
     @Getter

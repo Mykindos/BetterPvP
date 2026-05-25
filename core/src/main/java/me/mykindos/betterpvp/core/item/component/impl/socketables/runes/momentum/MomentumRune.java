@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.Socketable;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableGroup;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableGroups;
-import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.momentum.MomentumRuneItem;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -37,7 +36,7 @@ public class MomentumRune implements Socketable, Reloadable {
     private double expirySeconds = 1.0;
 
     @Inject
-    private MomentumRune(Provider<me.mykindos.betterpvp.core.item.component.impl.socketables.runes.momentum.MomentumRuneItem> itemProvider) {
+    private MomentumRune(Provider<MomentumRuneItem> itemProvider) {
         this.itemProvider = itemProvider;
     }
 

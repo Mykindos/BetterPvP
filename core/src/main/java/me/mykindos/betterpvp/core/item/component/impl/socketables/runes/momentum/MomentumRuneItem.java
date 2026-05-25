@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.RuneItem
 public class MomentumRuneItem extends RuneItem {
 
     @Inject
-    private MomentumRuneItem(me.mykindos.betterpvp.core.item.component.impl.socketables.runes.momentum.MomentumRune rune) {
+    private MomentumRuneItem(MomentumRune rune) {
         super(rune, RuneColor.WEAPON, ItemRarity.LEGENDARY);
     }
 }

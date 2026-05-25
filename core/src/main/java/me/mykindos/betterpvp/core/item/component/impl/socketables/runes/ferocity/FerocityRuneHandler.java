@@ -7,8 +7,6 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -60,8 +58,8 @@ public class FerocityRuneHandler implements Listener {
 
         final double delayReduction = ferocityRune.getDelay();
         event.setDamageDelay((long) Math.max(0, event.getDamageDelay() * (1 - delayReduction)));
-        new SoundEffect(Sound.ENTITY_RAVAGER_ROAR, 2f, 1f).play(damager.getLocation());
-        new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0f, 1f).play(damager.getLocation());
+        //new SoundEffect(Sound.ENTITY_RAVAGER_ROAR, 2f, 1f).play(damager.getLocation());
+        //new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0f, 1f).play(damager.getLocation());
 
     }
 }

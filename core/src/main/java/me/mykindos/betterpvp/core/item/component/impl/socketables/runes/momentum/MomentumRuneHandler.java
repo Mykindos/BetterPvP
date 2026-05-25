@@ -29,12 +29,12 @@ import java.util.Optional;
 @Singleton
 public class MomentumRuneHandler implements Listener {
 
-    private final me.mykindos.betterpvp.core.item.component.impl.socketables.runes.momentum.MomentumRune momentumRune;
+    private final MomentumRune momentumRune;
     private final ComponentLookupService componentLookupService;
     private final Multimap<LivingEntity, AttackEntry> attackSpeedMap = ArrayListMultimap.create();
 
     @Inject
-    public MomentumRuneHandler(me.mykindos.betterpvp.core.item.component.impl.socketables.runes.momentum.MomentumRune momentumRune, ComponentLookupService lookupService) {
+    public MomentumRuneHandler(MomentumRune momentumRune, ComponentLookupService lookupService) {
         this.momentumRune = momentumRune;
         this.componentLookupService = lookupService;
     }

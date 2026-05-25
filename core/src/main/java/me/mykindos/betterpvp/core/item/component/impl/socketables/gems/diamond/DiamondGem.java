@@ -21,7 +21,7 @@ import java.util.List;
 @Singleton
 public class DiamondGem implements Socketable, Reloadable {
 
-    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "diamond_gem");
+    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "flawless_diamond");
     private final Provider<DiamondGemItem> itemProvider;
 
     @Getter

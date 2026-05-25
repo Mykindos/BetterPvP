@@ -22,7 +22,7 @@ import java.util.List;
 @Singleton
 public class RubyGem implements Socketable, Reloadable {
 
-    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "ruby_gem");
+    public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "flawless_ruby");
     private final Provider<RubyGemItem> itemProvider;
 
     @Getter

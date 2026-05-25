@@ -10,10 +10,6 @@ import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -87,15 +83,15 @@ public class BrutalityRuneHandler implements Listener {
                 brutalityRune.getDamageIncrease())
         );
 
-        final double width = event.getDamagee().getWidth();
-        new SoundEffect(Sound.ITEM_TRIDENT_HIT, 0.5f, 1f).play(event.getDamagee().getLocation());
-        new SoundEffect(Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1f, 1f).play(event.getDamagee().getLocation());
-        Particle.DUST_PILLAR.builder()
-                .data(Material.REDSTONE_BLOCK.createBlockData())
-                .location(event.getDamagee().getLocation())
-                .offset(width / 2, width / 2, width / 2)
-                .receivers(60)
-                .count(100)
-                .spawn();
+       // final double width = event.getDamagee().getWidth();
+       // new SoundEffect(Sound.ITEM_TRIDENT_HIT, 0.5f, 1f).play(event.getDamagee().getLocation());
+       // new SoundEffect(Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1f, 1f).play(event.getDamagee().getLocation());
+       // Particle.DUST_PILLAR.builder()
+       //         .data(Material.REDSTONE_BLOCK.createBlockData())
+       //         .location(event.getDamagee().getLocation())
+       //         .offset(width / 2, width / 2, width / 2)
+       //         .receivers(60)
+       //         .count(100)
+       //         .spawn();
     }
 }
