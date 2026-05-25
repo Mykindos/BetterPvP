@@ -1233,12 +1233,12 @@ skills:
       applyRadiusIncreasePerLevel: 0.0
       passiveTravelSpeed: 16.0
       applyTravelSpeed: 6.0
-      damagePerSecond: 3.0
+      damagePerSecond: 5.0
       damageIncreasePerLevel: 1.0
       regenPerSecond: 8.0
       regenIncreasePerLevel: 1.0
-      impactHealthMultiplier: 0.1
-      impactHealthMultiplierIncreasePerLevel: 0.05
+      impactHealthMultiplier: 0.2
+      impactHealthMultiplierIncreasePerLevel: 0.1
       healthSeconds: 0.5
       mobHealthModifier: 0.25
   global:
