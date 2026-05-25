@@ -187,9 +187,9 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
 
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
 
-        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 2.0, Double.class);
+        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 0.0, Double.class);
         healthReductionPerPlayerAffectedDecreasePerLevel = getConfig("healthReductionPerPlayerAffectedDecreasePerLevel", 0.0, Double.class);
     }
 }

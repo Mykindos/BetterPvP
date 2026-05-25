@@ -1132,10 +1132,10 @@ skills:
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0
       baseDuration: 2.0
-      durationIncreasePerLevel: 0.5
+      durationIncreasePerLevel: 1.0
       distance: 5
       duration: 2.0
-      baseHealthReductionPerPlayerAffected: 2.0
+      baseHealthReductionPerPlayerAffected: 0.0
       healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
     clone:
       enabled: true
