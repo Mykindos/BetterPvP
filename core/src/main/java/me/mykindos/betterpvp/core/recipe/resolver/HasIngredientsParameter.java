@@ -149,7 +149,7 @@ public class HasIngredientsParameter implements LookupParameter {
         Preconditions.checkArgument(contents.length > 0, "Contents must not be empty");
         Preconditions.checkArgument(craftAmount > 0, "Craft amount must be positive");
 
-        // copy the contents and iteratively remove items until we run out of ingredients
+        // copy the contents and iteratively remove items exactly craftAmount times
         final ItemStack[] copy = new ItemStack[contents.length];
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
@@ -159,13 +159,10 @@ public class HasIngredientsParameter implements LookupParameter {
             }
         }
 
-        int amount = 0;
-        while (removeMatching(recipe, copy)) {
-            amount++;
-        }
-
-        if (amount < craftAmount) {
-            return false; // Not enough ingredients to craft the desired amount
+        for (int i = 0; i < craftAmount; i++) {
+            if (!removeMatching(recipe, copy)) {
+                return false; // Not enough ingredients to craft the desired amount
+            }
         }
 
         // copy from copy to contents
