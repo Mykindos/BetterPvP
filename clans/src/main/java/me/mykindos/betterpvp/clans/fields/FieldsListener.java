@@ -65,6 +65,7 @@ public class FieldsListener extends ClanListener {
     @EventHandler (ignoreCancelled = true)
     public void onSuffocate(DamageEvent event) {
         if(event.getBukkitCause() != EntityDamageEvent.DamageCause.SUFFOCATION) return;
+        event.setCancelled(true);
     }
 
     @EventHandler
