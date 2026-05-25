@@ -247,7 +247,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
 
         speedStrength = getConfig("speedStrength", 2, Integer.class);
         speedDuration = getConfig("speedDuration", 2.5, Double.class);
-        elapsedTimeToProcAbility = getConfig("elapsedTimeToProcAbility", 2.0, Double.class);
+        elapsedTimeToProcAbility = getConfig("elapsedTimeToProcAbility", 1.0, Double.class);
 
         healthGainedOnRandomSiphon = getConfig("healthGainedOnRandomSiphon", 2.0D, Double.class);
         randomSiphonHealthGainChance = getConfig("randomSiphonHealthGainChance", 0.1, Double.class);
