@@ -1096,7 +1096,8 @@ skills:
       baseBuffDuration: 2.0
       buffDurationIncreasePerLevel: 1.0
       speedStrength: 2
-      regenerationStrength: 2
+      baseHealthPerSecond: 4.0
+      healthPerSecondIncreasePerLevel: 0.0
     impotence:
       enabled: true
       maxlevel: 3
