@@ -63,7 +63,7 @@ public class RuneAuctionListener implements Listener {
         ItemStack itemStack = event.getItemStack();
         final ItemInstance itemInstance = itemFactory.fromItemStack(itemStack).orElseThrow();
         final NamespacedKey key = Objects.requireNonNull(itemFactory.getItemRegistry().getKey(itemInstance.getBaseItem()));
-        final List<IShopItem> matchingShopItems = shopManager.getShopItems().values()
+        final List<IShopItem> matchingShopItems = shopManager.getShopItems().get().values()
                 .stream()
                 .flatMap(Collection::stream)
                 .filter(shopItem -> shopItem.getItemKey().equals(key.toString()))

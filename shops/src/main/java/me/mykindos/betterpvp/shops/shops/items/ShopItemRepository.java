@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.shops.database.jooq.Tables.*;
 
@@ -28,79 +29,73 @@ public class ShopItemRepository {
         this.database = database;
     }
 
-    public Map<String, List<IShopItem>> getAllShopItems() {
-        var shopItems = new HashMap<String, List<IShopItem>>();
+    public CompletableFuture<Map<String, List<IShopItem>>> getAllShopItems() {
 
-        try {
-            database.getAsyncDslContext().executeAsync(ctx -> {
-                var shopItemRecords = ctx.selectFrom(SHOPITEMS).fetch();
+        return database.getAsyncDslContext().executeAsync(ctx -> {
+            Map<String, List<IShopItem>> shopItems = new HashMap<>();
+            var shopItemRecords = ctx.selectFrom(SHOPITEMS).fetch();
 
-                for (var record : shopItemRecords) {
-                    int id = record.get(SHOPITEMS.ID);
-                    String shopKeeper = record.get(SHOPITEMS.SHOPKEEPER);
-                    String itemKey = record.get(SHOPITEMS.ITEM_KEY);
-                    int order = record.get(SHOPITEMS.ORDER);
-                    int buyPrice = record.get(SHOPITEMS.BUY_PRICE);
-                    int sellPrice = record.get(SHOPITEMS.SELL_PRICE);
+            for (var record : shopItemRecords) {
+                int id = record.get(SHOPITEMS.ID);
+                String shopKeeper = record.get(SHOPITEMS.SHOPKEEPER);
+                String itemKey = record.get(SHOPITEMS.ITEM_KEY);
+                int order = record.get(SHOPITEMS.ORDER);
+                int buyPrice = record.get(SHOPITEMS.BUY_PRICE);
+                int sellPrice = record.get(SHOPITEMS.SELL_PRICE);
 
-                    if (!shopItems.containsKey(shopKeeper)) {
-                        shopItems.put(shopKeeper, new ArrayList<>());
-                    }
-
-                    ShopItem shopItem;
-
-                    // Fetch dynamic pricing
-                    var dynamicPricingRecord = ctx.selectFrom(SHOPITEMS_DYNAMIC_PRICING)
-                            .where(SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID.eq(id))
-                            .and(SHOPITEMS_DYNAMIC_PRICING.REALM.eq(Core.getCurrentRealm().getServer().getId()))
-                            .fetchOne();
-
-                    if (dynamicPricingRecord != null) {
-                        int minSellPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MIN_SELL_PRICE);
-                        int baseSellPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.BASE_SELL_PRICE);
-                        int maxSellPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MAX_SELL_PRICE);
-                        int minBuyPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MIN_BUY_PRICE);
-                        int baseBuyPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.BASE_BUY_PRICE);
-                        int maxBuyPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MAX_BUY_PRICE);
-                        int baseStock = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.BASE_STOCK);
-                        int maxStock = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MAX_STOCK);
-                        int currentStock = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.CURRENT_STOCK);
-
-                        PolynomialData polynomialData = new PolynomialData(
-                                minBuyPrice, baseBuyPrice, maxBuyPrice,
-                                minSellPrice, baseSellPrice, maxSellPrice,
-                                maxStock, baseStock, currentStock
-                        );
-                        shopItem = new DynamicShopItem(id, shopKeeper, itemKey, order, polynomialData);
-                    } else {
-                        shopItem = new NormalShopItem(id, shopKeeper, itemKey, order, buyPrice, sellPrice);
-                    }
-
-                    // Fetch item flags
-                    var itemFlagRecords = ctx.selectFrom(SHOPITEMS_FLAGS)
-                            .where(SHOPITEMS_FLAGS.SHOP_ITEM_ID.eq(id))
-                            .fetch();
-
-                    for (var flagRecord : itemFlagRecords) {
-                        String key = flagRecord.get(SHOPITEMS_FLAGS.PERSISTENT_KEY);
-                        String value = flagRecord.get(SHOPITEMS_FLAGS.PERSISTENT_VALUE);
-                        shopItem.getItemFlags().put(key, value);
-                    }
-
-                    shopItems.get(shopKeeper).add(shopItem);
+                if (!shopItems.containsKey(shopKeeper)) {
+                    shopItems.put(shopKeeper, new ArrayList<>());
                 }
 
-                return shopItems;
-            }).exceptionally(ex -> {
-                log.error("Failed to load shop items", ex).submit();
-                return null;
-            }).join();
+                ShopItem shopItem;
 
-        } catch (Exception ex) {
+                // Fetch dynamic pricing
+                var dynamicPricingRecord = ctx.selectFrom(SHOPITEMS_DYNAMIC_PRICING)
+                        .where(SHOPITEMS_DYNAMIC_PRICING.SHOP_ITEM_ID.eq(id))
+                        .and(SHOPITEMS_DYNAMIC_PRICING.REALM.eq(Core.getCurrentRealm().getServer().getId()))
+                        .fetchOne();
+
+                if (dynamicPricingRecord != null) {
+                    int minSellPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MIN_SELL_PRICE);
+                    int baseSellPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.BASE_SELL_PRICE);
+                    int maxSellPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MAX_SELL_PRICE);
+                    int minBuyPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MIN_BUY_PRICE);
+                    int baseBuyPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.BASE_BUY_PRICE);
+                    int maxBuyPrice = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MAX_BUY_PRICE);
+                    int baseStock = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.BASE_STOCK);
+                    int maxStock = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.MAX_STOCK);
+                    int currentStock = dynamicPricingRecord.get(SHOPITEMS_DYNAMIC_PRICING.CURRENT_STOCK);
+
+                    PolynomialData polynomialData = new PolynomialData(
+                            minBuyPrice, baseBuyPrice, maxBuyPrice,
+                            minSellPrice, baseSellPrice, maxSellPrice,
+                            maxStock, baseStock, currentStock
+                    );
+                    shopItem = new DynamicShopItem(id, shopKeeper, itemKey, order, polynomialData);
+                } else {
+                    shopItem = new NormalShopItem(id, shopKeeper, itemKey, order, buyPrice, sellPrice);
+                }
+
+                // Fetch item flags
+                var itemFlagRecords = ctx.selectFrom(SHOPITEMS_FLAGS)
+                        .where(SHOPITEMS_FLAGS.SHOP_ITEM_ID.eq(id))
+                        .fetch();
+
+                for (var flagRecord : itemFlagRecords) {
+                    String key = flagRecord.get(SHOPITEMS_FLAGS.PERSISTENT_KEY);
+                    String value = flagRecord.get(SHOPITEMS_FLAGS.PERSISTENT_VALUE);
+                    shopItem.getItemFlags().put(key, value);
+                }
+
+                shopItems.get(shopKeeper).add(shopItem);
+            }
+
+            return shopItems;
+        }).exceptionally(ex -> {
             log.error("Failed to load shop items", ex).submit();
-        }
+            return Map.of();
+        });
 
-        return shopItems;
     }
 
     public void updateStock(List<DynamicShopItem> dynamicShopItems) {

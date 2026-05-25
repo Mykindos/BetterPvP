@@ -233,7 +233,7 @@ public class ShopListener implements Listener {
     @UpdateEvent(delay = 180_000) // 3 minutes
     public void updateDynamicPrices() {
         List<DynamicShopItem> dynamicShopItems = new ArrayList<>();
-        shopManager.getShopItems().values().forEach(shopItems -> {
+        shopManager.getShopItems().get().values().forEach(shopItems -> {
             shopItems.forEach(shopItem -> {
                 if (shopItem instanceof DynamicShopItem dynamicShopItem) {
                     dynamicShopItems.add(dynamicShopItem);
@@ -246,7 +246,7 @@ public class ShopListener implements Listener {
 
     @UpdateEvent(delay = 3_600_000) // 2 Hours
     public void refreshStocks() {
-        shopManager.getShopItems().values().forEach(shopItems -> {
+        shopManager.getShopItems().get().values().forEach(shopItems -> {
             shopItems.forEach(shopItem -> {
                 if (shopItem instanceof DynamicShopItem dynamicShopItem) {
                     if (dynamicShopItem.getCurrentStock() < dynamicShopItem.getBaseStock()) {
