@@ -860,7 +860,7 @@ skills:
     kinetics:
       enabled: true
       maxlevel: 3
-      velocityRestTime: 4.0
+      velocityRestTime: 5.0
       storedVelocityCount: 1
       storedVelocityCountIncreasePerLevel: 1
       fallDamageLimit: 4.0
