@@ -1041,17 +1041,16 @@ skills:
       cooldownDecreasePerLevel: 3.0
       baseRange: 8.0
       rangeIncreasePerLevel: 1.0
-      baseHealthReduction: 12.0
+      baseHealthReduction: 10.0
       healthReductionDecreasePerLevel: 1.0
-      baseHealthReductionPerPlayerAffected: 2.0
+      baseHealthReductionPerPlayerAffected: 1.5
       healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
-      baseDuration: 20.0
-      durationIncreasePerLevel: 2.5
+      baseDuration: 10.0
+      durationIncreasePerLevel: 5.0
       damageReductionPerLevel: 0.0
       baseNumAttacksToReduce: 3
       numAttacksToReducePerLevel: 0
-      range: 8
-      duration: 60.0
+      range: 8.0
     soulbonds:
       enabled: true
       maxlevel: 3
