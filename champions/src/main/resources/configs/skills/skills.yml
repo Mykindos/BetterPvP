@@ -1209,9 +1209,9 @@ skills:
     frailty:
       enabled: true
       maxlevel: 3
-      baseHealthPercent: 0.3
+      baseHealthPercent: 0.4
       healthPercentIncreasePerLevel: 0.1
-      baseDamagePercent: 0.15
+      baseDamagePercent: 0.2
       damagePercentIncreasePerLevel: 0.05
     siphon:
       enabled: true
