@@ -956,8 +956,8 @@ skills:
       maxlevel: 3
       duration: 5.0
       maxConsecutiveHits: 5
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.25
+      baseDamage: 1.5
+      damageIncreasePerLevel: 0.5
       maxConsecutiveHitsIncreasePerLevel: 0
     agility:
       enabled: true
