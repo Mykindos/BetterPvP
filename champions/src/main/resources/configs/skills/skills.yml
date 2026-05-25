@@ -802,11 +802,11 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 2.0
+      baseDuration: 3.0
       durationIncreasePerLevel: 1.5
       baseExtraDamage: 2.0
       extraDamageIncreasePerLevel: 0.5
-      speedStrength: 2
+      speedStrength: 3
     explosivearrow:
       enabled: true
       maxlevel: 5
