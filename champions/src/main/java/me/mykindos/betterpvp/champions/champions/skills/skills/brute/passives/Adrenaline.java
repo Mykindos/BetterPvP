@@ -105,9 +105,9 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
 
     @Override
     public void loadSkillConfig() {
-        speedOneHealth = getConfig("speedOneHealth", 0.35, Double.class);
-        speedOneHealthIncreasePerLevel = getConfig("speedOneHealthIncreasePerLevel", 0.15, Double.class);
-        speedTwoHealth = getConfig("speedTwoHealth", 0.15, Double.class);
-        speedTwoHealthIncreasePerLevel = getConfig("speedTwoHealthIncreasePerLevel", 0.075, Double.class);
+        speedOneHealth = getConfig("speedOneHealth", 0.50, Double.class);
+        speedOneHealthIncreasePerLevel = getConfig("speedOneHealthIncreasePerLevel", 0.10, Double.class);
+        speedTwoHealth = getConfig("speedTwoHealth", 0.20, Double.class);
+        speedTwoHealthIncreasePerLevel = getConfig("speedTwoHealthIncreasePerLevel", 0.10, Double.class);
     }
 }

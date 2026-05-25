@@ -596,10 +596,10 @@ skills:
     adrenaline:
       enabled: true
       maxlevel: 3
-      speedOneHealth: 0.35
-      speedOneHealthIncreasePerLevel: 0.15
-      speedTwoHealth: 0.15
-      speedTwoHealthIncreasePerLevel: 0.075
+      speedOneHealth: 0.50
+      speedOneHealthIncreasePerLevel: 0.10
+      speedTwoHealth: 0.20
+      speedTwoHealthIncreasePerLevel: 0.10
     battletaunt:
       enabled: false
       energy: 15
