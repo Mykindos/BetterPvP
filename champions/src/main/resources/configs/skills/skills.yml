@@ -1045,7 +1045,7 @@ skills:
       healthReductionDecreasePerLevel: 1.0
       baseHealthReductionPerPlayerAffected: 1.5
       healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
-      baseDuration: 10.0
+      baseDuration: 15.0
       durationIncreasePerLevel: 5.0
       damageReductionPerLevel: 0.0
       baseNumAttacksToReduce: 3
