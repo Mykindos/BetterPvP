@@ -177,9 +177,18 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
             while (dataIterator.hasNext()) {
                 AxeProjectile projectile = dataIterator.next();
 
-                if (projectile.isExpired() || projectile.isMarkForRemoval()) {
+                if (projectile.isMarkForRemoval()) {
                     projectile.remove();
                     dataIterator.remove();
+                    continue;
+                }
+
+                //if expired, return the axe
+                if (projectile.isExpired()) {
+                    dataIterator.remove();
+                    projectile.remove();
+                    projectile.setMarkForRemoval(true);
+                    returnAxeToPlayer(player, projectile);
                     continue;
                 }
 
