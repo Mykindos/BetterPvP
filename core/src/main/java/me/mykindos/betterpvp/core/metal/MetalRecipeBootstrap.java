@@ -34,7 +34,7 @@ public class MetalRecipeBootstrap {
         // Runesteel
         final SmeltingRecipeBuilder runesteelBuilder = new SmeltingRecipeBuilder();
         runesteelBuilder.setPrimaryResult(runesteel, 500);
-        runesteelBuilder.addIngredient(blackroot, 10);
+        runesteelBuilder.addIngredient(blackroot, 4);
         runesteelBuilder.addIngredient(runebloodOre, 1);
         runesteelBuilder.addIngredient(fissureQuartz, 2);
         recipeRegistry.registerRecipe(new NamespacedKey("core", "runesteel"), runesteelBuilder.build(itemFactory));

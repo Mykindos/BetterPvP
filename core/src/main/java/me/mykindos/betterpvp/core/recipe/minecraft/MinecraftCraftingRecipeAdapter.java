@@ -93,6 +93,7 @@ public class MinecraftCraftingRecipeAdapter {
             if (recipe instanceof org.bukkit.inventory.CraftingRecipe craftingRecipe) {
                 disabledRecipeKeys.add(craftingRecipe.getKey());
                 recipeRegistry.clearRecipe(craftingRecipe.getKey());
+                Bukkit.removeRecipe(craftingRecipe.getKey());
             }
         }
     }
@@ -222,6 +223,7 @@ public class MinecraftCraftingRecipeAdapter {
                 continue;
             }
             recipeRegistry.clearRecipe(key);
+            Bukkit.removeRecipe(key);
         }
 
         plugin.saveConfig();
