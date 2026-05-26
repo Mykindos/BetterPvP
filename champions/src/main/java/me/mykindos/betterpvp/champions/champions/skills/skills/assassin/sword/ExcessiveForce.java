@@ -258,7 +258,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        baseDuration = getConfig("baseDuration", 2.5, Double.class);
         durationIncreasePerLevel = getConfig("durationPerLevel", 0.5, Double.class);
 
         baseKnockbackPercent = getConfig("baseKnockbackPercent", 0.75, Double.class);
