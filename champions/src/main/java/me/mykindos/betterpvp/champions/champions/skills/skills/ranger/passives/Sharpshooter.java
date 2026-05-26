@@ -202,7 +202,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
     public void loadSkillConfig() {
         duration = getConfig("duration", 5.0, Double.class);
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 5, Integer.class);
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         maxConsecutiveHitsIncreasePerLevel = getConfig("maxConsecutiveHitsIncreasePerLevel", 0, Integer.class);
     }
