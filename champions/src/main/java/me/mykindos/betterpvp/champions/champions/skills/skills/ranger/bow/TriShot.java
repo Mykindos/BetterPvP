@@ -95,7 +95,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next " + getValueString(this::getNumTridents, level) + " arrows will be converted into tridents",
+                "Your next " + getValueString(this::getNumTridents, level, 0) + " arrows will be converted into tridents",
                 "",
                 "Left click to instantly shoot them, dealing " + getValueString(this::getDamage, level) + " damage",
                 "",
@@ -299,7 +299,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     public void loadSkillConfig() {
         baseNumTridents = getConfig("baseNumTridents", 3, Integer.class);
         numTridentsIncreasePerLevel = getConfig("numTridentsIncreasePerLevel", 0, Integer.class);
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
         tridentDelay = getConfig("tridentDelay", 0.2, Double.class);
     }

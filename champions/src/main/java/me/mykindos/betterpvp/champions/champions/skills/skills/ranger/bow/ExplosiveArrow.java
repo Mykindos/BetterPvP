@@ -209,7 +209,7 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         velocityMultiplier = getConfig("velocityMultiplier", 1.2, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);

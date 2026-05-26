@@ -74,6 +74,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
                 "within " + getValueString(this::getRange, level) + " blocks of your target.",
                 "",
                 "Linked targets have " + getValueString(this::getLeechedHealth, level) + " health leeched per second",
+                "You may target up to " + getValueString(this::getMaximumEnemies, level, 0),
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -302,8 +303,8 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
 
     @Override
     public void loadSkillConfig() {
-        baseRange = getConfig("baseRange", 7.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.0, Double.class);
+        baseRange = getConfig("baseRange", 6.0, Double.class);
+        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
 
         baseLeechedHealth = getConfig("baseLeechedHealth", 2.0, Double.class);
         leachedHealthIncreasePerLevel = getConfig("leachedHealthIncreasePerLevel", 0.0, Double.class);

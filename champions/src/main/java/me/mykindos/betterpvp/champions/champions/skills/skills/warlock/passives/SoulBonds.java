@@ -8,18 +8,24 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -40,8 +46,13 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     private double healSpeedIncreasePerLevel;
     private double baseHealMultiplier;
     private double healMultiplierIncreasePerLevel;
+    private double baseHealOnHit;
+    private double healOnHitIncreasePerLevel;
+    private double baseReceiveMultiplier;
+    private double receiveMultiplierIncreasePerLevel;
 
     private final HashMap<UUID, Double> healthStored = new HashMap<>();
+    private final HashMap<UUID, Double> transferredHealthAccumulator = new HashMap<>();
     private final HashMap<UUID, Long> lastHealTime = new HashMap<>();
     private final HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
 
@@ -63,8 +74,10 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
                 "",
                 "Connect the souls of yourself and your allies",
                 "within " + getValueString(this::getRadius, level) + " blocks, causing the highest health player in the",
-                "radius to transfer their health to the",
-                "lowest health player every " + getValueString(this::getHealSpeed, level) + " seconds",
+                "radius to transfer their health to the lowest health player every " + getValueString(this::getHealSpeed, level) + " seconds.",
+                "The lowest health player receives " + getValueString(this::getReceiveMultiplier, level, 100, "%", 0) + " of what was taken",
+                "",
+                "Melee attacks heal you for " + getValueString(this::getHealOnHit, level) + " health",
                 "",
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level)
@@ -76,9 +89,6 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
         return baseRadius + ((level-1) * radiusIncreasePerLevel);
     }
 
-    public double getHealCooldown(int level) {
-        return baseHealCooldown + ((level - 1) * healCooldownDecreasePerLevel);
-    }
     public double getHealSpeed(int level) {
         return baseHealSpeed + ((level - 1) * healSpeedIncreasePerLevel);
     }
@@ -86,7 +96,32 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
         return baseHealMultiplier + ((level - 1) * healMultiplierIncreasePerLevel);
     }
 
-    @Override
+    public double getHealOnHit(int level) {
+        return baseHealOnHit + ((level - 1) * healOnHitIncreasePerLevel);
+    }
+
+    public double getReceiveMultiplier(int level) {
+        return baseReceiveMultiplier + ((level - 1) * receiveMultiplierIncreasePerLevel);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onMeleeHit(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!active.contains(damager.getUniqueId())) return;
+
+        int level = getLevel(damager);
+        if (level <= 0) return;
+
+        final LivingEntity damagee = event.getLivingDamagee();
+        if (damagee == null) return;
+
+        UtilEntity.health(damager, getHealOnHit(level));
+        damager.getWorld().spawnParticle(Particle.HEART, damager.getLocation().add(0, 1.5, 0), 2, 0.3, 0.3, 0.3, 0);
+    }
+
+
     public boolean process(Player player) {
         HashMap<String, Long> updateCooldowns = updaterCooldowns.get(player.getUniqueId());
 
@@ -166,7 +201,7 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
             long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
             if (currentTime - lastHeal > (getHealSpeed(level) * 1000L)) {
                 highestHealthPlayer.setHealth(highestHealthPlayer.getHealth() - healthToTransfer);
-                healthStored.put(lowestHealthPlayer.getUniqueId(), healthToTransfer);
+                healthStored.put(lowestHealthPlayer.getUniqueId(), healthToTransfer * getReceiveMultiplier(level));
                 lastHealTime.put(lowestHealthPlayer.getUniqueId(), currentTime);
                 createTrackingTrail(highestHealthPlayer, lowestHealthPlayer);
             }
@@ -207,6 +242,12 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     }
 
     @Override
+    public void cancel(Player player, String reason) {
+        super.cancel(player, reason);
+        transferredHealthAccumulator.remove(player.getUniqueId());
+    }
+
+    @Override
     public Role getClassType() {
         return Role.WARLOCK;
     }
@@ -235,5 +276,11 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
 
         baseHealMultiplier = getConfig("baseHealMultiplier", 0.25, Double.class);
         healMultiplierIncreasePerLevel = getConfig("healMultiplierIncreasePerLevel", 0.0, Double.class);
+
+        baseHealOnHit = getConfig("baseHealOnHit", 1.0, Double.class);
+        healOnHitIncreasePerLevel = getConfig("healOnHitIncreasePerLevel", 0.5, Double.class);
+
+        baseReceiveMultiplier = getConfig("baseReceiveMultiplier", 1.2, Double.class);
+        receiveMultiplierIncreasePerLevel = getConfig("receiveMultiplierIncreasePerLevel", 0.0, Double.class);
     }
 }

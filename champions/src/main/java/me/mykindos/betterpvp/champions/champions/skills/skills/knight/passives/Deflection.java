@@ -58,6 +58,8 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
                 "You gain <stat>1</stat> charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds.",
                 "You can store a maximum of " + getValueString(this::getMaxCharges, level, 0) + " charges",
                 "",
+                "You do not gain charges until " + getValueString(this::getTimeOutOfCombat, level) + " seconds after taking damage",
+                "",
                 "When attacked, the damage you take is",
                 "reduced by " + getValueString(this::getDamageReductionPerCharge, level) + " damage per charge",
         };

@@ -330,10 +330,10 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
         baseExtraDamage = getConfig("baseExtraDamage", 2.0, Double.class);
         extraDamageIncreasePerLevel = getConfig("extraDamageIncreasePerLevel", 0.5, Double.class);
-        speedStrength = getConfig("speedStrength", 2, Integer.class);
+        speedStrength = getConfig("speedStrength", 3, Integer.class);
     }
 }

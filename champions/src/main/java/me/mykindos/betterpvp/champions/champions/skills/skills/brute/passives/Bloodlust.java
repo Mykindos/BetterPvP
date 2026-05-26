@@ -65,7 +65,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
                 "and you receive <effect>Speed I</effect>, and <effect>Strength I</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Bloodlust can stack up to " + getValueString(this::getMaxStacks, level) + " times",
-                "boosting the level of <effect>Speed</effect> and <effect>Strength</effect> by 1",
+                "boosting the level of <effect>Speed</effect> and <effect>Strength</effect> by <yellow>1</yellow>",
                 "",
                 EffectTypes.STRENGTH.getGenericDescription()
         };

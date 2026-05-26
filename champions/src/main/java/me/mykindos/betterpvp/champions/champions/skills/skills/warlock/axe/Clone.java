@@ -115,7 +115,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 "This clone switches target to the player you are attacking",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level) + " seconds",
-                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1),
 
         };
     }
@@ -411,8 +410,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         duration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 8.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 0.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.0, Double.class);
 
         baseHealth = getConfig("baseHealth", 10.0, Double.class);
 

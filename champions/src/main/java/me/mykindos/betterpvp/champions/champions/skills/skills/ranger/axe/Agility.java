@@ -135,6 +135,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         if (active.containsKey(damagee.getUniqueId())) {
             int level = getLevel(damagee);
             event.addModifier(new SkillDamageModifier.Multiplier(this, (1 - getDamageReduction(level))));
+            event.setKnockback(false);
         }
 
         if (!(event.getDamager() instanceof Player damager)) return;
