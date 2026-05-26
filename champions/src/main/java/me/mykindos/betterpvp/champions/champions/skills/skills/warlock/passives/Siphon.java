@@ -240,7 +240,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        baseRadius = getConfig("baseRadius", 4.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
         baseEnergySiphoned = getConfig("baseEnergySiphoned", 1.0, Double.class);
         energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 0.0, Double.class);
@@ -250,6 +250,6 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         elapsedTimeToProcAbility = getConfig("elapsedTimeToProcAbility", 1.0, Double.class);
 
         healthGainedOnRandomSiphon = getConfig("healthGainedOnRandomSiphon", 2.0D, Double.class);
-        randomSiphonHealthGainChance = getConfig("randomSiphonHealthGainChance", 0.1, Double.class);
+        randomSiphonHealthGainChance = getConfig("randomSiphonHealthGainChance", 0.2, Double.class);
     }
 }
