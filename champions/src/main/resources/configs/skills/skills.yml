@@ -383,7 +383,7 @@ skills:
       baseDamage: 7.0
       damageIncreasePerLevel: 0.5
       baseSlowDuration: 2.0
-      slowDurationIncreasePerLevel: 0.0
+      slowDurationIncreasePerLevel: 0.5
       slowStrength: 2
     inferno:
       enabled: true
