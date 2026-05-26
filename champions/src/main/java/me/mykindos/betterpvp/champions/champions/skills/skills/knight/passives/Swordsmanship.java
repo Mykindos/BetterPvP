@@ -58,6 +58,8 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
                 "You gain 1 charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds,",
                 "storing up to a maximum of " + getValueString(this::getMaxCharges, level) + " charges",
                 "",
+                "You do not gain charges until " + getValueString(this::getTimeOutOfCombat, level) + " seconds after taking damage",
+                "",
                 "When you attack, your damage is increased",
                 "by <stat>" + getDamage(1, level) + "</stat> for each charge you have",
                 "",
@@ -67,6 +69,10 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
 
     public double getDamage(int charge, int level) {
         return (baseDamagePerCharge + ((level - 1) * damageIncreasePerLevel)) * charge;
+    }
+
+    public double getTimeOutOfCombat(int level) {
+        return timeOutOfCombat - ((level - 1) * timeOutOfCombatDecreasePerLevel);
     }
 
     public double getTimeBetweenCharges(int level) {
@@ -114,7 +120,7 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
             if (level > 0) {
                 if (charges.containsKey(cur)) {
                     Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
-                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
+                    if (UtilTime.elapsed(gamer.getLastDamaged(), (long) getTimeOutOfCombat(level))) {
                         if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
                         int charge = charges.get(cur);
                         if (charge < level) {
