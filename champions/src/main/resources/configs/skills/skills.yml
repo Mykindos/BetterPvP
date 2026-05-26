@@ -67,7 +67,7 @@ skills:
       durationIncreasePerLevel: 1.0
       slownessStrength: 1
     silencingstrikes:
-      enabled: true
+      enabled: false
       maxlevel: 3
       hitsNeeded: 3
       timeSpan: 0.8
