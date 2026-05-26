@@ -36,7 +36,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -101,17 +100,6 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public SkillType getType() {
         return SkillType.AXE;
-    }
-
-    @EventHandler
-    public void onDamage(DamageEvent event) {
-        if (event.isCancelled()) return;
-        if (!(event.getDamagee() instanceof Player player)) return;
-        if (!hasSkill(player)) return;
-
-        if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
-            event.setKnockback(false);
-        }
     }
 
     @Override
