@@ -427,8 +427,12 @@ public class UUIDController implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryMoveEvent(InventoryMoveItemEvent event) {
+        if(event.getDestination().firstEmpty() == -1) {
+            return;
+        }
+
         getUUIDItem(event.getItem()).ifPresent(uuidItem -> {
             Location locationSource = event.getSource().getLocation();
             Location locationDestination = event.getDestination().getLocation();

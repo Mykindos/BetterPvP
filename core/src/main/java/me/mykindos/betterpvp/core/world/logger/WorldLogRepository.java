@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetWorldLogsForBlock;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsMetadataRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsRecord;
-import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -22,11 +21,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_WORLD_LOGS_FOR_BLOCK;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.WORLD_LOGS;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.WORLD_LOGS_METADATA;
+import static me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR;
 
 /**
  * Repository responsible for managing and persisting world block change logs.
@@ -259,7 +258,7 @@ public class WorldLogRepository {
             int deletedRows = ctx.deleteFrom(WORLD_LOGS)
                     .where(WORLD_LOGS.REALM.eq(Core.getCurrentRealm().getId()))
                     .and(WORLD_LOGS.TIME.le(cutoff.toEpochMilli()))
-                    .limit(50000)
+                    .limit(100000)
                     .execute();
 
             log.info("Finished purging world_logs, deleted {} rows", deletedRows).submit();
