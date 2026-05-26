@@ -302,8 +302,8 @@ skills:
       enabled: true
       maxlevel: 3
       internalCooldown: 2.0
-      baseDamage: 0.8
-      damageIncreasePerLevel: 0.8
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.75
     sacrifice:
       enabled: true
       maxlevel: 3
