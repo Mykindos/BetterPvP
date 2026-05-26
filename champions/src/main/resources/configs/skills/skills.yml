@@ -104,11 +104,13 @@ skills:
       cooldownReductionPerLevel: 0.0
     excessiveforce:
       enabled: true
-      cooldown: 16.0
+      cooldown: 18.0
       maxlevel: 3
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 3.0
+      baseDuration: 2.5
       durationPerLevel: 0.5
+      baseKnockbackPercent: 0.75
+      knockbackPercentIncreasePerLevel: 0.0
     blink:
       enabled: true
       cooldown: 11.0
