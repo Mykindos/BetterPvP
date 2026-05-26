@@ -126,6 +126,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     private double maxStrengthDuration;
     private double maxStrengthDurationIncreasePerLevel;
     private double noDamageAbsorbedMessageDuration;
+    private double damageReduction;
+    private double damageReductionIncreasePerLevel;
 
     @Inject
     public VanguardsMight(Champions champions, ChampionsManager championsManager) {
@@ -145,11 +147,17 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 "While channeling, build charge",
                 "over time and by absorbing damage.",
                 "",
+                "While channeling, you take " + getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage",
+                "",
                 "Stop channeling to gain <effect>Strength</effect>",
                 "for up to " + getValueString(this::getMaxStrengthDuration, level) + " seconds.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
+    }
+
+    private double getDamageReduction(int level) {
+        return damageReduction + ((level - 1) * damageReductionIncreasePerLevel);
     }
 
     /**
@@ -356,7 +364,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.8F, 2.0F);
 
         // executes last
-        event.addModifier(new SkillDamageModifier.Multiplier(this, 0.0, -Integer.MAX_VALUE));
+        event.addModifier(new SkillDamageModifier.Multiplier(this, (1.0 - getDamageReduction(level)), -1000));
         event.setKnockback(false);
     }
 
@@ -563,6 +571,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         maxStrengthDuration = getConfig("maxStrengthDuration", 3.0, Double.class);
         maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 2.5, Double.class);
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
+        damageReduction = getConfig("damageReduction", 0.7, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
     }
 
 }
