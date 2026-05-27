@@ -83,7 +83,14 @@ public abstract sealed class ItemLoot<T> extends Loot<ItemInstance, T> permits G
 
     @Override
     public ItemView getIcon() {
-        ItemStack itemStack = this.getReward().getView().get();
+        final Core plugin = JavaPlugin.getPlugin(Core.class);
+        final ItemFactory itemFactory = plugin.getInjector().getInstance(ItemFactory.class);
+        final BaseItem baseItem = itemFactory.getItemRegistry().getItem(itemKey);
+        if (baseItem == null) {
+            throw new IllegalArgumentException("Item " + itemKey + " does not exist");
+        }
+
+        ItemStack itemStack = itemFactory.createPreview(baseItem).getView().get();
         final ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
         if(minAmount != maxAmount) {
             builder.lore(Component.empty());
