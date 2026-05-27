@@ -11,12 +11,13 @@ import org.bukkit.entity.Player;
  */
 @Getter
 @Setter
-public class FishingTreasureChanceCalculationEvent extends ProgressionFishingEvent {
+public class FishingTreasureChanceDropTableEvent extends ProgressionFishingEvent {
 
     private final Location location;
     private double treasureChance;
+    private String lootTableId = "fishing_treasure_chance";
 
-    public FishingTreasureChanceCalculationEvent(Player player, Location location, double treasureChance) {
+    public FishingTreasureChanceDropTableEvent(Player player, Location location, double treasureChance) {
         super(player);
         this.location = location;
         this.treasureChance = treasureChance;

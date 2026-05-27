@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerWoodcuttingTreasureDropEvent;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.WoodcuttingTreasureChanceDropTableEvent;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -63,11 +64,14 @@ public class WoodcuttingTreasureChanceListener implements Listener, Reloadable {
         final Location location = event.getChoppedLogBlock().getLocation();
 
         double chance = treasureChanceAttribute.getChance(player);
+        WoodcuttingTreasureChanceDropTableEvent treasureCalculationEvent = UtilServer.callEvent(new WoodcuttingTreasureChanceDropTableEvent(player, location, chance));
+        chance = treasureCalculationEvent.getTreasureChance();
+
         if (chance <= 0 || UtilMath.randDouble(0, 1) >= chance) {
             return;
         }
 
-        LootBundle bundle = rollTreasure(player, location);
+        LootBundle bundle = rollTreasure(player, location, treasureCalculationEvent.getLootTableId());
         PlayerWoodcuttingTreasureDropEvent treasureEvent = UtilServer.callEvent(new PlayerWoodcuttingTreasureDropEvent(player, location, bundle));
         if (treasureEvent.isCancelled()) {
             return;
@@ -97,9 +101,15 @@ public class WoodcuttingTreasureChanceListener implements Listener, Reloadable {
         }
     }
 
-    private LootBundle rollTreasure(Player player, Location location) {
-        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
+    private LootBundle rollTreasure(Player player, Location location, String lootTableId) {
+        LootTable lootTable = lootTableRegistry.getLoaded().get(lootTableId);
+        if (lootTable == null) {
+            lootTable = treasureLootTable;
+        }
+
+        final LootTable finalLootTable = lootTable;
+        final LootSession session = sessionController.resolve(player, finalLootTable, () -> LootSession.newSession(finalLootTable, player));
         final LootContext context = new LootContext(session, location, LootSource.of("Woodcutting", "woodcutting:treasure"));
-        return treasureLootTable.generateLoot(context);
+        return finalLootTable.generateLoot(context);
     }
 }

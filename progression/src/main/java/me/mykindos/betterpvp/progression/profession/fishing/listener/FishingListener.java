@@ -11,14 +11,12 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
-import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureChanceCalculationEvent;
+import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureChanceDropTableEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStopFishingEvent;
@@ -37,7 +35,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -308,7 +305,7 @@ public class FishingListener implements Listener {
     }
 
     @EventHandler
-    public void onTreasureDrop(FishingTreasureChanceCalculationEvent event) {
+    public void onTreasureDrop(FishingTreasureChanceDropTableEvent event) {
         if (!fishingHandler.isEnabled()) return;
         for (Bait activeBait : activeBaits.values()) {
             if (!activeBait.getType().equalsIgnoreCase("Lucky")) continue;
