@@ -30,9 +30,10 @@ public class FarmingInfoSubCommand extends ClanSubCommand {
     public FarmingInfoSubCommand(ClanManager clanManager, ClientManager clientManager, Clans clans) {
         super(clanManager, clientManager);
 
-        baseFarmingY = clans.getConfig().getInt("clans.farming.baseY");
-        baseFarmingLevels = clans.getConfig().getInt("clans.farming.baseFarmingLevels");
-        offlineGrowing = clans.getConfig().getBoolean("clans.farming.allowOfflineGrowing");
+        this.aliases.add("farminglevels");
+        baseFarmingY = clans.getConfig().getInt("clans.farming.baseY", 0);
+        baseFarmingLevels = clans.getConfig().getInt("clans.farming.baseFarmingLevels", 0);
+        offlineGrowing = clans.getConfig().getBoolean("clans.farming.allowOfflineGrowing", false);
     }
 
     @Override
