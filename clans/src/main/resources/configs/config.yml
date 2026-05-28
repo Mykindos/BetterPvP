@@ -118,6 +118,9 @@ command:
   clan:
     enabled: true
     requiredRank: PLAYER
+    farminginfo:
+      enabled: true
+      requiredRank: PLAYER
     info:
       enabled: true
       requiredRank: PLAYER

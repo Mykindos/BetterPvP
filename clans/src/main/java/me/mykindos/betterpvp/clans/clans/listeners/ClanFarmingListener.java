@@ -65,7 +65,7 @@ public class ClanFarmingListener implements Listener {
         if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
 
-            int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);
+            final int minY = ClanPerkManager.getInstance().computeFarmingLevelMinY(clan, baseFarmingY, baseFarmingLevels);
 
             if (block.getY() < minY || block.getY() > baseFarmingY) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Your clan can only cultivate between <green>%d</green> and <green>%d</green> Y.", minY, baseFarmingY);
@@ -106,7 +106,7 @@ public class ClanFarmingListener implements Listener {
         if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
 
-            int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);
+            final int minY = ClanPerkManager.getInstance().computeFarmingLevelMinY(clan, baseFarmingY, baseFarmingLevels);
 
             if (block.getY() < minY || block.getY() > baseFarmingY) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Your clan can only cultivate between <green>%d</green> and <green>%d</green> Y.", minY, baseFarmingY);
