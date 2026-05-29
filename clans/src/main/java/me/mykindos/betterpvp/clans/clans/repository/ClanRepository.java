@@ -231,6 +231,8 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void delete(Clan clan) {
+        queuedPropertyUpdates.entrySet().removeIf(entry -> entry.getKey().startsWith(clan.getId().toString()));
+
         database.getAsyncDslContext()
                 .executeAsyncVoid(ctx -> ctx.deleteFrom(CLANS)
                         .where(CLANS.ID.eq(clan.getId()))
