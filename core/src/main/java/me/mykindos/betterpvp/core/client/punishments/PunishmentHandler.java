@@ -75,26 +75,31 @@ public class PunishmentHandler {
         punishmentRepository.save(punishment);
         type.onReceive(target.getUniqueId(), punishment);
 
+        Component staffPunishMessage;
         if (time == -1) {
-            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has <green>permanently <reset>%s <yellow>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName());
+            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been <green>permanently <reset>%s.", target.getName(), type.getChatLabel());
+            staffPunishMessage = UtilMessage.deserialize("<yellow>%s<reset> was <green>permanently <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName());
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <green>permanently</green> <yellow>%s</yellow>. Reason: <red>%s",
                     type.getChatLabel(), punishment.getReason());
         } else if (time == 0) {
-            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has <reset>%s <yellow>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName());
+            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been <reset>%s.", target.getName(), type.getChatLabel());
+            staffPunishMessage = UtilMessage.deserialize("<yellow>%s<reset> was <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName());
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <yellow>%s</yellow>. Reason: <red>%s",
                     type.getChatLabel(), punishment.getReason());
         } else {
-            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has %s <yellow>%s<reset> for <green>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName(), formattedTime);
+            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been %s for <green>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime);
+            staffPunishMessage = UtilMessage.deserialize("<yellow>%s<reset> was %s for <green>%s<reset> by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime, punisher.getName());
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <yellow>%s</yellow> for <green>%s</green>. Reason: <red>%s",
                     type.getChatLabel(), formattedTime, punishment.getReason());
         }
-        log.info("{} was {} by {} for {} reason {}", target.getName(), punisher.getName(), type.getChatLabel(), formattedTime, reason)
+        clientManager.sendMessageToRank("Punish", staffPunishMessage, Rank.TRIAL_MOD);
+        log.info("{} was {} by {} for {} reason {}", target.getName(), type.getChatLabel(), punisher.getName(), formattedTime, reason)
                 .setAction("PUNISH_ADD")
                 .addClientContext(target, true)
                 .addClientContext(punisher, false)
