@@ -21,7 +21,10 @@ import org.bukkit.entity.Player;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +33,7 @@ import static me.mykindos.betterpvp.core.database.jooq.Tables.WORLD_LOGS_METADAT
 
 @CustomLog
 @SubCommand(WorldLoggerCommand.class)
-public class RollbackSubCommand extends Command {
+public class RestoreSubCommand extends Command {
 
     private final Core core;
     private final WorldLogHandler worldLogHandler;
@@ -38,7 +41,7 @@ public class RollbackSubCommand extends Command {
     private static final Pattern timePattern = Pattern.compile("(\\d+)([smhd])");
 
     @Inject
-    public RollbackSubCommand(Core core, WorldLogHandler worldLogHandler, Database database) {
+    public RestoreSubCommand(Core core, WorldLogHandler worldLogHandler, Database database) {
         this.core = core;
         this.worldLogHandler = worldLogHandler;
         this.database = database;
@@ -46,19 +49,19 @@ public class RollbackSubCommand extends Command {
 
     @Override
     public String getName() {
-        return "rollback";
+        return "restore";
     }
 
     @Override
     public String getDescription() {
-        return "Roll back block changes within a radius and time period";
+        return "Restore block changes within a radius and time period";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "World Logger", "Usage: /wl rollback radius:<radius> time:<time> [player:<player>]");
-            UtilMessage.message(player, "World Logger", "Example: /wl rollback radius:5 time:3h player:Mykindos");
+            UtilMessage.message(player, "World Logger", "Usage: /wl restore radius:<radius> time:<time> [player:<player>]");
+            UtilMessage.message(player, "World Logger", "Example: /wl restore radius:5 time:3h player:Mykindos");
             return;
         }
 
@@ -107,7 +110,7 @@ public class RollbackSubCommand extends Command {
         final int finalRadius = radius;
         final String finalTargetPlayer = targetPlayer;
 
-        UtilMessage.message(player, "World Logger", "Starting rollback process...");
+        UtilMessage.message(player, "World Logger", "Starting restore process...");
 
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             var query = ctx.selectQuery();
@@ -133,6 +136,9 @@ public class RollbackSubCommand extends Command {
             ));
             query.addConditions(WORLD_LOGS.TIME.ge(timeThreshold.getEpochSecond()));
 
+            // Order by time ascending to replay history
+            query.addOrderBy(WORLD_LOGS.TIME.asc());
+
             try {
                 List<WorldLog> worldLogs = new ArrayList<>();
                 query.fetch().forEach(worldLogRecord -> {
@@ -142,6 +148,7 @@ public class RollbackSubCommand extends Command {
                     int z = worldLogRecord.get(WORLD_LOGS.BLOCK_Z);
                     String action = worldLogRecord.get(WORLD_LOGS.ACTION);
                     String material = worldLogRecord.get(WORLD_LOGS.MATERIAL);
+                    long time = worldLogRecord.get(WORLD_LOGS.TIME);
 
                     WorldLog log = WorldLog.builder()
                             .world(world)
@@ -150,37 +157,48 @@ public class RollbackSubCommand extends Command {
                             .blockZ(z)
                             .action(WorldLogAction.valueOf(action))
                             .material(material)
+                            .time(Instant.ofEpochSecond(time))
                             .build();
                     worldLogs.add(log);
                 });
 
                 if (worldLogs.isEmpty()) {
-                    UtilMessage.message(player, "World Logger", "No blocks found to roll back.");
+                    UtilMessage.message(player, "World Logger", "No blocks found to restore.");
                     return;
                 }
 
-                // Process the rollback
-                processRollback(worldLogs);
+                // Process the restore
+                processRestore(worldLogs);
 
-                UtilMessage.message(player, "World Logger", "Rollback completed.");
+                UtilMessage.message(player, "World Logger", "Restore completed.");
 
             } catch (Exception ex) {
-                UtilMessage.simpleMessage(player, "World Logger", "Failed to rollback blocks");
-                log.error("Failed to rollback blocks", ex).submit();
+                UtilMessage.simpleMessage(player, "World Logger", "Failed to restore blocks");
+                log.error("Failed to restore blocks", ex).submit();
             }
         });
 
     }
 
-    private void processRollback(List<WorldLog> logs) {
+    private void processRestore(List<WorldLog> logs) {
+        // Group by location to only apply the latest change if multiple changes occurred at the same spot
+        // Although replaying all in order works too, taking the last state is more efficient.
+        Map<String, WorldLog> latestLogsMap = new HashMap<>();
+        for (WorldLog log : logs) {
+            String key = log.getWorld() + ":" + log.getBlockX() + ":" + log.getBlockY() + ":" + log.getBlockZ();
+            latestLogsMap.put(key, log);
+        }
+
+        List<WorldLog> latestLogs = new ArrayList<>(latestLogsMap.values());
         int blocksPerTick = 20;
+
         new org.bukkit.scheduler.BukkitRunnable() {
             private int index = 0;
 
             @Override
             public void run() {
-                for (int i = 0; i < blocksPerTick && index < logs.size(); i++) {
-                    WorldLog log = logs.get(index++);
+                for (int i = 0; i < blocksPerTick && index < latestLogs.size(); i++) {
+                    WorldLog log = latestLogs.get(index++);
                     Location location = new Location(
                             Bukkit.getWorld(log.getWorld()),
                             log.getBlockX(),
@@ -194,20 +212,21 @@ public class RollbackSubCommand extends Command {
                     }
 
                     // Process based on action type
+                    // Restore means re-applying what happened.
                     if (log.getAction().equals(WorldLogAction.BLOCK_PLACE.name())) {
-                        // If a block was placed, we remove it (set to AIR)
-                        location.getBlock().setType(Material.AIR);
-                    } else if (log.getAction().equals(WorldLogAction.BLOCK_BREAK.name())) {
-                        // If a block was broken, we restore it
+                        // If a block was placed, we place it back
                         if (log.getMaterial() != null) {
                             try {
                                 location.getBlock().setType(Material.valueOf(log.getMaterial()));
                             } catch (IllegalArgumentException ignored) {}
                         }
+                    } else if (log.getAction().equals(WorldLogAction.BLOCK_BREAK.name())) {
+                        // If a block was broken, we make it AIR (since it was broken)
+                        location.getBlock().setType(Material.AIR);
                     }
                 }
 
-                if (index >= logs.size()) {
+                if (index >= latestLogs.size()) {
                     this.cancel();
                 }
             }
