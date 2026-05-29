@@ -80,6 +80,73 @@ public class LogRepository {
         return logs;
     }
 
+    /**
+     * Queries for all UUID items whose most recent logged location falls within the given
+     * X/Z bounding box on the current realm.
+     *
+     * @param minX minimum X coordinate (inclusive)
+     * @param minZ minimum Z coordinate (inclusive)
+     * @param maxX maximum X coordinate (inclusive)
+     * @param maxZ maximum Z coordinate (inclusive)
+     * @return list of String arrays: [item_uuid, item_name, location_string]
+     */
+    public List<String[]> getUUIDItemsLastSeenInBounds(int minX, int minZ, int maxX, int maxZ) {
+        List<String[]> results = new ArrayList<>();
+
+        try {
+            DSLContext ctx = database.getDslContext();
+
+            // Use PostgreSQL DISTINCT ON to get the most recent location-bearing log per item UUID.
+            // Joins logs_context three times: once for the Item UUID, once for the Location,
+            // and once (left) for the ItemName.
+            String sql =
+                    "SELECT DISTINCT ON (lc_item.value) " +
+                    "    lc_item.value  AS item_uuid, " +
+                    "    lc_name.value  AS item_name, " +
+                    "    lc_loc.value   AS location " +
+                    "FROM logs l " +
+                    "JOIN logs_context lc_item ON lc_item.log_id = l.id AND lc_item.context = 'Item' " +
+                    "JOIN logs_context lc_loc  ON lc_loc.log_id  = l.id AND lc_loc.context  = 'Location' " +
+                    "LEFT JOIN logs_context lc_name ON lc_name.log_id = l.id AND lc_name.context = 'ItemName' " +
+                    "WHERE l.realm = ? " +
+                    "  AND l.action LIKE 'ITEM_%' " +
+                    "ORDER BY lc_item.value, l.log_time DESC";
+
+            ctx.resultQuery(sql, Core.getCurrentRealm().getId()).fetch().forEach(record -> {
+                String itemUuid = record.get("item_uuid", String.class);
+                String itemName = record.get("item_name", String.class);
+                String locationStr = record.get("location", String.class);
+
+                if (locationStr == null) return;
+
+                // Location format: "(WorldName, X, Y, Z)" from locationToString(loc, true, true)
+                try {
+                    String cleaned = locationStr.replaceAll("[)(]", "").trim();
+                    String[] parts = cleaned.split(",\\s*");
+                    if (parts.length < 4) return;
+
+                    int x = (int) Math.round(Double.parseDouble(parts[1].trim()));
+                    int z = (int) Math.round(Double.parseDouble(parts[3].trim()));
+
+                    int normalMinX = Math.min(minX, maxX);
+                    int normalMaxX = Math.max(minX, maxX);
+                    int normalMinZ = Math.min(minZ, maxZ);
+                    int normalMaxZ = Math.max(minZ, maxZ);
+
+                    if (x >= normalMinX && x <= normalMaxX && z >= normalMinZ && z <= normalMaxZ) {
+                        results.add(new String[]{itemUuid, itemName != null ? itemName : "unknown", locationStr});
+                    }
+                } catch (NumberFormatException ignored) {
+                    // skip malformed location entries
+                }
+            });
+        } catch (Exception e) {
+            log.error("Error fetching UUID items last seen in bounds", e).submit();
+        }
+
+        return results;
+    }
+
     public void purgeLogs(int days, int limit) {
 
         long daysToMillis = days * (24L * 60L * 60L * 1000L);
