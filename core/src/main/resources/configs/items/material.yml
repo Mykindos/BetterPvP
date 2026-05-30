@@ -1,0 +1,49 @@
+scorching_rune:
+  fire-chance: 0.3
+  fire-duration: 2.5
+flameguard_rune:
+  mitigation: 0.2
+recovery_rune:
+  increment: 0.3
+attraction_rune:
+  speed: 4.0
+  range: 5.0
+wanderer_rune:
+  speed: 0.3
+stonecaller_rune:
+  percent: 0.15
+hookmaster_rune:
+  percent: 0.15
+forestwright_rune:
+  percent: 0.15
+ferocity_rune:
+  chance: 0.15 # 0.3
+  delayReduction: 0.4 # 0.6
+  delay: 0.15
+greed_rune:
+  percentageBonus: 0.1
+detonation_rune:
+  damage: 5.0
+  radius: 3.0
+momentum_rune:
+  scalar: 0.05 # 0.15
+  expirySeconds: 1.0
+  maximumReduction: 0.3 # 0.75
+vampirism_rune:
+  healing: 3.0
+brutality_rune:
+  chance: 0.2
+  scalar: 0.3
+  damageIncrease: 1.0
+essence_rune:
+  energy: 10.0
+slayer_rune:
+  damage: 3.0
+flawless_diamond:
+  cooldownReduction: 33.0
+flawless_emerald:
+  damageIncrease: 20.0
+flawless_ruby:
+  healthModifier: 5.0
+flawless_sapphire:
+  energyModifier: 25.0

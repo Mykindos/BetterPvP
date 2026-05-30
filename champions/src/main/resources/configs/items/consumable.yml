@@ -1,0 +1,32 @@
+rabbit_stew:
+  duration: 7.0
+  cooldown: 10.0
+  level: 1
+purification_potion:
+  duration: 1.5
+  cooldown: 10.0
+energy_elixir:
+  energyRegen: 100.0
+  cooldown: 12.0
+energy_apple:
+  energy: 50.0
+  cooldown: 7.0
+mushroom_stew:
+  duration: 5.0
+  cooldown: 8.0
+  level: 2
+suspicious_stew:
+  duration: 5.0
+  cooldown: 8.0
+portable_brute_selector:
+  cast-time: 2.0
+portable_assassin_selector:
+  cast-time: 2.0
+portable_warlock_selector:
+  cast-time: 2.0
+portable_mage_selector:
+  cast-time: 2.0
+portable_ranger_selector:
+  cast-time: 2.0
+portable_knight_selector:
+  cast-time: 2.0
