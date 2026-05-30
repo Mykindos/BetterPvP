@@ -1,0 +1,6 @@
+oreburst_charge:
+  cooldown: 25.0
+  throwable-expiry: 10.0
+  throw-speed: 1.6
+  radius: 4
+  ore-chance: 0.15

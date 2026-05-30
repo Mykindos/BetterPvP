@@ -1,0 +1,27 @@
+cannon:
+  health: 200.0
+  size: 1.0
+  fuse-seconds: 2.5
+  shoot-cooldown: 15.0
+  spawn-cooldown: 30.0
+  block-collision-explode: true
+  cannonball-alive-seconds: 2.0
+  cannonball-damage: 15.0
+  cannonball-damage-max-radius: 4.0
+  cannonball-damage-min-radius: 1.0
+  cannonball-min-damage: 4.0
+  cannonball-velocity-strengh: 1.3
+  entity-collision-explode: true
+  cooldown: 15.0
+booster_sword:
+  durability: 32
+rustic_sword:
+  durability: 59
+ancient_sword:
+  durability: 2031
+crude_sword:
+  durability: 131
+standard_sword:
+  durability: 250
+power_sword:
+  durability: 1561
