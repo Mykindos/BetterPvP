@@ -22,6 +22,9 @@ public class PostgresDatabaseConnection implements IDatabaseConnection {
     public PostgresDatabaseConnection(Core core) {
         this.core = core;
         configureHikari("core.database.global");
+        // Run core migrations immediately so the schema exists before any other beans
+        // (e.g. PropertyMapper) attempt to query the database during Guice injection.
+        runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/postgres/", "global");
     }
 
     private void configureHikari(String configPath) {
