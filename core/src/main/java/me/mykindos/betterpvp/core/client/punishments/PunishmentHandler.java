@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,10 +56,20 @@ public class PunishmentHandler {
 
     public void punish(Client punisher, Client target, String reason, Rule rule) {
         KeyValue<IPunishmentType, Long> punishInfo = rule.getPunishmentForClient(target);
-        IPunishmentType type = punishInfo.getKey();
-        long time = punishInfo.getValue();
+        applyPunishment(punisher, target, reason, punishInfo.getKey(), punishInfo.getValue(), rule);
+    }
 
-        String formattedTime = UtilTime.getTime(time, 1);
+    public void punish(Client target, String reason, IPunishmentType type, long duration) {
+        applyPunishment(null, target, reason, type, duration, ruleManager.getObject("CUSTOM").orElseThrow());
+    }
+
+    public void punish(@Nullable Client punisher, Client target, String reason, IPunishmentType type, long duration) {
+        applyPunishment(punisher, target, reason, type, duration, ruleManager.getObject("CUSTOM").orElseThrow());
+    }
+
+    private void applyPunishment(@Nullable Client punisher, Client target, String reason, IPunishmentType type, long duration, Rule rule) {
+        long expiryTime = duration < 0 ? -1 : System.currentTimeMillis() + duration;
+        String formattedTime = UtilTime.getTime(duration, 1);
 
         Punishment punishment = new Punishment(
                 SnowflakeIdGenerator.ID_GENERATOR.nextId(),
@@ -67,43 +78,57 @@ public class PunishmentHandler {
                 type,
                 rule,
                 System.currentTimeMillis(),
-                time < 0 ? -1 : System.currentTimeMillis() + time,
+                expiryTime,
                 reason,
-                punisher.getUniqueId()
+                punisher != null ? punisher.getUniqueId() : null
         );
         target.getPunishments().add(punishment);
         punishmentRepository.save(punishment);
         type.onReceive(target.getUniqueId(), punishment);
 
         Component staffPunishMessage;
-        if (time == -1) {
+        if (duration == -1) {
             UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been <green>permanently <reset>%s.", target.getName(), type.getChatLabel());
-            staffPunishMessage = UtilMessage.deserialize("<yellow>%s<reset> was <green>permanently <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName());
+            staffPunishMessage = punisher != null
+                    ? UtilMessage.deserialize("<yellow>%s<reset> was <green>permanently <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName())
+                    : UtilMessage.deserialize("<yellow>%s<reset> was <green>permanently <reset>%s by <yellow>Server<reset>.", target.getName(), type.getChatLabel());
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <green>permanently</green> <yellow>%s</yellow>. Reason: <red>%s",
                     type.getChatLabel(), punishment.getReason());
-        } else if (time == 0) {
+        } else if (duration == 0) {
             UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been <reset>%s.", target.getName(), type.getChatLabel());
-            staffPunishMessage = UtilMessage.deserialize("<yellow>%s<reset> was <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName());
+            staffPunishMessage = punisher != null
+                    ? UtilMessage.deserialize("<yellow>%s<reset> was <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName())
+                    : UtilMessage.deserialize("<yellow>%s<reset> was <reset>%s by <yellow>Server<reset>.", target.getName(), type.getChatLabel());
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <yellow>%s</yellow>. Reason: <red>%s",
                     type.getChatLabel(), punishment.getReason());
         } else {
             UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been %s for <green>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime);
-            staffPunishMessage = UtilMessage.deserialize("<yellow>%s<reset> was %s for <green>%s<reset> by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime, punisher.getName());
+            staffPunishMessage = punisher != null
+                    ? UtilMessage.deserialize("<yellow>%s<reset> was %s for <green>%s<reset> by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime, punisher.getName())
+                    : UtilMessage.deserialize("<yellow>%s<reset> was %s for <green>%s<reset> by <yellow>Server<reset>.", target.getName(), type.getChatLabel(), formattedTime);
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <yellow>%s</yellow> for <green>%s</green>. Reason: <red>%s",
                     type.getChatLabel(), formattedTime, punishment.getReason());
         }
         clientManager.sendMessageToRank("Punish", staffPunishMessage, Rank.TRIAL_MOD);
-        log.info("{} was {} by {} for {} reason {}", target.getName(), type.getChatLabel(), punisher.getName(), formattedTime, reason)
-                .setAction("PUNISH_ADD")
-                .addClientContext(target, true)
-                .addClientContext(punisher, false)
-                .submit();
+
+        if (punisher != null) {
+            log.info("{} was {} by {} for {} reason {}", target.getName(), type.getChatLabel(), punisher.getName(), formattedTime, reason)
+                    .setAction("PUNISH_ADD")
+                    .addClientContext(target, true)
+                    .addClientContext(punisher, false)
+                    .submit();
+        } else {
+            log.info("{} was {} by Server for {} reason {}", target.getName(), type.getChatLabel(), formattedTime, reason)
+                    .setAction("PUNISH_ADD")
+                    .addClientContext(target, true)
+                    .submit();
+        }
 
         if (!reason.isEmpty()) {
             Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());

@@ -1,0 +1,30 @@
+package me.mykindos.betterpvp.progression.booster.item;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
+import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
+import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.progression.booster.BoosterManager;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+@Singleton
+@ItemKey("progression:profession_exp_booster_one_hour")
+public class ProfessionExpBoosterOneHour extends BaseItem {
+
+    @Inject
+    public ProfessionExpBoosterOneHour(BoosterManager boosterManager) {
+        super("One Hour Profession Experience Booster", ItemStack.of(Material.EXPERIENCE_BOTTLE), ItemGroup.CONSUMABLE, ItemRarity.EPIC);
+        
+        // 1 hours = 60 * 60 * 1000
+        long durationMillis = 60L * 60L * 1000L;
+        
+        addBaseComponent(InteractionContainerComponent.builder()
+                .root(InteractionInputs.RIGHT_CLICK, new BoosterInteraction(boosterManager, durationMillis))
+                .build());
+    }
+}
