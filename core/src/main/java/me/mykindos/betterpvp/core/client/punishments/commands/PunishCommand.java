@@ -11,18 +11,19 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 
 @Singleton
 public class PunishCommand extends Command {
 
+    private final Core core;
     private final ClientManager clientManager;
     private final PunishmentHandler punishmentHandler;
 
     @Inject
-    public PunishCommand(ClientManager clientManager, PunishmentHandler punishmentHandler) {
+    public PunishCommand(Core core, ClientManager clientManager, PunishmentHandler punishmentHandler) {
+        this.core = core;
         this.clientManager = clientManager;
         this.punishmentHandler = punishmentHandler;
     }
@@ -60,15 +61,13 @@ public class PunishCommand extends Command {
                     String.join(" ", Arrays.copyOfRange(args, 1, args.length)),
                     punishmentHandler,
                     null);
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                punishmentMenu.show(player);
-            });
+            UtilServer.runTask(core, () -> punishmentMenu.show(player));
         });
 
     }
 
     @Override
     public String getArgumentType(int argCount) {
-            return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+        return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
     }
 }

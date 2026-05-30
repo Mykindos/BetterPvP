@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.punishments.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -13,18 +14,19 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Singleton
+@CustomLog
 public class PlayerPunishmentHistoryCommand extends Command {
+    private final Core core;
     private final PunishmentHandler punishmentHandler;
 
     @Inject
-    public PlayerPunishmentHistoryCommand(PunishmentHandler punishmentHandler) {
+    public PlayerPunishmentHistoryCommand(Core core, PunishmentHandler punishmentHandler) {
+        this.core = core;
         this.punishmentHandler = punishmentHandler;
         aliases.addAll(List.of(
                 "punishhistory",
@@ -44,53 +46,55 @@ public class PlayerPunishmentHistoryCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-
-
-        if (args.length >= 1 && client.hasRank(Rank.TRIAL_MOD)) {
-            punishmentHandler.getClientManager().search().offline(args[0]).thenAcceptAsync(clientOptional -> {
-                clientOptional.ifPresent(target -> {
-                    List<Item> items = target.getPunishments().stream()
-                            .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
-                            .sorted(Comparator.comparing(Punishment::isActive).reversed())
-                            .map(punishment -> new PunishmentItem(
-                                    punishment,
-                                    punishmentHandler,
-                                    punishmentHandler.getClientManager().search().offline(punishment.getPunisher()).join().map(Client::getName).orElse(null),
-                                    punishmentHandler.getClientManager().search().offline(punishment.getRevoker()).join().map(Client::getName).orElse(null),
-                                    client.hasRank(Rank.TRIAL_MOD),
-                                    punishment.getRevokeReason(),
-                                    null))
-                            .map(Item.class::cast).toList();
-                    ViewCollectionMenu viewCollectionMenu = new ViewCollectionMenu(target.getName() + "'s Punish History", items, null);
-                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                        viewCollectionMenu.show(player);
-                    });
+        try {
+            if (args.length >= 1 && client.hasRank(Rank.TRIAL_MOD)) {
+                punishmentHandler.getClientManager().search().offline(args[0]).thenAcceptAsync(clientOptional -> {
+                    try {
+                        clientOptional.ifPresent(target -> {
+                            List<Item> items = target.getPunishments().stream()
+                                    .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
+                                    .sorted(Comparator.comparing(Punishment::isActive).reversed())
+                                    .map(punishment -> new PunishmentItem(
+                                            punishment,
+                                            punishmentHandler,
+                                            punishmentHandler.getClientManager().search().offline(punishment.getPunisher()).join().map(Client::getName).orElse(null),
+                                            punishmentHandler.getClientManager().search().offline(punishment.getRevoker()).join().map(Client::getName).orElse(null),
+                                            client.hasRank(Rank.TRIAL_MOD),
+                                            punishment.getRevokeReason(),
+                                            null))
+                                    .map(Item.class::cast).toList();
+                            ViewCollectionMenu viewCollectionMenu = new ViewCollectionMenu(target.getName() + "'s Punish History", items, null);
+                            UtilServer.runTask(core, () -> viewCollectionMenu.show(player));
+                        });
+                    } catch (Exception e) {
+                        log.error("Failed to display punishment history for {}", args[0], e).submit();
+                    }
                 });
-            });
-        } else {
-            CompletableFuture.runAsync(() -> {
-                    List<Item> items = client.getPunishments().stream()
-                            .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
-                            .sorted(Comparator.comparing(Punishment::isActive).reversed())
-                            .map(punishment -> new PunishmentItem(
-                                    punishment,
-                                    punishmentHandler,
-                                    punishmentHandler.getClientManager().search().offline(punishment.getPunisher()).join().map(Client::getName).orElse(null),
-                                    punishmentHandler.getClientManager().search().offline(punishment.getRevoker()).join().map(Client::getName).orElse(null),
-                                    client.hasRank(Rank.TRIAL_MOD),
-                                    punishment.getRevokeReason(),
-                                    null))
-                            .map(Item.class::cast).toList();
-                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                        new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);
-                    });
-            }).exceptionally(ex -> {
-                ex.printStackTrace();
-                return null;
-            });
-
+            } else {
+                UtilServer.runTaskAsync(core, () -> {
+                    try {
+                        boolean isStaff = client.hasRank(Rank.TRIAL_MOD);
+                        List<Item> items = client.getPunishments().stream()
+                                .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
+                                .sorted(Comparator.comparing(Punishment::isActive).reversed())
+                                .map(punishment -> new PunishmentItem(
+                                        punishment,
+                                        punishmentHandler,
+                                        isStaff ? punishmentHandler.getClientManager().search().offline(punishment.getPunisher()).join().map(Client::getName).orElse(null) : null,
+                                        isStaff ? punishmentHandler.getClientManager().search().offline(punishment.getRevoker()).join().map(Client::getName).orElse(null) : null,
+                                        isStaff,
+                                        punishment.getRevokeReason(),
+                                        null))
+                                .map(Item.class::cast).toList();
+                        UtilServer.runTask(core, () -> new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player));
+                    } catch (Exception e) {
+                        log.error("Failed to display punishment history for {}", client.getName(), e).submit();
+                    }
+                });
+            }
+        } catch (Exception e) {
+            log.error("Failed to execute punishment history command for {}", player.getName(), e).submit();
         }
-
 
     }
 }
