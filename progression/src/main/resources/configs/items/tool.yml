@@ -1,0 +1,64 @@
+sharkbait:
+  catchSpeedMultiplier: 0.7
+  radius: 6.0
+  durability: 2000
+speedy_bait:
+  radius: 5.0
+  multiplier: 1.5
+  duration: 180
+lucky_bait:
+  radius: 5.0
+  multiplier: 0.3
+  duration: 180
+event_bait:
+  radius: 5.0
+  multiplier: 1.0
+  duration: 180
+runed_pickaxe:
+  instantMine:
+    cooldown: 20.0
+    duration: 7.0
+  durability:
+    max-damage: 20480
+the_rift:
+  excavation:
+    radius: 2
+    trigger-chance: 0.3
+    ore-chance: 0.05
+  chain-throw:
+    cooldown: 15.0
+    alive-time: 4.0
+    speed: 1.4
+    explosion-interval: 0.3
+    explosion-radius: 2
+    ore-chance: 0.05
+    max-bounces: 10
+    allow-recall: true
+  ore-weights:
+    minecraft:coal_ore: 30.0
+    minecraft:iron_ore: 30.0
+    minecraft:copper_ore: 30.0
+    minecraft:gold_ore: 30.0
+    minecraft:redstone_ore: 30.0
+    minecraft:lapis_ore: 30.0
+    minecraft:diamond_ore: 30.0
+  durability:
+    max-damage: 20480
+deep_resonator:
+  vein-echo:
+    duration: 10.0
+    ore-respawn-chance: 0.5
+    ore-respawn-bonus-stacks: 1
+    max-stacks: 20
+    speed-per-stack: 30
+  durability:
+    max-damage: 20480
+oreburst_charge:
+  ore-weights:
+    minecraft:coal_ore: 30.0
+    minecraft:iron_ore: 30.0
+    minecraft:copper_ore: 30.0
+    minecraft:gold_ore: 20.0
+    minecraft:redstone_ore: 20.0
+    minecraft:lapis_ore: 15.0
+    minecraft:diamond_ore: 5.0
