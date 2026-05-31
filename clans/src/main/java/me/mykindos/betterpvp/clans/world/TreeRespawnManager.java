@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Queue;
@@ -81,8 +82,16 @@ public class TreeRespawnManager {
     // Queue state
     // -----------------------------------------------------------------------
 
+    /**
+     * Pairs a pre-computed chunk key with a weak reference to the chunk so that
+     * (a) the queue never prevents an unloaded chunk from being garbage-collected,
+     * and (b) the key can still be removed from {@link #queuedChunkKeys} even after
+     * the referent has been collected.
+     */
+    private record ChunkRef(long key, WeakReference<Chunk> ref) {}
+
     /** Chunks waiting to be evaluated for tree respawn. */
-    private final Queue<Chunk> pendingChunks = new ArrayDeque<>();
+    private final Queue<ChunkRef> pendingChunks = new ArrayDeque<>();
 
     /** Tracks the keys of chunks currently in {@link #pendingChunks} for O(1) dedup. */
     private final Set<Long> queuedChunkKeys = new HashSet<>();
@@ -124,7 +133,7 @@ public class TreeRespawnManager {
         if (clanManager.getClanByChunk(chunk).isPresent()) return;
 
         queuedChunkKeys.add(key);
-        pendingChunks.offer(chunk);
+        pendingChunks.offer(new ChunkRef(key, new WeakReference<>(chunk)));
     }
 
     /**
@@ -134,10 +143,15 @@ public class TreeRespawnManager {
     public void processNext() {
         if (!enabled) return;
 
-        Chunk chunk = pendingChunks.poll();
-        if (chunk == null) return;
+        ChunkRef entry = pendingChunks.poll();
+        if (entry == null) return;
 
-        queuedChunkKeys.remove(chunkKey(chunk));
+        // Always remove the key first so the slot is freed regardless of GC state
+        queuedChunkKeys.remove(entry.key());
+
+        Chunk chunk = entry.ref().get();
+        if (chunk == null) return; // chunk was unloaded and GC'd while queued
+
         processChunk(chunk);
     }
 
