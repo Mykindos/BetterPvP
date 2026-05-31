@@ -30,8 +30,8 @@ alligators_tooth:
     base: 7.0
     min: 6.0
     max: 8.0
-  velocityStrength: 0.7
-  energyPerTick: 1.0
+  velocityStrength: 0.8
+  energyPerTick: 0.33
   skimmingEnergyMultiplier: 3.0
   bonusDamage: 4.0
   durability: 3072
@@ -45,7 +45,7 @@ giants_broadsword:
     min: 8.0
     max: 10.0
   regenAmplifier: 5
-  energyPerTick: 2.2
+  energyPerTick: 2.5
   durability: 3072
   attack_speed:
     min: -0.25
@@ -102,7 +102,7 @@ thunderclap_aegis:
   maxChargeTicks: 60
   energyOnCollide: 25.0
   chargeDamage: 7.0
-  energyPerTick: 1.0
+  energyPerTick: 0.5
   durability: 3072
   attack_speed:
     min: -0.25
@@ -113,15 +113,15 @@ meridian_scepter:
     base: 0.0
     min: 0.0
     max: 0.0
-  blackHoleRadius: 0.5
-  blackHoleSpeed: 40.0
-  blackHoleHitbox: 0.5
-  blackHolePullStrength: 0.12
-  blackHolePullRadius: 3.5
-  blackHoleAliveSeconds: 1.3
-  blackHoleExpandSeconds: 0.75
-  blackHoleTravelSeconds: 2.0
-  blackHoleCooldown: 10.0
+  healingNovaRadius: 1.5
+  healingNovaSpeed: 3.0
+  healingNovaHitbox: 0.5
+  healingNovaHealRadius: 7.0
+  healingNovaAliveSeconds: 1.3
+  healingNovaExpandSeconds: 0.75
+  healingNovaTravelSeconds: 2.0
+  healingNovaCooldown: 10.0
+  healingNovaHealAmount: 12.0
   beamCooldown: 1.0
   beamDamage: 4.0
   beamSpeed: 70.0

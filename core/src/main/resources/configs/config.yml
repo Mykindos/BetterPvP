@@ -320,12 +320,12 @@ tab:
   shop: /store
 energy:
   nerf-energy-regen: false
-  consumption-regen-delay: 1.0
+  consumption-regen-delay: 0.5
   max-energy: 150.0
   energy-per-tick: 10.0
   energy-per-tick-nerfed: 4.0
   update-rate: 50
-  energy-per-second: 10.0
+  energy-per-second: 15.0
 combat:
   crit-arrows: false
 server:

@@ -1270,8 +1270,8 @@ skills:
     fastrecovery:
       enabled: true
       maxlevel: 3
-      percentagePerLevel: 0.1
-      basePercentage: 0.15
+      percentagePerLevel: 0.05
+      basePercentage: 0.1
     resistance:
       enabled: true
       maxlevel: 3
@@ -1294,5 +1294,5 @@ skills:
     energypool:
       enabled: true
       maxlevel: 3
-      baseEnergyPoolIncrease: 20.0
-      energyPoolIncreasePerLevel: 10.0
+      baseEnergyPoolIncrease: 30.0
+      energyPoolIncreasePerLevel: 15.0

@@ -19,7 +19,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -46,8 +45,8 @@ public class GatorStrokeAbility extends AbstractInteraction implements Displayed
         this.energyService = energyService;
 
         // Default values, will be overridden by config
-        this.velocityStrength = 0.7;
-        this.energyPerTick = 1.0;
+        this.velocityStrength = 0.8;
+        this.energyPerTick = 0.33;
         this.skimmingEnergyMultiplier = 3.0;
     }
 
@@ -73,7 +72,7 @@ public class GatorStrokeAbility extends AbstractInteraction implements Displayed
         }
 
         double energyToUse = energyPerTick;
-        if (!UtilBlock.isWater(player.getEyeLocation().getBlock().getRelative(BlockFace.DOWN))) {
+        if (!UtilBlock.isWater(player.getEyeLocation().getBlock())) {
             energyToUse *= skimmingEnergyMultiplier;
         }
 
