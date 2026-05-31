@@ -44,6 +44,7 @@ import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
 import me.mykindos.betterpvp.core.server.Server;
 import me.mykindos.betterpvp.core.sound.SoundManager;
+import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.OrientedVector;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
@@ -147,7 +148,6 @@ public class Core extends BPvPPlugin {
         var uuidManager = injector.getInstance(UUIDManager.class);
         uuidManager.loadObjectsFromNamespace("core");
 
-
         try {
             scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(this);
         } catch (NoPacketAdapterAvailableException e) {
@@ -184,7 +184,7 @@ public class Core extends BPvPPlugin {
         final Season season = database.getOrCreateSeason(currentSeason, seasonName);
         int realmId = database.getRealmId(server.getId(), currentSeason);
         setCurrentRealm(new Realm(realmId, server, season));
-        me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator.ID_GENERATOR.updateIds();
+        SnowflakeIdGenerator.ID_GENERATOR.updateIds();
     }
 
     @Override
@@ -195,7 +195,7 @@ public class Core extends BPvPPlugin {
         log.info("Sound manager shut down").submit();
 
         injector.getInstance(SmartBlockDataManager.class).saveWorlds().join();
-        log.info("Saved all cust0om blocks").submit();
+        log.info("Saved all custom blocks").submit();
 
         clientManager.processPropertyUpdates(false);
         log.info("Processed all pending stat updates and shut down client manager").submit();

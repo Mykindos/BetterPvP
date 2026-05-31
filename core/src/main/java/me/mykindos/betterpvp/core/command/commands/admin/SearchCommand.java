@@ -41,7 +41,7 @@ public class SearchCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>Usage: /search <item|player|location|online></green>"));
+        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>Usage: /search <item|player|online></green>"));
     }
 
     @Singleton
@@ -175,85 +175,6 @@ public class SearchCommand extends Command {
             if (argCount == 1) {
                 return ArgumentType.PLAYER.name();
             }
-            return ArgumentType.NONE.name();
-        }
-    }
-
-    @Singleton
-    @SubCommand(SearchCommand.class)
-    public static class SearchLocationSubCommand extends Command {
-
-        private final LogRepository logRepository;
-
-        @Inject
-        public SearchLocationSubCommand(LogRepository logRepository) {
-            this.logRepository = logRepository;
-        }
-
-        @Override
-        public String getName() {
-            return "location";
-        }
-
-        @Override
-        public String getDescription() {
-            return "Find all UUID items whose last known location falls within the given X/Z bounds";
-        }
-
-        public Component getUsage() {
-            return UtilMessage.deserialize("<green>Usage: /search location <minX> <minZ> <maxX> <maxZ>");
-        }
-
-        @Override
-        public void execute(Player player, Client client, String... args) {
-            if (args.length < 4) {
-                UtilMessage.message(player, "Search", getUsage());
-                return;
-            }
-
-            int minX, minZ, maxX, maxZ;
-            try {
-                minX = Integer.parseInt(args[0]);
-                minZ = Integer.parseInt(args[1]);
-                maxX = Integer.parseInt(args[2]);
-                maxZ = Integer.parseInt(args[3]);
-            } catch (NumberFormatException e) {
-                UtilMessage.message(player, "Search", UtilMessage.deserialize("<red>All coordinates must be integers."));
-                return;
-            }
-
-            UtilMessage.message(player, "Search", UtilMessage.deserialize(
-                    "<yellow>Searching for UUID items last seen in bounds [%d, %d] to [%d, %d]...</yellow>",
-                    minX, minZ, maxX, maxZ));
-
-            final int fMinX = minX, fMinZ = minZ, fMaxX = maxX, fMaxZ = maxZ;
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                List<String[]> found = logRepository.getUUIDItemsLastSeenInBounds(fMinX, fMinZ, fMaxX, fMaxZ);
-
-                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                    if (found.isEmpty()) {
-                        UtilMessage.message(player, "Search", "No UUID items found last seen in the specified location bounds.");
-                        return;
-                    }
-
-                    UtilMessage.message(player, "Search", UtilMessage.deserialize(
-                            "<yellow>Found <green>%d</green> UUID item(s) last seen in bounds [%d, %d] to [%d, %d]:</yellow>",
-                            found.size(), fMinX, fMinZ, fMaxX, fMaxZ));
-
-                    for (String[] entry : found) {
-                        String uuid     = entry[0];
-                        String itemName = entry[1];
-                        String location = entry[2];
-                        UtilMessage.message(player, "Search", UtilMessage.deserialize(
-                                "(<light_purple>%s</light_purple>) <green>%s</green> <white>@ %s</white>",
-                                uuid, itemName, location));
-                    }
-                });
-            });
-        }
-
-        @Override
-        public String getArgumentType(int argCount) {
             return ArgumentType.NONE.name();
         }
     }
