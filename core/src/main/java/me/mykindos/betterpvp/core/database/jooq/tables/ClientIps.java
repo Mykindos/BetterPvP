@@ -4,16 +4,10 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.Clients.ClientsPath;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.ClientIpsRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -35,6 +29,11 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -81,7 +80,7 @@ public class ClientIps extends TableImpl<ClientIpsRecord> {
     /**
      * The column <code>public.client_ips.last_seen</code>.
      */
-    public final TableField<ClientIpsRecord, Long> LAST_SEEN = createField(DSL.name("last_seen"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<ClientIpsRecord, Long> LAST_SEEN = createField(DSL.name("last_seen"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.field(DSL.raw("EXTRACT(epoch FROM now())"), SQLDataType.BIGINT)), this, "");
 
     private ClientIps(Name alias, Table<ClientIpsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

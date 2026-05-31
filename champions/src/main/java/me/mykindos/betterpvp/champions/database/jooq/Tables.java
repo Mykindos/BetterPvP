@@ -16,6 +16,9 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKdrByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKillsByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKillstreakByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopRatingByClass;
+import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRoleMatchupSnapshot;
+import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRolePlaytimeSnapshot;
+import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaSkillKdrSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetChampionsDataRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopDeathsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopHighestKillstreakByClassRecord;
@@ -23,7 +26,6 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKdrByC
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillstreakByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopRatingByClassRecord;
-
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -410,4 +412,19 @@ public class Tables {
             classParam
         );
     }
+
+    /**
+     * The table <code>public.grafana_role_matchup_snapshot</code>.
+     */
+    public static final GrafanaRoleMatchupSnapshot GRAFANA_ROLE_MATCHUP_SNAPSHOT = GrafanaRoleMatchupSnapshot.GRAFANA_ROLE_MATCHUP_SNAPSHOT;
+
+    /**
+     * The table <code>public.grafana_role_playtime_snapshot</code>.
+     */
+    public static final GrafanaRolePlaytimeSnapshot GRAFANA_ROLE_PLAYTIME_SNAPSHOT = GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT;
+
+    /**
+     * The table <code>public.grafana_skill_kdr_snapshot</code>.
+     */
+    public static final GrafanaSkillKdrSnapshot GRAFANA_SKILL_KDR_SNAPSHOT = GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT;
 }

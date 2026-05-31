@@ -7,6 +7,10 @@ import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
+
+import static me.mykindos.betterpvp.core.database.jooq.Tables.GRAFANA_CONFIG;
 
 /**
  * Core infrastructure for syncing YAML game-configuration values into the
@@ -97,13 +101,16 @@ public class GrafanaConfigSyncService {
     // -------------------------------------------------------------------------
 
     private void upsert(DSLContext ctx, String plugin, String configFile, String configKey, String configValue) {
-        ctx.execute("""
-                INSERT INTO grafana_config (plugin, config_file, config_key, config_value, updated_at)
-                VALUES (?, ?, ?, ?, NOW())
-                ON CONFLICT (plugin, config_file, config_key) DO UPDATE SET
-                    config_value = EXCLUDED.config_value,
-                    updated_at   = NOW()
-                """,
-                plugin, configFile, configKey, configValue);
+        ctx.insertInto(GRAFANA_CONFIG)
+                .set(GRAFANA_CONFIG.PLUGIN, plugin)
+                .set(GRAFANA_CONFIG.CONFIG_FILE, configFile)
+                .set(GRAFANA_CONFIG.CONFIG_KEY, configKey)
+                .set(GRAFANA_CONFIG.CONFIG_VALUE, configValue)
+                .set(GRAFANA_CONFIG.UPDATED_AT, DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE))
+                .onConflict(GRAFANA_CONFIG.PLUGIN, GRAFANA_CONFIG.CONFIG_FILE, GRAFANA_CONFIG.CONFIG_KEY)
+                .doUpdate()
+                .set(GRAFANA_CONFIG.CONFIG_VALUE, configValue)
+                .set(GRAFANA_CONFIG.UPDATED_AT, DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE))
+                .execute();
     }
 }

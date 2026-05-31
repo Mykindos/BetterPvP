@@ -4,7 +4,20 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
+import org.jooq.CommonTableExpression;
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
+
+import java.math.BigDecimal;
+
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLS;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GRAFANA_ROLE_MATCHUP_SNAPSHOT;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GRAFANA_ROLE_PLAYTIME_SNAPSHOT;
+import static me.mykindos.betterpvp.champions.database.jooq.Tables.GRAFANA_SKILL_KDR_SNAPSHOT;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_STATS;
+import static me.mykindos.betterpvp.core.database.jooq.Tables.KILLS;
 
 /**
  * Periodically snapshots Champions analytics data into dedicated Grafana tables.
@@ -50,155 +63,204 @@ public class GrafanaSnapshotRepository {
     // -------------------------------------------------------------------------
 
     private void takeRoleMatchupSnapshot(DSLContext ctx, int realmId) {
-        ctx.execute("""
-                WITH matchup_kills AS (
-                    SELECT
-                        ck.killer_class AS attacker,
-                        ck.victim_class AS defender,
-                        COUNT(*)        AS kills
-                    FROM kills k
-                    JOIN champions_kills ck ON k.id = ck.kill_id
-                    WHERE k.realm  = ?
-                      AND k.valid  = TRUE
-                      AND ck.killer_class <> ''
-                      AND ck.victim_class <> ''
-                    GROUP BY ck.killer_class, ck.victim_class
-                )
-                INSERT INTO grafana_role_matchup_snapshot
-                    (realm, captured_at, role, vs_role, kills, deaths, kdr)
-                SELECT
-                    ?::integer,
-                    NOW(),
-                    a.attacker,
-                    a.defender,
-                    a.kills,
-                    COALESCE(b.kills, 0),
-                    CASE
-                        WHEN COALESCE(b.kills, 0) = 0 THEN a.kills::NUMERIC
-                        ELSE ROUND(a.kills::NUMERIC / b.kills, 2)
-                    END
-                FROM matchup_kills a
-                LEFT JOIN matchup_kills b
-                    ON a.attacker = b.defender
-                   AND a.defender = b.attacker
-                """,
-                realmId, realmId);
+        // CTE: per (killer_class, victim_class) pair, count valid kills
+        CommonTableExpression<?> matchupKills = DSL.name("matchup_kills")
+                .fields("attacker", "defender", "kills")
+                .as(ctx.select(
+                                CHAMPIONS_KILLS.KILLER_CLASS,
+                                CHAMPIONS_KILLS.VICTIM_CLASS,
+                                DSL.count().cast(Long.class))
+                        .from(KILLS)
+                        .join(CHAMPIONS_KILLS).on(KILLS.ID.eq(CHAMPIONS_KILLS.KILL_ID))
+                        .where(KILLS.REALM.eq(realmId))
+                        .and(KILLS.VALID.isTrue())
+                        .and(CHAMPIONS_KILLS.KILLER_CLASS.ne(""))
+                        .and(CHAMPIONS_KILLS.VICTIM_CLASS.ne(""))
+                        .groupBy(CHAMPIONS_KILLS.KILLER_CLASS, CHAMPIONS_KILLS.VICTIM_CLASS));
+
+        // Reference the CTE twice for the self-join (a = attacker side, b = defender side)
+        var a = DSL.table(DSL.name("matchup_kills")).as("a");
+        var b = DSL.table(DSL.name("matchup_kills")).as("b");
+
+        Field<String>     aAttacker    = DSL.field(DSL.name("a", "attacker"), String.class);
+        Field<String>     aDefender    = DSL.field(DSL.name("a", "defender"), String.class);
+        Field<Long>       aKills       = DSL.field(DSL.name("a", "kills"),    Long.class);
+        Field<Long>       bKills       = DSL.field(DSL.name("b", "kills"),    Long.class);
+        Field<String>     bDefender    = DSL.field(DSL.name("b", "defender"), String.class);
+        Field<String>     bAttacker    = DSL.field(DSL.name("b", "attacker"), String.class);
+
+        Field<Long>       bKillsOrZero = DSL.coalesce(bKills, 0L);
+        Field<BigDecimal> kdr          = DSL
+                .when(bKillsOrZero.eq(0L), aKills.cast(SQLDataType.NUMERIC))
+                .otherwise(DSL.round(aKills.cast(SQLDataType.NUMERIC).div(bKills), 2));
+
+        ctx.with(matchupKills)
+                .insertInto(GRAFANA_ROLE_MATCHUP_SNAPSHOT,
+                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.REALM,
+                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.CAPTURED_AT,
+                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.ROLE,
+                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.VS_ROLE,
+                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.KILLS,
+                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.DEATHS,
+                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.KDR)
+                .select(DSL.select(
+                                DSL.val(realmId),
+                                DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE),
+                                aAttacker,
+                                aDefender,
+                                aKills,
+                                bKillsOrZero,
+                                kdr)
+                        .from(a)
+                        .leftJoin(b).on(aAttacker.eq(bDefender).and(aDefender.eq(bAttacker))))
+                .execute();
     }
 
     private void takeRolePlaytimeSnapshot(DSLContext ctx, int realmId) {
-        ctx.execute("""
-                WITH role_time AS (
-                    SELECT
-                        statdata->'wrappedStat'->>'role' AS role,
-                        SUM(stat)                        AS time_played_ms
-                    FROM client_stats
-                    WHERE stattype = 'CLANS_WRAPPER'
-                      AND statdata->'wrappedStat'->>'statType' = 'CHAMPIONS_ROLE'
-                      AND statdata->'wrappedStat'->>'action'   = 'TIME_PLAYED'
-                      AND realm = ?
-                    GROUP BY statdata->'wrappedStat'->>'role'
-                ),
-                role_kills AS (
-                    SELECT
-                        ck.killer_class AS role,
-                        COUNT(*)        AS kills
-                    FROM kills k
-                    JOIN champions_kills ck ON k.id = ck.kill_id
-                    WHERE k.realm  = ?
-                      AND k.valid  = TRUE
-                      AND ck.killer_class <> ''
-                    GROUP BY ck.killer_class
-                ),
-                role_deaths AS (
-                    SELECT
-                        ck.victim_class AS role,
-                        COUNT(*)        AS deaths
-                    FROM kills k
-                    JOIN champions_kills ck ON k.id = ck.kill_id
-                    WHERE k.realm  = ?
-                      AND k.valid  = TRUE
-                      AND ck.victim_class <> ''
-                    GROUP BY ck.victim_class
-                )
-                INSERT INTO grafana_role_playtime_snapshot
-                    (realm, captured_at, role, kills, deaths, kdr, time_played_ms)
-                SELECT
-                    ?::integer,
-                    NOW(),
-                    t.role,
-                    COALESCE(k.kills,  0),
-                    COALESCE(d.deaths, 0),
-                    CASE
-                        WHEN COALESCE(d.deaths, 0) = 0 THEN COALESCE(k.kills, 0)::NUMERIC
-                        ELSE ROUND(COALESCE(k.kills, 0)::NUMERIC / d.deaths, 2)
-                    END,
-                    t.time_played_ms
-                FROM role_time t
-                LEFT JOIN role_kills  k ON t.role = k.role
-                LEFT JOIN role_deaths d ON t.role = d.role
-                """,
-                realmId, realmId, realmId, realmId);
+        // JSONB path accessors
+        Field<String> wrappedStatType = DSL.field("{0}->'wrappedStat'->>'statType'", String.class, CLIENT_STATS.STATDATA);
+        Field<String> wrappedAction   = DSL.field("{0}->'wrappedStat'->>'action'",   String.class, CLIENT_STATS.STATDATA);
+        Field<String> wrappedRole     = DSL.field("{0}->'wrappedStat'->>'role'",     String.class, CLIENT_STATS.STATDATA);
+
+        // CTE 1: time played per role
+        CommonTableExpression<?> roleTime = DSL.name("role_time")
+                .fields("role", "time_played_ms")
+                .as(ctx.select(wrappedRole, DSL.sum(CLIENT_STATS.STAT))
+                        .from(CLIENT_STATS)
+                        .where(CLIENT_STATS.STATTYPE.eq("CLANS_WRAPPER"))
+                        .and(wrappedStatType.eq("CHAMPIONS_ROLE"))
+                        .and(wrappedAction.eq("TIME_PLAYED"))
+                        .and(CLIENT_STATS.REALM.eq(realmId))
+                        .groupBy(wrappedRole));
+
+        // CTE 2: kills per role
+        CommonTableExpression<?> roleKills = DSL.name("role_kills")
+                .fields("role", "kills")
+                .as(ctx.select(CHAMPIONS_KILLS.KILLER_CLASS, DSL.count().cast(Long.class))
+                        .from(KILLS)
+                        .join(CHAMPIONS_KILLS).on(KILLS.ID.eq(CHAMPIONS_KILLS.KILL_ID))
+                        .where(KILLS.REALM.eq(realmId))
+                        .and(KILLS.VALID.isTrue())
+                        .and(CHAMPIONS_KILLS.KILLER_CLASS.ne(""))
+                        .groupBy(CHAMPIONS_KILLS.KILLER_CLASS));
+
+        // CTE 3: deaths per role
+        CommonTableExpression<?> roleDeaths = DSL.name("role_deaths")
+                .fields("role", "deaths")
+                .as(ctx.select(CHAMPIONS_KILLS.VICTIM_CLASS, DSL.count().cast(Long.class))
+                        .from(KILLS)
+                        .join(CHAMPIONS_KILLS).on(KILLS.ID.eq(CHAMPIONS_KILLS.KILL_ID))
+                        .where(KILLS.REALM.eq(realmId))
+                        .and(KILLS.VALID.isTrue())
+                        .and(CHAMPIONS_KILLS.VICTIM_CLASS.ne(""))
+                        .groupBy(CHAMPIONS_KILLS.VICTIM_CLASS));
+
+        Field<String>     tRole        = DSL.field(DSL.name("t", "role"),          String.class);
+        Field<Long>       kKills       = DSL.field(DSL.name("k", "kills"),          Long.class);
+        Field<Long>       dDeaths      = DSL.field(DSL.name("d", "deaths"),         Long.class);
+        Field<Long>       tTimePlayed  = DSL.field(DSL.name("t", "time_played_ms"), Long.class);
+        Field<String>     kRole        = DSL.field(DSL.name("k", "role"),           String.class);
+        Field<String>     dRole        = DSL.field(DSL.name("d", "role"),           String.class);
+
+        Field<Long>       kKillsOrZero  = DSL.coalesce(kKills,  0L);
+        Field<Long>       dDeathsOrZero = DSL.coalesce(dDeaths, 0L);
+        Field<BigDecimal> kdr = DSL
+                .when(dDeathsOrZero.eq(0L), kKillsOrZero.cast(SQLDataType.NUMERIC))
+                .otherwise(DSL.round(kKillsOrZero.cast(SQLDataType.NUMERIC).div(dDeaths), 2));
+
+        ctx.with(roleTime, roleKills, roleDeaths)
+                .insertInto(GRAFANA_ROLE_PLAYTIME_SNAPSHOT,
+                        GRAFANA_ROLE_PLAYTIME_SNAPSHOT.REALM,
+                        GRAFANA_ROLE_PLAYTIME_SNAPSHOT.CAPTURED_AT,
+                        GRAFANA_ROLE_PLAYTIME_SNAPSHOT.ROLE,
+                        GRAFANA_ROLE_PLAYTIME_SNAPSHOT.KILLS,
+                        GRAFANA_ROLE_PLAYTIME_SNAPSHOT.DEATHS,
+                        GRAFANA_ROLE_PLAYTIME_SNAPSHOT.KDR,
+                        GRAFANA_ROLE_PLAYTIME_SNAPSHOT.TIME_PLAYED_MS)
+                .select(DSL.select(
+                                DSL.val(realmId),
+                                DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE),
+                                tRole,
+                                kKillsOrZero,
+                                dDeathsOrZero,
+                                kdr,
+                                tTimePlayed)
+                        .from(DSL.table(DSL.name("role_time")).as("t"))
+                        .leftJoin(DSL.table(DSL.name("role_kills")).as("k")).on(tRole.eq(kRole))
+                        .leftJoin(DSL.table(DSL.name("role_deaths")).as("d")).on(tRole.eq(dRole)))
+                .execute();
     }
 
     private void takeSkillKdrSnapshot(DSLContext ctx, int realmId) {
-        ctx.execute("""
-                WITH skill_kills AS (
-                    SELECT
-                        statdata->'wrappedStat'->>'skillName' AS skill_name,
-                        SUM(stat)                             AS kills
-                    FROM client_stats
-                    WHERE stattype = 'CLANS_WRAPPER'
-                      AND statdata->'wrappedStat'->>'statType' = 'CHAMPIONS_SKILL'
-                      AND statdata->'wrappedStat'->>'action'   = 'KILL'
-                      AND statdata->'wrappedStat'->>'skillName' IS NOT NULL
-                      AND statdata->'wrappedStat'->>'skillName' != ''
-                      AND realm = ?
-                    GROUP BY statdata->'wrappedStat'->>'skillName'
-                ),
-                skill_deaths AS (
-                    SELECT
-                        statdata->'wrappedStat'->>'skillName' AS skill_name,
-                        SUM(stat)                             AS deaths
-                    FROM client_stats
-                    WHERE stattype = 'CLANS_WRAPPER'
-                      AND statdata->'wrappedStat'->>'statType' = 'CHAMPIONS_SKILL'
-                      AND statdata->'wrappedStat'->>'action'   = 'DEATH'
-                      AND statdata->'wrappedStat'->>'skillName' IS NOT NULL
-                      AND statdata->'wrappedStat'->>'skillName' != ''
-                      AND realm = ?
-                    GROUP BY statdata->'wrappedStat'->>'skillName'
-                ),
-                skill_time AS (
-                    SELECT
-                        statdata->'wrappedStat'->>'skillName' AS skill_name,
-                        SUM(stat)                             AS time_played_ms
-                    FROM client_stats
-                    WHERE stattype = 'CLANS_WRAPPER'
-                      AND statdata->'wrappedStat'->>'statType' = 'CHAMPIONS_SKILL'
-                      AND statdata->'wrappedStat'->>'action'   = 'TIME_PLAYED'
-                      AND statdata->'wrappedStat'->>'skillName' IS NOT NULL
-                      AND statdata->'wrappedStat'->>'skillName' != ''
-                      AND realm = ?
-                    GROUP BY statdata->'wrappedStat'->>'skillName'
-                )
-                INSERT INTO grafana_skill_kdr_snapshot
-                    (realm, captured_at, skill_name, kills, deaths, kdr, time_played_ms)
-                SELECT
-                    ?::integer,
-                    NOW(),
-                    k.skill_name,
-                    k.kills,
-                    COALESCE(d.deaths, 0),
-                    CASE
-                        WHEN COALESCE(d.deaths, 0) = 0 THEN k.kills::NUMERIC
-                        ELSE ROUND(k.kills::NUMERIC / d.deaths, 2)
-                    END,
-                    COALESCE(t.time_played_ms, 0)
-                FROM skill_kills k
-                LEFT JOIN skill_deaths d ON k.skill_name = d.skill_name
-                LEFT JOIN skill_time   t ON k.skill_name = t.skill_name
-                """,
-                realmId, realmId, realmId, realmId);
+        // JSONB path accessors
+        Field<String> wrappedStatType  = DSL.field("{0}->'wrappedStat'->>'statType'",  String.class, CLIENT_STATS.STATDATA);
+        Field<String> wrappedAction    = DSL.field("{0}->'wrappedStat'->>'action'",    String.class, CLIENT_STATS.STATDATA);
+        Field<String> wrappedSkillName = DSL.field("{0}->'wrappedStat'->>'skillName'", String.class, CLIENT_STATS.STATDATA);
+
+        // Base WHERE conditions shared by all three skill CTEs
+        var baseCondition = CLIENT_STATS.STATTYPE.eq("CLANS_WRAPPER")
+                .and(wrappedStatType.eq("CHAMPIONS_SKILL"))
+                .and(wrappedSkillName.isNotNull())
+                .and(wrappedSkillName.ne(""))
+                .and(CLIENT_STATS.REALM.eq(realmId));
+
+        // CTE 1: kills per skill
+        CommonTableExpression<?> skillKills = DSL.name("skill_kills")
+                .fields("skill_name", "kills")
+                .as(ctx.select(wrappedSkillName, DSL.sum(CLIENT_STATS.STAT))
+                        .from(CLIENT_STATS)
+                        .where(baseCondition.and(wrappedAction.eq("KILL")))
+                        .groupBy(wrappedSkillName));
+
+        // CTE 2: deaths per skill
+        CommonTableExpression<?> skillDeaths = DSL.name("skill_deaths")
+                .fields("skill_name", "deaths")
+                .as(ctx.select(wrappedSkillName, DSL.sum(CLIENT_STATS.STAT))
+                        .from(CLIENT_STATS)
+                        .where(baseCondition.and(wrappedAction.eq("DEATH")))
+                        .groupBy(wrappedSkillName));
+
+        // CTE 3: time played per skill
+        CommonTableExpression<?> skillTime = DSL.name("skill_time")
+                .fields("skill_name", "time_played_ms")
+                .as(ctx.select(wrappedSkillName, DSL.sum(CLIENT_STATS.STAT))
+                        .from(CLIENT_STATS)
+                        .where(baseCondition.and(wrappedAction.eq("TIME_PLAYED")))
+                        .groupBy(wrappedSkillName));
+
+        Field<String>     kSkillName       = DSL.field(DSL.name("k", "skill_name"),    String.class);
+        Field<Long>       kKills           = DSL.field(DSL.name("k", "kills"),          Long.class);
+        Field<Long>       dDeaths          = DSL.field(DSL.name("d", "deaths"),         Long.class);
+        Field<Long>       tTimePlayed      = DSL.field(DSL.name("t", "time_played_ms"), Long.class);
+        Field<String>     dSkillName       = DSL.field(DSL.name("d", "skill_name"),     String.class);
+        Field<String>     tSkillName       = DSL.field(DSL.name("t", "skill_name"),     String.class);
+
+        Field<Long>       dDeathsOrZero    = DSL.coalesce(dDeaths,     0L);
+        Field<Long>       tTimePlayedOrZero = DSL.coalesce(tTimePlayed, 0L);
+        Field<BigDecimal> kdr = DSL
+                .when(dDeathsOrZero.eq(0L), kKills.cast(SQLDataType.NUMERIC))
+                .otherwise(DSL.round(kKills.cast(SQLDataType.NUMERIC).div(dDeaths), 2));
+
+        ctx.with(skillKills, skillDeaths, skillTime)
+                .insertInto(GRAFANA_SKILL_KDR_SNAPSHOT,
+                        GRAFANA_SKILL_KDR_SNAPSHOT.REALM,
+                        GRAFANA_SKILL_KDR_SNAPSHOT.CAPTURED_AT,
+                        GRAFANA_SKILL_KDR_SNAPSHOT.SKILL_NAME,
+                        GRAFANA_SKILL_KDR_SNAPSHOT.KILLS,
+                        GRAFANA_SKILL_KDR_SNAPSHOT.DEATHS,
+                        GRAFANA_SKILL_KDR_SNAPSHOT.KDR,
+                        GRAFANA_SKILL_KDR_SNAPSHOT.TIME_PLAYED_MS)
+                .select(DSL.select(
+                                DSL.val(realmId),
+                                DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE),
+                                kSkillName,
+                                kKills,
+                                dDeathsOrZero,
+                                kdr,
+                                tTimePlayedOrZero)
+                        .from(DSL.table(DSL.name("skill_kills")).as("k"))
+                        .leftJoin(DSL.table(DSL.name("skill_deaths")).as("d")).on(kSkillName.eq(dSkillName))
+                        .leftJoin(DSL.table(DSL.name("skill_time")).as("t")).on(kSkillName.eq(tSkillName)))
+                .execute();
     }
 }
-
