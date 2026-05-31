@@ -207,18 +207,6 @@ public abstract class Skill implements IChampionsSkill {
         return maxLevel;
     }
 
-    // -------------------------------------------------------------------------
-    // Public accessors for protected config fields (used by GrafanaConfigSyncService)
-    // -------------------------------------------------------------------------
-
-    public double getCooldown() { return cooldown; }
-    public double getCooldownDecreasePerLevel() { return cooldownDecreasePerLevel; }
-    public int getEnergy() { return energy; }
-    public double getEnergyDecreasePerLevel() { return energyDecreasePerLevel; }
-    public double getEnergyStartCost() { return energyStartCost; }
-    public double getEnergyStartCostDecreasePerLevel() { return energyStartCostDecreasePerLevel; }
-    public double getBaseCharge() { return baseCharge; }
-    public double getChargeIncreasePerLevel() { return chargeIncreasePerLevel; }
 
     public void reload() {
         try {

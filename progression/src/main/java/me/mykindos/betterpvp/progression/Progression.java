@@ -28,11 +28,11 @@ import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoad
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.FishLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
-import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.SkillTreeAccessProvider;
 import me.mykindos.betterpvp.progression.profession.skill.fishing.expertbaiter.ExpertBaiterAccessProvider;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.attributes.treefellercooldown.TreeFellerCooldownAttribute;
+import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
 import org.bukkit.Bukkit;
@@ -98,6 +98,8 @@ public class Progression extends BPvPPlugin {
             final ItemLoader itemLoader = new ItemLoader(this);
             itemLoader.load(adapters, reflections.getTypesAnnotatedWith(ItemKey.class));
 
+            
+
             var skillManager = injector.getInstance(ProfessionNodeManager.class);
             skillManager.loadNodeRegistry();
             skillManager.loadSkills();
@@ -124,6 +126,10 @@ public class Progression extends BPvPPlugin {
             progressionTipManager.loadTips(PACKAGE);
 
 
+            // Sync Progression items/* config YAMLs into grafana_config after items have loaded.
+            // Re-registration as Reloadable is handled automatically by ProgressionListenerLoader.
+            injector.getInstance(ProgressionGrafanaConfigContributor.class).reload();
+            
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapters.class));
         }
