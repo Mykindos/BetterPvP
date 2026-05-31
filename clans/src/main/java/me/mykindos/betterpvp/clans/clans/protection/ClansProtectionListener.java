@@ -6,8 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.events.PlayerChangeTerritoryEvent;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -19,6 +18,10 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.world.zone.PlayerEnterZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -33,67 +36,77 @@ public class ClansProtectionListener implements Listener {
     @Config(path = "protection.prevent-non-safe-non-own-territory-entrance", defaultValue = "false")
     private boolean preventNonSafeNonOwnTerritoryEntrance;
     private final ClientManager clientManager;
+    private final ClanManager clanManager;
     private final EffectManager effectManager;
-    private final ClanManager clanManger;
+    private final ZoneManager zoneManager;
 
     @Inject
-    public ClansProtectionListener(ClientManager clientManager, EffectManager effectManager, ClanManager clanManger) {
+    public ClansProtectionListener(ClientManager clientManager, ClanManager clanManager, EffectManager effectManager, ZoneManager zoneManager) {
         this.clientManager = clientManager;
+        this.clanManager = clanManager;
         this.effectManager = effectManager;
-        this.clanManger = clanManger;
+        this.zoneManager = zoneManager;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onChangeTerritory(PlayerChangeTerritoryEvent event) {
+    //if leaving a safezone, resume the protection timer
+    @EventHandler
+    public void onExitSafeZone(PlayerExitZoneEvent event) {
+        if (!event.getZone().hasTag(Zones.SAFE)) return;
         if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
-        Client client = clientManager.search().online(event.getPlayer());
-        Gamer gamer = client.getGamer();
 
-        //if leaving safe clan, re-add protection
-        if (event.getFromClan() != null && event.getFromClan().isSafe()) {
-            gamer.setLastSafeNow();
-            long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
-            if (remainingProtection > 0) {
-                UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> {
-                    effectManager.removeEffect(event.getPlayer(), EffectTypes.PROTECTION, false);
-                    effectManager.addEffect(event.getPlayer(), EffectTypes.PROTECTION, remainingProtection);
-                });
-                UtilMessage.message(event.getPlayer(), "Protection", "Protection timer resumed, you have left a safezone.");
-                UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining", UtilTime.getTime(remainingProtection, 1));
-            }
+        final Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
+        gamer.setLastSafeNow();
+        final long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
+        if (remainingProtection > 0) {
+            UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> {
+                effectManager.removeEffect(event.getPlayer(), EffectTypes.PROTECTION, false);
+                effectManager.addEffect(event.getPlayer(), EffectTypes.PROTECTION, remainingProtection);
+            });
+            UtilMessage.message(event.getPlayer(), "Protection", "Protection timer resumed, you have left a safezone.");
+            UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining", UtilTime.getTime(remainingProtection, 1));
+        }
+    }
 
-        }
-        if (event.getToClan() == null) {
-            return;
-        }
-        //if entering safe clan, pause protection timer
-        if (event.getToClan().isSafe()) {
-            gamer.updateRemainingProtection();
-            long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
-            if (remainingProtection > 0) {
-                UtilMessage.message(event.getPlayer(), "Protection", "Protection timer paused, you have entered a safezone.");
-                UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining",
-                        UtilTime.getTime(gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION), 1));
-                UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> {
-                    effectManager.removeEffect(event.getPlayer(), EffectTypes.PROTECTION, false);
-                    effectManager.addEffect(event.getPlayer(), EffectTypes.PROTECTION, 100_000L*1000L);
-                });
-            }
-        }
-        //only allow entrance to own territory or admin clan territory
-        if (preventNonSafeNonOwnTerritoryEntrance) {
-            if (!event.getToClan().equals(event.getClan()) && !event.getToClan().isAdmin()) {
-                event.getPlayerMoveEvent().setCancelled(true);
-                event.setCancelled(true);
-                long duration = effectManager.getDuration(event.getPlayer(), EffectTypes.PROTECTION);
-                UtilMessage.message(event.getPlayer(), "Protection", "You cannot enter other territories while protected!");
-                UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining",
-                        UtilTime.getTime(duration, 1));
-                EffectTypes.disableProtectionReminder(event.getPlayer());
-                event.getPlayer().teleportAsync(event.getPlayerMoveEvent().getFrom());
-            }
-        }
+    //if entering a safezone, pause the protection timer
+    @EventHandler
+    public void onEnterSafeZone(PlayerEnterZoneEvent event) {
+        if (!event.getZone().hasTag(Zones.SAFE)) return;
+        if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
 
+        final Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
+        gamer.updateRemainingProtection();
+        final long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
+        if (remainingProtection > 0) {
+            UtilMessage.message(event.getPlayer(), "Protection", "Protection timer paused, you have entered a safezone.");
+            UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining",
+                    UtilTime.getTime(remainingProtection, 1));
+            UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> {
+                effectManager.removeEffect(event.getPlayer(), EffectTypes.PROTECTION, false);
+                effectManager.addEffect(event.getPlayer(), EffectTypes.PROTECTION, 100_000L * 1000L);
+            });
+        }
+    }
+
+    //only allow entrance to own territory while protected
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEnterTerritory(PlayerEnterZoneEvent event) {
+        if (!preventNonSafeNonOwnTerritoryEntrance) return;
+        if (!event.getZone().hasTag(ClanZones.TERRITORY)) return;
+
+        final Player player = event.getPlayer();
+        if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
+
+        final Clan owner = clanManager.getClanByLocation(player.getLocation()).orElse(null);
+        if (owner == null) return;
+        final Clan self = clanManager.getClanByPlayer(player).orElse(null);
+        if (owner.equals(self)) return;
+
+        final long duration = effectManager.getDuration(player, EffectTypes.PROTECTION);
+        UtilMessage.message(player, "Protection", "You cannot enter other territories while protected!");
+        UtilMessage.message(player, "Protection", "You currently have <green>%s</green> of protection remaining",
+                UtilTime.getTime(duration, 1));
+        EffectTypes.disableProtectionReminder(player);
+        clanManager.closestWilderness(player).ifPresent(location -> player.teleportAsync(location));
     }
 
     @UpdateEvent(delay = 240 * 1000L)
@@ -104,9 +117,8 @@ public class ClansProtectionListener implements Listener {
 
             if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
                 assert player != null;
-                Clan clan = clanManger.getClanByLocation(player.getLocation()).orElse(null);
                 long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
-                if (clan == null || !clan.isSafe()) {
+                if (!zoneManager.hasTagAt(player.getLocation(), Zones.SAFE)) {
                     remainingProtection = remainingProtection - (System.currentTimeMillis() - gamer.getLastSafe());
                     gamer.updateRemainingProtection();
                 }

@@ -133,7 +133,6 @@ public class ClanLeaderboard extends Leaderboard<Long, Clan> implements Sorted {
     protected Map<Long, Clan> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
         final ClanSort sort = (ClanSort) Objects.requireNonNull(options.getSort());
         final Collection<Clan> pool = new HashSet<>(clanManager.getObjects().values());
-        pool.removeIf(Clan::isAdmin);
         return switch (sort) {
             case LEVEL -> pool.stream()
                     .sorted(Comparator.comparingLong(Clan::getLevel).reversed())

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionBuyEvent;
@@ -64,16 +65,12 @@ public class ClansAuctionListener implements Listener {
         }
 
 
-        Optional<Clan> clanByLocationOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
-        if (clanByLocationOptional.isEmpty()) {
-            event.cancel("You must be at in your clan territory or a safe zone to create an auction.");
-            return;
-        }
-
-        Clan clan = clanByPlayerOptional.get();
-        Clan locationClan = clanByLocationOptional.get();
-        if(!clan.equals(locationClan) && !locationClan.isSafe()) {
-            event.cancel("You must be at in your clan territory or a safe zone to create an auction.");
+        final Clan clan = clanByPlayerOptional.get();
+        final boolean inOwnTerritory = clanManager.getClanByLocation(event.getPlayer().getLocation())
+                .map(clan::equals).orElse(false);
+        final boolean inSafeZone = clanManager.getZoneManager().hasTagAt(event.getPlayer().getLocation(), Zones.SAFE);
+        if (!inOwnTerritory && !inSafeZone) {
+            event.cancel("You must be in your clan territory or a safe zone to create an auction.");
         }
 
     }

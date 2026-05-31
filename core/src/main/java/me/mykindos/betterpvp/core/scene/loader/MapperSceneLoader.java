@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.scene.loader;
 
 import dev.brauw.mapper.region.Region;
+import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -34,11 +35,7 @@ public abstract class MapperSceneLoader extends SceneObjectLoader {
      */
     @NotNull
     protected <T extends Region> T getDataPoint(@NotNull String name, @NotNull Class<T> type) {
-        return getRegions().stream()
-                .filter(r -> r.getName().equalsIgnoreCase(name))
-                .filter(type::isInstance)
-                .map(type::cast)
-                .findFirst()
+        return MapperHelper.findRegion(getRegions(), name, type)
                 .orElseThrow(() -> new IllegalStateException(
                         getClass().getSimpleName() + ": no data-point found with name '" + name + "' of type " + type.getSimpleName()));
     }
@@ -53,11 +50,7 @@ public abstract class MapperSceneLoader extends SceneObjectLoader {
      */
     @NotNull
     protected <T extends Region> List<T> getDataPoints(@NotNull String name, @NotNull Class<T> type) {
-        return getRegions().stream()
-                .filter(r -> r.getName().equalsIgnoreCase(name))
-                .filter(type::isInstance)
-                .map(type::cast)
-                .toList();
+        return MapperHelper.findRegions(getRegions(), name, type);
     }
 
 }

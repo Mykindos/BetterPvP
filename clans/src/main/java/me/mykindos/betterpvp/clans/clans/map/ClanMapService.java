@@ -210,7 +210,7 @@ public class ClanMapService {
                 .computeIfAbsent(player.getUniqueId(),
                         k -> Collections.newSetFromMap(new ConcurrentHashMap<>()))) {
             final IClan clan = chunkData.getClan();
-            if (clan != null && !clan.isAdmin()) {
+            if (clan != null) {
                 chunkData.setColor(UtilMapMaterial.getColorNeutral());
             }
         }
@@ -242,7 +242,7 @@ public class ClanMapService {
 
         for (ChunkData chunkData : mapHandler.getClanMapData().get(player.getUniqueId())) {
             final IClan clan = chunkData.getClan();
-            if (clan != null && !clan.isAdmin()) {
+            if (clan != null) {
                 ClanRelation relation = clanManager.getRelation(clan, playerClan);
                 chunkData.setColor(relation.getMaterialColor());
             }
@@ -337,20 +337,6 @@ public class ClanMapService {
      */
     public MapColor getColourForClan(Clan playerClan, Clan otherClan) {
         ClanRelation clanRelation = clanManager.getRelation(playerClan, otherClan);
-        MapColor materialColor = clanRelation.getMaterialColor();
-
-        if (otherClan != null) {
-            if (otherClan.isSafe()) {
-                materialColor = MapColor.SNOW;
-            } else if (otherClan.isAdmin()) {
-                if (otherClan.getName().equalsIgnoreCase("Outskirts")) {
-                    materialColor = MapColor.TERRACOTTA_PINK;
-                } else {
-                    materialColor = MapColor.COLOR_RED;
-                }
-            }
-        }
-
-        return materialColor;
+        return clanRelation.getMaterialColor();
     }
 }

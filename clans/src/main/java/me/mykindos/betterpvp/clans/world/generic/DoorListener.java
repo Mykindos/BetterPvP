@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world;
+package me.mykindos.betterpvp.clans.world.generic;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;

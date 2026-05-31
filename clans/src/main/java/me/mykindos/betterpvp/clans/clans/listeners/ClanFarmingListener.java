@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
@@ -137,14 +138,13 @@ public class ClanFarmingListener implements Listener {
     @EventHandler
     public void onSpread(BlockSpreadEvent event) {
         Block source = event.getSource();
+        if (clanManager.getZoneManager().hasTagAt(source.getLocation(), Zones.NO_BUILD)) {
+            event.setCancelled(true);
+            return;
+        }
         Optional<Clan> clanOptional = clanManager.getClanByChunk(source.getChunk());
         if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
-            if (clan.isAdmin()) {
-                event.setCancelled(true);
-                return;
-            }
-
             if (source.getType().name().contains("MUSHROOM") || source.getType() == Material.GLOW_BERRIES) {
 
                 int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);

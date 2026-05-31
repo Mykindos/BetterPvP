@@ -98,15 +98,10 @@ public class ClanRepository implements IRepository<Clan> {
                 String name = clanRecord.get(CLANS.NAME);
                 String coreLocString = clanRecord.get(CLANS.HOME);
                 Location coreLoc = coreLocString == null || coreLocString.isEmpty() ? null : UtilWorld.stringToLocation(coreLocString);
-                boolean admin = clanRecord.get(CLANS.ADMIN) != null && clanRecord.get(CLANS.ADMIN) != 0;
-                boolean safe = clanRecord.get(CLANS.SAFE) != null && clanRecord.get(CLANS.SAFE) != 0;
-
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
                 clan.getCore().setPosition(coreLoc);
-                clan.setAdmin(admin);
-                clan.setSafe(safe);
 
                 loadMetadata(clan);
                 loadProperties(clan);
@@ -209,7 +204,6 @@ public class ClanRepository implements IRepository<Clan> {
                     .set(CLANS.ID, clan.getId())
                     .set(CLANS.REALM, Core.getCurrentRealm().getId())
                     .set(CLANS.NAME, clan.getName())
-                    .set(CLANS.ADMIN, clan.isAdmin() ? 1 : 0)
                     .execute();
 
             ctx.insertInto(CLAN_METADATA)
@@ -266,30 +260,6 @@ public class ClanRepository implements IRepository<Clan> {
                         .execute())
                 .exceptionally(ex -> {
                     log.error("Failed to update clan name for clan: {}", clan.getName(), ex).submit();
-                    return null;
-                });
-    }
-
-    public void updateClanSafe(Clan clan) {
-        database.getAsyncDslContext()
-                .executeAsyncVoid(ctx -> ctx.update(CLANS)
-                        .set(CLANS.SAFE, clan.isSafe() ? 1 : 0)
-                        .where(CLANS.ID.eq(clan.getId()))
-                        .execute())
-                .exceptionally(ex -> {
-                    log.error("Failed to update clan safe status for clan: {}", clan.getName(), ex).submit();
-                    return null;
-                });
-    }
-
-    public void updateClanAdmin(Clan clan) {
-        database.getAsyncDslContext()
-                .executeAsyncVoid(ctx -> ctx.update(CLANS)
-                        .set(CLANS.ADMIN, clan.isAdmin() ? 1 : 0)
-                        .where(CLANS.ID.eq(clan.getId()))
-                        .execute())
-                .exceptionally(ex -> {
-                    log.error("Failed to update clan admin status for clan: {}", clan.getName(), ex).submit();
                     return null;
                 });
     }

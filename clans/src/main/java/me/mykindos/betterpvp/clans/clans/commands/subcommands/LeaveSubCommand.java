@@ -51,20 +51,17 @@ public class LeaveSubCommand extends ClanSubCommand {
             }
         }
 
-        if (!clan.isAdmin()) {
-            final Optional<ClanMember> leaderOptional = clan.getLeader();
-            if (leaderOptional.isPresent()) {
-                final ClanMember leader = leaderOptional.get();
-                if (leader.getUuid().equals(player.getUniqueId())) {
-                    if (clan.getMembers().size() > 1) {
-                        UtilMessage.message(player, "Clans", "You must pass on <alt>Leadership</alt> before leaving.");
-                        return;
-                    } else if (clan.getMembers().size() == 1) {
-                        player.chat("/clan disband");
-                        return;
-                    }
+        final Optional<ClanMember> leaderOptional = clan.getLeader();
+        if (leaderOptional.isPresent()) {
+            final ClanMember leader = leaderOptional.get();
+            if (leader.getUuid().equals(player.getUniqueId())) {
+                if (clan.getMembers().size() > 1) {
+                    UtilMessage.message(player, "Clans", "You must pass on <alt>Leadership</alt> before leaving.");
+                    return;
+                } else if (clan.getMembers().size() == 1) {
+                    player.chat("/clan disband");
+                    return;
                 }
-
             }
         }
 

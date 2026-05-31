@@ -120,9 +120,7 @@ public final class ClanCore {
                 UtilMessage.message(player, "Clans", "Teleported to clan core");
             }
 
-            if (!this.clan.isAdmin()) {
-                client.getStatContainer().incrementStat(ClientStat.CLANS_TELEPORT_CORE, 1);
-            }
+            client.getStatContainer().incrementStat(ClientStat.CLANS_TELEPORT_CORE, 1);
 
 
             new SoundEffect(Sound.BLOCK_BEACON_POWER_SELECT, 1.3F, 1f).play(this.position);
@@ -168,7 +166,7 @@ public final class ClanCore {
     }
 
     public boolean placeBlock() {
-        if (!this.clan.isAdmin() && this.position != null) {
+        if (this.position != null) {
             Block block = this.position.getBlock();
             block.breakNaturally();
             block.setType(CORE_BLOCK);

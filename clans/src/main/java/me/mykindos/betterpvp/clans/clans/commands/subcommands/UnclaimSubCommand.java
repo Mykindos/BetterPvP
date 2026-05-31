@@ -57,7 +57,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
                 return;
             }
 
-            if (locationClan.getTerritory().size() > 2 && !locationClan.isAdmin()){
+            if (locationClan.getTerritory().size() > 2) {
 
                 // Pass territory 2d array into algorithm.
                 if(UtilClans.isClaimRequired(UtilClans.getClaimLayout(player, locationClan))){
@@ -66,11 +66,6 @@ public class UnclaimSubCommand extends ClanSubCommand {
                 }
             }
         }else {
-            if (locationClan.isAdmin() && !client.isAdministrating()) {
-                UtilMessage.message(player, "Clans", "You cannot unclaim admin territory");
-                return;
-            }
-
             if (!client.isAdministrating()) {
                 if (locationClan.getTerritory().size() <= clanManager.getMaximumClaimsForClan(locationClan) && !client.isAdministrating()) {
                     UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has enough members to keep this territory.",
