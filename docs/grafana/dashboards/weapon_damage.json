@@ -1,0 +1,303 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_BETTERPVP",
+      "label": "BetterPvP",
+      "description": "BetterPvP PostgreSQL database",
+      "type": "datasource",
+      "pluginId": "postgres",
+      "pluginName": "PostgreSQL"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    { "type": "grafana",    "id": "grafana",    "name": "Grafana",    "version": "9.0.0" },
+    { "type": "datasource", "id": "postgres",   "name": "PostgreSQL", "version": "1.0.0" },
+    { "type": "panel",      "id": "barchart",   "name": "Bar chart",  "version": "" },
+    { "type": "panel",      "id": "table",      "name": "Table",      "version": "" },
+    { "type": "panel",      "id": "candlestick","name": "Candlestick","version": "" }
+  ],
+  "annotations": { "list": [] },
+  "description": "BetterPvP Weapon Damage — Min/Base/Max damage and DPS for every weapon × rune permutation",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "refresh": "",
+  "schemaVersion": 38,
+  "tags": ["betterpvp", "weapons", "damage"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": "All", "value": "All" },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Weapon Type",
+        "multi": false,
+        "name": "weapon_type",
+        "options": [
+          { "selected": true,  "text": "All",     "value": "All" },
+          { "selected": false, "text": "Sword",   "value": "sword" },
+          { "selected": false, "text": "Axe",     "value": "axe" },
+          { "selected": false, "text": "Special", "value": "special" }
+        ],
+        "query": "All,sword,axe,special",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": { "from": "now-5m", "to": "now" },
+  "timepicker": { "hidden": true },
+  "timezone": "browser",
+  "title": "Weapon Damage Ranges",
+  "uid": "betterpvp-weapon-damage",
+  "version": 1,
+  "weekStart": "",
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 10,
+      "title": "Damage Range (Min / Base / Max)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+      "description": "Min, Base, and Max damage for each weapon × Brutality rune count combination.\n\nX-axis = weapon config (e.g. 'Ancient Sword +2B' = 2 Brutality runes)\nSeries = Min / Base / Max\n\nRequires: schema.sql applied, weapon_seed.sql seeded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Damage",
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "gradientMode": "none",
+            "lineWidth": 1
+          },
+          "min": 0,
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Min Damage" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "light-blue",  "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Base Damage" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "green",        "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Max Damage" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "orange",       "mode": "fixed" } }]
+          }
+        ]
+      },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 1 },
+      "id": 1,
+      "options": {
+        "barRadius": 0.05,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n    config_label   AS \"Weapon Config\",\n    effective_min  AS \"Min Damage\",\n    effective_base AS \"Base Damage\",\n    effective_max  AS \"Max Damage\"\nFROM weapon_damage_permutations\nWHERE ('${weapon_type}' = 'All' OR weapon_type = '${weapon_type}')\n  AND effective_base > 0\nORDER BY weapon_type, effective_base ASC, rune_count ASC",
+          "refId": "A"
+        }
+      ],
+      "title": "Weapon Damage Range (Min / Base / Max)",
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
+      "id": 11,
+      "title": "DPS (Damage Per Second)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+      "description": "Sustained DPS at base attack speed for each weapon config.\n\nFormula: damage × 2.5 × (1 + attack_speed_base)\nBased on DEFAULT_DELAY = 400ms (DamageCause.java) → 2.5 base hits/sec.\n\nNote: Does not account for attack-speed rune rolls or Ferocity rune.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisLabel": "DPS",
+            "fillOpacity": 70,
+            "lineWidth": 1
+          },
+          "min": 0,
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "DPS Min" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "light-blue", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "DPS Base" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "green",      "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "DPS Max" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "orange",     "mode": "fixed" } }]
+          }
+        ]
+      },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 16 },
+      "id": 2,
+      "options": {
+        "barRadius": 0.05,
+        "barWidth": 0.9,
+        "groupWidth": 0.7,
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n    config_label AS \"Weapon Config\",\n    dps_min      AS \"DPS Min\",\n    dps_base     AS \"DPS Base\",\n    dps_max      AS \"DPS Max\"\nFROM weapon_damage_permutations\nWHERE ('${weapon_type}' = 'All' OR weapon_type = '${weapon_type}')\n  AND effective_base > 0\nORDER BY weapon_type, dps_base ASC, rune_count ASC",
+          "refId": "A"
+        }
+      ],
+      "title": "DPS Range (base attack speed)",
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 },
+      "id": 12,
+      "title": "Full Range DPS (min & max attack speed rolls)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+      "description": "Worst-case (min damage roll + slowest attack speed roll) vs best-case (max damage roll + fastest attack speed roll) DPS.\n\nThis represents the absolute floor and ceiling you can roll for a given weapon config.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisLabel": "DPS", "fillOpacity": 70, "lineWidth": 1 },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "DPS (worst)" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "red",    "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "DPS (base)" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "green",  "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "DPS (best)" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }]
+          }
+        ]
+      },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 31 },
+      "id": 3,
+      "options": {
+        "barRadius": 0.05,
+        "barWidth": 0.9,
+        "groupWidth": 0.7,
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "xTickLabelRotation": -45
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n    config_label AS \"Weapon Config\",\n    dps_worst    AS \"DPS (worst)\",\n    dps_base     AS \"DPS (base)\",\n    dps_best     AS \"DPS (best)\"\nFROM weapon_damage_permutations\nWHERE ('${weapon_type}' = 'All' OR weapon_type = '${weapon_type}')\n  AND effective_base > 0\nORDER BY weapon_type, dps_base ASC, rune_count ASC",
+          "refId": "A"
+        }
+      ],
+      "title": "DPS — Worst / Base / Best (including attack speed roll)",
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 45 },
+      "id": 13,
+      "title": "Full Config Table",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+      "description": "All weapon × rune-count permutations with full stat details.",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "effective_base" },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": { "mode": "absolute", "steps": [
+                  { "color": "blue",   "value": null },
+                  { "color": "green",  "value": 7.0 },
+                  { "color": "orange", "value": 9.0 }
+                ]}
+              },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 46 },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "dps_base" }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_BETTERPVP}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n    config_label        AS \"Config\",\n    weapon_type         AS \"Type\",\n    rune_count          AS \"Brutality Runes\",\n    effective_min       AS \"Dmg Min\",\n    effective_base      AS \"Dmg Base\",\n    effective_max       AS \"Dmg Max\",\n    attack_speed_base   AS \"Atk Spd\",\n    dps_min             AS \"DPS Min\",\n    dps_base            AS \"DPS Base\",\n    dps_max             AS \"DPS Max\",\n    dps_worst           AS \"DPS Worst\",\n    dps_best            AS \"DPS Best\"\nFROM weapon_damage_permutations\nWHERE ('${weapon_type}' = 'All' OR weapon_type = '${weapon_type}')\n  AND effective_base > 0\nORDER BY dps_base DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "All Permutations — Full Table",
+      "type": "table"
+    }
+  ]
+}
+

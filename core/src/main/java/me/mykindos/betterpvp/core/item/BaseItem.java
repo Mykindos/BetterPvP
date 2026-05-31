@@ -16,8 +16,10 @@ import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameRarityRenderer;
 import me.mykindos.betterpvp.core.item.renderer.RarityTooltipStyleRenderer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,6 +85,26 @@ public class BaseItem implements Item {
 
     public final @NotNull ItemStack getModel() {
         return model.clone();
+    }
+
+    /**
+     * Returns the display name component for this item (no rarity/purity colouring applied).
+     * Only available when the item uses a {@link NameRarityRenderer}; returns {@code null} otherwise.
+     */
+    public @Nullable Component getDisplayName() {
+        if (itemNameRenderer instanceof NameRarityRenderer nameRenderer) {
+            return nameRenderer.getRawName();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the plain-text display name (e.g. {@code "Standard Sword"}).
+     * Falls back to an empty string if the renderer is not a {@link NameRarityRenderer}.
+     */
+    public @NotNull String getPlainName() {
+        Component display = getDisplayName();
+        return display != null ? PlainTextComponentSerializer.plainText().serialize(display) : "";
     }
 
     protected void addItemStackRenderer(@NotNull ItemStackRenderer renderer) {

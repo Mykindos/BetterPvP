@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.item.model;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
@@ -72,6 +73,33 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
         getComponent(DurabilityComponent.class).ifPresent(durabilityComponent -> {
             durabilityComponent.setMaxDamage(durability);
         });
+    }
+
+    /**
+     * Returns the weapon key derived from the {@link ItemKey} annotation value
+     * (the segment after the namespace colon, e.g. {@code "standard_sword"}).
+     * Falls back to a normalised form of the item name when the annotation is absent.
+     */
+    public String getWeaponKey() {
+        ItemKey annotation = getClass().getAnnotation(ItemKey.class);
+        if (annotation != null) {
+            String value = annotation.value();
+            int colon = value.indexOf(':');
+            return colon >= 0 ? value.substring(colon + 1) : value;
+        }
+        return getPlainName().toLowerCase().replace(" ", "_").replace("'", "");
+    }
+
+    /**
+     * Derives a coarse weapon type from the weapon key.
+     * Returns {@code "axe"} if the key contains {@code "axe"},
+     * {@code "sword"} if it contains {@code "sword"}, or {@code "special"} otherwise.
+     */
+    public String getWeaponType() {
+        String key = getWeaponKey().toLowerCase();
+        if (key.contains("axe")) return "axe";
+        if (key.contains("sword")) return "sword";
+        return "special";
     }
 
     public enum Group {

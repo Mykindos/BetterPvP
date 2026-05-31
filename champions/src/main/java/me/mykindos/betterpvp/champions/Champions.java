@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
 import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponentSerializer;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
+import me.mykindos.betterpvp.champions.stats.repository.GrafanaConfigSyncService;
+import me.mykindos.betterpvp.champions.stats.repository.GrafanaSnapshotRepository;
 import me.mykindos.betterpvp.champions.tips.ChampionsTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -29,6 +31,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentSerializationRegistry;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -88,6 +91,10 @@ public class Champions extends BPvPPlugin {
             var skillManager = injector.getInstance(ChampionsSkillManager.class);
             skillManager.loadSkills();
 
+            // Sync all game config to Grafana tables (weapons, armor, skills, runes, roles, energy)
+            var configSyncService = injector.getInstance(GrafanaConfigSyncService.class);
+            configSyncService.syncAll();
+
             var championsTipManager = injector.getInstance(ChampionsTipLoader.class);
             championsTipManager.loadTips(PACKAGE);
 
@@ -107,6 +114,13 @@ public class Champions extends BPvPPlugin {
 
             // We do this to force the static initializer to run, can be removed if we import this class anywhere
             Class.forName("me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes");
+
+            // Schedule periodic Grafana snapshots (default: every hour = 72 000 ticks).
+            var snapshotRepository = injector.getInstance(GrafanaSnapshotRepository.class);
+            int snapshotIntervalTicks = getConfig().getOrSaveInt("grafana.snapshot.interval-ticks", 72000);
+            UtilServer.runTaskTimerAsync(this, () ->
+                    snapshotRepository.takeSnapshot(Core.getCurrentRealm().getId()),
+                    0L, snapshotIntervalTicks);
         }
     }
 
