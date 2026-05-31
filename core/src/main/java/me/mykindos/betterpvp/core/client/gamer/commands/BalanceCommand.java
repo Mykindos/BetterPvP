@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.gamer.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -11,8 +12,10 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.UUID;
@@ -71,7 +74,31 @@ public class BalanceCommand extends Command {
             }
 
             final Gamer gamer = client.getGamer();
-            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
+            int amountToPay;
+            try {
+                amountToPay = Integer.parseInt(args[1]);
+            } catch (NumberFormatException ex) {
+                UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
+                return;
+            }
+
+            if (amountToPay <= 0) {
+                UtilMessage.message(player, "Economy", "You must specify a value greater than 0.");
+                return;
+            }
+
+            if (amountToPay > gamer.getBalance()) {
+                UtilMessage.message(player, "Economy", "You have insufficient funds to make a payment of this amount.");
+                return;
+            }
+
+            Player targetPlayer = Bukkit.getPlayer(args[0]);
+            if(targetPlayer == null || !targetPlayer.isOnline()) {
+                UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
+                return;
+            }
+
+            clientManager.search(player).offline(args[0]).thenAccept(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
                     UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -83,16 +110,9 @@ public class BalanceCommand extends Command {
                     return;
                 }
 
-                try {
-
-                    int amountToPay = Integer.parseInt(args[1]);
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                     if (amountToPay > gamer.getBalance()) {
                         UtilMessage.message(player, "Economy", "You have insufficient funds to make a payment of this amount.");
-                        return;
-                    }
-
-                    if (amountToPay <= 0) {
-                        UtilMessage.message(player, "Economy", "You must specify a value greater than 0.");
                         return;
                     }
 
@@ -100,17 +120,10 @@ public class BalanceCommand extends Command {
                     targetGamer.saveProperty(GamerProperty.BALANCE, targetGamer.getBalance() + amountToPay);
 
                     UtilMessage.simpleMessage(player, "Economy", "You paid <yellow>%s <green>$%,d<gray>.", targetClient.getName(), amountToPay);
-
-                    Player targetPlayer = Bukkit.getPlayer(UUID.fromString(targetGamer.getUuid()));
-                    if (targetPlayer != null) {
-                        UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%,d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
-                    }
+                    UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%,d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
 
                     log.info("{} paid {} ${}", player.getName(), targetClient.getName(), amountToPay).submit();
-
-                } catch (NumberFormatException ex) {
-                    UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
-                }
+                });
             });
 
 
