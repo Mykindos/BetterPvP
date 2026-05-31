@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.item.impl.ColossusFragment;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.metal.Runesteel;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
@@ -73,7 +74,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
     private GiantsBroadsword(Champions champions,
                             RegenerationShieldAbility regenerationShieldAbility,
                             ItemFactory itemFactory) {
-        super(champions, "Giant's Broadsword", model, ItemRarity.LEGENDARY);
+        super(champions, "Giant's Broadsword", model, ItemRarity.MYTHICAL);
         this.itemFactory = itemFactory;
         this.regenerationShieldAbility = regenerationShieldAbility;
 
@@ -152,15 +153,16 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
-                                ColossusFragment colossusFragment, DurakHandle durakHandle) {
+                                ColossusFragment colossusFragment, DurakHandle durakHandle, Runesteel.BlockItem runesteelBlock) {
         if (registered) return;
         registered = true;
         String[] pattern = new String[] {
-                "C",
-                "C",
-                "D"
+                "RCR",
+                "RCR",
+                " D "
         };
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('R', new RecipeIngredient(runesteelBlock, 1));
         builder.setIngredient('C', new RecipeIngredient(colossusFragment, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         registry.registerRecipe(new NamespacedKey("champions", "giants_broadsword"), builder.build());
