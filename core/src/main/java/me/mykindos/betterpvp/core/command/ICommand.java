@@ -61,6 +61,7 @@ public interface ICommand {
                     tabCompletions.add(sender instanceof Player player ? player.getLocation().getY() + "" : "0");
             case "POSITION_Z" ->
                     tabCompletions.add(sender instanceof Player player ? player.getLocation().getZ() + "" : "0");
+            case "GAMEMODE" -> tabCompletions.addAll(List.of("Survival", "Creative", "Adventure", "Spectator", "s", "c", "a", "sp", "0", "1", "2", "3"));
             case "BOOLEAN" -> tabCompletions.addAll(List.of("true", "false"));
         }
 
@@ -81,6 +82,7 @@ public interface ICommand {
         POSITION_Y,
         POSITION_Z,
         WORLD,
+        GAMEMODE,
         BOOLEAN,
         CUSTOMITEM,
         ITEMUUID

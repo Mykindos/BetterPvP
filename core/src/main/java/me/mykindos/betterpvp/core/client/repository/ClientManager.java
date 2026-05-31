@@ -26,11 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,14 +81,22 @@ public class ClientManager extends PlayerManager<Client> {
     /**
      *
      */
-    public void sendMessageToRank(String prefix, Component message, Rank rank) {
+    public void sendMessageToRank(String prefix, Component message, Rank rank, List<UUID> ignored) {
         List<Client> clients = this.getOnline().stream().filter(client -> client.hasRank(rank)).toList();
         clients.forEach(client -> {
+            if (ignored != null && ignored.contains(client.getUniqueId())) {
+                return;
+            }
+
             final Player player = client.getGamer().getPlayer();
             if (player != null) {
                 UtilMessage.message(player, prefix, message);
             }
         });
+    }
+
+    public void sendMessageToRank(String prefix, Component message, Rank rank) {
+        this.sendMessageToRank(prefix, message, rank, null);
     }
 
     public Collection<Player> getPlayersOfRank(Rank rank) {
