@@ -87,36 +87,58 @@ public class BalanceCommand extends Command {
                 return;
             }
 
+            if (player.getName().equalsIgnoreCase(args[0])) {
+                UtilMessage.message(player, "Economy", "You cannot send money to yourself.");
+                return;
+            }
+
+            Player targetPlayer = Bukkit.getPlayer(args[0]);
+            if (targetPlayer == null || !targetPlayer.isOnline()) {
+                UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
+                return;
+            }
+
             if (amountToPay > gamer.getBalance()) {
                 UtilMessage.message(player, "Economy", "You have insufficient funds to make a payment of this amount.");
                 return;
             }
 
-            Player targetPlayer = Bukkit.getPlayer(args[0]);
-            if(targetPlayer == null || !targetPlayer.isOnline()) {
-                UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
-                return;
-            }
+            // Deduct the balance immediately (synchronously, before any async work) so that
+            // the per-logout DB flush always captures the deduction even if the player quits
+            // before the async lookup completes.  Without this, the async→runTask→event→queue
+            // chain spans 2+ extra ticks and the deduction could be missed on logout, allowing
+            // a dupe by logging off right after the command.
+            gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - amountToPay);
+            // Bypass the event→queue chain and push the DB update into the queue immediately.
+            // This guarantees the update is present before processPropertyUpdates can fire,
+            // even in the edge case where a kick event is processed before execute() completes
+            // its tick (e.g. anti-spam kicks the player on the same tick as the command).
+            clientManager.saveGamerProperty(gamer, GamerProperty.BALANCE.name(), gamer.getBalance());
 
-            clientManager.search(player).offline(args[0]).thenAccept(targetClientOptional -> {
+            // Use UUID instead of name so we credit exactly the player whose online presence
+            // was verified above, avoiding any name-vs-account ambiguity.
+            clientManager.search(player).offline(targetPlayer.getUniqueId()).thenAccept(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
-                    UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
+                    // Refund: target not found
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                        gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() + amountToPay);
+                        UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
+                    });
                     return;
                 }
+
                 Client targetClient = targetClientOptional.get();
                 final Gamer targetGamer = targetClient.getGamer();
                 if (targetGamer.equals(gamer)) {
-                    UtilMessage.message(player, "Economy", "You cannot send money to yourself.");
+                    // Refund: self-pay guard (belt-and-suspenders, caught by name check above)
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                        gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() + amountToPay);
+                        UtilMessage.message(player, "Economy", "You cannot send money to yourself.");
+                    });
                     return;
                 }
 
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                    if (amountToPay > gamer.getBalance()) {
-                        UtilMessage.message(player, "Economy", "You have insufficient funds to make a payment of this amount.");
-                        return;
-                    }
-
-                    gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - amountToPay);
                     targetGamer.saveProperty(GamerProperty.BALANCE, targetGamer.getBalance() + amountToPay);
 
                     UtilMessage.simpleMessage(player, "Economy", "You paid <yellow>%s <green>$%,d<gray>.", targetClient.getName(), amountToPay);
@@ -125,7 +147,6 @@ public class BalanceCommand extends Command {
                     log.info("{} paid {} ${}", player.getName(), targetClient.getName(), amountToPay).submit();
                 });
             });
-
 
         }
 
@@ -163,31 +184,40 @@ public class BalanceCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
+            int amountToGive;
+            try {
+                amountToGive = Integer.parseInt(args[1]);
+            } catch (NumberFormatException ex) {
+                UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
+                return;
+            }
+
+            if (amountToGive <= 0) {
+                UtilMessage.message(player, "Economy", "You must specify a value greater than 0.");
+                return;
+            }
+
+            clientManager.search(player).offline(args[0]).thenAccept(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
-                    UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
+                            UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]));
                     return;
                 }
                 final Client targetClient = targetClientOptional.get();
+                final Gamer targetGamer = targetClient.getGamer();
 
-                try {
-                    int amountToPay = Integer.parseInt(args[1]);
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                    targetGamer.saveProperty(GamerProperty.BALANCE, targetGamer.getBalance() + amountToGive);
 
-                    final Gamer targetGamer = targetClient.getGamer();
-                    targetGamer.saveProperty(GamerProperty.BALANCE, targetGamer.getBalance() + amountToPay);
-
-                    UtilMessage.simpleMessage(player, "Economy", "You gave <yellow>%s <green>$%d<gray>.", targetClient.getName(), amountToPay);
+                    UtilMessage.simpleMessage(player, "Economy", "You gave <yellow>%s <green>$%,d<gray>.", targetClient.getName(), amountToGive);
 
                     Player targetPlayer = Bukkit.getPlayer(UUID.fromString(targetGamer.getUuid()));
                     if (targetPlayer != null) {
-                        UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%,d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
+                        UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%,d <gray>from <yellow>%s<gray>.", amountToGive, player.getName());
                     }
 
-                    log.info("{} gave {} ${}", player, targetClient.getName(), amountToPay).submit();
-
-                } catch (NumberFormatException ex) {
-                    UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
-                }
+                    log.info("{} gave {} ${}", player.getName(), targetClient.getName(), amountToGive).submit();
+                });
             });
         }
 
@@ -230,26 +260,35 @@ public class BalanceCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
+            int amount;
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException ex) {
+                UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
+                return;
+            }
+
+            if (amount < 0) {
+                UtilMessage.message(player, "Economy", "You must specify a value of 0 or greater.");
+                return;
+            }
+
+            clientManager.search(player).offline(args[0]).thenAccept(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
-                    UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
+                            UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]));
                     return;
                 }
                 final Client targetClient = targetClientOptional.get();
+                final Gamer targetGamer = targetClient.getGamer();
 
-                try {
-                    int amount = Integer.parseInt(args[1]);
-
-                    final Gamer targetGamer = targetClient.getGamer();
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                     targetGamer.saveProperty(GamerProperty.BALANCE, amount);
 
                     UtilMessage.simpleMessage(player, "Economy", "You set <yellow>%s<gray>'s balance to <green>$%,d<gray>.", targetClient.getName(), amount);
 
-                    log.info("{} set {}'s balance to ${}", player, targetClient.getName(), amount).submit();
-
-                } catch (NumberFormatException ex) {
-                    UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
-                }
+                    log.info("{} set {}'s balance to ${}", player.getName(), targetClient.getName(), amount).submit();
+                });
             });
         }
 
@@ -292,16 +331,17 @@ public class BalanceCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
+            clientManager.search(player).offline(args[0]).thenAccept(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
-                    UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
+                            UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]));
                     return;
                 }
                 final Client targetClient = targetClientOptional.get();
-
                 final Gamer targetGamer = targetClient.getGamer();
 
-                UtilMessage.simpleMessage(player, "Economy", "<yellow>%s<gray> has <green>$%,d<gray>.", targetClient.getName(), targetGamer.getBalance());
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () ->
+                        UtilMessage.simpleMessage(player, "Economy", "<yellow>%s<gray> has <green>$%,d<gray>.", targetClient.getName(), targetGamer.getBalance()));
             });
         }
 
