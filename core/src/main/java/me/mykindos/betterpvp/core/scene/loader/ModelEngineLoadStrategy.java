@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Reloads the bound {@link SceneObjectLoader} each time ModelEngine finishes its
+ * Reloads the bound {@link TrackedLoader} each time ModelEngine finishes its
  * generation pipeline ({@link ModelGenerator.Phase#FINISHED}).
  * <p>
  * This covers both the initial server start and every {@code /meg reload}, ensuring
@@ -25,10 +25,10 @@ import org.jetbrains.annotations.NotNull;
 public class ModelEngineLoadStrategy implements LoadStrategy, Listener {
 
     private BPvPPlugin plugin;
-    private SceneObjectLoader loader;
+    private TrackedLoader<?> loader;
 
     @Override
-    public void bind(@NotNull SceneObjectLoader loader, @NotNull BPvPPlugin plugin) {
+    public void bind(@NotNull TrackedLoader<?> loader, @NotNull BPvPPlugin plugin) {
         this.loader = loader;
         this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);

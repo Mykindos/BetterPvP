@@ -4,15 +4,15 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Defines a trigger condition under which a {@link SceneObjectLoader} will (re)load.
+ * Defines a trigger condition under which a {@link TrackedLoader} will (re)load.
  * <p>
  * Each strategy is responsible for registering its own event listener (or equivalent)
- * and calling {@link SceneObjectLoader#reload()} when its trigger fires. This means
+ * and calling {@link TrackedLoader#reload()} when its trigger fires. This means
  * individual loaders never need to wire their own reload listeners - they simply declare
  * which strategies apply.
  * <p>
  * Implementations must be stateful: they hold the loader and plugin references set
- * during {@link #bind(SceneObjectLoader, BPvPPlugin)} and release them in {@link #unbind()}.
+ * during {@link #bind(TrackedLoader, BPvPPlugin)} and release them in {@link #unbind()}.
  *
  * <h3>Built-in strategies</h3>
  * <ul>
@@ -28,10 +28,10 @@ public interface LoadStrategy {
      * and loader are both fully initialized. Implementations should register their
      * event listener (or similar trigger) here.
      *
-     * @param loader the loader to call {@link SceneObjectLoader#reload()} on
+     * @param loader the loader to call {@link TrackedLoader#reload()} on
      * @param plugin the owning plugin (used for Bukkit listener registration)
      */
-    void bind(@NotNull SceneObjectLoader loader, @NotNull BPvPPlugin plugin);
+    void bind(@NotNull TrackedLoader<?> loader, @NotNull BPvPPlugin plugin);
 
     /**
      * Deactivates this strategy. Called on shutdown or when the loader is removed.

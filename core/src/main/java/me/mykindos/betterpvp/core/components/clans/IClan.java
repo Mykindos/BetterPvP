@@ -30,13 +30,6 @@ public interface IClan {
     String getName();
 
     /**
-     * Determines if the current clan has administrative privileges.
-     *
-     * @return true if the clan has administrative privileges, false otherwise
-     */
-    boolean isAdmin();
-
-    /**
      * Sends a message to all members of the clan.
      *
      * @param message The message string to be sent to all members of the clan.

@@ -7,10 +7,12 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -26,33 +28,38 @@ public class CoreTransportButton extends ControlItem<ClanTravelHubMenu> {
 
     private final Clan clan;
 
-
     public CoreTransportButton(Clan clan) {
         this.clan = clan;
     }
 
     @Override
-    public ItemProvider getItemProvider(ClanTravelHubMenu clanTravelHubMenu) {
-        ItemView.ItemViewBuilder provider = ItemView.builder().material(CORE_BLOCK)
+    public ItemProvider getItemProvider(ClanTravelHubMenu menu) {
+        ItemView.ItemViewBuilder provider = ItemView.builder()
+                .material(CORE_BLOCK)
+                .itemModel(Key.key("betterpvp", "menu/gui/waystone/button"))
                 .displayName(Component.text("Clan Home - ", NamedTextColor.GOLD).append(Component.text(clan.getName(), NamedTextColor.AQUA, TextDecoration.BOLD)))
                 .action(ClickActions.LEFT, Component.text("Teleport"));
+        if (menu.isPressed(this)) {
+            provider.itemModel(Key.key("betterpvp", "menu/gui/waystone/button_selected"));
+        }
         return provider.build();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
-        if (clickType.isLeftClick()) {
-            if (clan.getCore().isSet()) {
-                final Client client = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClientManager.class).search().online(player);
-
-                UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> {
-                    clan.getCore().teleport(player, client, true);
-                }));
-
-                player.closeInventory();
-            } else {
-                UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a core set!");
-            }
+        if (!clickType.isLeftClick()) {
+            return;
         }
+
+        if (!clan.getCore().isSet()) {
+            UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a core set!");
+            return;
+        }
+
+        getGui().beginTeleport(this, () -> {
+            final Client client = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClientManager.class).search().online(player);
+            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> clan.getCore().teleport(player, client, true)));
+            player.closeInventory();
+        });
     }
 }

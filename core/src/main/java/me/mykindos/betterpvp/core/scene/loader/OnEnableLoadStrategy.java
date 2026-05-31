@@ -4,7 +4,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Fires once immediately when {@link #bind(SceneObjectLoader, BPvPPlugin)} is called -
+ * Fires once immediately when {@link #bind(TrackedLoader, BPvPPlugin)} is called -
  * which happens during plugin enable after Guice injection is complete.
  * <p>
  * Use this for loaders that don't depend on ModelEngine or any async initialization,
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class OnEnableLoadStrategy implements LoadStrategy {
 
     @Override
-    public void bind(@NotNull SceneObjectLoader loader, @NotNull BPvPPlugin plugin) {
+    public void bind(@NotNull TrackedLoader<?> loader, @NotNull BPvPPlugin plugin) {
         loader.reload();
     }
 

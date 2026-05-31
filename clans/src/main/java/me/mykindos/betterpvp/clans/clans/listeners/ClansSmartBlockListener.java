@@ -7,7 +7,6 @@ import com.nexomc.nexo.api.events.furniture.NexoFurnitureInteractEvent;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.nexo.NexoSmartBlockFactory;
 import me.mykindos.betterpvp.core.client.Client;
@@ -16,9 +15,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -63,39 +60,26 @@ public class ClansSmartBlockListener implements Listener {
         }
 
         SmartBlockInstance smartBlockInstance = from.get();
-        Block block = smartBlockInstance.getLocation().getBlock();
 
         final Clan clan = this.clanManager.getClanByPlayer(player).orElse(null);
         final Optional<Clan> locationClanOptional = this.clanManager.getClanByLocation(smartBlockInstance.getLocation());
         locationClanOptional.ifPresent(locationClan -> {
-            if (locationClan != clan) {
-
-                final ClanRelation relation = this.clanManager.getRelation(clan, locationClan);
-
-                if (this.clanManager.getPillageHandler().isPillaging(clan, locationClan) && locationClan.getCore().isDead()) {
-                    final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
-                    tie.callEvent();
-                    if (tie.getResult() == Event.Result.DENY) {
-                        cancel.run();
-                    }
-                    return;
-                }
-
-                final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DENY, TerritoryInteractEvent.InteractionType.INTERACT);
-                tie.callEvent();
-                if (tie.getResult() != Event.Result.DENY) {
-                    return;
-                }
-
-                cancel.run();
-
-                if (tie.isInform()) {
-                    UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
-                            UtilFormat.cleanString(smartBlockInstance.getType().getName()),
-                            relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
-                    );
-                }
+            if (locationClan == clan) {
+                return;
             }
+
+            // Foreign furniture is protected unconditionally; pillaging a dead-core enemy is the only exception.
+            if (this.clanManager.getPillageHandler().isPillaging(clan, locationClan) && locationClan.getCore().isDead()) {
+                return;
+            }
+
+            cancel.run();
+
+            final ClanRelation relation = this.clanManager.getRelation(clan, locationClan);
+            UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
+                    UtilFormat.cleanString(smartBlockInstance.getType().getName()),
+                    relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
+            );
         });
     }
 }

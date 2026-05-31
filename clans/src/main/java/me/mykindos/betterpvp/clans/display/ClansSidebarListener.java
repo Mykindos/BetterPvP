@@ -6,12 +6,15 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -94,27 +97,29 @@ public class ClansSidebarListener implements Listener {
                             .append(coinsText);
                 })
                 .addDynamicLine(() -> {
-                    final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(player.getLocation());
+                    final Zone zone = this.clanManager.getZoneManager().getZoneAt(player.getLocation());
 
                     final Component emoji;
                     final Component territory;
-                    if (clanOptional.isEmpty() || clanOptional.get().getTerritory().isEmpty()) {
+                    if (zone == null) {
                         emoji = Component.text("<glyph:floating_island_icon>", NamedTextColor.WHITE);
                         territory = Component.text("Wilderness", NamedTextColor.GRAY);
-                    } else {
+                    } else if (zone.hasTag(Zones.SAFE)) {
+                        emoji = Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
+                        territory = zone.getDisplayName().applyFallbackStyle(ClanRelation.SAFE.getPrimary());
+                    } else if (zone.hasTag(ClanZones.TERRITORY)) {
                         final Clan self = this.clanManager.getClanByPlayer(player).orElse(null);
-                        Clan clan = clanOptional.get();
-                        ClanRelation relation = clanManager.getRelation(self, clan);
+                        final Clan owner = this.clanManager.getClanByLocation(player.getLocation()).orElse(null);
+                        final ClanRelation relation = clanManager.getRelation(self, owner);
 
-                        if (clan.isAdmin() && clan.isSafe()) {
-                            emoji = Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
-                        } else {
-                            emoji = switch (relation) {
-                                case PILLAGE, ENEMY, NEUTRAL -> Component.text("<glyph:sword_icon>", NamedTextColor.WHITE);
-                                case SAFE, SELF, ALLY, ALLY_TRUST -> Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
-                            };
-                        }
-                        territory = Component.text(clan.getName(), clanManager.getRelation(self, clan).getPrimary());
+                        emoji = switch (relation) {
+                            case PILLAGE, ENEMY, NEUTRAL -> Component.text("<glyph:sword_icon>", NamedTextColor.WHITE);
+                            case SAFE, SELF, ALLY, ALLY_TRUST -> Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
+                        };
+                        territory = zone.getDisplayName().applyFallbackStyle(relation.getPrimary());
+                    } else {
+                        emoji = Component.text("<glyph:floating_island_icon>", NamedTextColor.WHITE);
+                        territory = zone.getDisplayName().applyFallbackStyle(NamedTextColor.GRAY);
                     }
 
                     return empty()

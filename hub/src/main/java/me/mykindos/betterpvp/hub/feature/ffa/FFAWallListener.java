@@ -6,9 +6,9 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.hub.Hub;
-import me.mykindos.betterpvp.hub.feature.zone.Zone;
-import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
+import me.mykindos.betterpvp.hub.feature.zone.HubZones;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -34,15 +34,15 @@ public class FFAWallListener implements Listener {
     private static final double WALL_RADIUS = 10.0;
 
     private final Hub hub;
-    private final ZoneService zoneService;
+    private final ZoneManager zoneManager;
     private final ClientManager clientManager;
     private final FFARegionService ffaRegionService;
     private final Map<UUID, Set<BlockVector>> rendered = new HashMap<>();
 
     @Inject
-    public FFAWallListener(Hub hub, ZoneService zoneService, ClientManager clientManager, FFARegionService ffaRegionService) {
+    public FFAWallListener(Hub hub, ZoneManager zoneManager, ClientManager clientManager, FFARegionService ffaRegionService) {
         this.hub = hub;
-        this.zoneService = zoneService;
+        this.zoneManager = zoneManager;
         this.clientManager = clientManager;
         this.ffaRegionService = ffaRegionService;
     }
@@ -50,7 +50,7 @@ public class FFAWallListener implements Listener {
     @UpdateEvent(delay = 100)
     public void updateWalls() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (zoneService.getZone(player) != Zone.FFA || !clientManager.search().online(player).getGamer().isInCombat()) {
+            if (!zoneManager.isInZone(player, HubZones.FFA) || !clientManager.search().online(player).getGamer().isInCombat()) {
                 clear(player);
                 continue;
             }

@@ -5,10 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.hub.feature.menu.ServerSelectorMenu;
 import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
-import me.mykindos.betterpvp.hub.feature.zone.Zone;
-import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
+import me.mykindos.betterpvp.hub.feature.zone.HubZones;
 import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -28,17 +28,17 @@ public class HotbarListener implements Listener {
 
     private final NetworkPlayerCountService networkPlayerCountService;
     private final HubInventoryService inventoryService;
-    private final ZoneService zoneService;
+    private final ZoneManager zoneManager;
     private final HubQueueStatusRegistry queueStatusRegistry;
     private final OrchestrationGateway orchestrationGateway;
 
     @Inject
     public HotbarListener(NetworkPlayerCountService networkPlayerCountService, HubInventoryService inventoryService,
-                          ZoneService zoneService, HubQueueStatusRegistry queueStatusRegistry,
+                          ZoneManager zoneManager, HubQueueStatusRegistry queueStatusRegistry,
                           OrchestrationGateway orchestrationGateway) {
         this.networkPlayerCountService = networkPlayerCountService;
         this.inventoryService = inventoryService;
-        this.zoneService = zoneService;
+        this.zoneManager = zoneManager;
         this.queueStatusRegistry = queueStatusRegistry;
         this.orchestrationGateway = orchestrationGateway;
     }
@@ -55,7 +55,7 @@ public class HotbarListener implements Listener {
         }
 
         if (event.getClickedInventory() instanceof PlayerInventory
-                && zoneService.getZone((Player) event.getWhoClicked()) != Zone.FFA) {
+                && !zoneManager.isInZone((Player) event.getWhoClicked(), HubZones.FFA)) {
             event.setCancelled(true);
         }
     }
@@ -65,7 +65,7 @@ public class HotbarListener implements Listener {
         if (GameMode.CREATIVE.equals(event.getPlayer().getGameMode())) {
             return;
         }
-        if (zoneService.getZone(event.getPlayer()) != Zone.NONE) {
+        if (zoneManager.getZone(event.getPlayer()) != null) {
             event.setCancelled(true);
         }
     }

@@ -45,6 +45,10 @@ public class FFARegionService {
                 && region.contains(location);
     }
 
+    public PolygonRegion getRegion() {
+        return region;
+    }
+
     public Location getSpawnpoint() {
         return spawnpoint.clone();
     }

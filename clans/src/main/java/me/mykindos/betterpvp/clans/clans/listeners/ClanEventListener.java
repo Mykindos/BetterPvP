@@ -281,16 +281,8 @@ public class ClanEventListener extends ClanListener {
         clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
 
         UtilMessage.simpleMessage(player, "Clans", "Successfully created clan <aqua>%s", clan.getName());
-        if (clan.isAdmin()) {
-            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", player.getName(), clan.getName()), Rank.TRIAL_MOD);
-
-            log.info("{} ({}) created admin clan {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
-                    .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
-        } else {
-            log.info("{} ({}) created {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
-                    .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
-
-        }
+        log.info("{} ({}) created {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
+                .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
         clientManager.incrementStat(player, ClientStat.CLANS_CLAN_CREATE, 1);
 
     }
@@ -881,7 +873,7 @@ public class ClanEventListener extends ClanListener {
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();
 
-        if (!clan.isAdmin() && event.getPlayer().getLocation().getY() > maxCoreY) {
+        if (event.getPlayer().getLocation().getY() > maxCoreY) {
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot set the clan core above <yellow>%d Y</yellow>.", maxCoreY);
             return;
         }

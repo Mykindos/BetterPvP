@@ -7,11 +7,11 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.world.zone.PlayerEnterZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.hub.Hub;
-import me.mykindos.betterpvp.hub.feature.zone.PlayerEnterZoneEvent;
-import me.mykindos.betterpvp.hub.feature.zone.PlayerExitZoneEvent;
-import me.mykindos.betterpvp.hub.feature.zone.Zone;
-import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
+import me.mykindos.betterpvp.hub.feature.zone.HubZones;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -34,7 +34,7 @@ public class DoubleJumpListener implements Listener {
     private Hub hub;
 
     @Inject
-    private ZoneService zoneService;
+    private ZoneManager zoneManager;
 
     private final List<Player> doubleJumped = new ArrayList<>();
 
@@ -54,21 +54,21 @@ public class DoubleJumpListener implements Listener {
 
     @EventHandler
     public void onExitZone(PlayerExitZoneEvent event) {
-        if (event.getZone() == Zone.COMMON) {
+        if (event.getZone().is(HubZones.COMMON)) {
             disableFlight(event.getPlayer());
         }
     }
 
     @EventHandler
     public void onEnterZone(PlayerEnterZoneEvent event) {
-        if (event.getZone() == Zone.COMMON) {
+        if (event.getZone().is(HubZones.COMMON)) {
             queueFlight(event.getPlayer());
         }
     }
 
     @EventHandler
     public void onGamemodeChange(PlayerGameModeChangeEvent event) {
-        if (zoneService.getZone(event.getPlayer()) == Zone.COMMON) {
+        if (zoneManager.isInZone(event.getPlayer(), HubZones.COMMON)) {
             queueFlight(event.getPlayer());
         }
     }
@@ -107,7 +107,7 @@ public class DoubleJumpListener implements Listener {
 
             if (UtilBlock.isGrounded(player)) {
                 iterator.remove();
-                if (zoneService.getZone(player) == Zone.COMMON) {
+                if (zoneManager.isInZone(player, HubZones.COMMON)) {
                     queueFlight(player);
                 }
             }

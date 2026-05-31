@@ -14,11 +14,11 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
+import me.mykindos.betterpvp.core.world.zone.PlayerEnterZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.hub.feature.HubInventoryService;
-import me.mykindos.betterpvp.hub.feature.zone.PlayerEnterZoneEvent;
-import me.mykindos.betterpvp.hub.feature.zone.PlayerExitZoneEvent;
-import me.mykindos.betterpvp.hub.feature.zone.Zone;
-import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
+import me.mykindos.betterpvp.hub.feature.zone.HubZones;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class FFAArenaListener implements Listener {
 
-    private final ZoneService zoneService;
+    private final ZoneManager zoneManager;
     private final ClientManager clientManager;
     private final FFARegionService ffaRegionService;
     private final HubInventoryService inventoryService;
@@ -50,31 +50,32 @@ public class FFAArenaListener implements Listener {
     private final Set<UUID> ffaRespawns = ConcurrentHashMap.newKeySet();
 
     @Inject
-    public FFAArenaListener(ZoneService zoneService, ClientManager clientManager, FFARegionService ffaRegionService,
+    public FFAArenaListener(ZoneManager zoneManager, ClientManager clientManager, FFARegionService ffaRegionService,
                             HubInventoryService inventoryService, RolePlaceholderVisibility rolePlaceholderVisibility,
                             CombatFeaturesService combatFeaturesService, ArmorProtocol armorProtocol, TeleportRules teleportRules) {
-        this.zoneService = zoneService;
+        this.zoneManager = zoneManager;
         this.clientManager = clientManager;
         this.ffaRegionService = ffaRegionService;
         this.inventoryService = inventoryService;
         this.rolePlaceholderVisibility = rolePlaceholderVisibility;
         this.combatFeaturesService = combatFeaturesService;
         this.armorProtocol = armorProtocol;
-        teleportRules.putRule("hub-ffa", (entity, destination) -> isInFFA(zoneService, ffaRegionService, entity, destination));
+        teleportRules.putRule("hub-ffa", (entity, destination) -> isInFFA(zoneManager, ffaRegionService, entity, destination));
     }
 
-    private static boolean isInFFA(ZoneService zoneService, FFARegionService ffaRegionService, LivingEntity entity, Location destination) {
+    private static boolean isInFFA(ZoneManager zoneManager, FFARegionService ffaRegionService, LivingEntity entity, Location destination) {
         return entity instanceof Player player
-                && zoneService.getZone(player) == Zone.FFA
+                && zoneManager.isInZone(player, HubZones.FFA)
                 && ffaRegionService.contains(destination);
     }
 
     @EventHandler
     public void onEnterFfa(PlayerEnterZoneEvent event) {
-        this.combatFeaturesService.setActive(event.getPlayer(), event.getZone() == Zone.FFA);
-        this.rolePlaceholderVisibility.setVisible(event.getPlayer(), event.getZone() == Zone.FFA);
+        final boolean ffa = event.getZone().is(HubZones.FFA);
+        this.combatFeaturesService.setActive(event.getPlayer(), ffa);
+        this.rolePlaceholderVisibility.setVisible(event.getPlayer(), ffa);
         armorProtocol.broadcast(event.getPlayer(), true);
-        if (event.getZone() != Zone.FFA) {
+        if (!ffa) {
             return;
         }
 
@@ -84,7 +85,7 @@ public class FFAArenaListener implements Listener {
 
     @EventHandler
     public void onExitFfa(PlayerExitZoneEvent event) {
-        if (event.getZone() != Zone.FFA) {
+        if (!event.getZone().is(HubZones.FFA)) {
             return;
         }
 
@@ -102,7 +103,7 @@ public class FFAArenaListener implements Listener {
         }
 
         final Player player = event.getPlayer();
-        if (zoneService.getZone(player) != Zone.FFA || ffaRegionService.contains(event.getTo())) {
+        if (!zoneManager.isInZone(player, HubZones.FFA) || ffaRegionService.contains(event.getTo())) {
             return;
         }
 
@@ -115,7 +116,7 @@ public class FFAArenaListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onTeleportOutOfFfa(PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
-        if (zoneService.getZone(player) != Zone.FFA || ffaRegionService.contains(event.getTo())) {
+        if (!zoneManager.isInZone(player, HubZones.FFA) || ffaRegionService.contains(event.getTo())) {
             return;
         }
 
@@ -136,14 +137,14 @@ public class FFAArenaListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeathMessage(CustomDeathMessageEvent event) {
-        if (zoneService.getZone(event.getReceiver()) != Zone.FFA) {
+        if (!zoneManager.isInZone(event.getReceiver(), HubZones.FFA)) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
-        if (zoneService.getZone(event.getPlayer()) == Zone.FFA) {
+        if (zoneManager.isInZone(event.getPlayer(), HubZones.FFA)) {
             ffaRespawns.add(event.getPlayer().getUniqueId());
         }
     }

@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.clans.fields.block;
 
 import com.google.common.base.Preconditions;
-import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -12,6 +11,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
+import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
+import me.mykindos.betterpvp.core.world.zone.ZoneInteractEvent;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Effect;
@@ -41,8 +42,8 @@ public class LootChest implements FieldsInteractable, Listener {
     }
 
     @Override
-    public boolean processInteraction(ClientManager clientManager, TerritoryInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
-        if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.INTERACT)) {
+    public boolean processInteraction(ClientManager clientManager, ZoneInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
+        if (event.getInteraction() != ZoneInteraction.INTERACT) {
             return false; // They didn't right-click the chest
         }
 

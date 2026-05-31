@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.ExplosionResult;
@@ -75,15 +76,12 @@ public class ClansExplosionListener extends ClanListener {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             final Block block = event.getClickedBlock();
             if (block == null || block.getType() != Material.TNT) return;
-            final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(block.getLocation());
-            clanOptional.ifPresent(clan -> {
-                if (clan.isAdmin()) {
-                    final Client client = this.clientManager.search().online(event.getPlayer());
-                    if (!client.isAdministrating()) {
-                        event.setCancelled(true);
-                    }
+            if (this.clanManager.getZoneManager().hasTagAt(block.getLocation(), Zones.NO_BUILD)) {
+                final Client client = this.clientManager.search().online(event.getPlayer());
+                if (!client.isAdministrating()) {
+                    event.setCancelled(true);
                 }
-            });
+            }
         }
     }
 
@@ -151,6 +149,12 @@ public class ClansExplosionListener extends ClanListener {
         for (final Block block : event.blockList()) {
             if (protectedBlocks.contains(block.getType())) continue;
 
+            // Protected server zones (spawn, shops, ...) are immune to cannon damage.
+            if (this.clanManager.getZoneManager().hasTagAt(block.getLocation(), Zones.NO_BUILD)
+                    || this.clanManager.getZoneManager().hasTagAt(block.getLocation(), Zones.SAFE)) {
+                break;
+            }
+
             if (attackedClan == null) {
                 final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(block.getLocation());
                 if (clanOptional.isPresent()) {
@@ -160,10 +164,6 @@ public class ClansExplosionListener extends ClanListener {
             }
 
             if (attackedClan != null) {
-                if (attackedClan.isAdmin() || attackedClan.isSafe()) {
-                    break;
-                }
-
                 if (!this.clanManager.getPillageHandler().isPillaging(attackingClan, attackedClan)) {
                     cannotCannonClan = true;
                     break;

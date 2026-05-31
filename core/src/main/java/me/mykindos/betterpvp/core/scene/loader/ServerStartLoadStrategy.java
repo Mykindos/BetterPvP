@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Loads the bound {@link SceneObjectLoader} once when the server finishes starting
+ * Loads the bound {@link TrackedLoader} once when the server finishes starting
  * ({@link ServerStartEvent}).
  * <p>
  * Use this for loaders that depend on the world and Mapper data being ready, but have
@@ -23,10 +23,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ServerStartLoadStrategy implements LoadStrategy, Listener {
 
-    private SceneObjectLoader loader;
+    private TrackedLoader<?> loader;
 
     @Override
-    public void bind(@NotNull SceneObjectLoader loader, @NotNull BPvPPlugin plugin) {
+    public void bind(@NotNull TrackedLoader<?> loader, @NotNull BPvPPlugin plugin) {
         this.loader = loader;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
