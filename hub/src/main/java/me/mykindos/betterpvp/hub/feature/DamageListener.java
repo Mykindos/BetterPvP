@@ -5,9 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.hub.Hub;
-import me.mykindos.betterpvp.hub.feature.zone.Zone;
-import me.mykindos.betterpvp.hub.feature.zone.ZoneService;
+import me.mykindos.betterpvp.hub.feature.zone.HubZones;
 import me.mykindos.betterpvp.hub.model.HubWorld;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -23,23 +23,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class DamageListener implements Listener {
 
     private final HubWorld hubWorld;
-    private final ZoneService zoneService;
+    private final ZoneManager zoneManager;
 
     @Inject
-    private DamageListener(HubWorld hubWorld, ZoneService zoneService) {
+    private DamageListener(HubWorld hubWorld, ZoneManager zoneManager) {
         this.hubWorld = hubWorld;
-        this.zoneService = zoneService;
+        this.zoneManager = zoneManager;
     }
 
     // Disable PvP outside FFA
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDamage(DamageEvent event) {
-        if (event.getDamagee() instanceof Player player && zoneService.getZone(player) != Zone.FFA) {
+        if (event.getDamagee() instanceof Player player && !zoneManager.isInZone(player, HubZones.FFA)) {
             event.setCancelled(true);
             return;
         }
 
-        if (event.getDamager() instanceof Player player && zoneService.getZone(player) != Zone.FFA) {
+        if (event.getDamager() instanceof Player player && !zoneManager.isInZone(player, HubZones.FFA)) {
             event.setCancelled(true);
         }
     }
@@ -50,7 +50,7 @@ public class DamageListener implements Listener {
             return;
         }
 
-        if (zoneService.getZone(event.getPlayer()) != Zone.NONE) {
+        if (zoneManager.getZone(event.getPlayer()) != null) {
             event.getPlayer().getInventory().clear();
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Hub.class), () -> {
                 event.getPlayer().spigot().respawn();

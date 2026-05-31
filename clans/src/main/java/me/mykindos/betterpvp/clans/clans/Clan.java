@@ -47,8 +47,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private final long id;
     private final ClanCore core = new ClanCore(this);
     private String name;
-    private boolean admin;
-    private boolean safe;
     private boolean online;
     private BannerWrapper banner = BannerWrapper.builder().baseColor(BannerColor.WHITE).build();
     private List<ClanMember> members = new ArrayList<>();

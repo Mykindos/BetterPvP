@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
-import me.mykindos.betterpvp.clans.clans.events.PlayerChangeTerritoryEvent;
+import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -22,17 +22,17 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.world.zone.PlayerEnterZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
+import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.Optional;
 
@@ -51,145 +51,88 @@ public class ClansMovementListener extends ClanListener {
     }
 
     @EventHandler
-    public void onPlayerMoveEvent(PlayerMoveEvent event) {
-
-        if (event.getFrom().getBlockX() != event.getTo().getBlockX() || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-
-
-            UtilServer.runTaskAsync(clans, () -> {
-                Optional<Clan> clanToOptional = clanManager.getClanByLocation(event.getTo());
-                Optional<Clan> clanFromOption = clanManager.getClanByLocation(event.getFrom());
-
-
-                if (clanToOptional.isEmpty() && clanFromOption.isEmpty()) {
-                    return;
-                }
-
-
-                if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
-                        || !clanFromOption.equals(clanToOptional)) {
-                    UtilServer.callEvent(new PlayerChangeTerritoryEvent(
-                            event,
-                            event.getPlayer(),
-                            clanManager.getClanByPlayer(event.getPlayer()).orElse(null),
-                            clanFromOption.orElse(null),
-                            clanToOptional.orElse(null)
-                            ));
-                }
-            });
-
-        }
-
+    public void onEnterZone(PlayerEnterZoneEvent event) {
+        displayZone(event.getPlayer(), event.getZone());
     }
 
     @EventHandler
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (event.getFrom().getBlockX() != event.getTo().getBlockX() || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-            UtilServer.runTaskAsync(clans, () -> {
-                Optional<Clan> clanToOptional = clanManager.getClanByLocation(event.getTo());
-                Optional<Clan> clanFromOption = clanManager.getClanByLocation(event.getFrom());
-
-
-                if (clanToOptional.isEmpty() && clanFromOption.isEmpty()) {
-                    return;
-                }
-
-
-                if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
-                        || !clanFromOption.equals(clanToOptional)) {
-                    UtilServer.callEvent(new PlayerChangeTerritoryEvent(
-                            event,
-                            event.getPlayer(),
-                            clanManager.getClanByPlayer(event.getPlayer()).orElse(null),
-                            clanFromOption.orElse(null),
-                            clanToOptional.orElse(null)
-                    ));
-                }
-            });
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerChangeTerritory(PlayerChangeTerritoryEvent event) {
-        if (event.isCancelled()) return;
-        displayOwner(event.getPlayer(), event.getToClan());
-    }
-
-    public void displayOwner(Player player, Clan locationClan) {
-
-        Component component = Component.empty();
-
-        Clan clan = null;
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-        if (clanOptional.isPresent()) {
-            clan = clanOptional.get();
+    public void onExitZone(PlayerExitZoneEvent event) {
+        final Player player = event.getPlayer();
+        // If the player moved straight into another zone, the enter event handles the display. Only announce
+        // wilderness when they are no longer in any zone.
+        if (clanManager.getZoneManager().getZone(player) != null) {
+            return;
         }
 
-        Component append = Component.empty();
-
-        if (locationClan != null) {
-            ClanRelation relation = clanManager.getRelation(clan, locationClan);
-            component = Component.text(locationClan.getName()).color(relation.getPrimary());
-
-            if (locationClan.isAdmin()) {
-                if (locationClan.isSafe()) {
-                    component = Component.text(locationClan.getName(), NamedTextColor.WHITE);
-                    append = UtilMessage.deserialize(" <white>(<aqua>Safe</aqua>)</white>");
-                }
-            } else if (relation == ClanRelation.ALLY_TRUST) {
-                append = UtilMessage.deserialize(" <gray>(<yellow>Trusted</yellow>)</gray>");
-            } else if (relation == ClanRelation.ENEMY) {
-                if (clan != null) {
-                    append = UtilMessage.deserialize(clanManager.getDominanceString(clan, locationClan));
-                }
-            }
-        } else {
-            append = Component.text("Wilderness", NamedTextColor.GRAY);
-        }
-
-        Client client = clientManager.search().online(player);
+        final Client client = clientManager.search().online(player);
         final boolean popupSetting = (boolean) client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED).orElse(false);
-
-        if (locationClan != null) {
-            if (locationClan.getName().equalsIgnoreCase("Fields") || locationClan.getName().equalsIgnoreCase("Lake")) {
-                append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
-            }
-
-            if(popupSetting){
-                ClanRelation relation = clanManager.getRelation(clan, locationClan);
-                TitleComponent titleComponent = new TitleComponent(0, .75, .1, true,
-                        gamer -> Component.text("", NamedTextColor.GRAY),
-                        gamer -> {
-                            TextComponent text = Component.text(locationClan.getName(), relation.getPrimary());
-
-                            if(locationClan.isAdmin() && locationClan.isSafe() && !client.getGamer().isInCombat()) {
-                                text = text.append(Component.text(" (", NamedTextColor.WHITE).append(Component.text("Safe", NamedTextColor.AQUA).append(Component.text(")", NamedTextColor.WHITE))));
-                            }
-
-                            return text;
-                        });
-                client.getGamer().getTitleQueue().add(9, titleComponent);
-            }
-
-            final Component finalComponent = component;
-            final Component finalAppend = append;
-            UtilServer.runTaskAsync(clans, () -> {
-                UtilMessage.simpleMessage(player, "Territory", finalComponent.append(finalAppend), clanManager.getClanTooltip(player, locationClan));
-            });
-
-
-        } else {
-
-            if(popupSetting){
-                TitleComponent titleComponent = new TitleComponent(0, .75, .25, true,
-                        gamer -> Component.text("", NamedTextColor.GRAY),
-                        gamer -> Component.text("Wilderness", NamedTextColor.GRAY));
-                client.getGamer().getTitleQueue().add(9, titleComponent);
-            }
-
-            UtilMessage.message(player, "Territory", component.append(append));
+        if (popupSetting) {
+            TitleComponent titleComponent = new TitleComponent(0, .75, .25, true,
+                    gamer -> Component.text("", NamedTextColor.GRAY),
+                    gamer -> Component.text("Wilderness", NamedTextColor.GRAY));
+            client.getGamer().getTitleQueue().add(9, titleComponent);
         }
 
+        UtilMessage.message(player, "Territory", Component.text("Wilderness", NamedTextColor.GRAY));
+    }
+
+    public void displayZone(Player player, Zone zone) {
+        final NamedTextColor color = zoneColor(player, zone);
+        final Component name = zone.getDisplayName().applyFallbackStyle(color);
+
+        Clan owner = null;
+        Component append = Component.empty();
+        if (zone.hasTag(ClanZones.TERRITORY)) {
+            owner = clanManager.getClanByLocation(player.getLocation()).orElse(null);
+            if (owner != null) {
+                final Clan self = clanManager.getClanByPlayer(player).orElse(null);
+                final ClanRelation relation = clanManager.getRelation(self, owner);
+                if (relation == ClanRelation.ALLY_TRUST) {
+                    append = UtilMessage.deserialize(" <gray>(<yellow>Trusted</yellow>)</gray>");
+                } else if (relation == ClanRelation.ENEMY && self != null) {
+                    append = UtilMessage.deserialize(clanManager.getDominanceString(self, owner));
+                }
+            }
+        }
+
+        if (zone.hasTag(ClanZones.FIELDS)) {
+            append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
+        }
+
+        final Client client = clientManager.search().online(player);
+        final boolean popupSetting = (boolean) client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED).orElse(false);
+        if (popupSetting) {
+            TitleComponent titleComponent = new TitleComponent(0, .75, .1, true,
+                    gamer -> Component.text("", NamedTextColor.GRAY),
+                    gamer -> zone.getDisplayName().applyFallbackStyle(color));
+            client.getGamer().getTitleQueue().add(9, titleComponent);
+        }
+
+        final Component message = name.append(append);
+        if (owner != null) {
+            final Clan finalOwner = owner;
+            UtilServer.runTaskAsync(clans, () ->
+                    UtilMessage.simpleMessage(player, "Territory", message, clanManager.getClanTooltip(player, finalOwner)));
+        } else {
+            UtilMessage.message(player, "Territory", message);
+        }
+    }
+
+    /**
+     * Resolves the colour a zone's name should be shown in, following the relation colour scheme: safe zones use the
+     * {@link ClanRelation#SAFE safe} colour, clan territory uses the viewer's relation to the owning clan, and any other
+     * zone falls back to a neutral grey.
+     */
+    private NamedTextColor zoneColor(Player player, Zone zone) {
+        if (zone.hasTag(Zones.SAFE)) {
+            return ClanRelation.SAFE.getPrimary();
+        }
+        if (zone.hasTag(ClanZones.TERRITORY)) {
+            final Clan self = clanManager.getClanByPlayer(player).orElse(null);
+            final Clan owner = clanManager.getClanByLocation(player.getLocation()).orElse(null);
+            return clanManager.getRelation(self, owner).getPrimary();
+        }
+        return NamedTextColor.GRAY;
     }
 
     @EventHandler
@@ -211,56 +154,47 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
-            if (clan.isAdmin() && clan.isSafe()) {
-                event.setDelayInSeconds(0);
-                return;
-            }
+        if (clanManager.getZoneManager().hasTagAt(player.getLocation(), Zones.SAFE)) {
+            event.setDelayInSeconds(0);
+        } else {
+            clanManager.getClanByLocation(player.getLocation()).ifPresentOrElse(clan -> {
+                Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+                if (playerClanOptional.isPresent()) {
+                    Clan playerClan = playerClanOptional.get();
 
-            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
-            if (playerClanOptional.isPresent()) {
-                Clan playerClan = playerClanOptional.get();
+                    if (clan.equals(playerClan)) {
+                        boolean hasEnemies = false;
 
-                if (clan.equals(playerClan)) {
-                    boolean hasEnemies = false;
+                        for (ClanTerritory territory : playerClan.getTerritory()) {
+                            Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
+                            if (chunk == null) continue;
 
-                    for (ClanTerritory territory : playerClan.getTerritory()) {
-                        Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
-                        if (chunk == null) continue;
-
-                        for (Entity entity : chunk.getEntities()) {
-                            if (entity instanceof Player target && !entity.equals(player) && clanManager.canHurt(player, target)) {
-                                hasEnemies = true;
-                                break;
+                            for (Entity entity : chunk.getEntities()) {
+                                if (entity instanceof Player target && !entity.equals(player) && clanManager.canHurt(player, target)) {
+                                    hasEnemies = true;
+                                    break;
+                                }
                             }
+
+                            if (hasEnemies) break;
                         }
 
-                        if (hasEnemies) break;
+                        event.setDelayInSeconds(hasEnemies ? 20 : 0);
+                        return;
                     }
 
-                    if (hasEnemies) {
-                        event.setDelayInSeconds(20);
+                    if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
+                        event.setDelayInSeconds(60);
                     } else {
-                        event.setDelayInSeconds(0);
+                        event.setDelayInSeconds(30);
                     }
-                    return;
-                }
 
-                if (clanManager.getRelation(playerClan, clan) == ClanRelation.ENEMY) {
-                    event.setDelayInSeconds(60);
-                } else if (!clan.isAdmin()) {
-                    event.setDelayInSeconds(30);
                 } else {
                     event.setDelayInSeconds(20);
                 }
 
-            } else {
-                event.setDelayInSeconds(20);
-            }
-
-        }, () -> {
-            event.setDelayInSeconds(20);
-        });
+            }, () -> event.setDelayInSeconds(20));
+        }
 
         if (event.getDelayInSeconds() > 0) {
             UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan core in <alt>%.1f</alt> seconds, don't move!", event.getDelayInSeconds());
@@ -329,23 +263,21 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
-            if (clan.isAdmin() && clan.isSafe()) {
-                event.setDelayInSeconds(0);
-            } else {
-                Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
-                if (playerClanOptional.isPresent()) {
-                    if (playerClanOptional.get().equals(clan) && !chunkHasEnemies(event.getPlayer())) {
-                        event.setDelayInSeconds(0);
-                        return;
-                    }
-                }
-                event.setDelayInSeconds(15);
+        if (clanManager.getZoneManager().hasTagAt(event.getPlayer().getLocation(), Zones.SAFE)) {
+            event.setDelayInSeconds(0);
+            return;
+        }
 
+        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
+            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+            if (playerClanOptional.isPresent()) {
+                if (playerClanOptional.get().equals(clan) && !chunkHasEnemies(event.getPlayer())) {
+                    event.setDelayInSeconds(0);
+                    return;
+                }
             }
-        }, () -> {
             event.setDelayInSeconds(15);
-        });
+        }, () -> event.setDelayInSeconds(15));
     }
 
     public boolean chunkHasEnemies(Player player){

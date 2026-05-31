@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,11 +36,13 @@ public class ClansCombatListener implements Listener {
 
     private final ClanManager clanManager;
     private final ClientManager clientManager;
+    private final ZoneManager zoneManager;
 
     @Inject
-    public ClansCombatListener(ClanManager clanManager, ClientManager clientManager) {
+    public ClansCombatListener(ClanManager clanManager, ClientManager clientManager, ZoneManager zoneManager) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
+        this.zoneManager = zoneManager;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -99,6 +103,11 @@ public class ClansCombatListener implements Listener {
     @EventHandler
     public void onCombatLog(PlayerCombatLogEvent event) {
 
+        if (zoneManager.hasTagAt(event.getPlayer().getLocation(), Zones.SAFE)) {
+            event.setSafe(true);
+            return;
+        }
+
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
         if (clanOptional.isPresent()) {
             Clan locationClan = clanOptional.get();
@@ -107,7 +116,7 @@ public class ClansCombatListener implements Listener {
             if (playerClanOptional.isPresent()) {
                 Clan playerClan = playerClanOptional.get();
 
-                if (!playerClan.equals(locationClan) && !locationClan.isSafe()) {
+                if (!playerClan.equals(locationClan)) {
 
                     if (playerClan.isEnemy(locationClan)) {
                         event.setSafe(false);
@@ -117,9 +126,7 @@ public class ClansCombatListener implements Listener {
                     }
                 }
             } else {
-                if (!locationClan.isSafe()) {
-                    event.setSafe(false);
-                }
+                event.setSafe(false);
             }
         }
     }
@@ -158,9 +165,7 @@ public class ClansCombatListener implements Listener {
      * acting entity is not in combat, unless the two players are involved in an active pillage.
      */
     private void handleSafezone(Cancellable event, LivingEntity acted, Entity source) {
-        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(acted.getLocation());
-        if (locationClanOptional.isEmpty()) return;
-        if (!locationClanOptional.get().isSafe()) return;
+        if (!zoneManager.hasTagAt(acted.getLocation(), Zones.SAFE)) return;
 
         if (acted instanceof Player actedPlayer && source instanceof Player sourcePlayer) {
             if (playersInActivePillage(sourcePlayer, actedPlayer)) {

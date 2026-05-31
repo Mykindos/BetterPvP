@@ -69,20 +69,17 @@ public class CombatTagListener implements Listener {
 
             if (clanManager.isInSafeZone(player)) {
 
-                Clan locationClan = clanManager.getClanByLocation(player.getLocation()).orElseThrow();
-                if (locationClan.getName().toLowerCase().contains("shop")) {
-                    Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
-                    if (playerClan != null) {
-                        if (clanManager.getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(playerClan.getName())
-                                || pillage.getPillaged().getName().equals(playerClan.getName()))) {
-                            Component subtitleText = Component.text("You are not safe here during a pillage!", NamedTextColor.RED);
-                            TitleComponent titleComponent = new TitleComponent(0, 0.4, 0, false,
-                                    g -> Component.text("", NamedTextColor.GRAY),
-                                    g -> subtitleText);
+                Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+                if (playerClan != null) {
+                    if (clanManager.getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(playerClan.getName())
+                            || pillage.getPillaged().getName().equals(playerClan.getName()))) {
+                        Component subtitleText = Component.text("You are not safe here during a pillage!", NamedTextColor.RED);
+                        TitleComponent titleComponent = new TitleComponent(0, 0.4, 0, false,
+                                g -> Component.text("", NamedTextColor.GRAY),
+                                g -> subtitleText);
 
-                            gamer.getTitleQueue().add(10, titleComponent);
-                            continue;
-                        }
+                        gamer.getTitleQueue().add(10, titleComponent);
+                        continue;
                     }
                 }
 

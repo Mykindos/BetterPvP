@@ -1,9 +1,10 @@
 package me.mykindos.betterpvp.clans.fields.model;
 
-import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.FieldsInteractableStat;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
+import me.mykindos.betterpvp.core.world.zone.ZoneInteractEvent;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,8 +30,8 @@ public interface FieldsOre extends FieldsInteractable {
     }
 
     @Override
-    default boolean processInteraction(ClientManager clientManager, TerritoryInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
-        if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.BREAK)) {
+    default boolean processInteraction(ClientManager clientManager, ZoneInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
+        if (event.getInteraction() != ZoneInteraction.BREAK) {
             return false; // They didn't break the ore
         }
 

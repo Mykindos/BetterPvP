@@ -43,8 +43,8 @@ public final class MiningDetonation {
 
     /**
      * Locations of blocks currently being broken inside {@link #detonate}. Read by
-     * {@code ExplosiveExcavationSilencer} (a {@code @PluginAdapter} listener in clans) which
-     * flips {@code TerritoryInteractEvent#setInform(false)} for any matching block, suppressing
+     * {@code MiningDetonationListener} (a {@code @PluginAdapter} listener in clans) which
+     * clears {@code ZoneInteractEvent} inform for any matching block, suppressing
      * the "You cannot break X in Clan Y" spam that would otherwise fire once per skipped block.
      * The TTL is a safety net — entries are normally invalidated synchronously after each break.
      */

@@ -119,10 +119,6 @@ public class ClanEnergyListener extends ClanListener {
     public void processClanEnergy() {
         if (!enabled) return;
         clanManager.getObjects().forEach((name, clan) -> {
-            if (clan.isAdmin()) {
-                return;
-            }
-
             if (clan.isOnline()) {
                 return;
             }
@@ -213,8 +209,7 @@ public class ClanEnergyListener extends ClanListener {
     public void onBreakEnergyOutsideOfFields(BlockBreakEvent event) {
         if (event.getBlock().getType().name().contains("AMETHYST_BUD") || event.getBlock().getType() == Material.AMETHYST_CLUSTER) {
 
-            Optional<Clan> clanByLocation = clanManager.getClanByLocation(event.getPlayer().getLocation());
-            if (clanByLocation.isEmpty() || !clanByLocation.get().isAdmin()) {
+            if (!clanManager.isFields(event.getPlayer().getLocation())) {
                 event.setDropItems(false);
 
                 final int range = maxEnergy - minEnergy;

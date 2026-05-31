@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
+import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -32,6 +33,8 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -74,6 +77,9 @@ public class ClanManager extends Manager<Long, Clan> {
     private final PillageHandler pillageHandler;
 
     private final LeaderboardManager leaderboardManager;
+
+    @Getter
+    private final ZoneManager zoneManager;
 
     private Map<Integer, Double> dominanceScale;
 
@@ -119,12 +125,13 @@ public class ClanManager extends Manager<Long, Clan> {
     private int maxClanMembers;
 
     @Inject
-    public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager) {
+    public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager, ZoneManager zoneManager) {
         this.clans = clans;
         this.repository = repository;
         this.clientManager = clientManager;
         this.pillageHandler = pillageHandler;
         this.leaderboardManager = leaderboardManager;
+        this.zoneManager = zoneManager;
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
 
@@ -753,15 +760,7 @@ public class ClanManager extends Manager<Long, Clan> {
         Clan targetClan = getClanByPlayer(target).orElse(null);
         ClanRelation relation = getRelation(playerClan, targetClan);
 
-        Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
-        if (targetLocationClan != null && targetLocationClan.isSafe()) {
-
-            if (targetLocationClan.getName().toLowerCase().contains("shop")) {
-                if(relation == ClanRelation.PILLAGE) {
-                    return true;
-                }
-            }
-
+        if (zoneManager.hasTagAt(target.getLocation(), Zones.SAFE)) {
             Gamer gamer = clientManager.search().online(target).getGamer();
             if (!gamer.isInCombat() && relation != ClanRelation.PILLAGE) {
                 return false;
@@ -780,25 +779,17 @@ public class ClanManager extends Manager<Long, Clan> {
      *          {@code false} otherwise
      */
     public boolean canCast(Player player) {
-        Optional<Clan> locationClanOptional = getClanByLocation(player.getLocation());
-        if (locationClanOptional.isPresent()) {
-            Clan locationClan = locationClanOptional.get();
-            if (locationClan.isAdmin() && locationClan.isSafe()) {
-
-                if (locationClan.getName().toLowerCase().contains("shop")) {
-                    Clan playerClan = getClanByPlayer(player).orElse(null);
-                    if (playerClan != null) {
-                        // Allow using skills anywhere while participating in a pillage
-                        if (getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(playerClan.getName())
-                                || pillage.getPillaged().getName().equals(playerClan.getName()))) {
-                            return true;
-                        }
-                    }
-                }
-
-                Gamer gamer = clientManager.search().online(player).getGamer();
-                return gamer.isInCombat();
+        if (zoneManager.hasTagAt(player.getLocation(), Zones.SAFE)) {
+            // Allow using skills in a safezone while participating in a pillage
+            Clan playerClan = getClanByPlayer(player).orElse(null);
+            if (playerClan != null && getPillageHandler().getActivePillages().stream().anyMatch(pillage ->
+                    pillage.getPillager().getName().equals(playerClan.getName())
+                            || pillage.getPillaged().getName().equals(playerClan.getName()))) {
+                return true;
             }
+
+            Gamer gamer = clientManager.search().online(player).getGamer();
+            return gamer.isInCombat();
         }
 
         return true;
@@ -1009,33 +1000,27 @@ public class ClanManager extends Manager<Long, Clan> {
      * @return true if the player is in a safe zone, false otherwise
      */
     public boolean isInSafeZone(Player player) {
-        Optional<Clan> clanOptional = getClanByLocation(player.getLocation());
-        if (clanOptional.isPresent()) {
-            Clan clan = clanOptional.get();
-            return clan.isSafe();
-        }
-        return false;
+        return isSafe(player.getLocation());
     }
 
     /**
-     * Determines if the specified location belongs to a clan with the "Fields" attribute.
+     * Determines if the specified location is inside a safe zone.
      *
      * @param location the location to check
-     * @return true if the location belongs to a clan with the "Fields" attribute, false otherwise
+     * @return true if the location is covered by a zone tagged {@link Zones#SAFE}, false otherwise
      */
-    public boolean isFields(Location location) {
-        Optional<Clan> clan = getClanByLocation(location);
-        return clan.filter(this::isFields).isPresent();
+    public boolean isSafe(Location location) {
+        return zoneManager.hasTagAt(location, Zones.SAFE);
     }
 
     /**
-     * Checks if the given clan is named "Fields" (case insensitive).
+     * Determines if the specified location is inside a Fields resource zone.
      *
-     * @param clan the clan to check
-     * @return true if the clan's name is "Fields" (case insensitive), false otherwise
+     * @param location the location to check
+     * @return true if the location is covered by a zone tagged {@link ClanZones#FIELDS}, false otherwise
      */
-    public boolean isFields(Clan clan) {
-        return (clan.getName().equalsIgnoreCase("Fields"));
+    public boolean isFields(Location location) {
+        return zoneManager.hasTagAt(location, ClanZones.FIELDS);
     }
 
     /**

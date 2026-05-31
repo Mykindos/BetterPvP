@@ -97,7 +97,6 @@ public class CreateClanSubCommand extends ClanSubCommand {
                     Clan clan = new Clan(ID_GENERATOR.nextId());
                     clan.setName(clanName);
                     clan.setOnline(true);
-                    clan.setAdmin(client.isAdministrating());
                     clan.getProperties().registerListener(clan);
 
                     UtilServer.callEvent(new ClanCreateEvent(player, clan));

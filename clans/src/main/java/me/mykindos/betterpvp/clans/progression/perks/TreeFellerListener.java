@@ -2,12 +2,11 @@ package me.mykindos.betterpvp.clans.progression.perks;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -16,46 +15,31 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Iterator;
-import java.util.Optional;
 
 @Singleton
 @BPvPListener
 @PluginAdapter("Progression")
 public class TreeFellerListener implements Listener {
 
-    private final ClanManager clanManager;
+    private final ZoneManager zoneManager;
 
     @Inject
-    private TreeFellerListener(ClanManager clanManager) {
-        this.clanManager = clanManager;
+    private TreeFellerListener(ZoneManager zoneManager) {
+        this.zoneManager = zoneManager;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onFell(TreeFellerEvent event) {
         final Player player = event.getPlayer();
-        final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
         final Iterator<Block> iterator = event.getBlocks().iterator();
         while (iterator.hasNext()) {
             final Block block = iterator.next();
-            Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(block.getLocation());
-            if (targetBlockLocationClanOptional.isEmpty()) {
-                continue; // no clan
-            }
-
-            final Clan blockClan = targetBlockLocationClanOptional.get();
-            Event.Result result = blockClan != playerClan ? Event.Result.DENY : Event.Result.DEFAULT;
-            final TerritoryInteractEvent tie = new TerritoryInteractEvent(player,
-                    blockClan,
-                    block,
-                    result,
-                    TerritoryInteractEvent.InteractionType.BREAK);
-            tie.setInform(false); // we don't want to spam them
-            tie.callEvent();
-            if (tie.getResult() == Event.Result.DENY) {
+            // inform=false: pre-filtering blocks, so suppress the per-block denial message.
+            final Event.Result verdict = zoneManager.queryAccess(player, block.getLocation(), ZoneInteraction.BREAK, block, false);
+            if (verdict == Event.Result.DENY) {
                 iterator.remove(); // remove the block from the list of blocks to break
             }
         }
-
     }
 }

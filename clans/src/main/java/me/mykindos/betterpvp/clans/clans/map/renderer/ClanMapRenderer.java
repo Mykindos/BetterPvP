@@ -139,9 +139,6 @@ public class ClanMapRenderer extends MapRenderer {
     }
 
     private void renderChunk(MapCanvas mapCanvas, ChunkData chunkData, int centerX, int centerZ, int scale) {
-        IClan clan = chunkData.getClan();
-        boolean isAdminClan = clan.isAdmin();
-
         // Convert chunk coordinates to world coordinates
         int worldX = chunkData.getX() << 4; // Chunk's actual world coord
         int worldZ = chunkData.getZ() << 4; // Chunk's actual world coord
@@ -153,11 +150,11 @@ public class ClanMapRenderer extends MapRenderer {
         byte chunkColor = chunkData.getColor().getPackedId(MapColor.Brightness.NORMAL);
         int chunkSize = Math.max(1, (int) Math.ceil(CHUNK_WIDTH / (double) scale));
 
-        renderChunkPixels(mapCanvas, chunkData, pixelX, pixelZ, scale, chunkSize, chunkColor, isAdminClan);
+        renderChunkPixels(mapCanvas, chunkData, pixelX, pixelZ, scale, chunkSize, chunkColor);
     }
 
     private void renderChunkPixels(MapCanvas mapCanvas, ChunkData chunkData, int pixelX, int pixelZ,
-                                   int scale, int chunkSize, byte chunkColor, boolean isAdminClan) {
+                                   int scale, int chunkSize, byte chunkColor) {
         // At high zoom levels where chunks are very small (1-2 pixels), only render border outlines.
         // Without this check, border pixels cover every pixel, making claims appear as solid blocks.
         if (chunkSize <= 2) {

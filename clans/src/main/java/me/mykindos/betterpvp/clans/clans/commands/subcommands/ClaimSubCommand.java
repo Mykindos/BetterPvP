@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -27,9 +29,12 @@ import java.util.Optional;
 @SubCommand(ClanCommand.class)
 public class ClaimSubCommand extends ClanSubCommand {
 
+    private final ZoneManager zoneManager;
+
     @Inject
-    public ClaimSubCommand(ClanManager clanManager, ClientManager clientManager) {
+    public ClaimSubCommand(ClanManager clanManager, ClientManager clientManager, ZoneManager zoneManager) {
         super(clanManager, clientManager);
+        this.zoneManager = zoneManager;
         aliases.add("c");
     }
 
@@ -60,7 +65,7 @@ public class ClaimSubCommand extends ClanSubCommand {
         }
 
         if (clan.getTerritory().size() >= clanManager.getMaximumClaimsForClan(clan)) {
-            if(!(clan.isAdmin() || client.isAdministrating())) {
+            if (!client.isAdministrating()) {
                 UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
                 return;
             } else {
@@ -78,6 +83,12 @@ public class ClaimSubCommand extends ClanSubCommand {
             } else {
                 UtilMessage.message(player, "Clans", "This territory is owned by <alt2>Clan " + locationClan.getName() + "</alt2>.");
             }
+            return;
+        }
+
+        final Zone zoneAt = zoneManager.getZoneAt(player.getLocation());
+        if (zoneAt != null) {
+            UtilMessage.message(player, "Clans", "You cannot claim here.");
             return;
         }
 
@@ -101,24 +112,22 @@ public class ClaimSubCommand extends ClanSubCommand {
             }
         }
 
-        if (!clan.isAdmin()) {
-            if (clanManager.adjacentToWorldBorder(chunk)) {
-                UtilMessage.message(player, "Clans", "You cannot claim territory next to the world border.");
-                return;
-            }
-
-            if (clanManager.adjacentOtherClans(player.getChunk(), clan)) {
-                UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
-                return;
-            }
-
-            if(!chunk.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
-                UtilMessage.simpleMessage(player, "Clans", "You can only claim territory in the main world.");
-                return;
-            }
+        if (clanManager.adjacentToWorldBorder(chunk)) {
+            UtilMessage.message(player, "Clans", "You cannot claim territory next to the world border.");
+            return;
         }
 
-        if (!clan.getTerritory().isEmpty() && !clanManager.adjacentToOwnClan(player.getChunk(), clan) && !clan.isAdmin()) {
+        if (clanManager.adjacentOtherClans(player.getChunk(), clan)) {
+            UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
+            return;
+        }
+
+        if (!chunk.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
+            UtilMessage.simpleMessage(player, "Clans", "You can only claim territory in the main world.");
+            return;
+        }
+
+        if (!clan.getTerritory().isEmpty() && !clanManager.adjacentToOwnClan(player.getChunk(), clan)) {
             UtilMessage.message(player, "Clans", "You must claim next to your own territory");
             return;
         }

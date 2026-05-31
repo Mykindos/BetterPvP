@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.fields;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
 import me.mykindos.betterpvp.clans.fields.event.FieldsInteractableUseEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
@@ -22,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.world.zone.ZoneInteractEvent;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Material;
@@ -57,9 +57,7 @@ public class FieldsListener extends ClanListener {
     }
 
     private boolean isFields(Block block) {
-        return clanManager.getClanByLocation(block.getLocation())
-                .map(c -> c.getName().equalsIgnoreCase("Fields"))
-                .orElse(false);
+        return clanManager.isFields(block.getLocation());
     }
 
     @EventHandler (ignoreCancelled = true)
@@ -96,13 +94,14 @@ public class FieldsListener extends ClanListener {
         processBlockEvent(event.getPlayer(), event, event.getBlockPlaced());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onOreMine(TerritoryInteractEvent event) {
-        if (event.getResult() != TerritoryInteractEvent.Result.DENY) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onOreMine(ZoneInteractEvent event) {
+        if (event.getResult() != Event.Result.DENY) {
             return; // If they're allowed to edit the claim, this means we should not interfere with that
         }
 
-        if (!event.getTerritoryOwner().getName().equalsIgnoreCase("Fields")) {
+        final Block eventBlock = event.getBlock();
+        if (eventBlock == null || !isFields(eventBlock)) {
             return; // If they're not in the Fields zone, ignore
         }
 
