@@ -173,7 +173,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
         speedStrength = getConfig("speedStrength", 2, Integer.class);
         baseHealthReduction = getConfig("baseHealthReduction", 8.0, Double.class);
         healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);
-        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 2.0, Double.class);
+        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 1.0, Double.class);
         healthReductionPerPlayerAffectedDecreasePerLevel = getConfig("healthReductionPerPlayerAffectedDecreasePerLevel", 0.0, Double.class);
     }
 }

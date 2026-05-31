@@ -4,9 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.loot.Loot;
+import me.mykindos.betterpvp.core.loot.AwardStrategy;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
@@ -54,13 +55,19 @@ public class SalvagersTouchAttributeListener implements Listener {
         Player player = event.getPlayer();
         LootTable table = lootTableRegistry.loadLootTable(LOOT_TABLE_ID);
         LootSession session = sessionController.resolve(player, table, () -> LootSession.newSession(table, player));
-        LootContext context = new LootContext(session, block.getLocation().toCenterLocation(), "Mining");
+        LootContext context = new LootContext(session, block.getLocation().toCenterLocation(), LootSource.of("Mining", "mining:salvagers_touch"));
         LootBundle bundle = table.generateLoot(context);
-        for (Loot<?, ?> loot : bundle) {
-            final Object award = loot.award(context);
-            if (award instanceof Item item) {
-                event.getItems().add(item);
+        bundle.setAwardStrategy(new AwardStrategy() {
+            @Override
+            public void award(LootBundle b) {
+                for (var loot : b) {
+                    final Object award = awardSingle(b, loot);
+                    if (award instanceof Item item) {
+                        event.getItems().add(item);
+                    }
+                }
             }
-        }
+        });
+        bundle.award();
     }
 }

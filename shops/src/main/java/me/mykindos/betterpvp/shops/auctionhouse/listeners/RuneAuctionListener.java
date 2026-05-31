@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.shops.auctionhouse.events.PlayerPrepareListingEvent;
@@ -50,8 +50,8 @@ public class RuneAuctionListener implements Listener {
                 return;
             }
 
-            item.getComponent(RuneContainerComponent.class).ifPresent(container -> {
-                if (container.getRunes().isEmpty()) {
+            item.getComponent(SocketableContainerComponent.class).ifPresent(container -> {
+                if (container.getSocketables().isEmpty()) {
                     event.cancel("You cannot list this type of item unless it has a rune applied.");
                 }
             });
@@ -63,7 +63,7 @@ public class RuneAuctionListener implements Listener {
         ItemStack itemStack = event.getItemStack();
         final ItemInstance itemInstance = itemFactory.fromItemStack(itemStack).orElseThrow();
         final NamespacedKey key = Objects.requireNonNull(itemFactory.getItemRegistry().getKey(itemInstance.getBaseItem()));
-        final List<IShopItem> matchingShopItems = shopManager.getShopItems().values()
+        final List<IShopItem> matchingShopItems = shopManager.getShopItems().get().values()
                 .stream()
                 .flatMap(Collection::stream)
                 .filter(shopItem -> shopItem.getItemKey().equals(key.toString()))
@@ -73,9 +73,9 @@ public class RuneAuctionListener implements Listener {
         }
 
         // if it is a shop item and it doesnt have runes, prevent it from being listed
-        final Optional<RuneContainerComponent> containerOpt = itemInstance.getComponent(RuneContainerComponent.class);
+        final Optional<SocketableContainerComponent> containerOpt = itemInstance.getComponent(SocketableContainerComponent.class);
         if (containerOpt.isPresent()) {
-            if (containerOpt.get().getRunes().isEmpty()) {
+            if (containerOpt.get().getSocketables().isEmpty()) {
                 event.cancel("You cannot list this type of item unless it has a rune applied.");
             }
         } else {

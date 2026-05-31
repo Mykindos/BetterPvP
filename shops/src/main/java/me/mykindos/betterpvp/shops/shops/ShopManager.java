@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Singleton
 @Getter
@@ -34,7 +35,7 @@ public class ShopManager {
     private final ItemFactory itemFactory;
     private final ClientManager clientManager;
 
-    private Map<String, List<IShopItem>> shopItems = new HashMap<>();
+    private final AtomicReference<Map<String, List<IShopItem>>> shopItems = new AtomicReference<>(new HashMap<>());
 
     @Inject
     public ShopManager(ShopItemRepository shopItemRepository, ShopItemSellService shopItemSellService,
@@ -48,11 +49,11 @@ public class ShopManager {
 
     public void loadShopItems() {
         shopItemRepository.copyTemplatedDynamicPrices();
-        shopItems = shopItemRepository.getAllShopItems();
+        shopItemRepository.getAllShopItems().thenAccept(shopItems::set);
     }
 
     public List<IShopItem> getShopItems(String shopkeeper) {
-        return shopItems.get(shopkeeper);
+        return shopItems.get().get(shopkeeper);
     }
 
     /**
@@ -62,7 +63,7 @@ public class ShopManager {
         List<IShopItem> shopkeeperItems = getShopItems(shopkeeper);
         if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
-        List<IShopItem> allItems = shopItems.values().stream().flatMap(Collection::stream).toList();
+        List<IShopItem> allItems = shopItems.get().values().stream().flatMap(Collection::stream).toList();
         ShopContext context = new ShopContext(itemFactory, clientManager, shopItemSellService, allItems);
         new ShopMenu(shopkeeper, shopkeeperItems, context).show(player);
         log.info("{} opened Shop: {}", player.getName(), shopkeeper).submit();

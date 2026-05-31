@@ -60,13 +60,13 @@ public class BlockTagManager {
                     .whenComplete((res, ex) -> inFlightLoads.remove(chunkIdentifier));
         }).exceptionally(e -> {
             log.error("Failed to get block tags for chunk {}: {}", chunkIdentifier, e).submit();
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
         });
     }
 
     public CompletableFuture<Boolean> isPlayerManipulated(Block block) {
         return getBlockTags(block.getChunk()).thenApply(blockTags -> {
-            return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey("PlayerManipulated");
+            return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new ConcurrentHashMap<>()).containsKey("PlayerManipulated");
         }).exceptionally(e -> {
             log.error("Failed to check if block is player manipulated", e).submit();
             return false;
@@ -88,7 +88,7 @@ public class BlockTagManager {
             return false;
         }
 
-        return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey(BlockTags.PLAYER_MANIPULATED.getTag());
+        return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new ConcurrentHashMap<>()).containsKey(BlockTags.PLAYER_MANIPULATED.getTag());
     }
 
     /**
@@ -106,7 +106,7 @@ public class BlockTagManager {
             return null;
         }
 
-        Map<String, BlockTag> stringBlockTagHashMap = blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>());
+        Map<String, BlockTag> stringBlockTagHashMap = blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new ConcurrentHashMap<>());
         if (!stringBlockTagHashMap.containsKey(BlockTags.PLAYER_MANIPULATED.getTag())) {
             return null;
         }
@@ -135,7 +135,7 @@ public class BlockTagManager {
      */
     public void addBlockTag(Block block, BlockTag blockTag) {
         getBlockTags(block.getChunk()).thenAcceptAsync(blockTags -> {
-            blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).put(blockTag.getTag(), blockTag);
+            blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new ConcurrentHashMap<>()).put(blockTag.getTag(), blockTag);
             blockTagRepository.addBlockTag(block, blockTag);
         }, TAG_EXECUTOR).exceptionally(ex -> {
             log.error("Failed to add block tag", ex).submit();
@@ -153,7 +153,7 @@ public class BlockTagManager {
      */
     public void removeBlockTag(Block block, String tag) {
         getBlockTags(block.getChunk()).thenAcceptAsync(blockTags -> {
-            blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).remove(tag);
+            blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new ConcurrentHashMap<>()).remove(tag);
             blockTagRepository.removeBlockTag(block, tag);
         }, TAG_EXECUTOR).exceptionally(ex -> {
             log.error("Failed to remove block tag", ex).submit();

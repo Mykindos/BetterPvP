@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,7 +31,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
+public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill, HealthSkill {
 
     private final List<SoulData> souls = new ArrayList<>();
 
@@ -41,7 +43,9 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     private int speedStrength;
 
-    private int regenerationStrength;
+    private double baseHealthPerSecond;
+
+    private double healthPerSecondIncreasePerLevel;
 
     @Inject
     public SoulHarvest(Champions champions, ChampionsManager championsManager) {
@@ -60,7 +64,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
                 "which is only visible to " + getClassType().getName(),
                 "",
                 "Collected souls give bursts of",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and " + getValueString(this::getHealthPerSecond, level) + " health per second",
                 "",
                 "Buff duration: " + getValueString(this::getBuffDuration, level) + " seconds",
         };
@@ -68,6 +72,10 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     private double getBuffDuration(int level) {
         return baseBuffDuration + ((level - 1) * buffDurationIncreasePerLevel);
+    }
+
+    private double getHealthPerSecond(int level) {
+        return baseHealthPerSecond + ((level - 1) * healthPerSecondIncreasePerLevel);
     }
 
     @Override
@@ -128,12 +136,14 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
         buffDurationIncreasePerLevel = getConfig("buffDurationIncreasePerLevel", 1.0, Double.class);
 
         speedStrength = getConfig("speedStrength", 2, Integer.class);
-        regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
+        baseHealthPerSecond = getConfig("baseHealthPerSecond", 4.0, Double.class);
+        healthPerSecondIncreasePerLevel = getConfig("healthPerSecondIncreasePerLevel", 0.0, Double.class);
     }
 
     private void giveEffect(Player player, int level) {
-        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (getBuffDuration(level) * 1000));
-        championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, regenerationStrength, (long) (getBuffDuration(level) * 1000));
+        double duration = getBuffDuration(level);
+        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
+        UtilPlayer.slowHealth(champions, player, getHealthPerSecond(level) * duration, (int) (duration * 20), false);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_BITE, 2.0F, 2.0F);
 
         Location center = player.getLocation().add(0, 2, 0); // Position the halo above the player's head

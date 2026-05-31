@@ -33,7 +33,11 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,6 +56,10 @@ import java.util.UUID;
 @CustomLog
 public class UnstoppableForce extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CrowdControlSkill, MovementSkill, OffensiveSkill {
 
+    private static final double DEFAULT_STEP_HEIGHT = 0.6;
+
+    private final NamespacedKey stepHeightKey;
+
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double hitboxExpansion;
@@ -59,6 +67,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     @Inject
     public UnstoppableForce(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
+        this.stepHeightKey = new NamespacedKey(champions, "unstoppable_force_step_height");
     }
 
     @Override
@@ -97,6 +106,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
             return false;
         }
         active.add(player.getUniqueId());
+        applyStepHeight(player);
         return true;
     }
 
@@ -175,6 +185,22 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
         championsManager.getCooldowns().use(player, getName(), getCooldown(getLevel(player)), true,
                 true, false, isHolding(player) && (getType() == SkillType.AXE));
         championsManager.getEffects().removeEffect(player, EffectTypes.NO_JUMP, getName());
+        removeStepHeight(player);
+    }
+
+    private void applyStepHeight(Player player) {
+        AttributeInstance attribute = player.getAttribute(Attribute.STEP_HEIGHT);
+        if (attribute != null && attribute.getModifier(stepHeightKey) == null) {
+            double addition = 1.0 - DEFAULT_STEP_HEIGHT;
+            attribute.addTransientModifier(new AttributeModifier(stepHeightKey, addition, AttributeModifier.Operation.ADD_NUMBER));
+        }
+    }
+
+    private void removeStepHeight(Player player) {
+        AttributeInstance attribute = player.getAttribute(Attribute.STEP_HEIGHT);
+        if (attribute != null) {
+            attribute.removeModifier(stepHeightKey);
+        }
     }
 
     @EventHandler

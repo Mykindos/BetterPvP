@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting.forestflo
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.progression.event.ProfessionPropertyUpdateEvent;
 import me.mykindos.betterpvp.progression.profession.skill.IProfessionAttribute;
 import me.mykindos.betterpvp.progression.profession.skill.NodeId;
@@ -44,7 +43,7 @@ public class ForestFlourisher implements IProfessionAttribute, Listener {
      * planted
      */
     private final Map<UUID, Set<SaplingRef>> plantedSaplings = new HashMap<>();
-
+    private final Set<SaplingRef> queuedSaplings = new HashSet<>();
 
     /**
      * Global Queue that holds all the saplings that <b>Forest Flourisher</b> has decided to speed up growth
@@ -228,7 +227,7 @@ public class ForestFlourisher implements IProfessionAttribute, Listener {
                     continue;
                 }
 
-                if (Math.random() < growFactor) {
+                if (Math.random() < growFactor && queuedSaplings.add(ref)) {
                     blocksToBeBoneMealed.offer(ref);
                 }
             }
@@ -246,6 +245,7 @@ public class ForestFlourisher implements IProfessionAttribute, Listener {
     public void pollBlockToBoneMeal() {
         SaplingRef ref = blocksToBeBoneMealed.poll();
         if (ref == null) return;
+        queuedSaplings.remove(ref);
 
         World world = Bukkit.getWorld(ref.worldId());
         if (world == null) return;

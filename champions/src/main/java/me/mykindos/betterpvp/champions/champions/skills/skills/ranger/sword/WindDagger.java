@@ -164,7 +164,7 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
+        baseDamage = getConfig("baseDamage", 5.0, Double.class);
         damagePerLevel = getConfig("damagePerLevel", 1.0, Double.class);
         speed = getConfig("speed", 2.0, Double.class);
         duration = getConfig("duration", 1.0, Double.class);

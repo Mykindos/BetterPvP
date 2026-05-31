@@ -63,7 +63,7 @@ public final class ClanVault {
 
     @SneakyThrows
     public String serialize() {
-        return UtilItem.serializeItemStackMap(contents);
+        return UtilItem.serializeItemStackMap(new Int2ObjectOpenHashMap<>(contents));
     }
 
     public void show(Player player, Windowed previous) throws IllegalStateException {

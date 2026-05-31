@@ -11,6 +11,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -80,6 +82,9 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     private double baseDuration;
     private double durationIncreasePerLevel;
 
+    private double baseKnockbackPercent;
+    private double knockbackPercentIncreasePerLevel;
+
     @Inject
     public ExcessiveForce(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -112,6 +117,10 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
         return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
+    public double getKnockbackPercent(int level) {
+        return baseKnockbackPercent + (level - 1) * knockbackPercentIncreasePerLevel;
+    }
+
     // entrypoint
     @Override
     public boolean activate(Player player, int level) {
@@ -141,11 +150,23 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
      */
     @EventHandler(priority = EventPriority.HIGH)
     public void setKnockback(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (event.getDamager() instanceof Player damager) {
             if (active.containsKey(damager)) {
                 event.setKnockback(true);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onKnockback(CustomKnockbackEvent event) {
+        if (!event.getDamageEvent().getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!active.containsKey(damager)) return;
+        final int level = getLevel(damager);
+        if (level <= 0) return;
+
+        event.setMultiplier(event.getMultiplier() * getKnockbackPercent(level));
     }
 
     /**
@@ -237,7 +258,10 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        baseDuration = getConfig("baseDuration", 2.5, Double.class);
         durationIncreasePerLevel = getConfig("durationPerLevel", 0.5, Double.class);
+
+        baseKnockbackPercent = getConfig("baseKnockbackPercent", 0.75, Double.class);
+        knockbackPercentIncreasePerLevel = getConfig("knockbackPercentIncreasePerLevel", 0.0, Double.class);
     }
 }

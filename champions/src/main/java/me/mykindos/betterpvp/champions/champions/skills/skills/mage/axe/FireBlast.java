@@ -245,10 +245,10 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     @Override
     public void loadSkillConfig() {
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
-        speed = getConfig("speed", 0.2, Double.class);
+        speed = getConfig("speed", 0.3, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
-        baseFireDuration = getConfig("baseFireDuration", 0.8, Double.class);
+        baseFireDuration = getConfig("baseFireDuration", 1.0, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.4, Double.class);
         radius = getConfig("radius", 4.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);

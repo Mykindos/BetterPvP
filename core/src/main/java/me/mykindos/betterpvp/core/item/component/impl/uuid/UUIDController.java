@@ -133,10 +133,10 @@ public class UUIDController implements Listener {
         getUUIDItem(event.getItemInstance().getItemStack()).ifPresent(uuidItem -> {
             Location location = event.getLocation();
             log.info("({}) was looted from {} at {}",
-                    uuidItem.getUuid(), event.getSource(), UtilWorld.locationToString(location))
+                    uuidItem.getUuid(), event.getSource().getId(), UtilWorld.locationToString(location))
                     .setAction("ITEM_LOOT_SPAWN")
                     .addItemContext(itemFactory.getItemRegistry(), event.getItemInstance())
-                    .addContext(LogContext.SOURCE, event.getSource())
+                    .addContext(LogContext.SOURCE, event.getSource().getId())
                     .addLocationContext(location).submit();
         });
     }
@@ -427,8 +427,12 @@ public class UUIDController implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryMoveEvent(InventoryMoveItemEvent event) {
+        if(event.getDestination().firstEmpty() == -1) {
+            return;
+        }
+
         getUUIDItem(event.getItem()).ifPresent(uuidItem -> {
             Location locationSource = event.getSource().getLocation();
             Location locationDestination = event.getDestination().getLocation();

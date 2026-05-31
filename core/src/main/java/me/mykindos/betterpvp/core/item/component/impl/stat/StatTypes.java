@@ -76,6 +76,12 @@ public final class StatTypes {
             })
             .build();
 
+    public static final StatType<Double> ENERGY = StatType.builder(new NamespacedKey("betterpvp", "energy"), Double.class)
+            .name("Energy")
+            .description("Increases the energy pool of the holder.")
+            .displayColor(TextColor.color(66, 221, 245))
+            .build();
+
     /**
      * Called by dependency injection to register all built-in types.
      * Must be called after StatTypeRegistry is created.
@@ -87,5 +93,6 @@ public final class StatTypes {
         registry.register(MELEE_DAMAGE);
         registry.register(MELEE_ATTACK_SPEED);
         registry.register(MOVEMENT);
+        registry.register(ENERGY);
     }
 }

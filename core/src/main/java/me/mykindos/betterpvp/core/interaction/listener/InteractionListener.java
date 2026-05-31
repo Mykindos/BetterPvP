@@ -64,6 +64,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -157,7 +158,13 @@ public class InteractionListener implements Listener, PacketListener {
             if (processInput(damager, input, ctx.itemInstance(), ctx.itemStack(), dataSetup)) {
                 event.setCancelled(true);
             }
-        }, Bukkit.getScheduler().getMainThreadExecutor(JavaPlugin.getPlugin(Core.class))).join();
+        }, Bukkit.getScheduler().getMainThreadExecutor(JavaPlugin.getPlugin(Core.class)))
+                .orTimeout(100, TimeUnit.MILLISECONDS)
+                .exceptionally(e -> {
+                    log.error("Error processing interaction input", e).submit();
+                    return null;
+                })
+                .join();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

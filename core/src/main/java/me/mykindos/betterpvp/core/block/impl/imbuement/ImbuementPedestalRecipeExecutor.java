@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipe;
-import me.mykindos.betterpvp.core.imbuement.RuneImbuementRecipe;
+import me.mykindos.betterpvp.core.imbuement.SocketableImbuementRecipe;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -204,7 +204,7 @@ public class ImbuementPedestalRecipeExecutor {
      * Creates the primary result item for the recipe.
      */
     private ItemStack createPrimaryResult(@NotNull ImbuementRecipe recipe, @NotNull List<ItemInstance> currentItems) {
-        if (recipe instanceof RuneImbuementRecipe runeRecipe) {
+        if (recipe instanceof SocketableImbuementRecipe runeRecipe) {
             // For rune recipes, we need to pass the current items so the result reflects their state
             return runeRecipe.applyRuneToItems(currentItems).createItemStack();
         } else {

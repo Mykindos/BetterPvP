@@ -7,8 +7,8 @@ import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityCompo
 import me.mykindos.betterpvp.core.item.component.impl.fuel.FuelComponentSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponentSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponentSerializer;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneRegistry;
-import me.mykindos.betterpvp.core.item.component.impl.runes.serialization.RuneContainerSerializer;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.serialization.RuneContainerSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.stat.serialization.StatSerializationRegistry;
 import me.mykindos.betterpvp.core.item.component.serialization.impl.StatContainerSerializer;
 import me.mykindos.betterpvp.core.item.component.serialization.impl.UUIDPropertySerializer;
@@ -40,10 +40,10 @@ public class ComponentSerializationRegistry {
     }
 
     @Inject
-    private void registerDefaultSerializers(RuneRegistry runeRegistry, StatSerializationRegistry statRegistry) {
+    private void registerDefaultSerializers(SocketableRegistry socketableRegistry, StatSerializationRegistry statRegistry) {
         register(new UUIDPropertySerializer());
         register(new StatContainerSerializer(statRegistry));
-        register(new RuneContainerSerializer(runeRegistry));
+        register(new RuneContainerSerializer(socketableRegistry));
         register(new FuelComponentSerializer());
         register(new DurabilityComponentSerializer());
         register(new PurityComponentSerializer());

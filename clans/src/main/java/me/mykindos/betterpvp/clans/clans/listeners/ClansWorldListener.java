@@ -758,11 +758,6 @@ public class ClansWorldListener extends ClanListener {
             }
         }
 
-        if (event.getBlock().getY() > 150) {
-            UtilMessage.message(event.getPlayer(), "Clans", "You can only place water below 150Y");
-            event.setCancelled(true);
-            return;
-        }
         final Block block = event.getBlock();
         block.setType(Material.WATER);
         block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 1.0F, 1.0F);

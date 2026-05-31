@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanFarmingLevels;
 import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultLegend;
 import me.mykindos.betterpvp.clans.clans.leveling.perk.model.ClanVaultSlot;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -86,5 +87,9 @@ public class ClanPerkManager extends Manager<String, ClanPerk> {
 
     public int getTotalFarmingLevels(Clan clan) {
         return getPerks(clan).stream().filter(ClanFarmingLevels.class::isInstance).mapToInt(perk -> ((ClanFarmingLevels) perk).getLevels()).sum();
+    }
+
+    public int computeFarmingLevelMinY(@NotNull Clan clan, int baseFarmingY, int baseFarmingLevels) {
+        return baseFarmingY - baseFarmingLevels - getTotalFarmingLevels(clan);
     }
 }

@@ -47,7 +47,7 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
         return new String[]{
                 "Deal bonus damage based on how much higher your",
                 "Current health percentage is compared to your target's.",
-                "For every " + getValueString(this::getHealthOverTarget, level, 100, "%", 2) + " over your target's health percentage",
+                "For every " + getValueString(this::getHealthOverTarget, level, 100, "%", 0) + " over your target's health percentage",
                 "You deal " + getValueString(this::getBonusDamage, level) + " bonus damage",
                 "",
                 "Max bonus: " + getValueString(this::getMaxDamage, level) + " damage"

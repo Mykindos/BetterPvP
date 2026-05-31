@@ -173,37 +173,45 @@ public class RollbackSubCommand extends Command {
     }
 
     private void processRollback(List<WorldLog> logs) {
+        int blocksPerTick = 20;
+        new org.bukkit.scheduler.BukkitRunnable() {
+            private int index = 0;
 
-        UtilServer.runTask(core, () -> {
-            for (WorldLog log : logs) {
-                Location location = new Location(
-                        Bukkit.getWorld(log.getWorld()),
-                        log.getBlockX(),
-                        log.getBlockY(),
-                        log.getBlockZ()
-                );
+            @Override
+            public void run() {
+                for (int i = 0; i < blocksPerTick && index < logs.size(); i++) {
+                    WorldLog log = logs.get(index++);
+                    Location location = new Location(
+                            Bukkit.getWorld(log.getWorld()),
+                            log.getBlockX(),
+                            log.getBlockY(),
+                            log.getBlockZ()
+                    );
 
-                // Skip if the chunk is not loaded
-                if (!location.getChunk().isLoaded()) {
-                    location.getChunk().load();
-                }
+                    // Skip if the chunk is not loaded
+                    if (!location.getChunk().isLoaded()) {
+                        location.getChunk().load();
+                    }
 
-                // Process based on action type
-                if (log.getAction().equals(WorldLogAction.BLOCK_PLACE.name())) {
-                    // If a block was placed, we remove it (set to AIR)
-                    location.getBlock().setType(Material.AIR);
-                } else if (log.getAction().equals(WorldLogAction.BLOCK_BREAK.name())) {
-                    // If a block was broken, we restore it
-                    if (log.getMaterial() != null) {
-                        location.getBlock().setType(Material.valueOf(log.getMaterial()));
-                        // Set the block type to the original material
+                    // Process based on action type
+                    if (log.getAction().equals(WorldLogAction.BLOCK_PLACE.name())) {
+                        // If a block was placed, we remove it (set to AIR)
+                        location.getBlock().setType(Material.AIR);
+                    } else if (log.getAction().equals(WorldLogAction.BLOCK_BREAK.name())) {
+                        // If a block was broken, we restore it
+                        if (log.getMaterial() != null) {
+                            try {
+                                location.getBlock().setType(Material.valueOf(log.getMaterial()));
+                            } catch (IllegalArgumentException ignored) {}
+                        }
                     }
                 }
-                // Other action types can be handled as needed
+
+                if (index >= logs.size()) {
+                    this.cancel();
+                }
             }
-        });
-
-
+        }.runTaskTimer(core, 0L, 1L);
     }
 
     private long parseTimeString(String timeString) {

@@ -92,7 +92,7 @@ public class SupplyCrateListener implements Listener {
             return false;
         }
 
-        supplyCrate.consumeLoot().award(supplyCrate.getLootContext());
+        supplyCrate.awardNextLoot();
         new SoundEffect(Sound.BLOCK_BEEHIVE_EXIT, 0.7f, 1f).play(supplyCrate.getLocation());
         return true;
     }

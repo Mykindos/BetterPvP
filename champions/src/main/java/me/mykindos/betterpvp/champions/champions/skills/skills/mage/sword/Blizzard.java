@@ -50,6 +50,10 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     private double pushbackHorizontalStrength;
     private double pushHorizontalIncreasePerLevel;
     private double initialEnergyCost;
+    private double horizontalSpread;
+    private double horizontalSpreadIncreasePerLevel;
+    private double verticalSpread;
+    private double verticalSpreadIncreasePerLevel;
 
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
@@ -93,6 +97,14 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     public double getPushbackVerticalStrength(int level) {
         return pushbackVerticalStrength + ((level - 1) * pushVerticalIncreasePerLevel);
+    }
+
+    public double getHorizontalSpread(int level) {
+        return horizontalSpread + ((level - 1) * horizontalSpreadIncreasePerLevel);
+    }
+
+    public double getVerticalSpread(int level) {
+        return verticalSpread + ((level - 1) * verticalSpreadIncreasePerLevel);
     }
 
     @Override
@@ -169,7 +181,20 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
             } else {
                 Snowball s = player.launchProjectile(Snowball.class);
                 s.getLocation().add(0, 1, 0);
-                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1))));
+
+                // Build screen-space axes from the player's look direction
+                Vector forward = player.getLocation().getDirection();
+                Vector worldUp = new Vector(0, 1, 0);
+                // When looking nearly straight up/down, fall back to world-X as reference
+                Vector screenRight = Math.abs(forward.dot(worldUp)) > 0.99
+                        ? forward.clone().crossProduct(new Vector(1, 0, 0)).normalize()
+                        : forward.clone().crossProduct(worldUp).normalize();
+                Vector screenUp = screenRight.clone().crossProduct(forward).normalize();
+
+                Vector velocity = forward.clone()
+                        .add(screenRight.clone().multiply(UtilMath.randDouble(-getHorizontalSpread(level), getHorizontalSpread(level))))
+                        .add(screenUp.clone().multiply(UtilMath.randDouble(-getVerticalSpread(level), getVerticalSpread(level))));
+                s.setVelocity(velocity);
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
                 snow.put(s, player);
 
@@ -214,7 +239,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     public void loadSkillConfig() {
         initialEnergyCost = getConfig("initialEnergyCost", 20.0, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.25, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
         pushForwardStrength = getConfig("pushForwardStrength", 0.3, Double.class);
         pushUpwardStrength = getConfig("pushUpwardStrength", 0.15, Double.class);
@@ -224,5 +249,9 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         pushbackHorizontalStrength = getConfig("pushbackHorizontalStrength", 0.06, Double.class);
         pushVerticalIncreasePerLevel = getConfig("pushbackVerticalIncreasePerLevel", 0.0, Double.class);
         pushHorizontalIncreasePerLevel = getConfig("pushbackHorizontalIncreasePerLevel", 0.0, Double.class);
+        horizontalSpread = getConfig("horizontalSpread", 0.1, Double.class);
+        horizontalSpreadIncreasePerLevel = getConfig("horizontalSpreadIncreasePerLevel", 0.0, Double.class);
+        verticalSpread = getConfig("verticalSpread", 0.05, Double.class);
+        verticalSpreadIncreasePerLevel = getConfig("verticalSpreadIncreasePerLevel", 0.0, Double.class);
     }
 }

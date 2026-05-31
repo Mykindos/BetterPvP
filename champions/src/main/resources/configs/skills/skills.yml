@@ -67,7 +67,7 @@ skills:
       durationIncreasePerLevel: 1.0
       slownessStrength: 1
     silencingstrikes:
-      enabled: true
+      enabled: false
       maxlevel: 3
       hitsNeeded: 3
       timeSpan: 0.8
@@ -104,11 +104,13 @@ skills:
       cooldownReductionPerLevel: 0.0
     excessiveforce:
       enabled: true
-      cooldown: 16.0
+      cooldown: 18.0
       maxlevel: 3
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 3.0
+      baseDuration: 2.5
       durationPerLevel: 0.5
+      baseKnockbackPercent: 0.75
+      knockbackPercentIncreasePerLevel: 0.0
     blink:
       enabled: true
       cooldown: 11.0
@@ -302,8 +304,8 @@ skills:
       enabled: true
       maxlevel: 3
       internalCooldown: 2.0
-      baseDamage: 0.8
-      damageIncreasePerLevel: 0.8
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.75
     sacrifice:
       enabled: true
       maxlevel: 3
@@ -376,21 +378,20 @@ skills:
       enabled: true
       cooldown: 12.0
       maxlevel: 5
-      damage: 8.0
       slowDuration: 1.5
       cooldownDecreasePerLevel: 1.0
-      baseDamage: 6.0
+      baseDamage: 7.0
       damageIncreasePerLevel: 0.5
-      baseSlowDuration: 3.0
-      slowDurationIncreasePerLevel: 0.0
+      baseSlowDuration: 2.0
+      slowDurationIncreasePerLevel: 0.5
       slowStrength: 2
     inferno:
       enabled: true
       maxlevel: 3
       energy: 60
       baseFireDuration: 2.5
-      fireDurationIncreasePerLevel: 0.0
-      baseDamage: 1.0
+      fireDurationIncreasePerLevel: 0.25
+      baseDamage: 2.0
       damageIncreasePerLevel: 0.0
       immuneTime: 0.45
       fireTicks: 50
@@ -399,14 +400,14 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 12.0
-      speed: 0.2
-      baseDamage: 2.0
+      speed: 0.3
+      baseDamage: 3.0
       fireDurationIncreasePerLevel: 0.4
       cooldownDecreasePerLevel: 1.0
       damageIncreasePerLevel: 0.5
       radius: 4.0
       radiusIncreasePerLevel: 0.0
-      baseFireDuration: 0.8
+      baseFireDuration: 1.0
       velocityMultiplier: 2.0
       fallDamageLimit: 8.0
     iceprison:
@@ -417,20 +418,20 @@ skills:
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
       baseDuration: 4.0
-      durationIncreasePerLevel: 1.0
+      durationIncreasePerLevel: 0.75
       variance: 0.5
     lightningorb:
       enabled: true
       maxlevel: 5
       cooldown: 12.0
       cooldownDecreasePerLevel: 1.0
-      baseRadius: 3.5
+      baseRadius: 4.0
       radiusIncreasePerLevel: 0.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
       shockDurationIncreasePerLevel: 0.0
-      baseDamage: 7.0
-      damageIncreasePerLevel: 0.0
+      baseDamage: 6.0
+      damageIncreasePerLevel: 0.5
       slowDuration: 4.0
       baseShockDuration: 2.0
       velocityStrength: 3.0
@@ -461,7 +462,7 @@ skills:
       baseDamage: 1.0
       damageIncreasePerLevel: 1.0
     moltenshield:
-      enabled: true
+      enabled: false
       maxlevel: 1
     defensiveaura:
       enabled: true
@@ -479,7 +480,7 @@ skills:
       maxlevel: 3
       energy: 40
       baseSlowDuration: 2.0
-      slowDurationIncreasePerLevel: 0.0
+      slowDurationIncreasePerLevel: 0.25
       slowStrength: 1
       slowDuration: 2.0
       energyDecreasePerLevel: 5.0
@@ -491,21 +492,25 @@ skills:
       pushbackVerticalIncreasePerLevel: 0.0
       pushbackHorizontalStrength: 0.2
       pushbackHorizontalIncreasePerLevel: 0.0
+      horizontalSpread: 0.1
+      horizontalSpreadIncreasePerLevel: 0.0
+      verticalSpread: 0.05
+      verticalSpreadIncreasePerLevel: 0.0
     glacialblade:
       enabled: true
       maxlevel: 3
       cooldown: 2.0
       cooldownDecreasePerLevel: 0.5
-      damage: 1.0
+      damage: 2.0
       damageIncreasePerLevel: 1.0
     void:
       enabled: true
       maxlevel: 3
       energy: 20
-      baseDamageReduction: 1.5
+      baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.5
       baseEnergyReduction: 3.5
-      energyReductionDecreasePerLevel: 0.2
+      energyReductionDecreasePerLevel: 0.25
       slownessStrength: 3
       energyDecreasePerLevel: 2.0
       energyStartCost: 10.0
@@ -533,8 +538,8 @@ skills:
     nullblade:
       enabled: true
       maxlevel: 3
-      energySiphoned: 7.0
-      energySiphonedIncreasePerLevel: 2.0
+      energySiphoned: 9.0
+      energySiphonedIncreasePerLevel: 3.0
     holylight:
       enabled: true
       maxlevel: 3
@@ -593,10 +598,10 @@ skills:
     adrenaline:
       enabled: true
       maxlevel: 3
-      speedOneHealth: 0.35
-      speedOneHealthIncreasePerLevel: 0.15
-      speedTwoHealth: 0.15
-      speedTwoHealthIncreasePerLevel: 0.075
+      speedOneHealth: 0.50
+      speedOneHealthIncreasePerLevel: 0.10
+      speedTwoHealth: 0.20
+      speedTwoHealthIncreasePerLevel: 0.10
     battletaunt:
       enabled: false
       energy: 15
@@ -626,12 +631,11 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 1.5
       baseDistance: 5.0
       distanceIncreasePerLevel: 0.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
-      damage: 3.0
     skullsplitter:
       enabled: true
       maxlevel: 5
@@ -652,7 +656,7 @@ skills:
     fleshhook:
       enabled: true
       maxlevel: 5
-      cooldown: 14.0
+      cooldown: 13.0
       cooldownDecreasePerLevel: 1.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
@@ -663,13 +667,13 @@ skills:
       maxlevel: 5
       cooldown: 10.0
       cooldownDecreasePerLevel: 1.0
-      baseCharge: 0.55
-      chargeIncreasePerLevel: 0.15
-      baseDamage: 4.0
+      baseCharge: 0.60
+      chargeIncreasePerLevel: 0.20
+      baseDamage: 5.0
       damageIncreasePerLevel: 1.0
       baseRadius: 3.0
       radiusIncreasePerLevel: 0.0
-      baseSpeed: 1.4
+      baseSpeed: 1.5
       speedIncreasePerLevel: 0.1
       hitBoxSize: 1.0
       size: 0.6
@@ -687,15 +691,15 @@ skills:
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
       slownessStrength: 4
-      recoilDamage: 1.5
-      recoilDamageIncreasePerLevel: 0.5
+      recoilDamage: 0.0
+      recoilDamageIncreasePerLevel: 0.0
       damageIncreasePerLevel: 1.0
       velocityStrength: 1.2
       fallDamageLimit: 4.0
     stampede:
       enabled: true
       maxlevel: 3
-      durationPerStack: 5.0
+      durationPerStack: 4.0
       damage: 0.5
       damageIncreasePerLevel: 0.5
       durationPerStackDecreasePerLevel: 1.0
@@ -742,14 +746,14 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 8.0
-      cooldownDecreasePerLevel: 0.3
-      baseDamage: 4.0
+      cooldownDecreasePerLevel: 0.5
+      baseDamage: 5.0
       damagePerLevel: 1.0
       speed: 40.0
       duration: 1.0
       hitboxSize: 0.6
       cooldownReduction: 1.5
-      cooldownReductionPerLevel: 0.3
+      cooldownReductionPerLevel: 0.5
     bullseye:
       enabled: false
       maxlevel: 5
@@ -766,9 +770,9 @@ skills:
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       baseCharge: 0.40
-      chargeIncreasePerLevel: 0.10
-      baseDamage: 2.0
-      damageIncreasePerLevel: 1.0
+      chargeIncreasePerLevel: 0.15
+      baseDamage: 3.0
+      damageIncreasePerLevel: 1.5
       baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
@@ -779,7 +783,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseNumTridents: 3
       numTridentsIncreasePerLevel: 0
-      baseDamage: 1.0
+      baseDamage: 1.5
       damageIncreasePerLevel: 0.75
       tridentDelay: 0.2
     tethershot:
@@ -800,17 +804,17 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 2.0
+      baseDuration: 3.0
       durationIncreasePerLevel: 1.5
       baseExtraDamage: 2.0
       extraDamageIncreasePerLevel: 0.5
-      speedStrength: 2
+      speedStrength: 3
     explosivearrow:
       enabled: true
       maxlevel: 5
       cooldown: 16.0
       cooldownDecreasePerLevel: 2.0
-      baseDamage: 2.0
+      baseDamage: 3.0
       damageIncreasePerLevel: 0.5
       valocityMultiplier: 1.2
       radiusIncreasePerLevel: 0.0
@@ -858,7 +862,7 @@ skills:
     kinetics:
       enabled: true
       maxlevel: 3
-      velocityRestTime: 4.0
+      velocityRestTime: 5.0
       storedVelocityCount: 1
       storedVelocityCountIncreasePerLevel: 1
       fallDamageLimit: 4.0
@@ -918,9 +922,9 @@ skills:
       maxlevel: 3
       baseDamage: 1.0
       damageIncreasePerLevel: 0.5
-      damageResetTime: 2.0
+      damageResetTime: 4.0
       slownessStrength: 1
-      slowDuration: 1.0
+      slowDuration: 1.5
     volley:
       enabled: true
       maxlevel: 5
@@ -946,16 +950,16 @@ skills:
       maxlevel: 3
       maxSporeCharges: 2
       maxSporeChargesIncreasePerLevel: 1
-      sporeRemovalTime: 5.0
-      healingIncreasePerLevel: 0.0
-      healing: 1.5
+      sporeRemovalTime: 10.0
+      healingIncreasePerLevel: 0.5
+      healing: 2.0
     sharpshooter:
       enabled: true
       maxlevel: 3
       duration: 5.0
       maxConsecutiveHits: 5
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.25
+      baseDamage: 1.5
+      damageIncreasePerLevel: 0.5
       maxConsecutiveHitsIncreasePerLevel: 0
     agility:
       enabled: true
@@ -976,8 +980,8 @@ skills:
       cooldownDecreasePerLevel: 5.0
       baseDuration: 5.0
       durationIncreasePerLevel: 0.0
-      baseMissedSwings: 2
-      missedSwingsIncreasePerLevel: 1.0
+      baseMissedSwings: 4
+      missedSwingsIncreasePerLevel: 2.0
       strengthLevel: 2
       strengthLevelIncreasePerLevel: 0
     windburst:
@@ -1039,17 +1043,16 @@ skills:
       cooldownDecreasePerLevel: 3.0
       baseRange: 8.0
       rangeIncreasePerLevel: 1.0
-      baseHealthReduction: 12.0
+      baseHealthReduction: 10.0
       healthReductionDecreasePerLevel: 1.0
-      baseHealthReductionPerPlayerAffected: 2.0
+      baseHealthReductionPerPlayerAffected: 1.5
       healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
-      baseDuration: 20.0
-      durationIncreasePerLevel: 2.5
+      baseDuration: 15.0
+      durationIncreasePerLevel: 5.0
       damageReductionPerLevel: 0.0
       baseNumAttacksToReduce: 3
       numAttacksToReducePerLevel: 0
-      range: 8
-      duration: 60.0
+      range: 8.0
     soulbonds:
       enabled: true
       maxlevel: 3
@@ -1065,6 +1068,10 @@ skills:
       healMultiplierIncreasePerLevel: 0.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
+      baseHealOnHit: 1.0
+      healOnHitIncreasePerLevel: 0.5
+      baseRecieveMultiplier: 1.2
+      recieveMultiplierIncreasePerLevel: 0.0
     bloodshed:
       enabled: true
       maxlevel: 5
@@ -1077,11 +1084,13 @@ skills:
       speedStrength: 2
       baseHealthReduction: 4.0
       healthReductionDecreasePerLevel: 0.5
+      baseHealthReductionPerPlayerAffected: 1.0
+      healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
     bloodthirst:
       enabled: true
       maxlevel: 3
-      baseHealthPercent: 0.3
-      healthPercentIncreasePerLevel: 0.05
+      baseHealthPercent: 0.4
+      healthPercentIncreasePerLevel: 0.1
       speedStrength: 2
     soulharvest:
       enabled: true
@@ -1089,7 +1098,8 @@ skills:
       baseBuffDuration: 2.0
       buffDurationIncreasePerLevel: 1.0
       speedStrength: 2
-      regenerationStrength: 2
+      baseHealthPerSecond: 4.0
+      healthPerSecondIncreasePerLevel: 0.0
     impotence:
       enabled: true
       maxlevel: 3
@@ -1113,7 +1123,7 @@ skills:
       rangeIncreasePerLevel: 0.5
       baseDamageIncrease: 0.33
       damageIncreasePerLevel: 0.0
-      baseHealthReduction: 12.0
+      baseHealthReduction: 9.0
       healthReductionDecreasePerLevel: 1.0
     cleanse:
       enabled: true
@@ -1128,18 +1138,18 @@ skills:
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0
       baseDuration: 2.0
-      durationIncreasePerLevel: 0.5
+      durationIncreasePerLevel: 1.0
       distance: 5
       duration: 2.0
-      baseHealthReductionPerPlayerAffected: 2.0
+      baseHealthReductionPerPlayerAffected: 0.0
       healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
     clone:
       enabled: true
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 8.0
-      healthReductionDecreasePerLevel: 1.5
+      baseHealthReduction: 0.0
+      healthReductionDecreasePerLevel: 0.0
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
       baseHealth: 10.0
@@ -1164,23 +1174,25 @@ skills:
     grasp:
       enabled: true
       maxlevel: 5
-      cooldown: 20.0
+      cooldown: 18.0
       cooldownDecreasePerLevel: 2.0
       baseDistance: 10.0
       distanceIncreasePerLevel: 5.0
-      baseDamage: 2.0
+      baseDamage: 3.0
       damageIncreasePerLevel: 1.0
+      baseSpeed: 0.3
+      speedIncreasePerLevel: 0.0
     leech:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
-      baseRange: 7.0
-      rangeIncreasePerLevel: 0.0
-      baseLeechedHealth: 1.0
+      baseRange: 6.0
+      rangeIncreasePerLevel: 0.5
+      baseLeechedHealth: 2.0
       leachedHealthIncreasePerLevel: 0.0
       leechedHealth: 2.0
-      maximumEnemies: 2
+      maximumEnemies: 4
       maximumEnemiesIncreasePerLevel: 0
     wreath:
       enabled: true
@@ -1200,24 +1212,23 @@ skills:
     frailty:
       enabled: true
       maxlevel: 3
-      baseHealthPercent: 0.3
+      baseHealthPercent: 0.4
       healthPercentIncreasePerLevel: 0.1
-      baseDamagePercent: 0.15
+      baseDamagePercent: 0.2
       damagePercentIncreasePerLevel: 0.05
     siphon:
       enabled: true
       maxlevel: 3
-      baseRadius: 3.0
+      baseRadius: 4.0
       radiusIncreasePerLevel: 1.0
       baseEnergySiphoned: 1.0
       energySiphonedIncreasePerLevel: 0.0
       speedStrength: 2
       speedDuration: 2.5
-      radius: 4
       energySiphoned: 1.0
-      elapsedTimeToProcAbility: 2.0
+      elapsedTimeToProcAbility: 1.0
       healthGainedOnRandomSiphon: 2.0
-      randomSiphonHealthGainChance: 0.1
+      randomSiphonHealthGainChance: 0.2
     bloodsphere:
       enabled: true
       maxlevel: 5
@@ -1231,12 +1242,12 @@ skills:
       applyRadiusIncreasePerLevel: 0.0
       passiveTravelSpeed: 16.0
       applyTravelSpeed: 6.0
-      damagePerSecond: 3.0
+      damagePerSecond: 5.0
       damageIncreasePerLevel: 1.0
       regenPerSecond: 8.0
       regenIncreasePerLevel: 1.0
-      impactHealthMultiplier: 0.1
-      impactHealthMultiplierIncreasePerLevel: 0.05
+      impactHealthMultiplier: 0.2
+      impactHealthMultiplierIncreasePerLevel: 0.1
       healthSeconds: 0.5
       mobHealthModifier: 0.25
   global:

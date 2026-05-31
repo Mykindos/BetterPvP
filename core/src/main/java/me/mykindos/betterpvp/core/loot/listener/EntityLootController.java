@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
@@ -57,7 +58,9 @@ public class EntityLootController implements Listener {
             lootSession = sessionController.resolve(killer, lootTable, () -> LootSession.newSession(lootTable, killer));
         }
 
-        final LootContext context = new LootContext(lootSession, entity.getLocation(), entity.getName().replaceAll("§\\w", ""));
+        final String entityName = entity.getName().replaceAll("§\\w", "");
+        final LootContext context = new LootContext(lootSession, entity.getLocation(),
+                LootSource.of(entityName, "entity:" + entityName.toLowerCase().replace(' ', '_')));
         final LootBundle bundle = lootTable.generateLoot(context);
         bundle.award();
     }

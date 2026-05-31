@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.purity.distribution.PurityDistributionRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -54,7 +54,7 @@ public class PurityAssignmentBuilder implements Listener {
         }
 
         // Apply to items with rune sockets
-        if (instance.getComponent(RuneContainerComponent.class).isPresent()) {
+        if (instance.getComponent(SocketableContainerComponent.class).isPresent()) {
             return true;
         }
 

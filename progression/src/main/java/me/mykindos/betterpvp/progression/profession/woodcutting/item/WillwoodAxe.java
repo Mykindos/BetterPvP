@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.impl.interaction.TreeFellerInteraction;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
@@ -35,7 +35,7 @@ public class WillwoodAxe extends BaseItem {
         super("Willwood Axe", Item.model(Material.IRON_AXE, "willwood_axe"), ItemGroup.TOOL, ItemRarity.RARE);
         addSerializableComponent(new DurabilityComponent(1000));
         addSerializableComponent(new RepairableComponent());
-        addSerializableComponent(new RuneContainerComponent());
+        addSerializableComponent(new SocketableContainerComponent());
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.BLOCK_BREAK, interaction)
                 .build());

@@ -68,7 +68,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 "Instantly <effect>Vanish</effect> before your foes",
                 "for a maximum of " + getValueString(this::getDuration, level) + " seconds,",
                 "inflicting <effect>Blindness</effect> to enemies",
-                "within " + getValueString(this::getBlindRadius, level) + " blocks for <stat>" + getValueString(this::getBlindDuration, level) + " seconds",
+                "within " + getValueString(this::getBlindRadius, level) + " blocks for " + getValueString(this::getBlindDuration, level) + " seconds",
                 "",
                 "Interacting with your surroundings",
                 "or taking damage",

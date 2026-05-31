@@ -95,8 +95,8 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
 
     @Override
     public void loadSkillConfig() {
-        baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
-        healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.05, Double.class);
+        baseHealthPercent = getConfig("baseHealthPercent", 0.40, Double.class);
+        healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.1, Double.class);
 
         speedStrength = getConfig("speedStrength", 2, Integer.class);
     }

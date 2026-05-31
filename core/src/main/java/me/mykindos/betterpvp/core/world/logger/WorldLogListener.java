@@ -22,11 +22,9 @@ import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -165,27 +163,31 @@ public class WorldLogListener implements Listener {
     //    worldLogHandler.addLog(log);
     //}
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryPickupEvent(InventoryPickupItemEvent event) {
-
-        Inventory inventory = event.getInventory();
-        InventoryHolder inventoryHolder = inventory.getHolder();
-
-        if (inventory.getLocation() == null) return;
-
-        Block block = inventory.getLocation().getBlock();
-        if (inventoryHolder instanceof DoubleChest doubleChest) {
-            block = doubleChest.getLocation().getBlock();
-        }
-
-        WorldLog log = WorldLog.builder()
-                .block(block)
-                .action(WorldLogAction.BLOCK_PICKUP_ITEM)
-                .itemMetadata(event.getItem().getItemStack())
-                .build();
-
-        worldLogHandler.addLog(log);
-    }
+    //@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    //public void onInventoryPickupEvent(InventoryPickupItemEvent event) {
+//
+    //    Inventory inventory = event.getInventory();
+    //    InventoryHolder inventoryHolder = inventory.getHolder();
+//
+    //    if (inventory.getLocation() == null) return;
+//
+    //    Block block = inventory.getLocation().getBlock();
+    //    if (inventoryHolder instanceof DoubleChest doubleChest) {
+    //        block = doubleChest.getLocation().getBlock();
+    //    }
+//
+    //    if(block.getType() == Material.HOPPER || block.getType() == Material.HOPPER_MINECART) {
+    //        return;
+    //    }
+//
+    //    WorldLog log = WorldLog.builder()
+    //            .block(block)
+    //            .action(WorldLogAction.BLOCK_PICKUP_ITEM)
+    //            .itemMetadata(event.getItem().getItemStack())
+    //            .build();
+//
+    //    worldLogHandler.addLog(log);
+    //}
 
     // Always shows the source block as air, despite documentation suggesting otherwise
     //@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

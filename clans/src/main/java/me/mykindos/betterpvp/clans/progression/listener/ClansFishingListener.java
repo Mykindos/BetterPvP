@@ -80,7 +80,7 @@ public class ClansFishingListener implements Listener {
         if(true) {
             return;
         }
-        if (!"Fishing".equals(event.getContext().getSource())) return;
+        if (!event.getContext().getSource().getId().startsWith("fishing:")) return;
         if (!(event.getLoot() instanceof DroppedItemLoot droppedLoot)) return;
 
         final Audience audience = event.getContext().getSession().getAudience();

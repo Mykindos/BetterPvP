@@ -7,20 +7,17 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
-import me.mykindos.betterpvp.core.loot.LootTable;
-import me.mykindos.betterpvp.core.loot.LootTableRegistry;
-import me.mykindos.betterpvp.core.loot.session.LootSession;
-import me.mykindos.betterpvp.core.loot.session.LootSessionController;
+import me.mykindos.betterpvp.core.loot.LootSource;
+import me.mykindos.betterpvp.core.loot.event.LootAwardedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingDoubleTreasureDropEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingTreasureDropEvent;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
@@ -38,28 +35,16 @@ import java.util.Optional;
 @BPvPListener
 @Singleton
 @CustomLog
-public class DoubleTreasureChanceListener implements Listener, Reloadable {
+public class DoubleTreasureChanceListener implements Listener {
 
     private final FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute;
-    private final LootTableRegistry lootTableRegistry;
-    private final LootSessionController sessionController;
     private final ItemFactory itemFactory;
-
-    private LootTable treasureLootTable;
 
     @Inject
     public DoubleTreasureChanceListener(FishingDoubleTreasureChanceAttribute doubleTreasureChanceAttribute,
-                                        LootTableRegistry lootTableRegistry,
-                                        LootSessionController sessionController, ItemFactory itemFactory) {
+                                        ItemFactory itemFactory) {
         this.doubleTreasureChanceAttribute = doubleTreasureChanceAttribute;
-        this.lootTableRegistry = lootTableRegistry;
-        this.sessionController = sessionController;
         this.itemFactory = itemFactory;
-    }
-
-    @Override
-    public void reload() {
-        this.treasureLootTable = lootTableRegistry.loadLootTable("fishing_treasure_chance");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -72,37 +57,36 @@ public class DoubleTreasureChanceListener implements Listener, Reloadable {
             return;
         }
 
-        LootBundle bundle = rollTreasure(player, location);
-        PlayerFishingDoubleTreasureDropEvent doubleEvent = UtilServer.callEvent(new PlayerFishingDoubleTreasureDropEvent(player, location, bundle));
+        final LootBundle original = event.getBundle();
+        final LootContext doubleContext = new LootContext(
+                original.getContext().getSession(),
+                location,
+                LootSource.of("Fishing", "fishing:treasure_double")
+        );
+        final LootBundle doubled = original.duplicate(doubleContext);
+
+        PlayerFishingDoubleTreasureDropEvent doubleEvent = UtilServer.callEvent(new PlayerFishingDoubleTreasureDropEvent(player, location, doubled));
         if (doubleEvent.isCancelled()) {
             return;
         }
 
-        for (Loot<?, ?> loot : bundle) {
-            awardTreasure(player, location, loot, bundle.getContext());
-        }
+        doubled.award();
     }
 
-    private LootBundle rollTreasure(Player player, Location location) {
-        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
-        final LootContext context = new LootContext(session, location, "Fishing");
-        return treasureLootTable.generateLoot(context);
-    }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDoubleTreasureLootAwarded(LootAwardedEvent event) {
+        if (!"fishing:treasure_double".equals(event.getContext().getSource().getId())) return;
+        final Audience audience = event.getContext().getSession().getAudience();
+        if (!(audience instanceof Player player)) return;
+        final LootContext context = event.getContext();
+        final Location location = context.getLocation();
+        final Object award = event.getRawResult();
 
-    private void awardTreasure(Player player, Location location, Loot<?, ?> loot, LootContext context) {
-        final Object award = loot.award(context);
         if (award instanceof Item item) {
-            // Reel-in vector pointing from the hook back toward the player, mirroring the
-            // velocity Minecraft applies to the natural fishing-rod caught Item entity.
-            final Vector reelVelocity;
-            if (player != null) {
-                reelVelocity = player.getLocation().toVector()
-                        .subtract(context.getLocation().toVector())
-                        .multiply(0.1)
-                        .add(new Vector(0, 0.2, 0));
-            } else {
-                reelVelocity = new Vector(0, 0.2, 0);
-            }
+            final Vector reelVelocity = player.getLocation().toVector()
+                    .subtract(location.toVector())
+                    .multiply(0.1)
+                    .add(new Vector(0, 0.2, 0));
             if (item.isValid()) {
                 item.setVelocity(reelVelocity);
             }
@@ -115,7 +99,7 @@ public class DoubleTreasureChanceListener implements Listener, Reloadable {
     private void sendMessage(Player player, Location location, ItemStack itemStack) {
         final Component name;
         Optional<ItemInstance> itemInstanceOptional = itemFactory.fromItemStack(itemStack);
-        if(itemInstanceOptional.isPresent()) {
+        if (itemInstanceOptional.isPresent()) {
             ItemInstance itemInstance = itemInstanceOptional.get();
             name = itemInstance.getView().getName();
         } else {

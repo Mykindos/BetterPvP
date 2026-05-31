@@ -7,11 +7,13 @@ import me.mykindos.betterpvp.clans.fields.model.CustomOre;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -79,5 +81,13 @@ public class EnergyOre extends CustomOre implements Listener {
             default -> 0;
         };
         return new ItemStack[] { EnergyItem.SHARD.generateItem(amount, true) };
+    }
+
+    @Override
+    public void deliver(Player player, FieldsBlock block, ItemFactory itemFactory) {
+        final ItemStack[] itemStacks = generateDrops(block);
+        for (ItemStack itemStack : itemStacks) {
+            player.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), itemStack);
+        }
     }
 }

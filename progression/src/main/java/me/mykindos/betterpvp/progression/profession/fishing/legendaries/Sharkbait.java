@@ -13,7 +13,8 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -40,7 +41,8 @@ public class Sharkbait extends BaseItem implements Reloadable {
         this.auraAbility = auraAbility;
         
         // Add ability container
-        addSerializableComponent(new RuneContainerComponent(0, 0));
+        addSerializableComponent(new DurabilityComponent(2000));
+        addSerializableComponent(new SocketableContainerComponent(0, 0));
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.PASSIVE, auraAbility)
                 .build());
@@ -55,5 +57,10 @@ public class Sharkbait extends BaseItem implements Reloadable {
 
         auraAbility.setCatchSpeedMultiplier(catchSpeedMultiplier);
         auraAbility.setRadius(radius);
+
+        final int durability = config.getConfig("durability", 2000, Integer.class);
+        getComponent(DurabilityComponent.class).ifPresent(durabilityComponent -> {
+            durabilityComponent.setMaxDamage(durability);
+        });
     }
 }

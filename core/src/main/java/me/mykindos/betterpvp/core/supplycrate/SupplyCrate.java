@@ -8,8 +8,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.combat.cause.EnvironmentalDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.loot.AwardStrategy;
 import me.mykindos.betterpvp.core.loot.Loot;
+import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -36,8 +39,33 @@ public class SupplyCrate extends Projectile {
     @Getter(AccessLevel.NONE)
     private ActiveModel activeModel;
     private final SupplyCrateType type;
-    private Iterator<Loot<?, ?>> lootIterator;
+    private LootBundle lootBundle;
+    private final CrateAwardStrategy awardStrategy = new CrateAwardStrategy();
     private LootContext lootContext;
+
+    /**
+     * Captures the bundle's iterator on first award so the crate can drip-feed entries
+     * later via {@link #awardNextLoot()}, routed through {@link AwardStrategy#awardSingle}
+     * so {@link me.mykindos.betterpvp.core.loot.event.LootAwardedEvent} fires per entry.
+     */
+    private final class CrateAwardStrategy extends AwardStrategy {
+        private Iterator<Loot<?, ?>> iterator;
+
+        @Override
+        public void award(LootBundle b) {
+            this.iterator = b.iterator();
+        }
+
+        boolean hasNext() {
+            return iterator != null && iterator.hasNext();
+        }
+
+        void awardNext(LootBundle b) {
+            if (hasNext()) {
+                awardSingle(b, iterator.next());
+            }
+        }
+    }
 
     protected SupplyCrate(Player caller, Location location, SupplyCrateType type, long crateAliveTime) {
         super(caller, type.getSize(), location, crateAliveTime);
@@ -63,11 +91,15 @@ public class SupplyCrate extends Projectile {
     }
 
     public boolean hasLoot() {
-        return lootIterator != null && lootIterator.hasNext();
+        return awardStrategy.hasNext();
     }
 
-    public Loot<?, ?> consumeLoot() {
-        return lootIterator.next();
+    /**
+     * Awards the next loot entry through the strategy, which fires
+     * {@link me.mykindos.betterpvp.core.loot.event.LootAwardedEvent} per entry.
+     */
+    public void awardNextLoot() {
+        awardStrategy.awardNext(lootBundle);
     }
 
     @Override
@@ -183,9 +215,13 @@ public class SupplyCrate extends Projectile {
         // Award the loot and stop moving
         final LootTable lootTable = type.getLootTable();
         final LootSession session = LootSession.newSession(lootTable, Bukkit.getServer());
-        this.lootContext = new LootContext(session, this.location.clone().add(0, hitboxSize, 0), this.type.getDisplayName())
+        final String typeSlug = this.type.getDisplayName().toLowerCase().replace(' ', '_');
+        this.lootContext = new LootContext(session, this.location.clone().add(0, hitboxSize, 0),
+                LootSource.of(this.type.getDisplayName(), "supply_crate:" + typeSlug))
                 .withInput("player_count", Bukkit.getOnlinePlayers().size());
-        this.lootIterator = lootTable.generateLoot(lootContext).iterator();
+        this.lootBundle = lootTable.generateLoot(lootContext);
+        this.lootBundle.setAwardStrategy(this.awardStrategy);
+        this.lootBundle.award(); // strategy captures the iterator; no entries awarded yet
 
         // Sounds
         new SoundEffect(Sound.BLOCK_CHEST_LOCKED, 0.4f, 4.5f).play(location);

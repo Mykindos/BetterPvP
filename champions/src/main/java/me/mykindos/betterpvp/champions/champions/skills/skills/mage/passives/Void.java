@@ -154,7 +154,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.5, Double.class);
 
         baseEnergyReduction = getConfig("baseEnergyReduction", 2.5, Double.class);
-        energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0.5, Double.class);
+        energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0.25, Double.class);
 
         slownessStrength = getConfig("slownessStrength", 3, Integer.class);
     }

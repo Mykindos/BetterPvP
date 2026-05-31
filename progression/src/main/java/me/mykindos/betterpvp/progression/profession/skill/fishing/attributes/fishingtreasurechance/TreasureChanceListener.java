@@ -7,11 +7,12 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
+import me.mykindos.betterpvp.core.loot.event.LootAwardedEvent;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.loot.session.LootSessionController;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -19,9 +20,10 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
-import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureChanceCalculationEvent;
+import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureChanceDropTableEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingTreasureDropEvent;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
@@ -69,52 +71,57 @@ public class TreasureChanceListener implements Listener, Reloadable {
         final Location location = event.getHook().getLocation();
 
         double chance = treasureChanceAttribute.getChance(player);
-        FishingTreasureChanceCalculationEvent treasureCalculationEvent = UtilServer.callEvent(new FishingTreasureChanceCalculationEvent(player, location, chance));
+        FishingTreasureChanceDropTableEvent treasureCalculationEvent = UtilServer.callEvent(new FishingTreasureChanceDropTableEvent(player, location, chance));
         chance = treasureCalculationEvent.getTreasureChance();
 
         if (chance <= 0 || UtilMath.randDouble(0, 1) >= chance) {
             return;
         }
 
-        LootBundle bundle = rollTreasure(player, location);
+        LootBundle bundle = rollTreasure(player, location, treasureCalculationEvent.getLootTableId());
         PlayerFishingTreasureDropEvent treasureEvent = UtilServer.callEvent(new PlayerFishingTreasureDropEvent(player, location, bundle));
         if (treasureEvent.isCancelled()) {
             return;
         }
 
-        for (Loot<?, ?> loot : bundle) {
-            awardTreasure(player, location, loot, bundle.getContext());
-        }
+        bundle.award();
     }
 
-    private LootBundle rollTreasure(Player player, Location location) {
-        final LootSession session = sessionController.resolve(player, treasureLootTable, () -> LootSession.newSession(treasureLootTable, player));
-        final LootContext context = new LootContext(session, location, "Fishing");
-        return treasureLootTable.generateLoot(context);
-    }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTreasureLootAwarded(LootAwardedEvent event) {
+        if (!"fishing:treasure".equals(event.getContext().getSource().getId())) return;
+        final Audience audience = event.getContext().getSession().getAudience();
+        if (!(audience instanceof Player player)) return;
+        final LootContext context = event.getContext();
+        final Location location = context.getLocation();
+        final Object award = event.getRawResult();
 
-    private void awardTreasure(Player player, Location location, Loot<?, ?> loot, LootContext context) {
-        final Object award = loot.award(context);
         if (award instanceof Item item) {
             // Reel-in vector pointing from the hook back toward the player, mirroring the
             // velocity Minecraft applies to the natural fishing-rod caught Item entity.
-            final Vector reelVelocity;
-            if (player != null) {
-                reelVelocity = player.getLocation().toVector()
-                        .subtract(context.getLocation().toVector())
-                        .multiply(0.1)
-                        .add(new Vector(0, 0.2, 0));
-            } else {
-                reelVelocity = new Vector(0, 0.2, 0);
-            }
+            final Vector reelVelocity = player.getLocation().toVector()
+                    .subtract(location.toVector())
+                    .multiply(0.1)
+                    .add(new Vector(0, 0.2, 0));
             if (item.isValid()) {
                 item.setVelocity(reelVelocity);
             }
-
             sendMessage(player, location, item.getItemStack());
         } else if (award instanceof ItemStack itemStack) {
             sendMessage(player, location, itemStack);
         }
+    }
+
+    private LootBundle rollTreasure(Player player, Location location, String lootTableId) {
+        LootTable lootTable = lootTableRegistry.getLoaded().get(lootTableId);
+        if (lootTable == null) {
+            lootTable = treasureLootTable;
+        }
+
+        final LootTable finalLootTable = lootTable;
+        final LootSession session = sessionController.resolve(player, finalLootTable, () -> LootSession.newSession(finalLootTable, player));
+        final LootContext context = new LootContext(session, location, LootSource.of("Fishing", "fishing:treasure"));
+        return finalLootTable.generateLoot(context);
     }
 
     private void sendMessage(Player player, Location location, ItemStack itemStack) {

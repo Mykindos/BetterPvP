@@ -222,7 +222,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
         baseDamageIncrease = getConfig("baseDamageIncrease", 0.33, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseHealthReduction = getConfig("baseHealthReduction", 12.0, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 9.0, Double.class);
         healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 1.0, Double.class);
     }
 

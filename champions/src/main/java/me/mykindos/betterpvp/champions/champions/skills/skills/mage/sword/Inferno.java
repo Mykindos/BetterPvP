@@ -75,6 +75,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 "",
                 "You spray fire at high speed igniting",
                 "anything it hits for " + getValueString(this::getFireDuration, level) + " seconds",
+                "and dealing " + getValueString(this::getDamage, level) + " damage on hit.",
                 "",
                 "Energy: " + getValueString(this::getEnergyPerSecond, level),
         };
@@ -197,8 +198,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     @Override
     public void loadSkillConfig() {
         baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
-        fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.25, Double.class);
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         immuneTime = getConfig("immuneTime", 0.45, Double.class);
 

@@ -155,10 +155,10 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     public void loadSkillConfig() {
-        baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
+        baseHealthPercent = getConfig("baseHealthPercent", 0.40, Double.class);
         healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.10, Double.class);
 
-        baseDamagePercent = getConfig("baseDamagePercent", 0.15, Double.class);
+        baseDamagePercent = getConfig("baseDamagePercent", 0.2, Double.class);
         damagePercentIncreasePerLevel = getConfig("damagePercentIncreasePerLevel", 0.05, Double.class);
     }
 

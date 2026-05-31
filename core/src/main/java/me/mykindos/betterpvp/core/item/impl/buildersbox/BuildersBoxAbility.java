@@ -13,9 +13,11 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.loot.AwardStrategy;
 import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootBundle;
 import me.mykindos.betterpvp.core.loot.LootContext;
+import me.mykindos.betterpvp.core.loot.LootSource;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.loot.item.DroppedItemLoot;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
@@ -86,9 +88,9 @@ public class BuildersBoxAbility extends AbstractInteraction implements Displayed
         // Generate Loot
         final LootTable lootTable = lootTableSupplier.get();
         final LootSession lootSession = LootSession.newSession(lootTable, player);
-        final LootContext lootContext = new LootContext(lootSession, location.clone().add(0, 0.9, 0), source);
+        final LootContext lootContext = new LootContext(lootSession, location.clone().add(0, 0.9, 0),
+                LootSource.of(source, "builders_box:" + source.toLowerCase().replace(' ', '_')));
         final LootBundle bundle = lootTable.generateLoot(lootContext);
-        final Iterator<Loot<?, ?>> iterator = bundle.iterator();
 
         // Spawn the model using ModelEngine
         final Dummy<?> dummy = new Dummy<>();
@@ -119,49 +121,52 @@ public class BuildersBoxAbility extends AbstractInteraction implements Displayed
         // Play particle effects
         queueEffects(location, fallDuration + 2L);
 
-        // Then spawn the items AFTER
-        new BukkitRunnable() {
-            double angle = 0;
+        // Drip-feed strategy: schedules awards on a BukkitRunnable timer and routes each
+        // through awardSingle so a LootAwardedEvent fires per item.
+        bundle.setAwardStrategy(new AwardStrategy() {
             @Override
-            public void run() {
-                if (!iterator.hasNext()) {
-                    this.cancel();
-                    dummy.setRemoved(true);
-                    new SoundEffect(Sound.ENTITY_PLAYER_TELEPORT, 0.4F, 1.2F).play(location);
-                    Particle.POOF.builder()
-                            .count(25)
-                            .offset(0.2, 0.2, 0.2)
-                            .extra(0.1)
-                            .location(location)
-                            .receivers(60)
-                            .spawn();
-                    return; // No more items
-                }
+            public void award(LootBundle b) {
+                final Iterator<Loot<?, ?>> iterator = b.iterator();
+                new BukkitRunnable() {
+                    double angle = 0;
+                    @Override
+                    public void run() {
+                        if (!iterator.hasNext()) {
+                            this.cancel();
+                            dummy.setRemoved(true);
+                            new SoundEffect(Sound.ENTITY_PLAYER_TELEPORT, 0.4F, 1.2F).play(location);
+                            Particle.POOF.builder()
+                                    .count(25)
+                                    .offset(0.2, 0.2, 0.2)
+                                    .extra(0.1)
+                                    .location(location)
+                                    .receivers(60)
+                                    .spawn();
+                            return;
+                        }
 
-                final Loot<?, ?> loot = iterator.next();
-                if (loot instanceof DroppedItemLoot itemLoot) {
-                    final Item item = itemLoot.award(lootContext);
-                    // Shoot it out in a circle
-                    final double radians = Math.toRadians(angle);
-                    angle += 22.5; // controls spacing and spiral motion
-                    angle += (Math.random() * 6 - 3); // small chaotic variance
-                    shootItem(radians, item);
+                        final Loot<?, ?> loot = iterator.next();
+                        final Object awarded = awardSingle(b, loot);
+                        if (loot instanceof DroppedItemLoot && awarded instanceof Item item) {
+                            final double radians = Math.toRadians(angle);
+                            angle += 22.5;
+                            angle += (Math.random() * 6 - 3);
+                            shootItem(radians, item);
 
-                    // Prevent despawning
-                    item.setPickupDelay(20); // 1-second pickup delay
-                    item.setUnlimitedLifetime(true);
-                    item.setCanMobPickup(false);
-                    item.setThrower(player.getUniqueId());
-                    item.setWillAge(false);
-                    item.setInvulnerable(true);
+                            item.setPickupDelay(20);
+                            item.setUnlimitedLifetime(true);
+                            item.setCanMobPickup(false);
+                            item.setThrower(player.getUniqueId());
+                            item.setWillAge(false);
+                            item.setInvulnerable(true);
 
-                    // Sound
-                    new SoundEffect(Sound.BLOCK_BEEHIVE_EXIT, 2f, 1f).play(location);
-                } else {
-                    loot.award(lootContext);
-                }
+                            new SoundEffect(Sound.BLOCK_BEEHIVE_EXIT, 2f, 1f).play(location);
+                        }
+                    }
+                }.runTaskTimer(JavaPlugin.getPlugin(Core.class), openDuration + fallDuration + 20L, 1L);
             }
-        }.runTaskTimer(JavaPlugin.getPlugin(Core.class), openDuration + fallDuration + 20L, 1L);
+        });
+        bundle.award();
 
         return InteractionResult.Success.ADVANCE;
     }

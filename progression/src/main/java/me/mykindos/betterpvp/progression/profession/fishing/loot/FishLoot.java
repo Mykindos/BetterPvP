@@ -98,7 +98,7 @@ public final class FishLoot extends Loot<Fish, Item> {
      * @return The last dropped {@link Item} entity, or {@code null} if none was dropped.
      */
     @Override
-    public Item award(LootContext context) {
+    protected Item award(LootContext context) {
         final Audience audience = context.getSession().getAudience();
 
         Player player = null;
@@ -164,7 +164,7 @@ public final class FishLoot extends Loot<Fish, Item> {
         final BaseItem item = itemFactory.getItemRegistry().getItem(itemKey);
         final ItemView.ItemViewBuilder builder = item == null
                 ? ItemView.builder().material(Material.COD)
-                : ItemView.of(itemFactory.create(item).getView().get()).toBuilder();
+                : ItemView.of(itemFactory.createPreview(item).getView().get()).toBuilder();
         builder.lore(Component.empty());
         builder.lore(Component.empty()
                 .append(Component.text("Minimum Weight: ", NamedTextColor.GRAY))
