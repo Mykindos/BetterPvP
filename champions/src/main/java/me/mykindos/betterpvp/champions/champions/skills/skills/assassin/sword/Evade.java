@@ -128,6 +128,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
         event.setKnockback(false);
         event.cancel("Skill Evade");
+        player.setVelocity(new Vector(0, 0, 0));
         damageDelayManager.addDelay(event.getDamager(), event.getDamagee(), event.getCause(), (long) (getDamageDelay(level) * 1000L));
 
         Particle.LARGE_SMOKE.builder()
@@ -150,6 +151,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             if (!Boolean.TRUE.equals(success)) {
                 return;
             }
+            player.setVelocity(new Vector(0, 0, 0));
             cooldownManager.removeCooldown(player, getName(), true);
 
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
