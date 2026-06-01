@@ -1,11 +1,8 @@
 package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
-import lombok.CustomLog;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
@@ -62,7 +59,8 @@ public class GamerStatListener implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
-        clientManager.getSqlLayer().processPropertyUpdates(event.getPlayer().getUniqueId(), true);
+            clientManager.getSqlLayer().processPropertyUpdates(event.getPlayer().getUniqueId(), true);
+
     }
 
 
