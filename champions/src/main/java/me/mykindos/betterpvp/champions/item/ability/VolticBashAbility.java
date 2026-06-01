@@ -81,7 +81,7 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
         this.maxChargeTicks = 60;
         this.energyOnCollide = 25.0;
         this.chargeDamage = 7.0;
-        this.energyPerTick = 1.0;
+        this.energyPerTick = 0.5;
     }
 
     @Override

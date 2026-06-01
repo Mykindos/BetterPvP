@@ -424,33 +424,38 @@ public class ClientSQLLayer {
 
 
 
-    public void processPropertyUpdates(UUID uuid, boolean async) {
+    public CompletableFuture<Void> processPropertyUpdates(UUID uuid, boolean async) {
         ConcurrentHashMap<String, Query> sharedQueries = queuedSharedPropertyUpdates.get().remove(uuid.toString());
 
+        CompletableFuture<Void> sharedFuture = CompletableFuture.completedFuture(null);
         if (sharedQueries != null && !sharedQueries.isEmpty()) {
             List<Query> queries = new ArrayList<>(sharedQueries.values());
-            executeQueriesAsTransaction(queries, async);
+            sharedFuture = executeQueriesAsTransaction(queries, async);
         }
 
         // Process stat updates for this UUID
         ConcurrentHashMap<String, Query> gamerQueries = queuedPropertyUpdates.get().remove(uuid.toString());
 
+        CompletableFuture<Void> gamerFuture = CompletableFuture.completedFuture(null);
         if (gamerQueries != null && !gamerQueries.isEmpty()) {
             List<Query> queries = new ArrayList<>(gamerQueries.values());
-            executeQueriesAsTransaction(queries, async);
+            gamerFuture = executeQueriesAsTransaction(queries, async);
         }
 
         ConcurrentHashMap<String, Query> statQueries = queuedStatUpdates.get().remove(uuid.toString());
 
+        CompletableFuture<Void> statFuture = CompletableFuture.completedFuture(null);
         if (statQueries != null && !statQueries.isEmpty()) {
             List<Query> queries = new ArrayList<>(statQueries.values());
-            executeQueriesAsTransaction(queries, async);
+            statFuture = executeQueriesAsTransaction(queries, async);
         }
 
-        log.info("Updated stats for {}", uuid).submit();
+        return CompletableFuture.allOf(sharedFuture, gamerFuture, statFuture).thenRun(() -> {
+            log.info("Updated stats for {}", uuid).submit();
+        });
     }
 
-    public void processPropertyUpdates(boolean async) {
+    public CompletableFuture<Void> processPropertyUpdates(boolean async) {
 
         log.info("Beginning to process stat updates").submit();
 
@@ -461,8 +466,8 @@ public class ClientSQLLayer {
         List<Query> statementsToRun = new ArrayList<>();
         gamerStatements.forEach((key, value) -> statementsToRun.addAll(value.values()));
 
-        executeQueriesAsTransaction(statementsToRun, async);
-        log.info("Updated gamer properties with {} queries", statementsToRun.size()).submit();
+        CompletableFuture<Void> gamerFuture = executeQueriesAsTransaction(statementsToRun, async);
+        gamerFuture.thenRun(() -> log.info("Updated gamer properties with {} queries", statementsToRun.size()).submit());
 
         // Client - atomically swap with empty map
         ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> sharedStatements =
@@ -471,8 +476,8 @@ public class ClientSQLLayer {
         List<Query> sharedStatementsToRun = new ArrayList<>();
         sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
 
-        executeQueriesAsTransaction(sharedStatementsToRun, async);
-        log.info("Updated client properties with {} queries", sharedStatementsToRun.size()).submit();
+        CompletableFuture<Void> sharedFuture = executeQueriesAsTransaction(sharedStatementsToRun, async);
+        sharedFuture.thenRun(() -> log.info("Updated client properties with {} queries", sharedStatementsToRun.size()).submit());
 
         ConcurrentHashMap<String, ConcurrentHashMap<String, Query>> statStatements =
                 queuedStatUpdates.getAndSet(new ConcurrentHashMap<>());
@@ -480,9 +485,10 @@ public class ClientSQLLayer {
         List<Query> statStatementsToRun = new ArrayList<>();
         statStatements.forEach((key, value) -> statStatementsToRun.addAll(value.values()));
 
-        executeQueriesAsTransaction(statStatementsToRun, async);
-        log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
+        CompletableFuture<Void> statFuture = executeQueriesAsTransaction(statStatementsToRun, async);
+        statFuture.thenRun(() -> log.info("Updated client stats with {} queries", statStatementsToRun.size()).submit());
 
+        return CompletableFuture.allOf(gamerFuture, sharedFuture, statFuture);
     }
 
     public CompletableFuture<Void> processStatUpdates(Set<Client> clients, Realm realm) {

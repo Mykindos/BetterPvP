@@ -48,7 +48,7 @@ public class RegenerationShieldAbility extends AbstractInteraction implements Di
         this.effectManager = effectManager;
 
         // Default values, will be overridden by config
-        this.energyPerTick = 1.5;
+        this.energyPerTick = 2.5;
         this.regenerationAmplifier = 5;
     }
 

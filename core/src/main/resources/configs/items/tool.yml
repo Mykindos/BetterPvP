@@ -1,0 +1,48 @@
+booster_pickaxe:
+  durability: 1000
+power_hoe:
+  durability: 1561
+rustic_pickaxe:
+  durability: 59
+power_shovel:
+  durability: 1561
+booster_axe:
+  durability: 32
+booster_shovel:
+  durability: 32
+rustic_hoe:
+  durability: 59
+crude_axe:
+  durability: 131
+standard_axe:
+  durability: 250
+crude_hoe:
+  durability: 131
+power_pickaxe:
+  durability: 1561
+ancient_hoe:
+  durability: 2031
+standard_shovel:
+  durability: 250
+booster_hoe:
+  durability: 32
+rustic_shovel:
+  durability: 59
+rustic_axe:
+  durability: 59
+crude_shovel:
+  durability: 131
+ancient_pickaxe:
+  durability: 2031
+ancient_axe:
+  durability: 2031
+ancient_shovel:
+  durability: 2031
+crude_pickaxe:
+  durability: 131
+power_axe:
+  durability: 1561
+standard_hoe:
+  durability: 250
+standard_pickaxe:
+  durability: 250

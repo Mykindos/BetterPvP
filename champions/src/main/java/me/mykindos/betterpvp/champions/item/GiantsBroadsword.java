@@ -89,8 +89,8 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
         final Config config = Config.item(Champions.class, this);
         
         // Configure RegenerationShield ability
-        regenerationShieldAbility.setRegenerationAmplifier(config.getConfig("regenAmplifier", 4, Integer.class));
-        regenerationShieldAbility.setEnergyPerTick(config.getConfig("energyPerTick", 1.5, Double.class));
+        regenerationShieldAbility.setRegenerationAmplifier(config.getConfig("regenAmplifier", 5, Integer.class));
+        regenerationShieldAbility.setEnergyPerTick(config.getConfig("energyPerTick", 2.5, Double.class));
     }
 
     /**

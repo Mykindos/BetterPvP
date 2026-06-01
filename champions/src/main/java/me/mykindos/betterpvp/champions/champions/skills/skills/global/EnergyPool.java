@@ -43,10 +43,8 @@ public class EnergyPool extends Skill implements PassiveSkill, BuffSkill {
                 "Energy Information:",
                 "<white>Always Active</white>",
                 "Base Energy: <stat>" + this.championsManager.getEnergy().getMaxEnergy(),
-                //Energy is updated every 50ms. Energy is represented in 0-1
+                //Energy is updated every 50ms.
                 "Energy Regeneration / Second: <stat>" + (this.championsManager.getEnergy().getEnergyPerSecond()),
-                //"regeneration / second while sprinting ",
-                //"or in liquid: <stat>" + (EnergyService.NERFED_ENERGY_REGEN)
 
         };
     }
@@ -97,8 +95,8 @@ public class EnergyPool extends Skill implements PassiveSkill, BuffSkill {
 
     @Override
     public void loadSkillConfig(){
-        baseEnergyPoolIncrease = getConfig("baseEnergyPoolIncrease", 20.0, Double.class);
-        energyPoolIncreasePerLevel = getConfig("energyPoolIncreasePerLevel", 10.0, Double.class);
+        baseEnergyPoolIncrease = getConfig("baseEnergyPoolIncrease", 30.0, Double.class);
+        energyPoolIncreasePerLevel = getConfig("energyPoolIncreasePerLevel", 15.0, Double.class);
     }
 
 }
