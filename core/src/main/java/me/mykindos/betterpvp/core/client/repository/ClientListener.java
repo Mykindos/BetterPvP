@@ -93,6 +93,7 @@ public class ClientListener implements Listener {
     public void onJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         final Client client = clientManager.search().online(player);
+        client.setOnline(true);
         checkUnsetProperties(client);
 
         final ClientJoinEvent joinEvent = new ClientJoinEvent(client, player);
@@ -114,13 +115,13 @@ public class ClientListener implements Listener {
         final Player player = event.getPlayer();
         final Optional<Client> clientOpt = clientManager.getStoredExact(player.getUniqueId());
         clientOpt.ifPresent(client -> {
-            // Removing the client as they logged off
-            this.clientManager.unload(client);
-
-            final ClientQuitEvent quitEvent = new ClientQuitEvent(client, player);
-            UtilServer.callEvent(quitEvent);
+            final ClientQuitEvent quitEvent = UtilServer.callEvent(new ClientQuitEvent(client, player));
             event.quitMessage(quitEvent.getQuitMessage());
             client.setOnline(false);
+
+            clientManager.getSqlLayer().processPropertyUpdates(client.getUniqueId(), true).thenRun(() -> {
+                this.clientManager.unload(client);
+            });
 
         });
     }

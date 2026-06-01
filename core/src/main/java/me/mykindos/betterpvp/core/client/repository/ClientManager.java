@@ -145,18 +145,24 @@ public class ClientManager extends PlayerManager<Client> {
      * @param entity the Client object to be loaded into the store; must contain
      */
     @Override
-    protected void load(Client entity) {
+    public void load(Client entity) {
         this.store.put(entity.getUniqueId(), entity);
     }
 
     /**
      * Unloads the given client by saving its state to a Redis layer if Redis is enabled
      * and then invalidating the client's unique ID in the local store cache.
+     * <p>
+     * The client will only be unloaded if the player is offline.
      *
      * @param client the client instance to unload
      */
     @Override
-    protected void unload(final Client client) {
+    public void unload(final Client client) {
+        if (Bukkit.getPlayer(client.getUniqueId()) != null) {
+            return;
+        }
+
         this.store.invalidate(client.getUniqueId());
     }
 
@@ -249,9 +255,10 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     /**
-     *
+     * Retrieves a stored {@link Client} from the cache.
      */
-    protected Optional<Client> getStoredExact(@Nullable UUID uuid) {
+    @Override
+    public Optional<Client> getStoredExact(@Nullable UUID uuid) {
         if (uuid == null) {
             return Optional.empty();
         }
@@ -303,8 +310,8 @@ public class ClientManager extends PlayerManager<Client> {
      *              be processed synchronously.
      */
     @Override
-    public void processPropertyUpdates(boolean async) {
-        this.sqlLayer.processPropertyUpdates(async);
+    public CompletableFuture<Void> processPropertyUpdates(boolean async) {
+        return this.sqlLayer.processPropertyUpdates(async);
     }
 
     public CompletableFuture<Void> processStatUpdates(Realm realm) {

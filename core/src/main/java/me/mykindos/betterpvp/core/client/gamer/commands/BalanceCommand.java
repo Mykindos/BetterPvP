@@ -104,6 +104,11 @@ public class BalanceCommand extends Command {
                     return;
                 }
                 Client targetClient = targetClientOptional.get();
+                if(!targetClient.isOnline()) {
+                    UtilMessage.message(player, "Economy", "The player <yellow>%s</yellow> is not online", args[0]);
+                    return;
+                }
+
                 final Gamer targetGamer = targetClient.getGamer();
                 if (targetGamer.equals(gamer)) {
                     UtilMessage.message(player, "Economy", "You cannot send money to yourself.");

@@ -35,13 +35,13 @@ public abstract class PlayerManager<T extends Unique> {
      * This won't remove the entity from redis or sql, it will just remove it from the cache.
      * @param entity The entity to unload.
      */
-    protected abstract void unload(T entity);
+    public abstract void unload(T entity);
 
     /**
      * Load an entity into storage.
      * @param entity The entity to load.
      */
-    protected abstract void load(T entity);
+    public abstract void load(T entity);
 
     protected abstract CompletableFuture<Optional<Client>> loadOnline(UUID uuid, String name);
 
@@ -49,7 +49,7 @@ public abstract class PlayerManager<T extends Unique> {
 
     protected abstract Optional<T> loadOffline(@Nullable final UUID uuid);
 
-    protected abstract Optional<T> getStoredExact(@Nullable UUID uuid);
+    public abstract Optional<T> getStoredExact(@Nullable UUID uuid);
 
     protected abstract Optional<T> getStoredUser(Predicate<T> predicate);
 
@@ -69,7 +69,7 @@ public abstract class PlayerManager<T extends Unique> {
      */
     public abstract Set<T> getOnline();
 
-    public abstract void processPropertyUpdates(boolean async);
+    public abstract CompletableFuture<Void> processPropertyUpdates(boolean async);
 
     public abstract void saveProperty(T entity, String property, Object value);
 

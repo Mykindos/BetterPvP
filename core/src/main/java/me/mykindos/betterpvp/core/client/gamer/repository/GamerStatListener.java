@@ -3,17 +3,14 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 @BPvPListener
 @Singleton
@@ -62,9 +59,7 @@ public class GamerStatListener implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
-        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
             clientManager.getSqlLayer().processPropertyUpdates(event.getPlayer().getUniqueId(), true);
-        }, 1L);
 
     }
 
