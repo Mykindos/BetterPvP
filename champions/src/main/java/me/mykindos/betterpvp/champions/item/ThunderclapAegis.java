@@ -70,7 +70,7 @@ public class ThunderclapAegis extends WeaponItem implements Reloadable {
         volticBashAbility.setMaxChargeTicks(config.getConfig("maxChargeTicks", 60, Integer.class));
         volticBashAbility.setEnergyOnCollide(config.getConfig("energyOnCollide", 25.0, Double.class));
         volticBashAbility.setChargeDamage(config.getConfig("chargeDamage", 7.0, Double.class));
-        volticBashAbility.setEnergyPerTick(config.getConfig("energyPerTick", 1.0, Double.class));
+        volticBashAbility.setEnergyPerTick(config.getConfig("energyPerTick", 0.5, Double.class));
     }
 
     @Inject

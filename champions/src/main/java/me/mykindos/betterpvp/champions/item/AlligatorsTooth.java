@@ -80,8 +80,8 @@ public class AlligatorsTooth extends WeaponItem implements Reloadable {
         final Config config = Config.item(Champions.class, this);
 
         // Configure GatorStroke ability
-        gatorStrokeAbility.setVelocityStrength(config.getConfig("velocityStrength", 0.7, Double.class));
-        gatorStrokeAbility.setEnergyPerTick(config.getConfig("energyPerTick", 1.0, Double.class));
+        gatorStrokeAbility.setVelocityStrength(config.getConfig("velocityStrength", 0.8, Double.class));
+        gatorStrokeAbility.setEnergyPerTick(config.getConfig("energyPerTick", 0.33, Double.class));
         gatorStrokeAbility.setSkimmingEnergyMultiplier(config.getConfig("skimmingEnergyMultiplier", 3.0, Double.class));
 
         // Configure damage values

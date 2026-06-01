@@ -33,7 +33,7 @@ public class EnergyService {
     private boolean nerfEnergyRegen;
 
     @Inject
-    @Config(path = "energy.consumption-regen-delay", defaultValue = "1.0")
+    @Config(path = "energy.consumption-regen-delay", defaultValue = "0.5")
     private double consumptionRegenDelay;
 
     @Getter

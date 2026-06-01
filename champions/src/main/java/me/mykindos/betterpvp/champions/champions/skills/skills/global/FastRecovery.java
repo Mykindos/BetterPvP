@@ -83,8 +83,8 @@ public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
 
     @Override
     public void loadSkillConfig(){
-        basePercentage = getConfig("basePercentage", 0.15, Double.class);
-        percentagePerLevel = getConfig("percentagePerLevel", 0.10, Double.class);
+        basePercentage = getConfig("basePercentage", 0.10, Double.class);
+        percentagePerLevel = getConfig("percentagePerLevel", 0.05, Double.class);
     }
 
 }
