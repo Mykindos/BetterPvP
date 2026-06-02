@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -24,11 +26,13 @@ import org.bukkit.entity.Player;
 public class StuckSubCommand extends ClanSubCommand {
 
     private final CooldownManager cooldownManager;
+    private final ZoneManager zoneManager;
 
     @Inject
-    public StuckSubCommand(ClanManager clanManager, ClientManager clientManager, CooldownManager cooldownManager) {
+    public StuckSubCommand(ClanManager clanManager, ClientManager clientManager, CooldownManager cooldownManager, ZoneManager zoneManager) {
         super(clanManager, clientManager);
         this.cooldownManager = cooldownManager;
+        this.zoneManager = zoneManager;
     }
 
     @Override
@@ -48,23 +52,21 @@ public class StuckSubCommand extends ClanSubCommand {
             return;
         }
         
-        Optional<Clan> territoryOptional = clanManager.getClanByLocation(player.getLocation());
+        Zone zone = zoneManager.getZone(player);
+        if (zone == null) {
+            UtilMessage.message(player, "Clans", Component.text("You must be in a territory to use ", NamedTextColor.GRAY)
+                    .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
+            return;
+        }
 
-            if (territoryOptional.isEmpty()) {
-                UtilMessage.message(player, "Clans", Component.text("You must be in a claimed territory to use ", NamedTextColor.GRAY)
-                        .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
-                return;
-            }
 
+        Optional<Location> nearestWilderness = clanManager.closestWilderness(player);
+        if (nearestWilderness.isEmpty()) {
+            UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
+            return;
+        }
 
-            Optional<Location> nearestWilderness = clanManager.closestWilderness(player);
-
-            if (nearestWilderness.isEmpty()) {
-                UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
-                return;
-            }
-
-            UtilServer.callEvent(new ClanStuckTeleportEvent(player, () -> player.teleport(nearestWilderness.get())));
+        UtilServer.callEvent(new ClanStuckTeleportEvent(player, () -> player.teleport(nearestWilderness.get())));
     }
 
 

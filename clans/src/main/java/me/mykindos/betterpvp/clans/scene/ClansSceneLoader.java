@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.scene.loader.MapperSceneLoader;
 import me.mykindos.betterpvp.core.scene.loader.ModelEngineLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactoryManager;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactoryManager;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
@@ -35,11 +35,11 @@ import java.util.Objects;
 @PluginAdapter("ModelEngine")
 public class ClansSceneLoader extends MapperSceneLoader {
 
-    private final ClansNPCFactory npcFactory;
-    private final NPCFactoryManager npcFactoryManager;
+    private final ClansSceneObjectFactory npcFactory;
+    private final SceneObjectFactoryManager npcFactoryManager;
 
     @Inject
-    public ClansSceneLoader(Clans clans, ClansNPCFactory npcFactory, NPCFactoryManager npcFactoryManager, SceneLoaderManager sceneLoaderManager) {
+    public ClansSceneLoader(Clans clans, ClansSceneObjectFactory npcFactory, SceneObjectFactoryManager npcFactoryManager, SceneLoaderManager sceneLoaderManager) {
         this.npcFactory = npcFactory;
         this.npcFactoryManager = npcFactoryManager;
         sceneLoaderManager.register(this, clans);

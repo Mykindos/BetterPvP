@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEve
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
+import me.mykindos.betterpvp.core.scene.npc.NPC;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -29,11 +30,11 @@ public class ShopsNPCListener implements Listener {
     }
 
     private boolean isShopsNPC(UUID uuid) {
-        return this.npcRegistry.getObject(uuid) != null;
+        return this.npcRegistry.getObject(uuid) instanceof NPC npc && npc.getFactory() instanceof ShopkeeperNPCFactory;
     }
 
     private boolean isShopsNPC(Entity entity) {
-        return this.npcRegistry.getObject(entity.getUniqueId()) != null;
+        return this.npcRegistry.getObject(entity.getUniqueId()) instanceof NPC npc && npc.getFactory() instanceof ShopkeeperNPCFactory;
     }
 
     @EventHandler

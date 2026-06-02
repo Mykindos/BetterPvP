@@ -4,22 +4,22 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.scene.npc.NPC;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Pig;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class ClansNPCFactory extends NPCFactory {
+public class ClansSceneObjectFactory extends SceneObjectFactory {
 
     private final ClanManager clanManager;
     private final ClientManager clientManager;
 
     @Inject
-    private ClansNPCFactory(SceneObjectRegistry registry, ClanManager clanManager, ClientManager clientManager) {
+    private ClansSceneObjectFactory(SceneObjectRegistry registry, ClanManager clanManager, ClientManager clientManager) {
         super("clans", registry);
         this.clanManager = clanManager;
         this.clientManager = clientManager;
@@ -33,7 +33,7 @@ public class ClansNPCFactory extends NPCFactory {
     @Override
     public NPC spawnDefault(@NotNull Location location, @NotNull String type) {
         return switch (type) {
-            case "traveler" -> spawnNPC(
+            case "traveler" -> spawn(
                     new TravelerNPC(this, "Travel Hub", "Tavish", "npc_librarian", clanManager, clientManager),
                     backingEntity(location));
             default -> throw new IllegalArgumentException("Invalid clans NPC type: " + type);

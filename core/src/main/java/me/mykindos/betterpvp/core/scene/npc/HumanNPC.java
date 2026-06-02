@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.scene.npc;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.HumanEntity;
 
@@ -15,7 +16,7 @@ public class HumanNPC extends NPC {
     @Setter
     private PlayerListVisibility playerListVisibility = PlayerListVisibility.CUSTOM_NAME_VISIBLE;
 
-    public HumanNPC(HumanNMS handle, NPCFactory factory) {
+    public HumanNPC(HumanNMS handle, SceneObjectFactory factory) {
         super(factory);
         this.handle = handle;
         // The NMS entity is available immediately via the handle, so we can

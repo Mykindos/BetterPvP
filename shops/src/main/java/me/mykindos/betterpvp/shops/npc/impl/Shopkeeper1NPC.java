@@ -6,7 +6,7 @@ import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -35,7 +35,7 @@ public class Shopkeeper1NPC extends ModeledNPC implements Actor {
     private final List<ItemStack> showcaseItems;
     private ActiveModel model;
 
-    public Shopkeeper1NPC(NPCFactory factory, String shopName, String shopkeeperName, String skinBlueprint, List<ItemStack> showcaseItems) {
+    public Shopkeeper1NPC(SceneObjectFactory factory, String shopName, String shopkeeperName, String skinBlueprint, List<ItemStack> showcaseItems) {
         super(factory);
         Shops plugin = JavaPlugin.getPlugin(Shops.class);
         this.shopManager = plugin.getInjector().getInstance(ShopManager.class);

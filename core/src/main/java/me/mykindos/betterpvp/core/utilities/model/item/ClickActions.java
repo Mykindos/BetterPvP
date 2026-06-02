@@ -14,44 +14,44 @@ public enum ClickActions implements ClickAction {
 
     ALL(Component.empty()
             .append(Component.translatable("space.-4").font(Resources.Font.SPACE))
-            .append(Component.text("\uE073", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16"))),
+            .append(Component.text("\uE073", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16)),
             ClickType.values()),
 
     LEFT(Component.empty()
             .append(Component.translatable("space.-4").font(Resources.Font.SPACE))
-            .append(Component.text("\uE074", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16"))),
+            .append(Component.text("\uE074", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16)),
             ClickType.LEFT),
 
     RIGHT(Component.empty()
             .append(Component.translatable("space.-4").font(Resources.Font.SPACE))
-            .append(Component.text("\uE075", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16"))),
+            .append(Component.text("\uE075", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16)),
             ClickType.RIGHT),
 
     SHIFT(Component.empty()
             .append(Component.translatable("space.-3").font(Resources.Font.SPACE))
-            .append(Component.text("\uE084", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16"))),
+            .append(Component.text("\uE084", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16)),
             ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT),
 
     LEFT_SHIFT(Component.empty()
             .append(Component.translatable("space.-3").font(Resources.Font.SPACE))
-            .append(Component.text("\uE084", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16")))
+            .append(Component.text("\uE084", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16))
             .appendSpace()
             .append(Component.translatable("space.-2").font(Resources.Font.SPACE))
             .append(Component.text("+", NamedTextColor.GRAY))
             .appendSpace()
             .append(Component.translatable("space.-4").font(Resources.Font.SPACE))
-            .append(Component.text("\uE074", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16"))),
+            .append(Component.text("\uE074", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16)),
             ClickType.SHIFT_LEFT),
 
     RIGHT_SHIFT(Component.empty()
             .append(Component.translatable("space.-3").font(Resources.Font.SPACE))
-            .append(Component.text("\uE084", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16")))
+            .append(Component.text("\uE084", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16))
             .appendSpace()
             .append(Component.translatable("space.-2").font(Resources.Font.SPACE))
             .append(Component.text("+", NamedTextColor.GRAY))
             .appendSpace()
             .append(Component.translatable("space.-4").font(Resources.Font.SPACE))
-            .append(Component.text("\uE075", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16"))),
+            .append(Component.text("\uE075", NamedTextColor.WHITE).font(Resources.Font.GLYPH_16)),
             ClickType.SHIFT_RIGHT);
 
     @Getter

@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.clans.world.veloran.gateway;
 
+import com.google.inject.Provider;
 import dev.brauw.mapper.region.CuboidRegion;
 import lombok.Getter;
+import me.mykindos.betterpvp.clans.world.veloran.Veloran;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.scene.prop.Prop;
-import me.mykindos.betterpvp.core.scene.prop.PropFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,12 +30,16 @@ import org.joml.Vector3f;
 @Getter
 public class GatewayProp extends Prop {
 
+    private final ClientManager clientManager;
+    private final Provider<Veloran> veloranProvider;
     private final Location portalMarker;
     private final CuboidRegion portalRegion;
     private final Component label;
 
-    public GatewayProp(PropFactory factory, Location portalMarker, CuboidRegion portalRegion, Component label) {
+    public GatewayProp(SceneObjectFactory factory, ClientManager clientManager, Provider<Veloran> veloranProvider, Location portalMarker, CuboidRegion portalRegion, Component label) {
         super(factory);
+        this.clientManager = clientManager;
+        this.veloranProvider = veloranProvider;
         this.portalMarker = portalMarker;
         this.portalRegion = portalRegion;
         this.label = label;
@@ -61,6 +68,6 @@ public class GatewayProp extends Prop {
 
         addBehavior(new GatewayParticleBehavior(portalRegion, portalMarker.getDirection()));
         addBehavior(new GatewayAmbientSoundBehavior(portalRegion, 1.0f));
-        addBehavior(new GatewayTeleportBehavior(portalRegion));
+        addBehavior(new GatewayTeleportBehavior(clientManager, veloranProvider, portalRegion));
     }
 }
