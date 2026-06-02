@@ -75,7 +75,7 @@ public class GatewayAmbientSoundBehavior implements SceneBehavior {
 
         if (age % 160 == 0 && Math.random() < 0.5) {
             String sound = "raid.ambient_" + UtilMath.randomInt(7);
-            new SoundEffect("betterpvp", sound, 1f, 0.3f).play(audience);
+            new SoundEffect("betterpvp", sound, 1f, 0.1f).play(audience);
         }
 
         age++;

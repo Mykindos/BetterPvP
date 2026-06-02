@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.TimedDisplayObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +22,14 @@ public class TitleComponent extends TimedDisplayObject<Component> {
     private final Function<Gamer, Component> subtitleProvider;
     private final double fadeIn;
     private final double fadeOut;
+
+    /**
+     * Whether this component has been pushed to the player at least once. Unlike {@link #hasStarted()} (which tracks the
+     * expiry clock and can begin before the title is ever rendered, e.g. {@code waitToExpire = false}), this tracks render
+     * state: the first send uses the full fade-in/stay/fade-out, and any re-send afterward (e.g. resuming after a
+     * higher-priority title preempted this one) replays with no fade-in and the remaining duration.
+     */
+    private boolean shown = false;
 
     /**
      * @param fadeIn       The amount of seconds to fade in the component.
@@ -48,10 +57,11 @@ public class TitleComponent extends TimedDisplayObject<Component> {
 
     public void sendPlayer(@NotNull Player player, @NotNull Gamer gamer) {
         Title.Times times = Title.Times.times(
-                Duration.ofMillis(!hasStarted() ? (long) (fadeIn * 1000L) : 0),
-                Duration.ofMillis(!hasStarted() ? (long) ((getSeconds() - fadeIn - fadeOut) * 1000L) : getRemaining()),
-                Duration.ofMillis(!hasStarted() ? (long) (fadeOut * 1000L) : Math.min(getRemaining(), (long) (fadeOut * 1000L)))
+                Duration.ofMillis(!shown ? (long) (fadeIn * 1000L) : 0),
+                Duration.ofMillis(!shown ? (long) ((getSeconds() - fadeIn - fadeOut) * 1000L) : getRemaining()),
+                Duration.ofMillis(!shown ? (long) (fadeOut * 1000L) : Math.min(getRemaining(), (long) (fadeOut * 1000L)))
         );
+        shown = true;
 
         Component title = Optional.ofNullable(getProvider().apply(gamer)).orElse(TitleQueue.EMPTY);
         Component subtitle = Optional.ofNullable(getSubtitleProvider().apply(gamer)).orElse(TitleQueue.EMPTY);

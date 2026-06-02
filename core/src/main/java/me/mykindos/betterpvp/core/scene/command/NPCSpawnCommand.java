@@ -6,8 +6,8 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.scene.SceneObject;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactoryManager;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactoryManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -20,10 +20,10 @@ import java.util.Optional;
 @SubCommand(NPCCommand.class)
 public class NPCSpawnCommand extends Command {
 
-    private final NPCFactoryManager npcFactoryManager;
+    private final SceneObjectFactoryManager npcFactoryManager;
 
     @Inject
-    private NPCSpawnCommand(NPCFactoryManager npcFactoryManager) {
+    private NPCSpawnCommand(SceneObjectFactoryManager npcFactoryManager) {
         this.npcFactoryManager = npcFactoryManager;
     }
 
@@ -46,7 +46,7 @@ public class NPCSpawnCommand extends Command {
 
         final String factoryName = args[0];
         final String type = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        final Optional<NPCFactory> factoryOpt = npcFactoryManager.getObject(factoryName.toLowerCase());
+        final Optional<SceneObjectFactory> factoryOpt = npcFactoryManager.getObject(factoryName.toLowerCase());
         if (factoryOpt.isEmpty()) {
             final String available = String.join(", ", npcFactoryManager.getObjects().keySet());
             UtilMessage.message(player, "NPC", "<red>Unknown factory: <yellow>" + factoryName);
@@ -54,7 +54,7 @@ public class NPCSpawnCommand extends Command {
             return;
         }
 
-        final NPCFactory factory = factoryOpt.get();
+        final SceneObjectFactory factory = factoryOpt.get();
         if (!Arrays.asList(factory.getTypes()).contains(type)) {
             final String available = String.join(", ", factory.getTypes());
             UtilMessage.message(player, "NPC", "<red>Unknown type: <yellow>" + type);
@@ -73,7 +73,7 @@ public class NPCSpawnCommand extends Command {
                     .filter(k -> k.toLowerCase().startsWith(args[0].toLowerCase()))
                     .toList();
         } else if (args.length == 2) {
-            final NPCFactory factory = npcFactoryManager.getObject(args[0].toLowerCase()).orElse(null);
+            final SceneObjectFactory factory = npcFactoryManager.getObject(args[0].toLowerCase()).orElse(null);
             if (factory != null) {
                 return Arrays.stream(factory.getTypes())
                         .filter(t -> t.toLowerCase().startsWith(args[1].toLowerCase()))

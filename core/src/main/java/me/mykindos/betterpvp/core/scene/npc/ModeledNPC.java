@@ -1,9 +1,10 @@
 package me.mykindos.betterpvp.core.scene.npc;
 
 import com.ticxo.modelengine.api.ModelEngineAPI;
-import com.ticxo.modelengine.api.entity.CullType;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import me.mykindos.betterpvp.core.scene.HasModeledEntity;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
+import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -33,42 +34,35 @@ public class ModeledNPC extends NPC implements HasModeledEntity {
 
     @Nullable private Consumer<ModeledEntity> initConsumer;
 
-    public ModeledNPC(NPCFactory factory, @Nullable Consumer<ModeledEntity> initConsumer) {
+    public ModeledNPC(SceneObjectFactory factory, @Nullable Consumer<ModeledEntity> initConsumer) {
         super(factory);
         this.initConsumer = initConsumer;
     }
 
-    public ModeledNPC(NPCFactory factory) {
+    public ModeledNPC(SceneObjectFactory factory) {
         this(factory, (Consumer<ModeledEntity>) null);
     }
 
     /**
-     * @deprecated Use {@link #ModeledNPC(NPCFactory, Consumer)} and call
+     * @deprecated Use {@link #ModeledNPC(SceneObjectFactory, Consumer)} and call
      *             {@link #init(org.bukkit.entity.Entity)} separately.
      *             Retained for backward compatibility while existing callers are migrated.
      */
     @Deprecated
-    public ModeledNPC(NPCFactory factory, org.bukkit.entity.Entity entity, @Nullable Consumer<ModeledEntity> consumer) {
+    public ModeledNPC(SceneObjectFactory factory, org.bukkit.entity.Entity entity, @Nullable Consumer<ModeledEntity> consumer) {
         this(factory, consumer);
         init(entity);
     }
 
-    /** @deprecated See {@link #ModeledNPC(NPCFactory, org.bukkit.entity.Entity, Consumer)}. */
+    /** @deprecated See {@link #ModeledNPC(SceneObjectFactory, org.bukkit.entity.Entity, Consumer)}. */
     @Deprecated
-    public ModeledNPC(NPCFactory factory, org.bukkit.entity.Entity entity) {
+    public ModeledNPC(SceneObjectFactory factory, org.bukkit.entity.Entity entity) {
         this(factory, entity, null);
     }
 
     @Override
     protected void onInit() {
-        ModeledEntity modeledEntity = ModelEngineAPI.getModeledEntity(getEntity());
-        if (modeledEntity == null) {
-            // Standard flow: entity has no ME wrapper yet - create one now.
-            modeledEntity = ModelEngineAPI.createModeledEntity(getEntity(), initConsumer);
-        }
-        modeledEntity.getBase().getData().setBackCullType(CullType.NO_CULL);
-        modeledEntity.getBase().getData().setBlockedCullType(CullType.NO_CULL);
-        modeledEntity.getBase().getData().setVerticalCullType(CullType.NO_CULL);
+        ModelEngineHelper.bind(getEntity(), initConsumer);
         this.initConsumer = null; // release - only needed once
     }
 

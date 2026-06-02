@@ -6,7 +6,7 @@ import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -27,7 +27,7 @@ public class AuctionHouseNPC extends ModeledNPC implements Actor {
     private final String skinBlueprint;
     private ActiveModel model;
 
-    public AuctionHouseNPC(NPCFactory factory, String roleName, String shopkeeperName, String skinBlueprint) {
+    public AuctionHouseNPC(SceneObjectFactory factory, String roleName, String shopkeeperName, String skinBlueprint) {
         super(factory);
         Shops plugin = JavaPlugin.getPlugin(Shops.class);
         this.auctionManager = plugin.getInjector().getInstance(AuctionManager.class);

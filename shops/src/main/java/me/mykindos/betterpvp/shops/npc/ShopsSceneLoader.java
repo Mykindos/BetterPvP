@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.scene.loader.MapperSceneLoader;
 import me.mykindos.betterpvp.core.scene.loader.ModelEngineLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactoryManager;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactoryManager;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.shops.Shops;
@@ -36,10 +36,10 @@ import java.util.Objects;
 public class ShopsSceneLoader extends MapperSceneLoader {
 
     private final ShopkeeperNPCFactory npcFactory;
-    private final NPCFactoryManager npcFactoryManager;
+    private final SceneObjectFactoryManager npcFactoryManager;
 
     @Inject
-    public ShopsSceneLoader(Shops shops, ShopkeeperNPCFactory npcFactory, NPCFactoryManager npcFactoryManager, SceneLoaderManager sceneLoaderManager) {
+    public ShopsSceneLoader(Shops shops, ShopkeeperNPCFactory npcFactory, SceneObjectFactoryManager npcFactoryManager, SceneLoaderManager sceneLoaderManager) {
         this.npcFactory = npcFactory;
         this.npcFactoryManager = npcFactoryManager;
         sceneLoaderManager.register(this, shops);

@@ -22,7 +22,7 @@ public interface SoundProvider extends Function<@NotNull DamageEvent, @Nullable 
      */
     SoundProvider DEFAULT = event -> {
         final LivingEntity damagee = event.getLivingDamagee();
-        if (damagee == null) return null;
+        if (damagee == null || damagee.isSilent()) return null;
         final org.bukkit.Sound sound = damagee.getHurtSound();
         if (sound == null) {
             return null;

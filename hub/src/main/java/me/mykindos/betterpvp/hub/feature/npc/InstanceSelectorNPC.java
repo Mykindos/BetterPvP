@@ -6,7 +6,7 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.framework.SelectableServerType;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
 import me.mykindos.betterpvp.hub.feature.menu.ServerTypeMenu;
 import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
@@ -40,7 +40,7 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
     private final OrchestrationGateway orchestrationGateway;
     private final Component tag;
 
-    public InstanceSelectorNPC(NPCFactory factory, Component tag, SelectableServerType serverType,
+    public InstanceSelectorNPC(SceneObjectFactory factory, Component tag, SelectableServerType serverType,
                                NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
                                OrchestrationGateway orchestrationGateway) {
         super(factory);
@@ -86,7 +86,7 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
         private final Component title;
         private final String gradientColors;
 
-        public Featured(NPCFactory factory, Component title, TextColor[] gradient, SelectableServerType serverType,
+        public Featured(SceneObjectFactory factory, Component title, TextColor[] gradient, SelectableServerType serverType,
                         NetworkPlayerCountService networkPlayerCountService, HubQueueStatusRegistry queueStatusRegistry,
                         OrchestrationGateway orchestrationGateway) {
             super(factory, Component.empty(), serverType, networkPlayerCountService, queueStatusRegistry, orchestrationGateway);

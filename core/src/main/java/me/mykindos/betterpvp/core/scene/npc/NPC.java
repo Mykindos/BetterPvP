@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.scene.npc;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.scene.SceneEntity;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -20,19 +21,19 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public abstract class NPC extends SceneEntity implements Actor {
 
-    protected final NPCFactory factory;
+    protected final SceneObjectFactory factory;
 
-    protected NPC(NPCFactory factory) {
+    protected NPC(SceneObjectFactory factory) {
         super();
         this.factory = factory;
     }
 
     /**
-     * @deprecated Use {@link #NPC(NPCFactory)} and call {@link #init(Entity)} separately.
+     * @deprecated Use {@link #NPC(SceneObjectFactory)} and call {@link #init(Entity)} separately.
      *             Retained for backward compatibility while existing subclasses are migrated.
      */
     @Deprecated
-    protected NPC(@NotNull Entity entity, NPCFactory factory) {
+    protected NPC(@NotNull Entity entity, SceneObjectFactory factory) {
         this(factory);
         init(entity);
     }

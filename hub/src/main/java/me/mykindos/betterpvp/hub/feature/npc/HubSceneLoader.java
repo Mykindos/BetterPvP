@@ -112,14 +112,14 @@ public class HubSceneLoader extends MapperSceneLoader {
         // Store chest NPC
         final Location storeLocation = getDataPoint("npc_store", PerspectiveRegion.class).getLocation();
         storeLocation.setWorld(world);
-        track(npcFactory.spawnNPC(new StoreChestNPC(npcFactory, cooldownManager, hub), generateDummyEntity(storeLocation)));
+        track(npcFactory.spawn(new StoreChestNPC(npcFactory, cooldownManager, hub), generateDummyEntity(storeLocation)));
 
         // Trainer / FFA-arena NPC
         final Location trainerLocation = getDataPoint("npc_trainer", PerspectiveRegion.class).getLocation();
         trainerLocation.setWorld(world);
         final Location ffaSpawnpoint = getDataPoint("ffa_spawnpoint", PerspectiveRegion.class).getLocation();
         ffaSpawnpoint.setWorld(world);
-        track(npcFactory.spawnNPC(new TrainerNPC(npcFactory, cooldownManager, ffaSpawnpoint), generateDummyEntity(trainerLocation)));
+        track(npcFactory.spawn(new TrainerNPC(npcFactory, cooldownManager, ffaSpawnpoint), generateDummyEntity(trainerLocation)));
 
         // Floating text displays — tracked as SceneObjects so they auto-remove on reload
         final Location ffaArenaDisplayLocation = getDataPoint("ffa_arena_display", PerspectiveRegion.class).getLocation();
@@ -149,7 +149,7 @@ public class HubSceneLoader extends MapperSceneLoader {
         for (PerspectiveRegion region : getDataPoints("npc_coming_soon", PerspectiveRegion.class)) {
             final Location comingSoonLocation = region.getLocation();
             comingSoonLocation.setWorld(world);
-            track(npcFactory.spawnNPC(new ComingSoonNPC(npcFactory), generateDummyEntity(comingSoonLocation)));
+            track(npcFactory.spawn(new ComingSoonNPC(npcFactory), generateDummyEntity(comingSoonLocation)));
         }
 
         log.info("Hub scene loaded - {} kit-selector(s)", kitSelectors.size()).submit();
@@ -165,12 +165,12 @@ public class HubSceneLoader extends MapperSceneLoader {
                     TextColor.color(255, 182, 23),
                     TextColor.color(255, 116, 23),
             };
-            return npcFactory.spawnNPC(
+            return npcFactory.spawn(
                     new InstanceSelectorNPC.Featured(npcFactory, title, gradient, serverType,
                             networkPlayerCountService, queueStatusRegistry, orchestrationGateway),
                     golem);
         } else {
-            return npcFactory.spawnNPC(
+            return npcFactory.spawn(
                     new InstanceSelectorNPC(npcFactory, title, serverType,
                             networkPlayerCountService, queueStatusRegistry, orchestrationGateway),
                     golem);

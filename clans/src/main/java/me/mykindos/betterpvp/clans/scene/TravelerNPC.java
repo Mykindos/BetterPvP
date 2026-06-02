@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.clans.clans.transport.ClanTravelHubMenu;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,7 +24,7 @@ public class TravelerNPC extends ModeledNPC {
     private final ClanManager clanManager;
     private final ClientManager clientManager;
 
-    public TravelerNPC(NPCFactory factory, String roleName, String name, String modelName,
+    public TravelerNPC(SceneObjectFactory factory, String roleName, String name, String modelName,
                        ClanManager clanManager, ClientManager clientManager) {
         super(factory);
         this.roleName = roleName;

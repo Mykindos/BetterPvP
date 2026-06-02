@@ -44,15 +44,18 @@ public abstract class SceneObjectFactory {
 
     /**
      * Initializes {@code object} with {@code entity} and registers it with the registry.
-     * Use this in {@link #spawnDefault} implementations to ensure the two-phase init
-     * and registration always happen together in the correct order.
+     * Use this in {@link #spawnDefault} implementations (and from loaders) to ensure the
+     * two-phase init and registration always happen together in the correct order.
+     * <p>
+     * Works for any {@link SceneObject} - prop, NPC, mob, or display - so a single factory
+     * can spawn a mix of object kinds.
      *
      * @param object the uninitialized scene object
      * @param entity the entity to bind
      * @param <T>    the concrete scene object type
      * @return the same object, now initialized and registered
      */
-    protected <T extends SceneObject> T spawn(@NotNull T object, @NotNull Entity entity) {
+    public <T extends SceneObject> T spawn(@NotNull T object, @NotNull Entity entity) {
         object.init(entity);
         registry.register(object);
         return object;
