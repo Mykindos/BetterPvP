@@ -175,12 +175,12 @@ public class GatewayParticleBehavior implements SceneBehavior {
             point.add(perpB.clone().multiply(Math.sin(angle) * radius));
 
             final Location loc = point.toLocation(world);
-            Particle.DUST.builder()
+            Particle.SQUID_INK.builder()
                     .location(loc)
                     .count(1)
                     .offset(0.1, 0.1, 0.1)
                     .extra(0)
-                    .data(new Particle.DustTransition(Color.fromRGB(0x404040), Color.BLACK, 2f))
+//                    .data(new Particle.DustTransition(Color.fromRGB(0x404040), Color.BLACK, 2f))
                     .receivers(VIEW_RANGE)
                     .spawn();
 

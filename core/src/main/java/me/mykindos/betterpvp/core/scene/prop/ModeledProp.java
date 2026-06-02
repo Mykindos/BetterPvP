@@ -1,9 +1,10 @@
 package me.mykindos.betterpvp.core.scene.prop;
 
 import com.ticxo.modelengine.api.ModelEngineAPI;
-import com.ticxo.modelengine.api.entity.CullType;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import me.mykindos.betterpvp.core.scene.HasModeledEntity;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
+import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -29,19 +30,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class ModeledProp extends Prop implements HasModeledEntity {
 
-    protected ModeledProp(PropFactory factory) {
+    protected ModeledProp(SceneObjectFactory factory) {
         super(factory);
     }
 
     @Override
     protected void onInit() {
-        ModeledEntity me = ModelEngineAPI.getModeledEntity(getEntity());
-        if (me == null) {
-            me = ModelEngineAPI.createModeledEntity(getEntity(), null);
-        }
-        me.getBase().getData().setBackCullType(CullType.NO_CULL);
-        me.getBase().getData().setBlockedCullType(CullType.NO_CULL);
-        me.getBase().getData().setVerticalCullType(CullType.NO_CULL);
+        ModelEngineHelper.bind(getEntity());
     }
 
     @Nullable

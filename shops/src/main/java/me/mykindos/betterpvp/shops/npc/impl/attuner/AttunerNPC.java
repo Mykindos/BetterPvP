@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.item.attunement.GuiAttunement;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -30,7 +30,7 @@ public class AttunerNPC extends ModeledNPC implements Actor {
     private final String skinBlueprint;
     private ActiveModel model;
 
-    public AttunerNPC(NPCFactory factory, String roleName, String shopkeeperName, String skinBlueprint) {
+    public AttunerNPC(SceneObjectFactory factory, String roleName, String shopkeeperName, String skinBlueprint) {
         super(factory);
         this.plugin = JavaPlugin.getPlugin(Shops.class);
         this.runeDistributionRegistry = plugin.getInjector().getInstance(RuneSlotDistributionRegistry.class);

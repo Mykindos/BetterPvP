@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.shops.npc;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.scene.npc.NPC;
-import me.mykindos.betterpvp.core.scene.npc.NPCFactory;
 import me.mykindos.betterpvp.shops.npc.impl.AuctionHouseNPC;
 import me.mykindos.betterpvp.shops.npc.impl.Shopkeeper1NPC;
 import me.mykindos.betterpvp.shops.npc.impl.Shopkeeper2NPC;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Singleton
-public class ShopkeeperNPCFactory extends NPCFactory {
+public class ShopkeeperNPCFactory extends SceneObjectFactory {
 
     @Inject
     private ShopkeeperNPCFactory(SceneObjectRegistry registry) {
@@ -48,7 +48,7 @@ public class ShopkeeperNPCFactory extends NPCFactory {
     @Override
     public NPC spawnDefault(@NotNull Location location, @NotNull String type) {
         return switch (type) {
-            case "fisherman" -> spawnNPC(new ShopkeeperFishermanNPC(this, "Fisherman", "Gillbert", "skin_fisherman"), backingEntity(location));
+            case "fisherman" -> spawn(new ShopkeeperFishermanNPC(this, "Fisherman", "Gillbert", "skin_fisherman"), backingEntity(location));
             case "resource_merchant" -> {
                 List<ItemStack> items = List.of(
                         ItemStack.of(Material.DIAMOND),
@@ -57,15 +57,15 @@ public class ShopkeeperNPCFactory extends NPCFactory {
                         ItemStack.of(Material.NETHERITE_INGOT),
                         ItemStack.of(Material.EMERALD)
                 );
-                yield spawnNPC(new Shopkeeper1NPC(this, "Resource Merchant", "Orelando", "skin_resource_merchant", items), backingEntity(location));
+                yield spawn(new Shopkeeper1NPC(this, "Resource Merchant", "Orelando", "skin_resource_merchant", items), backingEntity(location));
             }
-            case "blacksmith" -> spawnNPC(new Shopkeeper2NPC(this, "Blacksmith", "Garrick", "skin_blacksmith"), backingEntity(location));
-            case "block_merchant" -> spawnNPC(new Shopkeeper2NPC(this, "Block Merchant", "Brock", "skin_block_merchant"), backingEntity(location));
-            case "farmer" -> spawnNPC(new Shopkeeper3NPC(this, "Farmer", "Wesley", "skin_farmer"), backingEntity(location));
-            case "lumberjack" -> spawnNPC(new ShopkeeperSitNPC(this, "Lumberjack", "Tim Burr", "skin_lumberjack"), backingEntity(location));
-            case "auctioneer" -> spawnNPC(new AuctionHouseNPC(this, "Auctioneer", "Baxter", "skin_auctioneer"), backingEntity(location));
-            case "attuner" -> spawnNPC(new AttunerNPC(this, "Attuner", "Josh", "skin_attuner"), backingEntity(location));
-            case "reforger" -> spawnNPC(new ReforgerNPC(this, "Reforger", "Ragnar", "skin_reforger"), backingEntity(location));
+            case "blacksmith" -> spawn(new Shopkeeper2NPC(this, "Blacksmith", "Garrick", "skin_blacksmith"), backingEntity(location));
+            case "block_merchant" -> spawn(new Shopkeeper2NPC(this, "Block Merchant", "Brock", "skin_block_merchant"), backingEntity(location));
+            case "farmer" -> spawn(new Shopkeeper3NPC(this, "Farmer", "Wesley", "skin_farmer"), backingEntity(location));
+            case "lumberjack" -> spawn(new ShopkeeperSitNPC(this, "Lumberjack", "Tim Burr", "skin_lumberjack"), backingEntity(location));
+            case "auctioneer" -> spawn(new AuctionHouseNPC(this, "Auctioneer", "Baxter", "skin_auctioneer"), backingEntity(location));
+            case "attuner" -> spawn(new AttunerNPC(this, "Attuner", "Josh", "skin_attuner"), backingEntity(location));
+            case "reforger" -> spawn(new ReforgerNPC(this, "Reforger", "Ragnar", "skin_reforger"), backingEntity(location));
             default -> throw new IllegalArgumentException("Invalid shopkeeper type: " + type);
         };
     }

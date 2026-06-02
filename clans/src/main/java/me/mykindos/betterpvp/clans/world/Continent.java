@@ -43,7 +43,5 @@ public abstract class Continent {
     /**
      * @return a short name for logging
      */
-    public @NotNull String name() {
-        return getClass().getSimpleName();
-    }
+    public abstract @NotNull String name();
 }

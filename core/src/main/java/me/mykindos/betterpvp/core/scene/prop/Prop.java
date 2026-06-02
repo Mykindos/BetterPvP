@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.scene.prop;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.scene.SceneEntity;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 
 /**
  * A non-interactive, static world object managed by the scene system.
@@ -26,9 +27,9 @@ import me.mykindos.betterpvp.core.scene.SceneEntity;
 @Getter
 public abstract class Prop extends SceneEntity {
 
-    protected final PropFactory factory;
+    protected final SceneObjectFactory factory;
 
-    protected Prop(PropFactory factory) {
+    protected Prop(SceneObjectFactory factory) {
         super();
         this.factory = factory;
     }
