@@ -153,7 +153,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
-                                ColossusFragment colossusFragment, DurakHandle durakHandle, Runesteel.BlockItem runesteelBlock) {
+                                ColossusFragment colossusFragment, DurakHandle durakHandle, Runesteel.Billet runesteelBillet) {
         if (registered) return;
         registered = true;
         String[] pattern = new String[] {
@@ -162,7 +162,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
                 " D "
         };
         final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('R', new RecipeIngredient(runesteelBlock, 1));
+        builder.setIngredient('R', new RecipeIngredient(runesteelBillet, 1));
         builder.setIngredient('C', new RecipeIngredient(colossusFragment, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         registry.registerRecipe(new NamespacedKey("champions", "giants_broadsword"), builder.build());
