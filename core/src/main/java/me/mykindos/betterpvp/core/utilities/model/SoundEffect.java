@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.model;
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
@@ -7,6 +8,8 @@ import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 @Getter
 public class SoundEffect {
@@ -44,6 +47,28 @@ public class SoundEffect {
 
     public SoundEffect(final Sound sound) {
         this.sound = sound;
+    }
+
+    /**
+     * Combines several effects into one that plays them all together as a single cue (see {@link LayeredSoundEffect}).
+     *
+     * @param effects the effects to layer; at least one
+     * @return a {@link SoundEffect} that fans every play out to each member
+     */
+    public static SoundEffect layered(final SoundEffect... effects) {
+        Preconditions.checkArgument(effects.length > 0, "At least one sound effect must be provided");
+        return layered(List.of(effects));
+    }
+
+    /**
+     * List form of {@link #layered(SoundEffect...)}.
+     *
+     * @param effects the effects to layer; at least one
+     * @return a {@link SoundEffect} that fans every play out to each member
+     */
+    public static SoundEffect layered(final List<SoundEffect> effects) {
+        Preconditions.checkArgument(!effects.isEmpty(), "At least one sound effect must be provided");
+        return new LayeredSoundEffect(effects);
     }
 
     /**
