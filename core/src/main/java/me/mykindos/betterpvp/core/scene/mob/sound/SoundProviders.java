@@ -4,10 +4,7 @@ import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.scene.mob.SceneMob;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +113,7 @@ public final class SoundProviders {
                 return null;
             }
 
-            return resolved.size() == 1 ? resolved.getFirst() : new LayeredSoundEffect(resolved);
+            return resolved.size() == 1 ? resolved.getFirst() : SoundEffect.layered(resolved);
         };
     }
 
@@ -170,52 +167,6 @@ public final class SoundProviders {
             final float pitch = Math.max(0.5f, Math.min(2.0f, sound.pitch() + jitter));
             return new SoundEffect(Sound.sound(sound.name(), sound.source(), sound.volume(), pitch));
         };
-    }
-
-    /**
-     * A {@link SoundEffect} that <em>is</em> several effects: every play path fans out to each member so
-     * {@link MobSoundBehavior}, which plays a single resolved effect, emits the whole stack from one
-     * cue without any awareness that layering is happening. It reports its first member's {@link Sound}
-     * for {@link #getSound()} so single-sound consumers still see a sensible value.
-     */
-    private static final class LayeredSoundEffect extends SoundEffect {
-
-        private final List<SoundEffect> effects;
-
-        private LayeredSoundEffect(List<SoundEffect> effects) {
-            super(effects.getFirst().getSound());
-            this.effects = effects;
-        }
-
-        @Override
-        public void play(Location location) {
-            effects.forEach(effect -> effect.play(location));
-        }
-
-        @Override
-        public void play(Audience audience) {
-            effects.forEach(effect -> effect.play(audience));
-        }
-
-        @Override
-        public void play(Audience audience, Location location) {
-            effects.forEach(effect -> effect.play(audience, location));
-        }
-
-        @Override
-        public void play(Audience audience, Sound.Emitter emitter) {
-            effects.forEach(effect -> effect.play(audience, emitter));
-        }
-
-        @Override
-        public void broadcast() {
-            effects.forEach(SoundEffect::broadcast);
-        }
-
-        @Override
-        public void broadcast(Sound.Emitter emitter) {
-            effects.forEach(effect -> effect.broadcast(emitter));
-        }
     }
 
 }

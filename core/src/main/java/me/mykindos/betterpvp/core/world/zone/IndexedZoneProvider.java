@@ -9,9 +9,12 @@ import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -75,5 +78,17 @@ final class IndexedZoneProvider implements ZoneProvider {
             return Stream.empty();
         }
         return bucket.stream().filter(zone -> zone.contains(location));
+    }
+
+    @Override
+    public @NotNull Collection<Zone> zones() {
+        // A zone is filed under every chunk it overlaps, so dedupe across buckets.
+        final Set<Zone> all = new LinkedHashSet<>();
+        for (Long2ObjectMap<List<Zone>> buckets : worlds.values()) {
+            for (List<Zone> bucket : buckets.values()) {
+                all.addAll(bucket);
+            }
+        }
+        return all;
     }
 }

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.world.zone.discovery.ZoneDiscovery;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -41,6 +42,8 @@ public final class Zone {
     private final Set<String> tags;
     /** Rules attached directly to this zone (composition half of the rule system). */
     private final ZoneRuleContainer rules;
+    /** Discovery notification config; when non-null this zone is {@link #isDiscoverable() discoverable}. */
+    private final ZoneDiscovery discovery;
 
     @Builder
     private Zone(@NotNull Key key,
@@ -48,13 +51,23 @@ public final class Zone {
                 @NotNull ZoneBounds bounds,
                 int priority,
                 @Singular Set<String> tags,
-                @Nullable ZoneRuleContainer rules) {
+                @Nullable ZoneRuleContainer rules,
+                @Nullable ZoneDiscovery discovery) {
         this.key = Objects.requireNonNull(key, "key");
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.displayName = displayName != null ? displayName : Component.text(UtilFormat.cleanString(key.value()));
         this.priority = priority;
         this.tags = Set.copyOf(tags);
         this.rules = rules != null ? rules : new ZoneRuleContainer();
+        this.discovery = discovery;
+    }
+
+    /**
+     * @return whether this zone fires a first-visit discovery notification (i.e. it was built with a
+     * {@link ZoneDiscovery})
+     */
+    public boolean isDiscoverable() {
+        return discovery != null;
     }
 
     /**
