@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.framework.sidebar;
 
+import lombok.CustomLog;
 import lombok.experimental.Delegate;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+@CustomLog
 public class Sidebar {
 
     public static final Component DEFAULT_TITLE = defaultTitle("BetterPvP");
@@ -44,16 +46,28 @@ public class Sidebar {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(wrapped.closed()) {
+                if (wrapped.closed()) {
                     cancel();
                     return;
                 }
-                wrapped.players().removeIf(player -> player == null || !player.isConnected());
-                if (wrapped.players().isEmpty()) {
-                    cancel();
-                    return;
+
+                try {
+                    if (wrapped.players().isEmpty()) {
+                        cancel();
+                        return;
+                    }
+                    layout.apply(wrapped);
+                } catch (Exception ex) {
+                    log.error("Error applying sidebar layout for gamer {} and type {}", gamer, sidebarType, ex);
+                } finally {
+                    var toRemove = wrapped.players().stream()
+                            .filter(player -> player == null || !player.isConnected())
+                            .toList();
+
+                    for (var player : toRemove) {
+                        wrapped.removePlayer(player);
+                    }
                 }
-                layout.apply(wrapped);
             }
         }.runTaskTimerAsynchronously(plugin, 5L, 5L);
 
