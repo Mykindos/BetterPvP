@@ -16,6 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -48,6 +50,11 @@ public class ClanZoneProvider implements ZoneProvider, Listener {
         return clanManager.getClanByChunk(location.getChunk())
                 .stream()
                 .map(this::zoneFor);
+    }
+
+    @Override
+    public @NotNull Collection<Zone> zones() {
+        return List.copyOf(zones.values());
     }
 
     /**

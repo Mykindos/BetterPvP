@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
 import me.mykindos.betterpvp.core.world.zone.Zones;
+import me.mykindos.betterpvp.core.world.zone.discovery.ZoneDiscovery;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -131,6 +132,8 @@ public class SunderedGate implements WorldContent {
                 .tag(TAG)
                 .tag(Zones.NO_BUILD)
                 .rules(rules)
+                // Defaults render "Area Discovered" / the zone name / an "Unlocked area" line with a chime.
+                .discovery(ZoneDiscovery.builder().build())
                 .build();
     }
 

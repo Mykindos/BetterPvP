@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -102,6 +104,29 @@ public class ZoneManager {
 
     public @NotNull Optional<Zone> getZone(@NotNull Key key) {
         return Optional.ofNullable(registered.get(key));
+    }
+
+    /**
+     * Enumerates every zone known to the manager — registered zones, ambient zones, and any zones surfaced by external
+     * {@link ZoneProvider#zones() providers} (e.g. clan territories) — deduped by {@link Zone#getKey() key}, with
+     * registered/ambient zones taking precedence. Intended for admin/listing tooling, not the per-move resolution path.
+     *
+     * @return all known zones, deduped by key
+     */
+    public @NotNull Collection<Zone> getAllZones() {
+        final Map<Key, Zone> all = new LinkedHashMap<>();
+        for (Zone zone : registered.values()) {
+            all.putIfAbsent(zone.getKey(), zone);
+        }
+        for (Zone zone : ambient) {
+            all.putIfAbsent(zone.getKey(), zone);
+        }
+        for (ZoneProvider provider : providers) {
+            for (Zone zone : provider.zones()) {
+                all.putIfAbsent(zone.getKey(), zone);
+            }
+        }
+        return all.values();
     }
 
     // </editor-fold>
