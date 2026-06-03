@@ -48,6 +48,11 @@ public class Sidebar {
                     cancel();
                     return;
                 }
+                wrapped.players().removeIf(player -> player == null || !player.isConnected());
+                if (wrapped.players().isEmpty()) {
+                    cancel();
+                    return;
+                }
                 layout.apply(wrapped);
             }
         }.runTaskTimerAsynchronously(plugin, 5L, 5L);
