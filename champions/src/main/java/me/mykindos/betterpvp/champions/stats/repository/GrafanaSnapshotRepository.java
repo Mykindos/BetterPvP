@@ -13,7 +13,6 @@ import org.jooq.impl.SQLDataType;
 import java.math.BigDecimal;
 
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLS;
-import static me.mykindos.betterpvp.champions.database.jooq.Tables.GRAFANA_ROLE_MATCHUP_SNAPSHOT;
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.GRAFANA_ROLE_PLAYTIME_SNAPSHOT;
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.GRAFANA_SKILL_KDR_SNAPSHOT;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.CLIENT_STATS;
@@ -48,7 +47,6 @@ public class GrafanaSnapshotRepository {
      */
     public void takeSnapshot(int realmId) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            takeRoleMatchupSnapshot(ctx, realmId);
             takeRolePlaytimeSnapshot(ctx, realmId);
             takeSkillKdrSnapshot(ctx, realmId);
             log.info("Grafana snapshot taken for realm {}", realmId).submit();
@@ -61,60 +59,6 @@ public class GrafanaSnapshotRepository {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
-    private void takeRoleMatchupSnapshot(DSLContext ctx, int realmId) {
-        // CTE: per (killer_class, victim_class) pair, count valid kills
-        CommonTableExpression<?> matchupKills = DSL.name("matchup_kills")
-                .fields("attacker", "defender", "kills")
-                .as(ctx.select(
-                                CHAMPIONS_KILLS.KILLER_CLASS,
-                                CHAMPIONS_KILLS.VICTIM_CLASS,
-                                DSL.count().cast(Long.class))
-                        .from(KILLS)
-                        .join(CHAMPIONS_KILLS).on(KILLS.ID.eq(CHAMPIONS_KILLS.KILL_ID))
-                        .where(KILLS.REALM.eq(realmId))
-                        .and(KILLS.VALID.isTrue())
-                        .and(CHAMPIONS_KILLS.KILLER_CLASS.ne(""))
-                        .and(CHAMPIONS_KILLS.VICTIM_CLASS.ne(""))
-                        .groupBy(CHAMPIONS_KILLS.KILLER_CLASS, CHAMPIONS_KILLS.VICTIM_CLASS));
-
-        // Reference the CTE twice for the self-join (a = attacker side, b = defender side)
-        var a = DSL.table(DSL.name("matchup_kills")).as("a");
-        var b = DSL.table(DSL.name("matchup_kills")).as("b");
-
-        Field<String>     aAttacker    = DSL.field(DSL.name("a", "attacker"), String.class);
-        Field<String>     aDefender    = DSL.field(DSL.name("a", "defender"), String.class);
-        Field<Long>       aKills       = DSL.field(DSL.name("a", "kills"),    Long.class);
-        Field<Long>       bKills       = DSL.field(DSL.name("b", "kills"),    Long.class);
-        Field<String>     bDefender    = DSL.field(DSL.name("b", "defender"), String.class);
-        Field<String>     bAttacker    = DSL.field(DSL.name("b", "attacker"), String.class);
-
-        Field<Long>       bKillsOrZero = DSL.coalesce(bKills, 0L);
-        Field<BigDecimal> kdr          = DSL
-                .when(bKillsOrZero.eq(0L), aKills.cast(SQLDataType.NUMERIC))
-                .otherwise(DSL.round(aKills.cast(SQLDataType.NUMERIC).div(bKills), 2));
-
-        ctx.with(matchupKills)
-                .insertInto(GRAFANA_ROLE_MATCHUP_SNAPSHOT,
-                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.REALM,
-                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.CAPTURED_AT,
-                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.ROLE,
-                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.VS_ROLE,
-                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.KILLS,
-                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.DEATHS,
-                        GRAFANA_ROLE_MATCHUP_SNAPSHOT.KDR)
-                .select(DSL.select(
-                                DSL.val(realmId),
-                                DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE),
-                                aAttacker,
-                                aDefender,
-                                aKills,
-                                bKillsOrZero,
-                                kdr)
-                        .from(a)
-                        .leftJoin(b).on(aAttacker.eq(bDefender).and(aDefender.eq(bAttacker))))
-                .execute();
-    }
 
     private void takeRolePlaytimeSnapshot(DSLContext ctx, int realmId) {
         // JSONB path accessors

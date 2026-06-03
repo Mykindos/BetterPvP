@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKdrByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKillsByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKillstreakByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopRatingByClass;
-import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRoleMatchupSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRolePlaytimeSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaSkillKdrSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetChampionsDataRecord;
@@ -412,11 +411,6 @@ public class Tables {
             classParam
         );
     }
-
-    /**
-     * The table <code>public.grafana_role_matchup_snapshot</code>.
-     */
-    public static final GrafanaRoleMatchupSnapshot GRAFANA_ROLE_MATCHUP_SNAPSHOT = GrafanaRoleMatchupSnapshot.GRAFANA_ROLE_MATCHUP_SNAPSHOT;
 
     /**
      * The table <code>public.grafana_role_playtime_snapshot</code>.

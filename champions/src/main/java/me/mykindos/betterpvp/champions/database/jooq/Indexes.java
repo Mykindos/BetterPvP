@@ -7,7 +7,6 @@ package me.mykindos.betterpvp.champions.database.jooq;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsCombatStats;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKills;
-import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRoleMatchupSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRolePlaytimeSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaSkillKdrSnapshot;
 import org.jooq.Index;
@@ -34,7 +33,6 @@ public class Indexes {
     public static final Index IDX_CHAMPIONS_KILL_CONTRIBUTIONS_CONTRIBUTOR_CLASS = Internal.createIndex(DSL.name("idx_champions_kill_contributions_contributor_class"), ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS, new OrderField[] { ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS.CONTRIBUTOR_CLASS }, false);
     public static final Index IDX_CHAMPIONS_KILLS_KILLER_CLASS = Internal.createIndex(DSL.name("idx_champions_kills_killer_class"), ChampionsKills.CHAMPIONS_KILLS, new OrderField[] { ChampionsKills.CHAMPIONS_KILLS.KILLER_CLASS }, false);
     public static final Index IDX_CHAMPIONS_KILLS_VICTIM_CLASS = Internal.createIndex(DSL.name("idx_champions_kills_victim_class"), ChampionsKills.CHAMPIONS_KILLS, new OrderField[] { ChampionsKills.CHAMPIONS_KILLS.VICTIM_CLASS }, false);
-    public static final Index IDX_GRAFANA_ROLE_MATCHUP_REALM_TIME = Internal.createIndex(DSL.name("idx_grafana_role_matchup_realm_time"), GrafanaRoleMatchupSnapshot.GRAFANA_ROLE_MATCHUP_SNAPSHOT, new OrderField[] { GrafanaRoleMatchupSnapshot.GRAFANA_ROLE_MATCHUP_SNAPSHOT.REALM, GrafanaRoleMatchupSnapshot.GRAFANA_ROLE_MATCHUP_SNAPSHOT.CAPTURED_AT.desc() }, false);
     public static final Index IDX_GRAFANA_ROLE_PLAYTIME_REALM_TIME = Internal.createIndex(DSL.name("idx_grafana_role_playtime_realm_time"), GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT, new OrderField[] { GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT.REALM, GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT.CAPTURED_AT.desc() }, false);
     public static final Index IDX_GRAFANA_SKILL_KDR_REALM_TIME = Internal.createIndex(DSL.name("idx_grafana_skill_kdr_realm_time"), GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT, new OrderField[] { GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT.REALM, GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT.CAPTURED_AT.desc() }, false);
 }
