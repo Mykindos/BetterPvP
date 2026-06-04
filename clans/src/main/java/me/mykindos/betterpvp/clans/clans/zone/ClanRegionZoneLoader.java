@@ -25,8 +25,9 @@ import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +35,10 @@ import java.util.Optional;
 /**
  * Loads server-owned areas (spawn, shops, Fields, ...) as Mapper region zones. This replaces the old "admin clan"
  * model: instead of seeding a clan with {@code admin}/{@code safe} flags and claiming its chunks, an operator defines
- * a Mapper data-point and maps it to capability tags in {@code config.yml}.
+ * a Mapper data-point and maps it to capability tags in a {@code zones/<continent>.yml} file (one file per continent,
+ * scanned from the module's data folder).
  * <p>
- * Each entry under {@code zones} pairs a Mapper region name with a list of capability {@link Zones tags} and an
+ * Each entry in a continent file pairs a Mapper region name with a list of capability {@link Zones tags} and an
  * optional priority. Tags are composable:
  * <ul>
  *     <li>{@link Zones#SAFE} — combat is suppressed (enforced by {@code ClansCombatListener}).</li>
@@ -71,29 +73,49 @@ public class ClanRegionZoneLoader extends ZoneLoader {
 
     @Override
     protected void load() {
-        final World world = Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME);
-        if (world == null) {
-            log.warn("Cannot load clan region zones: world '{}' is not loaded", BPvPWorld.MAIN_WORLD_NAME).submit();
+        final File zonesFolder = new File(clans.getDataFolder(), "zones");
+        final File[] files = zonesFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".yml"));
+        if (files == null || files.length == 0) {
+            log.warn("No zone files found in {} - no clan region zones loaded", zonesFolder).submit();
             return;
         }
 
-        final ExtendedYamlConfiguration config = clans.getConfig();
-        seedDefaults(config);
-        final ConfigurationSection section = config.getConfigurationSection("zones");
-        if (section == null) {
-            return;
+        int loaded = 0;
+        for (File file : files) {
+            loaded += loadFile(file);
+        }
+        log.info("Loaded {} clan region zone(s) from {} continent file(s)", loaded, files.length).submit();
+    }
+
+    /**
+     * Loads every zone defined in a single continent file. Each top-level key is a Mapper region name; the reserved
+     * {@code world} key (optional, defaults to the main world) selects the Bukkit world the regions live in.
+     *
+     * @return the number of zones registered from this file
+     */
+    private int loadFile(@NotNull File file) {
+        final ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(file);
+        final String worldName = config.getString("world", BPvPWorld.MAIN_WORLD_NAME);
+        final World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            log.warn("Zone file '{}' targets world '{}' which is not loaded - skipping", file.getName(), worldName).submit();
+            return 0;
         }
 
         final Collection<Region> regions = MapperHelper.getRegions(world);
         int loaded = 0;
-        for (String name : section.getKeys(false)) {
-            final List<String> tags = section.getStringList(name + ".tags");
-            final int priority = section.getInt(name + ".priority", ClanZones.SERVER_REGION_PRIORITY);
-            final String display = section.getString(name + ".display", name);
+        for (String name : config.getKeys(false)) {
+            if (name.equalsIgnoreCase("world") || !config.isConfigurationSection(name)) {
+                continue;
+            }
+
+            final List<String> tags = config.getStringList(name + ".tags");
+            final int priority = config.getInt(name + ".priority", ClanZones.SERVER_REGION_PRIORITY);
+            final String display = config.getString(name + ".display", name);
 
             final Optional<CuboidRegion> regionOptional = MapperHelper.findRegion(regions, name, CuboidRegion.class);
             if (regionOptional.isEmpty()) {
-                log.warn("Clan zone '{}' has no matching Mapper region - skipping", name).submit();
+                log.warn("Clan zone '{}' has no matching Mapper region in '{}' - skipping", name, worldName).submit();
                 continue;
             }
 
@@ -116,17 +138,6 @@ public class ClanRegionZoneLoader extends ZoneLoader {
             register(builder.build());
             loaded++;
         }
-
-        log.info("Loaded {} clan region zone(s)", loaded).submit();
-    }
-
-    private void seedDefaults(ExtendedYamlConfiguration config) {
-        if (config.isSet("zones")) {
-            return;
-        }
-        config.set("zones.spawn.tags", List.of(Zones.SAFE, Zones.NO_BUILD));
-        config.set("zones.spawn.priority", ClanZones.SERVER_REGION_PRIORITY);
-        config.set("zones.fields.tags", List.of(ClanZones.FIELDS));
-        config.set("zones.fields.priority", ClanZones.SERVER_REGION_PRIORITY - 10);
+        return loaded;
     }
 }

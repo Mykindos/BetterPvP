@@ -1,0 +1,18 @@
+# Example fishing resource node (water pond).
+#
+# Binds to every Mapper region tagged 'trout_pond'. When a player reels in a catch whose hook is inside the zone,
+# the vanilla fish is replaced by a roll of 'lootTable'. 'fishing.liquid' may be 'water' (default) or 'lava' for a
+# lava pond (same loot-replacement flow, different table); physically casting a bobber into lava is a vanilla
+# limitation handled outside this node.
+
+archetype: fishing
+match:
+  name: trout_pond
+profession: Fishing
+level: 10
+displayName: "Trout Pond"
+lootTable: trout_pond
+respawn: 0
+xp: 8
+fishing:
+  liquid: water

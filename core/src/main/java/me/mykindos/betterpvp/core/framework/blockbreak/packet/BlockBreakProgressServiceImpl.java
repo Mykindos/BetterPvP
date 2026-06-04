@@ -262,10 +262,27 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         // Nexo blocks often appear as AIR or BARRIER, so we must not rely on getType().
         final BlockData blockData = block.getBlockData();
         if (!session.isResolvedFor(blockData)) {
+            // The block under an active session changed (a degrade-chain step via setType, a Vein Echo respawn,
+            // a falling block landing, etc.). When this isn't the session's first resolve, the dig is effectively
+            // starting on a new block in place, so re-fire BlockDamageEvent — listeners that gate the *start* of
+            // mining (block protection, unbreakable resource-node stages) get the same chance to cancel they would
+            // on a fresh dig. A cancel ends the session; otherwise the destruction progress restarts from zero.
+            final boolean blockChanged = session.getResolvedFor() != null && !block.getType().isAir();
             final SmartBlockBreakOverride resolvedOverride =
                     SmartBlockOverrides.resolve(smartBlockFactory, block, player, held);
             final boolean smart = !block.getType().isAir() && smartBlockFactory.isSmartBlock(block);
             session.cacheResolve(blockData, resolvedOverride, smart);
+            if (blockChanged) {
+                final BlockDamageEvent damage = new BlockDamageEvent(player, block, session.getFace(), held, false);
+                Bukkit.getPluginManager().callEvent(damage);
+                if (damage.isCancelled()) {
+                    cancelSessionFor(session.getPlayerId());
+                    return;
+                }
+                session.setProgress(0.0);
+                session.setLastStageSent(-1);
+                clearOverlay(session);
+            }
         }
 
         final SmartBlockBreakOverride smartOverride = session.getCachedSmartOverride();
@@ -741,6 +758,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
                 || session.getBlockPos().getZ() != pos.getZ()) {
             return; // player retargeted between schedule and run
         }
+        session.setFace(face); // remember for re-fired BlockDamageEvents when the block changes mid-session
 
         final World world = Bukkit.getWorld(session.getWorldUid());
         if (world == null) return;
