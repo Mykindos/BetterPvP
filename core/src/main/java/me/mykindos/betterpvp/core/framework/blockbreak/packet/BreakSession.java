@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.block.SmartBlockBreakOverride;
 import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakProperties;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 
 import java.util.UUID;
@@ -28,13 +29,18 @@ public final class BreakSession {
     @Setter private double progress;
     /** integer destruction stage last sent (-1 = no overlay rendered yet). */
     @Setter private int lastStageSent = -1;
+    /**
+     * Block face the dig started against, replayed when we re-fire {@link org.bukkit.event.block.BlockDamageEvent}
+     * after the block changes under the session. Stamped by the main-thread dig dispatch; UP until then.
+     */
+    @Getter @Setter private BlockFace face = BlockFace.UP;
 
     // The tick loop re-derived smart-block override, breakability/speed, and
     // smart-block status every tick. All three depend only on the block's
     // BlockData (plus the held item, which already ends the session on change),
     // so we memoize them and recompute only when the BlockData changes
     // (Vein Echo respawn, falling block, turning to AIR, etc.).
-    private BlockData resolvedFor;
+    @Getter private BlockData resolvedFor;
     @Getter private SmartBlockBreakOverride cachedSmartOverride;
     @Getter private boolean cachedIsSmartBlock;
     /** Null until resolved for the current {@link #resolvedFor}; cleared when BlockData changes. */

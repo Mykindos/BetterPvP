@@ -1,0 +1,31 @@
+# Example tree resource node.
+#
+# A tree is a Mapper PERSPECTIVE data-point (a point with a facing) named 'willow'. Place one wherever you want a
+# tree; its location is the paste anchor and its yaw (snapped to 90 degrees) is the rotation. Tag it 'level:NN' /
+# 'name:...' to override per placement. Several markers = several trees.
+#
+# The tree is built from authored schematics (no need to build each tree in the world):
+#   tree.standing : the standing tree schematic. Its FAWE //copy origin is the block that lands on the marker, so
+#                   stand on the trunk base when you //copy. Re-pasting it on regrow clears fell debris (it carries
+#                   its own air), so author it over the tree's full footprint.
+#   tree.stages   : the fell animation frames (last = stump), played 'stageDelay' ticks apart.
+# All schematics are .schem/.schematic files in <data folder>/schematics/, authored in one canonical facing; the
+# marker's yaw rotates them (blocks and their facings) to match.
+
+archetype: tree
+match:
+  name: willow
+profession: Woodcutting
+level: 15
+displayName: "Willow Tree"
+lootTable: willow_tree
+respawn: 120
+xp: 12
+tree:
+  hits: 3
+  stageDelay: 6
+  standing: willow_standing
+  stages:
+    - willow_fall_1
+    - willow_fall_2
+    - willow_stump

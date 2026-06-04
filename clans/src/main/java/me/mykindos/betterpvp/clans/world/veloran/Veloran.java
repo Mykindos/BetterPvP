@@ -46,6 +46,6 @@ public class Veloran extends Continent {
 
     @Override
     public @NotNull List<WorldContent> content() {
-        return List.of();
+        return List.of(sunderedGate);
     }
 }

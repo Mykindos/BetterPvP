@@ -1,0 +1,44 @@
+# Example ore resource node.
+#
+# Binds to every Mapper region named 'copper_mine'. A region tag 'level:NN' overrides the level per placement,
+# and 'name:Some Name' overrides the label.
+#
+# A node can carry several degrade chains at once ('chains'). The region is scanned once at load and every
+# block whose material is the first stage of a RESOURCE chain is snapshotted and respawns after 'respawn' seconds.
+# A resource chain is one whose first stage is never something another chain degrades into - so copper_ore and
+# diamond_ore below are mined resources, while 'stone' (which they degrade into) is just an erosion rule and never
+# respawns. Mining steps a block to the next stage, preferring the chain it was mined as; once that chain ends, any
+# chain that can continue the current material takes over (so copper -> stone then stone -> cobblestone -> deepslate).
+#
+# 'chains' is a map of named chains; the key (e.g. 'copper') is just a readable label and each value is a list of
+# STAGES. A stage is either a plain material string (the block's vanilla drops) or an object with 'material' plus an
+# optional 'lootTable' (resolved by id from the loot-table system; must exist there) and an optional 'unbreakable: true'
+# (the block can't be mined - its damage is cancelled, so no cracking animation). Loot is per-stage: each mined block
+# drops its own table, or vanilla.
+#
+# Labels: place Mapper point/perspective data-points tagged 'label' INSIDE this region where you want the
+# "Name / Level N" text to float (the marker must be within the region bounds, so nodes can share x/z columns).
+# Place several for several labels - each player only sees the nearest one. With no 'label' marker inside the
+# region, a single label is auto-placed above the region centre.
+
+archetype: ore
+match:
+  name: copper_mine
+profession: Mining
+level: 25
+displayName: "Copper Mine"
+respawn: 45
+chains:
+  # Resource: mining the copper_ore stage drops the 'copper_mine' table; the block respawns to copper_ore.
+  copper:
+    - material: copper_ore
+      lootTable: copper_mine
+    - stone                  # plain string stage -> the block's vanilla drops
+  # Resource with no custom loot: every stage drops vanilla.
+  diamond: [diamond_ore, stone]
+  # Erosion: stone anywhere in the zone degrades to cobblestone, then to unbreakable deepslate.
+  erosion:
+    - stone
+    - cobblestone
+    - material: deepslate
+      unbreakable: true

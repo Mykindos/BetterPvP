@@ -34,6 +34,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
+import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRules;
@@ -168,5 +169,11 @@ public class Clans extends BPvPPlugin {
     @Override
     public void onDisable() {
         clanManager.getRepository().processPropertyUpdates(false);
+        if (injector != null) {
+            // Unload scene content so each archetype's onDeactivate fires on a graceful shutdown (the previously-unused
+            // SceneLoaderManager.shutdown()). In-flight respawn points are already persisted synchronously as they are
+            // mined, so no final flush is needed here.
+            injector.getInstance(SceneLoaderManager.class).shutdown();
+        }
     }
 }
