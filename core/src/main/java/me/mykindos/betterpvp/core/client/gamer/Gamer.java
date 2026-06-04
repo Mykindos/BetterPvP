@@ -35,7 +35,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -131,13 +130,17 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     }
 
     public void setSidebar(@Nullable Sidebar newSidebar) {
-        if (this.sidebar != null && this.isOnline()) {
-            this.sidebar.removePlayer(Objects.requireNonNull(getPlayer()));
-            sidebar.close();
+        if (this.sidebar != null) {
+            if (!this.sidebar.closed()) {
+                final Player player = getPlayer();
+                if (player != null && player.isOnline()) {
+                    this.sidebar.removePlayer(player);
+                }
+                this.sidebar.close();
+            }
         }
 
         this.sidebar = newSidebar;
-
     }
 
     @Override
