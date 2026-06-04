@@ -1,0 +1,20 @@
+# Zone definitions for the Veloran continent.
+#
+# Each top-level key is a Mapper data-point (region) name. Tags grant composable capabilities:
+#   SAFE      - combat is suppressed (enforced by ClansCombatListener)
+#   NO_BUILD  - block break/place and container access are denied (NoBuildRule)
+#   FIELDS    - the area is a Fields-style resource zone (resource-node harvesting + isFields() checks)
+# priority : resolution priority on overlap (higher wins); defaults to 50 (SERVER_REGION_PRIORITY).
+# display  : the zone's display name; defaults to the region name.
+# world    : (optional, file-level) the Bukkit world these regions live in; defaults to the main world.
+
+spawn:
+  tags:
+    - safe
+    - no_build
+  priority: 50
+
+fields:
+  tags:
+    - fields
+  priority: 40

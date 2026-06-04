@@ -67,7 +67,7 @@ public class ClansMovementListener extends ClanListener {
         final Client client = clientManager.search().online(player);
         final boolean popupSetting = (boolean) client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED).orElse(false);
         if (popupSetting) {
-            TitleComponent titleComponent = new TitleComponent(0, .75, .25, true,
+            TitleComponent titleComponent = new TitleComponent(0, .75, .25, false,
                     gamer -> Component.text("", NamedTextColor.GRAY),
                     gamer -> Component.text("Wilderness", NamedTextColor.GRAY));
             client.getGamer().getTitleQueue().add(9, titleComponent);

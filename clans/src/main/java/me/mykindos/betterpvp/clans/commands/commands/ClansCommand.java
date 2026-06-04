@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.core.vault.restriction.ClanVaultRestrictions;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
-import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -64,9 +63,6 @@ public class ClansCommand extends Command implements IConsoleCommand {
         private TipManager tipManager;
 
         @Inject
-        private Fields fields;
-
-        @Inject
         private ClanVaultRestrictions clanVaultRestrictions;
 
         @Inject
@@ -95,7 +91,6 @@ public class ClansCommand extends Command implements IConsoleCommand {
             commandLoader.reload(clans.getClass().getPackageName());
             tipManager.reloadTips(clans);
 
-            fields.reload(clans);
             clanVaultRestrictions.reload();
 
 
