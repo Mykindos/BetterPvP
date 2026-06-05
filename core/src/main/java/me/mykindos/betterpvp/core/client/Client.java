@@ -63,7 +63,7 @@ public class Client extends PropertyContainer implements IMapListener, Unique {
     }
 
     public Player getPlayer() {
-        return Bukkit.getServer().getPlayer(this.getUuid());
+        return Bukkit.getServer().getPlayer(this.getUniqueId());
     }
 
     public Component getTag(boolean bold) {
