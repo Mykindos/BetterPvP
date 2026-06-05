@@ -10,6 +10,9 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static me.mykindos.betterpvp.core.database.jooq.Tables.GRAFANA_CONFIG;
 
 /**
@@ -52,6 +55,10 @@ public class GrafanaConfigSyncService {
      * upserts each one into {@code grafana_config} keyed by
      * {@code (plugin.getName(), configPath, key)}.
      *
+     * <p>Stale rows (keys present in the DB but absent from the current YAML)
+     * are deleted in the same transaction as the upserts, so readers always
+     * observe a consistent snapshot of the config file.
+     *
      * @param plugin     the plugin that owns the config file
      * @param configPath config path relative to the plugin data folder,
      *                   without the {@code .yml} extension
@@ -61,15 +68,37 @@ public class GrafanaConfigSyncService {
         final String pluginName = plugin.getName();
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ExtendedYamlConfiguration config = plugin.getConfig(configPath);
-            int count = 0;
+            Map<String, String> liveEntries = new LinkedHashMap<>();
             for (String key : config.getKeys(true)) {
                 if (config.isConfigurationSection(key)) continue;
                 Object value = config.get(key);
                 if (value == null) continue;
-                upsert(ctx, pluginName, configPath, key, String.valueOf(value));
-                count++;
+                liveEntries.put(key, String.valueOf(value));
             }
-            log.info("grafana_config: synced {} keys from {}/{}.yml", count, pluginName, configPath).submit();
+
+            if (liveEntries.isEmpty()) {
+                // Guard: an empty result likely means the file failed to load.
+                // Skip the sync entirely rather than deleting all rows for this file.
+                log.warn("grafana_config: {}/{}.yml yielded no keys — skipping sync to avoid accidental data loss", pluginName, configPath).submit();
+                return;
+            }
+
+            ctx.transaction(trx -> {
+                DSLContext trxCtx = DSL.using(trx);
+                for (Map.Entry<String, String> entry : liveEntries.entrySet()) {
+                    upsert(trxCtx, pluginName, configPath, entry.getKey(), entry.getValue());
+                }
+                int deleted = trxCtx.deleteFrom(GRAFANA_CONFIG)
+                        .where(GRAFANA_CONFIG.PLUGIN.eq(pluginName))
+                        .and(GRAFANA_CONFIG.CONFIG_FILE.eq(configPath))
+                        .and(GRAFANA_CONFIG.CONFIG_KEY.notIn(liveEntries.keySet()))
+                        .execute();
+                if (deleted > 0) {
+                    log.info("grafana_config: removed {} stale keys from {}/{}.yml", deleted, pluginName, configPath).submit();
+                }
+            });
+
+            log.info("grafana_config: synced {} keys from {}/{}.yml", liveEntries.size(), pluginName, configPath).submit();
         }).exceptionally(ex -> {
             log.error("Failed to sync grafana_config for {}/{}.yml", pluginName, configPath, ex).submit();
             return null;

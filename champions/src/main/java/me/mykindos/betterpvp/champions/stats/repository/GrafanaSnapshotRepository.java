@@ -11,6 +11,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.CHAMPIONS_KILLS;
 import static me.mykindos.betterpvp.champions.database.jooq.Tables.GRAFANA_ROLE_PLAYTIME_SNAPSHOT;
@@ -43,12 +45,16 @@ public class GrafanaSnapshotRepository {
      * Inserts one snapshot row per tracked entity (role matchup, role playtime, skill)
      * for the given realm into the three Grafana snapshot tables.
      *
+     * <p>A single {@code capturedAt} timestamp is computed once and shared across all
+     * inserts so that cross-table joins on {@code captured_at} are deterministic.
+     *
      * @param realmId the current realm ID (from {@link me.mykindos.betterpvp.core.Core#getCurrentRealm()})
      */
     public void takeSnapshot(int realmId) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
-            takeRolePlaytimeSnapshot(ctx, realmId);
-            takeSkillKdrSnapshot(ctx, realmId);
+            OffsetDateTime capturedAt = OffsetDateTime.now(ZoneOffset.UTC);
+            takeRolePlaytimeSnapshot(ctx, realmId, capturedAt);
+            takeSkillKdrSnapshot(ctx, realmId, capturedAt);
             log.info("Grafana snapshot taken for realm {}", realmId).submit();
         }).exceptionally(ex -> {
             log.error("Failed to take Grafana snapshot for realm {}", realmId, ex).submit();
@@ -60,7 +66,7 @@ public class GrafanaSnapshotRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private void takeRolePlaytimeSnapshot(DSLContext ctx, int realmId) {
+    private void takeRolePlaytimeSnapshot(DSLContext ctx, int realmId, OffsetDateTime capturedAt) {
         // JSONB path accessors
         Field<String> wrappedStatType = DSL.field("{0}->'wrappedStat'->>'statType'", String.class, CLIENT_STATS.STATDATA);
         Field<String> wrappedAction   = DSL.field("{0}->'wrappedStat'->>'action'",   String.class, CLIENT_STATS.STATDATA);
@@ -99,20 +105,30 @@ public class GrafanaSnapshotRepository {
                         .and(CHAMPIONS_KILLS.VICTIM_CLASS.ne(""))
                         .groupBy(CHAMPIONS_KILLS.VICTIM_CLASS));
 
-        Field<String>     tRole        = DSL.field(DSL.name("t", "role"),          String.class);
-        Field<Long>       kKills       = DSL.field(DSL.name("k", "kills"),          Long.class);
-        Field<Long>       dDeaths      = DSL.field(DSL.name("d", "deaths"),         Long.class);
-        Field<Long>       tTimePlayed  = DSL.field(DSL.name("t", "time_played_ms"), Long.class);
-        Field<String>     kRole        = DSL.field(DSL.name("k", "role"),           String.class);
-        Field<String>     dRole        = DSL.field(DSL.name("d", "role"),           String.class);
+        // CTE 4: union of all role names so roles with only kills/deaths but no TIME_PLAYED are included
+        Field<String> roleField = DSL.field(DSL.name("role"), String.class);
+        CommonTableExpression<?> roleAll = DSL.name("role_all")
+                .fields("role")
+                .as(ctx.select(roleField).from(roleTime)
+                        .union(ctx.select(roleField).from(roleKills))
+                        .union(ctx.select(roleField).from(roleDeaths)));
 
-        Field<Long>       kKillsOrZero  = DSL.coalesce(kKills,  0L);
-        Field<Long>       dDeathsOrZero = DSL.coalesce(dDeaths, 0L);
+        Field<String>     aRole             = DSL.field(DSL.name("a", "role"),          String.class);
+        Field<Long>       kKills            = DSL.field(DSL.name("k", "kills"),          Long.class);
+        Field<Long>       dDeaths           = DSL.field(DSL.name("d", "deaths"),         Long.class);
+        Field<Long>       tTimePlayed       = DSL.field(DSL.name("t", "time_played_ms"), Long.class);
+        Field<String>     kRole             = DSL.field(DSL.name("k", "role"),           String.class);
+        Field<String>     dRole             = DSL.field(DSL.name("d", "role"),           String.class);
+        Field<String>     tRole             = DSL.field(DSL.name("t", "role"),           String.class);
+
+        Field<Long>       kKillsOrZero      = DSL.coalesce(kKills,      0L);
+        Field<Long>       dDeathsOrZero     = DSL.coalesce(dDeaths,     0L);
+        Field<Long>       tTimePlayedOrZero = DSL.coalesce(tTimePlayed, 0L);
         Field<BigDecimal> kdr = DSL
                 .when(dDeathsOrZero.eq(0L), kKillsOrZero.cast(SQLDataType.NUMERIC))
                 .otherwise(DSL.round(kKillsOrZero.cast(SQLDataType.NUMERIC).div(dDeaths), 2));
 
-        ctx.with(roleTime, roleKills, roleDeaths)
+        ctx.with(roleTime, roleKills, roleDeaths, roleAll)
                 .insertInto(GRAFANA_ROLE_PLAYTIME_SNAPSHOT,
                         GRAFANA_ROLE_PLAYTIME_SNAPSHOT.REALM,
                         GRAFANA_ROLE_PLAYTIME_SNAPSHOT.CAPTURED_AT,
@@ -123,25 +139,26 @@ public class GrafanaSnapshotRepository {
                         GRAFANA_ROLE_PLAYTIME_SNAPSHOT.TIME_PLAYED_MS)
                 .select(DSL.select(
                                 DSL.val(realmId),
-                                DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE),
-                                tRole,
+                                DSL.val(capturedAt),
+                                aRole,
                                 kKillsOrZero,
                                 dDeathsOrZero,
                                 kdr,
-                                tTimePlayed)
-                        .from(DSL.table(DSL.name("role_time")).as("t"))
-                        .leftJoin(DSL.table(DSL.name("role_kills")).as("k")).on(tRole.eq(kRole))
-                        .leftJoin(DSL.table(DSL.name("role_deaths")).as("d")).on(tRole.eq(dRole)))
+                                tTimePlayedOrZero)
+                        .from(DSL.table(DSL.name("role_all")).as("a"))
+                        .leftJoin(DSL.table(DSL.name("role_kills")).as("k")).on(aRole.eq(kRole))
+                        .leftJoin(DSL.table(DSL.name("role_deaths")).as("d")).on(aRole.eq(dRole))
+                        .leftJoin(DSL.table(DSL.name("role_time")).as("t")).on(aRole.eq(tRole)))
                 .execute();
     }
 
-    private void takeSkillKdrSnapshot(DSLContext ctx, int realmId) {
+    private void takeSkillKdrSnapshot(DSLContext ctx, int realmId, OffsetDateTime capturedAt) {
         // JSONB path accessors
         Field<String> wrappedStatType  = DSL.field("{0}->'wrappedStat'->>'statType'",  String.class, CLIENT_STATS.STATDATA);
         Field<String> wrappedAction    = DSL.field("{0}->'wrappedStat'->>'action'",    String.class, CLIENT_STATS.STATDATA);
         Field<String> wrappedSkillName = DSL.field("{0}->'wrappedStat'->>'skillName'", String.class, CLIENT_STATS.STATDATA);
 
-        // Base WHERE conditions shared by all three skill CTEs
+        // Base WHERE conditions shared by all skill CTEs
         var baseCondition = CLIENT_STATS.STATTYPE.eq("CLANS_WRAPPER")
                 .and(wrappedStatType.eq("CHAMPIONS_SKILL"))
                 .and(wrappedSkillName.isNotNull())
@@ -172,20 +189,29 @@ public class GrafanaSnapshotRepository {
                         .where(baseCondition.and(wrappedAction.eq("TIME_PLAYED")))
                         .groupBy(wrappedSkillName));
 
-        Field<String>     kSkillName       = DSL.field(DSL.name("k", "skill_name"),    String.class);
-        Field<Long>       kKills           = DSL.field(DSL.name("k", "kills"),          Long.class);
-        Field<Long>       dDeaths          = DSL.field(DSL.name("d", "deaths"),         Long.class);
-        Field<Long>       tTimePlayed      = DSL.field(DSL.name("t", "time_played_ms"), Long.class);
-        Field<String>     dSkillName       = DSL.field(DSL.name("d", "skill_name"),     String.class);
-        Field<String>     tSkillName       = DSL.field(DSL.name("t", "skill_name"),     String.class);
+        // CTE 4: union of all skill names so skills with zero kills are still included
+        CommonTableExpression<?> skillAll = DSL.name("skill_all")
+                .fields("skill_name")
+                .as(ctx.selectDistinct(wrappedSkillName)
+                        .from(CLIENT_STATS)
+                        .where(baseCondition));
 
-        Field<Long>       dDeathsOrZero    = DSL.coalesce(dDeaths,     0L);
+        Field<String>     aSkillName        = DSL.field(DSL.name("a", "skill_name"),    String.class);
+        Field<Long>       kKills            = DSL.field(DSL.name("k", "kills"),          Long.class);
+        Field<Long>       dDeaths           = DSL.field(DSL.name("d", "deaths"),         Long.class);
+        Field<Long>       tTimePlayed       = DSL.field(DSL.name("t", "time_played_ms"), Long.class);
+        Field<String>     kSkillName        = DSL.field(DSL.name("k", "skill_name"),     String.class);
+        Field<String>     dSkillName        = DSL.field(DSL.name("d", "skill_name"),     String.class);
+        Field<String>     tSkillName        = DSL.field(DSL.name("t", "skill_name"),     String.class);
+
+        Field<Long>       kKillsOrZero      = DSL.coalesce(kKills,     0L);
+        Field<Long>       dDeathsOrZero     = DSL.coalesce(dDeaths,    0L);
         Field<Long>       tTimePlayedOrZero = DSL.coalesce(tTimePlayed, 0L);
         Field<BigDecimal> kdr = DSL
-                .when(dDeathsOrZero.eq(0L), kKills.cast(SQLDataType.NUMERIC))
-                .otherwise(DSL.round(kKills.cast(SQLDataType.NUMERIC).div(dDeaths), 2));
+                .when(dDeathsOrZero.eq(0L), kKillsOrZero.cast(SQLDataType.NUMERIC))
+                .otherwise(DSL.round(kKillsOrZero.cast(SQLDataType.NUMERIC).div(dDeaths), 2));
 
-        ctx.with(skillKills, skillDeaths, skillTime)
+        ctx.with(skillKills, skillDeaths, skillTime, skillAll)
                 .insertInto(GRAFANA_SKILL_KDR_SNAPSHOT,
                         GRAFANA_SKILL_KDR_SNAPSHOT.REALM,
                         GRAFANA_SKILL_KDR_SNAPSHOT.CAPTURED_AT,
@@ -196,15 +222,16 @@ public class GrafanaSnapshotRepository {
                         GRAFANA_SKILL_KDR_SNAPSHOT.TIME_PLAYED_MS)
                 .select(DSL.select(
                                 DSL.val(realmId),
-                                DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE),
-                                kSkillName,
-                                kKills,
+                                DSL.val(capturedAt),
+                                aSkillName,
+                                kKillsOrZero,
                                 dDeathsOrZero,
                                 kdr,
                                 tTimePlayedOrZero)
-                        .from(DSL.table(DSL.name("skill_kills")).as("k"))
-                        .leftJoin(DSL.table(DSL.name("skill_deaths")).as("d")).on(kSkillName.eq(dSkillName))
-                        .leftJoin(DSL.table(DSL.name("skill_time")).as("t")).on(kSkillName.eq(tSkillName)))
+                        .from(DSL.table(DSL.name("skill_all")).as("a"))
+                        .leftJoin(DSL.table(DSL.name("skill_kills")).as("k")).on(aSkillName.eq(kSkillName))
+                        .leftJoin(DSL.table(DSL.name("skill_deaths")).as("d")).on(aSkillName.eq(dSkillName))
+                        .leftJoin(DSL.table(DSL.name("skill_time")).as("t")).on(aSkillName.eq(tSkillName)))
                 .execute();
     }
 }
