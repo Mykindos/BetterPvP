@@ -111,13 +111,19 @@ public class BlockTaggingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent event) {
-        event.getBlocks().forEach(block -> shift(block, event.getDirection()));
+        event.getBlocks().forEach(block -> {
+            tagBlock(block, null);
+            shift(block, event.getDirection());
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent event) {
         if (!event.isSticky()) return;
-        event.getBlocks().forEach(block -> shift(block, event.getDirection()));
+        event.getBlocks().forEach(block -> {
+            tagBlock(block, null);
+            shift(block, event.getDirection());
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -148,12 +154,8 @@ public class BlockTaggingListener implements Listener {
     }
 
     private void shift(Block block, BlockFace direction) {
-        UUID player = blockTagManager.getPlayerPlaced(block);
-        if (player == null) return;
-
         final Block relative = block.getRelative(direction);
-        untagBlock(block);
-        tagBlock(relative, player);
+        tagBlock(relative, null);
     }
 
     private boolean isLavaConversion(Block block, Material newType) {
