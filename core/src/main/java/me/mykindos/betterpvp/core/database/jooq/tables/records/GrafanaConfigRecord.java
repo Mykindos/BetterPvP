@@ -5,7 +5,7 @@ package me.mykindos.betterpvp.core.database.jooq.tables.records;
 
 
 import me.mykindos.betterpvp.core.database.jooq.tables.GrafanaConfig;
-import org.jooq.Record3;
+import org.jooq.Record4;
 import org.jooq.impl.UpdatableRecordImpl;
 
 import java.time.OffsetDateTime;
@@ -20,10 +20,25 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
     private static final long serialVersionUID = 1L;
 
     /**
+     * Setter for <code>public.grafana_config.realm</code>.
+     */
+    public GrafanaConfigRecord setRealm(Integer value) {
+        set(0, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.grafana_config.realm</code>.
+     */
+    public Integer getRealm() {
+        return (Integer) get(0);
+    }
+
+    /**
      * Setter for <code>public.grafana_config.plugin</code>.
      */
     public GrafanaConfigRecord setPlugin(String value) {
-        set(0, value);
+        set(1, value);
         return this;
     }
 
@@ -31,14 +46,14 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
      * Getter for <code>public.grafana_config.plugin</code>.
      */
     public String getPlugin() {
-        return (String) get(0);
+        return (String) get(1);
     }
 
     /**
      * Setter for <code>public.grafana_config.config_file</code>.
      */
     public GrafanaConfigRecord setConfigFile(String value) {
-        set(1, value);
+        set(2, value);
         return this;
     }
 
@@ -46,14 +61,14 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
      * Getter for <code>public.grafana_config.config_file</code>.
      */
     public String getConfigFile() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
      * Setter for <code>public.grafana_config.config_key</code>.
      */
     public GrafanaConfigRecord setConfigKey(String value) {
-        set(2, value);
+        set(3, value);
         return this;
     }
 
@@ -61,14 +76,14 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
      * Getter for <code>public.grafana_config.config_key</code>.
      */
     public String getConfigKey() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
      * Setter for <code>public.grafana_config.config_value</code>.
      */
     public GrafanaConfigRecord setConfigValue(String value) {
-        set(3, value);
+        set(4, value);
         return this;
     }
 
@@ -76,14 +91,14 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
      * Getter for <code>public.grafana_config.config_value</code>.
      */
     public String getConfigValue() {
-        return (String) get(3);
+        return (String) get(4);
     }
 
     /**
      * Setter for <code>public.grafana_config.updated_at</code>.
      */
     public GrafanaConfigRecord setUpdatedAt(OffsetDateTime value) {
-        set(4, value);
+        set(5, value);
         return this;
     }
 
@@ -91,7 +106,7 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
      * Getter for <code>public.grafana_config.updated_at</code>.
      */
     public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(4);
+        return (OffsetDateTime) get(5);
     }
 
     // -------------------------------------------------------------------------
@@ -99,8 +114,8 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
     // -------------------------------------------------------------------------
 
     @Override
-    public Record3<String, String, String> key() {
-        return (Record3) super.key();
+    public Record4<Integer, String, String, String> key() {
+        return (Record4) super.key();
     }
 
     // -------------------------------------------------------------------------
@@ -117,9 +132,10 @@ public class GrafanaConfigRecord extends UpdatableRecordImpl<GrafanaConfigRecord
     /**
      * Create a detached, initialised GrafanaConfigRecord
      */
-    public GrafanaConfigRecord(String plugin, String configFile, String configKey, String configValue, OffsetDateTime updatedAt) {
+    public GrafanaConfigRecord(Integer realm, String plugin, String configFile, String configKey, String configValue, OffsetDateTime updatedAt) {
         super(GrafanaConfig.GRAFANA_CONFIG);
 
+        setRealm(realm);
         setPlugin(plugin);
         setConfigFile(configFile);
         setConfigKey(configKey);

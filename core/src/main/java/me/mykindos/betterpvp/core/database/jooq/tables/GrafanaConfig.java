@@ -54,6 +54,11 @@ public class GrafanaConfig extends TableImpl<GrafanaConfigRecord> {
     }
 
     /**
+     * The column <code>public.grafana_config.realm</code>.
+     */
+    public final TableField<GrafanaConfigRecord, Integer> REALM = createField(DSL.name("realm"), SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
      * The column <code>public.grafana_config.plugin</code>.
      */
     public final TableField<GrafanaConfigRecord, String> PLUGIN = createField(DSL.name("plugin"), SQLDataType.CLOB.nullable(false), this, "");
@@ -114,7 +119,7 @@ public class GrafanaConfig extends TableImpl<GrafanaConfigRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.IDX_GRAFANA_CONFIG_PLUGIN_FILE);
+        return Arrays.asList(Indexes.IDX_GRAFANA_CONFIG_REALM_PLUGIN_FILE);
     }
 
     @Override

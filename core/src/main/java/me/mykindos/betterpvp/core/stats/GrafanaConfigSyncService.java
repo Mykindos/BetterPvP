@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.stats;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -21,7 +22,7 @@ import static me.mykindos.betterpvp.core.database.jooq.Tables.GRAFANA_CONFIG;
  * reflect the live server config.
  *
  * <p>The table is a generic flat key-value store keyed by
- * {@code (plugin, config_file, config_key)}. Every leaf node in a YAML config
+ * {@code (realm, plugin, config_file, config_key)}. Every leaf node in a YAML config
  * is walked and upserted as a single row; intermediate section keys are skipped.
  *
  * <p>Usage — each plugin contributes its own configs:
@@ -53,7 +54,7 @@ public class GrafanaConfigSyncService {
      * Asynchronously walks every leaf key in the YAML config located at
      * {@code configPath} (relative to the given plugin's data folder) and
      * upserts each one into {@code grafana_config} keyed by
-     * {@code (plugin.getName(), configPath, key)}.
+     * {@code (realm, plugin.getName(), configPath, key)}.
      *
      * <p>Stale rows (keys present in the DB but absent from the current YAML)
      * are deleted in the same transaction as the upserts, so readers always
@@ -66,6 +67,7 @@ public class GrafanaConfigSyncService {
      */
     public void syncYamlConfig(BPvPPlugin plugin, String configPath) {
         final String pluginName = plugin.getName();
+        final int realmId = Core.getCurrentRealm().getId();
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             ExtendedYamlConfiguration config = plugin.getConfig(configPath);
             Map<String, String> liveEntries = new LinkedHashMap<>();
@@ -86,10 +88,11 @@ public class GrafanaConfigSyncService {
             ctx.transaction(trx -> {
                 DSLContext trxCtx = DSL.using(trx);
                 for (Map.Entry<String, String> entry : liveEntries.entrySet()) {
-                    upsert(trxCtx, pluginName, configPath, entry.getKey(), entry.getValue());
+                    upsert(trxCtx, realmId, pluginName, configPath, entry.getKey(), entry.getValue());
                 }
                 int deleted = trxCtx.deleteFrom(GRAFANA_CONFIG)
-                        .where(GRAFANA_CONFIG.PLUGIN.eq(pluginName))
+                        .where(GRAFANA_CONFIG.REALM.eq(realmId))
+                        .and(GRAFANA_CONFIG.PLUGIN.eq(pluginName))
                         .and(GRAFANA_CONFIG.CONFIG_FILE.eq(configPath))
                         .and(GRAFANA_CONFIG.CONFIG_KEY.notIn(liveEntries.keySet()))
                         .execute();
@@ -117,8 +120,9 @@ public class GrafanaConfigSyncService {
      */
     public void syncRaw(BPvPPlugin plugin, String configFile, String configKey, String value) {
         final String pluginName = plugin.getName();
+        final int realmId = Core.getCurrentRealm().getId();
         database.getAsyncDslContext().executeAsyncVoid(ctx ->
-                upsert(ctx, pluginName, configFile, configKey, value)
+                upsert(ctx, realmId, pluginName, configFile, configKey, value)
         ).exceptionally(ex -> {
             log.error("Failed to sync grafana_config raw entry [{}/{}/{}]", pluginName, configFile, configKey, ex).submit();
             return null;
@@ -129,14 +133,15 @@ public class GrafanaConfigSyncService {
     // Internal helpers
     // -------------------------------------------------------------------------
 
-    private void upsert(DSLContext ctx, String plugin, String configFile, String configKey, String configValue) {
+    private void upsert(DSLContext ctx, int realmId, String plugin, String configFile, String configKey, String configValue) {
         ctx.insertInto(GRAFANA_CONFIG)
+                .set(GRAFANA_CONFIG.REALM, realmId)
                 .set(GRAFANA_CONFIG.PLUGIN, plugin)
                 .set(GRAFANA_CONFIG.CONFIG_FILE, configFile)
                 .set(GRAFANA_CONFIG.CONFIG_KEY, configKey)
                 .set(GRAFANA_CONFIG.CONFIG_VALUE, configValue)
                 .set(GRAFANA_CONFIG.UPDATED_AT, DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE))
-                .onConflict(GRAFANA_CONFIG.PLUGIN, GRAFANA_CONFIG.CONFIG_FILE, GRAFANA_CONFIG.CONFIG_KEY)
+                .onConflict(GRAFANA_CONFIG.REALM, GRAFANA_CONFIG.PLUGIN, GRAFANA_CONFIG.CONFIG_FILE, GRAFANA_CONFIG.CONFIG_KEY)
                 .doUpdate()
                 .set(GRAFANA_CONFIG.CONFIG_VALUE, configValue)
                 .set(GRAFANA_CONFIG.UPDATED_AT, DSL.field("NOW()", SQLDataType.TIMESTAMPWITHTIMEZONE))
