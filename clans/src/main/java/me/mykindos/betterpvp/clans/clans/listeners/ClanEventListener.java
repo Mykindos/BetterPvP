@@ -12,7 +12,25 @@ import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
-import me.mykindos.betterpvp.clans.clans.events.*;
+import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
+import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanAllianceEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanEnemyEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanInviteMemberEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanNeutralEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanRequestAllianceEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanRequestTrustEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanSetCoreLocationEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanTrustEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanUntrustEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -46,12 +64,17 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -893,6 +916,11 @@ public class ClanEventListener extends ClanListener {
         Location highest = player.getLocation();
 
         final Block block = core.getSafest(highest).getBlock();
+        if (block.getType() == Material.BEDROCK) {
+            UtilMessage.simpleMessage(player, "Clans", "You cannot place the clan core here.");
+            return;
+        }
+
         core.removeBlock(); // Remove old core
         Location coreLocation = block.getLocation().toCenterLocation().setDirection(player.getLocation().getDirection());
         core.setPosition(coreLocation); // Set new core location
@@ -925,7 +953,7 @@ public class ClanEventListener extends ClanListener {
 
         this.clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
             result.ifPresent(client -> {
-                UtilMessage.simpleMessage(player, "Clans", "You promoted %s to <yellow>%s</yellow>.", this.clanManager.getPlayerName(ClanRelation.SELF, clan.getName()), member.getRank().getName());
+                UtilMessage.simpleMessage(player, "Clans", "You promoted %s to <yellow>%s</yellow>.", this.clanManager.getPlayerName(ClanRelation.SELF, client.getName()), member.getRank().getName());
 
                 log.info("{} ({}) was promoted by {} ({}) to {} in {} ({})", client.getName(), member.getUuid(), player.getName(),
                                 player.getUniqueId(), member.getRank().getName(), clan.getName(), clan.getId()).setAction("CLAN_PROMOTE")
