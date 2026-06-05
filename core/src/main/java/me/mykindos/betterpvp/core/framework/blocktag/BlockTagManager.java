@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

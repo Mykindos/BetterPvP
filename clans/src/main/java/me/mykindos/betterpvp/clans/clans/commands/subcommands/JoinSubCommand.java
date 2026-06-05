@@ -55,6 +55,15 @@ public class JoinSubCommand extends ClanSubCommand {
 
         Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0].replace("_", " "));
         targetClanOptional.ifPresent(targetClan -> {
+            Optional<Clan> clanByLocationOptional = clanManager.getClanByLocation(player.getLocation());
+            if (clanByLocationOptional.isPresent()) {
+                Clan locationClan = clanByLocationOptional.get();
+                if(!locationClan.isSafe() && locationClan.getId() != targetClan.getId()) {
+                    UtilMessage.message(player, "Clans", "You must be in wilderness or safe territory to join another clan");
+                    return;
+                }
+            }
+
             UtilServer.callEvent(new MemberJoinClanEvent(player, targetClan));
         });
     }

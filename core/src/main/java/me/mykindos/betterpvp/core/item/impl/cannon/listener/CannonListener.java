@@ -11,6 +11,7 @@ import com.ticxo.modelengine.api.events.ModelRegistrationEvent;
 import com.ticxo.modelengine.api.events.RemoveModelEvent;
 import com.ticxo.modelengine.api.generator.ModelGenerator;
 import com.ticxo.modelengine.api.model.ActiveModel;
+import com.ticxo.modelengine.api.model.bone.ModelBone;
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -320,7 +321,13 @@ public class CannonListener implements Listener {
             }
 
             // Passive particles
-            final Location location = cannon.getActiveModel().getBone("fuse").orElseThrow().getLocation();
+            Optional<ModelBone> fuse = cannon.getActiveModel().getBone("fuse");
+            if(fuse.isEmpty()) {
+                iterator.remove();
+                continue;
+            }
+
+            final Location location = fuse.get().getLocation();
             new SoundEffect("littleroom_cannon", "littleroom.cannon.fuse", 1f, 1.3f).play(location);
             Particle.SMALL_FLAME.builder()
                     .location(location)
