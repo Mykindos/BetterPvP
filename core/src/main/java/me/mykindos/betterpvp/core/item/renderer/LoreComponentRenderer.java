@@ -5,8 +5,10 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
 import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,6 +49,13 @@ public class LoreComponentRenderer implements ItemLoreRenderer {
         if (Compatibility.TEXTURE_PROVIDER && purityComponent.isPresent() && purityComponent.get().isAttuned()) {
             final ItemPurity purity = purityComponent.get().getPurity();
             components.addFirst(purity.createLoreComponent());
+        }
+
+        // Normalize font - replace all elements in the components list
+        for (int i = 0; i < components.size(); i++) {
+            Component component = components.get(i);
+            Style style = component.style().font(Key.key("betterpvp", "rpg"));
+            components.set(i, component.applyFallbackStyle(style));
         }
 
         // Rarity ONLY if NEXO is available

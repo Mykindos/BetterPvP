@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.clans.world.veloran.Veloran;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
 import me.mykindos.betterpvp.core.scene.behavior.SceneBehavior;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -17,7 +16,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -129,7 +127,7 @@ public class GatewayTeleportBehavior implements SceneBehavior {
                 1.5,
                 false,
                 gmr -> Component.text("\ue800").font(Resources.Font.MENU),
-                gmr -> Resources.Glyph64.of(continentName)
+                gmr -> Resources.Font3d.of(continentName)
         ));
     }
 

@@ -34,22 +34,14 @@ public class Resources {
         public static final Key SMALL_CAPS = Key.key("betterpvp", "small_caps");
 
         /**
-         * Glyph 64
-         * Used for the menu overlays.
+         * Input 16, used for item lore and menus
          */
-        public static final Key GLYPH_64 = Key.key("betterpvp", "glyph_64");
+        public static final Key INPUT = Key.key("betterpvp", "input");
 
         /**
-         * Glyph 64 lower
-         * Used for the menu overlays.
+         * 3d font, used for overlays
          */
-        public static final Key GLYPH_64_LOWER = Key.key("betterpvp", "glyph_64_lower");
-
-        /**
-         * Glyph 16
-         * Used for the menu overlays.
-         */
-        public static final Key GLYPH_16 = Key.key("betterpvp", "glyph_16");
+        public static final Key FONT_3D = Key.key("betterpvp", "3d");
 
         /**
          * Menu
@@ -74,11 +66,11 @@ public class Resources {
     }
 
     /**
-     * Characters used as menu overlays in inventories. These only work with the {@link Resources.Font#GLYPH_64} font,
+     * Characters used as menu overlays in inventories. These only work with the {@link Resources.Font#INPUT} font,
      * and are ignored if used with any other font.
      */
     @UtilityClass
-    public static class Glyph64 {
+    public static class Font3d {
 
         public static Component of(@NotNull String text) {
             if (text.isEmpty()) {
@@ -99,7 +91,7 @@ public class Resources {
                 builder.append((char) codepoint);
             }
             final String string = builder.toString();
-            return Component.text(string, NamedTextColor.WHITE).font(Resources.Font.GLYPH_64);
+            return Component.text(string, NamedTextColor.WHITE).font(Font.FONT_3D);
         }
 
     }

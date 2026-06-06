@@ -1,12 +1,15 @@
 package me.mykindos.betterpvp.core.item.renderer;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.TooltipDisplay;
+import io.papermc.paper.datacomponent.item.ItemLore;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import net.kyori.adventure.key.Key;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Changes the tooltip style attribute for items depending on their rarity
@@ -19,6 +22,13 @@ public class RarityTooltipStyleRenderer implements ItemStackRenderer {
         final ItemRarity rarity = item.getRarity();
         final Key tooltipStyle = getTooltipStyle(rarity);
         itemStack.setData(DataComponentTypes.TOOLTIP_STYLE, tooltipStyle);
+
+        // We have to shift down by one
+        final List<Component> lines = new ArrayList<>();
+        lines.add(Component.empty());
+        ItemLore lore = itemStack.getData(DataComponentTypes.LORE);
+        if (lore != null) lines.addAll(lore.lines());
+        itemStack.setData(DataComponentTypes.LORE, ItemLore.lore(lines));
     }
 
     private Key getTooltipStyle(ItemRarity itemRarity) {
