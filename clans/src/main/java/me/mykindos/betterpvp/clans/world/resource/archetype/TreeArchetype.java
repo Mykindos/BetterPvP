@@ -7,22 +7,24 @@ import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.world.resource.BlockBatchStore;
-import me.mykindos.betterpvp.clans.world.resource.Respawn;
 import me.mykindos.betterpvp.clans.world.resource.ResourceArchetype;
 import me.mykindos.betterpvp.clans.world.resource.ResourceLoot;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeDefinition;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeProp;
+import me.mykindos.betterpvp.clans.world.resource.Respawn;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicAnimator;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -112,6 +114,9 @@ public class TreeArchetype implements ResourceArchetype {
         if (runtime != null) {
             runtime.animationGeneration++; // abort any fell frames still queued for this tree
             placements.remove(runtime.placement.regionId);
+
+            final Location anchor = runtime.placement.anchor;
+            schematicAnimator.restore(anchor.getWorld(), runtime.currentUndo);
         }
     }
 
@@ -193,6 +198,24 @@ public class TreeArchetype implements ResourceArchetype {
         runtime.currentUndo = placement.standingUndo;
         frameStore.clear(placement.regionId); // standing is the resting state — cache nothing, matching the ore store
         runtime.felled = false;
+
+        // cues
+        new SoundEffect(Sound.BLOCK_CHEST_OPEN, 0f, 1.3f).play(runtime.placement.anchor);
+        new SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 1.5f, 1.3f).play(runtime.placement.anchor);
+
+        // get center location
+        final double width = placement.standing.getWidth();
+        final double height = placement.standing.getHeight();
+        final Location center = placement.anchor.clone().add(0, height / 2, 0);
+
+        // play particles
+        Particle.ITEM_SLIME.builder()
+                .location(center)
+                .offset(width / 2, height / 2, width / 2)
+                .count(200)
+                .extra(0.1)
+                .receivers(60)
+                .spawn();
     }
 
     /**
@@ -205,21 +228,38 @@ public class TreeArchetype implements ResourceArchetype {
         runtime.felledAtMs = System.currentTimeMillis();
         final TreePlacement placement = runtime.placement;
         final World world = placement.anchor.getWorld();
-        if (world == null || placement.stages.isEmpty()) {
+        final List<Schematic> stages = placement.stages;
+        if (world == null || stages.isEmpty()) {
             return;
         }
+
         final long generation = ++runtime.animationGeneration;
-        for (int i = 0; i < placement.stages.size(); i++) {
-            final Schematic stage = placement.stages.get(i);
-            final long delay = Math.max(0L, placement.stageDelay * i);
-            UtilServer.runTaskLater(core, () -> showFrame(runtime, world, stage, generation), delay);
-        }
+        UtilServer.repeatTask(core, run -> {
+            final Schematic stage = stages.get(run);
+            showFrame(runtime, world, stage, generation);
+
+            boolean isLast = run == stages.size() - 1;
+            if (isLast) {
+                new SoundEffect(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0f, 1.3f).play(runtime.placement.anchor);
+            } else {
+                new SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0f, 1.3f).play(runtime.placement.anchor);
+            }
+            return true;
+        }, stages.size(), placement.stageDelay);
     }
 
     /** Shows one fell frame: undo the frame on screen, then overlay this one — unless a newer sequence superseded us. */
     private void showFrame(@NotNull TreeRuntime runtime, @NotNull World world, @NotNull Schematic frame, long generation) {
         if (runtime.animationGeneration != generation) {
             return;
+        }
+        for (Schematic.PlacedBlock placedBlock : runtime.currentUndo) {
+            if (Math.random() < 0.9) {
+                continue;
+            }
+            Block block = world.getBlockAt(placedBlock.getX(), placedBlock.getY(), placedBlock.getZ());
+            final BlockData data = block.getBlockData();
+            UtilBlock.playBlockEffect(block, data);
         }
         schematicAnimator.restore(world, runtime.currentUndo);
         recordFrame(runtime, world, schematicAnimator.pasteCapturing(world, frame, runtime.placement.anchor, runtime.placement.quarterTurns));

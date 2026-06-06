@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -64,6 +65,9 @@ public class CoreCommand extends Command implements IConsoleCommand {
         private ResourcePackHandler resourcePackHandler;
 
         @Inject
+        private SchematicService schematicService;
+
+        @Inject
         private RuleManager ruleManager;
 
         @Override
@@ -90,6 +94,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
             tipManager.reloadTips(core);
             resourcePackHandler.reload();
             ruleManager.reload(core);
+            schematicService.clearCache();
 
             UtilMessage.message(sender, "Core", "Successfully reloaded core");
         }
