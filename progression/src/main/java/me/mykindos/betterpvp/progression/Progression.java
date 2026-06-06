@@ -125,11 +125,6 @@ public class Progression extends BPvPPlugin {
             var progressionTipManager = injector.getInstance(ProgressionTipLoader.class);
             progressionTipManager.loadTips(PACKAGE);
 
-
-            // Sync Progression items/* config YAMLs into grafana_config after items have loaded.
-            // Re-registration as Reloadable is handled automatically by ProgressionListenerLoader.
-            injector.getInstance(ProgressionGrafanaConfigContributor.class).reload();
-            
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapters.class));
         }

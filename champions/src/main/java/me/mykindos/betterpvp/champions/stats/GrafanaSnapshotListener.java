@@ -28,7 +28,7 @@ public class GrafanaSnapshotListener implements Listener {
     }
 
     /**
-     * Takes a full Grafana snapshot (role matchups, role playtime, skill KDR) once per hour.
+     * Takes a full Grafana snapshot (role playtime, skill KDR) once per hour.
      */
     @UpdateEvent(delay = 3_600_000L, isAsync = true)
     public void takeHourlySnapshot() {

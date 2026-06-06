@@ -53,8 +53,11 @@ public class GrafanaSnapshotRepository {
     public void takeSnapshot(int realmId) {
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             OffsetDateTime capturedAt = OffsetDateTime.now(ZoneOffset.UTC);
-            takeRolePlaytimeSnapshot(ctx, realmId, capturedAt);
-            takeSkillKdrSnapshot(ctx, realmId, capturedAt);
+            ctx.transaction(configuration -> {
+                DSLContext trxCtx = DSL.using(configuration);
+                takeRolePlaytimeSnapshot(trxCtx, realmId, capturedAt);
+                takeSkillKdrSnapshot(trxCtx, realmId, capturedAt);
+            });
             log.info("Grafana snapshot taken for realm {}", realmId).submit();
         }).exceptionally(ex -> {
             log.error("Failed to take Grafana snapshot for realm {}", realmId, ex).submit();
@@ -80,6 +83,8 @@ public class GrafanaSnapshotRepository {
                         .where(CLIENT_STATS.STATTYPE.eq("CLANS_WRAPPER"))
                         .and(wrappedStatType.eq("CHAMPIONS_ROLE"))
                         .and(wrappedAction.eq("TIME_PLAYED"))
+                        .and(wrappedRole.isNotNull())
+                        .and(wrappedRole.ne(""))
                         .and(CLIENT_STATS.REALM.eq(realmId))
                         .groupBy(wrappedRole));
 

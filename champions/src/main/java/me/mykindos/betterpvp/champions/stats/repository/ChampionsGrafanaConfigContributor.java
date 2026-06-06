@@ -67,7 +67,7 @@ public class ChampionsGrafanaConfigContributor implements Reloadable {
             grafanaConfigSyncService.syncRaw(
                     champions,
                     "roles",
-                    role.getName().toLowerCase() + ".base_health",
+                    role.getName().toLowerCase(java.util.Locale.ROOT) + ".base_health",
                     String.valueOf(role.getHealth()));
         }
     }

@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
 import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponentSerializer;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
-import me.mykindos.betterpvp.champions.stats.repository.ChampionsGrafanaConfigContributor;
 import me.mykindos.betterpvp.champions.tips.ChampionsTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -103,8 +102,6 @@ public class Champions extends BPvPPlugin {
             var uuidManager = injector.getInstance(UUIDManager.class);
             uuidManager.loadObjectsFromNamespace("champions");
 
-            final ChampionsGrafanaConfigContributor grafanaConfigContributor = injector.getInstance(ChampionsGrafanaConfigContributor.class);
-            grafanaConfigContributor.reload();
 
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapters.class));
