@@ -27,7 +27,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.SMALL_CAPS;
 
 @CustomLog
@@ -88,8 +87,6 @@ public class TipListener implements Listener {
             Tip tip = tipList.random();
             UtilMessage.message(player, Component.empty());
             UtilMessage.message(player, Component.empty()
-                    .append(Component.text("<glyph:question_mark_icon>").font(NEXO))
-                    .appendSpace()
                     .append(Component.text("TIP", NamedTextColor.GOLD, TextDecoration.BOLD).font(SMALL_CAPS))
                     .appendSpace()
                     .append(tip.getComponent()));
