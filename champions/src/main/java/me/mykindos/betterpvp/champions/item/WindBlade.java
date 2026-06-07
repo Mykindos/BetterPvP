@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.AetherCore;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -59,6 +60,8 @@ public class WindBlade extends WeaponItem implements Listener, Reloadable {
                 .root(InteractionInputs.LEFT_CLICK, windSlashAbility)
                 .root(InteractionInputs.PASSIVE, featherFeetAbility)
                 .build());
+
+        addBaseComponent(TooltipSpriteComponent.of("\uE000"));
     }
 
     @Override

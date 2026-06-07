@@ -24,4 +24,15 @@ public interface LoreComponent {
      */
     int getRenderPriority();
 
+    /**
+     * Get the lore page this component renders on. Pages are an open-ended {@code int}
+     * (page {@code 0} is the default/primary page); only pages that have at least one
+     * component producing non-empty lines are ever shown.
+     *
+     * @return the page index this component belongs to
+     */
+    default int getLorePage() {
+        return 0;
+    }
+
 }

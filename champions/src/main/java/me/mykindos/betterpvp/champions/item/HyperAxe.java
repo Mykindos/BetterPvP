@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.ElderwoodCore;
 import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
@@ -67,6 +68,7 @@ public class HyperAxe extends WeaponItem implements Reloadable {
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.RIGHT_CLICK, hyperRushAbility)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE007"));
     }
 
     @Override

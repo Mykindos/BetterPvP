@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.BurntRemnant;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -79,6 +80,7 @@ public class ScytheOfTheFallenLord extends WeaponItem implements Reloadable {
                 .root(InteractionInputs.PASSIVE, lifestealAbility)
                 .root(InteractionInputs.HOLD_RIGHT_CLICK, soulHarvestAbility)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE00E"));
     }
 
     private double getHeal(Player player) {

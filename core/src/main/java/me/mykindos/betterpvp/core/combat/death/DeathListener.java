@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemInstanceView;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -107,17 +108,20 @@ public class DeathListener implements Listener {
                 if (reasons.length == 0 && itemStack.getType() != Material.AIR) {
 
                     final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(itemStack);
-                    if (instanceOpt.isPresent()) {
-                        itemStack = instanceOpt.get().getView().get();
-                    }
-
-                    final Component name;
+                    Component name;
                     if (itemStack.getItemMeta().hasDisplayName()) {
                         name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
                     } else {
                         name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
                                 Component.translatable(itemStack.getType().translationKey()));
                     }
+
+                    if (instanceOpt.isPresent()) {
+                        final ItemInstanceView view = instanceOpt.get().getView();
+                        itemStack = view.get();
+                        name = view.getName();
+                    }
+
 
                     String namePlainText = PlainTextComponentSerializer.plainText().serialize(name).replaceAll("[\\[\\]]", "");
                     final String article = UtilFormat.getIndefiniteArticle(namePlainText);

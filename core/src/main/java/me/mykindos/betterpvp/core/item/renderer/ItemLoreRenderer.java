@@ -15,21 +15,42 @@ import java.util.List;
 public interface ItemLoreRenderer {
 
     /**
-     * Create a list of components to be used as lore for an item.
+     * Create the lore lines for a specific {@link LorePages page} of an item.
      * @param item The item to create lore for
-     * @param itemStack
-     * @return
+     * @param itemStack The item stack being rendered
+     * @param page The page to render
+     * @return the lore lines for that page
      */
-    List<Component> create(ItemInstance item, ItemStack itemStack);
+    List<Component> create(ItemInstance item, ItemStack itemStack, int page);
 
     /**
-     * Render the lore for an item.
+     * Create lore for the item's most relevant page.
+     * @param item The item to create lore for
+     * @param itemStack The item stack being rendered
+     * @return the lore lines for the most relevant page
+     */
+    default List<Component> create(ItemInstance item, ItemStack itemStack) {
+        return create(item, itemStack, LorePages.mostRelevant(item));
+    }
+
+    /**
+     * Render the lore for a specific page of an item.
+     * @param item The item to render lore for
+     * @param itemStack The item stack to render lore on
+     * @param page The page to render
+     */
+    default void write(ItemInstance item, ItemStack itemStack, int page) {
+        final ItemLore lore = ItemLore.lore(create(item, itemStack, page));
+        itemStack.setData(DataComponentTypes.LORE, lore);
+    }
+
+    /**
+     * Render the lore for an item's most relevant page.
      * @param item The item to render lore for
      * @param itemStack The item stack to render lore on
      */
     default void write(ItemInstance item, ItemStack itemStack) {
-        final ItemLore lore = ItemLore.lore(create(item, itemStack));
-        itemStack.setData(DataComponentTypes.LORE, lore);
+        write(item, itemStack, LorePages.mostRelevant(item));
     }
 
     /**

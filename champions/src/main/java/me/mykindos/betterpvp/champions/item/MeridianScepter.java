@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.MeridianOrb;
@@ -50,6 +51,7 @@ public class MeridianScepter extends WeaponItem implements Listener, Reloadable 
                 .root(InteractionInputs.RIGHT_CLICK, healingNovaAbility)
                 .root(InteractionInputs.LEFT_CLICK, meridianBeamAbility)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE00A"));
     }
 
     @Override

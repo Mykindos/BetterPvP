@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.interaction.utility.SoundInteraction;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.config.ConfigEntry;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
@@ -73,6 +74,7 @@ public class KatanaHinokami extends WeaponItem implements Reloadable {
         this.battoDoInteraction = new BattoDoInteraction(config.fork("batto_do"));
 
         addBaseComponent(buildInteractions(cooldownManager));
+        addBaseComponent(TooltipSpriteComponent.of("\uE006"));
     }
 
     private InteractionContainerComponent buildInteractions(CooldownManager cooldownManager) {

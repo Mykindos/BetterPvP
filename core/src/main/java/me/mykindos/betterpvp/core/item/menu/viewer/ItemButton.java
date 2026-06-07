@@ -6,8 +6,11 @@ import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
+import me.mykindos.betterpvp.core.inventory.window.AbstractWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.pagination.LoreRotationClock;
+import me.mykindos.betterpvp.core.item.renderer.LorePages;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
@@ -26,25 +29,31 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
-public class ItemButton extends ControlItem<AbstractGui> {
+public class ItemButton extends ControlItem<AbstractGui> implements LoreRotationClock.Rotatable {
 
     private final ItemInstance itemInstance;
+    private final LoreRotationClock rotationClock;
     private final CompletableFuture<Result> loadFuture;
 
     private volatile Result cachedResult;
-    private volatile ItemProvider cachedProvider;
+    // One pre-rendered provider per visible lore page; rotation just swaps between them.
+    private volatile List<ItemProvider> pageProviders;
+    private volatile int pageIndex;
 
     private record Result(LinkedList<Recipe<?>> recipes, LinkedList<Recipe<?>> usages) {}
 
     public ItemButton(ItemInstance item) {
         this.itemInstance = item;
 
-        RecipeRegistries registries = JavaPlugin.getPlugin(Core.class)
-                .getInjector().getInstance(RecipeRegistries.class);
+        Core core = JavaPlugin.getPlugin(Core.class);
+        RecipeRegistries registries = core.getInjector().getInstance(RecipeRegistries.class);
+        this.rotationClock = core.getInjector().getInstance(LoreRotationClock.class);
 
         CompletableFuture<LinkedList<Recipe<?>>> recipesFuture =
                 registries.getResolver().lookup(new ExactResultParameter(item.getBaseItem()));
@@ -56,41 +65,88 @@ public class ItemButton extends ControlItem<AbstractGui> {
                     if (ex != null) {
                         log.error("Error loading recipes for item {}", itemInstance.getBaseItem().getClass().getSimpleName()).submit();
                         cachedResult = null;
-                        cachedProvider = ItemView.of(itemInstance.getView().get())
-                                .toBuilder()
-                                .lore(Component.text("Error loading recipes"))
-                                .build();
                     } else {
                         cachedResult = res;
-                        ItemView.ItemViewBuilder builder = ItemView.of(itemInstance.getView().get()).toBuilder();
-                        if (!res.recipes.isEmpty()) {
-                            builder.action(ClickActions.LEFT, Component.text("View Recipes"));
-                        }
-                        if (!res.usages.isEmpty()) {
-                            builder.action(ClickActions.RIGHT, Component.text("View Usages"));
-                        }
-                        cachedProvider = builder.build();
                     }
-                    // update GUI on main thread
-                    Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(Core.class), this::notifyWindows);
+                    // Build the per-page providers and (re)register for rotation on the main thread.
+                    Bukkit.getScheduler().runTask(core, this::onLoaded);
                 });
+    }
+
+    private void onLoaded() {
+        final List<ItemProvider> providers = new ArrayList<>();
+        if (cachedResult == null) {
+            providers.add(ItemView.of(itemInstance.getView().get())
+                    .toBuilder()
+                    .lore(Component.text("Error loading recipes"))
+                    .build());
+        } else {
+            for (int page : LorePages.visiblePages(itemInstance)) {
+                providers.add(buildProvider(page));
+            }
+            if (providers.isEmpty()) {
+                providers.add(buildProvider(LorePages.mostRelevant(itemInstance)));
+            }
+        }
+        this.pageProviders = providers;
+        notifyWindows();
+        maybeRegisterRotation();
+    }
+
+    private ItemProvider buildProvider(int page) {
+        ItemView.ItemViewBuilder builder = ItemView.of(itemInstance.getView().get(null, page)).toBuilder();
+        if (cachedResult != null) {
+            if (!cachedResult.recipes.isEmpty()) {
+                builder.action(ClickActions.LEFT, Component.text("View Recipes"));
+            }
+            if (!cachedResult.usages.isEmpty()) {
+                builder.action(ClickActions.RIGHT, Component.text("View Usages"));
+            }
+        }
+        return builder.build();
     }
 
     @Override
     public ItemProvider getItemProvider(AbstractGui gui) {
-        if (!loadFuture.isDone()) {
+        final List<ItemProvider> providers = pageProviders;
+        if (providers == null || providers.isEmpty()) {
             return ItemView.of(itemInstance.getView().get())
                     .toBuilder()
-                    .lore(Component.text("Loading recipes..."))
+                    .lore(Component.text(loadFuture.isDone() ? "Error loading recipes" : "Loading recipes..."))
                     .build();
         }
-        if (cachedProvider != null) {
-            return cachedProvider;
+        return providers.get(Math.min(pageIndex, providers.size() - 1));
+    }
+
+    @Override
+    public void rotateTick() {
+        final List<ItemProvider> providers = pageProviders;
+        if (providers == null || providers.size() <= 1) {
+            return;
         }
-        return ItemView.of(itemInstance.getView().get())
-                .toBuilder()
-                .lore(Component.text("Error loading recipes"))
-                .build();
+        pageIndex = (pageIndex + 1) % providers.size();
+        notifyWindows();
+    }
+
+    @Override
+    public void addWindow(AbstractWindow window) {
+        super.addWindow(window);
+        maybeRegisterRotation();
+    }
+
+    @Override
+    public void removeWindow(AbstractWindow window) {
+        super.removeWindow(window);
+        if (getWindows().isEmpty()) {
+            rotationClock.unregister(this);
+        }
+    }
+
+    private void maybeRegisterRotation() {
+        final List<ItemProvider> providers = pageProviders;
+        if (providers != null && providers.size() > 1 && !getWindows().isEmpty()) {
+            rotationClock.register(this);
+        }
     }
 
     @Override

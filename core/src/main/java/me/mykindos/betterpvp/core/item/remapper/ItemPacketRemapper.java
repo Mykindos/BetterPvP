@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.pagination.LorePageService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -43,10 +44,12 @@ import java.util.Optional;
 public class ItemPacketRemapper implements PacketListener {
 
     private final ItemFactory itemFactory;
+    private final LorePageService lorePageService;
 
     @Inject
-    private ItemPacketRemapper(Core core, ItemFactory itemFactory) {
+    private ItemPacketRemapper(Core core, ItemFactory itemFactory, LorePageService lorePageService) {
         this.itemFactory = itemFactory;
+        this.lorePageService = lorePageService;
         PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.LOW);
     }
 
@@ -104,7 +107,7 @@ public class ItemPacketRemapper implements PacketListener {
         if (existing.equals(view)) {
             event.setCancelled(true);
         } else {
-            packet.setItemStack(mapTo(stack));
+            packet.setItemStack(mapTo(stack, player));
         }
     }
 
@@ -151,19 +154,22 @@ public class ItemPacketRemapper implements PacketListener {
             // Buffer already consumed by another handler in the pipeline
             return;
         }
+        final Player viewer = event.getPlayer() instanceof Player player ? player : null;
         for (Equipment equipment : packet.getEquipment()) {
-            equipment.setItem(mapTo(equipment.getItem()));
+            equipment.setItem(mapTo(equipment.getItem(), viewer));
         }
     }
 
     private void onSetCursorItem(PacketSendEvent event) {
         final WrapperPlayServerSetCursorItem packet = new WrapperPlayServerSetCursorItem(event);
-        packet.setStack(mapTo(packet.getStack()));
+        final Player viewer = event.getPlayer() instanceof Player player ? player : null;
+        packet.setStack(mapTo(packet.getStack(), viewer));
     }
 
     private void onSetPlayerInventory(PacketSendEvent event) {
         final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(event);
-        packet.setStack(mapTo(packet.getStack()));
+        final Player viewer = event.getPlayer() instanceof Player player ? player : null;
+        packet.setStack(mapTo(packet.getStack(), viewer));
     }
 
     private void onWindowItems(PacketSendEvent event) {
@@ -173,11 +179,12 @@ public class ItemPacketRemapper implements PacketListener {
         } catch (Exception e) {
             return;
         }
+        final Player viewer = event.getPlayer() instanceof Player player ? player : null;
         final List<ItemStack> items = packet.getItems().stream()
-                        .map(this::mapTo)
+                        .map(item -> mapTo(item, viewer))
                         .toList();
         packet.setItems(new ArrayList<>(items));
-        packet.setCarriedItem(mapTo(packet.getCarriedItem().orElse(null)));
+        packet.setCarriedItem(mapTo(packet.getCarriedItem().orElse(null), viewer));
     }
 
     private void onSetSlot(PacketSendEvent event) {
@@ -199,10 +206,11 @@ public class ItemPacketRemapper implements PacketListener {
             return;
         }
 
-        packet.setItem(mapTo(packet.getItem()));
+        final Player viewer = event.getPlayer() instanceof Player player ? player : null;
+        packet.setItem(mapTo(packet.getItem(), viewer));
     }
 
-    private ItemStack mapTo(ItemStack protocolItemStack) {
+    private ItemStack mapTo(ItemStack protocolItemStack, Player viewer) {
         if (protocolItemStack == null) return null;
 
         try {
@@ -212,7 +220,11 @@ public class ItemPacketRemapper implements PacketListener {
             }
 
             final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(previous.clone());
-            final org.bukkit.inventory.ItemStack result = itemOpt.map(itemInstance -> itemInstance.getView().get()).orElse(previous).clone();
+            final org.bukkit.inventory.ItemStack result = itemOpt.map(itemInstance -> {
+                // Render the page this specific viewer is looking at (defaults to most relevant).
+                final Integer page = viewer != null ? lorePageService.resolve(viewer.getUniqueId(), itemInstance) : null;
+                return itemInstance.getView().get(null, page);
+            }).orElse(previous).clone();
             return SpigotConversionUtil.fromBukkitItemStack(result);
         } catch (Exception e) {
             return protocolItemStack;

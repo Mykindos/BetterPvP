@@ -4,7 +4,7 @@ import com.google.inject.Injector;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.item.impl.PaginatedLoreItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -69,7 +69,7 @@ public class GuiCraftingRecipeViewer extends AbstractGui implements Windowed {
             }
         }
 
-        setItem(15, new SimpleItem(recipe.previewResult().getView().get()));
+        setItem(15, new PaginatedLoreItem(recipe.previewResult(), null));
         setItem(16, new BlueprintButton());
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry

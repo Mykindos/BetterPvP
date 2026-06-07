@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.recipe.menu;
 import com.google.inject.Injector;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.item.impl.PaginatedLoreItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.menu.viewer.AlloyButton;
 import me.mykindos.betterpvp.core.item.menu.viewer.ItemButton;
@@ -43,7 +43,7 @@ public class GuiCastingRecipeViewer extends AbstractGui implements Windowed {
         setItem(19, new AlloyButton(recipe.getAlloy(), recipe.getRequiredMillibuckets(), false, "Required"));
         setItem(26, new ItemButton(itemFactory.createPreview(recipe.getResult())));
 
-        setItem(15, new SimpleItem(recipe.previewResult().getView().get()));
+        setItem(15, new PaginatedLoreItem(recipe.previewResult(), null));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())

@@ -117,6 +117,11 @@ public class InteractionContainerComponent implements ItemComponent, LoreCompone
         return -1;
     }
 
+    @Override
+    public int getLorePage() {
+        return 2;
+    }
+
     /**
      * Fluent builder for creating interaction containers with chains.
      */

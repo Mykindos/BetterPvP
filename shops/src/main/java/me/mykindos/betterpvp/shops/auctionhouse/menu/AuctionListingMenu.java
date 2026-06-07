@@ -93,7 +93,7 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
                     return displayName.contains(queryLower);
                 })
                 .sorted(Comparator.comparingDouble(Auction::getExpiryTime).reversed())
-                .map(auction -> new AuctionButton(auctionManager, auction))
+                .map(auction -> new AuctionButton(auctionManager, auction, player))
                 .map(Item.class::cast)
                 .toList();
         setContent(activeAuctions);
