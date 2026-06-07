@@ -184,6 +184,11 @@ public class SocketableContainerComponent implements ItemComponent, LoreComponen
     }
 
     @Override
+    public int getLorePage() {
+        return 1;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 

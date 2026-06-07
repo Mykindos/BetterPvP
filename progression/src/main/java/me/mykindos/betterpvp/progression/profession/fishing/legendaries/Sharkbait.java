@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
@@ -46,6 +47,7 @@ public class Sharkbait extends BaseItem implements Reloadable {
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.PASSIVE, auraAbility)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE00F"));
     }
 
     @Override

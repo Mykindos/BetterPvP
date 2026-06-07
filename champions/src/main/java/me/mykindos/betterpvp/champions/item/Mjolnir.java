@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.Rope;
@@ -58,6 +59,7 @@ public class Mjolnir extends WeaponItem implements Reloadable, NexoItem {
                 .root(InteractionInputs.THROW, skyforgedAscent)
                 .root(InteractionInputs.SWAP_HAND, heavensplitter)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE00B"));
     }
 
     @Override

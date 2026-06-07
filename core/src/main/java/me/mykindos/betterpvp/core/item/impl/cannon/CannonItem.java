@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.cannon.ability.CannonPlaceAbility;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -32,6 +33,7 @@ public class CannonItem extends BaseItem implements Reloadable {
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.RIGHT_CLICK, cannonPlaceAbility)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE003"));
     }
 
     @Override

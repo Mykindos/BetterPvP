@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
@@ -101,6 +102,7 @@ public class TheRift extends BaseItem implements Reloadable {
                 .root(InteractionInputs.BLOCK_BREAK, explosiveExcavationInteraction)
                 .root(InteractionInputs.SWAP_HAND, chainThrowInteraction)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE010"));
 
         addBaseComponent(new ToolComponent()
                 .addRule(BlockBreakRule.of(BlockGroups.STONES, BlockBreakProperties.breakable(180))));

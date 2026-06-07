@@ -54,6 +54,11 @@ public class Resources {
          */
         public static final Key NEXO = Key.key("betterpvp", "nexo");
 
+        /**
+         * 32x32 item sprite glyphs rendered above item names.
+         */
+        public static final Key SPRITE = Key.key("betterpvp", "sprite");
+
     }
 
     /**

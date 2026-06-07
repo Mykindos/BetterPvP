@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent;
@@ -67,6 +68,7 @@ public class DeepResonator extends BaseItem implements Reloadable {
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.BLOCK_BREAK, veinEchoInteraction)
                 .build());
+        addBaseComponent(TooltipSpriteComponent.of("\uE004"));
 
         addBaseComponent(new ToolComponent()
                 .addRule(BlockBreakRule.of(BlockGroups.STONES, BlockBreakProperties.breakable(180))));

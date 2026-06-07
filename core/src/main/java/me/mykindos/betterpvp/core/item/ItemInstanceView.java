@@ -5,6 +5,7 @@ import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
+import me.mykindos.betterpvp.core.item.renderer.LorePages;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -42,6 +43,17 @@ public class ItemInstanceView implements ItemProvider {
 
     @Override
     public @NotNull ItemStack get(@Nullable String lang) {
+        return get(lang, null);
+    }
+
+    /**
+     * Render this view on a specific lore page.
+     *
+     * @param lang the language (currently unused)
+     * @param page the lore page to render, or {@code null} for the item's most relevant page
+     * @return the rendered display item stack
+     */
+    public @NotNull ItemStack get(@Nullable String lang, @Nullable Integer page) {
         // todo: localization support
         final ItemStack itemStack = itemInstance.createItemStack();
 
@@ -91,10 +103,11 @@ public class ItemInstanceView implements ItemProvider {
             }
         });
 
-        // if lore is available, write it
+        // if lore is available, write it on the requested page (or the most relevant one)
         final ItemLoreRenderer loreRenderer = itemInstance.getLoreRenderer();
         if (loreRenderer != null) {
-            loreRenderer.write(itemInstance, itemStack);
+            final int resolvedPage = page != null ? LorePages.clamp(itemInstance, page) : LorePages.mostRelevant(itemInstance);
+            loreRenderer.write(itemInstance, itemStack, resolvedPage);
         }
 
         // Write all item stack renderers

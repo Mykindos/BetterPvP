@@ -4,6 +4,7 @@ import com.google.inject.Injector;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.anvil.AnvilRecipe;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.impl.PaginatedLoreItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -70,7 +71,7 @@ public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
                 .build()));
 
         // Result
-        setItem(15, new SimpleItem(recipe.previewResult().getPrimaryResult().getView().get()));
+        setItem(15, new PaginatedLoreItem(recipe.previewResult().getPrimaryResult(), null));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:anvil")).createItemStack())

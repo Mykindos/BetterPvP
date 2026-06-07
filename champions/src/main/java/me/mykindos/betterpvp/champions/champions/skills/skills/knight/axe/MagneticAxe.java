@@ -274,7 +274,12 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
         if (event.getAction() != InventoryAction.HOTBAR_SWAP) return;
         if (event.getClickedInventory() == null) return;
-        final ItemStack hotbarItem = event.getClickedInventory().getItem(event.getHotbarButton());
+        final int hotbarButton = event.getHotbarButton();
+        if (hotbarButton == -1) {
+            return;
+        }
+
+        final ItemStack hotbarItem = event.getClickedInventory().getItem(hotbarButton);
         if (this.matches(hotbarItem)) {
             event.setCancelled(true);
         }
