@@ -65,13 +65,14 @@ public class RarityTooltipStyleRenderer implements ItemStackRenderer {
             final int x = (int) ((max - 32) / 2);
             final Component sprite = Component.empty()
                     .append(Component.translatable("space." + x).font(Resources.Font.SPACE))
-                    .append(spriteComponent.get().getSprite().applyFallbackStyle(NamedTextColor.WHITE));
+                    .append(spriteComponent.get().getSprite().applyFallbackStyle(NamedTextColor.WHITE))
+                    .decoration(TextDecoration.ITALIC, false);
 
-            lines.add(Component.empty());
+            lines.add(sprite);
             lines.add(Component.empty());
             lines.add(Component.empty());
             lines.add(centeredName);
-            itemStack.setData(DataComponentTypes.ITEM_NAME, sprite);
+            itemStack.setData(DataComponentTypes.ITEM_NAME, Component.empty());
         } else {
             itemStack.setData(DataComponentTypes.ITEM_NAME, centeredName);
         }
