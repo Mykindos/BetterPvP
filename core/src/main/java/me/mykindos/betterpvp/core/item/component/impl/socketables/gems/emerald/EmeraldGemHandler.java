@@ -36,7 +36,7 @@ public class EmeraldGemHandler implements Listener {
             final ItemStack mainHand = player.getInventory().getItemInMainHand();
             getSocketableContainer(mainHand).ifPresent(container -> {
                 if (container.hasRune(emeraldGem)) {
-                    event.addModifier(new GenericModifier(emeraldGem.getName(), ModifierType.RUNE, DamageOperator.MULTIPLIER, 1.0 + (emeraldGem.getDamageIncrease() / 100.0)));
+                    event.addModifier(new GenericModifier(emeraldGem.getName(), ModifierType.RUNE, DamageOperator.MULTIPLIER, 1.0 + emeraldGem.getDamageIncrease()));
                 }
             });
         }

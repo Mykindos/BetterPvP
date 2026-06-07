@@ -33,7 +33,7 @@ public class DiamondGemHandler implements Listener {
 
         getSocketableContainer(mainHand).ifPresent(container -> {
             if (container.hasRune(diamondGem)) {
-                double reduction = 1.0 - (diamondGem.getCooldownReduction() / 100.0);
+                double reduction = 1.0 - diamondGem.getCooldownReduction();
                 event.getCooldown().setSeconds((event.getCooldown().getSeconds() * reduction));
             }
         });
