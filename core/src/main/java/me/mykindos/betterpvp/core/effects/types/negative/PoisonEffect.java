@@ -23,12 +23,12 @@ public class PoisonEffect extends VanillaEffectType {
 
     @Override
     public String getDescription(int level) {
-        return "<white>Poison " + UtilFormat.getRomanNumeral(level) + "</white> deals <val>" + (level * 3) + "</val> damage every <stat>" + (25d/20d) + "</stat> seconds";
+        return "<white>Poison " + UtilFormat.getRomanNumeral(level) + "</white> deals <val>" + (level * 2) + "</val> damage every <stat>" + (25d/20d) + "</stat> seconds";
     }
 
     @Override
     public String getGenericDescription() {
-        return "<white>" + getName() + "</white>" + " deals <green>3</green> damage per level every <yellow>" + (25d/20d) + "</yellow> seconds";
+        return "<white>" + getName() + "</white>" + " deals <green>2</green> damage per level every <yellow>" + (25d/20d) + "</yellow> seconds";
     }
 }
 
