@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -76,10 +77,10 @@ public class DelayedActionListener implements Listener {
 
         delayedActionMap.forEach((player, delayedAction) -> {
             if (delayedAction.isCountdown() && delayedAction.getCountdownText() != null) {
-                Component remainingTime = UtilMessage.deserialize("<alt2>%s</alt2> <alt>%.1f</alt> <alt2>%s</alt2>",
-                        delayedAction.getCountdownText(),
-                        UtilTime.convert((delayedAction.getTime() - System.currentTimeMillis()), UtilTime.TimeUnit.BEST, 1),
-                        UtilTime.getTimeUnit2((double) delayedAction.getTime() - System.currentTimeMillis()).toLowerCase()
+                Component remainingTime = Translations.component("core.delayed_action.countdown",
+                        Component.text(delayedAction.getCountdownText(), NamedTextColor.YELLOW),
+                        Component.text(String.format("%.1f", UtilTime.convert((delayedAction.getTime() - System.currentTimeMillis()), UtilTime.TimeUnit.BEST, 1)), NamedTextColor.GREEN),
+                        Component.text(UtilTime.getTimeUnit2((double) delayedAction.getTime() - System.currentTimeMillis()).toLowerCase(), NamedTextColor.YELLOW)
                 );
 
                 final TitleComponent titleComponent = TitleComponent.title(0, 0.5, 0, false, gamer -> remainingTime);
@@ -126,7 +127,7 @@ public class DelayedActionListener implements Listener {
 
         if (gamer.isInCombat()) {
             event.setCancelled(true);
-            UtilMessage.message(event.getPlayer(), "Combat", "You cannot do this while in combat!");
+            UtilMessage.message(event.getPlayer(), "core.prefix.combat", "core.combat.in_combat");
         }
     }
 

@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.item.projectile.RiftPickaxeProjectile;
@@ -202,16 +203,12 @@ public class ChainThrowInteraction extends CooldownInteraction implements Displa
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Chain Throw");
+        return Translations.component("progression.ability.chain-throw.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.empty()
-                .append(Component.text("Hurl the pickaxe forward, triggering"))
-                .appendSpace()
-                .append(explosiveExcavation.getDisplayName())
-                .appendSpace()
-                .append(Component.text("every bounce. Press again to recall it."));
+        return Translations.component("progression.ability.chain-throw.description",
+                explosiveExcavation.getDisplayName());
     }
 }

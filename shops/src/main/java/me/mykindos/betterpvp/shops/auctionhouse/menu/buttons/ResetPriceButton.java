@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -10,6 +11,8 @@ import me.mykindos.betterpvp.shops.auctionhouse.menu.ListingCreationMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+
+import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,8 +31,8 @@ public class ResetPriceButton extends ControlItem<ListingCreationMenu> {
     public ItemProvider getItemProvider(ListingCreationMenu gui) {
         return ItemView.builder().material(Material.TNT_MINECART)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .displayName(Component.text("Reset", NamedTextColor.RED))
-                .lore(Component.text("Left-click to reset the sell price", NamedTextColor.GRAY))
+                .displayName(Translations.component("shops.menu.listing-creation.button.reset-price.name").color(NamedTextColor.RED))
+                .lore(List.of(Translations.componentLines("shops.menu.listing-creation.button.reset-price.lore")))
                 .build();
     }
 
@@ -40,7 +43,7 @@ public class ResetPriceButton extends ControlItem<ListingCreationMenu> {
         }
 
         auction.setSellPrice(0);
-        UtilMessage.simpleMessage(player, "Auction House", "Sell price reset to <yellow>$0</yellow>");
+        UtilMessage.message(player, "core.prefix.auction-house", Translations.component("shops.menu.listing-creation.message.price-reset"));
         SoundEffect.HIGH_PITCH_PLING.play(player);
 
         notifyWindows();

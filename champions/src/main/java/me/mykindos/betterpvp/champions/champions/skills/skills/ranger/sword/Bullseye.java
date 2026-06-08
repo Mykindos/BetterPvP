@@ -20,7 +20,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -72,17 +76,11 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "",
-                "While looking at an enemy you will gain charge",
-                "on them, when you next shoot an arrow towards",
-                "that enemy it will curve towards them from a",
-                "distance of up to " + getValueString(this::getCurveDistance, level) + " blocks and also deal",
-                getValueString(this::getBonusDamage, level) + " bonus damage",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)};
+    public Component[] getDescription(int level) {
+        Component curveDistance = getValueComponent(this::getCurveDistance, level);
+        Component bonusDamage = getValueComponent(this::getBonusDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.ranger.bullseye.description", curveDistance, bonusDamage, cooldown);
     }
 
     @Override
@@ -215,7 +213,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
             event.addModifier(new SkillDamageModifier.Flat(this, getBonusDamage(playerLevel)));
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
-            UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> hit you with <alt>" + getName());
+            UtilMessage.message(damagee, getName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.GREEN), getDisplayName().color(NamedTextColor.GREEN));
 
             //apply cooldown
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);

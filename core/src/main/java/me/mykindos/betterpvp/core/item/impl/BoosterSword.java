@@ -22,7 +22,7 @@ public class BoosterSword extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 32;
 
     public BoosterSword() {
-        super("Booster Sword", ItemStack.of(Material.GOLDEN_SWORD), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.booster-sword.name"), ItemStack.of(Material.GOLDEN_SWORD), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

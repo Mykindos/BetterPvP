@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.button.BackTabButton;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
@@ -46,7 +47,7 @@ public class GuiQuickCraftViewer extends AbstractPagedGui<QuickCraftingButton> {
                 .addIngredient('I', InfoTabButton.builder()
                         // todo: wiki entry
                         .wikiEntry("Test", url)
-                        .description(Component.text("Click on an item to quickly place its ingredients into the workbench."))
+                        .descriptionLines(List.of(Translations.rawComponentLines("core.menu.workbench.quick-craft-viewer.info.description")))
                         .build())
                 );
         this.parent = parentWorkbench;

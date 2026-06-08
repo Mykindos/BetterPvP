@@ -17,8 +17,12 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -50,16 +54,14 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "",
-                "While channelling, any enemies within " + getValueString(this::getRadius, level) + " blocks",
-                "get slowly pulled towards you",
-                "",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component energy = getValueComponent(this::getEnergy, level);
+        return Translations.componentLines(
+                "champions.skill.brute.battle-taunt.description",
+                radius,
+                energy
+        );
     }
 
     public double getRadius(int level) {

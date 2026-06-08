@@ -215,7 +215,7 @@ public class StatContainerComponent extends AbstractItemComponent implements Lor
             final String value = stat.stringValue();
             final Component line = Component.text(value, stat.getValueColor())
                     .appendSpace()
-                    .append(Component.text(stat.getType().getShortName(), NamedTextColor.GRAY));
+                    .append(stat.getType().getShortNameComponent().color(NamedTextColor.GRAY));
             lines.add(line);
         }
         return lines;

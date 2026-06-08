@@ -24,7 +24,7 @@ public class CutStone extends BaseItem {
 
     @Inject
     private CutStone() {
-        super("Cut Stone", Item.model("cut_stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.cut-stone.name"), Item.model("cut_stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 
     @Inject

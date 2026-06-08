@@ -13,8 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.IAuctionDeliveryService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -63,13 +62,11 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
                 final ItemInstance instance = itemFactory.fromItemStack(itemStack).orElseThrow();
                 final Component name = instance.getBaseItem().getItemNameRenderer().createName(instance);
                 if (auction.isCancelled()) {
-                    final TextComponent text = Component.text("Your listing for ").append(name).append(Component.text(" has been cancelled."));
-                    UtilMessage.simpleMessage(player, "Auction House", text);
+                    UtilMessage.message(player, "core.prefix.auction-house", "clans.auction.listing-cancelled", name);
                 } else if (auction.hasExpired()) {
-                    final TextComponent text = Component.text("Your listing for ").append(name).append(Component.text(" has expired."));
-                    UtilMessage.simpleMessage(player, "Auction House", text);
+                    UtilMessage.message(player, "core.prefix.auction-house", "clans.auction.listing-expired", name);
                 } else {
-                    UtilMessage.simpleMessage(player, "Auction House", "Your purchase has been delivered to your Clan mailbox.");
+                    UtilMessage.message(player, "core.prefix.auction-house", "clans.auction.purchase-delivered");
                     UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_BELL, 2f, 1f, false);
                 }
             }
@@ -86,8 +83,8 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
         if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
             clan.saveProperty(ClanProperty.BALANCE, clan.getBalance() + amount);
-            clan.messageClan("<gray>Your clan has received <green>$" + UtilFormat.formatNumber(amount) + " <gray>from an auction sale.", null, true);
-            clan.messageClan("<gray>This money can be withdrawn using <yellow>/clan bank withdraw <amount>", null, true);
+            clan.messageClan("clans.auction.currency-received", new Object[]{Component.text("$" + UtilFormat.formatNumber(amount), NamedTextColor.GREEN)}, null, true);
+            clan.messageClan("clans.auction.currency-withdraw-info", null, null, true);
             return true;
         }
 

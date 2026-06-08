@@ -217,7 +217,7 @@ public class FishingListener implements Listener {
 
                 final LootBundle bundle = fishLoot.get(player);
                 if (bundle == null) {
-                    UtilMessage.message(player, "Fishing", "<red>No loot bundle found — please report this to an admin!");
+                    UtilMessage.message(player, "core.prefix.fishing", "progression.fishing.no-loot-bundle");
                     return;
                 }
 

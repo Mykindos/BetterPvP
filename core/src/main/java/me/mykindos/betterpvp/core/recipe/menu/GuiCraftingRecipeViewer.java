@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.menu.viewer.ItemButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
@@ -75,7 +77,7 @@ public class GuiCraftingRecipeViewer extends AbstractGui implements Windowed {
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:workbench")).createItemStack())
                 .wikiEntry("Test", url)
-                .description(Component.text("Click on an ingredient to look at its recipes. Crafting recipes that require a blueprint can only be used in a workbench."))
+                .descriptionLines(List.of(Translations.rawComponentLines("core.menu.recipe.crafting.info.description")))
                 .build());
         setBackground(Menu.INVISIBLE_BACKGROUND_ITEM);
     }
@@ -93,13 +95,13 @@ public class GuiCraftingRecipeViewer extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "item/blueprint"))
-                        .displayName(Component.text("Requires Blueprint", NamedTextColor.RED))
+                        .displayName(Translations.component("core.menu.recipe.crafting.blueprint.required.name").color(NamedTextColor.RED))
                         .build();
             } else {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Resources.ItemModel.INVISIBLE)
-                        .displayName(Component.text("No Blueprint Required", NamedTextColor.GREEN))
+                        .displayName(Translations.component("core.menu.recipe.crafting.blueprint.none.name").color(NamedTextColor.GREEN))
                         .build();
             }
         }

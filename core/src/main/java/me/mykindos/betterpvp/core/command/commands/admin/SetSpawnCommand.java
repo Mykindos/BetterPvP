@@ -5,9 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.WorldHandler;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -29,14 +31,14 @@ public class SetSpawnCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Set the spawn point for the current world";
+        return "core.command.set-spawn.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if(args.length == 0) {
             player.getWorld().setSpawnLocation(player.getLocation());
-            UtilMessage.message(player, "Spawn", "Set the main world spawn point to your current location.");
+            UtilMessage.message(player, "core.prefix.spawn", "core.command.setspawn.main.success");
             return;
         }
 
@@ -46,7 +48,8 @@ public class SetSpawnCommand extends Command {
         core.getConfig().set("spawns." + spawnName, UtilWorld.locationToString(player.getLocation(), false));
         core.saveConfig();
 
-        UtilMessage.simpleMessage(player, "Spawn", "You created a spawn (<green>%s</green>) at <yellow>%s<gray>.",
-                spawnName, UtilWorld.locationToString(player.getLocation()));
+        UtilMessage.message(player, "core.prefix.spawn", Translations.component("core.command.setspawn.named.success",
+                Component.text(spawnName),
+                Component.text(UtilWorld.locationToString(player.getLocation()))));
     }
 }

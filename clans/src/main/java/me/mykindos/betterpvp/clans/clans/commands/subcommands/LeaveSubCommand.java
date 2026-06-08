@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -34,7 +35,7 @@ public class LeaveSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Leave the clan you are currently in";
+        return "clans.command.leave.description";
     }
 
     @Override
@@ -46,7 +47,7 @@ public class LeaveSubCommand extends ClanSubCommand {
         if (locationClanOptional.isPresent()) {
             final Clan locationClan = locationClanOptional.get();
             if (clan.isEnemy(locationClan)) {
-                UtilMessage.message(player, "Clans", "You cannot leave your clan while in enemy territory");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.leave.enemy-territory");
                 return;
             }
         }
@@ -56,7 +57,7 @@ public class LeaveSubCommand extends ClanSubCommand {
             final ClanMember leader = leaderOptional.get();
             if (leader.getUuid().equals(player.getUniqueId())) {
                 if (clan.getMembers().size() > 1) {
-                    UtilMessage.message(player, "Clans", "You must pass on <alt>Leadership</alt> before leaving.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.leave.leadership");
                     return;
                 } else if (clan.getMembers().size() == 1) {
                     player.chat("/clan disband");
@@ -65,7 +66,7 @@ public class LeaveSubCommand extends ClanSubCommand {
             }
         }
 
-        new ConfirmationMenu("Are you sure you want to leave your clan?", success -> {
+        new ConfirmationMenu(Translations.component("clans.command.clan.leave.confirmation").toString(), success -> {
             if (success) {
                 UtilServer.callEvent(new MemberLeaveClanEvent(player, clan));
             }

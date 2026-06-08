@@ -22,7 +22,7 @@ public class PowerSword extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 1561;
 
     public PowerSword() {
-        super("Power Sword", ItemStack.of(Material.DIAMOND_SWORD), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.power-sword.name"), ItemStack.of(Material.DIAMOND_SWORD), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

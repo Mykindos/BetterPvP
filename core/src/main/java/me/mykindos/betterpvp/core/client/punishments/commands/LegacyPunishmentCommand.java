@@ -20,7 +20,7 @@ public class LegacyPunishmentCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Base command for the legacy punishing system";
+        return "core.command.legacy-punishment.description";
     }
 
     @Override

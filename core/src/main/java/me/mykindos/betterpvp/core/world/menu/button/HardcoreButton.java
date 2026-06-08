@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.menu.GuiCreateWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -22,9 +23,11 @@ public class HardcoreButton extends ControlItem<GuiCreateWorld> {
     public ItemProvider getItemProvider(GuiCreateWorld gui) {
         return ItemView.builder()
                 .material(hardcore ? Material.DIAMOND_SWORD : Material.WOODEN_SWORD)
-                .displayName(Component.text("Hardcore: ", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.world.create.button.hardcore.name").color(NamedTextColor.GRAY)
                         .append(Component.text(this.hardcore, this.hardcore ? NamedTextColor.GREEN : NamedTextColor.RED)))
-                .action(ClickActions.ALL, Component.text(this.hardcore ? "Disable" : "Enable"))
+                .action(ClickActions.ALL, this.hardcore
+                        ? Translations.component("core.menu.world.create.button.disable.action")
+                        : Translations.component("core.menu.world.create.button.enable.action"))
                 .build();
     }
 

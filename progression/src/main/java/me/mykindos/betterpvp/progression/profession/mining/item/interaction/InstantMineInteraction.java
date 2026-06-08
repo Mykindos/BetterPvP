@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.mining.item.interaction;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Setter;
@@ -161,12 +163,12 @@ public class InstantMineInteraction extends CooldownInteraction implements Displ
     }
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Instant Mine");
+        return Translations.component("progression.ability.instant-mine.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Instantly destroy any breakable block.");
+        return Translations.component("progression.ability.instant-mine.description");
     }
 
     private class InstantMineListener implements Listener {

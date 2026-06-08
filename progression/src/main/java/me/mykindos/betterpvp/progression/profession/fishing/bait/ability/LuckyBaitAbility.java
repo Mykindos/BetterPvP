@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.fishing.bait.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
@@ -39,12 +41,12 @@ public class LuckyBaitAbility extends BaitAbility {
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Lucky Bait");
+        return Translations.component("progression.ability.lucky-bait.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Increases the chance of finding treasure while fishing");
+        return Translations.component("progression.ability.lucky-bait.description");
     }
 
     @Override

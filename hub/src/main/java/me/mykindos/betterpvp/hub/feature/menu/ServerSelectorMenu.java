@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.hub.feature.menu;
 import me.mykindos.betterpvp.core.framework.ServerTypes;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
@@ -28,7 +29,7 @@ public class ServerSelectorMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Server Select", NamedTextColor.DARK_GRAY);
+        return Translations.component("hub.menu.server-selector.title").color(NamedTextColor.DARK_GRAY);
     }
 
 }

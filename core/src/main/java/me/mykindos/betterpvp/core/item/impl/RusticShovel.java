@@ -22,7 +22,7 @@ public class RusticShovel extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 59;
 
     public RusticShovel() {
-        super("Rustic Shovel", ItemStack.of(Material.WOODEN_SHOVEL), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.rustic-shovel.name"), ItemStack.of(Material.WOODEN_SHOVEL), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

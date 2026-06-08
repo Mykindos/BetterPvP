@@ -22,7 +22,7 @@ public class AncientShovel extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 2031;
 
     public AncientShovel() {
-        super("Ancient Shovel", ItemStack.of(Material.NETHERITE_SHOVEL), ItemGroup.TOOL, ItemRarity.RARE);
+        super(translatableName("core.item.ancient-shovel.name"), ItemStack.of(Material.NETHERITE_SHOVEL), ItemGroup.TOOL, ItemRarity.RARE);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

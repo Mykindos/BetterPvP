@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -42,7 +44,7 @@ public class ButtonBuildMenuHotbar extends ControlItem<BuildMenu> {
     public ItemProvider getItemProvider(BuildMenu gui) {
         return ItemView.builder()
                 .material(Material.CHEST)
-                .displayName(Component.text("Edit Hotbar", NamedTextColor.GOLD))
+                .displayName(Translations.component("game.menu.hotbar.edit.name").color(NamedTextColor.GOLD))
                 .build();
     }
 

@@ -39,7 +39,7 @@ public class AllyChatCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Toggle ally only chat";
+        return "clans.command.ally-chat.description";
     }
 
     @Override
@@ -47,7 +47,7 @@ public class AllyChatCommand extends Command {
         final Gamer gamer = client.getGamer();
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
         if (clanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You must be in a Clan to send an Ally Message");
+            UtilMessage.message(player, "clans.prefix", "clans.command.ally-chat.no-clan");
             return;
         }
         Clan clan = clanOptional.get();

@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,9 +28,11 @@ public class ClanDemoteMemberLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> demoted <yellow>%s</yellow> from <green>%s</green> to <green>%s</green>",
-                context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLIENT_NAME),
-                context.get(LogContext.CURRENT_CLAN_RANK), context.get(LogContext.NEW_CLAN_RANK));
+        return Translations.component("core.log.clan-demote-member.1",
+                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.CURRENT_CLAN_RANK), NamedTextColor.GREEN),
+                Component.text(context.get(LogContext.NEW_CLAN_RANK), NamedTextColor.GREEN));
     }
 
     @Override
@@ -41,18 +44,21 @@ public class ClanDemoteMemberLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("demoted", NamedTextColor.GRAY),
+                Translations.component("core.log.clan-demote-member.2").color(NamedTextColor.GRAY),
                 Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW),
-                UtilMessage.deserialize("from <green>%s</green> to <green>%s</green>",
-                        context.get(LogContext.CURRENT_CLAN_RANK), context.get(LogContext.NEW_CLAN_RANK)),
+                Translations.component("core.log.clan-demote-member.3",
+                        Component.text(context.get(LogContext.CURRENT_CLAN_RANK), NamedTextColor.GREEN),
+                        Component.text(context.get(LogContext.NEW_CLAN_RANK), NamedTextColor.GREEN)),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
 
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>demoted</red> <yellow>%s</yellow>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLIENT_NAME)))
+                .displayName(Translations.component("core.log.clan-demote-member.4",
+                        Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                        Translations.component("core.log.clan-demote-member.5").color(NamedTextColor.RED),
+                        Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW)))
                 .material(Material.RED_CANDLE)
                 .lore(lore)
                 .frameLore(false)

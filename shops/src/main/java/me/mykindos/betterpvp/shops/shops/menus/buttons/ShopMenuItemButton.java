@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.ReferencingInventory;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -37,16 +38,18 @@ public class ShopMenuItemButton extends ControlItem<ShopMenu> {
         Component sellPrice = menu.getContext().buildPriceComponent(currency, shopItem.getSellPrice() * STACK_AMOUNT);
 
         final ItemView.ItemViewBuilder builder = menu.getContext().createDisplayStack(shopItem, 1).toBuilder();
-        builder.action(ClickActions.ALL, Component.empty().append(Component.text("Open")));
+        builder.action(ClickActions.ALL, Translations.component("shops.menu.shop.button.item.action-open"));
 
         if (shopItem.getBuyPrice() * 64 < 1_000_000) {
             builder.action(ClickActions.LEFT_SHIFT, Component.empty()
-                    .append(Component.text("Buy " + STACK_AMOUNT + " for "))
+                    .append(Translations.component("shops.menu.shop.button.item.action-buy", Component.text(STACK_AMOUNT)))
+                    .appendSpace()
                     .append(buyPrice));
 
             if (shopItem.getSellPrice() > 0) {
                 builder.action(ClickActions.RIGHT_SHIFT, Component.empty()
-                        .append(Component.text("Sell " + STACK_AMOUNT + " for "))
+                        .append(Translations.component("shops.menu.shop.button.item.action-sell", Component.text(STACK_AMOUNT)))
+                        .appendSpace()
                         .append(sellPrice));
             }
         }

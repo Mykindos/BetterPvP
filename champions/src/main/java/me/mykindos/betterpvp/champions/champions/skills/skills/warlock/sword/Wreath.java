@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -79,7 +80,9 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
         final int currentMaxCharges = getMaxCharges(getLevel(player));
         final int newCharges = charges.get(player).getCharges();
 
-        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+        return Component.empty().color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(getDisplayName())
+                .append(Component.text(" "))
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
                 .append(Component.text("\u25A0".repeat(Math.max(0, currentMaxCharges - newCharges))).color(NamedTextColor.RED));
     });
@@ -95,20 +98,14 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Release a barrage of teeth that",
-                "deal " + getValueString(this::getDamage, level, 2) + " damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "to their target for " + getValueString(this::getSlowDuration, level) + " seconds.",
-                "",
-                "For each enemy hit, restore " + getValueString(this::getHealthPerEnemyHit, level) + " health.",
-                "",
-                "Store up to " + getValueString(this::getMaxCharges, level) + " charges",
-                "",
-                "Gain a charge every: " + getValueString(this::getRechargeSeconds, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level, 2);
+        Component slowRoman = Component.text(UtilFormat.getRomanNumeral(slowStrength), NamedTextColor.GREEN);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component healthPerHit = getValueComponent(this::getHealthPerEnemyHit, level);
+        Component maxCharges = getValueComponent(this::getMaxCharges, level);
+        Component rechargeSeconds = getValueComponent(this::getRechargeSeconds, level);
+        return Translations.componentLines("champions.skill.warlock.wreath.description", damage, slowRoman, slowDuration, healthPerHit, maxCharges, rechargeSeconds);
     }
 
 
@@ -131,7 +128,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
             return true;
         }
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You don't have any <alt>" + getName() + "</alt> charges.");
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.warlock.wreath.no-charges", getDisplayName().color(NamedTextColor.GREEN));
         return false;
     }
 
@@ -148,7 +145,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
     }
 
     private void notifyCharges(Player player, int charges) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Wreath Charges: <alt2>" + charges);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.warlock.wreath.charges", Component.text(String.valueOf(charges), NamedTextColor.YELLOW));
     }
 
     public int getMaxCharges(int level){

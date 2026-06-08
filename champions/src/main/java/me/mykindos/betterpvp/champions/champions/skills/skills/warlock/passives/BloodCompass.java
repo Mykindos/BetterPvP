@@ -10,9 +10,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -60,18 +64,12 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Drop Sword / Axe to activate",
-                "",
-                "Shoot out up to " + getValueString(this::getFinalNumLines, level) + " tracking lines that will fly",
-                "towards the nearest enemies within " + getValueString(this::getMaxDistance, level) + " blocks",
-                "",
-                "Players hit with these blood lines will receive",
-                "<effect>Glowing</effect> for " + getValueString(this::getEffectDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component numLines = getValueComponent(this::getFinalNumLines, level);
+        Component maxDistance = getValueComponent(this::getMaxDistance, level);
+        Component effectDuration = getValueComponent(this::getEffectDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.warlock.blood-compass.description", numLines, maxDistance, effectDuration, cooldown);
     }
 
     public int getFinalNumLines(int level) {
@@ -105,7 +103,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
             }
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 1.0f);
         } else {
-            UtilMessage.message(player, getClassType().getName(), "Blood Compass failed.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.warlock.blood-compass.failed");
         }
 
         playerMarkersMap.put(player, markers);
@@ -249,8 +247,8 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                     show(player, nearbyAllies, target);
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    UtilMessage.message(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + "</alt>.");
-                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
+                    UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
 
                     new BukkitRunnable() {
                         @Override

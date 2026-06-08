@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -93,7 +94,7 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text(name + "'s Players");
+        return Translations.component("clans.menu.players-of-clan.title", Component.text(name));
     }
 
     @Override

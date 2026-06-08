@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -64,12 +65,12 @@ public class PortableClassAbility extends AbstractInteraction implements Listene
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Equip");
+        return Translations.component("champions.ability.equip.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Instantly swaps to the " + role.getName() + " class. Does not work in combat. Armor stored on this item will be equipped.");
+        return Translations.component("champions.ability.equip.description", Component.text(role.getName()));
     }
 
     @Override

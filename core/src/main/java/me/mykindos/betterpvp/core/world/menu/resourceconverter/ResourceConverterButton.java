@@ -41,7 +41,7 @@ public class ResourceConverterButton extends AbstractItem {
         if (UtilInventory.remove(player, itemStack.getType(), itemStack.getAmount())) {
             targetResource.setAmount(itemStack.getAmount());
             UtilItem.insert(player, targetResource);
-            UtilMessage.simpleMessage(player, "Resource Converter", "Successfully converted resources.");
+            UtilMessage.message(player, "core.prefix.resource-converter", "core.resourceconverter.success");
             UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.3f, 1f);
         }
 

@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -94,9 +95,9 @@ public class RoleListener implements Listener {
 
         Role role = event.getRole();
         if (role == null) {
-            UtilMessage.simpleMessage(player, "Class", "Armor Class: <green>None");
+            UtilMessage.message(player, "core.prefix.class", "champions.class.armor-none", Translations.component("champions.class.none").color(NamedTextColor.GREEN));
         } else {
-            UtilMessage.simpleMessage(player, "Class", "You equipped <green>%s", role.getName());
+            UtilMessage.message(player, "core.prefix.class", "champions.class.equipped", role.getDisplayName().color(NamedTextColor.GREEN));
             UtilMessage.message(player, equipMessage(player, role));
         }
     }
@@ -150,7 +151,7 @@ public class RoleListener implements Listener {
             Material armorType = player.getInventory().getItem(mainhand.getType().getEquipmentSlot()).getType();
 
             if (armorType != Material.AIR && gamer.isInCombat()) {
-                UtilMessage.message(player, "Class", "You cannot hotswap armor while in combat.");
+                UtilMessage.message(player, "core.prefix.class", "champions.class.no-hotswap");
                 event.setUseItemInHand(Event.Result.DENY);
             }
         }

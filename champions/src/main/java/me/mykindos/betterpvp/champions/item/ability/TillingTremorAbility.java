@@ -16,7 +16,9 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -61,12 +63,12 @@ public class TillingTremorAbility extends CooldownInteraction implements Display
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Tilling Tremor");
+        return Translations.component("champions.ability.tilling-tremor.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Harvest crops in a small radius. Enemies in the area will be damaged and knocked back.");
+        return Translations.component("champions.ability.tilling-tremor.description");
     }
 
     @Override
@@ -84,7 +86,7 @@ public class TillingTremorAbility extends CooldownInteraction implements Display
             UtilItem.damageItem(player, itemStack, 1);
         }
 
-        UtilMessage.simpleMessage(entity, "Rake", "You used <green>Tilling Tremor<gray>.");
+        UtilMessage.message(entity, "core.prefix.rake", "champions.item.tilling-tremor.used", Translations.component("champions.item.tilling-tremor.name").color(NamedTextColor.GREEN));
 
         Location playerLocation = entity.getLocation();
         World world = entity.getWorld();

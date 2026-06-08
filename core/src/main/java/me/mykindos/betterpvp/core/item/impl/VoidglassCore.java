@@ -14,7 +14,7 @@ public class VoidglassCore extends BaseItem {
 
     @Inject
     private VoidglassCore() {
-        super("Voidglass Core", Item.model("voidglass_core"), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
+        super(translatableName("core.item.voidglass-core.name"), Item.model("voidglass_core"), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
     }
 
 }

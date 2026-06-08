@@ -17,10 +17,12 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.PreCannonPlaceEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -53,12 +55,12 @@ public class CannonPlaceAbility extends CooldownInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Cannon Placement");
+        return Translations.component("core.ability.cannon-placement.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Place a cannon that can be loaded with cannonballs");
+        return Translations.component("core.ability.cannon-placement.description");
     }
 
     @Override
@@ -80,13 +82,14 @@ public class CannonPlaceAbility extends CooldownInteraction implements Displayed
         final Location cannonLocation = cannonLocations.remove(player.getUniqueId());
 
         if(!cannonLocation.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
-            UtilMessage.message(player, "Combat", "You cannot place a cannon in this world.");
+            UtilMessage.message(player, "core.prefix.combat", "core.cannon.wrong_world");
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         Cannon cannon = this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
         if (cannon != null) {
-            UtilMessage.message(player, "Combat", "You placed a <alt2>Cannon</alt2>!");
+            UtilMessage.message(player, "core.prefix.combat", "core.cannon.placed",
+                    Translations.component("core.item.cannon.name").color(NamedTextColor.YELLOW));
             return InteractionResult.Success.ADVANCE;
         }
         return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
@@ -96,7 +99,8 @@ public class CannonPlaceAbility extends CooldownInteraction implements Displayed
         final PreCannonPlaceEvent event = new PreCannonPlaceEvent(player.getLocation(), player);
         if (!Compatibility.MODEL_ENGINE) {
             event.cancel("Cannons are not supported on this server. There are missing dependencies.");
-            UtilMessage.message(player, "Combat", "Cannons are not supported on this server. <red>Please contact an administrator.");
+            UtilMessage.message(player, "core.prefix.combat", "core.cannon.not_supported",
+                    Translations.component("core.cannon.contact_admin").color(NamedTextColor.RED));
             SoundEffect.LOW_PITCH_PLING.play(player);
         } else {
             final RayTraceResult rayTraceResult = player.rayTraceBlocks(4.5, FluidCollisionMode.ALWAYS);

@@ -14,8 +14,8 @@ public class FishItem extends BaseItem implements NexoItem {
 
     private final String nexoId;
 
-    public FishItem(String name, String nexoId) {
-        super(name, ItemStack.of(Material.PAPER), ItemGroup.MATERIAL, ItemRarity.COMMON);
+    public FishItem(String nameKey, String nexoId) {
+        super(translatableName(nameKey), ItemStack.of(Material.PAPER), ItemGroup.MATERIAL, ItemRarity.COMMON);
         this.nexoId = nexoId;
     }
 

@@ -14,7 +14,7 @@ public class Crown extends BaseItem {
 
     @Inject
     private Crown() {
-        super("Crown", Item.model("crown", 1), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.crown.name"), Item.model("crown", 1), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 
 }

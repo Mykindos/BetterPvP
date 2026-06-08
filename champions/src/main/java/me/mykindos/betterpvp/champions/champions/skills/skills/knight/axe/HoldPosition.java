@@ -14,9 +14,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -54,19 +57,32 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Hold your position, gaining",
-                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
-                "knockback for <val>" + getDuration(level) + "</val> seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.RESISTANCE.getDescription(resistanceStrength)
-        };
+    public Component[] getDescription(int level) {
+        Component resistance = Translations.component("champions.skill.effect.resistance",
+                Component.text(UtilFormat.getRomanNumeral(resistanceStrength))).color(NamedTextColor.WHITE);
+        Component slowness = Translations.component("champions.skill.effect.slowness",
+                Component.text(UtilFormat.getRomanNumeral(slownessStrength))).color(NamedTextColor.WHITE);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component[] components = Translations.componentLines(
+                "champions.skill.knight.hold-position.description",
+                resistance,
+                slowness,
+                duration,
+                cooldown
+        );
+        Component resistanceDetail = Translations.component("champions.skill.effect.resistance",
+                Component.text(UtilFormat.getRomanNumeral(resistanceStrength))).color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.knight.hold-position.detail",
+                resistanceDetail,
+                Component.text((resistanceStrength * 20) + "%", NamedTextColor.YELLOW)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {
@@ -117,7 +133,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
             @Override
             public void run() {
                 if (ticksRun > durationTicks || getLevel(player) <= 0) {
-                    UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ended", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(getLevel(player)), NamedTextColor.GREEN));
                     this.cancel();
                     return;
                 }

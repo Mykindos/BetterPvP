@@ -12,7 +12,7 @@ public class FissureQuartz {
     public static class Item extends MetalItem {
         @Inject
         public Item() {
-            super("Fissure Quartz", "fissure_quartz", ItemRarity.RARE);
+            super(translatableName("core.item.fissure-quartz.name"), "fissure_quartz", ItemRarity.RARE);
         }
     }
 
@@ -29,7 +29,7 @@ public class FissureQuartz {
     public static class OreItem extends MetalBlockItem {
         @Inject
         public OreItem() {
-            super("Fissure Quartz Ore", "fissure_quartz_stone_ore", ItemRarity.RARE);
+            super(translatableName("core.item.fissure-quartz-stone-ore.name"), "fissure_quartz_stone_ore", ItemRarity.RARE);
         }
     }
 
@@ -46,7 +46,7 @@ public class FissureQuartz {
     public static class DeepslateOreItem extends MetalBlockItem {
         @Inject
         public DeepslateOreItem() {
-            super("Fissure Quartz Deepslate Ore", "fissure_quartz_deepslate_ore", ItemRarity.RARE);
+            super(translatableName("core.item.fissure-quartz-deepslate-ore.name"), "fissure_quartz_deepslate_ore", ItemRarity.RARE);
         }
     }
 

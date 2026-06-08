@@ -14,7 +14,7 @@ public class ScrollOfTheUndead extends BaseItem {
 
     @Inject
     private ScrollOfTheUndead() {
-        super("Scroll of the Undead", Item.model("scroll_of_the_undead"), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.scroll-of-the-undead.name"), Item.model("scroll_of_the_undead"), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 
 }

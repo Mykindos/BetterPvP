@@ -22,6 +22,8 @@ import me.mykindos.betterpvp.core.world.zone.PlayerEnterZoneEvent;
 import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.Zones;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -62,8 +64,8 @@ public class ClansProtectionListener implements Listener {
                 effectManager.removeEffect(event.getPlayer(), EffectTypes.PROTECTION, false);
                 effectManager.addEffect(event.getPlayer(), EffectTypes.PROTECTION, remainingProtection);
             });
-            UtilMessage.message(event.getPlayer(), "Protection", "Protection timer resumed, you have left a safezone.");
-            UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining", UtilTime.getTime(remainingProtection, 1));
+            UtilMessage.message(event.getPlayer(), "core.prefix.protection", "clans.protection.timer-resumed");
+            UtilMessage.message(event.getPlayer(), "core.prefix.protection", "clans.protection.remaining-current", Component.text(UtilTime.getTime(remainingProtection, 1), NamedTextColor.GREEN));
         }
     }
 
@@ -77,9 +79,9 @@ public class ClansProtectionListener implements Listener {
         gamer.updateRemainingProtection();
         final long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
         if (remainingProtection > 0) {
-            UtilMessage.message(event.getPlayer(), "Protection", "Protection timer paused, you have entered a safezone.");
-            UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining",
-                    UtilTime.getTime(remainingProtection, 1));
+            UtilMessage.message(event.getPlayer(), "core.prefix.protection", "clans.protection.timer-paused");
+            UtilMessage.message(event.getPlayer(), "core.prefix.protection", "clans.protection.remaining-current",
+                    Component.text(UtilTime.getTime(remainingProtection, 1), NamedTextColor.GREEN));
             UtilServer.runTask(JavaPlugin.getPlugin(Champions.class), () -> {
                 effectManager.removeEffect(event.getPlayer(), EffectTypes.PROTECTION, false);
                 effectManager.addEffect(event.getPlayer(), EffectTypes.PROTECTION, 100_000L * 1000L);
@@ -102,9 +104,9 @@ public class ClansProtectionListener implements Listener {
         if (owner.equals(self)) return;
 
         final long duration = effectManager.getDuration(player, EffectTypes.PROTECTION);
-        UtilMessage.message(player, "Protection", "You cannot enter other territories while protected!");
-        UtilMessage.message(player, "Protection", "You currently have <green>%s</green> of protection remaining",
-                UtilTime.getTime(duration, 1));
+        UtilMessage.message(player, "core.prefix.protection", "clans.protection.cannot-enter");
+        UtilMessage.message(player, "core.prefix.protection", "clans.protection.remaining-current",
+                Component.text(UtilTime.getTime(duration, 1), NamedTextColor.GREEN));
         EffectTypes.disableProtectionReminder(player);
         clanManager.closestWilderness(player).ifPresent(location -> player.teleportAsync(location));
     }
@@ -124,8 +126,8 @@ public class ClansProtectionListener implements Listener {
                 }
 
                 if (remainingProtection > 0) {
-                    UtilMessage.message(player, "Protection", "You have <green>%s</green> of protection remaining",
-                            UtilTime.getTime(remainingProtection, 1));
+                    UtilMessage.message(player, "core.prefix.protection", "clans.protection.remaining",
+                            Component.text(UtilTime.getTime(remainingProtection, 1), NamedTextColor.GREEN));
                 }
             }
         });

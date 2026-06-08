@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.settings;
 
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -27,8 +28,8 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.WOODEN_SWORD)
-                    .displayName(Component.text("Skill Tooltips", color))
-                    .lore(Component.text("Whether or not to display your current skills description on your weapon", NamedTextColor.GRAY))
+                    .displayName(Translations.component("champions.menu.settings.tooltips.name").color(color))
+                    .lore(Translations.component("champions.menu.settings.tooltips.lore").color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -44,7 +45,7 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Champions Settings");
+        return Translations.component("champions.menu.settings.title");
     }
 
     @Override
@@ -52,8 +53,8 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
         return Description.builder()
                 .icon(ItemView.builder()
                         .material(Material.DIAMOND_CHESTPLATE)
-                        .displayName(Component.text("Champions Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
-                        .lore(Component.text("View generic settings related to the champions classes", NamedTextColor.GRAY))
+                        .displayName(Translations.component("champions.menu.settings.button.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                        .lore(Translations.component("champions.menu.settings.button.lore").color(NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
                         .frameLore(true)
                         .build())

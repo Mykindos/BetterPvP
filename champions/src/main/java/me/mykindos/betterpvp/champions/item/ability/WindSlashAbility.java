@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -75,12 +77,12 @@ public class WindSlashAbility extends CooldownInteraction implements DisplayedIn
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Wind Slash");
+        return Translations.component("champions.ability.wind-slash.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.");
+        return Translations.component("champions.ability.wind-slash.description");
     }
 
     @Override

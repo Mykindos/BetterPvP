@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 public class ReinforcedMageChestplate extends ArmorItem {
     @Inject
     private ReinforcedMageChestplate(Champions champions) {
-        super(champions, "Reinforced Mage Chestplate", Item.builder(Material.GOLDEN_CHESTPLATE)
+        super(champions, translatableName("champions.item.reinforced-mage-chestplate.name"), Item.builder(Material.GOLDEN_CHESTPLATE)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.MAGE));

@@ -28,19 +28,19 @@ public class AuctionHouseCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Open the auction house menu";
+        return "shops.command.auction-house.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if(!client.isAdministrating()) {
             if (client.getGamer().isInCombat()) {
-               UtilMessage.simpleMessage(player,"Auction House", "You cannot access the auction house while in combat.");
+               UtilMessage.message(player, "shops.prefix", "shops.command.auctionhouse.no-combat");
                 return;
             }
 
             if(!player.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
-                UtilMessage.simpleMessage(player,"Auction House", "You cannot access the auction house in this world.");
+                UtilMessage.message(player, "shops.prefix", "shops.command.auctionhouse.invalid-world");
                 return;
             }
 

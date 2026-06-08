@@ -19,10 +19,13 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
@@ -64,18 +67,22 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getSpeedDuration, level) + " seconds",
-                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for " + getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "While charging, you take no knockback",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-
-        };
+    public Component[] getDescription(int level) {
+        Component speed = Translations.component("champions.skill.effect.speed",
+                Component.text(UtilFormat.getRomanNumeral(speedStrength))).color(NamedTextColor.WHITE);
+        Component speedDuration = getValueComponent(this::getSpeedDuration, level);
+        Component slowness = Translations.component("champions.skill.effect.slowness",
+                Component.text(UtilFormat.getRomanNumeral(slownessStrength))).color(NamedTextColor.WHITE);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.bulls-charge.description",
+                speed,
+                speedDuration,
+                slowness,
+                slowDuration,
+                cooldown
+        );
     }
 
     public double getSpeedDuration(int level) {
@@ -128,10 +135,10 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
                 if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + " " + level + "</green>.");
+                    UtilMessage.message(damaged, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
                 }
 
-                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + event.getDamagee().getName() + "</yellow> with <green>" + getName() + " " + level + "</green>.");
+                UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(event.getDamagee().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
                 running.remove(damager.getUniqueId());
             }
         }
@@ -159,7 +166,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
             }
 
             int level = getLevel(player);
-            UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), level));
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ended", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             return true;
         }
 

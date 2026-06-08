@@ -6,8 +6,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.tips.ChampionsTip;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -29,10 +30,12 @@ public class CrossbowWeaponTip extends ChampionsTip {
 
     @Override
     public Component generateComponent() {
-        Component component = UtilMessage.deserialize("Crossbows <gold>boost</gold> bow skills by <yellow>1</yellow> level. Certain skills require " +
-                "the crossbow to be loaded to use.");
+        Component component = Translations.component("champions.tip.crossbowweapontip",
+                Component.text("boost", NamedTextColor.GOLD),
+                Component.text("1", NamedTextColor.YELLOW));
         if (crossbowCooldownEnabled) {
-            component = component.appendSpace().append(UtilMessage.deserialize("Crossbows can be fired every <yellow>%s</yellow> seconds", crossbowCooldownDuration));
+            component = component.appendSpace().append(Translations.component("champions.tip.crossbowweapontip.cooldown",
+                    Component.text(String.valueOf(crossbowCooldownDuration), NamedTextColor.YELLOW)));
         }
 
         return component;

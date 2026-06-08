@@ -14,9 +14,11 @@ import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.gems.GemItem;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.RuneItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -147,7 +149,7 @@ public class ImbuementPedestal extends SmartBlock implements NexoBlock, DataHold
     private boolean handleItemPlacement(@NotNull ImbuementPedestalData data, @NotNull Player player, @NotNull ItemInstance itemInstance) {
         // Check if pedestal is full
         if (data.isFull()) {
-            UtilMessage.message(player, "Imbuement", "<red>This pedestal is full!");
+            UtilMessage.message(player, "core.prefix.imbuement", Translations.component("core.block.imbuement.full").color(NamedTextColor.RED));
             new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f).play(player);
             return false;
         }
@@ -163,7 +165,7 @@ public class ImbuementPedestal extends SmartBlock implements NexoBlock, DataHold
                 && itemInstance.getComponent(SocketableContainerComponent.class).map(runeContainer -> runeContainer.getSockets() > 0).orElse(false);
 
         if (!isRune && !isAttunedWithSockets) {
-            UtilMessage.message(player, "Imbuement", "<red>You can only place runes or attuned items with sockets on the pedestal.");
+            UtilMessage.message(player, "core.prefix.imbuement", Translations.component("core.block.imbuement.invalid_item").color(NamedTextColor.RED));
             new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f).play(player);
             return false;
         }

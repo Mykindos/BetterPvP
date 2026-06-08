@@ -18,7 +18,7 @@ public class RefreshItemCacheCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Rebuild the item viewer cache (use after editing a registered item's shape)";
+        return "core.command.refresh-item-cache.description";
     }
 
     @Override
@@ -29,6 +29,6 @@ public class RefreshItemCacheCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         GuiItemViewer.invalidateCache();
-        UtilMessage.simpleMessage(player, "Items", "Item viewer cache invalidated. Next /items will rebuild it.");
+        UtilMessage.message(player, "core.prefix.command", "core.command.refreshitemcache.success");
     }
 }

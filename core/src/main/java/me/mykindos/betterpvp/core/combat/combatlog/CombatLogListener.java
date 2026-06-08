@@ -12,9 +12,10 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.WorldHandler;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -61,7 +62,11 @@ public class CombatLogListener implements Listener {
 
         PlayerCombatLogEvent combatLogEvent = UtilServer.callEvent(new PlayerCombatLogEvent(event.getClient(), event.getPlayer()));
 
-        event.setQuitMessage(event.getQuitMessage().append(UtilMessage.deserialize(" <gray>(" + (combatLogEvent.isSafe() ? "<green>Safe" : "<red>Unsafe") + "<gray>)")));
+        final net.kyori.adventure.text.Component statusLabel = combatLogEvent.isSafe()
+                ? Translations.component("core.combatlog.status.safe").color(NamedTextColor.GREEN)
+                : Translations.component("core.combatlog.status.unsafe").color(NamedTextColor.RED);
+        event.setQuitMessage(event.getQuitMessage().append(
+                Translations.component("core.combatlog.status", statusLabel).color(NamedTextColor.GRAY)));
         if (!combatLogEvent.isSafe()) {
             combatLogManager.createCombatLog(event.getPlayer(), System.currentTimeMillis() + combatLogEvent.getDuration());
         }

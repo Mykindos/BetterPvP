@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameRarityRenderer;
 import me.mykindos.betterpvp.core.item.renderer.RarityTooltipStyleRenderer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +57,25 @@ public class BaseItem implements Item {
 
     public BaseItem(String name, ItemStack model, ItemGroup group, ItemRarity rarity) {
         this(model, group, itemInstance -> rarity, new LoreComponentRenderer(), new NameRarityRenderer(name));
+    }
+
+    /**
+     * Creates a translatable display-name {@link Component} from a translation key.
+     *
+     * <p>Pass the result as the {@code name} argument of a {@link BaseItem} (or subclass)
+     * constructor so that the item's display name is localized per viewer while still
+     * receiving rarity/purity fallback coloring from {@link NameRarityRenderer}.</p>
+     *
+     * <p>Example:</p>
+     * <pre>
+     * super(translatableName("core.item.stone.name"), Item.model("stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+     * </pre>
+     *
+     * @param key the translation key for the item name (e.g. {@code core.item.stone.name})
+     * @return a translatable component for use as an item name
+     */
+    protected static Component translatableName(String key) {
+        return Translations.component(key);
     }
 
     public BaseItem(Component name, ItemStack model, ItemGroup group, ItemRarity rarity) {

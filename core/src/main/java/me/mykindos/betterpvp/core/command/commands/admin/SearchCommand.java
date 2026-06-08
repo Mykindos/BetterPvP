@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDController;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDItem;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
@@ -36,12 +37,12 @@ public class SearchCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Base Search command";
+        return "core.command.search.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>Usage: /search <item|player></green>"));
+        UtilMessage.message(player, "core.prefix.search", "core.command.search.usage");
     }
 
     @Singleton
@@ -63,17 +64,17 @@ public class SearchCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Search for an item by its uuid";
-        }
+        return "core.command.search-item.description";
+    }
 
         public Component getUsage() {
-            return UtilMessage.deserialize("<green>Usage: <UUID> [amount]");
+            return Translations.component("core.command.search.item.usage");
         }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 1) {
-                UtilMessage.message(player, "Search", getUsage());
+                UtilMessage.message(player, "core.prefix.search", getUsage());
                 return;
             }
 
@@ -81,14 +82,14 @@ public class SearchCommand extends Command {
             try {
                 uuid = UUID.fromString(args[0]);
             } catch (IllegalArgumentException e) {
-                UtilMessage.message(player, "Search", UtilMessage.deserialize("<light_purple>%s</light_purple> is not a valid UUID.", args[0]));
+                UtilMessage.message(player, "core.prefix.search", "core.command.search.item.invalid_uuid", Component.text(args[0]));
                 return;
             }
 
             Optional<UUIDItem> uuidItemOptional = uuidManager.getObject(uuid.toString());
 
             if (uuidItemOptional.isEmpty()) {
-                UtilMessage.message(player, "Search", UtilMessage.deserialize("There is no item with the UUID <light_purple>%s</light_purple>", uuid.toString()));
+                UtilMessage.message(player, "core.prefix.search", "core.command.search.item.not_found", Component.text(uuid.toString()));
                 return;
             }
 
@@ -140,24 +141,24 @@ public class SearchCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Search for an item by a player";
-        }
+        return "core.command.search-player.description";
+    }
 
         public Component getUsage() {
-            return UtilMessage.deserialize("<green>Usage: <player> [amount]");
+            return Translations.component("core.command.search.player.usage");
         }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 1) {
-                UtilMessage.message(player, "Search", getUsage());
+                UtilMessage.message(player, "core.prefix.search", getUsage());
                 return;
             }
 
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
                 clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
                     if (clientOptional.isEmpty()) {
-                        UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
+                        UtilMessage.message(player, "core.prefix.search", "core.command.search.player.invalid_player", Component.text(args[0]));
                         return;
                     }
 
@@ -196,32 +197,35 @@ public class SearchCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Return all UUID Items currently held by players";
-        }
+        return "core.command.search-online.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
-            clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving all <light_purple>UUIDitems</light_purple> currently being held", player.getName()), Rank.TRIAL_MOD);
+            clientManager.sendMessageToRank("core.prefix.search", Translations.component("core.command.search.online.retrieving",
+                    Component.text(player.getName())), Rank.TRIAL_MOD);
 
             boolean atLeastOneUUIDItemFound = false;
             for (Player online : Bukkit.getOnlinePlayers()) {
                 boolean hasAtLeastOneUUIDItem = false;
-                Component component = UtilMessage.deserialize("<yellow>%s</yellow> is holding:", online.getName());
+                Component component = Translations.component("core.command.search.online.holding", Component.text(online.getName()));
                 for (UUIDItem uuidItem : uuidController.getUUIDItems(online).keySet()) {
                     if (!hasAtLeastOneUUIDItem) {
                         hasAtLeastOneUUIDItem = true;
                     }
-                    component = component.appendNewline().append(UtilMessage.deserialize("(<green>%s</green>) <light_purple>%s</light_purple>", uuidItem.getIdentifier(), uuidItem.getUuid()));
+                    component = component.appendNewline().append(Translations.component("core.command.search.online.entry",
+                            Component.text(uuidItem.getIdentifier()),
+                            Component.text(uuidItem.getUuid().toString())));
                 }
                 if (hasAtLeastOneUUIDItem) {
                     atLeastOneUUIDItemFound = true;
-                    UtilMessage.message(player, "Search", component);
+                    UtilMessage.message(player, "core.prefix.search", component);
                 }
 
             }
             if (!atLeastOneUUIDItemFound) {
                 //there are no UUIDItems being held
-                UtilMessage.message(player, "Search", "There are currently no UUIDItems being held");
+                UtilMessage.message(player, "core.prefix.search", "core.command.search.online.none");
             }
         }
 

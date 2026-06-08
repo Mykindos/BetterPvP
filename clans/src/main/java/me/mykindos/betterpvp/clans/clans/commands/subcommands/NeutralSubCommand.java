@@ -33,7 +33,7 @@ public class NeutralSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Request a neutral status with another clan";
+        return "clans.command.neutral.description";
     }
 
     @Override
@@ -44,13 +44,13 @@ public class NeutralSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if(args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a clan to request neutral status with.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.neutral.no-args");
             return;
         }
 
         Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if(targetClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "The target clan does not exist.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.neutral.not-found");
             return;
         }
 
@@ -58,17 +58,17 @@ public class NeutralSubCommand extends ClanSubCommand {
         Clan targetClan = targetClanOptional.get();
 
         if(playerClan.equals(targetClan)) {
-            UtilMessage.message(player, "Clans", "You cannot neutral your own clan");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.neutral.self");
             return;
         }
 
         if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Only the clan admins can form alliances.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.neutral.no-rank");
             return;
         }
 
         if(!playerClan.isEnemy(targetClan) && !playerClan.isAllied(targetClan)) {
-            UtilMessage.message(player, "Clans", "You are already neutral with this clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.neutral.already-neutral");
             return;
         }
 

@@ -14,10 +14,10 @@ import net.kyori.adventure.text.format.TextColor;
 @Getter
 public enum FatigueTier {
 
-    FRESH("Rested", NamedTextColor.GREEN),
-    WORN("Worn", NamedTextColor.YELLOW),
-    WEARY("Weary", NamedTextColor.GOLD),
-    EXHAUSTED("Exhausted", NamedTextColor.RED);
+    FRESH("clans.fatigue.tier.rested", NamedTextColor.GREEN),
+    WORN("clans.fatigue.tier.worn", NamedTextColor.YELLOW),
+    WEARY("clans.fatigue.tier.weary", NamedTextColor.GOLD),
+    EXHAUSTED("clans.fatigue.tier.exhausted", NamedTextColor.RED);
 
     private final String displayName;
     private final TextColor color;

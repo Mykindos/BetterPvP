@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionHouseMenu;
@@ -9,6 +10,8 @@ import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionListingMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+
+import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,8 +31,8 @@ public class MyListingsButton extends ControlItem<AuctionHouseMenu> {
         return ItemView.builder().material(Material.PLAYER_HEAD)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
-                .displayName(Component.text("View my Listings", NamedTextColor.GREEN))
-                .lore(Component.text("Click to view all of your listed auctions", NamedTextColor.GRAY))
+                .displayName(Translations.component("shops.menu.auction-house.button.my-listings.name").color(NamedTextColor.GREEN))
+                .lore(List.of(Translations.componentLines("shops.menu.auction-house.button.my-listings.lore")))
                 .build();
     }
 

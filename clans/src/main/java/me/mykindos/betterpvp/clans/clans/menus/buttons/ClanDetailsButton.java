@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -52,9 +53,15 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
                 .frameLore(true)
                 .hideAdditionalTooltip(true)
                 .displayName(Component.text(this.clan.getName(), this.viewerRelation.getSecondary()))
-                .lore(Component.text("Net Dominance: ", NamedTextColor.GRAY).append(Component.text(netDominanceText, netDominance >= 0 ? NamedTextColor.GREEN : NamedTextColor.RED)))
-                .lore(UtilMessage.deserialize("<gray>Online: <white>%,d</white>/<white>%,d</white>", this.clan.getOnlineMemberCount(), this.clan.getMembers().size()))
-                .lore(UtilMessage.deserialize("<gray>Squad Size: <white>%d</white>", this.clan.getSquadCount()));
+                .lore(Translations.component("clans.menu.clan.button.details.lore.net-dominance").color(NamedTextColor.GRAY)
+                        .appendSpace().append(Component.text(netDominanceText, netDominance >= 0 ? NamedTextColor.GREEN : NamedTextColor.RED)))
+                .lore(Translations.component("clans.menu.clan.button.details.lore.online").color(NamedTextColor.GRAY)
+                        .appendSpace()
+                        .append(Component.text(String.format("%,d", this.clan.getOnlineMemberCount()), NamedTextColor.WHITE))
+                        .append(Component.text("/", NamedTextColor.WHITE))
+                        .append(Component.text(String.format("%,d", this.clan.getMembers().size()), NamedTextColor.WHITE)))
+                .lore(Translations.component("clans.menu.clan.button.details.lore.squad-size").color(NamedTextColor.GRAY)
+                        .appendSpace().append(Component.text(this.clan.getSquadCount(), NamedTextColor.WHITE)));
 
         if (this.viewerRelation == ClanRelation.ENEMY) {
             double dominance;
@@ -69,13 +76,15 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
                     }
                 }
 
-                builder.lore(UtilMessage.deserialize("<gray>Dominance: %s%.1f", dominance >= 0 ? "<green>" : "<red>", dominance));
+                final NamedTextColor domColor = dominance >= 0 ? NamedTextColor.GREEN : NamedTextColor.RED;
+                builder.lore(Translations.component("clans.menu.clan.button.details.lore.dominance").color(NamedTextColor.GRAY)
+                        .appendSpace().append(Component.text(String.format("%.1f", dominance), domColor)));
             }
 
         }
 
         if (this.admin) {
-            builder.action(ClickActions.ALL, Component.text("Edit Banner"));
+            builder.action(ClickActions.ALL, Translations.component("clans.menu.clan.button.details.action.edit-banner"));
         }
 
         return builder.build();

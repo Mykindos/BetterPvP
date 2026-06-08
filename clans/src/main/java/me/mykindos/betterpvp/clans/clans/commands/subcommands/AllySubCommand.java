@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -38,7 +40,7 @@ public class AllySubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Form an alliance with another clan";
+        return "clans.command.ally.description";
     }
 
     @Override
@@ -49,61 +51,63 @@ public class AllySubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You did not input a clan name");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.no-args");
             return;
         }
 
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         if(clan == null) {
-            UtilMessage.simpleMessage(player, "Clans", "An unexpected error occurred. Please report this to an admin.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.error");
             return;
         }
 
         if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Only the clan admins can form alliances.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.no-rank");
             return;
         }
 
         Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if (targetClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "The clan you want to ally with does not exist.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.not-found");
             return;
         }
 
         Clan targetClan = targetClanOptional.get();
         if (clan.equals(targetClan)) {
-            UtilMessage.message(player, "Clans", "You cannot ally with your own clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.self");
             return;
         }
 
         if (clan.isAllied(targetClan)) {
-            UtilMessage.message(player, "Clans", "You are already allied with this clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.already-allied");
             return;
         }
 
         if(clan.isEnemy(targetClan)) {
-            UtilMessage.message(player, "Clans", "You cannot ally with a clan you are at war with.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.at-war");
             return;
         }
 
         if (clan.getSquadCount() >= maxClanMembers) {
-            UtilMessage.message(player, "Clans", "Your clan is at the maximum squad size (<green>%s</green>), you cannot ally another clan.", clan.getSquadCount());
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.max-squad-size", Component.text(clan.getSquadCount(), NamedTextColor.GREEN));
             return;
         }
 
         int ownClanSize = clan.getMembers().size();
         if (ownClanSize + targetClan.getSquadCount() > maxClanMembers) {
-            UtilMessage.simpleMessage(player, "Clans",
-                    "<yellow>%s<gray> has too many members and allies (<green>%s</green>) to ally your clan (<green>%s</green>)",
-                    targetClan.getName(), targetClan.getSquadCount(), ownClanSize);
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.target-too-many-members",
+                    Component.text(targetClan.getName(), NamedTextColor.YELLOW),
+                    Component.text(targetClan.getSquadCount(), NamedTextColor.GREEN),
+                    Component.text(ownClanSize, NamedTextColor.GREEN));
             return;
         }
 
         int targetClanSize = targetClan.getMembers().size();
         if (targetClanSize + clan.getSquadCount() > maxClanMembers) {
-            UtilMessage.message(player, "Clans",
-                    "Your clan has too many members and allies (<green>%s</green>) to ally <yellow>%s</yellow> (<green>%s</green>)",
-                    clan.getSquadCount(), targetClan.getName(), targetClanSize);
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.ally.own-too-many-members",
+                    Component.text(clan.getSquadCount(), NamedTextColor.GREEN),
+                    Component.text(targetClan.getName(), NamedTextColor.YELLOW),
+                    Component.text(targetClanSize, NamedTextColor.GREEN));
             return;
         }
 

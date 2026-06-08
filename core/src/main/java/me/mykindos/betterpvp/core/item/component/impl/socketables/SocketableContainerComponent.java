@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
-import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 /**
  * Container component that holds multiple runes for an item.
@@ -156,11 +154,9 @@ public class SocketableContainerComponent implements ItemComponent, LoreComponen
                     .append(Component.text("✔", NamedTextColor.GREEN))
                     .append(Component.text("]", NamedTextColor.GRAY))
                     .appendSpace()
-                    .append(Component.text(socketable.getName(), NamedTextColor.GREEN, TextDecoration.UNDERLINED)));
+                    .append(socketable.getDisplayName().color(NamedTextColor.GREEN).decorate(TextDecoration.UNDERLINED)));
 
-            final Component description = miniMessage.deserialize("<gray>" + socketable.getDescription());
-            final List<Component> runeDescription = ComponentWrapper.wrapLine(description);
-            loreLines.addAll(runeDescription);
+            loreLines.addAll(socketable.getDescriptionLines());
 
             if (socketables.indexOf(socketable) < sockets - 1) {
                 loreLines.add(Component.empty());
@@ -173,7 +169,7 @@ public class SocketableContainerComponent implements ItemComponent, LoreComponen
                     .append(Component.text("✘", NamedTextColor.RED))
                     .append(Component.text("]", NamedTextColor.GRAY))
                     .appendSpace()
-                    .append(Component.text("Empty Rune Socket", NamedTextColor.GRAY)));
+                    .append(Translations.component("core.socketable.empty-socket").color(NamedTextColor.GRAY)));
         }
         return loreLines;
     }

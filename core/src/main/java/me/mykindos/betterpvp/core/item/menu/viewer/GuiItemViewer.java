@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -105,7 +106,7 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
                 .addIngredient('I', InfoTabButton.builder()
                         // todo: wiki entry
                         .wikiEntry("Test", url)
-                        .description(Component.text("Most items have a recipe they can be obtained with. The anvil, workbench, smelter and imbuement pedestal all make use of recipes listed here."))
+                        .descriptionLines(List.of(Translations.rawComponentLines("core.menu.items.info.description")))
                         .build()));
 
         this.recipeRegistries = recipeRegistries;
@@ -121,7 +122,7 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/exclamation_mark_icon"))
-                        .displayName(Component.text("Loading...", NamedTextColor.RED))
+                        .displayName(Translations.component("core.menu.button.loading.name").color(NamedTextColor.RED))
                         .build();
             }
             return Menu.INVISIBLE_BACKGROUND_ITEM;
@@ -266,7 +267,8 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
             return ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(Key.key("betterpvp", "menu/icon/regular/star_icon"))
-                    .displayName(Component.text("Custom Items Only", customOnly ? NamedTextColor.GREEN : NamedTextColor.RED))
+                    .displayName(Translations.component("core.menu.items.button.custom-only.name")
+                            .color(customOnly ? NamedTextColor.GREEN : NamedTextColor.RED))
                     .build();
         }
 

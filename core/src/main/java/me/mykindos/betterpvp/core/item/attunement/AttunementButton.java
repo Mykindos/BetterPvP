@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistribution;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
-import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -60,23 +60,14 @@ public class AttunementButton extends ControlItem<Gui> {
             final ItemView.ItemViewBuilder builder = ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(visible ? Key.key("betterpvp", "menu/gui/attunement/button_success") : Material.AIR.getKey())
-                    .displayName(Component.text("GO!", NamedTextColor.GREEN, TextDecoration.BOLD));
+                    .displayName(Translations.component("core.menu.attunement.button.go.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
 
             builder.lore(Component.empty());
             ItemRarity rarity = itemFactory.fromItemStack(Objects.requireNonNull(itemInventory.getItem(0))).orElseThrow().getRarity();
 
-            // description
-            final Component description = Component.empty()
-                    .append(Component.text("Attuning reveals your item's hidden purity. Higher", NamedTextColor.GRAY))
-                    .appendSpace()
-                    .append(Component.text("Purity", NamedTextColor.YELLOW))
-                    .appendSpace()
-                    .append(Component.text("grants stronger reforge ranges and increases your chance of gaining extra", NamedTextColor.GRAY))
-                    .appendSpace()
-                    .append(Component.text("Rune Sockets", NamedTextColor.LIGHT_PURPLE))
-                    .append(Component.text(".", NamedTextColor.GRAY));
-            for (Component component : ComponentWrapper.wrapLine(description, 40)) {
-                builder.lore(component);
+            // description - pre-split translatable lines
+            for (Component line : Translations.rawComponentLines("core.menu.attunement.button.description")) {
+                builder.lore(line);
             }
             builder.lore(Component.empty());
 
@@ -84,7 +75,7 @@ public class AttunementButton extends ControlItem<Gui> {
             final long cost = getAttunementCost(rarity);
             final String currency = cost == 1 ? "Gold Bar" : "Gold Bars";
             builder.lore(Component.empty()
-                    .append(Component.text("Cost:", NamedTextColor.GOLD, TextDecoration.BOLD))
+                    .append(Translations.component("core.menu.attunement.button.cost.label").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD))
                     .appendSpace()
                     .append(Component.text(cost + "x " + currency, NamedTextColor.YELLOW)));
 
@@ -123,26 +114,26 @@ public class AttunementButton extends ControlItem<Gui> {
         // Check if item slot has an item
         ItemStack itemStack = itemInventory.getItem(0);
         if (itemStack == null) {
-            errors.add(Component.text("No item to attune", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.attunement.error.no-item").color(NamedTextColor.RED));
             return errors; // Can't validate further
         }
 
         // Get ItemInstance
         Optional<ItemInstance> itemInstanceOpt = itemFactory.fromItemStack(itemStack);
         if (itemInstanceOpt.isEmpty()) {
-            errors.add(Component.text("Invalid item", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.attunement.error.invalid-item").color(NamedTextColor.RED));
             return errors;
         }
 
         ItemInstance itemInstance = itemInstanceOpt.get();
         if (itemInstance.getItemStack().getAmount() > 1) {
-            errors.add(Component.text("Cannot attune multiple items", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.attunement.error.multiple-items").color(NamedTextColor.RED));
         }
 
         // Check for PurityComponent
         Optional<PurityComponent> purityOpt = itemInstance.getComponent(PurityComponent.class);
         if (purityOpt.isEmpty()) {
-            errors.add(Component.text("Item has no purity", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.attunement.error.no-purity").color(NamedTextColor.RED));
             return errors;
         }
 
@@ -150,20 +141,20 @@ public class AttunementButton extends ControlItem<Gui> {
 
         // Check if already attuned
         if (purity.isAttuned()) {
-            errors.add(Component.text("Already attuned", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.attunement.error.already-attuned").color(NamedTextColor.RED));
         }
 
         // Check attunement stone
         ItemStack stoneStack = stoneInventory.getItem(0);
         if (stoneStack == null) {
-            errors.add(Component.text("Need attunement stone", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.attunement.error.need-stone").color(NamedTextColor.RED));
         }
 
         // Check gold
         ItemStack goldStack = goldInventory.getItem(0);
         long cost = getAttunementCost(itemInstance.getRarity());
         if (goldStack == null) {
-            errors.add(Component.text("Need " + cost + " gold", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.attunement.error.need-gold", Component.text(cost)).color(NamedTextColor.RED));
         } else {
             // Validate gold amount
             Optional<ItemInstance> goldInstanceOpt = itemFactory.fromItemStack(goldStack);
@@ -171,7 +162,7 @@ public class AttunementButton extends ControlItem<Gui> {
                 ItemInstance goldInstance = goldInstanceOpt.get();
 
                 if (!CurrencyUtils.canSubtract(goldInstance, cost)) {
-                    errors.add(Component.text("Need " + cost + " gold", NamedTextColor.RED));
+                    errors.add(Translations.component("core.menu.attunement.error.need-gold", Component.text(cost)).color(NamedTextColor.RED));
                 }
             }
         }

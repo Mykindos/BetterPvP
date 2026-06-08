@@ -91,11 +91,11 @@ public class AdminChatListener implements Listener {
                     final Player player = client.getGamer().getPlayer();
                     if (player != null) {
                         UtilMessage.message(player, component);
-                        UtilMessage.message(player, "Core", "If a staff member is on this server, they have received this message");
+                        UtilMessage.message(player, "core.prefix.core", "core.chat.adminchat.received");
                     }
                 }
 
-                clientManager.sendMessageToRank("", component, Rank.HELPER);
+                clientManager.sendMessageToRank(null, component, Rank.HELPER);
                 playSoundToStaff(Set.of(client.getUuid()));
             });
         }).exceptionally(ex -> {

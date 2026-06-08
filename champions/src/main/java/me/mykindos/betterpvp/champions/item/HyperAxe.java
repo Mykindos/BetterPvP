@@ -59,7 +59,7 @@ public class HyperAxe extends WeaponItem implements Reloadable {
                     CooldownManager cooldownManager,
                     EffectManager effectManager,
                     ItemFactory itemFactory) {
-        super(champions, "Hyper Axe", model, ItemRarity.EPIC);
+        super(champions, translatableName("champions.item.hyper-axe.name"), model, ItemRarity.EPIC);
         this.hyperRushAbility = new HyperRushAbility(champions, cooldownManager, effectManager);
         this.itemFactory = itemFactory;
         this.attackSpeed = 1; // 100%+ attack speed by default

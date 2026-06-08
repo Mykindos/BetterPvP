@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -19,9 +21,9 @@ public class ResetHotbarButton extends ControlItem<HotBarEditor> {
     @Override
     public ItemProvider getItemProvider(HotBarEditor gui) {
         return ItemView.builder()
-                .displayName(Component.text("Reset", NamedTextColor.GREEN))
+                .displayName(Translations.component("game.menu.hotbar.reset.name").color(NamedTextColor.GREEN))
                 .material(Material.TINTED_GLASS)
-                .action(ClickActions.ALL, Component.text("Reset Hotbar"))
+                .action(ClickActions.ALL, Translations.component("game.menu.hotbar.reset.action"))
                 .build();
     }
 

@@ -12,7 +12,9 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -47,13 +49,13 @@ public class SendSkillsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Send your skills as a formatted message in your chat channel";
+        return "champions.command.send-skills.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if(!cooldownManager.use(player, getName(), 15d, false, true)){
-            UtilMessage.message(player, "Skills", "You must wait some time between using this command again");
+            UtilMessage.message(player, "core.prefix.skills", "champions.command.sendskills.wait");
             return;
         }
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
@@ -63,7 +65,7 @@ public class SendSkillsCommand extends Command {
             Role role = roleManager.getRole(player);
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-                Component messageComponent = UtilMessage.deserialize("<white>My current %s build", role.getName()).decoration(TextDecoration.UNDERLINED, true)
+                Component messageComponent = Translations.component("champions.command.sendskills.my-build", role.getDisplayName()).color(NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true)
                         .hoverEvent(HoverEvent.showText(build.getBuildComponent()));
                 UtilServer.runTaskAsync(champions, () -> UtilServer.callEvent(new ChatSentEvent(player, client.getGamer().getChatChannel(), Component.empty(), messageComponent)));
             }

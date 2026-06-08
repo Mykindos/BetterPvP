@@ -30,7 +30,7 @@ public class ShopsCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Shops base command";
+        return "shops.command.shops.description";
     }
 
     @Override
@@ -73,8 +73,8 @@ public class ShopsCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Reload the shops plugin";
-        }
+        return "shops.command.reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -89,7 +89,7 @@ public class ShopsCommand extends Command implements IConsoleCommand {
             shopManager.loadShopItems();
             commandLoader.reload(shops.getClass().getPackageName());
 
-            UtilMessage.message(sender, "Clans", "Successfully reloaded shops");
+            UtilMessage.message(sender, "shops.prefix", "shops.command.reload.success");
         }
     }
 

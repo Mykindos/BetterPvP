@@ -5,7 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -22,11 +25,16 @@ public class DiscordCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View the discord invite link";
+        return "core.command.discord.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Discord", "<yellow><click:open_url:'%s'>Click Here</click></yellow> to join our discord!", discordInvite);
+        UtilMessage.message(player,
+                "core.prefix.command",
+                "core.command.discord.message",
+                Translations.component("core.command.discord.message.click")
+                        .color(NamedTextColor.YELLOW)
+                        .clickEvent(ClickEvent.openUrl(discordInvite)));
     }
 }

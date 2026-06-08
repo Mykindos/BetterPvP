@@ -24,7 +24,7 @@ public class CharcoalItem extends BaseItem {
 
     @Inject
     private CharcoalItem() {
-        super("Charcoal", model, ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.charcoal-item.name"), model, ItemGroup.MATERIAL, ItemRarity.COMMON);
         // Coal burns for 30 seconds (30,000ms) and can reach 800°C
         addBaseComponent(new FuelComponent(10_000L, 950.0f));
     }

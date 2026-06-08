@@ -71,18 +71,18 @@ public class ShopListener implements Listener {
 
         if (event.getCurrency() == ShopCurrency.COINS) {
             if (event.getGamer().getIntProperty(GamerProperty.BALANCE) < cost) {
-                event.cancel("You have insufficient funds to purchase this item.");
+                event.cancel("shops.purchase.insufficient-funds");
                 return;
             }
         } else if (event.getCurrency() == ShopCurrency.BARK) {
             if (!UtilInventory.contains(event.getPlayer(), "progression:tree_bark", cost)) {
-                event.cancel("You have insufficient funds to purchase this item.");
+                event.cancel("shops.purchase.insufficient-funds");
                 return;
             }
         }
 
         if (event.getPlayer().getInventory().firstEmpty() == -1) {
-            event.cancel("Your inventory is full.");
+            event.cancel("shops.purchase.inventory-full");
             return;
         }
 
@@ -91,7 +91,7 @@ public class ShopListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onFinalBuyItem(PlayerBuyItemEvent event) {
         if (event.isCancelled()) {
-            UtilMessage.message(event.getPlayer(), "Shop", event.getCancelReason());
+            UtilMessage.message(event.getPlayer(), "shops.prefix", event.getCancelReason());
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
             return;
         }
@@ -114,8 +114,11 @@ public class ShopListener implements Listener {
         final ItemInstance instanceResult = itemFactory.fromItemStack(boughtItem).orElseThrow();
         final ItemStack result = instanceResult.createItemStack();
         UtilItem.insert(event.getPlayer(), result);
-        UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
-                amount, shopItemSellService.getItemName(event.getShopItem()), NumberFormat.getInstance().format(cost), event.getCurrency().name().toLowerCase());
+        UtilMessage.message(event.getPlayer(), "shops.prefix", "shops.purchase.success",
+                Component.text(amount, NamedTextColor.YELLOW),
+                Component.text(shopItemSellService.getItemName(event.getShopItem()), NamedTextColor.YELLOW),
+                Component.text(NumberFormat.getInstance().format(cost), NamedTextColor.YELLOW),
+                Component.text(event.getCurrency().name().toLowerCase(), NamedTextColor.YELLOW));
         log.info("{} purchased {}x {} for {} {}",
                         event.getPlayer().getName(), amount, shopItemSellService.getItemName(event.getShopItem()), cost, event.getCurrency().name().toLowerCase())
                 .setAction("SHOP_BUY").addClientContext(event.getPlayer())
@@ -141,7 +144,7 @@ public class ShopListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onSellItem(PlayerSellItemEvent event) {
         if (event.getShopItem().getSellPrice() == 0) {
-            event.cancel("You cannot sell this item.");
+            event.cancel("shops.sell.cannot-sell");
             return;
         }
 
@@ -153,7 +156,7 @@ public class ShopListener implements Listener {
             }
         }
         if (count < event.getRequestedAmount()) {
-            event.cancel("You do not have enough of this item to sell.");
+            event.cancel("shops.sell.not_enough_items");
         }
     }
 
@@ -163,7 +166,7 @@ public class ShopListener implements Listener {
         ShopItem shopItem = (ShopItem) event.getShopItem();
 
         if (event.isCancelled()) {
-            UtilMessage.message(player, "Shop", event.getCancelReason());
+            UtilMessage.message(player, "shops.prefix", event.getCancelReason());
             player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
             // For staged sells the items live in a VirtualInventory; return them so they are
             // not silently discarded when the menu closes.
@@ -203,7 +206,7 @@ public class ShopListener implements Listener {
 
         if (remaining > 0) {
             // Items were present at validation time but are gone now; abort without side effects.
-            UtilMessage.message(player, "Shop", "You do not have enough of this item to sell.");
+            UtilMessage.message(player, "shops.prefix", "shops.sell.not_enough_items");
             return;
         }
 
@@ -219,8 +222,11 @@ public class ShopListener implements Listener {
                     dynamicShopItem.getCurrentStock() + totalSold));
         }
 
-        UtilMessage.simpleMessage(player, "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
-                totalSold, itemName, UtilFormat.formatNumber(totalEarned), event.getCurrency().name().toLowerCase());
+        UtilMessage.message(player, "shops.prefix", "shops.sell.success",
+                Component.text(totalSold, NamedTextColor.YELLOW),
+                Component.text(itemName, NamedTextColor.YELLOW),
+                Component.text(UtilFormat.formatNumber(totalEarned), NamedTextColor.YELLOW),
+                Component.text(event.getCurrency().name().toLowerCase(), NamedTextColor.YELLOW));
 
         log.info("{} sold {}x {} for {} {}", player.getName(), totalSold, itemName, totalEarned, event.getCurrency().name().toLowerCase())
                 .setAction("SHOP_SELL").addClientContext(player)
@@ -258,7 +264,7 @@ public class ShopListener implements Listener {
             });
         });
 
-        UtilMessage.simpleBroadcast("Shop", "Dynamic prices have been updated!",
+        UtilMessage.broadcast("shops.prefix", "shops.dynamic_prices.updated",
                 Component.text("This means that buy / sell prices on farming items have been adjusted to reflect the current market.", NamedTextColor.GRAY));
     }
 

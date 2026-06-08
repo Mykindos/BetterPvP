@@ -14,6 +14,6 @@ public class MagneticShard extends BaseItem {
 
     @Inject
     private MagneticShard() {
-        super("Magnetic Shard", Item.model("magnetic_shard", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.magnetic-shard.name"), Item.model("magnetic_shard", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

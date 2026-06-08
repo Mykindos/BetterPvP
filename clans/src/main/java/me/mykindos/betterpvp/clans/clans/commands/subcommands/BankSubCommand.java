@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @CustomLog
@@ -35,7 +37,7 @@ public class BankSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "View your clans bank";
+        return "clans.command.bank.description";
     }
 
     @Override
@@ -49,11 +51,11 @@ public class BankSubCommand extends ClanSubCommand {
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
         if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.MEMBER)) {
-            UtilMessage.message(player, "Clans", "Recruits cannot view the clan bank");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.recruits-no-access");
             return;
         }
 
-       UtilMessage.simpleMessage(player, "Clans", "<yellow>Bank balance: <green>$%s", UtilFormat.formatNumber(clan.getBalance()));
+       UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.balance", Component.text("$" + UtilFormat.formatNumber(clan.getBalance()), NamedTextColor.GREEN));
 
     }
 
@@ -83,8 +85,8 @@ public class BankSubCommand extends ClanSubCommand {
 
         @Override
         public String getDescription() {
-            return "Withdraw money from your clans bank";
-        }
+        return "clans.command.bank-withdraw.description";
+    }
 
         @Override
         public String getUsage() {
@@ -95,14 +97,14 @@ public class BankSubCommand extends ClanSubCommand {
         public void execute(Player player, Client client, String... args) {
 
             if(args.length != 2) {
-                UtilMessage.message(player, "Clans", "Correct usage /clan bank withdraw <amount>");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.withdraw.usage");
                 return;
             }
 
             Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
             if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-                UtilMessage.message(player, "Clans", "Only clan admins can withdraw money from the clan bank");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.withdraw.no-rank");
                 return;
             }
 
@@ -110,12 +112,12 @@ public class BankSubCommand extends ClanSubCommand {
             try {
                 int amountToWithdraw = Integer.parseInt(args[1]);
                 if(clan.getBalance() < amountToWithdraw) {
-                    UtilMessage.message(player, "Clans", "You cannot withdraw more money than your clans bank has available.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.withdraw.insufficient-funds");
                     return;
                 }
 
                 if(amountToWithdraw <= 0) {
-                    UtilMessage.message(player, "Clans", "You must specify a value greater than 0.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.withdraw.invalid-amount");
                     return;
                 }
 
@@ -123,10 +125,17 @@ public class BankSubCommand extends ClanSubCommand {
                 clan.saveProperty(ClanProperty.BALANCE, clan.getBalance() - amountToWithdraw);
                 gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() + amountToWithdraw);
 
-                clan.messageClan("<yellow>" + player.getName() + " <gray>withdrew <green>$" + amountToWithdraw + " <gray>from the clan bank.", null, true);
+                clan.getMembers().forEach(member -> {
+                    Player clanPlayer = org.bukkit.Bukkit.getPlayer(member.getUuid());
+                    if (clanPlayer != null) {
+                        UtilMessage.message(clanPlayer, CLANS_PREFIX, "clans.command.clan.bank.withdraw.success",
+                                Component.text(player.getName(), NamedTextColor.YELLOW),
+                                Component.text("$" + amountToWithdraw, NamedTextColor.GREEN));
+                    }
+                });
                 log.info("{} withdrew ${} from clan {}", player.getName(), amountToWithdraw, clan.getId()).submit();
             }catch(NumberFormatException ex) {
-                UtilMessage.message(player, "Clans", "Value provided is not a valid number.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.withdraw.not-number");
             }
 
         }
@@ -159,8 +168,8 @@ public class BankSubCommand extends ClanSubCommand {
 
         @Override
         public String getDescription() {
-            return "Deposit money into your clans bank";
-        }
+        return "clans.command.bank-deposit.description";
+    }
 
         @Override
         public String getUsage() {
@@ -171,7 +180,7 @@ public class BankSubCommand extends ClanSubCommand {
         public void execute(Player player, Client client, String... args) {
 
             if(args.length != 2) {
-                UtilMessage.message(player, "Clans", "Correct usage /clan bank deposit <amount>");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.deposit.usage");
                 return;
             }
 
@@ -180,22 +189,29 @@ public class BankSubCommand extends ClanSubCommand {
             try {
                 int amountToWithdraw = Integer.parseInt(args[1]);
                 if(gamer.getBalance() < amountToWithdraw) {
-                    UtilMessage.message(player, "Clans", "You cannot deposit more money than you have available.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.deposit.insufficient-funds");
                     return;
                 }
 
                 if(amountToWithdraw <= 0) {
-                    UtilMessage.message(player, "Clans", "You must specify a value greater than 0.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.deposit.invalid-amount");
                     return;
                 }
 
                 clan.saveProperty(ClanProperty.BALANCE, clan.getBalance() + amountToWithdraw);
                 gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - amountToWithdraw);
 
-                clan.messageClan("<yellow>" + player.getName() + " <gray>deposited <green>$" + amountToWithdraw + " <gray>into the clan bank.", null, true);
+                clan.getMembers().forEach(member -> {
+                    Player clanPlayer = org.bukkit.Bukkit.getPlayer(member.getUuid());
+                    if (clanPlayer != null) {
+                        UtilMessage.message(clanPlayer, CLANS_PREFIX, "clans.command.clan.bank.deposit.success",
+                                Component.text(player.getName(), NamedTextColor.YELLOW),
+                                Component.text("$" + amountToWithdraw, NamedTextColor.GREEN));
+                    }
+                });
                 log.info("{} deposited ${} into clan {}", player.getName(), amountToWithdraw, clan.getId()).submit();
             }catch(NumberFormatException ex) {
-                UtilMessage.message(player, "Clans", "Value provided is not a valid number.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.bank.deposit.not-number");
             }
 
         }

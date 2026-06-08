@@ -11,6 +11,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -27,7 +29,7 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
 
     @Override
     public String getDescription() {
-        return "Base woodcutting experience command";
+        return "progression.command.woodcutting-experience.description";
     }
 
     @Override
@@ -61,8 +63,8 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
 
         @Override
         public String getDescription() {
-            return "set a players woodcutting experience";
-        }
+        return "progression.command.set-woodcutting-experience.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -72,13 +74,14 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
         @Override
         public void execute(CommandSender sender, String[] args) {
             if (args.length < 2) {
-                UtilMessage.message(sender, "Woodcutting", "Usage: /woodcuttingexp set <player> <experience>");
+                UtilMessage.message(sender, "core.prefix.woodcutting", "progression.command.woodcuttingexp.usage");
                 return;
             }
 
             clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isEmpty()) {
-                    UtilMessage.message(sender, "Woodcutting", "Cannot find a player with the name <yellow>%s</yellow>", args[0]);
+                    UtilMessage.message(sender, "core.prefix.woodcutting", "progression.command.exp.player-not-found",
+                            Component.text(args[0], NamedTextColor.YELLOW));
                     return;
                 }
                 Client target = targetOptional.get();
@@ -90,7 +93,8 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
                         throw new NumberFormatException();
                     }
                 } catch (NumberFormatException ignored) {
-                    UtilMessage.message(sender, "Woodcutting", "<green>%s</green> is an invalid amount of experience", args[1]);
+                    UtilMessage.message(sender, "core.prefix.woodcutting", "progression.command.exp.invalid-amount",
+                            Component.text(args[1], NamedTextColor.GREEN));
                     return;
                 }
                 ProfessionData professionData = woodcuttingHandler.getProfessionData(target.getUniqueId());
@@ -99,8 +103,10 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
 
                 professionProfileManager.getRepository().saveExperience(target.getUniqueId(), professionData.getProfession(), professionData.getExperience());
 
-                UtilMessage.message(sender, "Woodcutting", "Set <yellow>%s</yellow>'s woodcutting experience to <green>%s</green> (was <white>%s</white>)",
-                        target.getName(), newExperience, oldExperience);
+                UtilMessage.message(sender, "core.prefix.woodcutting", "progression.command.woodcuttingexp.set",
+                        Component.text(target.getName(), NamedTextColor.YELLOW),
+                        Component.text(newExperience, NamedTextColor.GREEN),
+                        Component.text(oldExperience, NamedTextColor.WHITE));
             });
         }
 

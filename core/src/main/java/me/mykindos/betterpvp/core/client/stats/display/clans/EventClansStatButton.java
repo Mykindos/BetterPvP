@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -28,7 +29,7 @@ public class EventClansStatButton extends ControlItem<IAbstractClansStatMenu> {
                 .material(Material.BEACON)
                 .lore(getEventStats())
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .displayName(Component.text("Events Stats"))
+                .displayName(Translations.component("core.menu.stats.clans.button.events.name"))
                 .build();
     }
 

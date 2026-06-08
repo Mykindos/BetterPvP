@@ -12,6 +12,7 @@ import io.papermc.paper.registry.data.dialog.type.DialogType;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -42,18 +43,19 @@ public class NameSearchButton extends AbstractItem {
             return ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(Key.key("betterpvp", "menu/icon/regular/magnifying_glass_icon"))
-                    .displayName(Component.text("Search", NamedTextColor.GRAY))
-                    .action(ClickActions.LEFT, Component.text("Search"))
+                    .displayName(Translations.component("core.menu.button.search.name").color(NamedTextColor.GRAY))
+                    .action(ClickActions.LEFT, Translations.component("core.menu.button.search.name"))
                     .build();
         }
 
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/magnifying_glass_icon"))
-                .displayName(Component.text("Search: ", NamedTextColor.GRAY).
-                        append(Component.text(name, NamedTextColor.GOLD)))
-                .action(ClickActions.LEFT, Component.text("Change Search"))
-                .action(ClickActions.RIGHT, Component.text("Clear Search"))
+                .displayName(Translations.component("core.menu.button.search.with").color(NamedTextColor.GRAY)
+                        .append(Component.space())
+                        .append(Component.text(name, NamedTextColor.GOLD)))
+                .action(ClickActions.LEFT, Translations.component("core.menu.button.search.change"))
+                .action(ClickActions.RIGHT, Translations.component("core.menu.button.search.clear"))
                 .build();
     }
 
@@ -70,19 +72,19 @@ public class NameSearchButton extends AbstractItem {
 
     private void createDialog(RegistryBuilderFactory<@NotNull Dialog, ? extends DialogRegistryEntry.Builder> factory) {
         final DialogRegistryEntry.Builder builder = factory.empty();
-        final TextDialogInput input = DialogInput.text("search", Component.text("Search an item by name")).maxLength(20).build();
-        builder.base(DialogBase.builder(Component.text("Search"))
+        final TextDialogInput input = DialogInput.text("search", Translations.component("core.menu.dialog.search.prompt")).maxLength(20).build();
+        builder.base(DialogBase.builder(Translations.component("core.menu.button.search.name"))
                 .inputs(List.of(input))
                 .build());
 
         builder.type(DialogType.confirmation(
-                ActionButton.builder(Component.text("Search")).action(DialogAction.customClick((response, audience) -> {
+                ActionButton.builder(Translations.component("core.menu.button.search.name")).action(DialogAction.customClick((response, audience) -> {
                     final String text = response.getText("search");
                     String value = (text == null || text.isBlank()) ? null : text.toLowerCase().replace(" ", "_");
                     setter.accept(value);
                     notifyWindows();
                 }, ClickCallback.Options.builder().build())).build(),
-                ActionButton.builder(Component.text("Cancel")).build()
+                ActionButton.builder(Translations.component("core.menu.button.cancel.name")).build()
         ));
     }
 }

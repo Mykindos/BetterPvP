@@ -114,6 +114,11 @@ public abstract class CooldownInteraction extends AbstractInteraction {
 
             final double cooldown = getCooldown(actor);
             if (cooldown > 0) {
+                // Register the translatable ability name so the cooldown (action bar + chat) localizes it
+                // instead of showing the raw internal cooldown name.
+                if (this instanceof DisplayedInteraction displayed) {
+                    cooldownManager.registerDisplayName(this.cooldownName, displayed.getDisplayName());
+                }
                 boolean usedSiblingPath = false;
                 if (this instanceof DisplayedInteraction && itemInstance != null) {
                     final Optional<InteractionContainerComponent> containerOpt =

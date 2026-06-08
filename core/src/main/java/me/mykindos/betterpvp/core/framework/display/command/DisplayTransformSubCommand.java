@@ -23,11 +23,11 @@ public class DisplayTransformSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Summon a display entity";
+        return "core.command.display-transform.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.simpleMessage(player, "Display", "Usage: /display transform <action> [options]");
+        UtilMessage.message(player, "core.prefix.display", "core.display.transform.usage");
     }
 }

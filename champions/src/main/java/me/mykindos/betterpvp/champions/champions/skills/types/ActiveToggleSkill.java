@@ -6,8 +6,11 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -51,9 +54,9 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     protected void cancel(Player player, String reason) {
         active.remove(player.getUniqueId());
         if (reason == null) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off", getName());
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.toggle.off", getDisplayName(), Translations.component("champions.skill.toggle.off-label").color(NamedTextColor.RED));
         } else {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "%s: <red>Off <reset>(<alt2>%s</alt2>)", getName(), reason);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.toggle.off-reason", getDisplayName(), Translations.component("champions.skill.toggle.off-label").color(NamedTextColor.RED), Component.text(reason, NamedTextColor.YELLOW));
         }
     }
 

@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -42,7 +45,7 @@ public class MessageCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Send a message to another player";
+        return "core.command.message.description";
     }
 
     @Override
@@ -50,35 +53,36 @@ public class MessageCommand extends Command {
         if (args.length > 1) {
 
             if (client.hasPunishment(PunishmentTypes.MUTE)) {
-                UtilMessage.message(player, "Command", "You may not message other players while muted");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.message.muted");
                 return;
             }
 
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                UtilMessage.message(player, "Command", "Player not found.");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.message.player_not_found");
                 return;
             }
 
             if(target.isOp() && target.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                UtilMessage.message(player, "Command", "Player not found.");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.message.player_not_found");
                 return;
             }
 
             if (player.equals(target)) {
-                UtilMessage.message(player, "Command", "You cannot message yourself.");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.message.self");
                 return;
             }
 
             Client targetClient = clientManager.search().online(target);
             // check if client has target igored
             if (ignoreService.isClientIgnored(client, targetClient)) {
-                UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.message.ignored",
+                        Component.text(target.getName(), NamedTextColor.YELLOW));
                 return;
             }
 
             if (!player.isListed(target) && !client.hasRank(Rank.ADMIN)) {
-                UtilMessage.message(player, "Command", "Player not found.");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.message.player_not_found");
                 return;
             }
 
@@ -89,14 +93,18 @@ public class MessageCommand extends Command {
                 log.info("{} messaged {}: {}", player.getName(), target.getName(), message).submit();
 
                 // We still pretend the message was sent, regardless of ignore status
-                UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + filteredMessage);
+                final Component you = Translations.component("core.command.message.you");
+                UtilMessage.message(player, privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
+                        you, Component.text(target.getName()), filteredMessage));
                 if (!ignoreService.isClientIgnored(targetClient, client)) {
-                    UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + filteredMessage);
+                    UtilMessage.message(target, privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
+                            Component.text(player.getName()), you, filteredMessage));
 
                     for (Player online : Bukkit.getOnlinePlayers()) {
                         if (online.equals(target) || online.equals(player)) continue;
                         if (clientManager.search().online(online).isAdministrating()) {
-                            UtilMessage.simpleMessage(online, "<dark_green>[<green>" + player.getName() + "<dark_green> -> <green>" + target.getName() + "<dark_green>] <gray>" + filteredMessage);
+                            UtilMessage.message(online, privateMessage(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN,
+                                    Component.text(player.getName()), Component.text(target.getName()), filteredMessage));
                         }
                     }
 
@@ -104,15 +112,27 @@ public class MessageCommand extends Command {
                 }
 
             });
-
-
         } else {
-            UtilMessage.simpleMessage(player, "Command", "Usage: /message <player> <message>");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.message.usage");
         }
     }
 
     @Override
     public String getArgumentType(int index) {
         return index == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+    }
+
+    /**
+     * Builds a private-message display line in the form {@code [from -> to] message}, where the
+     * brackets and arrow use {@code bracketColor} and the names use {@code nameColor}.
+     */
+    static Component privateMessage(NamedTextColor bracketColor, NamedTextColor nameColor,
+                                    Component from, Component to, String message) {
+        return Component.text("[", bracketColor)
+                .append(from.colorIfAbsent(nameColor))
+                .append(Component.text(" -> ", bracketColor))
+                .append(to.colorIfAbsent(nameColor))
+                .append(Component.text("] ", bracketColor))
+                .append(Component.text(message, NamedTextColor.GRAY));
     }
 }

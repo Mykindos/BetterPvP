@@ -23,17 +23,17 @@ public class DisplayDeselectSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Deselect a display entity";
+        return "core.command.display-deselect.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         final boolean deselected = displayEditorManager.selectDisplay(player, null);
         if (!deselected) {
-            UtilMessage.simpleMessage(player, "Display", "You are not selecting a display.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.not_selecting");
             return;
         }
-        UtilMessage.simpleMessage(player, "Display", "Deselected display entity.");
+        UtilMessage.message(player, "core.prefix.display", "core.display.deselected");
     }
 
 }

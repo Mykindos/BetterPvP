@@ -15,9 +15,13 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,14 +51,19 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Your axe attacks deal " + getValueString(this::getPercentageOfDamage, level, 100, "%", 0) + " of your damage to",
-                "all enemies within " + getValueString(this::getDistance, level) + " blocks of your target enemy.",
-                "",
-                "Max Enemies Hit: " + getValueString(this::getMaxEnemiesHit, level, 0),
-        };
+    public Component[] getDescription(int level) {
+        Component percentage = getValueComponent(this::getPercentageOfDamage, level, 100, 0, "%");
+        Component distance = getValueComponent(this::getDistance, level);
+        Component enemies = Component.text(
+                String.valueOf(getMaxEnemiesHit(level)),
+                NamedTextColor.YELLOW
+        );
+        return Translations.componentLines(
+                "champions.skill.knight.cleave.description",
+                percentage,
+                distance,
+                enemies
+        );
     }
 
     public double getPercentageOfDamage(int level) {

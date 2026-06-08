@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.core.effects.types.negative;
 
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.potion.PotionEffectType;
 
 public class SlownessEffect extends VanillaEffectType {
@@ -28,6 +31,13 @@ public class SlownessEffect extends VanillaEffectType {
     @Override
     public String getGenericDescription() {
         return "<white>" + getName() + "</white> reduces player movement by <green>15</green>% per level and prevents the use of movement abilities";
+    }
+
+    @Override
+    public Component getGenericDescriptionComponent() {
+        return Translations.component("core.effect.slowness.generic",
+                Component.text(getName(), NamedTextColor.WHITE),
+                Component.text("15", NamedTextColor.GREEN));
     }
 }
 

@@ -33,19 +33,19 @@ public class SpectateCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Spectate the next game";
+        return "game.command.spectate.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         final boolean inGame = serverController.getCurrentState() == GameState.IN_GAME || serverController.getCurrentState() == GameState.ENDING;
         if (inGame && !serverController.getCurrentGame().getConfiguration().getAllowLateJoinsAttribute().getValue()) {
-            UtilMessage.simpleMessage(player, "Game", "You cannot toggle spectator while a game is in progress.");
+            UtilMessage.message(player, "core.prefix.game", "game.command.spectate.in-progress");
             return;
         }
 
         if (playerController.getParticipant(player).isAlive() && client.getGamer().isInCombat()) {
-            UtilMessage.simpleMessage(player, "Game", "You may not toggle spectator while in combat");
+            UtilMessage.message(player, "core.prefix.game", "game.command.spectate.in-combat");
             return;
         }
 
@@ -63,10 +63,10 @@ public class SpectateCommand extends Command {
         playerController.setSpectating(player, participant, toSpectate, shouldPersist);
 
         if (participant.isSpectateNextGame()) {
-            UtilMessage.simpleMessage(player, "Game", "You will now spectate the next game.");
+            UtilMessage.message(player, "core.prefix.game", "game.command.spectate.now");
             new SoundEffect(Sound.UI_BUTTON_CLICK, 1.0f, 1.0f).play(player);
         } else if (!inGame || !participant.isAlive()) {
-            UtilMessage.simpleMessage(player, "Game", "You will no longer spectate the next game.");
+            UtilMessage.message(player, "core.prefix.game", "game.command.spectate.no-longer");
             new SoundEffect(Sound.UI_BUTTON_CLICK, 0.75f, 1.0f).play(player);
         }
     }

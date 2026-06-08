@@ -14,6 +14,6 @@ public class MagicSeal extends BaseItem {
 
     @Inject
     private MagicSeal() {
-        super("Magic Seal", Item.model("magic_seal"), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.magic-seal.name"), Item.model("magic_seal"), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 }

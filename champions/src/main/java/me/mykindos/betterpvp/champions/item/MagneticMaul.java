@@ -58,7 +58,7 @@ public class MagneticMaul extends WeaponItem implements Reloadable {
     private MagneticMaul(Champions champions,
                          MagnetismAbility magnetismAbility,
                          ItemFactory itemFactory) {
-        super(champions, "Magnetic Maul", model, ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
+        super(champions, translatableName("champions.item.magnetic-maul.name"), model, ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
         this.magnetismAbility = magnetismAbility;
         this.reverseKnockbackAbility = new ReverseKnockbackAbility(champions, itemFactory, this);
 

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelec
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ToggleShowPassiveButton;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -50,6 +51,6 @@ public class ClassSelectionMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Pick a Class");
+        return Translations.component("champions.menu.class-selection.title");
     }
 }

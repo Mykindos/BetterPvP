@@ -25,6 +25,8 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillE
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -32,6 +34,7 @@ import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -71,17 +74,16 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "Hold right click with a Sword to channel",
-                "",
-                "Charge a hook at " + getValueString(this::getChargePerSecond, level, 100, "%", 0) + " per second",
-                "that latches onto enemies,",
-                "pulling them towards you" ,
-                "and dealing " + getValueString(this::getDamage, level) + " damage.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component charge = getValueComponent(this::getChargePerSecond, level, 100, 0, "%");
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.brute.flesh-hook.description",
+                charge,
+                damage,
+                cooldown
+        );
     }
 
     @Override
@@ -164,7 +166,7 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
     }
 
     public boolean use(Player player, ChargeData data, int level) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
         new SoundEffect(Sound.ENTITY_SPLASH_POTION_THROW, 2F, 0.8F).play(player.getLocation());
 
         final Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
@@ -215,8 +217,8 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
         UtilDamage.doDamage(ev);
 
         // Cues
-        UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + " " + level + "</alt>.");
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + hit.getName() + "</alt2> with <alt>" + getName() + " " + level + "</alt>.");
+        UtilMessage.message(hit, getClassType().getDisplayName(), "champions.skill.brute.flesh-hook.pulled-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(hit.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 
         throwableItem.getItem().remove();

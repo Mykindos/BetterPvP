@@ -16,7 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -70,16 +74,11 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Players hit with your arrows will receive",
-                "a spore charge for " + getValueString(this::getSporeRemovalTime, level) + " seconds",
-                "",
-                "Each time you hit someone with a spore",
-                "charge, you will heal " + getValueString(this::getHealing, level) + " health.",
-                "",
-                "Maximum spore charges: " + getValueString(this::getMaxSporeCharges, level),
-        };
+    public Component[] getDescription(int level) {
+        Component sporeRemovalTime = getValueComponent(this::getSporeRemovalTime, level);
+        Component healing = getValueComponent(this::getHealing, level);
+        Component maxSporeCharges = getValueComponent(this::getMaxSporeCharges, level, 0);
+        return Translations.componentLines("champions.skill.ranger.vitality-spores.description", sporeRemovalTime, healing, maxSporeCharges);
     }
 
     public double getSporeRemovalTime(int level) {

@@ -21,7 +21,7 @@ public class CannonballItem extends BaseItem {
 
     @Inject
     private CannonballItem(Core core, CannonManager cannonManager, CannonballReloadAbility cannonballReloadAbility) {
-        super("Cannonball", Item.model("cannonball", 16), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.cannonball.name"), Item.model("cannonball", 16), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
         cannonballReloadAbility.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.RIGHT_CLICK, cannonballReloadAbility)

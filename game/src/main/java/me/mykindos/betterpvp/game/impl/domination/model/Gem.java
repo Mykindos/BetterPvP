@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -177,9 +178,9 @@ public class Gem implements Powerup {
 
         // Chat Cue
         UtilMessage.message(player, Component.newline()
-                .append(Component.text("You scored  ", NamedTextColor.GREEN, TextDecoration.BOLD).font(SMALL_CAPS))
-                .append(Component.text("+" + score, NamedTextColor.DARK_GREEN, TextDecoration.BOLD))
-                .append(Component.text("  points for your team!", NamedTextColor.GREEN, TextDecoration.BOLD).font(SMALL_CAPS))
+                .append(Translations.component("game.domination.gem.scored",
+                                Component.text("+" + score, NamedTextColor.DARK_GREEN, TextDecoration.BOLD))
+                        .color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).font(SMALL_CAPS))
                 .appendNewline());
 
         // Title Cue

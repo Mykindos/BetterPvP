@@ -13,6 +13,10 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,14 +51,16 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "For every hit you took since last damaging",
-                "an enemy, your damage will increase by " + getValueString(this::getDamage, level) + " damage",
-                "up to a maxiumum of " + getValueString(this::getMaxDamage, level) + " extra damage",
-                "",
-                "Extra damage will reset after "+ getValueString(this::getExpirationTime, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component maxDamage = getValueComponent(this::getMaxDamage, level);
+        Component expiration = getValueComponent(this::getExpirationTime, level);
+        return Translations.componentLines(
+                "champions.skill.knight.vengeance.description",
+                damage,
+                maxDamage,
+                expiration
+        );
     }
 
     public double getDamage(int level) {

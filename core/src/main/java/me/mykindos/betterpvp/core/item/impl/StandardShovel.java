@@ -22,7 +22,7 @@ public class StandardShovel extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 250;
 
     public StandardShovel() {
-        super("Standard Shovel", ItemStack.of(Material.IRON_SHOVEL), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.standard-shovel.name"), ItemStack.of(Material.IRON_SHOVEL), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

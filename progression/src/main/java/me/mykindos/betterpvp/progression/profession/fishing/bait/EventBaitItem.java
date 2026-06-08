@@ -29,7 +29,7 @@ public class EventBaitItem extends BaitItem {
      */
     @Inject
     public EventBaitItem(Progression progression, EventBaitAbility ability) {
-        super(progression, "Event Bait", new ItemStack(Material.LIGHT_BLUE_GLAZED_TERRACOTTA), ItemRarity.RARE, ability);
+        super(progression, translatableName("progression.item.event-bait.name"), new ItemStack(Material.LIGHT_BLUE_GLAZED_TERRACOTTA), ItemRarity.RARE, ability);
         addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT)));
     }
 } 

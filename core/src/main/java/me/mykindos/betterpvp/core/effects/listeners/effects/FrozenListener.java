@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -67,7 +69,7 @@ public class FrozenListener implements Listener {
             event.setCancelled(true);
             event.setUseInteractedBlock(Event.Result.DENY);
             event.setUseItemInHand(Event.Result.DENY);
-            UtilMessage.message(event.getPlayer(), "Frozen", "You cannot do this while frozen");
+            UtilMessage.message(event.getPlayer(), "core.prefix.frozen", "core.effect.frozen.cannot_interact");
         }
     }
 
@@ -84,14 +86,15 @@ public class FrozenListener implements Listener {
     public void entDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof LivingEntity damagee) {
             if (effectManager.hasEffect(damagee, EffectTypes.FROZEN)) {
-                UtilMessage.message(event.getDamager(), "Frozen", "<yellow>%s</yellow> is frozen and cannot receive damage!", damagee.getName());
+                UtilMessage.message(event.getDamager(), "core.prefix.frozen", "core.effect.frozen.target_immune",
+                        Component.text(damagee.getName(), NamedTextColor.YELLOW));
                 event.setCancelled(true);
             }
         }
 
         if (event.getDamager() instanceof LivingEntity damager) {
             if (effectManager.hasEffect(damager, EffectTypes.FROZEN)) {
-                UtilMessage.message(damager, "Frozen", "You cannot damage anything while you are Frozen!");
+                UtilMessage.message(damager, "core.prefix.frozen", "core.effect.frozen.cannot_damage");
                 event.setCancelled(true);
             }
         }
@@ -101,14 +104,15 @@ public class FrozenListener implements Listener {
     public void onCanHurt(EntityCanHurtEntityEvent event) {
         if (event.getDamagee() instanceof LivingEntity damagee) {
             if (effectManager.hasEffect(damagee, EffectTypes.FROZEN)) {
-                UtilMessage.message(event.getDamager(), "Frozen", "<yellow>%s</yellow> is frozen and cannot receive damage!", damagee.getName());
+                UtilMessage.message(event.getDamager(), "core.prefix.frozen", "core.effect.frozen.target_immune",
+                        Component.text(damagee.getName(), NamedTextColor.YELLOW));
                 event.setResult(Event.Result.DENY);
             }
         }
 
         if (event.getDamager() instanceof LivingEntity damager) {
             if (effectManager.hasEffect(damager, EffectTypes.FROZEN)) {
-                UtilMessage.message(damager, "Frozen", "You cannot damage anything while you are Frozen!");
+                UtilMessage.message(damager, "core.prefix.frozen", "core.effect.frozen.cannot_damage");
                 event.setResult(Event.Result.DENY);
             }
         }

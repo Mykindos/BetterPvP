@@ -23,7 +23,7 @@ public class RusticPickaxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 59;
 
     public RusticPickaxe() {
-        super("Rustic Pickaxe", ItemStack.of(Material.WOODEN_PICKAXE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.rustic-pickaxe.name"), ItemStack.of(Material.WOODEN_PICKAXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

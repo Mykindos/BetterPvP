@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.locale.TranslationService;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.ExperienceTag;
@@ -12,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.model.tag.ResistanceTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.TimeTag;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -25,6 +28,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
+import java.util.function.Function;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilMessage {
@@ -52,7 +59,6 @@ public class UtilMessage {
             .color(NamedTextColor.DARK_GRAY)
             .decorate(TextDecoration.STRIKETHROUGH);
 
-
     public static final Component StudioPrefix = Component.empty().append(Component.text("BPvP", NamedTextColor.RED));
 
     /**
@@ -62,7 +68,11 @@ public class UtilMessage {
      * @param prefix  The message
      * @param message Message to send to a player
      */
-    public static void message(Audience sender, String prefix, Component message) {
+    public static void message(Audience sender, @Nullable String prefix, Component message) {
+        message(sender, translated(prefix), message);
+    }
+
+    public static void message(Audience sender, @Nullable ComponentLike prefix, Component message) {
         sender.sendMessage(getPrefix(prefix).append(normalize(message)));
     }
 
@@ -75,7 +85,11 @@ public class UtilMessage {
      * @param message Message to send to the CommandSender
      */
     public static void message(Audience sender, String prefix, String message) {
-        message(sender, prefix, miniMessage.deserialize(message, tagResolver));
+        message(sender, translated(prefix), translated(message));
+    }
+
+    public static void message(Audience sender, ComponentLike prefix, String message) {
+        sender.sendMessage(getPrefix(prefix).append(resolveStringMessage(message)));
     }
 
     /**
@@ -89,6 +103,14 @@ public class UtilMessage {
      */
     public static void message(Audience sender, String prefix, String message, Object... args) {
         message(sender, prefix, String.format(message, args));
+    }
+
+    public static void message(Audience sender, String prefixKey, String key, ComponentLike... args) {
+        message(sender, translated(prefixKey), translated(key, args));
+    }
+
+    public static void message(Audience sender, Component prefix, String key, ComponentLike... args) {
+        message(sender, prefix, translated(key, args));
     }
 
     /**
@@ -128,6 +150,10 @@ public class UtilMessage {
         player.sendMessage(message);
     }
 
+    public static void message(Audience player, String key, ComponentLike... args) {
+        message(player, translated(key, args));
+    }
+
 
     /**
      * Sends a message to a player, adds the required rank at the end of the message
@@ -144,99 +170,6 @@ public class UtilMessage {
         player.sendMessage(Component.join(JoinConfiguration.separator(Component.space()), prefixCmpt, messageCmpt, rankCmpt));
     }
 
-    /**
-     * Sends an array of strings to a player, does not format the strings
-     *
-     * @param player  The player receiving the message
-     * @param message The strings to be sent
-     */
-    public static void message(Audience player, String[] message) {
-        for (String string : message) {
-            message(player, string);
-        }
-    }
-
-    /**
-     * Sends an array of strings to a player, does not format the strings
-     *
-     * @param player  The player receiving the message
-     * @param message The strings to be sent
-     */
-    public static void message(Audience player, Component[] message) {
-        for (Component string : message) {
-            player.sendMessage(string);
-        }
-    }
-
-    /**
-     * Sends an array of strings to a player with appropriate formatting
-     *
-     * @param player  The player
-     * @param prefix  The message
-     * @param message Strings to send to a player
-     */
-    public static void message(Audience player, String prefix, String[] message) {
-        for (String string : message) {
-            message(player, prefix, string);
-        }
-    }
-
-    /**
-     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     *
-     * @param sender  The CommandSender to send the message to
-     * @param message The message to send
-     */
-    public static void simpleMessage(Audience sender, String message) {
-        sender.sendMessage(deserialize(message));
-    }
-
-    /**
-     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     *
-     * @param sender  The CommandSender
-     * @param prefix  The PREFIX
-     * @param message Message to send to the CommandSender
-     */
-    public static void simpleMessage(Audience sender, String prefix, String message) {
-        sender.sendMessage(getPrefix(prefix).append(deserialize(message)));
-    }
-
-    /**
-     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     *
-     * @param sender  The CommandSender to send the message to
-     * @param prefix  The message
-     * @param message Message to send to the CommandSender
-     * @param hover   Hover event to add to the message
-     */
-    public static void simpleMessage(Audience sender, String prefix, String message, Component hover) {
-        simpleMessage(sender, prefix, deserialize(message), hover);
-    }
-
-    /**
-     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     *
-     * @param sender  The CommandSender to send the message to
-     * @param prefix  The message
-     * @param message Message to send to the CommandSender
-     * @param hover   Hover event to add to the message
-     */
-    public static void simpleMessage(Audience sender, String prefix, Component message, Component hover) {
-        sender.sendMessage(getPrefix(prefix).hoverEvent(HoverEvent.showText(hover)).append(normalize(message)));
-    }
-
-    /**
-     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     *
-     * @param sender  The CommandSender
-     * @param prefix  The message
-     * @param message Message to send to the CommandSender
-     * @param args    The args to interpolate in the string
-     */
-    public static void simpleMessage(Audience sender, String prefix, String message, Object... args) {
-        simpleMessage(sender, prefix, String.format(message, args));
-    }
 
     /**
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
@@ -246,28 +179,39 @@ public class UtilMessage {
      * @param component Message to send to the CommandSender
      */
     public static void simpleMessage(Audience sender, String prefix, Component component) {
+        simpleMessage(sender, Component.text(prefix), component);
+    }
+
+    public static void simpleMessage(Audience sender, ComponentLike prefix, Component component) {
         sender.sendMessage(getPrefix(prefix).append(normalize(component)));
     }
 
-    /**
-     * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
-     *
-     * @param sender  The CommandSender
-     * @param message Message to send to the CommandSender
-     * @param args    The args to interpolate in the string
-     */
+    // Compatibility overloads for literal (non-translated) messages. Retained for code that has not yet been
+    // migrated to the translation-key API; prefer message(sender, prefixKey, key, args...) for new code.
+    public static void simpleMessage(Audience sender, String message) {
+        sender.sendMessage(deserialize(message));
+    }
+
+    public static void simpleMessage(Audience sender, String prefix, String message) {
+        sender.sendMessage(getPrefix(prefix).append(deserialize(message)));
+    }
+
+    public static void simpleMessage(Audience sender, String prefix, String message, Component hover) {
+        simpleMessage(sender, prefix, deserialize(message), hover);
+    }
+
+    public static void simpleMessage(Audience sender, String prefix, Component message, Component hover) {
+        sender.sendMessage(getPrefix(prefix).hoverEvent(HoverEvent.showText(hover)).append(normalize(message)));
+    }
+
+    public static void simpleMessage(Audience sender, String prefix, String message, Object... args) {
+        simpleMessage(sender, prefix, String.format(message, args));
+    }
+
     public static void simpleMessage(Audience sender, String message, Object... args) {
         sender.sendMessage(deserialize(String.format(message, args)));
     }
 
-
-    public static void simpleBroadcast(String prefix, String message, Object... args) {
-        Bukkit.getServer().broadcast(getPrefix(prefix).append(deserialize(String.format(message, args))));
-    }
-
-    public static void simpleBroadcast(String prefix, String message, Component hover) {
-        Bukkit.getServer().broadcast(getPrefix(prefix).append(deserialize(message)).hoverEvent(HoverEvent.showText(hover)));
-    }
 
     public static Component getMiniMessage(String message, Object... args) {
         return deserialize(String.format(message, args)).decoration(TextDecoration.ITALIC, false);
@@ -307,7 +251,7 @@ public class UtilMessage {
      */
     public static Component copyCommand(String commandText, String copyText) {
         return UtilMessage.deserialize("<gold>" + commandText + "</gold>")
-                .hoverEvent(HoverEvent.showText(Component.text("Click to Copy Command")))
+                .hoverEvent(HoverEvent.showText(Translations.component("core.util.copy_command.hover")))
                 .clickEvent(ClickEvent.copyToClipboard(copyText));
     }
 
@@ -319,7 +263,7 @@ public class UtilMessage {
      */
     public static Component tableOfContentsEntry(String entryText, int pageNum) {
         return Component.empty().append(UtilMessage.deserialize("<reset><black>" + entryText + ": " + pageNum).decoration(TextDecoration.BOLD, false)
-                .hoverEvent(HoverEvent.showText(Component.text("Click to open page " + pageNum)))
+                .hoverEvent(HoverEvent.showText(Translations.component("core.util.table_of_contents.hover", Component.text(pageNum))))
                 .clickEvent(ClickEvent.changePage(pageNum)));
     }
 
@@ -328,32 +272,44 @@ public class UtilMessage {
     }
 
     public static Component getPrefix(String prefix) {
-        if (prefix.isEmpty()) {
+        return getPrefix(Component.text(prefix));
+    }
+
+    public static Component getPrefix(@Nullable ComponentLike prefix) {
+
+        if (prefix == null) {
             return Component.empty();
         }
-        return miniMessage.deserialize("<blue>" + prefix + "> ");
+
+        Component prefixComponent = prefix.asComponent();
+        return prefixComponent.color(NamedTextColor.BLUE).append(Component.text("> ", NamedTextColor.BLUE));
     }
 
     /**
      * Broadcasts a message to all players on the server with formatting
      *
      * @param prefix  The PREFIX of the message
-     * @param message The message to be broadcasted
-     */
-    public static void broadcast(String prefix, String message) {
-        Bukkit.getServer().broadcast(getPrefix(prefix).append(deserialize(message)));
-    }
-
-    /**
-     * Broadcasts a message to all players on the server with formatting
-     *
-     * @param prefix  The PREFIX of the message
-     * @param message The message to be broadcasted
+     * @param key The message to be broadcasted
      * @param args    The args to interpolate in the string
      */
-    public static void broadcast(String prefix, String message, Object... args) {
-        Bukkit.getServer().broadcast(getPrefix(prefix).append(deserialize(message, args)));
+    public static void broadcast(String prefix, String key, ComponentLike... args) {
+        // Treat prefix as a translation key
+        Bukkit.getServer().broadcast(getPrefix(translated(prefix)).append(normalize(translated(key, args))));
     }
+
+
+    /**
+     * Broadcasts a translated message using translated prefix and message keys.
+     *
+     * @param prefixKey  The translation key for the prefix (e.g. "events.prefix")
+     * @param messageKey The translation key for the message
+     */
+    public static void broadcast(String prefixKey, String messageKey) {
+        Bukkit.getServer().broadcast(getPrefix(translated(prefixKey)).append(normalize(translated(messageKey))));
+    }
+
+    // Note: the (String prefixKey, String messageKey, ComponentLike... args) variant is handled by
+    // broadcast(String, String, ComponentLike...) above which now translates the prefix too.
 
     /**
      * Broadcasts a message to all players on the server with formatting
@@ -374,13 +330,53 @@ public class UtilMessage {
     }
 
     /**
+     * Broadcasts a message to every online player, building the component <b>per recipient</b> so that any
+     * embedded item-hover events can be localized into that recipient's locale.
+     *
+     * <p>Use this (not {@link #broadcast(Component)}) whenever a broadcast message embeds an item hover:
+     * item hover data is serialized into the chat packet and is not resolved by the client, so the hover
+     * ItemStack must be rendered server-side for each viewer (see
+     * {@link Translations#renderItemStack(org.bukkit.inventory.ItemStack, Locale)}).</p>
+     *
+     * @param messageForLocale builds the message for a given recipient locale
+     */
+    public static void broadcastLocalized(Function<Locale, Component> messageForLocale) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(messageForLocale.apply(player.locale()));
+        }
+    }
+
+    /**
      * Broadcasts a pre-built component to all players on the server with a formatted prefix
      *
      * @param prefix  The PREFIX of the message
      * @param message The component to be broadcasted
      */
     public static void broadcast(String prefix, Component message) {
+        // Treat prefix as a translation key
+        Bukkit.getServer().broadcast(getPrefix(translated(prefix)).append(normalize(message)));
+    }
+
+    public static void broadcast(ComponentLike prefix, Component message) {
         Bukkit.getServer().broadcast(getPrefix(prefix).append(normalize(message)));
+    }
+
+    // The (String, Component) overload now translates the prefix by default.
+
+    private static Component translated(String key, ComponentLike... args) {
+        if(key == null || key.isEmpty()) {
+            return Component.empty();
+        }
+
+        return normalize(Translations.component(key, args));
+    }
+
+    private static Component resolveStringMessage(String message) {
+        if (TranslationService.translator().hasTranslation(message)) {
+            return translated(message);
+        }
+
+        return deserialize(message);
     }
 
 }

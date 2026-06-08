@@ -14,7 +14,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -44,11 +48,14 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Below " + getValueString(this::getSpeedOneHealth, level, 100, "%", 1) + " health you gain <effect>Speed I</effect>,",
-                "and below " + getValueString(this::getSpeedTwoHealth, level, 100, "%", 1) + " health you gain <effect>Speed II</effect> ",
-        };
+    public Component[] getDescription(int level) {
+        Component speedOne = getValueComponent(this::getSpeedOneHealth, level, 100, 0, "%");
+        Component speedTwo = getValueComponent(this::getSpeedTwoHealth, level, 100, 0, "%");
+        return Translations.componentLines(
+                "champions.skill.brute.adrenaline.description",
+                speedOne,
+                speedTwo
+        );
     }
 
     public double getSpeedOneHealth(int level) {

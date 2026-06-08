@@ -21,6 +21,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -57,22 +60,14 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Summon the power of the wolf, gaining",
-                "<effect>Strength " + UtilFormat.getRomanNumeral(getStrengthLevel(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and giving",
-                "no knockback on your attacks",
-                "",
-                "If you miss " + getValueString(this::getMaxMissedSwings, level) + " consecutive swings",
-                "Wolfs Fury ends",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.STRENGTH.getDescription(getStrengthLevel(level)),
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component maxMissedSwings = getValueComponent(this::getMaxMissedSwings, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component strengthII = Translations.component("champions.skill.effect.strength",
+                Component.text("II")).color(NamedTextColor.WHITE);
+        Component strength = Translations.component("champions.skill.effect.strength.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.wolfs-fury.description", duration, maxMissedSwings, cooldown, strengthII, strength);
     }
 
     public double getDuration(int level) {
@@ -188,7 +183,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     public void deactivate(Player player) {
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ended", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(getLevel(player)), NamedTextColor.GREEN));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
 

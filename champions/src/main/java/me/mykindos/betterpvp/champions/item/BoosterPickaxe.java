@@ -33,7 +33,7 @@ public class BoosterPickaxe extends BaseItem implements Reloadable {
 
     @Inject
     private BoosterPickaxe(Champions champions) {
-        super("Booster Pickaxe", ItemStack.of(Material.GOLDEN_PICKAXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.booster-pickaxe.name"), ItemStack.of(Material.GOLDEN_PICKAXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

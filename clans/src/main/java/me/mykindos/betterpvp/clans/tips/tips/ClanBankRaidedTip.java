@@ -5,9 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.ISuggestCommand;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -27,7 +28,8 @@ public class ClanBankRaidedTip extends ClanTip implements ISuggestCommand {
     @Override
     public Component generateComponent() {
 
-        return UtilMessage.deserialize("<reset>If you are raided by another clan, you will lose <yellow>50%<reset> of the money in your clan bank.");
+        Component percentComponent = Component.text("50%", NamedTextColor.YELLOW);
+        return Translations.component("clans.tip.bank-raided", percentComponent);
     }
 
     @Override

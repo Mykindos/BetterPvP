@@ -4,6 +4,8 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.component.impl.stat.type.DoubleStatTypeHandler;
 import me.mykindos.betterpvp.core.item.component.impl.stat.type.IntegerStatTypeHandler;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -66,6 +68,28 @@ public class StatType<T> {
         this.typeHandler = builder.typeHandler;
         this.lifecycleHooks = builder.lifecycleHooks;
         this.displayColor = builder.displayColor;
+    }
+
+    /**
+     * The display name as a localized component. {@link #getName()} returns the underlying translation key.
+     */
+    public Component getNameComponent() {
+        return Translations.component(name);
+    }
+
+    /**
+     * The short display name (shown next to the value in item lore) as a localized component.
+     * {@link #getShortName()} returns the underlying translation key.
+     */
+    public Component getShortNameComponent() {
+        return Translations.component(shortName);
+    }
+
+    /**
+     * The description as a localized component, or an empty component when no description key is set.
+     */
+    public Component getDescriptionComponent() {
+        return description == null ? Component.empty() : Translations.component(description);
     }
 
     public TextColor getValueColor(T value) {

@@ -12,6 +12,10 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -55,12 +59,12 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "You take " + getValueString(this::getPercent, level, 1, "%", 0) + " less damage",
-                "but you deal " + getValueString(this::getPercent, level, 1, "%", 0) + " less damage as well"
-        };
+    public Component[] getDescription(int level) {
+        Component percent = getValueComponent(this::getPercent, level, 1, 0, "%");
+        return Translations.componentLines(
+                "champions.skill.brute.fortify.description",
+                percent
+        );
     }
 
     private int getPercent(int level) {

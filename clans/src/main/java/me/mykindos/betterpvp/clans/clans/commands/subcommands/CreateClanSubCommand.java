@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -51,7 +53,7 @@ public class CreateClanSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Create a clan";
+        return "clans.command.create-clan.description";
     }
 
     @Override
@@ -62,35 +64,35 @@ public class CreateClanSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String[] args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Command", "You did not input a clan name");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.create.no-args");
             return;
         }
 
         if (clanManager.getClanByClient(client).isPresent()) {
-            UtilMessage.message(player, "Command", "You are already in a clan");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.create.already-in-clan");
             return;
         }
 
         String clanName = args[0];
 
         if (clanName.length() < minCharactersInClanName) {
-            UtilMessage.message(player, "Command", "Clan name too short. Minimum length is [" + minCharactersInClanName + "].");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.create.too-short", Component.text(minCharactersInClanName, NamedTextColor.YELLOW));
             return;
         }
 
         if (clanName.length() > maxCharactersInClanName) {
-            UtilMessage.message(player, "Command", "Clan name too long. Maximum length is [" + maxCharactersInClanName + "].");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.create.too-long", Component.text(maxCharactersInClanName, NamedTextColor.YELLOW));
             return;
         }
 
         if (clanName.matches("^.*[^a-zA-Z0-9].*$")) {
-            UtilMessage.message(player, "Command", "Invalid characters in Clan name.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.create.invalid-chars");
             return;
         }
 
         filterService.isFiltered(clanName).thenAcceptAsync(filtered -> {
             if (filtered) {
-                UtilMessage.message(player, "Command", "Clan name contains filtered words.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.create.filtered");
             } else {
                 Optional<Clan> clanOptional = clanManager.getClanByName(clanName.toLowerCase());
                 if (clanOptional.isEmpty()) {
@@ -101,7 +103,7 @@ public class CreateClanSubCommand extends ClanSubCommand {
 
                     UtilServer.callEvent(new ClanCreateEvent(player, clan));
                 } else {
-                    UtilMessage.message(player, "Command", "A clan with that name already exists.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.create.already-exists");
                 }
             }
         }, Bukkit.getScheduler().getMainThreadExecutor(clans));

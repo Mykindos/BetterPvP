@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -140,20 +141,16 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "Right click with a Sword to channel",
-                "",
-                "While channeling, build charge",
-                "over time and by absorbing damage.",
-                "",
-                "While channeling, you take " + getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage",
-                "",
-                "Stop channeling to gain <effect>Strength</effect>",
-                "for up to " + getValueString(this::getMaxStrengthDuration, level) + " seconds.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component reduction = getValueComponent(this::getDamageReduction, level, 100, 0, "%");
+        Component duration = getValueComponent(this::getMaxStrengthDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.vanguards-might.description",
+                reduction,
+                duration,
+                cooldown
+        );
     }
 
     private double getDamageReduction(int level) {

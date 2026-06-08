@@ -55,6 +55,8 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -183,8 +185,9 @@ public class SkillListener implements Listener {
             if (cooldownManager.hasCooldown(player, skill.getName())) {
 
                 if (prepareArrowSkill.showCooldownFinished()) {
-                    UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", skill.getName(),
-                            Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining()));
+                    UtilMessage.message(player, "core.prefix.cooldown", "champions.skill.cooldown",
+                            skill.getDisplayName().color(NamedTextColor.GREEN),
+                            Component.text(String.valueOf(Math.max(0, cooldownManager.getAbilityRecharge(player, skill.getName()).getRemaining())), NamedTextColor.GREEN));
                 }
                 event.setCancelled(true);
             }
@@ -397,11 +400,13 @@ public class SkillListener implements Listener {
 
     private void sendSkillUsed(Player player, IChampionsSkill skill, int level) {
         if (skill instanceof PrepareSkill) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You prepared <green>%s %d<gray>.", skill.getName(), level);
+            UtilMessage.message(player, skill.getClassType().getDisplayName(), "champions.skill.prepared",
+                    skill.getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
 
         } else {
             if (!(skill instanceof ChannelSkill) && !(skill instanceof ActiveToggleSkill)) {
-                UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You used <green>%s %d<gray>.", skill.getName(), level);
+                UtilMessage.message(player, skill.getClassType().getDisplayName(), "champions.skill.used",
+                        skill.getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             }
         }
     }
@@ -412,7 +417,8 @@ public class SkillListener implements Listener {
         IChampionsSkill skill = event.getSkill();
 
         if (!skill.isEnabled()) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "<alt>%s</alt> has been disabled by the server.", skill.getName());
+            UtilMessage.message(player, skill.getClassType().getDisplayName(), "champions.skill.disabled",
+                    skill.getDisplayName().color(NamedTextColor.GREEN));
             event.setCancelled(true);
 
         }
@@ -428,8 +434,8 @@ public class SkillListener implements Listener {
         if (skill.canUseWhileSlowed()) return;
 
         if (player.hasPotionEffect(PotionEffectType.SLOWNESS)) {
-            UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
-                    "You cannot use <green>%s<gray> while slowed.", event.getSkill().getName());
+            UtilMessage.message(player, event.getSkill().getClassType().getDisplayName(),
+                    "champions.skill.slowed", event.getSkill().getDisplayName().color(NamedTextColor.GREEN));
             event.setCancelled(true);
         }
     }
@@ -443,8 +449,8 @@ public class SkillListener implements Listener {
         if (skill.canUseWhileLevitating()) return;
 
         if (player.hasPotionEffect(PotionEffectType.LEVITATION)) {
-            UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
-                    "You cannot use <green>%s<gray> while levitating.", event.getSkill().getName());
+            UtilMessage.message(player, event.getSkill().getClassType().getDisplayName(),
+                    "champions.skill.levitating", event.getSkill().getDisplayName().color(NamedTextColor.GREEN));
             event.setCancelled(true);
         }
     }
@@ -459,7 +465,8 @@ public class SkillListener implements Listener {
         if (skill.canUseInLiquid()) return;
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> in liquid.", skill.getName());
+            UtilMessage.message(player, skill.getClassType().getDisplayName(), "champions.skill.liquid",
+                    skill.getDisplayName().color(NamedTextColor.GREEN));
             event.setCancelled(true);
         }
     }
@@ -472,7 +479,8 @@ public class SkillListener implements Listener {
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileSilenced()) return;
         if (effectManager.hasEffect(player, EffectTypes.SILENCE)) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while silenced.", skill.getName());
+            UtilMessage.message(player, skill.getClassType().getDisplayName(), "champions.skill.silenced",
+                    skill.getDisplayName().color(NamedTextColor.GREEN));
             player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
             event.setCancelled(true);
         }
@@ -591,7 +599,8 @@ public class SkillListener implements Listener {
         if (skill.ignoreNegativeEffects()) return;
         if (skill.canUseWhileStunned()) return;
         if (effectManager.hasEffect(player, EffectTypes.STUN)) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> while stunned.", skill.getName());
+            UtilMessage.message(player, skill.getClassType().getDisplayName(), "champions.skill.stunned",
+                    skill.getDisplayName().color(NamedTextColor.GREEN));
             event.setCancelled(true);
         }
     }

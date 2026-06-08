@@ -7,10 +7,11 @@ import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -67,13 +68,15 @@ public class QualifiedStatListButton extends ControlItem<IAbstractStatMenu> {
                                 period)
                                 .submit();
                     }
-                    return UtilMessage.deserialize("<gold>%s</gold>: <yellow>%s</yellow>",
-                            stat.getQualifiedName(), formattedValue);
+                    return Translations.component("core.menu.stats.qualified-stat-list.entry",
+                            Component.text(stat.getQualifiedName(), NamedTextColor.GOLD),
+                            Component.text(formattedValue, NamedTextColor.YELLOW));
                 }
                 )
                 .toList();
         return ItemView.builder()
-                .displayName(Component.text("Stat List " + (pageNum + 1)))
+                .displayName(Translations.component("core.menu.stats.qualified-stat-list.name",
+                        Component.text(pageNum + 1)))
                 .material(Material.PAPER)
                 .lore(description)
                 .frameLore(true)

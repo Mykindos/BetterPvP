@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,12 +34,12 @@ public class ShadowFilterCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Manage shadow chat filter words";
+        return "core.command.shadow-filter.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Command", UtilMessage.deserialize("<gray>Usage: /filter <add | remove | list | reload></gray>"));
+        UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.usage");
     }
 
     @Override
@@ -64,13 +65,13 @@ public class ShadowFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Add a word to the shadow filter list";
-        }
+        return "core.command.shadow-filter-add.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 1) {
-                UtilMessage.message(player, "Filter", UtilMessage.deserialize("<green>Usage: /filter add <word></green>"));
+                UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.add.usage");
                 return;
             }
 
@@ -78,9 +79,9 @@ public class ShadowFilterCommand extends Command {
 
             filterManager.addFilteredWord(word, client).thenAccept(success -> {
                 if (success) {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Added <yellow>%s</yellow> to the shadow filter list", word));
+                    UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.add.success", Component.text(word));
                 } else {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is already in the shadow filter list", word));
+                    UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.add.exists", Component.text(word));
                 }
             });
         }
@@ -103,13 +104,13 @@ public class ShadowFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Remove a word from the shadow filter list";
-        }
+        return "core.command.shadow-filter-remove.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 1) {
-                UtilMessage.message(player, "Filter", UtilMessage.deserialize("<green>Usage: /filter remove <word></green>"));
+                UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.remove.usage");
                 return;
             }
 
@@ -117,9 +118,9 @@ public class ShadowFilterCommand extends Command {
 
             filterManager.removeFilteredWord(word).thenAccept(success -> {
                 if (success) {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Removed <yellow>%s</yellow> from the shadow filter list", word));
+                    UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.remove.success", Component.text(word));
                 } else {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is not in the shadow filter list", word));
+                    UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.remove.not_found", Component.text(word));
                 }
             });
         }
@@ -142,19 +143,19 @@ public class ShadowFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "List all shadow filtered words";
-        }
+        return "core.command.shadow-filter-list.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             Set<String> filteredWords = filterManager.getFilteredWords();
 
             if (filteredWords.isEmpty()) {
-                UtilMessage.message(player, "Filter", "There are no words in the shadow filter list");
+                UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.list.empty");
                 return;
             }
 
-            Component message = Component.text("Shadow Filtered Words:", NamedTextColor.GREEN);
+            Component message = Translations.component("core.command.shadowfilter.list.header").color(NamedTextColor.GREEN);
             List<String> sortedWords = new ArrayList<>(filteredWords);
             sortedWords.sort(String::compareTo);
 
@@ -163,7 +164,7 @@ public class ShadowFilterCommand extends Command {
                         .append(Component.text(word, NamedTextColor.YELLOW));
             }
 
-            UtilMessage.message(player, "Filter", message);
+            UtilMessage.message(player, "core.prefix.command", message);
         }
     }
 
@@ -184,13 +185,13 @@ public class ShadowFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Reload the shadow filter list from the database";
-        }
+        return "core.command.shadow-filter-reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             filterManager.loadFilteredWords();
-            UtilMessage.message(player, "Filter", "Reloaded shadow filter list from database");
+            UtilMessage.message(player, "core.prefix.command", "core.command.shadowfilter.reload.done");
         }
     }
 }

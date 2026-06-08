@@ -23,7 +23,7 @@ public class DurakHandle extends BaseItem {
 
     @Inject
     private DurakHandle() {
-        super("Durak Handle", Item.model("durak_handle"), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.durak-handle.name"), Item.model("durak_handle"), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 
     @Inject

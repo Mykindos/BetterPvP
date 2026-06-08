@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -31,7 +32,7 @@ public class GuiClanVault extends AbstractGui implements Windowed {
 
     private static final Item DISABLED_SLOT_ITEM = new SimpleItem(ItemView.builder()
             .material(Material.RED_STAINED_GLASS_PANE)
-            .displayName(Component.text("LOCKED SLOT", NamedTextColor.RED, TextDecoration.BOLD))
+            .displayName(Translations.component("clans.menu.vault.button.locked-slot.name").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
             .build(), click -> SoundEffect.WRONG_ACTION.play(click.getPlayer()));
 
     private final ClanVault vault;
@@ -114,6 +115,6 @@ public class GuiClanVault extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text(vault.getClan().getName() + ": Clan Vault");
+        return Translations.component("clans.menu.vault.title", Component.text(vault.getClan().getName()));
     }
 }

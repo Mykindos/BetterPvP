@@ -15,6 +15,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -38,12 +41,15 @@ public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "After " + getValueString(this::getTimeOutOfCombat, level) + " seconds out of combat",
-                "you will gain <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength),
-        };
+    public Component[] getDescription(int level) {
+        Component time = getValueComponent(this::getTimeOutOfCombat, level);
+        Component regen = Translations.component("champions.skill.effect.regeneration",
+                Component.text(UtilFormat.getRomanNumeral(regenerationStrength))).color(NamedTextColor.YELLOW);
+        return Translations.componentLines(
+                "champions.skill.global.tranquility.description",
+                time,
+                regen
+        );
     }
 
     public double getTimeOutOfCombat(int level) {

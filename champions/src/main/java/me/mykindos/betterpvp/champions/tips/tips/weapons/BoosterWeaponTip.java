@@ -5,7 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.tips.ChampionsTip;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -13,10 +15,10 @@ public class BoosterWeaponTip extends ChampionsTip {
 
     @Inject
     public BoosterWeaponTip(Champions champions) {
-        super(champions, 1, 1,
-                UtilMessage.deserialize("<gold>Booster</gold> weapons (<gold>Gold</gold> weapons) increase the " +
-                        "level of their corresponding skill by <yellow>1</yellow> level")
-                );
+        super(champions, 1, 1, Translations.component("champions.tip.boosterweapontip",
+                Component.text("Booster", NamedTextColor.GOLD),
+                Component.text("Gold", NamedTextColor.GOLD),
+                Component.text("1", NamedTextColor.YELLOW)));
     }
 
     @Override

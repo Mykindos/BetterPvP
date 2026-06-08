@@ -6,11 +6,15 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 @Singleton
 public class TeleportPositionCommand extends Command {
+
+    private static final String TELEPORT_PREFIX = "core.prefix.teleport";
 
     @WithReflection
     public TeleportPositionCommand() {
@@ -24,18 +28,20 @@ public class TeleportPositionCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Teleport to a specific position";
+        return "core.command.teleport-position.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        double x = 0, y = 0, z = 0;
         if (args.length == 3) {
             Location location = UtilLocation.getTeleportLocation(player.getLocation(), args);
             player.teleport(location);
-            UtilMessage.message(player, "Teleport", UtilMessage.deserialize("You teleported to (<green>%s</green>, <green>%s</green>, <green>%s</green>)", location.getX(), location.getY(), location.getZ()));
+            UtilMessage.message(player, TELEPORT_PREFIX, "core.command.teleportposition.success",
+                    Component.text(location.getX(), NamedTextColor.GREEN),
+                    Component.text(location.getY(), NamedTextColor.GREEN),
+                    Component.text(location.getZ(), NamedTextColor.GREEN));
         } else {
-            UtilMessage.message(player, "Teleport", "Correct usage: /tppos x y z");
+            UtilMessage.message(player, TELEPORT_PREFIX, "core.command.teleportposition.usage");
         }
     }
 

@@ -33,9 +33,8 @@ public class WorkbenchItem extends BaseItem implements NexoItem {
 
     @Inject
     private WorkbenchItem() {
-        super("Workbench", model, ItemGroup.BLOCK, ItemRarity.COMMON);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and right-click this to craft items.")));
+        super(translatableName("core.item.workbench.name"), model, ItemGroup.BLOCK, ItemRarity.COMMON);
+        addBaseComponent(DescriptionComponent.translatable(1, "core.item.workbench.lore"));
     }
 
     @Override

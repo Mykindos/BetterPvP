@@ -14,6 +14,6 @@ public class Vine extends BaseItem {
 
     @Inject
     private Vine() {
-        super("Vine", Item.model("vine", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.vine.name"), Item.model("vine", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
     }
 }

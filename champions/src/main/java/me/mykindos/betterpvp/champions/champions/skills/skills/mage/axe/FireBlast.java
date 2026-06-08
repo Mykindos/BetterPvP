@@ -42,6 +42,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -82,18 +86,12 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Launch a fireball which explodes on impact,",
-                "knocking back any players within " + getValueString(this::getRadius, level) + " blocks",
-                "dealing " + getValueString(this::getDamage, level) + " damage, and igniting them for ",
-                getValueString(this::getFireDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component fireDuration = getValueComponent(this::getFireDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.mage.fire-blast.description", radius, damage, fireDuration, cooldown);
     }
 
     public double getDamage(int level) {

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemFlag;
 
 import javax.annotation.Nullable;
@@ -60,8 +61,11 @@ public abstract class ProfessionNode implements ISkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return skill == null ? new String[0] : skill.getDescription(level);
+    public Component[] getDescription(int level) {
+        if (skill == null) return new Component[0];
+        // Localized per-viewer (keyed where available), else deserialized MiniMessage. See
+        // IProfessionSkill#getDescriptionComponents.
+        return skill.getDescriptionComponents(level);
     }
 
     public ItemFlag getFlag() {

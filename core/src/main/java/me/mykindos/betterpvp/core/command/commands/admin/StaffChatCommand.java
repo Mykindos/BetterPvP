@@ -40,7 +40,7 @@ public class StaffChatCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Toggle staff only chat";
+        return "core.command.staff-chat.description";
     }
 
     @Override

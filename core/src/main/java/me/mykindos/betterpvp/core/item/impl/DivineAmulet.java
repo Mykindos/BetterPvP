@@ -14,6 +14,6 @@ public class DivineAmulet extends BaseItem {
 
     @Inject
     private DivineAmulet() {
-        super("Divine Amulet", Item.model("divine_amulet", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.divine-amulet.name"), Item.model("divine_amulet", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

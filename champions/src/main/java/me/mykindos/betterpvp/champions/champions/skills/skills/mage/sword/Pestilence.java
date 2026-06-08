@@ -31,6 +31,9 @@ import org.bukkit.event.block.Action;
 
 import java.util.Iterator;
 import java.util.WeakHashMap;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 
 @Slf4j
 @Singleton
@@ -73,17 +76,14 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with a Sword to channel",
-                "",
-                "Release a <effect>Pestilence</effect> cloud that bounces,",
-                "from target to target, giving them <effect>Poison " + poisonLevel + "</effect>",
-                "for a maximum of " + getValueString(this::getPoisonDuration, level) + " seconds.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Energy: " + getValueString(this::getEnergyPerSecond, level)
-        };
+    public Component[] getDescription(int level) {
+        Component poisonDuration = getValueComponent(this::getPoisonDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component energy = getValueComponent(this::getEnergyPerSecond, level);
+        Component pestilence = Translations.component("champions.skill.mage.pestilence.name").color(NamedTextColor.WHITE);
+        Component poisonI = Translations.component("champions.skill.effect.poison",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.pestilence.description", poisonDuration, cooldown, energy, pestilence, poisonI);
     }
 
     public double getPoisonDuration(int level) {
@@ -136,7 +136,7 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
                 continue;
             }
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             shoot(player, data, level);
             iterator.remove();
         }

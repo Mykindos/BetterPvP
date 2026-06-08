@@ -33,6 +33,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
+import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
 import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -89,6 +90,7 @@ public class Clans extends BPvPPlugin {
 
         var core = (Core) Bukkit.getPluginManager().getPlugin("Core");
         if (core != null) {
+            TranslationService.registerBundle(this, "translations.clans");
 
             core.setCurrentMode(CurrentMode.CLANS);
 

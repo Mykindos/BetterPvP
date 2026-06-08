@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.display.championsgame.domination.
 import me.mykindos.betterpvp.core.client.stats.display.start.ChampionsStatButton;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -37,10 +38,10 @@ public class DominationStatButton extends ChampionsStatButton {
 
         return ItemView.builder()
                 .material(Material.BEACON)
-                .displayName(Component.text("Domination Stats"))
+                .displayName(Translations.component("core.menu.stats.champions.button.domination.name"))
                 .lore(getDominationStatsDescription("", ""))
                 .frameLore(true)
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }
 

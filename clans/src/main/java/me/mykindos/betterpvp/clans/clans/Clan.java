@@ -20,7 +20,10 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
@@ -33,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -383,9 +387,27 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
             final Player player = Bukkit.getPlayer(member.getUuid());
             if (player != null) {
-                UtilMessage.simpleMessage(player, prefix ? "Clans" : "", message);
+                UtilMessage.message(player, prefix ? Translations.component("clans.prefix") : Component.empty(), message);
             }
 
+        });
+    }
+
+    @Override
+    public void messageClan(final String key, final Object[] args, final UUID ignore, final boolean prefix) {
+        this.members.forEach(member -> {
+            if (ignore != null && ignore.equals(member.getUuid())) {
+                return;
+            }
+
+            final Player player = Bukkit.getPlayer(member.getUuid());
+            if (player != null) {
+                final ComponentLike[] components = args == null ? new ComponentLike[0]
+                        : Arrays.stream(args)
+                                .map(arg -> arg instanceof ComponentLike componentLike ? componentLike : Component.text(String.valueOf(arg)))
+                                .toArray(ComponentLike[]::new);
+                UtilMessage.message(player, prefix ? "clans.prefix" : "", key, components);
+            }
         });
     }
 

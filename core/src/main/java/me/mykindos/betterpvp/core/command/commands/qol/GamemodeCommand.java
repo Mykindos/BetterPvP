@@ -25,12 +25,12 @@ public class GamemodeCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Quickly change gamemode";
+        return "core.command.gamemode.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Command", "Please specify a valid gamemode");
+        UtilMessage.message(player, "core.prefix.command", "core.command.gamemode.invalid");
     }
 
     @Singleton
@@ -49,8 +49,8 @@ public class GamemodeCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Swap to survival mode";
-        }
+        return "core.command.survival.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String[] args) {
@@ -74,8 +74,8 @@ public class GamemodeCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Swap to creative mode";
-        }
+        return "core.command.creative.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String[] args) {
@@ -99,8 +99,8 @@ public class GamemodeCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Swap to adventure mode";
-        }
+        return "core.command.adventure.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String[] args) {
@@ -124,8 +124,8 @@ public class GamemodeCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Swap to spectator mode";
-        }
+        return "core.command.spectator.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String[] args) {

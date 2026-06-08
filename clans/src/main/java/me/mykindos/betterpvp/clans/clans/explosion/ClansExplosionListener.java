@@ -187,7 +187,7 @@ public class ClansExplosionListener extends ClanListener {
         }
 
         if (cannotCannonClan) {
-            UtilMessage.message(shooter, "Clans", "You must pillage this clan first!");
+            UtilMessage.message(shooter, "core.prefix.clans", "clans.explosion.must-pillage-first");
         }
     }
 

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.logging.menu.button.LocationButton;
 import me.mykindos.betterpvp.core.logging.menu.button.PlayerItemButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -36,14 +37,12 @@ public class PlayerDeathItemLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return Component.text(context.get("Victim"), NamedTextColor.YELLOW)
-                .append(Component.text(" was killed while holding ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
-                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
-                .append(Component.text(" by ", NamedTextColor.GRAY))
-                .append(Component.text(context.get("Killer"), NamedTextColor.GREEN))
-                .append(Component.text(" at ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW));
+        return Translations.component("core.log.player-death-item.1",
+                Component.text(context.get("Victim"), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
+                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))),
+                Component.text(context.get("Killer"), NamedTextColor.GREEN),
+                Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY);
     }
 
 
@@ -56,13 +55,14 @@ public class PlayerDeathItemLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get("Victim"), NamedTextColor.YELLOW)
-                        .append(Component.text(" was killed while holding", NamedTextColor.GRAY)),
+                        .append(Translations.component("core.log.player-death-item.2").color(NamedTextColor.GRAY)),
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
                 UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
                         context.get(LogContext.ITEM)),
-                Component.text("by ").append(Component.text(context.get("Killer"), NamedTextColor.YELLOW)),
-                UtilMessage.deserialize("at <yellow>%s</yellow>",
-                        context.get(LogContext.LOCATION)),
+                Translations.component("core.log.player-death-item.3",
+                        Component.text(context.get("Killer"), NamedTextColor.YELLOW)),
+                Translations.component("core.log.player-death-item.4",
+                        Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW)),
                 UtilMessage.DIVIDER
         );
 
@@ -74,7 +74,7 @@ public class PlayerDeathItemLogFormatter implements ILogFormatter {
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(Component.text("Death Player"))
+                .displayName(Translations.component("core.log.player-death-item.5"))
                 .material(Material.GOLDEN_SWORD)
                 .lore(lore)
                 .build();

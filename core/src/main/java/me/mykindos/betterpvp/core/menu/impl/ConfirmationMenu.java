@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.menu.impl;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -27,7 +28,7 @@ public class ConfirmationMenu extends AbstractGui implements Windowed {
         List<Component> titleDescription = Menu.getFixedLore(description);
         SimpleItem titleItem = new SimpleItem(ItemView.builder()
                 .material(Material.REDSTONE_TORCH)
-                .displayName(Component.text("Confirmation", NamedTextColor.GREEN))
+                .displayName(Translations.component("core.menu.confirmation.title").color(NamedTextColor.GREEN))
                 .lore(titleDescription)
                 .build());
 
@@ -68,6 +69,6 @@ public class ConfirmationMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Confirmation");
+        return Translations.component("core.menu.confirmation.title");
     }
 }

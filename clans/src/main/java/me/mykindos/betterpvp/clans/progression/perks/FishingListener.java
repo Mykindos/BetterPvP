@@ -80,6 +80,6 @@ public class FishingListener implements Listener {
     // PlayerStartFishingEvent isn't Cancellable; removing the hook is the only way to short-circuit.
     private void denyFishing(PlayerStartFishingEvent event, Player player, String message) {
         event.getHook().remove();
-        UtilMessage.simpleMessage(player, "Fishing", message);
+        UtilMessage.message(player, "core.prefix.fishing", message);
     }
 }

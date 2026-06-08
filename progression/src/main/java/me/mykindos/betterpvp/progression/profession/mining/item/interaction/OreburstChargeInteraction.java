@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.mining.item.interaction;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableHandler;
@@ -75,12 +77,12 @@ public class OreburstChargeInteraction extends CooldownInteraction implements Th
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Oreburst Charge");
+        return Translations.component("progression.ability.oreburst-charge.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Throw a charge that detonates on impact, carving a crater lined with ores.");
+        return Translations.component("progression.ability.oreburst-charge.description");
     }
 
     @Override

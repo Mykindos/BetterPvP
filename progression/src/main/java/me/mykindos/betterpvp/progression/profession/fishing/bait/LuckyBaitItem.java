@@ -37,7 +37,7 @@ public class LuckyBaitItem extends BaitItem {
      */
     @Inject
     public LuckyBaitItem(Progression progression, LuckyBaitAbility ability) {
-        super(progression, "Lucky Bait", new ItemStack(Material.YELLOW_GLAZED_TERRACOTTA), ItemRarity.EPIC, ability);
+        super(progression, translatableName("progression.item.lucky-bait.name"), new ItemStack(Material.YELLOW_GLAZED_TERRACOTTA), ItemRarity.EPIC, ability);
         addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT)));
     }
 

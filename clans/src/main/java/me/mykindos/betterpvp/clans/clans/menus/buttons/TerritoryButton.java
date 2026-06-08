@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -31,13 +31,16 @@ public class TerritoryButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/flag_icon"))
-                .displayName(Component.text("Territory", NamedTextColor.DARK_GREEN))
-                .lore(UtilMessage.deserialize("<white>%d</white>/%d claimed", clan.getTerritory().size(), Math.min(clan.getMembers().size() + 3, 9)))
+                .displayName(Translations.component("clans.menu.clan.button.territory.name").color(NamedTextColor.DARK_GREEN))
+                .lore(Translations.component("clans.menu.clan.button.territory.lore.claimed",
+                        Component.text(clan.getTerritory().size(), NamedTextColor.WHITE),
+                        Component.text(Math.min(clan.getMembers().size() + 3, 9), NamedTextColor.GRAY))
+                        .color(NamedTextColor.GRAY))
                 .frameLore(true);
 
         if (admin) {
-            builder.action(ClickActions.LEFT, Component.text("Claim Territory"));
-            builder.action(ClickActions.RIGHT, Component.text("Unclaim Territory"));
+            builder.action(ClickActions.LEFT, Translations.component("clans.menu.clan.button.territory.action.claim"));
+            builder.action(ClickActions.RIGHT, Translations.component("clans.menu.clan.button.territory.action.unclaim"));
         }
 
         return builder.build();

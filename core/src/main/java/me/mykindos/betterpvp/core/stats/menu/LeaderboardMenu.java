@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -18,7 +19,6 @@ import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -70,7 +70,7 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
         SearchOptions.SearchOptionsBuilder optionsBuilder = SearchOptions.builder();
         if (leaderboard instanceof Sorted sorted) {
             // Create sort button
-            final TextComponent sortTypeName = Component.text("Sort By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            final Component sortTypeName = Translations.component("core.menu.leaderboard.button.sort-by.name").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD);
             CycleButton<SortType> button = new CycleButton<>(sorted.acceptedSortTypes(), new ItemStack(Material.ARMOR_STAND), sortTypeName, type -> {
                 // On click, update search options
                 searchOptions = searchOptions.withSort(type);
@@ -85,7 +85,7 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
 
         if (leaderboard instanceof Filtered filtered) {
             // Create filter button
-            final TextComponent filterTypeName = Component.text("Filter By", NamedTextColor.WHITE, TextDecoration.BOLD);
+            final Component filterTypeName = Translations.component("core.menu.leaderboard.button.filter-by.name").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD);
             CycleButton<FilterType> button = new CycleButton<>(filtered.acceptedFilters(), new ItemStack(Material.LECTERN), filterTypeName, type -> {
                 // On click, update search options
                 searchOptions = searchOptions.withFilter(type);
@@ -119,7 +119,7 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
                     .displayName(title)
                     .lore(UtilMessage.DIVIDER)
                     .lore(Component.empty())
-                    .lore(Component.text("        EMPTY POSITION!", NamedTextColor.RED, TextDecoration.BOLD))
+                    .lore(Translations.component("core.menu.leaderboard.entry.empty").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
                     .lore(Component.empty())
                     .lore(UtilMessage.DIVIDER)
                     .build();
@@ -128,7 +128,7 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
                     .displayName(title)
                     .lore(UtilMessage.DIVIDER)
                     .lore(Component.empty())
-                    .lore(Component.text("           LOADING...", NamedTextColor.RED, TextDecoration.BOLD))
+                    .lore(Translations.component("core.menu.leaderboard.entry.loading").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
                     .lore(Component.empty())
                     .lore(UtilMessage.DIVIDER)
                     .build();
@@ -146,18 +146,18 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
 
         // Podium indicators
         final ItemView.ItemViewBuilder builder = ItemView.builder();
-        final ItemView top1 = builder.material(Material.GOLD_INGOT).displayName(Component.text("Top #1", NamedTextColor.GOLD, TextDecoration.BOLD)).build();
+        final ItemView top1 = builder.material(Material.GOLD_INGOT).displayName(Translations.component("core.menu.leaderboard.podium.top1").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD)).build();
         setItem(13, new SimpleItem(top1));
-        final ItemView top2 = builder.material(Material.IRON_INGOT).displayName(Component.text("Top #2", NamedTextColor.GRAY, TextDecoration.BOLD)).build();
+        final ItemView top2 = builder.material(Material.IRON_INGOT).displayName(Translations.component("core.menu.leaderboard.podium.top2").color(NamedTextColor.GRAY).decorate(TextDecoration.BOLD)).build();
         setItem(21, new SimpleItem(top2));
-        final ItemView top3 = builder.material(Material.COPPER_INGOT).displayName(Component.text("Top #3", NamedTextColor.GOLD, TextDecoration.BOLD)).build();
+        final ItemView top3 = builder.material(Material.COPPER_INGOT).displayName(Translations.component("core.menu.leaderboard.podium.top3").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD)).build();
         setItem(23, new SimpleItem(top3));
 
         // Own data
-        final TextComponent title = Component.text("Your Data", NamedTextColor.WHITE, TextDecoration.BOLD);
+        final Component title = Translations.component("core.menu.leaderboard.your-data.name").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD);
         final ItemView loading = ItemView.builder()
                 .material(Material.PAPER)
-                .displayName(Component.text("Retrieving your data...", NamedTextColor.GRAY)).build();
+                .displayName(Translations.component("core.menu.leaderboard.your-data.loading").color(NamedTextColor.GRAY)).build();
         final LeaderboardEntryButton<E, T> button = new LeaderboardEntryButton<>(() -> {
             final CompletableFuture<Optional<LeaderboardEntry<E, T>>> data = leaderboard.getPlayerData(player.getUniqueId(), searchOptions);
             return data.thenApply(opt -> opt.orElse(null));
@@ -177,7 +177,7 @@ public class LeaderboardMenu<E, T> extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text(leaderboard.getName() + " Leaderboard");
+        return Translations.component("core.menu.leaderboard.title", Component.text(leaderboard.getName()));
     }
 
 }

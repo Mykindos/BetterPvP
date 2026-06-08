@@ -6,6 +6,11 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * Renderer for display names on items.
+ *
+ * <p>Implementations produce the item's name as an authored, possibly <b>unresolved</b> translatable
+ * component. Server-side localization into a recipient's locale happens later, at the outgoing packet
+ * boundary (see {@code ItemPacketRemapper} / {@link me.mykindos.betterpvp.core.locale.Translations#renderItemStack}).
+ * Do not resolve translations here.</p>
  */
 @FunctionalInterface
 public interface ItemNameRenderer {
@@ -13,7 +18,6 @@ public interface ItemNameRenderer {
     /**
      * Create the name for an item.
      * @param item The item to create the name for
-     * @param itemStack The item stack to apply the name to
      * @return The component representing the name of the item
      */
     Component createName(ItemInstance item);

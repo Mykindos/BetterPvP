@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ public abstract class MetalBlockItem extends BaseItem implements NexoItem {
 
     private final String nexoId;
 
-    protected MetalBlockItem(String name, String nexoId, ItemRarity rarity) {
+    protected MetalBlockItem(Component name, String nexoId, ItemRarity rarity) {
         super(name, ItemStack.of(Material.PAPER), ItemGroup.BLOCK, rarity);
         this.nexoId = nexoId;
     }

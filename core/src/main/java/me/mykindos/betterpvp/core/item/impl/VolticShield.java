@@ -14,6 +14,6 @@ public class VolticShield extends BaseItem {
 
     @Inject
     private VolticShield() {
-        super("Voltic Shield", Item.model("voltic_shield", 1), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.voltic-shield.name"), Item.model("voltic_shield", 1), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

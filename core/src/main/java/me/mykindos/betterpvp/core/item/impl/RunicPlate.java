@@ -14,6 +14,6 @@ public class RunicPlate extends BaseItem {
 
     @Inject
     private RunicPlate() {
-        super("Runic Plate", Item.model("runic_plate", 16), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.runic-plate.name"), Item.model("runic_plate", 16), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
     }
 }

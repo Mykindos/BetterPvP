@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,12 +47,12 @@ public class WaterDamageAbility extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Water Damage");
+        return Translations.component("champions.ability.water-damage.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Increases damage dealt by melee attacks while in water by a flat amount.");
+        return Translations.component("champions.ability.water-damage.description");
     }
 
     @Override

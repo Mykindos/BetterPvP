@@ -18,6 +18,7 @@ import java.util.Optional;
 
 public abstract class ClanSubCommand extends Command {
 
+    protected static final String CLANS_PREFIX = "clans.prefix";
     protected final ClanManager clanManager;
     protected final ClientManager clientManager;
 
@@ -35,7 +36,7 @@ public abstract class ClanSubCommand extends Command {
         if (!canExecuteWithoutClan()) {
             Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
             if (playerClanOptional.isEmpty()) {
-                UtilMessage.message(player, "Clans", "You are not in a clan");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.no-clan");
                 return;
             }
         }

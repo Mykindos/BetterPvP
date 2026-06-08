@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,20 +38,22 @@ public class LocationButton extends AbstractItem implements PreviousableButton {
 
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
-            .action(ClickActions.LEFT, Component.text("Send in Chat"))
+            .action(ClickActions.LEFT, Translations.component("core.menu.log.button.location.send.action"))
             .material(Material.GRASS_BLOCK)
             .customModelData(0)
             .lore(Component.text(UtilWorld.locationToString(location, true, false)))
             .frameLore(true);
 
         if (location.getWorld() != null) {
-            itemViewBuilder.displayName(Component.text("Location: " + location.getWorld().getName()));
+            itemViewBuilder.displayName(Translations.component("core.menu.log.button.location.name")
+                    .append(Component.text(location.getWorld().getName())));
         } else {
-            itemViewBuilder.displayName(Component.text("Location: " + "Unloaded World"));
+            itemViewBuilder.displayName(Translations.component("core.menu.log.button.location.name")
+                    .append(Translations.component("core.menu.log.button.location.unloaded-world")));
         }
 
         if (admin && location.getWorld() != null) {
-            itemViewBuilder.action(ClickActions.RIGHT, Component.text("Teleport"));
+            itemViewBuilder.action(ClickActions.RIGHT, Translations.component("core.menu.log.button.location.teleport.action"));
         }
 
         return itemViewBuilder.build();
@@ -68,7 +71,7 @@ public class LocationButton extends AbstractItem implements PreviousableButton {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (clickType.isLeftClick()) {
             // for mods that give waypoints
-            UtilMessage.message(player, "Location", UtilWorld.locationToString(location));
+            UtilMessage.message(player, "core.prefix.location", UtilWorld.locationToString(location));
         }
         if (clickType.isRightClick() && admin && location.getWorld() != null) {
             player.teleport(location.toCenterLocation());

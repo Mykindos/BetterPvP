@@ -23,7 +23,7 @@ public class BoosterAxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 32;
 
     public BoosterAxe() {
-        super("Booster Axe", ItemStack.of(Material.GOLDEN_AXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.booster-axe.name"), ItemStack.of(Material.GOLDEN_AXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

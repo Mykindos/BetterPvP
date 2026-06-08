@@ -24,23 +24,23 @@ public class ProgressionFishBootstrap {
     }
 
     public void register() {;
-        itemRegistry.registerItem(key("trout"), new FishItem("Trout", "trout"));
-        itemRegistry.registerItem(key("salmon"), new FishItem("Salmon", "salmon"));
-        itemRegistry.registerItem(key("bluegill"), new FishItem("Bluegill", "bluegill"));
-        itemRegistry.registerItem(key("gar"), new FishItem("Gar", "gar"));
-        itemRegistry.registerItem(key("carp"), new FishItem("Carp", "carp"));
-        itemRegistry.registerItem(key("catfish"), new FishItem("Catfish", "catfish"));
-        itemRegistry.registerFallbackItem(key("cod"), Material.COD, new FishItem("Cod", "acod"));
-        itemRegistry.registerItem(key("drum"), new FishItem("Drum", "drum"));
-        itemRegistry.registerItem(key("sablefish"), new FishItem("Sablefish", "sablefish"));
-        itemRegistry.registerItem(key("kingfish"), new FishItem("Kingfish", "kingfish"));
-        itemRegistry.registerItem(key("cobia"), new FishItem("Cobia", "cobia"));
-        itemRegistry.registerItem(key("sea_bass"), new FishItem("Sea Bass", "sea_bass"));
-        itemRegistry.registerItem(key("tuna"), new FishItem("Tuna", "tuna"));
-        itemRegistry.registerItem(key("swordfish"), new FishItem("Swordfish", "swordfish"));
-        itemRegistry.registerItem(key("marlin"), new FishItem("Marlin", "marlin"));
-        itemRegistry.registerItem(key("grouper"), new FishItem("Grouper", "grouper"));
-        itemRegistry.registerItem(key("sturgeon"), new FishItem("Sturgeon", "sturgeon"));
-        itemRegistry.registerItem(key("sunfish"), new FishItem("Sunfish", "sunfish"));
+        itemRegistry.registerItem(key("trout"), new FishItem("progression.item.trout.name", "trout"));
+        itemRegistry.registerItem(key("salmon"), new FishItem("progression.item.salmon.name", "salmon"));
+        itemRegistry.registerItem(key("bluegill"), new FishItem("progression.item.bluegill.name", "bluegill"));
+        itemRegistry.registerItem(key("gar"), new FishItem("progression.item.gar.name", "gar"));
+        itemRegistry.registerItem(key("carp"), new FishItem("progression.item.carp.name", "carp"));
+        itemRegistry.registerItem(key("catfish"), new FishItem("progression.item.catfish.name", "catfish"));
+        itemRegistry.registerFallbackItem(key("cod"), Material.COD, new FishItem("progression.item.cod.name", "acod"));
+        itemRegistry.registerItem(key("drum"), new FishItem("progression.item.drum.name", "drum"));
+        itemRegistry.registerItem(key("sablefish"), new FishItem("progression.item.sablefish.name", "sablefish"));
+        itemRegistry.registerItem(key("kingfish"), new FishItem("progression.item.kingfish.name", "kingfish"));
+        itemRegistry.registerItem(key("cobia"), new FishItem("progression.item.cobia.name", "cobia"));
+        itemRegistry.registerItem(key("sea_bass"), new FishItem("progression.item.sea-bass.name", "sea_bass"));
+        itemRegistry.registerItem(key("tuna"), new FishItem("progression.item.tuna.name", "tuna"));
+        itemRegistry.registerItem(key("swordfish"), new FishItem("progression.item.swordfish.name", "swordfish"));
+        itemRegistry.registerItem(key("marlin"), new FishItem("progression.item.marlin.name", "marlin"));
+        itemRegistry.registerItem(key("grouper"), new FishItem("progression.item.grouper.name", "grouper"));
+        itemRegistry.registerItem(key("sturgeon"), new FishItem("progression.item.sturgeon.name", "sturgeon"));
+        itemRegistry.registerItem(key("sunfish"), new FishItem("progression.item.sunfish.name", "sunfish"));
     }
 }

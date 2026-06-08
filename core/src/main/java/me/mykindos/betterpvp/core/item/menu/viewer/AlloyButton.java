@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.metal.casting.CastingMoldRecipe;
 import me.mykindos.betterpvp.core.recipe.Recipe;
@@ -38,7 +39,7 @@ public class AlloyButton extends ControlItem<Gui> {
 
     private final Alloy alloy;
     private final int millibuckets;
-    private final String millibucketPrefix;
+    private final Component millibucketPrefix;
     private final boolean viewOnly;
     private final CompletableFuture<Result> loadFuture;
 
@@ -47,7 +48,7 @@ public class AlloyButton extends ControlItem<Gui> {
 
     private record Result(LinkedList<Recipe<?>> recipes, LinkedList<Recipe<?>> usages) {}
 
-    public AlloyButton(Alloy alloy, int millibuckets, boolean viewOnly, String millibucketPrefix) {
+    public AlloyButton(Alloy alloy, int millibuckets, boolean viewOnly, Component millibucketPrefix) {
         this.viewOnly = viewOnly;
         this.millibuckets = millibuckets;
         this.alloy = alloy;
@@ -77,16 +78,16 @@ public class AlloyButton extends ControlItem<Gui> {
                     if (ex != null) {
                         cachedResult = null;
                         cachedProvider = baseBuilder()
-                                .lore(Component.text("Error loading recipes"))
+                                .lore(Translations.component("core.menu.alloy.error.lore"))
                                 .build();
                     } else {
                         cachedResult = res;
                         ItemView.ItemViewBuilder builder = baseBuilder();
                         if (!res.recipes.isEmpty()) {
-                            builder.action(ClickActions.LEFT, Component.text("View Recipes"));
+                            builder.action(ClickActions.LEFT, Translations.component("core.menu.alloy.view-recipes.action"));
                         }
                         if (!res.usages.isEmpty()) {
-                            builder.action(ClickActions.RIGHT, Component.text("View Usages"));
+                            builder.action(ClickActions.RIGHT, Translations.component("core.menu.alloy.view-usages.action"));
                         }
                         cachedProvider = builder.build();
                     }
@@ -103,7 +104,8 @@ public class AlloyButton extends ControlItem<Gui> {
                 .displayName(Component.text(alloy.getName(),
                         TextColor.color(alloy.getColor().asRGB()), TextDecoration.BOLD))
                 .customModelData(15)
-                .lore(Component.text(millibucketPrefix + ":", TextColor.color(214, 214, 214))
+                .lore(millibucketPrefix.color(TextColor.color(214, 214, 214))
+                        .append(Component.text(":", TextColor.color(214, 214, 214)))
                         .appendSpace()
                         .append(Component.text(UtilFormat.formatNumber(millibuckets / 1000d, 1), NamedTextColor.WHITE))
                         .append(Component.text(" " + bucketsString, NamedTextColor.WHITE)));
@@ -116,14 +118,14 @@ public class AlloyButton extends ControlItem<Gui> {
         }
         if (!loadFuture.isDone()) {
             return baseBuilder()
-                    .lore(Component.text("Loading recipes..."))
+                    .lore(Translations.component("core.menu.alloy.loading.lore"))
                     .build();
         }
         if (cachedProvider != null) {
             return cachedProvider;
         }
         return baseBuilder()
-                .lore(Component.text("Error loading recipes"))
+                .lore(Translations.component("core.menu.alloy.error.lore"))
                 .build();
     }
 

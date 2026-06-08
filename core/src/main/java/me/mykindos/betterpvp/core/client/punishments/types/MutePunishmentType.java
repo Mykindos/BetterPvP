@@ -22,7 +22,7 @@ public class MutePunishmentType implements IPunishmentType {
     public void onExpire(UUID client, Punishment punishment) {
         Player player = Bukkit.getPlayer(client);
         if (player != null) {
-            UtilMessage.message(player, "Punish", "Your mute has expired");
+            UtilMessage.message(player, "core.prefix.punish", "core.punishment.mute.expired");
         }
     }
 

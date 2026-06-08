@@ -39,6 +39,16 @@ public interface IClan {
     void messageClan(String message, UUID ignore, boolean prefix);
 
     /**
+     * Sends a localized message to all members of the clan.
+     *
+     * @param key    The translation key.
+     * @param args   The arguments for the translation key.
+     * @param ignore The UUID of a member to exclude from receiving the message; can be null to include everyone.
+     * @param prefix Indicates whether the message should include a PREFIX. If true, a PREFIX will be added.
+     */
+    void messageClan(String key, Object[] args, UUID ignore, boolean prefix);
+
+    /**
      * Retrieves the list of members in the clan.
      *
      * @return a list of {@code ClanMember} objects representing the members of the clan.

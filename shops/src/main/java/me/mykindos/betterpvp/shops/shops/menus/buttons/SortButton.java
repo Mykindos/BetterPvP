@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.shops.menus.buttons;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
@@ -32,10 +33,10 @@ public class SortButton extends AbstractItem {
         for (SortMode sortMode : SortMode.values()) {
             TextColor color = sortMode == menu.getSortMode() ? TextColor.color(0xFFD700) : NamedTextColor.GRAY;
             if (!titled) {
-                builder.displayName(Component.text(sortMode.getDisplayName(), color));
+                builder.displayName(Translations.component(sortMode.getTranslationKey()).color(color));
                 titled = true;
             } else {
-                builder.lore(Component.text(sortMode.getDisplayName(), color));
+                builder.lore(Translations.component(sortMode.getTranslationKey()).color(color));
             }
         }
 

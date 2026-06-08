@@ -33,7 +33,7 @@ public class SuspiciousStew extends BaseItem implements Reloadable {
 
     @Inject
     private SuspiciousStew(EffectRouletteAbility effectRouletteAbility) {
-        super("Suspicious Stew", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.suspicious-stew.name"), model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.effectRouletteAbility = effectRouletteAbility;
         this.effectRouletteAbility.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()

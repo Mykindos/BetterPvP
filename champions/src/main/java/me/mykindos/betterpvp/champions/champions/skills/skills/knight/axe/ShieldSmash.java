@@ -21,9 +21,13 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -68,16 +72,14 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Smash your shield into an enemy,",
-                "dealing " + getValueString(this::getKnockbackMultiplier, level, 100, "%", 0) + " knockback and knocking",
-                "you back in the opposite direction.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component knockback = getValueComponent(this::getKnockbackMultiplier, level, 100, 0, "%");
+        Component cooldownComp = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.shield-smash.description",
+                knockback,
+                cooldownComp
+        );
     }
 
     public double getBlockKickbackMultiplier(int level) {
@@ -150,7 +152,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             }
 
             // Inform them
-            UtilMessage.simpleMessage(ent, "Skill", "<alt2>%s</alt2> hit you with <alt>%s</alt>.", player.getName(), getName());
+            UtilMessage.message(ent, "core.prefix.skill", "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
         }
 
         if (hit) { // entity hit
@@ -179,7 +181,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         if (hit) {
             player.getWorld().playSound(bashLocation, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.9f);
         } else {
-            UtilMessage.simpleMessage(player, "Skill", "You missed <alt>%s</alt>.", getName());
+            UtilMessage.message(player, "core.prefix.skill", "champions.skill.missed", getDisplayName().color(NamedTextColor.GREEN));
         }
         return true;
     }

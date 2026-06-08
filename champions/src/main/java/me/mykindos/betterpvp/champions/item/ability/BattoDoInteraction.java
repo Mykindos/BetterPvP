@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.destroystokyo.paper.ParticleBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -82,12 +84,12 @@ public class BattoDoInteraction extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Batto-Do");
+        return Translations.component("champions.ability.batto-do.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Dash forward and strike targets in your path, dealing damage, knocking them back, and setting them on fire.");
+        return Translations.component("champions.ability.batto-do.description");
     }
 
     private void onSelect(@NotNull InteractionActor actor, @NotNull InteractionContext context, LivingEntity livingEntity) {

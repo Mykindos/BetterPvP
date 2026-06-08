@@ -63,7 +63,7 @@ public class ClansFishingListener implements Listener {
 
             fish.setWeight((int) (fish.getWeight() * 0.50));
             if (UtilMath.randomInt(20) < 2) {
-                UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
+                UtilMessage.message(event.getPlayer(), "core.prefix.fishing", "clans.fishing.outside-fields");
             }
         } else {
             UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
@@ -110,11 +110,8 @@ public class ClansFishingListener implements Listener {
         dropped.get().setItemStack(new ItemStack(Material.DRAGON_HEAD));
 
         final Component name = reward.getBaseItem().getItemNameRenderer().createName(reward);
-        UtilMessage.simpleMessage(player, "Fishing",
-                Component.text("You would have caught a ", NamedTextColor.GRAY)
-                        .append(name)
-                        .append(Component.text(", but you were not at Fields!", NamedTextColor.GRAY)));
-        UtilMessage.simpleMessage(player, "Fishing", "Have this instead...");
+        UtilMessage.message(player, "core.prefix.fishing", "clans.fishing.legendary-denied", name);
+        UtilMessage.message(player, "core.prefix.fishing", "clans.fishing.replacement");
 
         log.info("{} ({}) would have caught a legendary while fishing, but they were not at fields!",
                 player.getName(), player.getUniqueId()).submit();

@@ -24,7 +24,7 @@ public class Rope extends BaseItem {
 
     @Inject
     private Rope() {
-        super("Rope", Item.model("rope", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.rope.name"), Item.model("rope", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 
     @Inject

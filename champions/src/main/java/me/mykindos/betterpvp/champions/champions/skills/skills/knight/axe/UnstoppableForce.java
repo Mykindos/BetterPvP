@@ -23,10 +23,14 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -76,19 +80,16 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Hold right click with an axe to channel",
-                "",
-                "Raise your shield and begin to charge at high speed.",
-                "Deals " + getValueString(this::getDamage, level) + " damage and knocks back any enemy hit.",
-                "",
-                "While charging, you are immune to any crowd control effects",
-                "",
-                "Energy: " + getValueString(this::getEnergy, level) + " per second",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds starting when the charge ends"
-
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component energy = getValueComponent(this::getEnergy, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.unstoppable-force.description",
+                damage,
+                energy,
+                cooldown
+        );
     }
 
     public double getDamage(int level) {
@@ -101,8 +102,9 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
             return true;
         }
         if (championsManager.getCooldowns().hasCooldown(player, getName())) {
-            UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s %s</alt> for <alt>%s</alt> seconds.", getName(), level,
-                    Math.max(0, championsManager.getCooldowns().getAbilityRecharge(player, getName()).getRemaining()));
+            UtilMessage.message(player, "core.prefix.cooldown", "champions.skill.cooldown",
+                    getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)),
+                    Component.text(String.valueOf(Math.max(0, championsManager.getCooldowns().getAbilityRecharge(player, getName()).getRemaining())), NamedTextColor.GREEN));
             return false;
         }
         active.add(player.getUniqueId());

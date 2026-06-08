@@ -14,6 +14,6 @@ public class RunicDust extends BaseItem {
 
     @Inject
     private RunicDust() {
-        super("Runic Dust", Item.model("runic_dust", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.runic-dust.name"), Item.model("runic_dust", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 }

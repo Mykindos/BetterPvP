@@ -34,7 +34,7 @@ public class TrustSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Form a trust with an ally clan, allowing them to use your clan's doors.";
+        return "clans.command.trust.description";
     }
 
     @Override
@@ -45,37 +45,37 @@ public class TrustSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You did not input a clan name");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.trust.no-args");
             return;
         }
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
         if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Only the clan admins can request a trust between clans.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.trust.no-rank");
             return;
         }
 
         Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if (targetClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "The clan you want to trust with does not exist.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.trust.not-found");
             return;
         }
 
         Clan targetClan = targetClanOptional.get();
         if (clan.equals(targetClan)) {
-            UtilMessage.message(player, "Clans", "You cannot request a trust with your own clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.trust.self");
             return;
         }
 
         Optional<ClanAlliance> allianceOptional = clan.getAlliance(targetClan);
         if (allianceOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You cannot request a trust with a clan you are not allied with.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.trust.not-allied");
             return;
         }
 
         ClanAlliance alliance = allianceOptional.get();
         if(alliance.isTrusted()) {
-            UtilMessage.message(player, "Clans", "You are already trusted with this clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.trust.already-trusted");
             return;
         }
 

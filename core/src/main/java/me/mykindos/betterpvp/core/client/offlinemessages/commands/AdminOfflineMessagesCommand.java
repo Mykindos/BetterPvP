@@ -31,19 +31,20 @@ public class AdminOfflineMessagesCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Retrieve another players offline messages from a given time period";
+        return "core.command.admin-offline-messages.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 3) {
-            UtilMessage.message(player, "OfflineMessages", "Usage: <yellow>/adminofflinemessages <green><player> <number> <unit></green></yellow>");
+            UtilMessage.message(player, "core.prefix.offlinemessages", "core.command.offlinemessages.admin.usage");
             return;
         }
 
         clientManager.search().offline(args[0]).thenAcceptAsync((targetOptional) -> {
             if (targetOptional.isEmpty()) {
-                UtilMessage.message(player, "Core", "<yellow>%s</yellow> is not a valid player name", args[0]);
+                UtilMessage.message(player, "core.prefix.core", "core.command.balance.player_not_found",
+                        net.kyori.adventure.text.Component.text(args[0], net.kyori.adventure.text.format.NamedTextColor.YELLOW));
                 return;
             }
             Client target = targetOptional.get();

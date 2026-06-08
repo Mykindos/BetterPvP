@@ -18,7 +18,9 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -52,13 +54,13 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Add a punishment to a player";
+        return "core.command.punishment-add.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 3) {
-            UtilMessage.message(player, "Command", "Usage: /punish add <player> <rule> <reason...>");
+            UtilMessage.message(player, "core.prefix.command", "core.command.punishment.add.usage");
             return;
         }
 
@@ -66,13 +68,13 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
                 if (target.getRank().getId() >= client.getRank().getId()) {
-                    UtilMessage.message(player, "Punish", "You cannot punish a client with the same or higher rank.");
+                    UtilMessage.message(player, "core.prefix.command", "core.command.punishment.rank.too_high");
                     return;
                 }
 
                 processPunishment(player, target, client, args);
             } else {
-                UtilMessage.message(player, "Punish", "Could not find a client with this name.");
+                UtilMessage.message(player, "core.prefix.command", "core.command.punishment.client.not_found");
             }
         });
 
@@ -81,7 +83,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 3) {
-            UtilMessage.message(sender, "Command", "Usage: /punish add <player> <rule> <reason...>");
+            UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.add.usage");
             return;
         }
 
@@ -89,13 +91,13 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
                 if (target.hasRank(Rank.ADMIN)) {
-                    UtilMessage.message(sender, "Punish", "You cannot punish this client.");
+                    UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.rank.too_high");
                     return;
                 }
 
                 processPunishment(sender, target, null, args);
             } else {
-                UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
+                UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.client.not_found");
             }
         });
     }
@@ -105,20 +107,20 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         Optional<Rule> ruleOptional = ruleManager.getObject(args[1].toLowerCase());
 
         if (ruleOptional.isEmpty()) {
-            UtilMessage.message(sender, "Punish", "Invalid rule");
+            UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.rule.invalid");
             return;
         }
 
         Rule rule = ruleOptional.get();
 
         if (rule.getKey().equalsIgnoreCase("custom")) {
-            UtilMessage.message(sender, "Punish", "This is a reserved rule. Use <white>/punish custom</white> for a custom punishment");
+            UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.rule.reserved");
         }
 
         String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         if (reason.isEmpty()) {
-            UtilMessage.message(sender, "Punish", "You must include a reason for a punishment");
+            UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.reason.required");
             return;
         }
 
@@ -145,9 +147,9 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         type.onReceive(target.getUniqueId(), punishment);
         if (punisher != null) {
             if (time == -1) {
-                UtilMessage.broadcast("Punish", "<yellow>%s<reset> has <green>permanently <reset>%s <yellow>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName());
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.with_punisher.permanent", Component.text(punisher.getName()), Component.text(type.getChatLabel()), Component.text(target.getName()));
             } else {
-                UtilMessage.broadcast("Punish", "<yellow>%s<reset> has %s <yellow>%s<reset> for <green>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName(), formattedTime);
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.with_punisher.temp", Component.text(punisher.getName()), Component.text(type.getChatLabel()), Component.text(target.getName()), Component.text(formattedTime));
             }
             log.info("{} was {} by {} for {} reason {}", target.getName(), punisher.getName(), type.getChatLabel(), formattedTime, reason)
                     .setAction("PUNISH_ADD")
@@ -156,9 +158,9 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
                     .submit();
         } else {
             if (time == -1) {
-                UtilMessage.broadcast("Punish", "<yellow>%s<reset> was <green>permanently <reset>%s.", target.getName(), type.getChatLabel());
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.no_punisher.permanent", Component.text(target.getName()), Component.text(type.getChatLabel()));
             } else {
-                UtilMessage.broadcast("Punish", "<yellow>%s<reset> was %s for <green>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime);
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.no_punisher.temp", Component.text(target.getName()), Component.text(type.getChatLabel()), Component.text(formattedTime));
             }
             log.info("{} was {} for {} reason {}", target.getName(), type.getChatLabel(), formattedTime, reason)
                     .setAction("PUNISH_ADD")
@@ -168,10 +170,12 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
         if (!reason.isEmpty()) {
             Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
-            Component reasonComponent = UtilMessage.deserialize("<red>Reason<reset>: <reset>%s", reason);
+            Component reasonComponent = Translations.component("core.punishment.staff.reason",
+                    Translations.component("core.punishment.staff.reason_label").color(NamedTextColor.RED),
+                    Component.text(reason));
 
             if (targetPlayer != null) {
-                UtilMessage.message(targetPlayer, "Punish", reasonComponent);
+                UtilMessage.message(targetPlayer, "core.prefix.punish", reasonComponent);
             }
 
             clientManager.sendMessageToRank("Punish", reasonComponent, Rank.TRIAL_MOD);

@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -31,21 +33,22 @@ public class ShowEffectsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "List all effects the player currently has";
+        return "core.command.show-effects.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         Optional<ConcurrentHashMap<String, List<Effect>>> listOptional = effectManager.getObject(player.getUniqueId().toString());
         if (listOptional.isEmpty()) {
-            UtilMessage.message(player, "Effects", "You do not currently have any effects applied");
+            UtilMessage.message(player, "core.prefix.effects", "core.command.showeffects.none");
             return;
         }
         ConcurrentHashMap<String, List<Effect>> effects = listOptional.get();
         effects.values().forEach(effectList -> {
             effectList.forEach(effect -> {
-                UtilMessage.message(player, "Effects", "<white>%s %s</white>: <green>%s</green>",
-                        effect.getEffectType().getName(), effect.getAmplifier(), UtilTime.getTime(effect.getRemainingDuration(), 1));
+                UtilMessage.message(player, "core.prefix.effects", "core.command.showeffects.entry",
+                        Component.text(effect.getEffectType().getName() + " " + effect.getAmplifier(), NamedTextColor.WHITE),
+                        Component.text(UtilTime.getTime(effect.getRemainingDuration(), 1), NamedTextColor.GREEN));
             });
         });
 

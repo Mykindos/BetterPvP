@@ -14,6 +14,6 @@ public class ReapersEdge extends BaseItem {
 
     @Inject
     private ReapersEdge() {
-        super("Reaper's Edge", Item.model("reapers_edge", 64), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.reapers-edge.name"), Item.model("reapers_edge", 64), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 }

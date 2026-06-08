@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonWrapperStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -33,7 +34,7 @@ public class DungeonClansStatButton extends ControlItem<IAbstractClansStatMenu> 
                 .material(Material.MOSSY_COBBLESTONE)
                 .lore(getDungeonStats())
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .displayName(Component.text("Dungeons Stats"))
+                .displayName(Translations.component("core.menu.stats.clans.button.dungeons.name"))
                 .build();
     }
 

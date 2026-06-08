@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,7 +32,7 @@ public class SetEnergySubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Force set the energy for your current clan";
+        return "clans.command.set-energy.description";
     }
 
     @Override
@@ -42,14 +43,14 @@ public class SetEnergySubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length != 1) {
-            UtilMessage.message(player, "Clans", Component.text("This command requires 1 argument as input."));
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.set-energy.usage");
             return;
         }
         int energy;
         try {
             energy = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
-            UtilMessage.message(player, "Clans", Component.text(args[0] + " is not a valid input. Input must be an integer."));
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.set-energy.invalid-input", Component.text(args[0], NamedTextColor.YELLOW));
             return;
         }
 
@@ -60,15 +61,22 @@ public class SetEnergySubCommand extends ClanSubCommand {
         int oldEnergy = playerClan.getEnergy();
         playerClan.setEnergy(energy);
 
-        Component component = Component.text("Energy set to: ", NamedTextColor.GRAY)
-                .append(Component.text(playerClan.getEnergy() + " - (", NamedTextColor.YELLOW)
-                        .append(Component.text(playerClan.getEnergyTimeRemaining(), NamedTextColor.GOLD)
-                                .append(Component.text(")", NamedTextColor.YELLOW))))
-                .append(Component.text(" Previous: ", NamedTextColor.GRAY)).append(Component.text(oldEnergy, NamedTextColor.YELLOW));
+        Component component = Translations.component("clans.command.clan.set-energy.success",
+                Component.text(playerClan.getEnergy(), NamedTextColor.YELLOW),
+                Component.text(playerClan.getEnergyTimeRemaining(), NamedTextColor.GOLD),
+                Component.text(oldEnergy, NamedTextColor.YELLOW));
 
-        UtilMessage.message(player, "Clans", component);
-        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> set the energy of <yellow>%s<gray> to <green>%s <white>(<yellow>%s<white>)",
-                player.getName(), playerClan.getName(), playerClan.getEnergy(), playerClan.getEnergyTimeRemaining()), Rank.TRIAL_MOD);
+        UtilMessage.message(player, CLANS_PREFIX, component);
+
+        Component notification = Translations.component("clans.command.clan.set-energy.mod-notification",
+                Component.text(player.getName(), NamedTextColor.YELLOW),
+                Component.text(playerClan.getName(), NamedTextColor.YELLOW),
+                Component.text(playerClan.getEnergy(), NamedTextColor.GREEN),
+                Component.text(playerClan.getEnergyTimeRemaining(), NamedTextColor.YELLOW));
+
+        clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(target -> {
+            UtilMessage.message(target, Translations.component(CLANS_PREFIX), notification);
+        });
     }
 
     @Override

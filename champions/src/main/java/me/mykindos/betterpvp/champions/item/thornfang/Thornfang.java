@@ -51,7 +51,7 @@ public class Thornfang extends WeaponItem implements Reloadable {
 
     @Inject
     private Thornfang(Champions champions, CooldownManager cooldownManager, ClientManager clientManager, EffectManager effectManager, ItemFactory itemFactory) {
-        super(champions, "Thornfang", model, ItemRarity.MYTHICAL, List.of(Group.MELEE));
+        super(champions, translatableName("champions.item.thornfang.name"), model, ItemRarity.MYTHICAL, List.of(Group.MELEE));
 
         // Create Hunter's Brand first
         this.huntersBrand = new HuntersBrand(champions, itemFactory, effectManager, this);

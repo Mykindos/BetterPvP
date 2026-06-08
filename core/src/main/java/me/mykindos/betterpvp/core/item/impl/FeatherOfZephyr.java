@@ -14,6 +14,6 @@ public class FeatherOfZephyr extends BaseItem {
 
     @Inject
     private FeatherOfZephyr() {
-        super("Feather of Zephyr", Item.model("feather_of_zephyr", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.feather-of-zephyr.name"), Item.model("feather_of_zephyr", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

@@ -37,10 +37,10 @@ import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
@@ -48,7 +48,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntToDoubleFunction;
 
-import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 @Singleton
 @CustomLog
@@ -115,84 +114,76 @@ public abstract class Skill implements IChampionsSkill {
         return canUseInLiquid;
     }
 
-    public Component[] parseDescription(int level) {
-        final String[] description = getDescription(level);
-        final Component[] components = new Component[description.length];
-        for (int i = 0; i < description.length; i++) {
-            components[i] = miniMessage.deserialize("<gray>" + description[i])
-                    .decoration(TextDecoration.ITALIC, false);
-        }
-        return components;
-    }
+    // Description rendering now provided directly by each skill via Component[] getDescription(int level)
 
     @Override
     public Component getTags() {
         Component component = Component.empty();
         if (this instanceof ChargeSkill) {
-            component = component.append(Component.text("Charge", NamedTextColor.AQUA).appendSpace());
+            component = component.append(tagComponent("charge", NamedTextColor.AQUA));
         }
         if (this instanceof PrepareArrowSkill) {
-            component = component.append(Component.text("Arrow", NamedTextColor.DARK_BLUE).appendSpace());
+            component = component.append(tagComponent("arrow", NamedTextColor.DARK_BLUE));
         }
 
         if (this instanceof EnergyChannelSkill || this instanceof EnergySkill) {
-            component = component.append(Component.text("Energy", NamedTextColor.YELLOW).appendSpace());
+            component = component.append(tagComponent("energy", NamedTextColor.YELLOW));
         }
 
         if (this instanceof ToggleSkill) {
-            component = component.append(Component.text("Toggle", NamedTextColor.GRAY).appendSpace());
+            component = component.append(tagComponent("toggle", NamedTextColor.GRAY));
         }
 
         if (this instanceof CrowdControlSkill) {
-            component = component.append(Component.text("Crowd Control", NamedTextColor.GOLD).appendSpace());
+            component = component.append(tagComponent("crowd-control", NamedTextColor.GOLD));
         }
 
         if (this instanceof DamageSkill) {
-            component = component.append(Component.text("Damage", NamedTextColor.DARK_RED).appendSpace());
+            component = component.append(tagComponent("damage", NamedTextColor.DARK_RED));
         }
 
         if (this instanceof MovementSkill) {
-            component = component.append(Component.text("Movement", NamedTextColor.WHITE).appendSpace());
+            component = component.append(tagComponent("movement", NamedTextColor.WHITE));
         }
 
         if (this instanceof AreaOfEffectSkill) {
-            component = component.append(Component.text("AoE", NamedTextColor.GOLD).appendSpace());
+            component = component.append(tagComponent("aoe", NamedTextColor.GOLD));
         }
 
         if (this instanceof BuffSkill) {
-            component = component.append(Component.text("Buff", NamedTextColor.GREEN).appendSpace());
+            component = component.append(tagComponent("buff", NamedTextColor.GREEN));
         }
 
         if (this instanceof DebuffSkill) {
-            component = component.append(Component.text("Debuff", NamedTextColor.RED).appendSpace());
+            component = component.append(tagComponent("debuff", NamedTextColor.RED));
         }
 
         if (this instanceof OffensiveSkill) {
-            component = component.append(Component.text("Offensive", NamedTextColor.LIGHT_PURPLE).appendSpace());
+            component = component.append(tagComponent("offensive", NamedTextColor.LIGHT_PURPLE));
         }
 
         if (this instanceof DefensiveSkill) {
-            component = component.append(Component.text("Defensive", NamedTextColor.GRAY).appendSpace());
+            component = component.append(tagComponent("defensive", NamedTextColor.GRAY));
         }
 
         if (this instanceof HealthSkill) {
-            component = component.append(Component.text("Health", NamedTextColor.RED).appendSpace());
+            component = component.append(tagComponent("health", NamedTextColor.RED));
         }
 
         if (this instanceof FireSkill) {
-            component = component.append(Component.text("Fire", NamedTextColor.YELLOW).appendSpace());
+            component = component.append(tagComponent("fire", NamedTextColor.YELLOW));
         }
 
         if (this instanceof TeamSkill) {
-            component = component.append(Component.text("Team", NamedTextColor.AQUA).appendSpace());
+            component = component.append(tagComponent("team", NamedTextColor.AQUA));
         }
 
         if (this instanceof WorldSkill) {
-            component = component.append(Component.text("World", NamedTextColor.DARK_PURPLE).appendSpace());
+            component = component.append(tagComponent("world", NamedTextColor.DARK_PURPLE));
         }
 
         if (this instanceof UtilitySkill) {
-            component = component.append(Component.text("Utility", NamedTextColor.LIGHT_PURPLE).appendSpace());
+            component = component.append(tagComponent("utility", NamedTextColor.LIGHT_PURPLE));
         }
 
         if (component.equals(Component.empty())) {
@@ -200,6 +191,27 @@ public abstract class Skill implements IChampionsSkill {
         }
 
         return component;
+    }
+
+    private Component tagComponent(String tag, NamedTextColor color) {
+        return Translations.component("champions.skill.tag." + tag)
+                .color(color)
+                .appendSpace();
+    }
+
+    /**
+     * The player-facing, translatable display name of this skill. This is resolved per-viewer at render
+     * time from {@code champions.skill.<role>.<skill>.name} (mirroring the description key scheme), where
+     * {@code <role>} is the class type (or {@code global} for class-less skills) and {@code <skill>} is the
+     * kebab-cased {@link #getName()}. {@link #getName()} itself remains the stable internal identifier and
+     * must not be used for display.
+     *
+     * @return the translatable display name component
+     */
+    public Component getDisplayName() {
+        final String classPart = getClassType() != null ? getClassType().name().toLowerCase() : "global";
+        final String skillPart = getName().toLowerCase().replace(" ", "-");
+        return Translations.component("champions.skill." + classPart + "." + skillPart + ".name");
     }
 
     @Override
@@ -316,6 +328,63 @@ public abstract class Skill implements IChampionsSkill {
             }
         }
         return valueString;
+    }
+
+    /**
+     * Returns a styled value {@link Component} for a level-dependent skill value.
+     * Mirrors {@link #getValueString} colouring: values that change between this
+     * level and the next render green, static values render yellow.
+     *
+     * @param method a method that takes the level
+     * @param level  the level of the skill
+     * @return a coloured component holding the formatted value
+     */
+    public Component getValueComponent(IntToDoubleFunction method, int level) {
+        return getValueComponent(method, level, 1, 1);
+    }
+
+    /**
+     * @param method        a method that takes the level
+     * @param level         the level of the skill
+     * @param decimalPlaces number of decimal places to use
+     * @return a coloured component holding the formatted value
+     */
+    public Component getValueComponent(IntToDoubleFunction method, int level, int decimalPlaces) {
+        return getValueComponent(method, level, 1, decimalPlaces);
+    }
+
+    /**
+     * @param method        a method that takes the level
+     * @param level         the level of the skill
+     * @param multiplier    the multiplier to multiply the value by
+     * @param decimalPlaces number of decimal places to use
+     * @return a coloured component holding the formatted value
+     */
+    public Component getValueComponent(IntToDoubleFunction method, int level, double multiplier, int decimalPlaces) {
+        double currentValue = method.applyAsDouble(level) * multiplier;
+        double nextValue = method.applyAsDouble(level + 1) * multiplier;
+        // if the value is the same next level it is static (yellow), otherwise it varies (green)
+        NamedTextColor color = currentValue == nextValue ? NamedTextColor.YELLOW : NamedTextColor.GREEN;
+        return Component.text(UtilFormat.formatNumber(currentValue, decimalPlaces, true), color);
+    }
+
+    /**
+     * As {@link #getValueComponent(IntToDoubleFunction, int, double, int)} but appends a literal
+     * suffix (e.g. {@code "%"}) to the formatted value, keeping it the same colour as the value.
+     *
+     * @param method        a method that takes the level
+     * @param level         the level of the skill
+     * @param multiplier    the multiplier to multiply the value by
+     * @param decimalPlaces number of decimal places to use
+     * @param suffix        literal text appended after the value
+     * @return a coloured component holding the formatted value and suffix
+     */
+    public Component getValueComponent(IntToDoubleFunction method, int level, double multiplier, int decimalPlaces, String suffix) {
+        double currentValue = method.applyAsDouble(level) * multiplier;
+        double nextValue = method.applyAsDouble(level + 1) * multiplier;
+        // if the value is the same next level it is static (yellow), otherwise it varies (green)
+        NamedTextColor color = currentValue == nextValue ? NamedTextColor.YELLOW : NamedTextColor.GREEN;
+        return Component.text(UtilFormat.formatNumber(currentValue, decimalPlaces, true) + suffix, color);
     }
 
     /**

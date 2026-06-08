@@ -22,7 +22,7 @@ public class RusticHoe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 59;
 
     public RusticHoe() {
-        super("Rustic Hoe", ItemStack.of(Material.WOODEN_HOE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.rustic-hoe.name"), ItemStack.of(Material.WOODEN_HOE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

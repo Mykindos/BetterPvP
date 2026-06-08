@@ -5,7 +5,10 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +56,7 @@ public class PillageHandler {
 
     public void endPillage(Pillage pillage) {
         activePillages.remove(pillage);
-        UtilMessage.simpleBroadcast("Clans", "The pillage on <yellow>%s <gray>has ended.",
-                pillage.getPillaged().getName());
+        UtilMessage.broadcast("core.prefix.clans", Translations.component("clans.pillage.broadcast-ended",
+                Component.text(pillage.getPillaged().getName(), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY));
     }
 }

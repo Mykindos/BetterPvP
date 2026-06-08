@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.bloomrot;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -72,12 +74,12 @@ public class NectarOfDecay extends CooldownInteraction implements Listener, Disp
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Nectar of Decay");
+        return Translations.component("champions.ability.nectar-of-decay.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Unleash a toxic blossom that bursts into a spreading poison cloud, siphoning health from enemies to restore your own.");
+        return Translations.component("champions.ability.nectar-of-decay.description");
     }
 
     @Override

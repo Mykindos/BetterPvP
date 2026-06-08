@@ -24,7 +24,7 @@ public class CoalItem extends BaseItem {
 
     @Inject
     private CoalItem() {
-        super("Coal", model, ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.coal.name"), model, ItemGroup.MATERIAL, ItemRarity.COMMON);
         addBaseComponent(new FuelComponent(10_000L, 800.0f));
     }
 } 

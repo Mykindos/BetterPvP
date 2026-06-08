@@ -5,8 +5,9 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.types.GameCategory;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
 @Singleton
@@ -24,7 +25,7 @@ public class ChampionsWinsCategory extends AchievementCategory {
     public ItemView getItemView() {
         return ItemView.builder()
                 .material(Material.BELL)
-                .displayName(UtilMessage.deserialize("<white>Champions Wins"))
+                .displayName(Translations.component("core.achievement.category.champions-wins.name").color(NamedTextColor.WHITE))
                 .build();
     }
 }

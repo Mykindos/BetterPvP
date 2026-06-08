@@ -28,7 +28,7 @@ public class ProfileCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Opens a player profile";
+        return "core.command.profile.description";
     }
 
     @Override

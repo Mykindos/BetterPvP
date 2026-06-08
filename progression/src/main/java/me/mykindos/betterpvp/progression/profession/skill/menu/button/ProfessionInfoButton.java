@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.skill.menu.button;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -72,20 +73,20 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
         });
         ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.BARRIER)
                 .customModelData(1)
-                .displayName(Component.text(profession + " Level", NamedTextColor.BLUE))
+                .displayName(Translations.component("progression.menu.info.level-title", Component.text(profession)).color(NamedTextColor.BLUE))
                 .itemModel(Resources.ItemModel.INVISIBLE)
                 .lore(progressBarFinal)
                 .lore(Component.empty())
-                .lore(Component.text("Level: ", NamedTextColor.GRAY).append(Component.text(currentLevel, NamedTextColor.YELLOW)))
-                .lore(Component.text("Progress: ", NamedTextColor.GRAY).append(Component.text(String.format("%,.1f / %,.1f XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
-                .lore(Component.text("Total Experience: ", NamedTextColor.GRAY).append(Component.text(String.format("%,.1f XP", professionData.getExperience()), NamedTextColor.YELLOW)))
+                .lore(Translations.component("progression.menu.info.level").color(NamedTextColor.GRAY).appendSpace().append(Component.text(currentLevel, NamedTextColor.YELLOW)))
+                .lore(Translations.component("progression.menu.info.progress").color(NamedTextColor.GRAY).appendSpace().append(Component.text(String.format("%,.1f / %,.1f XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
+                .lore(Translations.component("progression.menu.info.total-xp").color(NamedTextColor.GRAY).appendSpace().append(Component.text(String.format("%,.1f XP", professionData.getExperience()), NamedTextColor.YELLOW)))
                 .lore(Component.empty())
-                .lore(UtilMessage.deserialize("<green>Points available: <yellow>%d", Math.max(0, professionHandler.getAvailableSkillPoints(professionData))));
+                .lore(Translations.component("progression.menu.info.points", Component.text(Math.max(0, professionHandler.getAvailableSkillPoints(professionData))).color(NamedTextColor.YELLOW)).color(NamedTextColor.GREEN));
 
         // Add attribute totals to lore if any exist
         if (!attributeTotals.isEmpty()) {
             builder.lore(Component.empty())
-                    .lore(Component.text("Attribute Totals:", NamedTextColor.GOLD));
+                    .lore(Translations.component("progression.menu.info.attribute-totals").color(NamedTextColor.GOLD));
 
             attributeTotals.forEach((attribute, total) -> {
                 String formattedValue = UtilFormat.formatNumber(attribute.getDisplayValue(total), 1);

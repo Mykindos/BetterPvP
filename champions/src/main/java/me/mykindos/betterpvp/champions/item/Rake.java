@@ -27,7 +27,7 @@ public class Rake extends WeaponItem implements Reloadable {
 
     @Inject
     public Rake(Champions champions, TillingTremorAbility tillingTremorAbility) {
-        super(champions, "Rake", Item.model("rake"), ItemRarity.LEGENDARY);
+        super(champions, translatableName("champions.item.rake.name"), Item.model("rake"), ItemRarity.LEGENDARY);
         this.champions = champions;
 
         // Create and add the tilling tremor ability

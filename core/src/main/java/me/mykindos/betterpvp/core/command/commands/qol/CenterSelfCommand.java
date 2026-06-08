@@ -25,7 +25,7 @@ public class CenterSelfCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "center yourself on the specified block";
+        return "core.command.center-self.description";
     }
 
     @Override

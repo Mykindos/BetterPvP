@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -20,8 +21,6 @@ import java.util.List;
 
 public class GuiClanMailbox extends AbstractPagedGui<Item> implements Windowed {
 
-    private final String title;
-
     public GuiClanMailbox(ClanMailbox clanMailbox, ItemFactory itemFactory, @Nullable Windowed previous) {
         super(9, 6, false, new Structure(
                 "# # # # # # # # #",
@@ -35,8 +34,6 @@ public class GuiClanMailbox extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new PageForwardButton()));
-        this.title = "Mailbox";
-
         List<Item> mailboxItems = clanMailbox.getContents().stream().map(item -> new ClanMailboxItem(clanMailbox, item, itemFactory))
                 .map(Item.class::cast)
                 .toList();
@@ -46,7 +43,7 @@ public class GuiClanMailbox extends AbstractPagedGui<Item> implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text(title);
+        return Translations.component("clans.menu.mailbox.title");
     }
 
     @Override

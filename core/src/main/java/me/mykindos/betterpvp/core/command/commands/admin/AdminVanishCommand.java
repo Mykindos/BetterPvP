@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -30,7 +31,7 @@ public class AdminVanishCommand extends Command implements Listener {
     private final String effectName;
 
     @Inject
-    public AdminVanishCommand(EffectManager effectManager, ClientManager clientManager){
+    public AdminVanishCommand(EffectManager effectManager, ClientManager clientManager) {
         this.effectManager = effectManager;
         this.clientManager = clientManager;
         this.effectName = "commandVanish";
@@ -45,18 +46,21 @@ public class AdminVanishCommand extends Command implements Listener {
 
     @Override
     public String getDescription() {
-        return "Become invisible and removes you from the tab list and auto-completions.";
+        return "core.command.admin-vanish.description";
     }
 
     private Component getFakeLeaveMessage(Player player) {
-        return Component.text("Leave> ", NamedTextColor.RED)
-                .append(Component.text(player.getName(), NamedTextColor.GRAY))
-                .append(UtilMessage.deserialize(" <gray>(<green>Safe<gray>)"));
+        return Translations.component("core.command.vanish.fake_leave", Component.text(player.getName(), NamedTextColor.GRAY))
+                .color(NamedTextColor.RED)
+                .appendSpace()
+                .append(Component.text("(").color(NamedTextColor.GRAY))
+                .append(Translations.component("core.command.vanish.safe").color(NamedTextColor.GREEN))
+                .append(Component.text(")").color(NamedTextColor.GRAY));
     }
 
     private Component getFakeJoinMessage(Player player) {
-        return Component.text("Join> ", NamedTextColor.GREEN)
-                .append(Component.text(player.getName(), NamedTextColor.GRAY));
+        return Translations.component("core.command.vanish.fake_join", Component.text(player.getName(), NamedTextColor.GRAY))
+                        .color(NamedTextColor.GREEN);
     }
 
     @Override
@@ -64,12 +68,12 @@ public class AdminVanishCommand extends Command implements Listener {
         if (vanished.contains(player.getUniqueId())) { // Is already vanished
             vanished.remove(player.getUniqueId());
             effectManager.removeEffect(player, EffectTypes.VANISH, effectName);
-            UtilMessage.message(player, "Vanish", UtilMessage.deserialize("<red>You are no longer vanished.</red>"));
+            UtilMessage.message(player, "core.prefix.vanish", Translations.component("core.command.vanish.disabled").color(NamedTextColor.RED));
             UtilMessage.broadcast(getFakeJoinMessage(player));
         } else { // Not vanished
             vanished.add(player.getUniqueId());
             effectManager.addEffect(player, player, EffectTypes.VANISH, effectName, 1, 100L, true, true, false, null);
-            UtilMessage.message(player, "Vanish", UtilMessage.deserialize("<green>You are now vanished.</green>"));
+            UtilMessage.message(player, "core.prefix.vanish", Translations.component("core.command.vanish.enabled").color(NamedTextColor.GREEN));
             UtilMessage.broadcast(getFakeLeaveMessage(player));
         }
     }

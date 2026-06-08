@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.reflections.Reflections;
 
@@ -18,10 +19,12 @@ import java.util.Set;
 public class ChampionsSkillManager extends Manager<String, Skill> {
 
     private final Champions champions;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public ChampionsSkillManager(Champions champions){
+    public ChampionsSkillManager(Champions champions, CooldownManager cooldownManager){
         this.champions = champions;
+        this.cooldownManager = cooldownManager;
     }
 
     /**
@@ -38,6 +41,10 @@ public class ChampionsSkillManager extends Manager<String, Skill> {
             champions.getInjector().injectMembers(skill);
 
             addObject(skill.getName(), skill);
+
+            // Register the skill's translatable display name so cooldowns (action bar + chat) localize it
+            // instead of showing the raw internal name.
+            cooldownManager.registerDisplayName(skill.getName(), skill.getDisplayName());
 
         }
 

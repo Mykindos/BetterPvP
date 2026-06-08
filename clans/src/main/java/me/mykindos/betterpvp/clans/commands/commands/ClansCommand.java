@@ -28,7 +28,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Base clans command";
+        return "clans.command.clans.description";
     }
 
     @Override
@@ -75,8 +75,8 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Reload the clans plugin";
-        }
+        return "clans.command.reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -94,7 +94,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
             clanVaultRestrictions.reload();
 
 
-            UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
+            UtilMessage.message(sender, "clans.prefix", "clans.command.clans.reload.success");
         }
     }
 }

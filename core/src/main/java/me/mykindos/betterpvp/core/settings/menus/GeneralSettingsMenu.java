@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -34,8 +35,8 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
             final NamedTextColor color = tipSetting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.WRITABLE_BOOK)
-                    .displayName(Component.text("Tips", color))
-                    .lore(Component.text("Whether to enable tips or not.", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.settings.general.button.tips.name").color(color))
+                    .lore(Translations.component("core.menu.settings.general.button.tips.lore.1").color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -46,8 +47,8 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
             final NamedTextColor color = chatSetting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.WRITABLE_BOOK)
-                    .displayName(Component.text("Chat", color))
-                    .lore(Component.text("Whether to enable chat or not.", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.settings.general.button.chat.name").color(color))
+                    .lore(Translations.component("core.menu.settings.general.button.chat.lore.1").color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -58,8 +59,8 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
             final NamedTextColor color = chatSetting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.WRITABLE_BOOK)
-                    .displayName(Component.text("Drop Protection", color))
-                    .lore(Component.text("Whether to enable drop protection or not.", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.settings.general.button.drop-protection.name").color(color))
+                    .lore(Translations.component("core.menu.settings.general.button.drop-protection.lore.1").color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -70,8 +71,8 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.JUKEBOX)
-                    .displayName(Component.text("Sounds", color))
-                    .lore(Component.text("Whether to play a sound when a cooldown has expired or not", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.settings.general.button.sounds.name").color(color))
+                    .lore(Translations.component("core.menu.settings.general.button.sounds.lore.1").color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -81,12 +82,14 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
             final Rank.ShowTag showTag = Rank.ShowTag.valueOf((String) client.getProperty(ClientProperty.SHOW_TAG).orElse("NONE"));
             return ItemView.builder()
                     .material(Material.NAME_TAG)
-                    .displayName(Component.text("Show Tag: ", NamedTextColor.WHITE).append(Component.text(showTag.name(), NamedTextColor.YELLOW)))
-                    .lore(List.of(Component.text("How you want your tag to be displayed", NamedTextColor.GRAY),
-                            Component.text("LONG ", NamedTextColor.YELLOW).append(Component.text("- Shows Studio + Tag", NamedTextColor.GRAY)),
-                            Component.text("SHORT ", NamedTextColor.YELLOW).append(Component.text("- Shows Tag", NamedTextColor.GRAY)),
-                            Component.text("NONE ", NamedTextColor.YELLOW).append(Component.text("- Shows No Tag", NamedTextColor.GRAY)
-                    )))
+                    .displayName(Translations.component("core.menu.settings.general.button.show-tag.name",
+                            Component.text(showTag.name(), NamedTextColor.YELLOW)))
+                    .lore(List.of(
+                            Translations.component("core.menu.settings.general.button.show-tag.lore.1").color(NamedTextColor.GRAY),
+                            Translations.component("core.menu.settings.general.button.show-tag.lore.2").color(NamedTextColor.GRAY),
+                            Translations.component("core.menu.settings.general.button.show-tag.lore.3").color(NamedTextColor.GRAY),
+                            Translations.component("core.menu.settings.general.button.show-tag.lore.4").color(NamedTextColor.GRAY)
+                    ))
                     .frameLore(true)
                     .build()
                     .get();
@@ -109,7 +112,7 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("General Settings");
+        return Translations.component("core.menu.settings.general.title");
     }
 
     @Override
@@ -117,8 +120,8 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
         return Description.builder()
                 .icon(ItemView.builder()
                         .material(Material.REDSTONE_TORCH)
-                        .displayName(Component.text("General Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
-                        .lore(Component.text("View your general settings", NamedTextColor.GRAY)).frameLore(true)
+                        .displayName(Translations.component("core.menu.settings.general.description.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                        .lore(Translations.component("core.menu.settings.general.description.lore.1").color(NamedTextColor.GRAY)).frameLore(true)
                         .build())
                 .build();
     }

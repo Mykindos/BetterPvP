@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,8 +28,9 @@ public class ClanRemoveAllianceLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> removed alliance with clan <yellow>%s</yellow>",
-                context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME));
+        return Translations.component("core.log.clan-remove-alliance.1",
+                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW));
     }
 
     @Override
@@ -40,15 +42,17 @@ public class ClanRemoveAllianceLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("removed alliance with"),
+                Translations.component("core.log.clan-remove-alliance.2"),
                 Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.GREEN),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>remove alliance</red> <green>%s</green>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
+                .displayName(Translations.component("core.log.clan-remove-alliance.3",
+                        Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                        Translations.component("core.log.clan-remove-alliance.4").color(NamedTextColor.RED),
+                        Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.GREEN)))
                 .material(Material.BLACK_DYE)
                 .lore(lore)
                 .glow(true)

@@ -15,9 +15,13 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillE
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -61,14 +65,11 @@ public class Farshot extends Skill implements PassiveSkill, DamageSkill, Offensi
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Your arrows start at " + getValueString(this::getMinDamage, level) + " damage but",
-                "they gain extra damage the further",
-                "they travel up to a maximum of " + getValueString(this::getMaxDamage, level),
-                "damage at " + getValueString(this::getMaxDistance, level) + " blocks",
-                "",
-                "Cannot be used in own territory"};
+    public Component[] getDescription(int level) {
+        Component minDamage = getValueComponent(this::getMinDamage, level);
+        Component maxDamage = getValueComponent(this::getMaxDamage, level);
+        Component maxDistance = getValueComponent(this::getMaxDistance, level);
+        return Translations.componentLines("champions.skill.ranger.farshot.description", minDamage, maxDamage, maxDistance);
     }
 
     public double getMaxDamage(int level) {
@@ -145,7 +146,7 @@ public class Farshot extends Skill implements PassiveSkill, DamageSkill, Offensi
         double scaledDamage = minDamage + (damageMultiplier * (maxDamage));
 
         if (scaledDamage > baseArrowDamage){
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>%s</alt> did <alt2>%.1f</alt2> damage.", getName(), scaledDamage);
+            UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.ranger.farshot.damage", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.format("%.1f", scaledDamage), NamedTextColor.YELLOW));
         }
 
         event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_BREEZE_JUMP, (float)(2.0F * damageMultiplier), 1.5f);

@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.clans.menus.PerkMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -48,14 +49,16 @@ public class ClanProgressionButton extends ControlItem<ClanMenu> {
                 .append(Component.text(String.format("(%,d%%)", (int) (progress * 100)), TextColor.color(222, 222, 222)));
 
         this.itemProvider = ItemView.builder().material(Material.BEACON)
-                .displayName(Component.text("Clan Level", NamedTextColor.BLUE))
+                .displayName(Translations.component("clans.menu.clan.button.progression.name").color(NamedTextColor.BLUE))
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/level_up_icon"))
                 .lore(progressBarFinal)
                 .lore(Component.empty())
-                .lore(Component.text("Level: ", NamedTextColor.GRAY).append(Component.text(currentLevel, NamedTextColor.YELLOW)))
-                .lore(Component.text("Progress: ", NamedTextColor.GRAY).append(Component.text(String.format("%,.1f / %,.1f XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
+                .lore(Translations.component("clans.menu.clan.button.progression.lore.level").color(NamedTextColor.GRAY)
+                        .appendSpace().append(Component.text(currentLevel, NamedTextColor.YELLOW)))
+                .lore(Translations.component("clans.menu.clan.button.progression.lore.progress").color(NamedTextColor.GRAY)
+                        .appendSpace().append(Component.text(String.format("%,.1f / %,.1f XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
                 .frameLore(true)
-                .action(ClickActions.ALL, Component.text("View Perks"))
+                .action(ClickActions.ALL, Translations.component("clans.menu.clan.button.progression.action"))
                 .build();
     }
 

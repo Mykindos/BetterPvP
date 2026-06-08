@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.coretips.CoreTip;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.IRunCommand;
 import me.mykindos.betterpvp.core.tips.types.ISuggestCommand;
 import net.kyori.adventure.text.Component;
@@ -27,11 +28,7 @@ public class TipsTip extends CoreTip implements ISuggestCommand, IRunCommand {
     public Component generateComponent() {
         Component suggestCommand = suggestCommand("/tip <number>", "/tip ");
         Component settingsComponent = runCommand("/settings");
-        Component component = Component.empty().append(Component.text("Want more tips? Try using")).appendSpace()
-                .append(suggestCommand).append(Component.text("!")).appendSpace()
-                .append(Component.text("Want less tips? You can disable them in")).appendSpace()
-                .append(settingsComponent);
-        return component;
+        return Translations.component("core.tip.tipstip", suggestCommand, settingsComponent);
     }
 
     @Override

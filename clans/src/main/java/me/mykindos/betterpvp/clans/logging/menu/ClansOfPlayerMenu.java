@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +61,7 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
         }
         setContent(List.of(new SimpleItem(ItemView.builder()
                 .material(Material.PAPER)
-                .displayName(Component.text("Loading..."))
+                .displayName(Translations.component("clans.menu.loading.name"))
                 .build())
         ));
         refresh();
@@ -78,8 +80,8 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
             log.error("Error loading Clans Of Player", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
-                    .displayName(Component.text("Error! Check console!"))
-                    .lore(Component.text("Please inform staff if you see this"))
+                    .displayName(Translations.component("clans.menu.error.name"))
+                    .lore(Translations.component("clans.menu.error.lore").color(NamedTextColor.GRAY))
                     .build()));
         }));
         return future.thenApply(logs -> {
@@ -90,7 +92,7 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text(client.getName() + "'s Clans");
+        return Translations.component("clans.menu.clans-of-player.title", Component.text(client.getName()));
     }
 
     @Override

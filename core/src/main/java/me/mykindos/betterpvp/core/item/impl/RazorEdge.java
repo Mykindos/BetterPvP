@@ -14,6 +14,6 @@ public class RazorEdge extends BaseItem {
 
     @Inject
     private RazorEdge() {
-        super("Razor Edge", Item.model("razor_edge", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.razor-edge.name"), Item.model("razor_edge", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 }

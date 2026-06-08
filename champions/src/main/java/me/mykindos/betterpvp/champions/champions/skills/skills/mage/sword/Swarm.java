@@ -42,6 +42,10 @@ import java.util.ListIterator;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
@@ -67,17 +71,9 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "",
-                "Release a swarm of bats which",
-                "damage and knock back any enemies",
-                "they come in contact with",
-                "",
-                "Energy: " + getValueString(this::getEnergy, level)
-        };
+    public Component[] getDescription(int level) {
+        Component energy = getValueComponent(this::getEnergy, level);
+        return Translations.componentLines("champions.skill.mage.swarm.description", energy);
     }
 
     @Override

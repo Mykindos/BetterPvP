@@ -31,7 +31,7 @@ public class EnergyApple extends BaseItem implements Reloadable {
 
     @Inject
     private EnergyApple(EnergyService energyService, CooldownManager cooldownManager) {
-        super("Energy Apple", ItemStack.of(Material.APPLE), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.energy-apple.name"), ItemStack.of(Material.APPLE), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         final SoundEffect soundEffect = new SoundEffect(Sound.ENTITY_PLAYER_BURP, 1f, 1f);
         this.energyBoost = new EnergyBoost(energyService, cooldownManager, soundEffect);
         energyBoost.setConsumesItem(true);

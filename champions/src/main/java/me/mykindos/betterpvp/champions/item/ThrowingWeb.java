@@ -34,7 +34,7 @@ public class ThrowingWeb extends BaseItem implements Reloadable {
 
     @Inject
     private ThrowingWeb(ChampionsManager championsManager, WorldBlockHandler blockHandler, CooldownManager cooldownManager) {
-        super("Throwing Web", ItemStack.of(Material.COBWEB), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.throwing-web.name"), ItemStack.of(Material.COBWEB), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
         this.throwingWebAbility = new ThrowingWebAbility(championsManager, blockHandler, cooldownManager);
         throwingWebAbility.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.display.playerlist;
 
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.text.Component;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class PlayerList {
@@ -70,10 +72,13 @@ public class PlayerList {
             footer = getComponent(PlayerListType.FOOTER, gamer);
         }
 
-        // Send the action bar to the player
+        // Send the tab list to the player, resolving any translatable header/footer into the player's locale.
         final Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
         if (player != null) {
-            player.sendPlayerListHeaderAndFooter(header, footer);
+            final Locale locale = player.locale();
+            player.sendPlayerListHeaderAndFooter(
+                    header == null ? EMPTY : Translations.render(header, locale),
+                    footer == null ? EMPTY : Translations.render(footer, locale));
         }
     }
 

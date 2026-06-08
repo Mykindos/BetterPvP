@@ -30,7 +30,7 @@ public class RusticSword extends WeaponItem {
 
     @Inject
     private RusticSword(Champions champions) {
-        super(champions, "Rustic Sword", model, ItemRarity.COMMON);
+        super(champions, translatableName("champions.item.rustic-sword.name"), model, ItemRarity.COMMON);
     }
 
 }

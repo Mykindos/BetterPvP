@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.skill;
 
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -32,10 +33,10 @@ public class ProfessionRecipeNode extends ProfessionNode {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public net.kyori.adventure.text.Component[] getDescription(int level) {
         final RecipeRegistries registries = JavaPlugin.getPlugin(Progression.class).getInjector().getInstance(RecipeRegistries.class);
-        List<String> desc = new ArrayList<>();
-        desc.add("Unlock the following recipes:");
+        List<net.kyori.adventure.text.Component> desc = new ArrayList<>();
+        desc.add(Translations.component("progression.recipe.unlock-following"));
         for (Key key : recipes) {
             final Optional<Recipe<?>> recipeOpt = registries.getRecipe(NamespacedKey.fromString(key.asString()));
             if (recipeOpt.isEmpty()) {
@@ -50,9 +51,10 @@ public class ProfessionRecipeNode extends ProfessionNode {
                 text = Component.text(recipe.previewResult().toString());
             }
 
-            desc.add("<gray> - <green>" + UtilMessage.miniMessage.serialize(text));
+            desc.add(net.kyori.adventure.text.Component.text(" - ").color(NamedTextColor.GRAY)
+                    .append(text.colorIfAbsent(NamedTextColor.GREEN)));
         }
-        return desc.toArray(new String[0]);
+        return desc.toArray(new net.kyori.adventure.text.Component[0]);
     }
 
     public Set<Key> getRecipes() {
@@ -75,25 +77,25 @@ public class ProfessionRecipeNode extends ProfessionNode {
     public Component getRequirementLore() {
         String professionName = getProgressionTree();
         if (professionName == null || professionName.isBlank()) {
-            return Component.text("Requires skill tree progression");
+            return Translations.component("progression.recipe.requires-generic");
         }
 
-        String capitalized = professionName.substring(0, 1).toUpperCase() + professionName.substring(1).toLowerCase();
+        // Localized profession name when available, else a capitalized fallback.
+        final String professionKey = "progression.profession." + professionName.toLowerCase() + ".name";
+        final String capitalized = professionName.substring(0, 1).toUpperCase() + professionName.substring(1).toLowerCase();
+        final Component professionComponent = (Translations.hasTranslation(professionKey)
+                ? Translations.component(professionKey)
+                : Component.text(capitalized)).color(NamedTextColor.GREEN);
 
         ProfessionNodeDependency dep = getDependencies();
         int level = dep != null ? dep.getRequiredLevel() : 0;
         if (level > 0) {
-            return Component.empty()
-                    .append(Component.text("Unlocked with"))
-                    .appendSpace()
-                    .append(Component.text(capitalized, NamedTextColor.GREEN))
-                    .appendSpace()
-//                    .append(Component.text("skill tree at"))
-//                    .appendSpace()
-                    .append(Component.text("Lvl. " + level, NamedTextColor.GREEN));
+            return Translations.component("progression.recipe.unlocked-with",
+                    professionComponent,
+                    Component.text(level, NamedTextColor.GREEN));
         }
 
-        return Component.text("Requires " + capitalized + " skill tree progression");
+        return Translations.component("progression.recipe.requires", professionComponent);
     }
 
 }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -100,7 +101,10 @@ public class ProgressionListener implements Listener {
         final int previous = event.getPreviousLevel();
 
         if(level >= 99) {
-            UtilMessage.broadcast("Profession", "<yellow>%s <green>has reached level <yellow>%d</yellow><green> in %s!", player.getName(), level, tree);
+            UtilMessage.broadcast("progression.prefix", "progression.levelup.broadcast",
+                    Component.text(player.getName(), NamedTextColor.YELLOW),
+                    Component.text(level, NamedTextColor.YELLOW),
+                    Component.text(tree));
             for(Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2f, 1f, true);
                 UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 2f, 1f, true);
@@ -108,16 +112,17 @@ public class ProgressionListener implements Listener {
             }
         }
 
-        final Component spendSkillPointsComponent = Component.text("Type ")
-                .append(Component.text("/" + tree.toLowerCase(), NamedTextColor.YELLOW)
-                        .decorate(TextDecoration.UNDERLINED)
-                        .clickEvent(ClickEvent.runCommand("/" + tree.toLowerCase()))
-                        .hoverEvent(HoverEvent.showText(Component.text("Click to spend your skill points!", NamedTextColor.GRAY)))
-                )
-                .append(Component.text(" to spend your skill points!", NamedTextColor.GRAY));
+        final Component spendSkillPointsComponent = Translations.component("progression.levelup.spend-points",
+                        Component.text("/" + tree.toLowerCase(), NamedTextColor.YELLOW)
+                                .decorate(TextDecoration.UNDERLINED)
+                                .clickEvent(ClickEvent.runCommand("/" + tree.toLowerCase()))
+                                .hoverEvent(HoverEvent.showText(Translations.component("progression.levelup.spend-points-hover").color(NamedTextColor.GRAY))))
+                .color(NamedTextColor.GRAY);
 
-        UtilMessage.simpleMessage(player, tree, "You have leveled up to <green>%d <gray>in <green>%s<gray>!", level, tree);
-        UtilMessage.simpleMessage(player, tree, spendSkillPointsComponent);
+        UtilMessage.message(player, tree, "progression.levelup.message",
+                Component.text(level, NamedTextColor.GREEN),
+                Component.text(tree, NamedTextColor.GREEN));
+        UtilMessage.message(player, tree, spendSkillPointsComponent);
 
             Function<Gamer, Component> title = gmr -> Component.text(tree + " Level Up!", NamedTextColor.GREEN, TextDecoration.BOLD);
             Function<Gamer, Component> subtitle = gmr -> Component.text("Level " + previous + " \u279C " + level, NamedTextColor.DARK_GREEN);

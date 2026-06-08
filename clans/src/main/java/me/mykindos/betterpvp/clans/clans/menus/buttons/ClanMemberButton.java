@@ -9,11 +9,11 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.framework.profiles.PlayerProfiles;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
@@ -67,11 +67,12 @@ public class ClanMemberButton extends AbstractItem {
 
         ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
 
-        final TextComponent role = Component.text("Role: ", NamedTextColor.WHITE).append(Component.text(member.getRank().getName(), NamedTextColor.GRAY));
+        final Component role = Translations.component("clans.menu.clan.button.member.lore.role").color(NamedTextColor.WHITE)
+                .appendSpace().append(Component.text(member.getRank().getName(), NamedTextColor.GRAY));
         if (canEdit) {
-            builder.action(ClickActions.LEFT, Component.text("Promote"));
-            builder.action(ClickActions.RIGHT, Component.text("Demote"));
-            builder.action(ClickActions.SHIFT, Component.text("Kick"));
+            builder.action(ClickActions.LEFT, Translations.component("clans.menu.clan.button.member.action.promote"));
+            builder.action(ClickActions.RIGHT, Translations.component("clans.menu.clan.button.member.action.demote"));
+            builder.action(ClickActions.SHIFT, Translations.component("clans.menu.clan.button.member.action.kick"));
         }
 
         if (!player.isOnline()) {
@@ -92,7 +93,8 @@ public class ClanMemberButton extends AbstractItem {
         if (detailed) {
             final Location loc = online.getLocation();
             final String locText = String.format("%,d %,d", loc.getBlockX(), loc.getBlockZ());
-            final TextComponent location = Component.text("Location: ", NamedTextColor.WHITE).append(Component.text(locText, NamedTextColor.GRAY));
+            final Component location = Translations.component("clans.menu.clan.button.member.lore.location").color(NamedTextColor.WHITE)
+                    .appendSpace().append(Component.text(locText, NamedTextColor.GRAY));
             builder.lore(location);
         }
 

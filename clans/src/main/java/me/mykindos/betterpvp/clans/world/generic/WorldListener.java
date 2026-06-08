@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.text.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -104,7 +105,7 @@ public class WorldListener implements Listener {
                 }
                 if (clickedBlock != null && clickedBlock.getType() != Material.TNT && clickedBlock.getType() != Material.NETHERRACK &&
                         !clickedBlock.getType().name().contains("CANDLE")) {
-                    UtilMessage.message(event.getPlayer(), "Flint and Steel", "You may not use Flint and Steel on this block type!");
+                    UtilMessage.message(event.getPlayer(), "core.prefix.flint-and-steel", "clans.world.flint-and-steel-denied");
                     event.setCancelled(true);
                 }
             }
@@ -117,7 +118,7 @@ public class WorldListener implements Listener {
     @EventHandler
     public void handleBucket(PlayerBucketFillEvent event) {
         event.setCancelled(true);
-        UtilMessage.simpleMessage(event.getPlayer(), "Game", "Your <alt2>Bucket</alt2> broke!");
+        UtilMessage.message(event.getPlayer(), "core.prefix.game", "clans.world.bucket-broke");
         ItemStack replacement = new ItemStack(Material.IRON_INGOT, event.getPlayer().getInventory().getItemInMainHand().getAmount() * 3);
         event.getPlayer().getInventory().setItemInMainHand(replacement);
     }
@@ -149,7 +150,7 @@ public class WorldListener implements Listener {
         BlockState state = block.getState();
         if (state instanceof Container || block.getType().name().endsWith("_MINECART")) {
             if (block.getLocation().getY() > 200 || block.getLocation() .getY() < 0) {
-                UtilMessage.message(player, "Restriction", "You can only place this block between Y: 0 and Y: 200");
+                UtilMessage.message(player, "core.prefix.restriction", "clans.world.restriction-y");
                 event.setCancelled(true);
             }
         }
@@ -187,7 +188,8 @@ public class WorldListener implements Listener {
 
                 final Client client = clientManager.search().online(player);
                 if (!client.isAdministrating()) {
-                    UtilMessage.simpleMessage(player, "Game", "<alt2>" + UtilFormat.cleanString(event.getInventory().getType().toString()) + "</alt2> is disabled.");
+                    UtilMessage.message(player, "core.prefix.game", "clans.world.inventory-disabled",
+                            Component.text(UtilFormat.cleanString(event.getInventory().getType().toString())));
                     event.setCancelled(true);
                 }
             }
@@ -262,7 +264,8 @@ public class WorldListener implements Listener {
             if (block.getType().name().contains("OBSIDIAN") || block.getType() == Material.BEDROCK || block.getType() == Material.WATER_BUCKET
                     || block.getType() == Material.SPAWNER || block.getType() == Material.COBWEB
                     || block.getType() == Material.BREWING_STAND || block.getType().name().contains("_BED")) {
-                UtilMessage.simpleMessage(player, "Server", "You cannot place <alt2>" + WordUtils.capitalizeFully(block.getType().toString()) + "</alt2>.");
+                UtilMessage.message(player, "core.prefix.server", "clans.world.place-denied",
+                        Component.text(WordUtils.capitalizeFully(block.getType().toString().replace("_", " "))));
                 event.setCancelled(true);
             }
         }

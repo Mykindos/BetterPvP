@@ -20,7 +20,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
@@ -73,19 +77,15 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Grant yourself and allies within " + getValueString(this::getRange, level) + " blocks",
-                "a barrier which reduces the damage of the next " + getValueString(this::numAttacksToReduce, level, 0),
-                "incoming attacks by " + getValueString(this::getDamageReduction, level, 100, "%", 0),
-                "",
-                "Barrier lasts for " + getValueString(this::getDuration, level) + " seconds, and does not stack",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1) + " + " + getValueString(this::getHealthReductionPerPlayerAffected, level, 1) + " per player affected",
-        };
+    public Component[] getDescription(int level) {
+        Component range = getValueComponent(this::getRange, level);
+        Component numAttacks = getValueComponent(this::numAttacksToReduce, level, 0);
+        Component damageReduction = getValueComponent(this::getDamageReduction, level, 0);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component healthReduction = getValueComponent(this::getHealthReduction, level);
+        Component healthReductionPerPlayer = getValueComponent(this::getHealthReductionPerPlayerAffected, level);
+        return Translations.componentLines("champions.skill.warlock.blood-barrier.description", range, numAttacks, damageReduction, duration, cooldown, healthReduction, healthReductionPerPlayer);
     }
 
     public double getHealthReduction(int level) {
@@ -146,7 +146,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
             if (player == null) return true;
 
             if (entry.getValue().getEndTime() - System.currentTimeMillis() <= 0) {
-                UtilMessage.message(player, getClassType().getName(), "Your blood barrier has expired.");
+                UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.warlock.blood-barrier.expired");
                 return true;
             }
 
@@ -185,7 +185,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         int level = getLevel(player);
 
         if (player.getHealth() - getHealthReduction(level) <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.not-enough-health", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             return false;
         }
 

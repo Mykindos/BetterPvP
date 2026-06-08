@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.blocks.RestoreBlock;
@@ -36,6 +37,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 
 @CustomLog
 @Singleton
@@ -61,17 +65,11 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Launches an icy orb, trapping any players within " + getValueString(this::getSphereSize, level, 0),
-                "blocks of it in a prison of ice for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Shift-click to destroy the prison early.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component sphereSize = getValueComponent(this::getSphereSize, level, 0);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.mage.ice-prison.description", sphereSize, duration, cooldown);
     }
 
     private double getDuration(int level) {
@@ -122,7 +120,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
             Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
             block.restore();
         }
-        UtilMessage.message(player, getClassType().getName(), "You destroyed your <alt>" + getName() + "</alt>.");
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.ice-prison.destroyed", getDisplayName().color(NamedTextColor.GREEN));
     }
 
     private void handleIcePrisonCollision(ThrowableItem throwableItem) {
@@ -211,7 +209,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
                 block.restore();
             }
 
-            UtilMessage.message(player, getClassType().getName(), "Your <alt>Ice Prison</alt> shattered upon your death.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.ice-prison.shattered", getDisplayName().color(NamedTextColor.GREEN));
         }
     }
 }

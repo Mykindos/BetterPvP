@@ -23,7 +23,7 @@ public class AncientPickaxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 2031;
 
     public AncientPickaxe() {
-        super("Ancient Pickaxe", ItemStack.of(Material.NETHERITE_PICKAXE), ItemGroup.TOOL, ItemRarity.RARE);
+        super(translatableName("core.item.ancient-pickaxe.name"), ItemStack.of(Material.NETHERITE_PICKAXE), ItemGroup.TOOL, ItemRarity.RARE);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

@@ -11,8 +11,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,13 +46,12 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Negative effects have their duration reduced by " + getValueString(this::getDurationReduction, level, 1, "%", 0),
-                "",
-                "Self-inflicted effects are not affected by this skill."
-        };
+    public Component[] getDescription(int level) {
+        Component reduction = getValueComponent(this::getDurationReduction, level, 1, 0, "%");
+        return Translations.componentLines(
+                "champions.skill.global.resilience.description",
+                reduction
+        );
     }
 
     public double getDurationReduction(int level) {

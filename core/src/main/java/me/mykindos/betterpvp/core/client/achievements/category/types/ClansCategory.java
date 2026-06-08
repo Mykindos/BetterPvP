@@ -4,8 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
 import java.util.List;
@@ -20,9 +21,9 @@ public class ClansCategory extends AchievementCategory {
     @Override
     public ItemView getItemView() {
         return ItemView.builder()
-                .displayName(Component.text("Clan"))
+                .displayName(Translations.component("core.achievement.category.clans.name").color(NamedTextColor.WHITE))
                 .lore(
-                        List.of(Component.text("Clan related achievements"))
+                        List.of(Translations.component("core.achievement.category.clans.description"))
                 )
                 .material(Material.DIAMOND_SWORD)
                 .build();

@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,9 +28,10 @@ public class ClanUnclaimChunkLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> unclaimed <green>%s</green> for <yellow>%s</yellow>",
-                context.get(LogContext.CLIENT_NAME), context.get(LogContext.CHUNK),
-                context.get(LogContext.CLAN_NAME));
+        return Translations.component("core.log.clan-unclaim-chunk.1",
+                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.CHUNK), NamedTextColor.GREEN),
+                Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.YELLOW));
     }
 
     @Override
@@ -41,15 +43,17 @@ public class ClanUnclaimChunkLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("unclaimed ", NamedTextColor.GRAY).append(Component.text(context.get(LogContext.CHUNK), NamedTextColor.YELLOW)),
+                Translations.component("core.log.clan-unclaim-chunk.2").color(NamedTextColor.GRAY).append(Component.text(" ")).append(Component.text(context.get(LogContext.CHUNK), NamedTextColor.YELLOW)),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
 
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>unclaimed</red> <yellow>%s</yellow>",
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CHUNK)))
+                .displayName(Translations.component("core.log.clan-unclaim-chunk.3",
+                        Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                        Translations.component("core.log.clan-unclaim-chunk.4").color(NamedTextColor.RED),
+                        Component.text(context.get(LogContext.CHUNK), NamedTextColor.YELLOW)))
                 .material(Material.DEEPSLATE)
                 .lore(lore)
                 .frameLore(false)

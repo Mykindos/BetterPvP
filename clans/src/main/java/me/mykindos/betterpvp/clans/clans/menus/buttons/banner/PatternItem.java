@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons.banner;
 import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.GuiSelectPattern;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -35,11 +36,12 @@ public class PatternItem extends ControlItem<BannerMenu> {
     public ItemProvider getItemProvider(BannerMenu gui) {
         return ItemView.of(BannerWrapper.builder().pattern(pattern).build().get())
                 .toBuilder()
-                .displayName(Component.text("Pattern " + (index + 1), NamedTextColor.GREEN, TextDecoration.BOLD))
+                .displayName(Translations.component("clans.menu.banner.button.pattern.name",
+                        Component.text(index + 1)).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                 .hideAdditionalTooltip(true)
-                .action(ClickActions.LEFT, Component.text("Add Pattern Before"))
-                .action(ClickActions.RIGHT, Component.text("Replace Pattern"))
-                .action(ClickActions.SHIFT, Component.text("Remove Pattern"))
+                .action(ClickActions.LEFT, Translations.component("clans.menu.banner.button.pattern.action.add-before"))
+                .action(ClickActions.RIGHT, Translations.component("clans.menu.banner.button.pattern.action.replace"))
+                .action(ClickActions.SHIFT, Translations.component("clans.menu.banner.button.pattern.action.remove"))
                 .build();
     }
 

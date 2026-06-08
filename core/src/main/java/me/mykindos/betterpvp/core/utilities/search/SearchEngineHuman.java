@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.utilities.search;
 
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,12 +84,17 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
         final String matchesList = matches.stream().map(Object::toString).collect(Collectors.joining(", "));
         final int count = matches.size();
 
-        UtilMessage.message(this.human, "Player Search", "<alt2>%s</alt2> matches for [<alt2>%s</alt2>]", count, search);
-        UtilMessage.message(this.human, "Player Search", "Possible matches: [<alt2>%s</alt2>]", matchesList);
+        UtilMessage.message(this.human, "core.prefix.player-search", "core.search.matches_for",
+                Component.text(count, NamedTextColor.YELLOW),
+                Component.text(String.valueOf(search), NamedTextColor.YELLOW));
+        UtilMessage.message(this.human, "core.prefix.player-search", "core.search.possible_matches",
+                Component.text(matchesList, NamedTextColor.YELLOW));
     }
 
     public void zeroMatches(@Nullable final String search) {
-        UtilMessage.message(this.human, "Player Search", "<alt2>0</alt2> matches for [<alt2>%s</alt2>]", search);
+        UtilMessage.message(this.human, "core.prefix.player-search", "core.search.matches_for",
+                Component.text("0", NamedTextColor.YELLOW),
+                Component.text(String.valueOf(search), NamedTextColor.YELLOW));
     }
 
     private boolean willInform() {

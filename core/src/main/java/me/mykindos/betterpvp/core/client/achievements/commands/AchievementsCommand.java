@@ -31,7 +31,7 @@ public class AchievementsCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Show achievements";
+        return "core.command.achievements.description";
     }
 
     @Override

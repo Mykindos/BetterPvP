@@ -12,6 +12,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -33,21 +37,24 @@ public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[] {
-                "Increase your energy regeneration",
-                "speed by " + getValueString(this::getPercentage, level, 100, "%", 0),
-                "",
-                "Energy Information:",
-                "<white>Always Active</white>",
-                "Base Energy: <stat>" + this.championsManager.getEnergy().getMaxEnergy(),
-                //Energy is updated every 50ms. Energy is represented in 0-1
-                "Energy Regeneration / Second: <stat>" + (this.championsManager.getEnergy().getEnergyPerSecond()),
-                //"regeneration / second while sprinting ",
-                //"or in liquid: <stat>" + (EnergyService.NERFED_ENERGY_REGEN)
-
-        };
+    public Component[] getDescription(int level) {
+        Component percentage = getValueComponent(this::getPercentage, level, 100, 0, "%");
+        Component baseEnergy = Component.text(
+                String.valueOf(this.championsManager.getEnergy().getMaxEnergy()),
+                NamedTextColor.YELLOW
+        );
+        Component energyPerSecond = Component.text(
+                String.valueOf(this.championsManager.getEnergy().getEnergyPerSecond()),
+                NamedTextColor.YELLOW
+        );
+        Component alwaysActive = Translations.component("champions.skill.global.always-active").color(NamedTextColor.WHITE);
+        return Translations.componentLines(
+                "champions.skill.global.fast-recovery.description",
+                percentage,
+                baseEnergy,
+                energyPerSecond,
+                alwaysActive
+        );
     }
 
     public double getPercentage(int level) {

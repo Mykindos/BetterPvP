@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -41,38 +44,38 @@ public class ReplyCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Reply to another players message";
+        return "core.command.reply.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Command", "Usage: /reply <message>");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.usage");
             return;
         }
 
         if (client.hasPunishment(PunishmentTypes.MUTE)) {
-            UtilMessage.message(player, "Command", "You may not message other players while muted");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.muted");
             return;
         }
 
         Optional<UUID> lastMessagedOptional = client.getProperty(ClientProperty.LAST_MESSAGED.name());
         if (lastMessagedOptional.isEmpty()) {
-            UtilMessage.message(player, "Command", "You have nobody to reply to.");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.no_target");
             return;
         }
 
         UUID lastMessaged = lastMessagedOptional.get();
         Player target = Bukkit.getPlayer(lastMessaged);
         if (target == null) {
-            UtilMessage.message(player, "Command", "Player not found.");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.player_not_found");
             return;
         }
 
         Client targetClient = clientManager.search().online(target);
 
         if (!player.isListed(target) && !client.hasRank(Rank.ADMIN)) {
-            UtilMessage.message(player, "Command", "Player not found.");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.player_not_found");
             return;
         }
 
@@ -82,25 +85,32 @@ public class ReplyCommand extends Command {
             boolean isTargetIgnored = ignoreService.isClientIgnored(client, targetClient);
 
             if (isTargetIgnored) {
-                UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.ignored",
+                        Component.text(target.getName(), NamedTextColor.YELLOW));
                 return;
             }
 
+            final Component you = Translations.component("core.command.message.you");
+
             if (isClientIgnored) {
                 // We still send a fake message
-                UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + filteredMessage);
+                UtilMessage.message(player, MessageCommand.privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
+                        you, Component.text(target.getName()), filteredMessage));
                 client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
                 return;
             }
 
 
-            UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + filteredMessage);
-            UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + filteredMessage);
+            UtilMessage.message(player, MessageCommand.privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
+                    you, Component.text(target.getName()), filteredMessage));
+            UtilMessage.message(target, MessageCommand.privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
+                    Component.text(player.getName()), you, filteredMessage));
 
             for (Player online : Bukkit.getOnlinePlayers()) {
                 if (online.equals(target) || online.equals(player)) continue;
                 if (clientManager.search().online(online).isAdministrating()) {
-                    UtilMessage.simpleMessage(online, "<dark_green>[<green>" + player.getName() + "<dark_green> -> <green>" + target.getName() + "<dark_green>] <gray>" + filteredMessage);
+                    UtilMessage.message(online, MessageCommand.privateMessage(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN,
+                            Component.text(player.getName()), Component.text(target.getName()), filteredMessage));
                 }
             }
 

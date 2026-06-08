@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.display.championsgame.ctf.map;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.CTFStatButton;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -30,7 +31,8 @@ public class CTFMapInfoStatButton extends CTFStatButton {
 
         return ItemView.builder()
                 .material(Material.FILLED_MAP)
-                .displayName(Component.text(mapName + " Stats"))
+                .displayName(Translations.component("core.menu.stats.champions.button.map.name",
+                        Component.text(mapName)))
                 .lore(getCTFStatsDescription("", mapName))
                 .frameLore(true)
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))

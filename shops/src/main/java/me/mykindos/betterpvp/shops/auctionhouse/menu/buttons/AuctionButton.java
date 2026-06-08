@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.impl.PaginatedLoreItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -48,12 +49,15 @@ public class AuctionButton extends PaginatedLoreItem {
 
             lore.add(Component.text(""));
             lore.add(UtilMessage.DIVIDER);
-            lore.add(Component.text("Price: ", NamedTextColor.WHITE).append(Component.text("$" + UtilFormat.formatNumber(auction.getSellPrice()), NamedTextColor.YELLOW)));
-            lore.add(Component.text("Expires: ", NamedTextColor.WHITE).append(Component.text(prettyTime.format(new Date(auction.getExpiryTime())), NamedTextColor.YELLOW)));
+            lore.add(Translations.component("shops.menu.auction-listing.button.auction.price").color(NamedTextColor.WHITE)
+                    .appendSpace().append(Component.text("$" + UtilFormat.formatNumber(auction.getSellPrice()), NamedTextColor.YELLOW)));
+
+            lore.add(Translations.component("shops.menu.auction-listing.button.auction.expires").color(NamedTextColor.WHITE)
+                    .appendSpace().append(Component.text(prettyTime.format(new Date(auction.getExpiryTime())), NamedTextColor.YELLOW)));
             lore.add(Component.text(""));
-            lore.add(ClickActions.LEFT.to(Component.text("Purchase")));
+            lore.add(ClickActions.LEFT.to(Translations.component("shops.menu.auction-listing.button.auction.action-purchase")));
             if (auction.getSeller().equals(viewer.getUniqueId()) || viewer.isOp()) {
-                lore.add(ClickActions.RIGHT.to(Component.text("Cancel")));
+                lore.add(ClickActions.RIGHT.to(Translations.component("shops.menu.auction-listing.button.auction.action-cancel")));
             }
 
             meta.lore(lore);

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import net.kyori.adventure.text.Component;
 import me.mykindos.betterpvp.core.item.component.impl.access.RestrictedAccessComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -32,7 +33,7 @@ public abstract class BaitItem extends BaseItem implements Reloadable {
      * @param rarity  The item rarity
      * @param ability The bait ability
      */
-    protected BaitItem(BPvPPlugin plugin, String name, ItemStack model, ItemRarity rarity, BaitAbility ability) {
+    protected BaitItem(BPvPPlugin plugin, Component name, ItemStack model, ItemRarity rarity, BaitAbility ability) {
         super(name, model, ItemGroup.TOOL, rarity);
         this.ability = ability;
         this.plugin = plugin;

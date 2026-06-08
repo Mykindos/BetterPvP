@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public class ProtectionSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Remove new clan protection";
+        return "clans.command.protection.description";
     }
 
     @Override
@@ -46,17 +47,20 @@ public class ProtectionSubCommand extends ClanSubCommand {
 
         Optional<Clan> targetClanOptional = clanManager.getClanByPlayer(player);
         if(targetClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.protection.no-clan");
             return;
         }
 
        Clan clan = targetClanOptional.get();
         if(clan.isNoDominanceCooldownActive()) {
-            new ConfirmationMenu("Are you sure you want to remove your clans protection?", success -> {
+            new ConfirmationMenu(Translations.component("clans.command.clan.protection.confirmation").toString(), success -> {
                 if (Boolean.TRUE.equals(success)) {
                     clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, 0L);
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.protection.success");
                 }
             }).show(player);
+        } else {
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.protection.not-active");
         }
     }
 

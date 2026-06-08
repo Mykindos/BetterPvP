@@ -28,7 +28,7 @@ public class ReforgeCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Admin command to reforge items";
+        return "core.command.reforge.description";
     }
 
     @Override

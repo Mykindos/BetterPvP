@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -45,9 +47,9 @@ public class SaplingSkillListener implements Listener {
         if (skill.getSkillLevel(event.getPlayer()) > 0) return;
 
         event.setCancelled(true);
-        UtilMessage.message(event.getPlayer(), "Woodcutting",
-                "You must unlock <green>%s</green> saplings before planting this.",
-                skill.getTreeName());
+        UtilMessage.message(event.getPlayer(), "core.prefix.woodcutting",
+                "progression.woodcutting.sapling.unlock-required",
+                Component.text(skill.getTreeName(), NamedTextColor.GREEN));
     }
 
     private void register(SaplingSkill skill) {

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
 import me.mykindos.betterpvp.core.logging.menu.button.LocationButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -35,12 +36,11 @@ public class ContainerExplodeLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return Component.empty().append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
-                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
-                .append(Component.text(" dropped due to an explosion from ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.BLOCK), NamedTextColor.GREEN))
-                .append(Component.text(" at ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW));
+        return Translations.component("core.log.container-explode.1",
+                Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
+                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))),
+                Component.text(context.get(LogContext.BLOCK), NamedTextColor.GREEN),
+                Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY);
 
     }
 
@@ -53,12 +53,14 @@ public class ContainerExplodeLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
-                UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
-                        context.get(LogContext.ITEM)),
-                Component.text("dropped due explosion from ", NamedTextColor.GRAY)
+                Component.text("(", NamedTextColor.LIGHT_PURPLE)
+                        .append(Component.text(context.get(LogContext.ITEM)))
+                        .append(Component.text(")")),
+                Translations.component("core.log.container-explode.2").color(NamedTextColor.GRAY)
+                        .append(Component.text(" "))
                         .append(Component.text(context.get(LogContext.BLOCK) == null ? "NULL" : context.get(LogContext.BLOCK), NamedTextColor.GREEN)),
-                UtilMessage.deserialize("at <yellow>%s</yellow>",
-                        context.get(LogContext.LOCATION)),
+                Translations.component("core.log.container-explode.3",
+                        Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW)),
                 UtilMessage.DIVIDER
         );
 
@@ -68,7 +70,7 @@ public class ContainerExplodeLogFormatter implements ILogFormatter {
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(Component.text("Container Explode"))
+                .displayName(Translations.component("core.log.container-explode.4"))
                 .material(Material.TNT)
                 .lore(lore)
                 .build();

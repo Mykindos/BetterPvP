@@ -23,7 +23,7 @@ public class PowerAxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 1561;
 
     public PowerAxe() {
-        super("Power Axe", ItemStack.of(Material.DIAMOND_AXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.power-axe.name"), ItemStack.of(Material.DIAMOND_AXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

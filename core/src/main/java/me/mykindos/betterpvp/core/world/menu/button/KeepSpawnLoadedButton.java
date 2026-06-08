@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.menu.GuiCreateWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
@@ -23,9 +24,11 @@ public class KeepSpawnLoadedButton extends ControlItem<GuiCreateWorld> {
     public ItemProvider getItemProvider(GuiCreateWorld gui) {
         return ItemView.builder()
                 .material(this.keepSpawnLoaded ? Material.PANDA_SPAWN_EGG : Material.GHAST_SPAWN_EGG)
-                .displayName(Component.text("Keep Spawn Loaded: ", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.world.create.button.keep-spawn-loaded.name").color(NamedTextColor.GRAY)
                         .append(Component.text(this.keepSpawnLoaded, this.keepSpawnLoaded ? NamedTextColor.GREEN : NamedTextColor.RED)))
-                .action(ClickActions.ALL, Component.text(this.keepSpawnLoaded ? "Disable" : "Enable"))
+                .action(ClickActions.ALL, this.keepSpawnLoaded
+                        ? Translations.component("core.menu.world.create.button.disable.action")
+                        : Translations.component("core.menu.world.create.button.enable.action"))
                 .build();
     }
 

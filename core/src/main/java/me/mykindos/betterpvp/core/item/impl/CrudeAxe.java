@@ -23,7 +23,7 @@ public class CrudeAxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 131;
 
     public CrudeAxe() {
-        super("Crude Axe", ItemStack.of(Material.STONE_AXE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.crude-axe.name"), ItemStack.of(Material.STONE_AXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

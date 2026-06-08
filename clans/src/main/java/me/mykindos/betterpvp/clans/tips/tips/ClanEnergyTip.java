@@ -5,8 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -25,8 +26,8 @@ public class ClanEnergyTip extends ClanTip {
 
     @Override
     public Component generateComponent() {
-        return Component.empty().append(UtilMessage.deserialize("You can gain <light_purple>Clan energy</light_purple> by killing other players, completing dungeons " +
-                "and raids, participating in world events, or mining in the world or at fields."));
+        Component energyComponent = Translations.component("clans.tip.energy.highlight").color(NamedTextColor.LIGHT_PURPLE);
+        return Translations.component("clans.tip.energy", energyComponent);
     }
 
     @Override

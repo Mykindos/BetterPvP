@@ -14,6 +14,6 @@ public class PoisonIvy extends BaseItem {
 
     @Inject
     private PoisonIvy() {
-        super("Poison Ivy", Item.model("poison_ivy", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.poison-ivy.name"), Item.model("poison_ivy", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 }

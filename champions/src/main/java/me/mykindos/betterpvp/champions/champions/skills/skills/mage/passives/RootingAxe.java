@@ -16,8 +16,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Effect;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -52,15 +56,10 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Your axe rips players downward into the earth,",
-                "disrupting their movement, and stopping them",
-                "from jumping for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.mage.rooting-axe.description", duration, cooldown);
     }
 
     private double getDuration(int level) {

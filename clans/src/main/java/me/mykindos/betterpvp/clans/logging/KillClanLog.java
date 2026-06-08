@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.clans.logging;
 
 import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
 @Data
@@ -26,7 +28,10 @@ public class KillClanLog {
     private final long time;
 
     public Component getRelativeTimeComponent() {
-        return UtilMessage.deserialize("<white>" + UtilTime.getTime((System.currentTimeMillis() - this.time), 2) + " ago</white> ");
+        return Translations.component("clans.log.kill.relative-time",
+                        Component.text(UtilTime.getTime((System.currentTimeMillis() - this.time), 2)))
+                .color(NamedTextColor.WHITE)
+                .append(Component.text(" "));
     }
 
     public Component getAbsoluteTimeComponent() {

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.ISuggestCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,7 +34,7 @@ public class ClanClaimTip extends ClanTip implements ISuggestCommand {
     @Override
     public Component generateComponent() {
         Component suggestComponent = suggestCommand("/c claim", "/c claim");
-        return Component.text("You can claim territory by running ", NamedTextColor.GRAY).append(suggestComponent);
+        return Translations.component("clans.tip.claim", suggestComponent).colorIfAbsent(NamedTextColor.GRAY);
     }
 
     @Override

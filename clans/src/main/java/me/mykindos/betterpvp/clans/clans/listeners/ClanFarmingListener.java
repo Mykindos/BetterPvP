@@ -69,11 +69,11 @@ public class ClanFarmingListener implements Listener {
             final int minY = ClanPerkManager.getInstance().computeFarmingLevelMinY(clan, baseFarmingY, baseFarmingLevels);
 
             if (block.getY() < minY || block.getY() > baseFarmingY) {
-                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Your clan can only cultivate between <green>%d</green> and <green>%d</green> Y.", minY, baseFarmingY);
+                UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.farming.cultivation-y-denied", minY, baseFarmingY);
                 event.setCancelled(true);
             }
         } else {
-            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot cultivate in the wilderness.");
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.farming.wilderness-denied");
             event.setCancelled(true);
         }
 
@@ -110,7 +110,7 @@ public class ClanFarmingListener implements Listener {
             final int minY = ClanPerkManager.getInstance().computeFarmingLevelMinY(clan, baseFarmingY, baseFarmingLevels);
 
             if (block.getY() < minY || block.getY() > baseFarmingY) {
-                UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Your clan can only cultivate between <green>%d</green> and <green>%d</green> Y.", minY, baseFarmingY);
+                UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.farming.cultivation-y-denied", minY, baseFarmingY);
                 event.setCancelled(true);
             }
         }

@@ -6,8 +6,9 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -29,8 +30,9 @@ public class ClanPillageTip extends ClanTip {
 
     @Override
     public Component generateComponent() {
-        return Component.empty().append(UtilMessage.deserialize("Upon reaching <yellow>100%</yellow> dominance on an <red>enemy</red> clan, " +
-                "your clan will be able to pillage that clan. This will allow you to attack them and potentially gain valuable loot"));
+        Component percentComponent = Component.text("100%", NamedTextColor.YELLOW);
+        Component enemyComponent = Translations.component("clans.tip.pillage.enemy").color(NamedTextColor.RED);
+        return Translations.component("clans.tip.pillage", percentComponent, enemyComponent);
         // TODO make this more descriptive of the pillage process
     }
 

@@ -21,7 +21,7 @@ public class Steel {
     public static class Ingot extends MetalItem {
         @Inject
         public Ingot() {
-            super("Steel Ingot", "steel_ingot", ItemRarity.COMMON);
+            super(translatableName("core.item.steel-ingot.name"), "steel_ingot", ItemRarity.COMMON);
         }
     }
 
@@ -38,7 +38,7 @@ public class Steel {
     public static class BlockItem extends MetalBlockItem {
         @Inject
         public BlockItem() {
-            super("Steel Block", "steel_block", ItemRarity.COMMON);
+            super(translatableName("core.item.steel-block.name"), "steel_block", ItemRarity.COMMON);
         }
     }
 

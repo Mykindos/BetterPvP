@@ -1,9 +1,10 @@
 package me.mykindos.betterpvp.core.logging;
 
 import lombok.Data;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.HashMap;
 
@@ -16,11 +17,13 @@ public class CachedLog {
     private final HashMap<String, String> context;
 
     public Component getRelativeTimeComponent() {
-        return UtilMessage.deserialize("<white>" + UtilTime.getTime((System.currentTimeMillis() - timestamp), 2) + " ago</white> ");
+        return Translations.component("core.log.cached-log.1",
+                Component.text(UtilTime.getTime((System.currentTimeMillis() - timestamp), 2), NamedTextColor.WHITE))
+                .append(Component.text(" "));
     }
 
     public Component getAbsoluteTimeComponent() {
-        return UtilMessage.deserialize("<white>" + UtilTime.getDateTime(timestamp));
+        return Component.text(UtilTime.getDateTime(timestamp), NamedTextColor.WHITE);
     }
 
 }

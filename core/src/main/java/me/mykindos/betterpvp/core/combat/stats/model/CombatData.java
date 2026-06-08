@@ -7,9 +7,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.stats.repository.PlayerData;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.NotNull;
 
@@ -114,14 +115,21 @@ public abstract class CombatData extends PlayerData {
     @Override
     public Component[] getDescription() {
         return new Component[] {
-                UtilMessage.deserialize("Rating: <alt>%,d", rating),
+                Translations.component("core.combat.stats.rating",
+                        Component.text(String.format("%,d", rating), NamedTextColor.GREEN)),
                 Component.empty(),
-                UtilMessage.deserialize("Kills: <alt2>%,d", kills),
-                UtilMessage.deserialize("Assists: <alt2>%,d", assists),
-                UtilMessage.deserialize("Deaths: <alt2>%,d", deaths),
-                UtilMessage.deserialize("KDR: <alt2>%,.2f", getKillDeathRatio()),
-                UtilMessage.deserialize("Killstreak: <alt2>%,d", killStreak),
-                UtilMessage.deserialize("Highest Killstreak: <alt2>%,d", highestKillStreak),
+                Translations.component("core.combat.stats.kills",
+                        Component.text(String.format("%,d", kills), NamedTextColor.YELLOW)),
+                Translations.component("core.combat.stats.assists",
+                        Component.text(String.format("%,d", assists), NamedTextColor.YELLOW)),
+                Translations.component("core.combat.stats.deaths",
+                        Component.text(String.format("%,d", deaths), NamedTextColor.YELLOW)),
+                Translations.component("core.combat.stats.kdr",
+                        Component.text(String.format("%,.2f", getKillDeathRatio()), NamedTextColor.YELLOW)),
+                Translations.component("core.combat.stats.killstreak",
+                        Component.text(String.format("%,d", killStreak), NamedTextColor.YELLOW)),
+                Translations.component("core.combat.stats.highest_killstreak",
+                        Component.text(String.format("%,d", highestKillStreak), NamedTextColor.YELLOW)),
         };
     }
 

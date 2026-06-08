@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -26,10 +27,10 @@ public class LeaveClanButton extends AbstractItem {
         final ItemView.ItemViewBuilder provider = ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/cross_icon"))
-                .displayName(Component.text("Leave", NamedTextColor.RED))
-                .action(ClickActions.ALL, Component.text("Leave Clan"));
+                .displayName(Translations.component("clans.menu.clan.button.leave.name").color(NamedTextColor.RED))
+                .action(ClickActions.ALL, Translations.component("clans.menu.clan.button.leave.action.leave"));
         if (leader) {
-            provider.action(ClickActions.SHIFT, Component.text("Disband Clan"));
+            provider.action(ClickActions.SHIFT, Translations.component("clans.menu.clan.button.leave.action.disband"));
         }
         return provider.build();
     }

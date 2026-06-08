@@ -23,6 +23,8 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -109,8 +111,12 @@ public class PillageListener implements Listener {
             pillager.saveProperty(ClanProperty.BALANCE.name(), pillager.getBalance() + amountEarnedFromBank);
             pillaged.saveProperty(ClanProperty.BALANCE.name(), pillaged.getBalance() - amountEarnedFromBank);
 
-            pillager.messageClan("<green>$" + UtilFormat.formatNumber(amountEarnedFromBank) + "<reset> has been deposited into your clan bank.", null, true);
-            pillaged.messageClan("<red>$" + UtilFormat.formatNumber(amountEarnedFromBank) + "<reset> has been taken from your clan bank.", null, true);
+            pillager.messageClan("clans.pillage.bank-deposited", new Object[]{
+                    Component.text("$" + UtilFormat.formatNumber(amountEarnedFromBank), NamedTextColor.GREEN)
+            }, null, true);
+            pillaged.messageClan("clans.pillage.bank-taken", new Object[]{
+                    Component.text("$" + UtilFormat.formatNumber(amountEarnedFromBank), NamedTextColor.RED)
+            }, null, true);
 
         }
 
@@ -125,7 +131,9 @@ public class PillageListener implements Listener {
 
         log.info("{} ({}) started a pillage against {} ({})", pillager.getName(), pillager.getId(), pillaged.getName(), pillaged.getId())
                 .setAction("CLAN_PILLAGE").addClanContext(pillager).addClanContext(pillaged, true).submit();
-        UtilMessage.broadcast(UtilMessage.deserialize("<blue>Clans> <red>%s <gray>has started a pillage on <red>%s<gray>!", pillager.getName(), pillaged.getName()));
+        UtilMessage.broadcast("clans.prefix", "clans.pillage.started",
+                Component.text(pillager.getName(), NamedTextColor.RED),
+                Component.text(pillaged.getName(), NamedTextColor.RED));
         Bukkit.getOnlinePlayers().forEach(player -> UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_1, 1f, 0.8f, true));
 
         pillaged.getMembers().forEach(clanMember -> {
@@ -143,11 +151,11 @@ public class PillageListener implements Listener {
         // Grant points
         int pointsGained = Math.max(1, pillaged.getSquadCount() - pillager.getSquadCount());
         pillager.saveProperty(ClanProperty.POINTS.name(), pillager.getPoints() + pointsGained);
-        pillager.messageClan("Your clan has earned <green>" + pointsGained + "<reset> points.", null, true);
+        pillager.messageClan("clans.pillage.earned-points", new Object[]{Component.text(pointsGained, NamedTextColor.GREEN)}, null, true);
 
         // Deduct points
         pillaged.saveProperty(ClanProperty.POINTS.name(), Math.max(0, pillaged.getPoints() - pointsGained));
-        pillaged.messageClan("Your clan has lost <red>" + pointsGained + "<reset> points.", null, true);
+        pillaged.messageClan("clans.pillage.lost-points", new Object[]{Component.text(pointsGained, NamedTextColor.RED)}, null, true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -155,7 +163,7 @@ public class PillageListener implements Listener {
         pillageHandler.endPillage(event.getPillage());
         Clan clan = (Clan) event.getPillage().getPillaged();
 
-        clan.messageClan("The raid on your clan has ended, and your base will begin to regenerate in <green>2</green> minutes.", null, true);
+        clan.messageClan("clans.pillage.regen-notification", null, null, true);
 
         UtilServer.runTaskLater(clans, () -> {
             List<Insurance> insuranceList = clan.getInsurance();
@@ -200,10 +208,8 @@ public class PillageListener implements Listener {
         if (pillage != null && timeRemoveOnKill > 0) {
             pillage.setPillageFinishTime(pillage.getPillageFinishTime() - (timeRemoveOnKill * 1000L));
 
-            killerClan.messageClan("As your clan killed an attacker, the remaining pillage time has been reduced by <green>"
-                    + timeRemoveOnKill + " <gray>seconds.", null, true);
-            killedClan.messageClan("As your clan was killed by a defender, the remaining pillage time has been reduced by <green>"
-                    + timeRemoveOnKill + " <gray>seconds.", null, true);
+            killerClan.messageClan("clans.pillage.kill-reduced-attacker", new Object[]{Component.text(timeRemoveOnKill, NamedTextColor.GREEN)}, null, true);
+            killedClan.messageClan("clans.pillage.kill-reduced-defender", new Object[]{Component.text(timeRemoveOnKill, NamedTextColor.GREEN)}, null, true);
             notifyPillageTime(pillage);
             checkActivePillages();
         }
@@ -218,7 +224,7 @@ public class PillageListener implements Listener {
         }
 
         if(clanManager.getPillageHandler().isBeingPillaged(clan) && clan.getCore().isDead()) {
-            UtilMessage.message(event.getPlayer(), "Clans", "Your clan core has been destroyed by raiders, you will need to find another way home...");
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.pillage.core-destroyed");
             event.setCancelled(true);
         }
     }
@@ -226,10 +232,8 @@ public class PillageListener implements Listener {
     private void notifyPillageTime(Pillage pillage) {
         if (pillage.getPillageFinishTime() > System.currentTimeMillis()) {
             String minutesRemaining = df.format((double) (pillage.getPillageFinishTime() - System.currentTimeMillis()) / 60000);
-            pillage.getPillaged().messageClan("<gray>The pillage on your clan ends in <green>"
-                    + minutesRemaining + " <gray>minutes.", null, true);
-            pillage.getPillager().messageClan("<gray>The pillage on <red>" + pillage.getPillaged().getName()
-                    + "<gray> ends in <green>" + minutesRemaining + " <gray>minutes.", null, true);
+            pillage.getPillaged().messageClan("clans.pillage.time-remaining-self", new Object[]{Component.text(minutesRemaining, NamedTextColor.GREEN)}, null, true);
+            pillage.getPillager().messageClan("clans.pillage.time-remaining-other", new Object[]{Component.text(pillage.getPillaged().getName(), NamedTextColor.RED), Component.text(minutesRemaining, NamedTextColor.GREEN)}, null, true);
         }
     }
 
@@ -247,7 +251,7 @@ public class PillageListener implements Listener {
         Clan locationClan = locationClanOptional.get();
 
         if (pillageHandler.isPillaging(playerClan, locationClan)) {
-            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot drop items directly from storage during a pillage!");
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.pillage.drop-loot-denied");
             event.setCancelled(true);
         }
     }

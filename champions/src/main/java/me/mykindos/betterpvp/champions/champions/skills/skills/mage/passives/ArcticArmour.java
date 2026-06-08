@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
@@ -26,6 +27,8 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -67,22 +70,17 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Drop your Sword / Axe to toggle",
-                "",
-                "Create a freezing area around",
-                "you in a " + getValueString(this::getRadius, level) + " Block radius",
-                "",
-                "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, and",
-                "enemies hit by you receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for",
-                getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
-                "",
-                EffectTypes.RESISTANCE.getDescription(resistanceStrength)
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component energyStartCost = getValueComponent(this::getEnergyStartCost, level);
+        Component energy = getValueComponent(this::getEnergy, level);
+        Component resistanceI = Translations.component("champions.skill.effect.resistance",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        Component slownessI = Translations.component("champions.skill.effect.slowness",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        Component resistance = Translations.component("champions.skill.effect.resistance.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.arctic-armour.description", radius, slowDuration, energyStartCost, energy, resistanceI, slownessI, resistance);
     }
 
     public int getRadius(int level) {
@@ -230,7 +228,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
-            UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.arctic-armour.on", Translations.component("champions.skill.toggle.on").color(NamedTextColor.GREEN));
         }
         else
         {

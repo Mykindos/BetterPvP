@@ -36,7 +36,7 @@ public class Ivybolt extends WeaponItem implements Reloadable {
 
     @Inject
     private Ivybolt(Champions champions, EndlessQuiverAbility endlessQuiverAbility, ItemFactory itemFactory, EffectManager effectManager, CooldownManager cooldownManager) {
-        super(champions, "Ivybolt", Item.model(Material.BOW, "ivybolt"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
+        super(champions, translatableName("champions.item.ivybolt.name"), Item.model(Material.BOW, "ivybolt"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
         this.itemFactory = itemFactory;
         this.vineSnareAbility = new VineSnareAbility(champions, itemFactory, this, effectManager);
         this.endlessQuiverAbility = endlessQuiverAbility;

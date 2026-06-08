@@ -61,7 +61,7 @@ public class AlligatorsTooth extends WeaponItem implements Reloadable {
                            GatorStrokeAbility gatorStrokeAbility,
                            UnderwaterBreathingAbility underwaterBreathingAbility,
                            ItemFactory itemFactory) {
-        super(champions, "Alligator's Tooth", model, ItemRarity.LEGENDARY);
+        super(champions, translatableName("champions.item.alligators-tooth.name"), model, ItemRarity.LEGENDARY);
         this.gatorStrokeAbility = gatorStrokeAbility;
         this.underwaterBreathingAbility = underwaterBreathingAbility;
         this.waterDamageAbility = new WaterDamageAbility(champions, itemFactory, this);

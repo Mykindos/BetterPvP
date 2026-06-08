@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.fishing.bait.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
@@ -30,12 +32,12 @@ public class SpeedyBaitAbility extends BaitAbility {
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Speedy Bait");
+        return Translations.component("progression.ability.speedy-bait.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Reduces the waiting time for fish to bite");
+        return Translations.component("progression.ability.speedy-bait.description");
     }
 
     @Override

@@ -25,7 +25,7 @@ public class ForgeSpike extends BaseItem {
 
     @Inject
     private ForgeSpike() {
-        super("Forge Spike", Item.model("forge_spike", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.forge-spike.name"), Item.model("forge_spike", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
         addBaseComponent(new ReinforcementComponent(ItemRarity.EPIC));
     }
 

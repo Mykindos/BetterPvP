@@ -29,7 +29,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Base core command";
+        return "core.command.core.description";
     }
 
     @Override
@@ -77,8 +77,8 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Reload the core plugin";
-        }
+        return "core.command.reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -96,7 +96,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
             ruleManager.reload(core);
             schematicService.clearCache();
 
-            UtilMessage.message(sender, "Core", "Successfully reloaded core");
+            UtilMessage.message(sender, "core.prefix.core", "core.command.core.reload.success");
         }
 
         @Override

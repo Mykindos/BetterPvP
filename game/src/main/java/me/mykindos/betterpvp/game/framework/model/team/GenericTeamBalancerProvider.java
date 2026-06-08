@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.game.framework.model.attribute.team.MaxImbalanceAtt
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -130,9 +129,8 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
                     teamGame.removePlayerFromTeam(participant);
                     teamGame.addPlayerToTeam(participant, targetTeam);
                     teamSizes.put(targetTeam, teamSizes.getOrDefault(targetTeam, 0) + 1);
-                    UtilMessage.message(participant.getPlayer(), "Team", Component.text("You were moved to ", NamedTextColor.GRAY)
-                            .append(Component.text(targetTeam.getProperties().name(), targetTeam.getProperties().color(), TextDecoration.BOLD))
-                            .append(Component.text(" team for balance.", NamedTextColor.GRAY)));
+                    UtilMessage.message(participant.getPlayer(), "core.prefix.team", "game.team.moved-for-balance",
+                            Component.text(targetTeam.getProperties().name(), targetTeam.getProperties().color(), TextDecoration.BOLD));
                 }
             }
         }

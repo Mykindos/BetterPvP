@@ -147,7 +147,7 @@ public class CommandListener implements Listener {
 
     private void promptInsufficientPrivileges(ICommand command, Player player) {
         if (command.informInsufficientRank()) {
-            UtilMessage.message(player, "Command", "You have insufficient privileges to perform this command.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.generic.insufficient_privileges");
         }
     }
 

@@ -17,7 +17,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -55,23 +59,13 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "Right click with a Sword to activate",
-                "Right click again to recall the orb",
-                "",
-                "Launch an orb that deals " + getValueString(this::getDamagePerSecond, level) + " max",
-                "damage/second to all enemies within " + getValueString(this::getRadius, level) + " blocks.",
-                "",
-                "For the damage dealt, heal your",
-                "allies for a max of " + getValueString(this::getMaxHealthPerSecond, level) + " health per",
-                "second.",
-                "",
-                "Upon recalling your orb, heal for",
-                getValueString(this::getImpactHealthMultiplier, level, 100, "%", 0) + " of all damage dealt.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
-        };
+    public Component[] getDescription(int level) {
+        Component damagePerSec = getValueComponent(this::getDamagePerSecond, level);
+        Component radius = getValueComponent(this::getRadius, level);
+        Component maxHealthPerSec = getValueComponent(this::getMaxHealthPerSecond, level);
+        Component impactMultiplier = Component.text(String.format("%.0f", getImpactHealthMultiplier(level) * 100), NamedTextColor.GREEN);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.warlock.blood-sphere.description", damagePerSec, radius, maxHealthPerSec, impactMultiplier, cooldown);
     }
 
     @Override
@@ -109,7 +103,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
         if (projectiles.containsKey(player)) {
             final BloodSphereProjectile projectile = projectiles.get(player);
             if (!projectile.isImpacted()) {
-                UtilMessage.simpleMessage(player, getName(), "You recalled <alt>%s</alt>.", getName());
+                UtilMessage.message(player, getName(), "champions.skill.warlock.blood-sphere.recalled", getDisplayName().color(NamedTextColor.GREEN));
                 projectile.impact();
             }
             return false;
@@ -136,7 +130,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
                 this);
         projectile.redirect(player.getLocation().getDirection());
         projectiles.put(player, projectile);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>%s %d</alt>.", getName(), level);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
         return true;
     }
 

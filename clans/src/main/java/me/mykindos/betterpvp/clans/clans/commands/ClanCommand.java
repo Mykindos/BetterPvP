@@ -41,7 +41,7 @@ public class ClanCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Basic clan command";
+        return "clans.command.clan.description";
     }
 
     @Override
@@ -55,7 +55,7 @@ public class ClanCommand extends Command {
             if (playerClan != null) {
                 openClanMenu(player, playerClan, playerClan);
             } else {
-                UtilMessage.message(player, "Clans", "You are not in a clan");
+                UtilMessage.message(player, "clans.prefix", "clans.command.clan.no-clan");
             }
 
             return;
@@ -74,10 +74,10 @@ public class ClanCommand extends Command {
                 final Client targetClient = clientOptional.get();
                 final Optional<Clan> foundClan = clanManager.getClanByPlayer(targetClient.getUniqueId());
                 foundClan.ifPresentOrElse(clan -> openClanMenu(player, playerClan, clan), () -> {
-                    UtilMessage.message(player, "Clans", "That player is not in a clan.");
+                    UtilMessage.message(player, "clans.prefix", "clans.command.clan.player-no-clan");
                 });
             } else {
-                UtilMessage.message(player, "Clans", "Cannot find the specified clan or player.");
+                UtilMessage.message(player, "clans.prefix", "clans.command.clan.not-found");
             }});
 
 

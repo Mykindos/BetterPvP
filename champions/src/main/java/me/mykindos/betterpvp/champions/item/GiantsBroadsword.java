@@ -75,7 +75,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
     private GiantsBroadsword(Champions champions,
                             RegenerationShieldAbility regenerationShieldAbility,
                             ItemFactory itemFactory) {
-        super(champions, "Giant's Broadsword", model, ItemRarity.MYTHICAL);
+        super(champions, translatableName("champions.item.giants-broadsword.name"), model, ItemRarity.MYTHICAL);
         this.itemFactory = itemFactory;
         this.regenerationShieldAbility = regenerationShieldAbility;
 

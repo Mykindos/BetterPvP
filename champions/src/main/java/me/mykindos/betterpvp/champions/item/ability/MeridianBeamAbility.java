@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -60,12 +61,12 @@ public class MeridianBeamAbility extends CooldownInteraction implements Displaye
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text(MeridianBeam.NAME);
+        return Translations.component("champions.ability.meridian-beam.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Fires a damaging beam of energy that travels in a straight line.");
+        return Translations.component("champions.ability.meridian-beam.description");
     }
 
     @Override

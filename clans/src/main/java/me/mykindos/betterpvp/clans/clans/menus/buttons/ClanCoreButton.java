@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -26,11 +27,11 @@ public class ClanCoreButton extends AbstractItem {
     @Override
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder provider = ItemView.builder().material(ClanCore.CORE_BLOCK)
-                .displayName(Component.text("Clan Core", NamedTextColor.YELLOW, TextDecoration.BOLD))
+                .displayName(Translations.component("clans.menu.clan.button.core.name").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/house_icon"))
-                .action(ClickActions.ALL, Component.text("Teleport to Core"));
+                .action(ClickActions.ALL, Translations.component("clans.menu.clan.button.core.action.teleport"));
         if (admin) {
-            provider.action(ClickActions.SHIFT, Component.text("Set Core"));
+            provider.action(ClickActions.SHIFT, Translations.component("clans.menu.clan.button.core.action.set"));
         }
         return provider.build();
     }

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -42,7 +43,7 @@ public class ClanKillLogButton extends AbstractItem {
     @Override
     public ItemProvider getItemProvider() {
         Component name = Component.text(killClanLog.getKillerName(), killerRelation.getPrimary())
-                            .append(Component.text(" killed ", NamedTextColor.GRAY))
+                            .appendSpace().append(Translations.component("clans.menu.kill-logs.lore.killed").color(NamedTextColor.GRAY)).appendSpace()
                             .append(Component.text(killClanLog.getVictimName(), victimRelation.getPrimary()));
         List<Component> lore = getLore();
         ItemStack itemStack = ItemStack.of(Material.TIPPED_ARROW);
@@ -72,12 +73,13 @@ public class ClanKillLogButton extends AbstractItem {
                 Component.text(killClanLog.getKillerClanName(), killerRelation.getSecondary())
                         .appendSpace()
                         .append(Component.text(killClanLog.getKillerName(), killerRelation.getPrimary())),
-                Component.text("killed", NamedTextColor.GRAY),
+                Translations.component("clans.menu.kill-logs.lore.killed").color(NamedTextColor.GRAY),
                 Component.text(killClanLog.getVictimClanName(), victimRelation.getSecondary())
                         .appendSpace()
                         .append(Component.text(killClanLog.getVictimName(), victimRelation.getPrimary())),
-                Component.text("for ", NamedTextColor.GRAY).append(Component.text(dominance, dominanceColor))
-                        .append(Component.text(" dominance", NamedTextColor.GRAY)),
+                Translations.component("clans.menu.kill-logs.lore.for").color(NamedTextColor.GRAY)
+                        .appendSpace().append(Component.text(dominance, dominanceColor))
+                        .appendSpace().append(Translations.component("clans.menu.kill-logs.lore.dominance").color(NamedTextColor.GRAY)),
                 UtilMessage.DIVIDER
         );
     }

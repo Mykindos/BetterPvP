@@ -14,9 +14,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -58,16 +61,11 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill, Healt
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "When enemies die, they will drop a soul",
-                "which is only visible to " + getClassType().getName(),
-                "",
-                "Collected souls give bursts of",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and " + getValueString(this::getHealthPerSecond, level) + " health per second",
-                "",
-                "Buff duration: " + getValueString(this::getBuffDuration, level) + " seconds",
-        };
+    public Component[] getDescription(int level) {
+        Component speedRoman = Component.text(UtilFormat.getRomanNumeral(speedStrength), NamedTextColor.GREEN);
+        Component healthPerSec = getValueComponent(this::getHealthPerSecond, level);
+        Component buffDuration = getValueComponent(this::getBuffDuration, level);
+        return Translations.componentLines("champions.skill.warlock.soul-harvest.description", speedRoman, healthPerSec, buffDuration);
     }
 
     private double getBuffDuration(int level) {

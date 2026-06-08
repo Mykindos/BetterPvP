@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jooq.DSLContext;
@@ -109,7 +111,11 @@ public class BuildRepository implements IRepository<RoleBuild> {
             if (!build.isActive()) return;
             Player player = Bukkit.getPlayer(build.getClientUUID());
             if (player == null) return;
-            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, refunding <green>%s</green> skill point(s) and removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), level, build.getRole().toString(), build.getId()));
+            UtilMessage.message(player, "core.prefix.champions", "champions.build.disabled-skill",
+                    skill.getDisplayName().color(NamedTextColor.GREEN),
+                    Component.text(String.valueOf(level), NamedTextColor.GREEN),
+                    Component.text(build.getRole().toString(), NamedTextColor.YELLOW),
+                    Component.text(String.valueOf(build.getId()), NamedTextColor.GREEN));
             return;
         }
 

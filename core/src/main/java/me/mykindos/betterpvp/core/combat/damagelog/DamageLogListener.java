@@ -76,7 +76,7 @@ public class DamageLogListener implements Listener {
                 .append(Component.text("why."))
                 .clickEvent(clickEvent);
         final Component message = UtilMessage.getMiniMessage("<alt2>%s</alt2> has <red>%.1f\u2764</red> remaining.", event.getKiller().getName(), event.getKiller().getHealth());
-        UtilMessage.simpleMessage(event.getVictim(), "Death", message.appendSpace().append(component));
+        UtilMessage.message(event.getVictim(), "core.prefix.death", message.appendSpace().append(component));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -103,7 +103,7 @@ public class DamageLogListener implements Listener {
                 .append(Component.text("to view your death summary."))
                 .clickEvent(clickEvent);
         final Component hover = Component.text("What killed you?");
-        UtilMessage.simpleMessage(event.getPlayer(), "Death", component, hover);
+        UtilMessage.message(event.getPlayer(), "core.prefix.death", component, hover);
 
         // Clear the damage logs for this player after this death
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {

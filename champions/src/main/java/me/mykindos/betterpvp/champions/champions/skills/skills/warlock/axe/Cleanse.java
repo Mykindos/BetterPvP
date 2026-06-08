@@ -14,6 +14,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -55,20 +59,13 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Purge all negative effects from you and your allies within " + getValueString(this::getRange, level) + " blocks",
-                "",
-                "Affected players also receive an immunity against negative",
-                "effects for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1) + " + " + getValueString(this::getHealthReductionPerPlayerAffected, level, 1) + " per player affected",
-
-
-        };
+    public Component[] getDescription(int level) {
+        Component range = getValueComponent(this::getRange, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component healthReduction = getValueComponent(this::getHealthReduction, level);
+        Component healthReductionPerPlayer = getValueComponent(this::getHealthReductionPerPlayerAffected, level);
+        return Translations.componentLines("champions.skill.warlock.cleanse.description", range, duration, cooldown, healthReduction, healthReductionPerPlayer);
     }
 
     public double getHealthReduction(int level) {
@@ -103,7 +100,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         int level = getLevel(player);
 
         if (player.getHealth() - getHealthReduction(level) <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.not-enough-health", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             return false;
         }
 
@@ -132,7 +129,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             healthReduction += getHealthReductionPerPlayerAffected(level);
 
             championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
-            UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative effects by <alt>" + player.getName());
+            UtilMessage.message(ally, "core.prefix.cleanse", "champions.skill.warlock.cleanse.cleansed", Component.text(player.getName(), NamedTextColor.GREEN));
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
 

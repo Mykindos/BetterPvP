@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -80,7 +81,7 @@ public class SellAllMenu extends AbstractGui implements Windowed {
 
         ItemView placeholder = ItemView.builder()
                 .material(Material.PAPER)
-                .displayName(Component.text("Place items here to sell them!", NamedTextColor.RED))
+                .displayName(Translations.component("shops.menu.sell-all.placeholder").color(NamedTextColor.RED))
                 .itemModel(Resources.ItemModel.INVISIBLE)
                 .build();
         for (int slot = 0; slot < 45; slot++) {

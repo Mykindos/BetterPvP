@@ -14,6 +14,6 @@ public class VoidSphere extends BaseItem {
 
     @Inject
     private VoidSphere() {
-        super("Void Sphere", Item.model("void_sphere", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.void-sphere.name"), Item.model("void_sphere", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

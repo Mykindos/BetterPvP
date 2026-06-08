@@ -16,6 +16,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -54,19 +57,15 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level) + " of your health to give",
-                "yourself and all allies within " + getValueString(this::getRadius, level) + " blocks",
-                "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1) + " + " + getValueString(this::getHealthReductionPerPlayerAffected, level, 1) + " per player affected",
-
-        };
+    public Component[] getDescription(int level) {
+        Component healthReduction = getValueComponent(this::getHealthReduction, level);
+        Component radius = getValueComponent(this::getRadius, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component healthReductionPerPlayer = getValueComponent(this::getHealthReductionPerPlayerAffected, level);
+        Component speedII = Translations.component("champions.skill.effect.speed",
+                Component.text("II")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.warlock.bloodshed.description", healthReduction, radius, duration, cooldown, healthReductionPerPlayer, speedII);
     }
 
     public double getHealthReduction(int level) {
@@ -117,7 +116,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
             }
 
             championsManager.getEffects().addEffect(target, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
-            UtilMessage.simpleMessage(target, getName(), "<yellow>%s</yellow> gave you <white>Speed "+ UtilFormat.getRomanNumeral(speedStrength) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
+            UtilMessage.message(target, getName(), "champions.skill.warlock.bloodshed.gave-speed", Component.text(player.getName(), NamedTextColor.YELLOW), Translations.component("champions.skill.effect.speed", Component.text(UtilFormat.getRomanNumeral(speedStrength))).color(NamedTextColor.WHITE), Component.text(String.valueOf(getDuration(level)), NamedTextColor.GREEN));
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
             healthReduction += getHealthReductionPerPlayerAffected(level);
 
@@ -152,7 +151,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
     public boolean canUse(Player player) {
         int level = getLevel(player);
         if (player.getHealth() - getHealthReduction(level) <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.not-enough-health", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             return false;
         }
 

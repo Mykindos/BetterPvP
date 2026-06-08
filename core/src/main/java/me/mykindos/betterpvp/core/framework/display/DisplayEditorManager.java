@@ -8,10 +8,12 @@ import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -35,22 +37,22 @@ public class DisplayEditorManager implements Listener {
 
     private static final Object DUMMY = new Object();
 
-    private static Component quaternion(String key, Quaternionf quaternion) {
-        return UtilMessage.deserialize("<green>%s: <dark_green>[<aqua>%.2f</aqua>, <red>%.2fi</red>, <gold>%.2fj</gold>, <yellow>%.2fk</yellow>]",
-                key,
-                quaternion.w,
-                quaternion.x,
-                quaternion.y,
-                quaternion.z
+    private static Component quaternion(Component label, Quaternionf quaternion) {
+        return Translations.component("core.display.quaternion",
+                label.color(NamedTextColor.GREEN),
+                Component.text(String.format("%.2f", quaternion.w), NamedTextColor.AQUA),
+                Component.text(String.format("%.2f", quaternion.x), NamedTextColor.RED),
+                Component.text(String.format("%.2f", quaternion.y), NamedTextColor.GOLD),
+                Component.text(String.format("%.2f", quaternion.z), NamedTextColor.YELLOW)
         );
     }
 
-    private static Component vector(String key, Vector3f vector) {
-        return UtilMessage.deserialize("<green>%s: <dark_green>[<gray>%.2f</gray>, <gray>%.2f</gray>, <gray>%.2f</gray>]",
-                key,
-                vector.x,
-                vector.y,
-                vector.z
+    private static Component vector(Component label, Vector3f vector) {
+        return Translations.component("core.display.vector",
+                label.color(NamedTextColor.GREEN),
+                Component.text(String.format("%.2f", vector.x), NamedTextColor.GRAY),
+                Component.text(String.format("%.2f", vector.y), NamedTextColor.GRAY),
+                Component.text(String.format("%.2f", vector.z), NamedTextColor.GRAY)
         );
     }
 
@@ -66,10 +68,10 @@ public class DisplayEditorManager implements Listener {
     private final PermanentComponent actionBar = new PermanentComponent(gmr -> {
         final Display display = selectedDisplays.get(gmr.getPlayer());
         final Transformation t = display.getTransformation();
-        final Component translation = vector("Translation", t.getTranslation());
-        final Component left = quaternion("Left", t.getLeftRotation());
-        final Component scale = vector("Scale", t.getScale());
-        final Component right = quaternion("Right", t.getRightRotation());
+        final Component translation = vector(Translations.component("core.display.label.translation"), t.getTranslation());
+        final Component left = quaternion(Translations.component("core.display.label.left"), t.getLeftRotation());
+        final Component scale = vector(Translations.component("core.display.label.scale"), t.getScale());
+        final Component right = quaternion(Translations.component("core.display.label.right"), t.getRightRotation());
         return translation.appendSpace().append(left).appendSpace().append(scale).appendSpace().append(right);
     });
 
@@ -131,7 +133,7 @@ public class DisplayEditorManager implements Listener {
 
         selectDisplay(event.getPlayer(), display);
         selecting.invalidate(event.getPlayer());
-        UtilMessage.simpleMessage(event.getPlayer(), "Display", "Selected display entity.");
+        UtilMessage.message(event.getPlayer(), "core.prefix.display", "core.display.selected");
     }
 
 }

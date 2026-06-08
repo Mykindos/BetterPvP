@@ -7,8 +7,11 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -66,7 +69,8 @@ public class CoinDeathListener implements Listener {
         // Calculate the final drop amount including all bonuses
         final int dropAmount = coinDropEvent.getTotalDropAmount(percentCoinsDroppedOnDeath);
         gamer.saveProperty(GamerProperty.BALANCE, Math.max(0, gamer.getBalance() - dropAmount));
-        UtilMessage.simpleMessage(player, "Death", "You lost <yellow>%s coins<gray> for dying.", UtilFormat.formatNumber(dropAmount));
+        UtilMessage.message(player, "core.prefix.death", "core.economy.coins_lost",
+                Translations.component("core.economy.coins_amount", Component.text(UtilFormat.formatNumber(dropAmount))).color(NamedTextColor.YELLOW));
 
         ItemStack coinItem = generateDrops(dropAmount);
         if (coinItem != null) {

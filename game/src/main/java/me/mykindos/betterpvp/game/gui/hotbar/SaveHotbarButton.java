@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -18,9 +20,9 @@ public class SaveHotbarButton extends ControlItem<HotBarEditor> {
     @Override
     public ItemProvider getItemProvider(HotBarEditor gui) {
         return ItemView.builder()
-                .displayName(Component.text("Save", NamedTextColor.GREEN))
+                .displayName(Translations.component("game.menu.hotbar.save.name").color(NamedTextColor.GREEN))
                 .material(Material.GREEN_STAINED_GLASS)
-                .action(ClickActions.ALL, Component.text("Save Hotbar"))
+                .action(ClickActions.ALL, Translations.component("game.menu.hotbar.save.action"))
                 .build();
     }
 

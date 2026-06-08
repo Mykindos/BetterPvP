@@ -38,7 +38,7 @@ public class PowerSword extends WeaponItem {
 
     @Inject
     private PowerSword(Champions champions) {
-        super(champions, "Power Sword", model, ItemRarity.UNCOMMON);
+        super(champions, translatableName("champions.item.power-sword.name"), model, ItemRarity.UNCOMMON);
     }
 
     @Inject

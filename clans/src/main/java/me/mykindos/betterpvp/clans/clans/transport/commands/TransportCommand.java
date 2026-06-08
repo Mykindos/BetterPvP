@@ -23,7 +23,7 @@ public class TransportCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Opens the travel hub UI";
+        return "clans.command.transport.description";
     }
 
     @Override

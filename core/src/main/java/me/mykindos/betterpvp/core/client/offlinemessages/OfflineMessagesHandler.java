@@ -38,7 +38,8 @@ public class OfflineMessagesHandler {
         offlineMessagesRepository.getNewOfflineMessagesForClient(client).thenAcceptAsync((offlineMessages) -> {
             if (offlineMessages.isEmpty()) return;
 
-            UtilMessage.message(player, "Offline", "While you were away, you received <green>%s</green> Offline Messages", offlineMessages.size());
+            UtilMessage.message(player, "core.prefix.offline", "core.client.offlinemessages.login",
+                    Component.text(offlineMessages.size(), NamedTextColor.GREEN));
             for (int i = 0; i < 10; i++) {
                 if (i >= offlineMessages.size()) break;
                 offlineMessages.get(i).send();
@@ -54,7 +55,7 @@ public class OfflineMessagesHandler {
                     .append(Component.text(" or use "))
                     .append(Component.text("/offlinemessages <time> <unit>", NamedTextColor.YELLOW).clickEvent(ClickEvent.suggestCommand("/offlinemessages 7 d"))).appendSpace()
                     .append(Component.text("to retrieve past messages for the given time duration"));
-            UtilMessage.message(player, "Offline", additional);
+            UtilMessage.message(player, "core.prefix.offline", additional);
         });
 
 
@@ -74,12 +75,14 @@ public class OfflineMessagesHandler {
 
         offlineMessagesRepository.getOfflineMessagesForClient(client.getId(), time).whenComplete((messages, throwable) -> {
             if (throwable != null) {
-                UtilMessage.message(player, "Offline", "An error occurred while retrieving messages");
+                UtilMessage.message(player, "core.prefix.offline", "core.client.offlinemessages.error");
                 return;
             }
 
             if (messages.isEmpty()) {
-                UtilMessage.message(player, "Offline", "No messages found for <green>%s</green> in the last <green>%s</green>", client.getName(), time);
+                UtilMessage.message(player, "core.prefix.offline", "core.client.offlinemessages.none",
+                        Component.text(client.getName(), NamedTextColor.GREEN),
+                        Component.text(time, NamedTextColor.GREEN));
                 return;
             }
 

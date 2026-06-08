@@ -25,7 +25,7 @@ public class AnchorStone extends BaseItem {
 
     @Inject
     private AnchorStone() {
-        super("Anchor Stone", Item.model("anchor_stone", 64), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.anchor-stone.name"), Item.model("anchor_stone", 64), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
         addBaseComponent(new ReinforcementComponent(ItemRarity.LEGENDARY));
     }
 

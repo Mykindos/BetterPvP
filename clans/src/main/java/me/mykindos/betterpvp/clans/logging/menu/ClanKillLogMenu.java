@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterValueButton;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueButton;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -26,6 +27,7 @@ import me.mykindos.betterpvp.core.menu.button.filter.IContextFilterButton;
 import me.mykindos.betterpvp.core.menu.button.filter.StringContext;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
@@ -81,7 +83,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
         }
         setContent(List.of(new SimpleItem(ItemView.builder()
                 .material(Material.PAPER)
-                .displayName(Component.text("Loading..."))
+                .displayName(Translations.component("clans.menu.loading.name"))
                 .build())
         ));
         refresh();
@@ -104,8 +106,8 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
             log.error("Error loading clan kill logs for clan", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
-                    .displayName(Component.text("Error! Check console!"))
-                    .lore(Component.text("Please inform staff if you see this"))
+                    .displayName(Translations.component("clans.menu.error.name"))
+                    .lore(Translations.component("clans.menu.error.lore").color(NamedTextColor.GRAY))
                     .build()));
         }).thenApply(logs -> {
             setContent(logs);
@@ -145,7 +147,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text(clan.getName() + "'s Kill Logs");
+        return Translations.component("clans.menu.kill-logs.title", Component.text(clan.getName()));
     }
 
     @Override

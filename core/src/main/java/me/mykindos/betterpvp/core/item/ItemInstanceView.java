@@ -37,6 +37,14 @@ public class ItemInstanceView implements ItemProvider {
         this.itemInstance = itemInstance;
     }
 
+    /**
+     * Gets the (unresolved) item display name component.
+     *
+     * <p>This may contain translatable nodes. Localization into a recipient's locale happens at the
+     * outgoing packet boundary ({@code ItemPacketRemapper}), not here, so canonical/view stacks are never
+     * baked into a single language. It is also safe to use directly in chat/hover contexts, where the
+     * audience renders per-viewer on send.</p>
+     */
     public Component getName() {
         return itemInstance.getBaseItem().getItemNameRenderer().createName(itemInstance);
     }
@@ -54,7 +62,8 @@ public class ItemInstanceView implements ItemProvider {
      * @return the rendered display item stack
      */
     public @NotNull ItemStack get(@Nullable String lang, @Nullable Integer page) {
-        // todo: localization support
+        // The view is built with UNRESOLVED translatable name/lore on purpose; the packet layer resolves
+        // it per recipient. The lang argument is therefore not used to bake a language in here.
         final ItemStack itemStack = itemInstance.createItemStack();
 
         // Set name and attributes
@@ -103,7 +112,7 @@ public class ItemInstanceView implements ItemProvider {
             }
         });
 
-        // if lore is available, write it on the requested page (or the most relevant one)
+        // if lore is available, write it on the requested page (unresolved; localized later at the packet boundary)
         final ItemLoreRenderer loreRenderer = itemInstance.getLoreRenderer();
         if (loreRenderer != null) {
             final int resolvedPage = page != null ? LorePages.clamp(itemInstance, page) : LorePages.mostRelevant(itemInstance);

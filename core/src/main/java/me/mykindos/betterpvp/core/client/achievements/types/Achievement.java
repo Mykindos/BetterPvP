@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.utility.StatValueType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.server.Realm;
 import me.mykindos.betterpvp.core.server.Season;
@@ -182,22 +183,28 @@ public abstract class Achievement implements IAchievement, IStat {
         //todo localize timezones
         final Component timeComponent = Component.text(UtilTime.getDateTime(achievementCompletion.getTimestamp()), NamedTextColor.GOLD);
 
-        final Component placementComponent = UtilMessage.deserialize("<gold>#%s of %s", achievementCompletion.getCompletedRank() + 1, achievementCompletion.getTotalCompletions());
+        final Component placementComponent = Translations.component("core.achievement.placement",
+                Component.text(achievementCompletion.getCompletedRank() + 1),
+                Component.text(achievementCompletion.getTotalCompletions())).color(NamedTextColor.GOLD);
 
         return new ArrayList<>(List.of(
-                Component.text("Completed", NamedTextColor.GOLD),
+                Translations.component("core.achievement.completed").color(NamedTextColor.GOLD),
                 timeComponent,
                 placementComponent));
     }
 
     @Override
     public void notifyProgress(StatContainer container, Audience audience, float threshold) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), UtilFormat.formatNumber(getPercentComplete(container, achievementFilterType, getPeriod()) * 100)));
+        UtilMessage.message(audience, "core.prefix.achievement", "core.achievement.progress",
+                Component.text(getName(), NamedTextColor.WHITE),
+                Component.text(UtilFormat.formatNumber(getPercentComplete(container, achievementFilterType, getPeriod()) * 100), NamedTextColor.GREEN));
     }
 
     @Override
     public void notifyComplete(StatContainer container, Audience audience) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <gold>Completed!",  getName(), getPercentComplete(container, achievementFilterType, getPeriod())));
+        UtilMessage.message(audience, "core.prefix.achievement", "core.achievement.complete",
+                Component.text(getName(), NamedTextColor.WHITE),
+                Translations.component("core.achievement.completed_label").color(NamedTextColor.GOLD));
     }
 
     protected Period getPeriod() {

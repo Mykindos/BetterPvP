@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities.model.display.actionbar;
 
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityData;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
@@ -75,10 +76,11 @@ public class ActionBar implements IDisplayQueue<DisplayObject<Component>> {
             component = EMPTY;
         }
 
-        // Send the action bar to the player
+        // Send the action bar to the player. Resolve any translatable nodes (e.g. cooldown ability names)
+        // into the recipient's locale server-side, so they never display as raw keys.
         final Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
         if (player != null) {
-            player.sendActionBar(component);
+            player.sendActionBar(Translations.render(component, player.locale()));
         }
     }
 

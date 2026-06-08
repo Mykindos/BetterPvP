@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.WorldHandler;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -31,7 +32,7 @@ public class CreateButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         return ItemView.builder()
                 .material(Material.GREEN_CONCRETE)
-                .displayName(Component.text("Create World", NamedTextColor.GREEN, TextDecoration.BOLD))
+                .displayName(Translations.component("core.menu.world.create.button.create.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                 .glow(true)
                 .build();
     }
@@ -41,10 +42,10 @@ public class CreateButton extends AbstractItem {
         new ConfirmationMenu("Are you sure you want to create this world?", confirmed -> {
             if (Boolean.TRUE.equals(confirmed)) {
                 player.closeInventory();
-                UtilMessage.message(player, "World", "Creating world...");
+                UtilMessage.message(player, "core.prefix.world", "core.world.creating");
                 final BPvPWorld world = new BPvPWorld(creator.name());
                 world.createWorld(creator);
-                UtilMessage.message(player, "World", "World created!");
+                UtilMessage.message(player, "core.prefix.world", "core.world.created");
                 player.teleport(Objects.requireNonNull(world.getWorld()).getSpawnLocation());
                 SoundEffect.HIGH_PITCH_PLING.play(player);
             } else {

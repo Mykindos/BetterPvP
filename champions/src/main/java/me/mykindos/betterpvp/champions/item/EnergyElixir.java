@@ -27,7 +27,7 @@ public class EnergyElixir extends BaseItem implements Reloadable {
 
     @Inject
     private EnergyElixir(EnergyService energyService, CooldownManager cooldownManager) {
-        super("Energy Elixir", ItemStack.of(Material.HONEY_BOTTLE), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.energy-elixir.name"), ItemStack.of(Material.HONEY_BOTTLE), ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         final SoundEffect soundEffect = new SoundEffect(Sound.ITEM_HONEY_BOTTLE_DRINK, 1.2f, 1f);
         this.energyBoost = new EnergyBoost(energyService, cooldownManager, soundEffect);
         energyBoost.setConsumesItem(true);

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons.banner;
 import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.GuiSelectPattern;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -21,7 +22,7 @@ public class AddPatternItem extends ControlItem<BannerMenu> {
     public ItemProvider getItemProvider(BannerMenu gui) {
         return ItemView.builder()
                 .material(Material.FLOWER_BANNER_PATTERN)
-                .displayName(Component.text("Add Pattern", NamedTextColor.YELLOW, TextDecoration.BOLD))
+                .displayName(Translations.component("clans.menu.banner.button.add-pattern.name").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .hideAdditionalTooltip(true)
                 .build();
     }

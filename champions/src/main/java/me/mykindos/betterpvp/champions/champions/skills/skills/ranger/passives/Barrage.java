@@ -16,10 +16,13 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -65,16 +68,11 @@ public class Barrage extends BowChargeSkill implements Listener, PassiveSkill, D
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Draw back your bow to charge " + getValueString(this::getChargePerSecond, level, 100, "%", 0) + " per second",
-                "",
-                "The more charge, the more arrows you will fire",
-                "up to a maximum of " + getValueString(this::getNumArrows, level) + " and they will deal " + getValueString(this::getArrowDamage, level),
-                "damage each",
-                "",
-                "Additional arrows do not work with bow abilities",
-        };
+    public Component[] getDescription(int level) {
+        Component chargePerSecond = getValueComponent(this::getChargePerSecond, level, 100, 0).append(Component.text("%"));
+        Component numArrows = getValueComponent(this::getNumArrows, level, 0);
+        Component arrowDamage = getValueComponent(this::getArrowDamage, level);
+        return Translations.componentLines("champions.skill.ranger.barrage.description", chargePerSecond, numArrows, arrowDamage);
     }
 
     @Override

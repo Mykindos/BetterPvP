@@ -14,9 +14,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -55,26 +58,19 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Drop your Sword / Axe to toggle",
-                "",
-                "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength "
-                        + UtilFormat.getRomanNumeral(strengthLevel) + "</effect>, and <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
-                "",
-                "You leave a trail of fire, which",
-                "ignites enemies for " + getValueString(this::getFireTickDuration, level) + " seconds",
-                "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
-                "",
-                "While active, you are also immune to fire damage",
-                "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel),
-                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength),
-        };
+    public Component[] getDescription(int level) {
+        Component fireTickDuration = getValueComponent(this::getFireTickDuration, level);
+        Component energyStartCost = getValueComponent(this::getEnergyStartCost, level);
+        Component energy = getValueComponent(this::getEnergy, level);
+        Component speedI = Translations.component("champions.skill.effect.speed",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        Component strengthI = Translations.component("champions.skill.effect.strength",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        Component vulnerabilityI = Translations.component("champions.skill.effect.vulnerability",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        Component strength = Translations.component("champions.skill.effect.strength.name").color(NamedTextColor.WHITE);
+        Component vulnerability = Translations.component("champions.skill.effect.vulnerability.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.immolate.description", fireTickDuration, energyStartCost, energy, speedI, strengthI, vulnerabilityI, strength, vulnerability);
     }
 
     public double getFireTickDuration(int level) {
@@ -112,7 +108,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(player.getLevel()), false)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: <green>On");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.immolate.on", Translations.component("champions.skill.toggle.on").color(NamedTextColor.GREEN));
         } else {
             cancel(player);
         }

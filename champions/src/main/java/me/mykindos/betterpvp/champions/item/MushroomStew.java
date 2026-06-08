@@ -44,7 +44,7 @@ public class MushroomStew extends BaseItem implements Reloadable {
 
     @Inject
     private MushroomStew(RegenerationAbility regenerationAbility) {
-        super("Mushroom Stew", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.mushroom-stew.name"), model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.regenerationAbility = regenerationAbility;
         regenerationAbility.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()

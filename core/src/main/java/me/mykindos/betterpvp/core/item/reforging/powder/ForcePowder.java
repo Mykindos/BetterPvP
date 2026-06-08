@@ -19,7 +19,7 @@ public class ForcePowder extends BaseItem {
 
     @Inject
     public ForcePowder() {
-        super("Force Powder", Item.model("force_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.force-powder.name"), Item.model("force_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
         addBaseComponent(new StatAugmentationComponent(List.of(
                 new StatAugmentation(StatTypes.MELEE_DAMAGE, 1, 0.01, StatAugmentation.Operation.ADD)
         )));

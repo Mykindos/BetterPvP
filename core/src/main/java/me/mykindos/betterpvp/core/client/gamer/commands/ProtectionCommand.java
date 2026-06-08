@@ -27,20 +27,21 @@ public class ProtectionCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Disables PvP protection";
+        return "core.command.protection.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
-            UtilMessage.message(player, "Protection", "You currently do not have protection");
+            UtilMessage.message(player, "core.prefix.protection", "core.command.protection.not_active");
             return;
         }
+        // NOTE: ConfirmationMenu requires a String; translating this title is skipped for now (see summary)
         new ConfirmationMenu("Disable Protection", success -> {
             if (Boolean.TRUE.equals(success)) {
                 client.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, 0L);
                 effectManager.removeEffect(player, EffectTypes.PROTECTION, false);
-                UtilMessage.message(player, "Protection", "Protection disabled");
+                UtilMessage.message(player, "core.prefix.protection", "core.command.protection.disabled");
             }
 
         }).show(player);

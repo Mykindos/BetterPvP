@@ -14,7 +14,7 @@ public class GoldBars extends BaseItem {
 
     @Inject
     private GoldBars() {
-        super("Gold Bars", Item.model("gold_bars", 99), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.gold-bars.name"), Item.model("gold_bars", 99), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
         addBaseComponent(new CurrencyComponent(1));
     }
 }

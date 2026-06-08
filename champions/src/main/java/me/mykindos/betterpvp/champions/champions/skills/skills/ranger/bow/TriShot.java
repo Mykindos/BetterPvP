@@ -18,9 +18,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -73,7 +75,9 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         final int maxCharges = getNumTridents(level);
         final int newCharges = (maxCharges - data.getTridentsShot());
 
-        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+        return Component.empty().color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(getDisplayName())
+                .append(Component.text(" "))
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
                 .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
@@ -91,16 +95,11 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Your next " + getValueString(this::getNumTridents, level, 0) + " arrows will be converted into tridents",
-                "",
-                "Left click to instantly shoot them, dealing " + getValueString(this::getDamage, level) + " damage",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds",
-        };
+    public Component[] getDescription(int level) {
+        Component numTridents = getValueComponent(this::getNumTridents, level, 0);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.ranger.tri-shot.description", numTridents, damage, cooldown);
     }
 
     public int getNumTridents(int level) {
@@ -178,7 +177,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         }
 
         if (!UtilInventory.contains(player, Material.ARROW, 1)) {
-            UtilMessage.message(player, getName(), "You need at least <alt2>1 Arrow</alt2> to use this skill.");
+            UtilMessage.message(player, getName(), "champions.skill.ranger.tri-shot.need-arrow", Translations.component("champions.skill.ranger.tri-shot.one-arrow").color(NamedTextColor.YELLOW));
             return;
         }
 

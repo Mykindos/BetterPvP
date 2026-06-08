@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.skill.menu.button;
 
 import me.mykindos.betterpvp.core.inventory.gui.ScrollGui;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ScrollItem;
 import me.mykindos.betterpvp.core.utilities.Resources;
@@ -20,11 +21,11 @@ public class ScrollDownButton extends ScrollItem {
     public ItemProvider getItemProvider(ScrollGui<?> gui) {
         final ItemView.ItemViewBuilder builder = ItemView.of(new ItemStack(Material.BARRIER)).toBuilder();
         builder.customModelData(1);
-        builder.displayName(Component.text("Scroll down"));
+        builder.displayName(Translations.component("progression.menu.scroll.down"));
         builder.itemModel(Resources.ItemModel.INVISIBLE);
-        builder.action(ClickActions.LEFT_SHIFT, Component.text("Scroll down 5 levels"));
+        builder.action(ClickActions.LEFT_SHIFT, Translations.component("progression.menu.scroll.down-5"));
         if (!gui.canScroll(1))
-            builder.lore(Component.text("You've reached the bottom"));
+            builder.lore(Translations.component("progression.menu.scroll.bottom"));
 
         return builder.build();
     }

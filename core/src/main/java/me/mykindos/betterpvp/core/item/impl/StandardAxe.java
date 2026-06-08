@@ -23,7 +23,7 @@ public class StandardAxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 250;
 
     public StandardAxe() {
-        super("Standard Axe", ItemStack.of(Material.IRON_AXE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.standard-axe.name"), ItemStack.of(Material.IRON_AXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

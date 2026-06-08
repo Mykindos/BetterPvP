@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -36,7 +37,7 @@ public class PromoteSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Promote a member of your clan to a higher rank";
+        return "clans.command.promote.description";
     }
 
     @Override
@@ -47,7 +48,7 @@ public class PromoteSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a player to promote.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.promote.no-args");
             return;
         }
 
@@ -55,34 +56,34 @@ public class PromoteSubCommand extends ClanSubCommand {
 
         ClanMember member = clan.getMember(player.getUniqueId());
         if (member.getRank().getPrivilege() < ClanMember.MemberRank.ADMIN.getPrivilege()) {
-            UtilMessage.message(player, "Clans", "You do not have permission to do this.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.promote.no-permission");
             return;
         }
 
         String targetMemberName = args[0];
         if(player.getName().equalsIgnoreCase(targetMemberName)) {
-            UtilMessage.message(player, "Clans", "You cannot promote yourself.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.promote.self");
             return;
         }
 
         clientManager.search(player).offline(targetMemberName).thenAcceptAsync(result -> {
             UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
                 if (result.isEmpty()) {
-                    UtilMessage.message(player, "Clans", "Could not find a player with that name");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.promote.not-found");
                     return;
                 }
 
                 clan.getMemberByUUID(result.get().getUniqueId()).ifPresentOrElse(targetMember -> {
                     if (targetMember.getRank().getPrivilege() + 1 >= member.getRank().getPrivilege()){
                         if (member.getRank() == ClanMember.MemberRank.LEADER) {
-                            new ConfirmationMenu("Are you sure you want to promote this person to leader?", success -> {
+                            new ConfirmationMenu(Translations.component("clans.command.clan.promote.leader-confirmation").toString(), success -> {
                                 if (success) {
                                     UtilServer.callEvent(new MemberDemoteEvent(player, clan, member));
                                     UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));
                                 }
                             }).show(player);
                         } else {
-                            UtilMessage.message(player, "Clans", "You can only promote players with a lower rank.");
+                            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.promote.lower-rank-only");
                         }
 
                         return;
@@ -91,7 +92,7 @@ public class PromoteSubCommand extends ClanSubCommand {
                     UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));
                     SoundEffect.HIGH_PITCH_PLING.play(player);
                 }, () -> {
-                    UtilMessage.message(player, "Clans", "That player is not in your clan.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.promote.not-in-clan");
                 });
             });
 

@@ -14,6 +14,6 @@ public class AlligatorScale extends BaseItem {
 
     @Inject
     private AlligatorScale() {
-        super("Alligator Scale", Item.model("alligator_scale", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.alligator-scale.name"), Item.model("alligator_scale", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

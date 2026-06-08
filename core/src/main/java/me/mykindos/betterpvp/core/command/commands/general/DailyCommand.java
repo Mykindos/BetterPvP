@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -35,7 +37,7 @@ public class DailyCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Claim your daily rewards";
+        return "core.command.daily.description";
     }
 
     @Override
@@ -45,10 +47,11 @@ public class DailyCommand extends Command {
 
             gamer.saveProperty(GamerProperty.BALANCE, (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0) + coinsAmount);
 
-            UtilMessage.simpleMessage(player, "Daily", "You have claimed your daily reward of $<green>%s</green>", UtilFormat.formatNumber(coinsAmount));
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.daily.claimed",
+                    Component.text(UtilFormat.formatNumber(coinsAmount)).color(NamedTextColor.GREEN));
 
         } else {
-            UtilMessage.simpleMessage(player, "Daily", "You have already claimed your daily reward!");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.daily.already");
         }
     }
 }

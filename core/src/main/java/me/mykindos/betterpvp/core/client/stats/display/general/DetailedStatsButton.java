@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.display.general;
 import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -18,8 +19,8 @@ public class DetailedStatsButton extends ControlItem<IAbstractStatMenu> {
 
         return ItemView.builder()
                 .material(Material.WRITABLE_BOOK)
-                .displayName(Component.text("Detailed Stats"))
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .displayName(Translations.component("core.menu.stats.button.detailed.name"))
+                .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }
 

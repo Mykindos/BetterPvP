@@ -34,13 +34,13 @@ public class NPCSpawnCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Spawns an NPC";
+        return "core.command.n-p-c-spawn.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "NPC", "<red>Usage: <yellow>/npc spawn <factory> <type>");
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.spawn.usage");
             return;
         }
 
@@ -49,21 +49,21 @@ public class NPCSpawnCommand extends Command {
         final Optional<SceneObjectFactory> factoryOpt = npcFactoryManager.getObject(factoryName.toLowerCase());
         if (factoryOpt.isEmpty()) {
             final String available = String.join(", ", npcFactoryManager.getObjects().keySet());
-            UtilMessage.message(player, "NPC", "<red>Unknown factory: <yellow>" + factoryName);
-            UtilMessage.message(player, "NPC", "<red>Available: <yellow>" + available);
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.spawn.factory.unknown", net.kyori.adventure.text.Component.text(factoryName));
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.spawn.factory.available", net.kyori.adventure.text.Component.text(available));
             return;
         }
 
         final SceneObjectFactory factory = factoryOpt.get();
         if (!Arrays.asList(factory.getTypes()).contains(type)) {
             final String available = String.join(", ", factory.getTypes());
-            UtilMessage.message(player, "NPC", "<red>Unknown type: <yellow>" + type);
-            UtilMessage.message(player, "NPC", "<red>Available for " + factoryName + ": <yellow>" + available);
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.spawn.type.unknown", net.kyori.adventure.text.Component.text(type));
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.spawn.type.available_for", net.kyori.adventure.text.Component.text(factoryName), net.kyori.adventure.text.Component.text(available));
             return;
         }
 
         final SceneObject spawned = factory.spawnDefault(player.getLocation(), type);
-        UtilMessage.message(player, "NPC", "<green>Spawned <yellow>" + type + " <green>(ID <yellow>" + spawned.getId() + "<green>)");
+        UtilMessage.message(player, "core.prefix.command", "core.command.npc.spawn.success", net.kyori.adventure.text.Component.text(type), net.kyori.adventure.text.Component.text(spawned.getId()));
     }
 
     @Override

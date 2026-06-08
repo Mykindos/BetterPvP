@@ -16,6 +16,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -52,16 +56,14 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Throw your sword forward and deal " + getValueString(this::getDamage, level) + " damage",
-                "to the first enemy hit. The enemy hit will be",
-                "pulled towards you",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.battlebind.description",
+                damage,
+                cooldown
+        );
     }
 
     @Override

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.menu.viewer.ItemButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
@@ -62,7 +64,7 @@ public class GuiImbuingRecipeViewer extends AbstractGui implements Windowed {
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:imbuement_pedestal")).createItemStack())
                 .wikiEntry("Test", url)
-                .description(Component.text("Click on an ingredient to look at its recipes. To imbue an item, place its ingredients in the imbuement pedestal and right-click it to start imbuing."))
+                .descriptionLines(List.of(Translations.rawComponentLines("core.menu.recipe.imbuing.info.description")))
                 .build());
         setBackground(Menu.INVISIBLE_BACKGROUND_ITEM);
     }

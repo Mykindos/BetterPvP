@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -32,10 +33,10 @@ public class DefaultSidebarBuilder implements HubSidebarBuilder {
         final Client client = clientManager.search().online(player);
 
         builder.addBlankLine();
-        builder.addStaticLine(Component.text("Rank", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        builder.addStaticLine(Translations.component("hub.sidebar.rank").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
         builder.addDynamicLine(() -> Component.text(client.getRank().getName(), client.getRank().getColor()));
         builder.addBlankLine();
-        builder.addStaticLine(Component.text("Online", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        builder.addStaticLine(Translations.component("hub.sidebar.online").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
         builder.addDynamicLine(() -> Component.text(networkPlayerCountService.getOnlineCount(), NamedTextColor.WHITE));
         builder.addBlankLine();
     }

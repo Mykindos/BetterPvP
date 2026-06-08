@@ -32,9 +32,8 @@ public class AnvilItem extends BaseItem implements NexoItem {
 
     @Inject
     private AnvilItem() {
-        super("Anvil", model, ItemGroup.BLOCK, ItemRarity.COMMON);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and right-click with ingredients to craft an item. Requires a hammer.")));
+        super(translatableName("core.item.anvil.name"), model, ItemGroup.BLOCK, ItemRarity.COMMON);
+        addBaseComponent(DescriptionComponent.translatable(1, "core.item.anvil.lore"));
     }
 
     @Override

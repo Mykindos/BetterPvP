@@ -31,7 +31,7 @@ public class WoodcuttingCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Woodcutting! command";
+        return "progression.command.woodcutting.description";
     }
 
     @Override

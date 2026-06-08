@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
@@ -190,10 +191,10 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
             if (item.getBaseItem() instanceof CastingMold mold && mold.equals(smelterData.getProcessingEngine().getCastingMold())) {
                 builder.glow(true);
                 builder.lore(Component.empty());
-                builder.lore(Component.text("Currently Selected", NamedTextColor.GREEN, TextDecoration.BOLD));
+                builder.lore(Translations.component("core.menu.smelter.mold.currently-selected.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
             }
 
-            return builder.action(ClickActions.LEFT, Component.text("Select this mold"))
+            return builder.action(ClickActions.LEFT, Translations.component("core.menu.smelter.mold.select.action"))
                     .build();
         }
 
@@ -234,11 +235,11 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
             if (item.getBaseItem() instanceof CastingMold mold && mold.equals(smelterData.getProcessingEngine().getCastingMold())) {
                 builder.glow(true);
                 builder.lore(Component.empty());
-                builder.lore(Component.text("Currently Selected", NamedTextColor.GREEN, TextDecoration.BOLD));
+                builder.lore(Translations.component("core.menu.smelter.mold.currently-selected.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
             }
 
-            return builder.action(ClickActions.LEFT, Component.text("Select this mold"))
-                    .action(ClickActions.RIGHT_SHIFT, Component.text("Remove", NamedTextColor.RED))
+            return builder.action(ClickActions.LEFT, Translations.component("core.menu.smelter.mold.select.action"))
+                    .action(ClickActions.RIGHT_SHIFT, Translations.component("core.menu.smelter.mold.remove.action").color(NamedTextColor.RED))
                     .build();
         }
 
@@ -288,10 +289,8 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
             return ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(Key.key("betterpvp", "menu/icon/regular/chest_open_icon"))
-                    .displayName(Component.text("Add Casting Mold", NamedTextColor.GREEN))
-                    .lore(Component.text("Drag a casting mold from your", NamedTextColor.GRAY))
-                    .lore(Component.text("inventory and click this button", NamedTextColor.GRAY))
-                    .lore(Component.text("to store it.", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.smelter.add-mold.name").color(NamedTextColor.GREEN))
+                    .lore(List.of(Translations.componentLines("core.menu.smelter.add-mold.lore")))
                     .build();
         }
 

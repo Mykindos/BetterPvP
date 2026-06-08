@@ -14,7 +14,9 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
@@ -48,12 +50,12 @@ public class HyperRushAbility extends CooldownInteraction implements DisplayedIn
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Hyper Rush");
+        return Translations.component("champions.ability.hyper-rush.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Gain a burst of speed at a high level for a short duration.");
+        return Translations.component("champions.ability.hyper-rush.description");
     }
 
     @Override
@@ -70,7 +72,7 @@ public class HyperRushAbility extends CooldownInteraction implements DisplayedIn
         effectManager.addEffect(entity, EffectTypes.SPEED, speedAmplifier, (long) ((durationTicks / 20.0) * 1000));
 
         // Notify player and play sound
-        UtilMessage.simpleMessage(entity, "Hyper Axe", "You used <green>Hyper Rush<gray>.");
+        UtilMessage.message(entity, "core.prefix.hyper-axe", "champions.item.hyper-rush.used", Translations.component("champions.item.hyper-rush.name").color(NamedTextColor.GREEN));
         UtilSound.playSound(entity.getWorld(), entity.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
         return InteractionResult.Success.ADVANCE;
     }

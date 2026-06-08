@@ -15,8 +15,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -54,11 +58,10 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Arrows that travel further than " + getValueString(this::getDistance, level),
-                "Deal " + getValueString(this::getDamage, level) + " extra damage."
-        };
+    public Component[] getDescription(int level) {
+        Component distance = getValueComponent(this::getDistance, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        return Translations.componentLines("champions.skill.ranger.longshot.description", distance, damage);
     }
 
     public double getDamage(int level) {

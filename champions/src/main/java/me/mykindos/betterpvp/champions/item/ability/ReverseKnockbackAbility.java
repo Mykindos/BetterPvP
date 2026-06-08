@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,12 +50,12 @@ public class ReverseKnockbackAbility extends AbstractInteraction implements Disp
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Magnetic Pull");
+        return Translations.component("champions.ability.magnetic-pull.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Enemies hit by this weapon will be pulled inwards instead of pushed away.");
+        return Translations.component("champions.ability.magnetic-pull.description");
     }
 
     @Override

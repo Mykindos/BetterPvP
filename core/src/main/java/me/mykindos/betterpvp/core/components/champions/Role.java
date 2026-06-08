@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.components.champions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.EquipmentSlot;
@@ -40,6 +42,27 @@ public enum Role {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * The player-facing, translatable display name of this role (e.g. {@code core.role.assassin.name}).
+     * {@link #getName()} remains the stable internal identifier (DB, config, registry, map keys) and must
+     * not be used for display.
+     *
+     * @return the translatable display-name component
+     */
+    public Component getDisplayName() {
+        return Translations.component("core.role." + name().toLowerCase() + ".name");
+    }
+
+    /**
+     * The player-facing, translatable description of this role (e.g. {@code core.role.assassin.description}).
+     * {@link #getDescription()} remains the raw English string for any internal use.
+     *
+     * @return the translatable description component
+     */
+    public Component getDescriptionComponent() {
+        return Translations.component("core.role." + name().toLowerCase() + ".description");
     }
 
     public Material getMaterial(EquipmentSlot equipmentSlot) {

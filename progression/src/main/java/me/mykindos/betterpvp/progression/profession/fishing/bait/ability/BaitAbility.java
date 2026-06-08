@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -68,7 +69,7 @@ public abstract class BaitAbility extends CooldownInteraction implements Display
 
         // Send message
         final Component name = getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW);
-        UtilMessage.message(player, "Bait", Component.text("You used ", NamedTextColor.GRAY).append(name));
+        UtilMessage.message(player, "core.prefix.bait", Translations.component("progression.bait.used", name));
         return InteractionResult.Success.ADVANCE;
     }
     

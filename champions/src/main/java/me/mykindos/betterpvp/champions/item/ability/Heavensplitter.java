@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,12 +60,12 @@ public class Heavensplitter extends AbstractInteraction implements Listener, Dis
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Heavensplitter");
+        return Translations.component("champions.ability.heavensplitter.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Throw the weapon, summon the power of Thor, and deal damage to enemies in its path.");
+        return Translations.component("champions.ability.heavensplitter.description");
     }
 
     @Override

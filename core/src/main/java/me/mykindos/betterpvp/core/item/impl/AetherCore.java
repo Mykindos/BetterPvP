@@ -14,6 +14,6 @@ public class AetherCore extends BaseItem {
 
     @Inject
     private AetherCore() {
-        super("Aether Core", Item.model("aether_core", 1), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.aether-core.name"), Item.model("aether_core", 1), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 }

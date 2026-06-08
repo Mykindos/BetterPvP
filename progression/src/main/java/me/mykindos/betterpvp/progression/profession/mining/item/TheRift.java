@@ -70,7 +70,7 @@ public class TheRift extends BaseItem implements Reloadable {
                     BlockTagManager blockTagManager,
                     CooldownManager cooldownManager,
                     ItemFactory itemFactory) {
-        super("The Rift",
+        super(translatableName("progression.item.the-rift.name"),
                 Item.model(Material.DIAMOND_PICKAXE, "the_rift"),
                 ItemGroup.TOOL,
                 ItemRarity.LEGENDARY);

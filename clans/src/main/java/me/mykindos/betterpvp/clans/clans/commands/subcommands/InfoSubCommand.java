@@ -31,7 +31,7 @@ public class InfoSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "View another clans information";
+        return "clans.command.info.description";
     }
 
     @Override
@@ -42,14 +42,14 @@ public class InfoSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a clan name.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.info.no-args");
             return;
         }
 
         String clanName = String.join(" ", args).trim();
         Optional<Clan> clanOptional = clanManager.getClanByName(clanName);
         if (clanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "Could not find a clan with that name.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.info.not-found");
             return;
         }
 

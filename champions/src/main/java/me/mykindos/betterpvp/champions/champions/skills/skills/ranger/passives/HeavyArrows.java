@@ -18,7 +18,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -57,21 +61,13 @@ public class HeavyArrows extends BowChargeSkill implements DamageSkill, PassiveS
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "The arrows you shoot are heavy",
-                "Travelling at " + getValueString(this::getArrowSpeed, level, 100, "%", 0) + " of normal speed",
-                "",
-                "Draw back your bow ",
-                "to charge " + getValueString(this::getChargePerSecond, level, 100, "%", 0) + " per second",
-                "Draining " + getValueString(this::getEnergy, level) + " energy per second to charge",
-                "",
-                "The more charge, the faster ",
-                "your arrow will travel up to " + getValueString(this::getMaxArrowSpeed, level, 100, "%", 0),
-                "of normal speed at max charge, ",
-                "increasing extra damage by " + getValueString(this::getMaxDamage, level),
-                "and increasing pushback received",
-        };
+    public Component[] getDescription(int level) {
+        Component arrowSpeed = getValueComponent(this::getArrowSpeed, level, 100, 0).append(Component.text("%"));
+        Component chargePerSecond = getValueComponent(this::getChargePerSecond, level, 100, 0).append(Component.text("%"));
+        Component energy = getValueComponent(this::getEnergy, level);
+        Component maxArrowSpeed = getValueComponent(this::getMaxArrowSpeed, level, 100, 0).append(Component.text("%"));
+        Component maxDamage = getValueComponent(this::getMaxDamage, level);
+        return Translations.componentLines("champions.skill.ranger.heavy-arrows.description", arrowSpeed, chargePerSecond, energy, maxArrowSpeed, maxDamage);
     }
     public double getMaxDamage(int level) {
         return baseMaxDamage + (maxDamageIncreasePerLevel * (level - 1));

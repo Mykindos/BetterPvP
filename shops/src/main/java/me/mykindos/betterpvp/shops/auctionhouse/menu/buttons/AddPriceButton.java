@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -11,6 +12,8 @@ import me.mykindos.betterpvp.shops.auctionhouse.menu.ListingCreationMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+
+import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -32,10 +35,11 @@ public class AddPriceButton extends ControlItem<ListingCreationMenu> {
     @Override
     public ItemProvider getItemProvider(ListingCreationMenu gui) {
         String formattedPrice = UtilFormat.formatNumber(price);
+        Component priceArg = Component.text(formattedPrice, NamedTextColor.GREEN);
         return ItemView.builder().material(material)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .displayName(Component.text("+ $" + formattedPrice, NamedTextColor.GREEN))
-                .lore(Component.text("Left-click increase sell price by $" + formattedPrice, NamedTextColor.GRAY))
+                .displayName(Translations.component("shops.menu.listing-creation.button.add-price.name", priceArg).color(NamedTextColor.GREEN))
+                .lore(List.of(Translations.componentLines("shops.menu.listing-creation.button.add-price.lore", priceArg)))
                 .build();
     }
 
@@ -46,8 +50,9 @@ public class AddPriceButton extends ControlItem<ListingCreationMenu> {
         }
 
         auction.setSellPrice(auction.getSellPrice() + price);
-        UtilMessage.simpleMessage(player, "Auction House", "Sell price increased by <yellow>%s</yellow> to <yellow>%s",
-                "$" +  UtilFormat.formatNumber(price), "$" + UtilFormat.formatNumber(auction.getSellPrice()));
+        UtilMessage.message(player, "core.prefix.auction-house", Translations.component("shops.menu.listing-creation.message.price-increased",
+                Component.text(UtilFormat.formatNumber(price), NamedTextColor.YELLOW),
+                Component.text(UtilFormat.formatNumber(auction.getSellPrice()), NamedTextColor.YELLOW)));
 
         SoundEffect.HIGH_PITCH_PLING.play(player);
 

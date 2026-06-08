@@ -14,6 +14,6 @@ public class PolariteChunk extends BaseItem {
 
     @Inject
     private PolariteChunk() {
-        super("Polarite Chunk", Item.model("polarite_chunk", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.polarite-chunk.name"), Item.model("polarite_chunk", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

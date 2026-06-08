@@ -15,13 +15,15 @@ public class LogoutCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Informs the player on whether they are safe to logout";
+        return "core.command.logout.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         PlayerCombatLogEvent event = UtilServer.callEvent(new PlayerCombatLogEvent(client, player));
-        String result = event.isSafe() ? "<green>safe</green>" : "<red><b>unsafe</b></red>";
-        UtilMessage.message(player, "Logout", "It is currently %s to logout", result);
+        String result = event.isSafe() ? "safe" : "unsafe";
+        UtilMessage.message(player, "core.prefix.logout", "core.command.logout.status",
+                me.mykindos.betterpvp.core.locale.Translations.component("core.command.logout." + result)
+                        .color(event.isSafe() ? net.kyori.adventure.text.format.NamedTextColor.GREEN : net.kyori.adventure.text.format.NamedTextColor.RED));
     }
 }

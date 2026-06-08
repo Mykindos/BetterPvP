@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.game.framework.model.attribute.GameAttribute;
 import me.mykindos.betterpvp.game.framework.model.attribute.GameAttributeManager;
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.framework.state.GameState;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -51,17 +53,17 @@ public class GameCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Game management commands";
+        return "game.command.game.description";
     }
 
     @Override
     public void execute(Player player, Client client, String[] args) {
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> set <value>");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> get");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> reset");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game set <game>");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game start");
-        UtilMessage.message(player, "Game", "Usage: <alt2>/game end");
+        UtilMessage.message(player, "core.prefix.game", "game.command.usage.attribute-set", Component.text("/game attribute <attribute> set <value>", NamedTextColor.YELLOW));
+        UtilMessage.message(player, "core.prefix.game", "game.command.usage.attribute-get", Component.text("/game attribute <attribute> get", NamedTextColor.YELLOW));
+        UtilMessage.message(player, "core.prefix.game", "game.command.usage.attribute-reset", Component.text("/game attribute <attribute> reset", NamedTextColor.YELLOW));
+        UtilMessage.message(player, "core.prefix.game", "game.command.usage.set", Component.text("/game set <game>", NamedTextColor.YELLOW));
+        UtilMessage.message(player, "core.prefix.game", "game.command.usage.start", Component.text("/game start", NamedTextColor.YELLOW));
+        UtilMessage.message(player, "core.prefix.game", "game.command.usage.end", Component.text("/game end", NamedTextColor.YELLOW));
     }
 
     @Singleton
@@ -84,18 +86,18 @@ public class GameCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Start the game";
-        }
+        return "game.command.game-start.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String[] args) {
             if (serverController.getCurrentState() == GameState.IN_GAME || serverController.getCurrentState() == GameState.ENDING) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>You cannot start the game while in-game");
+                UtilMessage.message(player, "core.prefix.game", "game.command.start.error-in-game", Component.text("Error:", NamedTextColor.DARK_RED));
                 return;
             }
 
             if (!transitionHandler.checkStateRequirements(true)) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>Cannot start the game, not enough players");
+                UtilMessage.message(player, "core.prefix.game", "game.command.start.error-not-enough-players", Component.text("Error:", NamedTextColor.DARK_RED));
                 return;
             }
 
@@ -121,13 +123,13 @@ public class GameCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "End the game";
-        }
+        return "game.command.game-end.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String[] args) {
             if (serverController.getCurrentState() != GameState.IN_GAME) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>You cannot end the game while not in-game");
+                UtilMessage.message(player, "core.prefix.game", "game.command.end.error-not-in-game", Component.text("Error:", NamedTextColor.DARK_RED));
                 return;
             }
 
@@ -158,18 +160,18 @@ public class GameCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Set the current game";
-        }
+        return "game.command.game-set.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length == 0) {
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game set <game>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.usage.set", Component.text("/game set <game>", NamedTextColor.YELLOW));
                 return;
             }
 
             if (serverController.getCurrentState() != GameState.WAITING) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>You can only set the game while in WAITING state");
+                UtilMessage.message(player, "core.prefix.game", "game.command.set.error-only-waiting", Component.text("Error:", NamedTextColor.DARK_RED));
                 return;
             }
 
@@ -178,7 +180,7 @@ public class GameCommand extends Command {
                     .filter(game -> game.getConfiguration().getName().equalsIgnoreCase(gameName))
                     .findFirst();
             if (foundOpt.isEmpty()) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>Unknown game <alt>" + gameName + "</alt>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.set.error-unknown-game", Component.text("Error:", NamedTextColor.DARK_RED), Component.text(gameName, NamedTextColor.GREEN));
                 return;
             }
 
@@ -186,19 +188,19 @@ public class GameCommand extends Command {
             final AbstractGame<?, ?> game = foundOpt.get();
             final Optional<MappedWorld> mapOpt = mapManager.selectRandomMap(game);
             if (mapOpt.isEmpty()) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>No maps found for game <alt>" + gameName + "</alt>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.set.error-no-maps", Component.text("Error:", NamedTextColor.DARK_RED), Component.text(gameName, NamedTextColor.GREEN));
                 return;
             }
 
             if (serverController.getCurrentGame() == game) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>Game is already set to <alt>" + gameName + "</alt>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.set.error-already-set", Component.text("Error:", NamedTextColor.DARK_RED), Component.text(gameName, NamedTextColor.GREEN));
                 return;
             }
 
             // set
             serverController.setGame(game);
             mapManager.setCurrentMap(mapOpt.get());
-            UtilMessage.message(player, "Game", "Game set to <alt>" + gameName + "</alt>");
+            UtilMessage.message(player, "core.prefix.game", "game.command.set.success", Component.text(gameName, NamedTextColor.GREEN));
             SoundEffect.HIGH_PITCH_PLING.play(player);
         }
 
@@ -232,22 +234,22 @@ public class GameCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Game attribute management commands";
-        }
+        return "game.command.game-attribute.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String[] args) {
             if (args.length < 2) {
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> set <value>");
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> get");
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> reset");
+                UtilMessage.message(player, "core.prefix.game", "game.command.usage.attribute-set", Component.text("/game attribute <attribute> set <value>", NamedTextColor.YELLOW));
+                UtilMessage.message(player, "core.prefix.game", "game.command.usage.attribute-get", Component.text("/game attribute <attribute> get", NamedTextColor.YELLOW));
+                UtilMessage.message(player, "core.prefix.game", "game.command.usage.attribute-reset", Component.text("/game attribute <attribute> reset", NamedTextColor.YELLOW));
                 return;
             }
 
             String attributeName = args[0];
             final GameAttribute<?> attribute = attributeManager.getAttribute(attributeName);
             if (attribute == null) {
-                UtilMessage.message(player, "Game", "Unknown attribute: <alt2>" + attributeName);
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.unknown-attribute", Component.text(attributeName, NamedTextColor.YELLOW));
                 return;
             }
 
@@ -255,7 +257,7 @@ public class GameCommand extends Command {
                 case "set" -> setAttributeValue(player, attribute, Arrays.copyOfRange(args, 2, args.length));
                 case "get" -> getAttributeValue(player, attribute);
                 case "reset" -> resetAttributeValue(player, attribute);
-                default -> UtilMessage.message(player, "Game", "Unknown command: <alt2>" + args[1]);
+                default -> UtilMessage.message(player, "core.prefix.game", "game.command.attribute.unknown-command", Component.text(args[1], NamedTextColor.YELLOW));
             }
         }
 
@@ -287,57 +289,57 @@ public class GameCommand extends Command {
 
         private <T> void getAttributeValue(Player player, GameAttribute<T> attribute) {
             if (!attribute.canGet(player)) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>" + attribute.getCannotGetMessage());
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.error-cannot-get", Component.text(attribute.getCannotGetMessage(), NamedTextColor.RED));
                 return;
             }
 
             final String value = attribute.formatValue(attribute.getValue());
-            UtilMessage.message(player, "Game", "Attribute <alt>" + attribute.getKey() + "</alt>: <alt2>" + value);
+            UtilMessage.message(player, "core.prefix.game", "game.command.attribute.get-value", Component.text(attribute.getKey(), NamedTextColor.GREEN), Component.text(value, NamedTextColor.YELLOW));
         }
 
         private void resetAttributeValue(Player player, GameAttribute<?> attribute) {
             if (!attribute.canSet(player)) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>" + attribute.getCannotSetMessage());
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.error-cannot-set", Component.text(attribute.getCannotSetMessage(), NamedTextColor.RED));
                 return;
             }
 
             if (attribute.resetToDefault()) {
-                UtilMessage.message(player, "Game", "Attribute <alt>" + attribute.getKey() + "</alt> reset to default value");
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.reset-success", Component.text(attribute.getKey(), NamedTextColor.GREEN));
                 getAttributeValue(player, attribute);
                 SoundEffect.HIGH_PITCH_PLING.play(player);
             } else {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>Failed to reset attribute <alt>" + attribute.getKey() + "</alt>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.error-reset-failed", Component.text("Error:", NamedTextColor.DARK_RED), Component.text(attribute.getKey(), NamedTextColor.GREEN));
             }
         }
 
         private <T> void setAttributeValue(Player player, GameAttribute<T> attribute, String[] args) {
             if (args.length == 0) {
-                UtilMessage.message(player, "Game", "Usage: <alt2>/game attribute <attribute> set <value>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.usage.attribute-set", Component.text("/game attribute <attribute> set <value>", NamedTextColor.YELLOW));
                 return;
             }
 
             if (!attribute.canSet(player)) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>" + attribute.getCannotSetMessage());
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.error-cannot-set", Component.text(attribute.getCannotSetMessage(), NamedTextColor.RED));
                 return;
             }
 
             final String valueString = String.join(" ", args);
             final T value = attribute.parseValue(valueString);
             if (value == null) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>Invalid value for attribute <alt>" + attribute.getKey() + "</alt>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.error-invalid-value", Component.text("Error:", NamedTextColor.DARK_RED), Component.text(attribute.getKey(), NamedTextColor.GREEN));
                 return;
             }
 
             if (!attribute.isValidValue(value)) {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>Invalid value for attribute <alt>" + attribute.getKey() + "</alt>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.error-invalid-value", Component.text("Error:", NamedTextColor.DARK_RED), Component.text(attribute.getKey(), NamedTextColor.GREEN));
                 return;
             }
 
             if (attribute.setValue(value)) {
-                UtilMessage.message(player, "Game", "Attribute <alt>" + attribute.getKey() + "</alt> set to <alt2>" + attribute.formatValue(attribute.getValue()));
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.set-success", Component.text(attribute.getKey(), NamedTextColor.GREEN), Component.text(attribute.formatValue(attribute.getValue()), NamedTextColor.YELLOW));
                 SoundEffect.HIGH_PITCH_PLING.play(player);
             } else {
-                UtilMessage.message(player, "Game", "<dark_red>Error: <red>Failed to set attribute <alt>" + attribute.getKey() + "</alt>");
+                UtilMessage.message(player, "core.prefix.game", "game.command.attribute.error-set-failed", Component.text("Error:", NamedTextColor.DARK_RED), Component.text(attribute.getKey(), NamedTextColor.GREEN));
             }
         }
     }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ public class PlayerItemButton extends LogRepositoryButton {
         if (uuid == null) {
             return ItemView.builder()
                     .displayName(Component.text("NULL"))
-                    .lore(Component.text("No Player For This Log"))
+                    .lore(Translations.component("core.menu.log.button.player.no-player.lore"))
                     .material(Material.SKELETON_SKULL)
                     .build();
         }
@@ -37,7 +38,7 @@ public class PlayerItemButton extends LogRepositoryButton {
         List<Component> lore = List.of(
                 Component.text(relation),
                 Component.text(uuid),
-                Component.text("Click to search by Player")
+                Translations.component("core.menu.log.button.player.search.lore")
         );
         return ItemView.builder()
                 .displayName(Component.text(name))

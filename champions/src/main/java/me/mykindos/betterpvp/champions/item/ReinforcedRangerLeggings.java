@@ -32,7 +32,7 @@ public class ReinforcedRangerLeggings extends ArmorItem {
 
     @Inject
     private ReinforcedRangerLeggings(Champions champions) {
-        super(champions, "Reinforced Ranger Leggings", Item.builder(Material.CHAINMAIL_LEGGINGS)
+        super(champions, translatableName("champions.item.reinforced-ranger-leggings.name"), Item.builder(Material.CHAINMAIL_LEGGINGS)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.RANGER));

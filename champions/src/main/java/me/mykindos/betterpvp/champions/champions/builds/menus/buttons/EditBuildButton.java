@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
@@ -82,8 +83,8 @@ public class EditBuildButton extends FlashingButton<BuildMenu> {
 
     @Override
     public ItemProvider getItemProvider(BuildMenu gui) {
-        final Component standardComponent = Component.text("Edit Build " + build, NamedTextColor.GRAY);
-        final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
+        final Component standardComponent = Translations.component("champions.menu.build.button.edit.name", Component.text(build)).color(NamedTextColor.GRAY);
+        final Component flashComponent = Component.empty().append(Translations.component("core.menu.button.click-me.name").color(NamedTextColor.GREEN)).appendSpace().append(standardComponent);
         return ItemView.builder().material(Material.ANVIL)
                 .displayName(this.isFlashing() ? flashComponent : standardComponent)
                 .glow(this.isFlash())

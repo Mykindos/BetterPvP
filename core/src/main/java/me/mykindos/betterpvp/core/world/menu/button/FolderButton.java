@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 
 import java.util.function.Consumer;
 
@@ -29,7 +30,7 @@ public class FolderButton extends AbstractItem {
         return ItemView.builder()
                 .material(Material.CHEST)
                 .displayName(Component.text(folderName, NamedTextColor.YELLOW, TextDecoration.BOLD))
-                .lore(Component.text("Click to open folder", NamedTextColor.GRAY))
+                .lore(Translations.component("core.menu.world.button.folder.lore").color(NamedTextColor.GRAY))
                 .build();
     }
 

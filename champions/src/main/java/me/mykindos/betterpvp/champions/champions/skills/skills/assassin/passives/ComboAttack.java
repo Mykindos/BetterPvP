@@ -22,8 +22,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,19 +65,16 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Each time you make a melee attack, your",
-                "melee damage increases by " + getValueString(this::getDamageIncrement, level),
-                "",
-                "You can deal up to " + getValueString(this::getMaxDamageIncrement, level),
-                "bonus melee damage",
-                "",
-                "Interrupting your melee combo",
-                "by using a skill or by",
-                "not attacking for " + getValueString(this::getDuration, level) + " seconds",
-                "will reset your bonus damage"};
+    public Component[] getDescription(int level) {
+        Component increment = getValueComponent(this::getDamageIncrement, level);
+        Component max = getValueComponent(this::getMaxDamageIncrement, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.combo-attack.description",
+                increment,
+                max,
+                duration
+        );
     }
 
     public double getMaxDamageIncrement(int level) {
@@ -170,7 +171,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
     }
 
     public void endInfo(Player player, int level, double combo) {
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended at +<green>%.1f</green>", getName(), level, combo));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.combo-attack.ended", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN), Component.text(String.format("%.1f", combo), NamedTextColor.GREEN));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 5.0f);
     }
 

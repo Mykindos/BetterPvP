@@ -18,11 +18,14 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -73,18 +76,15 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-        String duration = getValueString(this::getSpeedDuration, level);
-
-
-        return new String[]{
-                "Drain " + getValueString(this::getEnergySiphoned, level) + " energy per second from all enemies within " + getValueString(this::getRadius, level) + " blocks,",
-                "granting you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + duration + " seconds.",
-                "",
-                "When this skill activates, you have a " + getValueString(this::getRandomSiphonHealthGainChanceAsPercentage, level) + "% chance to gain " + getValueString(this::getHealthGainedOnRandomSiphon, level) + " health",
-                "",
-                "This skill only activates when enemies stay within range for " + getValueString(this::getElapsedTimeToProcAbility, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component energySiphoned = getValueComponent(this::getEnergySiphoned, level);
+        Component radius = getValueComponent(this::getRadius, level);
+        Component speedRoman = Component.text(UtilFormat.getRomanNumeral(speedStrength), NamedTextColor.GREEN);
+        Component speedDuration = getValueComponent(this::getSpeedDuration, level);
+        Component healthChance = getValueComponent(this::getRandomSiphonHealthGainChanceAsPercentage, level, 0);
+        Component healthGain = getValueComponent(this::getHealthGainedOnRandomSiphon, level);
+        Component elapsedTime = getValueComponent(this::getElapsedTimeToProcAbility, level);
+        return Translations.componentLines("champions.skill.warlock.siphon.description", energySiphoned, radius, speedRoman, speedDuration, healthChance, healthGain, elapsedTime);
     }
 
     public double getRadius(int level) {
@@ -215,7 +215,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
                         double healthToGain = getHealthGainedOnRandomSiphon(level);
                         double actualHeal = UtilEntity.health(player, healthToGain);
                         championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_SIPHON, actualHeal);
-                        UtilMessage.message(player, getName(), "You gained <alt2>%s</alt2> health.", UtilFormat.formatNumber(healthToGain));
+                        UtilMessage.message(player, getName(), "champions.skill.gained-health", Component.text(UtilFormat.formatNumber(healthToGain), NamedTextColor.YELLOW));
                     }
 
                     long speedDuration = (long) (getSpeedDuration(level) * 1000);

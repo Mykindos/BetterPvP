@@ -16,11 +16,13 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -50,6 +52,39 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
 
     @Inject
     private ClientManager clientManager;
+
+    /**
+     * Maps a cooldown name (the stable internal identifier, e.g. {@code "Blink"} or {@code "Wind Slash"}) to a
+     * (translatable) display component, so cooldowns shown on the action bar and in chat use the localized
+     * skill/ability display name rather than the raw English identifier. Populated centrally when skills load
+     * ({@code ChampionsSkillManager}) and when displayed interactions trigger ({@link me.mykindos.betterpvp.core.interaction.CooldownInteraction}).
+     */
+    private static final java.util.Map<String, ComponentLike> DISPLAY_NAMES = new ConcurrentHashMap<>();
+
+    /**
+     * Registers the localized display name for a cooldown identifier. Safe to call repeatedly (idempotent).
+     */
+    public void registerDisplayName(@NotNull String cooldownName, @NotNull ComponentLike displayName) {
+        DISPLAY_NAMES.put(cooldownName, displayName);
+    }
+
+    /**
+     * Resolves the display component for a cooldown identifier. Resolution order:
+     * <ol>
+     *   <li>if the cooldown name is itself a translation key, render it as a translatable (preferred — pass
+     *       a {@code <module>.<...>.name} key as the cooldown name and it localizes per-viewer);</li>
+     *   <li>otherwise a {@link #registerDisplayName registered} display component, if any;</li>
+     *   <li>otherwise the raw name as literal text.</li>
+     * </ol>
+     * The returned component carries no colour/decoration of its own (the caller styles it).
+     */
+    private static Component displayName(String cooldownName) {
+        if (Translations.hasTranslation(cooldownName)) {
+            return Translations.component(cooldownName);
+        }
+        final ComponentLike display = DISPLAY_NAMES.get(cooldownName);
+        return display != null ? display.asComponent() : Component.text(cooldownName);
+    }
 
     /**
      * Triggers the usage of a player's ability with a specified duration and cooldown settings.
@@ -216,7 +251,7 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
                     return null; // Skip if we should not send the action bar message;
                 }
 
-                final TextComponent cooldownName = Component.text(ability).decorate(TextDecoration.BOLD).color(NamedTextColor.WHITE);
+                final Component cooldownName = displayName(ability);
                 final Optional<ConcurrentHashMap<String, Cooldown>> cooldowns = getObject(player.getUniqueId().toString());
                 if (cooldowns.isEmpty()) {
                     return null; // Skip
@@ -227,7 +262,7 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
                 // Show READY after cooldown has been removed, not expired.
                 // If it has expired that means that the cooldown remaining time is 0 or -1, and we want to show full bar for that
                 if (cooldown == null || cooldown.getRemaining() <= 0) {
-                    return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN), Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
+                    return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN), Translations.component("core.cooldown.recharged-bar").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
                 }
 
                 final double max = cooldown.getSeconds() / 1000;
@@ -237,7 +272,7 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
                 final TextComponent bar = progressBar.build();
                 final double remainingSeconds = Math.max(0.0, cooldown.getRemaining());
                 final TextComponent cooldownRemaining = Component.text(String.format("%.1fs", remainingSeconds)).color(NamedTextColor.WHITE);
-                return Component.join(JoinConfiguration.separator(Component.space()), cooldownName, bar, cooldownRemaining);
+                return Component.join(JoinConfiguration.separator(Component.space()), cooldownName.decorate(TextDecoration.BOLD).color(NamedTextColor.WHITE), bar, cooldownRemaining);
             });
         }
 
@@ -317,7 +352,9 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
      * @param ability The name of the ability for which the cooldown information is being provided.
      */
     public void informCooldown(Player player, String ability) {
-        UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
+        UtilMessage.message(player, "core.prefix.cooldown", "core.cooldown.on_cooldown",
+                displayName(ability).color(NamedTextColor.GREEN),
+                Component.text(String.valueOf(Math.max(0, getAbilityRecharge(player, ability).getRemaining())), NamedTextColor.GREEN));
     }
 
     /**
@@ -398,7 +435,8 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
                     }
 
-                    UtilMessage.simpleMessage(player, "Recharge", "<alt>%s</alt> has been recharged.", ability);
+                    UtilMessage.message(player, "core.prefix.recharge", "core.cooldown.recharged",
+                            displayName(ability).color(NamedTextColor.GREEN));
                 }
             }
 
@@ -508,14 +546,14 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
     }
 
     private Component renderCooldownBar(@NotNull Cooldown cooldown) {
-        final TextComponent abilityName = Component.text(cooldown.getName())
+        final Component abilityName = displayName(cooldown.getName())
                 .decorate(TextDecoration.BOLD)
                 .color(NamedTextColor.WHITE);
 
         if (cooldown.getRemaining() <= 0) {
             return Component.join(JoinConfiguration.separator(Component.space()),
                     abilityName.decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN),
-                    Component.text("Recharged").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
+                    Translations.component("core.cooldown.recharged-bar").decorate(TextDecoration.BOLD).color(NamedTextColor.GREEN));
         }
 
         final double max = cooldown.getSeconds() / 1000;
@@ -561,7 +599,8 @@ public class CooldownManager extends Manager<String, ConcurrentHashMap<String, C
                                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
                             }
 
-                            UtilMessage.simpleMessage(player, "Cooldown", "<alt>%s</alt> has been recharged.", entry.getKey());
+                            UtilMessage.message(player, "core.prefix.cooldown", "core.cooldown.recharged",
+                                    displayName(entry.getKey()).color(NamedTextColor.GREEN));
                         }
                     }
 

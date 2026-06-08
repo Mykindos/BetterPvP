@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.Resources;
@@ -42,14 +43,14 @@ public class QuickCraftingButton extends ControlItem<Gui> {
             CraftingRecipe recipe = quickCrafts.get(slot);
             return ItemView.of(recipe.previewResult().getView().get())
                     .toBuilder()
-                    .action(ClickActions.LEFT, Component.text("Quick Craft", TextColor.color(0, 255, 30)))
-                    .action(ClickActions.LEFT_SHIFT, Component.text("Bulk Quick Craft", TextColor.color(255, 215, 0)))
+                    .action(ClickActions.LEFT, Translations.component("core.menu.workbench.quick-craft.action").color(TextColor.color(0, 255, 30)))
+                    .action(ClickActions.LEFT_SHIFT, Translations.component("core.menu.workbench.quick-craft.bulk.action").color(TextColor.color(255, 215, 0)))
                     .build();
         } else {
             return ItemView.builder()
                     .material(Material.BARRIER)
                     .itemModel(Resources.ItemModel.STOP)
-                    .displayName(Component.text("No Quick Craft", TextColor.color(255, 0, 0)))
+                    .displayName(Translations.component("core.menu.workbench.no-quick-craft.name").color(TextColor.color(255, 0, 0)))
                     .build();
         }
     }

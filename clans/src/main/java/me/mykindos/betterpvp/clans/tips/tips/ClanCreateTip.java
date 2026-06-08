@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.ISuggestCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,7 +27,7 @@ public class ClanCreateTip extends ClanTip implements ISuggestCommand {
     @Override
     public Component generateComponent() {
         Component suggestComponent = suggestCommand("/c create <name>", "/c create ");
-        return Component.text("You can create a clan by running ", NamedTextColor.GRAY).append(suggestComponent);
+        return Translations.component("clans.tip.create", suggestComponent).colorIfAbsent(NamedTextColor.GRAY);
     }
 
     @Override

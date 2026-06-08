@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -47,8 +48,8 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
     @Override
     public ItemProvider getItemProvider(BuildMenu gui) {
         Material type = Material.COMPARATOR;
-        Component buildName = Component.text("Random Build " + build, NamedTextColor.GRAY);
-        List<Component> lore = List.of(UtilMessage.deserialize("Delete this build and generate a random one"));
+        Component buildName = Translations.component("champions.menu.build.button.random.name", Component.text(build)).color(NamedTextColor.GRAY);
+        List<Component> lore = List.of(Translations.component("champions.menu.build.button.random.lore").color(NamedTextColor.GRAY));
         return ItemView.builder().displayName(buildName).lore(lore).material(type).build();
     }
 

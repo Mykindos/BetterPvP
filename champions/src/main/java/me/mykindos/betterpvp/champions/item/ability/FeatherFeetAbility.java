@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
@@ -41,12 +43,12 @@ public class FeatherFeetAbility extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Feather Feet");
+        return Translations.component("champions.ability.feather-feet.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Prevents all incoming damage from falling while holding this item.");
+        return Translations.component("champions.ability.feather-feet.description");
     }
 
     @Override

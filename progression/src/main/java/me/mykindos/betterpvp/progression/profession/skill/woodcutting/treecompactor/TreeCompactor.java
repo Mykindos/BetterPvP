@@ -87,7 +87,7 @@ public class TreeCompactor extends ProfessionSkill {
         Client client = clientManager.search().online(player);
         if (!client.isAdministrating()) {
             event.setCancelled(true);
-            UtilMessage.simpleMessage(player, "Progression", "You cannot place this block");
+            UtilMessage.message(player, "core.prefix.progression", "progression.woodcutting.tree-compactor.place-denied");
         }
     }
 

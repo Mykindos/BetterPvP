@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.display.DisplayEditorManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 
@@ -24,26 +25,26 @@ public class DisplayInterpolationSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Change the interpolation of a display entity";
+        return "core.command.display-interpolation.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length != 2) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display interpolation <delay|duration> <value>");
+            UtilMessage.message(player, "core.prefix.display", "core.display.interpolation.usage");
             return;
         }
 
         final Display selectedDisplay = displayEditorManager.getSelectedDisplay(player);
         if (selectedDisplay == null) {
-            UtilMessage.simpleMessage(player, "Display", "You are not selecting a display.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.not_selecting");
             return;
         }
 
         final String type = args[0].toLowerCase();
         final boolean delay = type.equalsIgnoreCase("delay");
         if (!delay && !type.equalsIgnoreCase("duration")) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display interpolation <delay|duration> <ticks>");
+            UtilMessage.message(player, "core.prefix.display", "core.display.interpolation.usage_ticks");
             return;
         }
 
@@ -51,7 +52,7 @@ public class DisplayInterpolationSubCommand extends Command {
         try {
             ticks = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            UtilMessage.simpleMessage(player, "Display", "Invalid ticks, must be an integer.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.interpolation.invalid_ticks");
             return;
         }
 
@@ -61,6 +62,7 @@ public class DisplayInterpolationSubCommand extends Command {
             selectedDisplay.setInterpolationDuration(ticks);
         }
 
-        UtilMessage.simpleMessage(player, "Display", "Set interpolation " + type + " to " + ticks + " ticks.");
+        UtilMessage.message(player, "core.prefix.display", "core.display.interpolation.set",
+                Component.text(type), Component.text(ticks));
     }
 }

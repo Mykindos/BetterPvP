@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.stats.menu;
 
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
@@ -20,7 +21,7 @@ public class LeaderboardListMenu extends ViewCollectionMenu {
         setContent(manager.getViewable(category).values().stream()
                 .map(lb -> {
                     final ItemView item = ItemView.of(lb.getDescription().getIcon().get()).toBuilder()
-                            .action(ClickActions.ALL, Component.text("Open"))
+                            .action(ClickActions.ALL, Translations.component("core.menu.leaderboard.list.button.open.action"))
                             .build();
 
                     return (Item) new SimpleItem(item, click -> new LeaderboardMenu<>(click.getPlayer(), lb, LeaderboardListMenu.this).show(click.getPlayer()));

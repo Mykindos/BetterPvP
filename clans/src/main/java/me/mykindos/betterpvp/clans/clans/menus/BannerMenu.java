@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.menus.buttons.banner.SaveItem;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -32,7 +33,7 @@ public class BannerMenu extends AbstractGui implements Windowed {
     private BannerWrapper.BannerBuilder builder;
     private static final SimpleItem missingPatternItem = ItemView.builder()
             .material(Material.RED_STAINED_GLASS_PANE)
-            .displayName(Component.text(""))
+            .displayName(Translations.component("clans.menu.banner.empty-slot.name"))
             .build().toSimpleItem();
 
     public BannerMenu(Clan clan, Windowed previous, Runnable onBack) {
@@ -87,6 +88,6 @@ public class BannerMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Banner Editor");
+        return Translations.component("clans.menu.banner.title");
     }
 }

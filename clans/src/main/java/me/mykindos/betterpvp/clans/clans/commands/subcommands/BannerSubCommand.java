@@ -33,7 +33,7 @@ public class BannerSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Set your clans banner";
+        return "clans.command.banner.description";
     }
 
     @Override
@@ -41,13 +41,13 @@ public class BannerSubCommand extends ClanSubCommand {
         // Check if player is in a clan and is a leader or admin
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         if (clan == null) {
-            UtilMessage.message(player, "Banner", "You are not in a clan!");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.banner.no-clan");
             return;
         }
 
         ClanMember member = clan.getMember(player.getUniqueId());
         if (member.getRank() != ClanMember.MemberRank.ADMIN && member.getRank() != ClanMember.MemberRank.LEADER) {
-            UtilMessage.message(player, "Banner", "Only admins and leaders can set the clan banner!");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.banner.no-rank");
             return;
         }
 

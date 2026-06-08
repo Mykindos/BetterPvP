@@ -19,10 +19,14 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import org.bukkit.Location;
@@ -63,17 +67,16 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Dash forwards " + getValueString(this::getDistance, level) + " blocks, dealing " + getValueString(this::getDamage, level),
-                "damage to anything you pass through",
-                "",
-                "Cooldown resets whenever you kill an enemy",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component distance = getValueComponent(this::getDistance, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.slash.description",
+                distance,
+                damage,
+                cooldown
+        );
     }
 
     public double getDistance(int level) {
@@ -123,7 +126,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                     .ifPresentOrElse(stream -> stream.map(RayTraceResult::getHitEntity)
                                     .map(LivingEntity.class::cast)
                                     .forEach(hit -> hit(player, level, hit)),
-                            () -> UtilMessage.message(player, getClassType().getName(), "You missed <alt>%s</alt>.", getName()));
+                            () -> UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.missed", getDisplayName().color(NamedTextColor.GREEN)));
         });
         return true;
     }
@@ -137,8 +140,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.8f, 2f);
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.8f, 1.5f);
 
-            UtilMessage.message(caster, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", hit.getName(), getName());
-            UtilMessage.message(hit, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), getName());
+            UtilMessage.message(caster, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(hit.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(hit, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
         }
     }
 

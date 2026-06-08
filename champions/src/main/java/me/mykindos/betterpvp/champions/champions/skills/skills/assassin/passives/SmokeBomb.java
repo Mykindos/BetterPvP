@@ -16,9 +16,13 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -61,23 +65,29 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Drop your Sword / Axe to activate",
-                "",
-                "Instantly <effect>Vanish</effect> before your foes",
-                "for a maximum of " + getValueString(this::getDuration, level) + " seconds,",
-                "inflicting <effect>Blindness</effect> to enemies",
-                "within " + getValueString(this::getBlindRadius, level) + " blocks for " + getValueString(this::getBlindDuration, level) + " seconds",
-                "",
-                "Interacting with your surroundings",
-                "or taking damage",
-                "will cause you to reappear",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.VANISH.getDescription(0)
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component radius = getValueComponent(this::getBlindRadius, level);
+        Component blindDuration = getValueComponent(this::getBlindDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component vanish = Translations.component("champions.skill.effect.vanish.name").color(NamedTextColor.WHITE);
+        Component blindness = Translations.component("champions.skill.effect.blindness.name").color(NamedTextColor.WHITE);
+        Component[] components = Translations.componentLines(
+                "champions.skill.assassin.smoke-bomb.description",
+                duration,
+                radius,
+                blindDuration,
+                cooldown,
+                vanish,
+                blindness
+        );
+        Component vanishDetail = Translations.component("champions.skill.effect.vanish.name").color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines("champions.skill.effect.vanish.detail", vanishDetail);
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getBlindRadius(int level) {
@@ -165,7 +175,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 .spawn();
 
         player.playSound(player.getLocation().add(0, 1, 0), Sound.ENTITY_ALLAY_HURT, 0.5F, 0.5F);
-        UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.smoke-bomb.reappeared");
     }
 
     private void interact(Player player) {

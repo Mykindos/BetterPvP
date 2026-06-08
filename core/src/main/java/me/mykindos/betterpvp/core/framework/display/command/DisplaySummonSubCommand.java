@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.display.DisplayEditorManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,13 +34,13 @@ public class DisplaySummonSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Summon a display entity";
+        return "core.command.display-summon.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display summon <type> [options]");
+            UtilMessage.message(player, "core.prefix.display", "core.display.summon.usage");
             return;
         }
 
@@ -50,26 +51,28 @@ public class DisplaySummonSubCommand extends Command {
         switch (args[0].toLowerCase()) {
             case "block" -> {
                 if (args.length < 2) {
-                    UtilMessage.simpleMessage(player, "Display", "Usage: /display summon block <block>");
+                    UtilMessage.message(player, "core.prefix.display", "core.display.summon.block_usage");
                     return;
                 }
                 Material material = Material.matchMaterial(args[1]);
                 if (material == null) {
-                    UtilMessage.simpleMessage(player, "Display", "Invalid block: " + args[1]);
+                    UtilMessage.message(player, "core.prefix.display", "core.display.summon.invalid_block",
+                            Component.text(args[1]));
                     return;
                 }
                 display = player.getWorld().spawn(location, BlockDisplay.class);
                 ((BlockDisplay) display).setBlock(Bukkit.createBlockData(material));
             }
             default -> {
-                UtilMessage.simpleMessage(player, "Display", "Invalid type: " + args[0]);
+                UtilMessage.message(player, "core.prefix.display", "core.display.summon.invalid_type",
+                        Component.text(args[0]));
                 return;
             }
         }
 
         // tag
         displayEditorManager.selectDisplay(player, display);
-        UtilMessage.simpleMessage(player, "Display", "Display entity summoned!");
+        UtilMessage.message(player, "core.prefix.display", "core.display.summon.success");
     }
 
     @Override

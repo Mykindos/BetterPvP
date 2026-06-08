@@ -14,6 +14,6 @@ public class MeridianOrb extends BaseItem {
 
     @Inject
     private MeridianOrb() {
-        super("Meridian Orb", Item.model("meridian_orb", 16), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.meridian-orb.name"), Item.model("meridian_orb", 16), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 }

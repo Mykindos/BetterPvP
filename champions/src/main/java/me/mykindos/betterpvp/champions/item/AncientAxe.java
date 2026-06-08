@@ -17,7 +17,7 @@ public class AncientAxe extends WeaponItem {
 
     @Inject
     private AncientAxe(Champions champions) {
-        super(champions, "Ancient Axe", ItemStack.of(Material.NETHERITE_AXE), ItemRarity.RARE);
+        super(champions, translatableName("champions.item.ancient-axe.name"), ItemStack.of(Material.NETHERITE_AXE), ItemRarity.RARE);
     }
 
 }

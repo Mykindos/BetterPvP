@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.playerlist.PlayerListType;
 import net.kyori.adventure.text.Component;
@@ -56,12 +57,13 @@ public class GamerListener implements Listener {
         this.manager = manager;
 
         this.header = new PermanentComponent(gamer -> Component.text("BetterPvP ", NamedTextColor.GOLD)
-                .append(Component.text("Network ", NamedTextColor.WHITE))
-                .append(Component.text(core.getConfig().getOrSaveString("core.info.server", "unknown"), NamedTextColor.GREEN)));
+                .append(Translations.component("core.tab.header.network",
+                                Component.text(core.getConfig().getOrSaveString("core.info.server", "unknown"), NamedTextColor.GREEN))
+                        .color(NamedTextColor.WHITE)));
 
-        this.footer = new PermanentComponent(gamer -> Component.text("Type ", NamedTextColor.WHITE)
-                .append(Component.text(Objects.requireNonNull(shop, ""), NamedTextColor.YELLOW))
-                .append(Component.text(" for cool perks!", NamedTextColor.WHITE)));
+        this.footer = new PermanentComponent(gamer -> Translations.component("core.tab.footer",
+                        Component.text(Objects.requireNonNull(shop, ""), NamedTextColor.YELLOW))
+                .color(NamedTextColor.WHITE));
     }
 
     @UpdateEvent (isAsync = true)

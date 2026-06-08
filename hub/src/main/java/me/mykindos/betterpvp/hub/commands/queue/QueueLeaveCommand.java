@@ -31,22 +31,22 @@ public class QueueLeaveCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Leave the queue you are currently in";
+        return "hub.command.queue-leave.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (queueStatusRegistry.getStatus(player.getUniqueId()).isEmpty()) {
-            UtilMessage.simpleMessage(player, "Queue", "<gray>You are not currently queued for any server.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.not-queued-any");
             return;
         }
 
         try {
             orchestrationGateway.leaveQueue(player.getUniqueId()).join();
-            UtilMessage.simpleMessage(player, "Queue", "<gray>You have left the queue.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.leave.success");
         } catch (Exception ex) {
             QueueCommandSupport.logCommandFailure("leave queue for " + player.getName(), ex);
-            UtilMessage.simpleMessage(player, "Queue", "<red>Failed to leave the queue. Please try again.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.leave.failed");
         }
     }
 

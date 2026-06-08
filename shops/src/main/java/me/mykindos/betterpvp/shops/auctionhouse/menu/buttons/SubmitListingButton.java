@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -45,15 +46,17 @@ public class SubmitListingButton extends ControlItem<ListingCreationMenu> {
 
     @Override
     public ItemProvider getItemProvider(ListingCreationMenu gui) {
+        Component priceArg = Component.text(UtilFormat.formatNumber(auction.getSellPrice()), NamedTextColor.GREEN);
+        Component durationArg = Component.text(auction.getListingDuration().getDisplay(), NamedTextColor.GREEN);
         return ItemView.builder().material(Material.CHEST_MINECART)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .displayName(Component.text("Submit", NamedTextColor.GREEN))
-                .lore(Component.text("Left-click to submit the listing.", NamedTextColor.GRAY))
+                .displayName(Translations.component("shops.menu.listing-creation.button.submit.name").color(NamedTextColor.GREEN))
+                .lore(Translations.component("shops.menu.listing-creation.button.submit.lore.1").color(NamedTextColor.GRAY))
                 .lore(Component.text(""))
-                .lore(UtilMessage.deserialize("Sell price: <green>$%s", UtilFormat.formatNumber(auction.getSellPrice())))
-                .lore(UtilMessage.deserialize("Duration: <green>%s", auction.getListingDuration().getDisplay()))
+                .lore(Translations.component("shops.menu.listing-creation.button.submit.lore.2", priceArg).color(NamedTextColor.GRAY))
+                .lore(Translations.component("shops.menu.listing-creation.button.submit.lore.3", durationArg).color(NamedTextColor.GRAY))
                 .lore(Component.text(""))
-                .lore(Component.text("The auction house will take a 5% cut", NamedTextColor.GRAY))
+                .lore(Translations.component("shops.menu.listing-creation.button.submit.lore.4").color(NamedTextColor.GRAY))
                 .build();
     }
 
@@ -65,7 +68,7 @@ public class SubmitListingButton extends ControlItem<ListingCreationMenu> {
 
         AuctionCreateEvent auctionCreateEvent = UtilServer.callEvent(new AuctionCreateEvent(player, auction));
         if(auctionCreateEvent.isCancelled()) {
-            UtilMessage.simpleMessage(player, "Auction House", auctionCreateEvent.getCancelReason());
+            UtilMessage.message(player, "core.prefix.auction-house", auctionCreateEvent.getCancelReason());
             SoundEffect.WRONG_ACTION.play(player);
             return;
         }
@@ -92,12 +95,22 @@ public class SubmitListingButton extends ControlItem<ListingCreationMenu> {
                 }
             }
 
-            Component globalSellMessage = Component.text("Auction House> ", NamedTextColor.BLUE)
-                    .append(UtilMessage.deserialize("<gray>New Auction Listing: "))
-                    .append(name.hoverEvent(itemStack.asHoverEvent()).append(Component.text(" for ", NamedTextColor.GRAY)
-                            .append(Component.text("$" + UtilFormat.formatNumber(auction.getSellPrice()), NamedTextColor.GREEN))))
-                    .clickEvent(ClickEvent.runCommand("/auctionhouse"));
-            UtilMessage.broadcast(globalSellMessage);
+            final ItemStack hoverStack = itemStack;
+            final double sellPrice = auction.getSellPrice();
+            // Per recipient: render the hover ItemStack into each viewer's locale before building the hover.
+            UtilMessage.broadcastLocalized(locale -> {
+                Component newListingLabel = Translations.render(Translations.component("shops.menu.listing-creation.broadcast.new-listing").color(NamedTextColor.GRAY), locale);
+                Component forLabel = Translations.render(Translations.component("shops.menu.listing-creation.broadcast.for").color(NamedTextColor.GRAY), locale);
+                return Component.text("Auction House> ", NamedTextColor.BLUE)
+                        .append(newListingLabel)
+                        .appendSpace()
+                        .append(name.hoverEvent(Translations.renderItemStack(hoverStack, locale)))
+                        .appendSpace()
+                        .append(forLabel)
+                        .appendSpace()
+                        .append(Component.text("$" + UtilFormat.formatNumber(sellPrice), NamedTextColor.GREEN))
+                        .clickEvent(ClickEvent.runCommand("/auctionhouse"));
+            });
         }
 
         SoundEffect.HIGH_PITCH_PLING.play(player);

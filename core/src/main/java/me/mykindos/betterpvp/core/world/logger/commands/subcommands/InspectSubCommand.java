@@ -26,16 +26,16 @@ public class InspectSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Enable inspection mode";
+        return "core.command.inspect.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if(worldLogHandler.getInspectingPlayers().remove(player.getUniqueId())){
-            UtilMessage.simpleMessage(player, "World Logger", "Inspection mode disabled");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.inspect.disabled");
         }else{
             worldLogHandler.getInspectingPlayers().add(player.getUniqueId());
-            UtilMessage.simpleMessage(player, "World Logger", "Inspection mode enabled");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.inspect.enabled");
         }
     }
 }

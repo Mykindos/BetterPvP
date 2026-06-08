@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.menu.GuiCreateWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -22,9 +23,11 @@ public class StructuresButton extends ControlItem<GuiCreateWorld> {
     public ItemProvider getItemProvider(GuiCreateWorld gui) {
         return ItemView.builder()
                 .material(Material.FURNACE)
-                .displayName(Component.text("Generate Structures: ", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.world.create.button.structures.name").color(NamedTextColor.GRAY)
                         .append(Component.text(this.generateStructures, this.generateStructures ? NamedTextColor.GREEN : NamedTextColor.RED)))
-                .action(ClickActions.ALL, Component.text(this.generateStructures ? "Disable" : "Enable"))
+                .action(ClickActions.ALL, this.generateStructures
+                        ? Translations.component("core.menu.world.create.button.disable.action")
+                        : Translations.component("core.menu.world.create.button.enable.action"))
                 .build();
     }
 

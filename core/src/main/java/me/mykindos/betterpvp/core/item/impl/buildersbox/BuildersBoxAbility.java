@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.item.impl.buildersbox;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.destroystokyo.paper.ParticleBuilder;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.animation.BlueprintAnimation;
@@ -61,12 +63,12 @@ public class BuildersBoxAbility extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Open");
+        return Translations.component("core.ability.open-builders-box.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Unseal the box to release a trove of building items.");
+        return Translations.component("core.ability.open-builders-box.description");
     }
 
     @Override

@@ -59,7 +59,7 @@ public class AntiHealListener implements Listener {
         if (event.isCancelled()) return;
         if (event.getEffect().getEffectType() == EffectTypes.ANTI_HEAL) {
             event.getTarget().getWorld().playSound(event.getTarget().getLocation(), Sound.BLOCK_GLASS_BREAK, 2.0f, 2.0f );
-            UtilMessage.message(event.getTarget(), "Anti Heal", "You can no longer regenerate health!");
+            UtilMessage.message(event.getTarget(), "core.prefix.anti-heal", "core.effect.antiheal.applied");
         }
     }
 }

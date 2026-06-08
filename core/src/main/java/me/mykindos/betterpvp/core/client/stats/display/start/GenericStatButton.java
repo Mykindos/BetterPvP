@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -36,10 +37,10 @@ public class GenericStatButton extends ControlItem<IAbstractStatMenu> {
 
         return ItemView.builder()
                 .material(Material.ANVIL)
-                .displayName(Component.text("Generic Stats"))
+                .displayName(Translations.component("core.menu.stats.button.generic.name"))
                 .lore(getGenericStatsDescription())
                 .frameLore(true)
-                .action(ClickActions.ALL, Component.text("Show All Stats"))
+                .action(ClickActions.ALL, Translations.component("core.menu.stats.button.generic.action"))
                 .build();
     }
 

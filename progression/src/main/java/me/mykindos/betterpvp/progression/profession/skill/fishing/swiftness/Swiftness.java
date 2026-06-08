@@ -2,10 +2,13 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing.swiftness;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
 import me.mykindos.betterpvp.progression.profession.skill.NodeId;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkill;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -23,6 +26,12 @@ public class Swiftness extends ProfessionSkill {
         return new String[]{
                 "Increases catch speed by <green>" + UtilFormat.formatNumber(getSpeedBonus(level), 2) + "%"
         };
+    }
+
+    @Override
+    public Component[] getDescriptionComponents(int level) {
+        return Translations.componentLines("progression.skill.swiftness.desc",
+                Component.text(UtilFormat.formatNumber(getSpeedBonus(level), 2) + "%", NamedTextColor.GREEN));
     }
 
     private double getSpeedBonus(int level) {

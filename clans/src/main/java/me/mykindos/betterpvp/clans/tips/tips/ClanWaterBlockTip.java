@@ -8,8 +8,11 @@ import me.mykindos.betterpvp.clans.item.WaterBlock;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+
+import java.util.Locale;
 
 @Singleton
 public class ClanWaterBlockTip extends ClanTip {
@@ -29,9 +32,11 @@ public class ClanWaterBlockTip extends ClanTip {
     public Component generateComponent() {
 
         final ItemInstance instance = itemFactory.createPreview(waterBlock);
-        return Component.empty().append(Component.text("You can place water in your territory by buying or crafting a "))
-                .append(instance.getView().getName()).hoverEvent(instance.getView().get().asHoverEvent())
-                .append(Component.text(" (lapis block), then placing it like you would a water bucket"));
+        // This tip component is built once and shown to many players, so the hover item is resolved to
+        // English (the universal fallback); the inline name still renders per-viewer when sent.
+        final Component itemComponent = instance.getView().getName()
+                .hoverEvent(Translations.renderItemStack(instance.getView().get(), Locale.ENGLISH).asHoverEvent());
+        return Translations.component("clans.tip.water-block", itemComponent);
     }
 
     @Override

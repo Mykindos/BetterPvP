@@ -27,13 +27,13 @@ public class OfflineMessagesCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Retrieve your offline messages from a given time period";
+        return "core.command.offline-messages.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "OfflineMessages", "Usage: <yellow>/offlinemessages <green><number> <unit></green></yellow>");
+            UtilMessage.message(player, "core.prefix.offlinemessages", "core.command.offlinemessages.usage");
             return;
         }
         offlineMessagesHandler.showMenuForMessagesForClientAfterTime(player, client, UtilTime.parseTimeString(args));

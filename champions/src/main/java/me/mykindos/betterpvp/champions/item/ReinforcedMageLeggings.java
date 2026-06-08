@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 public class ReinforcedMageLeggings extends ArmorItem {
     @Inject
     private ReinforcedMageLeggings(Champions champions) {
-        super(champions, "Reinforced Mage Leggings", Item.builder(Material.GOLDEN_LEGGINGS)
+        super(champions, translatableName("champions.item.reinforced-mage-leggings.name"), Item.builder(Material.GOLDEN_LEGGINGS)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.MAGE));

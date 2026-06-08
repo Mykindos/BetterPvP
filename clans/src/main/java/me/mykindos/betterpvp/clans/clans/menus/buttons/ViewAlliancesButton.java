@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -41,8 +42,8 @@ public class ViewAlliancesButton extends ViewClanCollectionButton {
         List<Item> alliances = clan.getAlliances().stream().map(alliance -> {
             final Clan alliedClan = (Clan) alliance.getClan();
             final TextColor color = alliance.isTrusted() ? NamedTextColor.GREEN : NamedTextColor.RED;
-            final List<Component> lore = List.of(Component.text("Trusted: ", NamedTextColor.GRAY)
-                    .append(Component.text(alliance.isTrusted(), color)));
+            final List<Component> lore = List.of(Translations.component("clans.menu.clan.button.alliance.lore.trusted").color(NamedTextColor.GRAY)
+                    .appendSpace().append(Component.text(alliance.isTrusted(), color)));
             return (Item) new ViewClanButton(viewerClan, alliedClan, lore);
         }).toList();
 

@@ -11,7 +11,9 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -41,20 +43,20 @@ public class LegendsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "give the target all legendary and mythic weapons";
+        return "champions.command.legends.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.message(player, "Command", getUsage());
+            UtilMessage.message(player, "core.prefix.command", getUsage());
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
 
         if (target == null) {
-            UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid player name.", args[0]));
+            UtilMessage.message(player, "core.prefix.command", "champions.command.legends.invalid-player", Component.text(args[0], NamedTextColor.YELLOW));
             return;
         }
 
@@ -82,7 +84,7 @@ public class LegendsCommand extends Command {
         }
 
     public Component getUsage() {
-        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>legends <player>");
+        return Translations.component("champions.command.legends.usage").color(NamedTextColor.GREEN);
     }
 
     @Override

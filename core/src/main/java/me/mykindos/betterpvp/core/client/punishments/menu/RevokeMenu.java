@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Click;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -29,8 +30,8 @@ public class RevokeMenu extends AbstractGui implements Windowed {
         super(9, 3);
 
         ItemView appealView = ItemView.builder()
-                .displayName(Component.text(RevokeType.APPEAL.name()))
-                .lore(Component.text("Valid punishment, being lifted early"))
+                .displayName(Translations.component("core.menu.revoke.button.appeal.name"))
+                .lore(Translations.component("core.menu.revoke.button.appeal.lore.1"))
                 .material(Material.HOPPER)
                 .customModelData(1)
                 .build();
@@ -50,8 +51,8 @@ public class RevokeMenu extends AbstractGui implements Windowed {
         SimpleItem appealItem = new SimpleItem(appealView, appealClick);
 
         ItemView incorrectView = ItemView.builder()
-                .displayName(Component.text(RevokeType.INCORRECT.name()))
-                .lore(Component.text("invalid punishment, being revoked"))
+                .displayName(Translations.component("core.menu.revoke.button.incorrect.name"))
+                .lore(Translations.component("core.menu.revoke.button.incorrect.lore.1"))
                 .material(Material.REDSTONE_BLOCK)
                 .customModelData(1)
                 .build();
@@ -88,6 +89,6 @@ public class RevokeMenu extends AbstractGui implements Windowed {
      */
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Revoke");
+        return Translations.component("core.menu.revoke.title");
     }
 }

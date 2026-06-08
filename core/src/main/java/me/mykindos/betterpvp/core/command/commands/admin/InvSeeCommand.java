@@ -39,19 +39,19 @@ public class InvSeeCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Opens a target players inventory";
+        return "core.command.inv-see.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.simpleMessage(player, "Usage: /invsee <player>");
+            UtilMessage.message(player, "core.prefix.command", "core.command.invsee.usage");
             return;
         }
 
         clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isEmpty()) {
-                UtilMessage.simpleMessage(player, "Could not find player <yellow>" + args[0]);
+                UtilMessage.message(player, "core.prefix.command", "core.command.invsee.target_not_found", args[0]);
                 return;
             }
 

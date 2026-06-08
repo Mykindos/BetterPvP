@@ -20,6 +20,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,7 +65,11 @@ public class SkillChatListener implements Listener {
             int index = messageText.toLowerCase().indexOf(entry.getKey().toLowerCase());
             Skill skill = entry.getValue();
 
-            final Component text = Component.join(JoinConfiguration.newlines(), skill.parseDescription(1));
+            final Component[] lines = skill.getDescription(1);
+            final List<Component> styled = Arrays.stream(lines)
+                    .map(c -> c.colorIfAbsent(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
+                    .toList();
+            final Component text = Component.join(JoinConfiguration.newlines(), styled);
             Component skillComponent = Component.text(messageText.substring(index, index + skill.getName().length()))
                     .color(NamedTextColor.GREEN).decorate(TextDecoration.UNDERLINED)
                     .hoverEvent(HoverEvent.showText(text));

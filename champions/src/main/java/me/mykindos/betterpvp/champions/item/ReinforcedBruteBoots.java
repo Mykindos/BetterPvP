@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 public class ReinforcedBruteBoots extends ArmorItem {
     @Inject
     private ReinforcedBruteBoots(Champions champions) {
-        super(champions, "Reinforced Brute Boots", Item.builder(Material.DIAMOND_BOOTS)
+        super(champions, translatableName("champions.item.reinforced-brute-boots.name"), Item.builder(Material.DIAMOND_BOOTS)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.BRUTE));

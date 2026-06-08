@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
@@ -37,7 +38,7 @@ public class DisbandClanSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Disbands your current clan";
+        return "clans.command.disband-clan.description";
     }
 
     @Override
@@ -49,16 +50,16 @@ public class DisbandClanSubCommand extends ClanSubCommand {
             ClanMember leader = leaderOptional.get();
 
             if (!leader.getUuid().equals(client.getUniqueId()) && !client.isAdministrating()) {
-                UtilMessage.message(player, "Command", "You do not have permission to disband this clan");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.disband.no-permission");
                 return;
             }
 
             if(clanManager.getPillageHandler().isBeingPillaged(clan)){
-                UtilMessage.message(player, "Clans", "You cannot disband your clan while being pillaged.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.disband.pillaged");
                 return;
             }
 
-            new ConfirmationMenu("Are you sure you want to disband your clan?", success -> {
+            new ConfirmationMenu(Translations.component("clans.command.clan.disband.confirmation").toString(), success -> {
                 if (success) {
                     Bukkit.getPluginManager().callEvent(new ClanDisbandEvent(player, clan));
                 }

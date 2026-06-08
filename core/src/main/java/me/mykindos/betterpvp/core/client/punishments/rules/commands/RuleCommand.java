@@ -25,7 +25,7 @@ public class RuleCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Lists the rules of the server";
+        return "core.command.rule.description";
     }
 
     @Override

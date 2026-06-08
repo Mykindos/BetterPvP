@@ -14,6 +14,6 @@ public class ToxicGem extends BaseItem {
 
     @Inject
     private ToxicGem() {
-        super("Toxic Gem", Item.model("toxic_gem", 16), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.toxic-gem.name"), Item.model("toxic_gem", 16), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
     }
 }

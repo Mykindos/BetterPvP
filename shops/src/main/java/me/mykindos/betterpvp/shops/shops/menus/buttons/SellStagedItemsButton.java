@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.shops.menus.buttons;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -26,7 +27,8 @@ public class SellStagedItemsButton extends ControlItem<SellAllMenu> {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.text("Sell for ", TextColor.color(144, 238, 144))
+                .displayName(Translations.component("shops.menu.sell-all.button.sell-staged.name").color(TextColor.color(144, 238, 144))
+                        .appendSpace()
                         .append(UtilMessage.deserialize("<gold>" + UtilFormat.formatNumber(sellAllMenu.getTotalPrice()) + "g <coins></coins></gold>")))
                 .build();
     }

@@ -34,9 +34,8 @@ public class SmelterItem extends BaseItem implements NexoItem {
 
     @Inject
     private SmelterItem() {
-        super("Smelter", model, ItemGroup.BLOCK, ItemRarity.COMMON);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and right-click this to smelt items.")));
+        super(translatableName("core.item.smelter.name"), model, ItemGroup.BLOCK, ItemRarity.COMMON);
+        addBaseComponent(DescriptionComponent.translatable(1, "core.item.smelter.lore"));
     }
 
     @Override

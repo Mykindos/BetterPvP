@@ -12,7 +12,9 @@ import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 
 public abstract class PortableClassSelectorItem extends BaseItem implements Reloadable {
@@ -21,7 +23,7 @@ public abstract class PortableClassSelectorItem extends BaseItem implements Relo
     private final PortableClassAbility ability;
 
     protected PortableClassSelectorItem(Champions champions, Role role, Material material) {
-        super("Portable " + role.getName() + " Selector",
+        super(Translations.component("champions.item.portable-class-selector.name", role.getDisplayName()),
                 Item.builder(material).maxStackSize(1).build(),
                 ItemGroup.CONSUMABLE,
                 ItemRarity.UNCOMMON);

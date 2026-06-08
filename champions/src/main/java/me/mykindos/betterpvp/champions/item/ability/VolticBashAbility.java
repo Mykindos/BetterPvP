@@ -25,7 +25,9 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -86,12 +88,12 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Voltic Bash");
+        return Translations.component("champions.ability.voltic-bash.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Charge up and dash forward, dealing damage to entities in your path. Higher charge increases damage and velocity.");
+        return Translations.component("champions.ability.voltic-bash.description");
     }
 
     @Override
@@ -104,7 +106,7 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
 
         // Check if player is in liquid
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, "Thunderclap Aegis", "You cannot use <green>Voltic Bash <gray>while in water.");
+            UtilMessage.message(player, "core.prefix.thunderclap-aegis", "champions.item.voltic-bash.water", Translations.component("champions.item.voltic-bash.name").color(NamedTextColor.GREEN));
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 

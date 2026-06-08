@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -29,9 +29,12 @@ public class ViewClanButton extends SimpleItem {
         super(ItemView.of(clan.getBanner().get()).toBuilder()
                 .displayName(Component.text(clan.getName(), NamedTextColor.GREEN))
                 .lore(new ArrayList<>(extraLore))
-                .lore(UtilMessage.deserialize("<gray><white>%,d</white>/<white>%,d</white> Online", clan.getOnlineMemberCount(), clan.getMembers().size()))
+                .lore(Translations.component("clans.menu.clan.button.view-clan.lore.online",
+                        Component.text(String.format("%,d", clan.getOnlineMemberCount()), NamedTextColor.WHITE),
+                        Component.text(String.format("%,d", clan.getMembers().size()), NamedTextColor.WHITE))
+                        .color(NamedTextColor.GRAY))
                 .frameLore(true)
-                .action(ClickActions.ALL, Component.text("View Clan"))
+                .action(ClickActions.ALL, Translations.component("clans.menu.clan.button.view-clan.action"))
                 .build());
         this.viewerClan = viewerClan;
         this.clan = clan;

@@ -22,7 +22,7 @@ public abstract class SocketableItem extends BaseItem {
      * @param rarity The rarity of this rune
      */
     protected SocketableItem(Socketable socketable, ItemStack itemStack, ItemGroup itemGroup, ItemRarity rarity) {
-        super(socketable.getName(), itemStack, itemGroup, rarity);
+        super(socketable.getDisplayName(), itemStack, itemGroup, rarity);
         this.socketable = socketable;
         addBaseComponent(new SocketableDescriptionComponent(socketable));
     }

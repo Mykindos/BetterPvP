@@ -23,7 +23,7 @@ public class AncientAxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 2031;
 
     public AncientAxe() {
-        super("Ancient Axe", ItemStack.of(Material.NETHERITE_AXE), ItemGroup.TOOL, ItemRarity.RARE);
+        super(translatableName("core.item.ancient-axe.name"), ItemStack.of(Material.NETHERITE_AXE), ItemGroup.TOOL, ItemRarity.RARE);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

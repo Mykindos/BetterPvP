@@ -12,9 +12,9 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -89,16 +89,12 @@ public class WoodcuttingDoubleTreasureChanceListener implements Listener {
             }
         }
 
-        TextComponent message = Component.text("You found ")
-                .append(Component.text(UtilFormat.formatNumber(itemStack.getAmount())))
-                .append(Component.text(" "))
-                .append(name);
+        final Component message = Translations.component(
+                doubled ? "progression.woodcutting.treasure.found-doubled" : "progression.woodcutting.treasure.found",
+                Component.text(UtilFormat.formatNumber(itemStack.getAmount())),
+                name);
 
-        if (doubled) {
-            message = message.append(Component.text(" (doubled!)"));
-        }
-
-        UtilMessage.message(player, "Woodcutting", message);
+        UtilMessage.message(player, "core.prefix.woodcutting", message);
 
         log.info("{} found {}x {} from woodcutting treasure{}", player.getName(), itemStack.getAmount(),
                         itemStack.getType().name().toLowerCase(), doubled ? " (doubled)" : "")

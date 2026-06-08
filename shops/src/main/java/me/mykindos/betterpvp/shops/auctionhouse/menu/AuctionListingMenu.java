@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -34,7 +35,6 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
     @Getter
     private final Player player;
 
-    private final String title;
     private final AuctionManager auctionManager;
     private final Predicate<Auction> auctionFilter;
     private ItemRarity raritySearch = null;
@@ -54,7 +54,6 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new PageForwardButton()));
         this.player = player;
-        this.title = "Auction House";
         this.auctionManager = auctionManager;
         this.auctionFilter = auctionFilter;
 
@@ -102,7 +101,7 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text(title);
+        return Translations.component("shops.menu.auction-listing.title");
     }
 
     @Override

@@ -32,7 +32,7 @@ public class ReinforcedWarlockBoots extends ArmorItem {
 
     @Inject
     private ReinforcedWarlockBoots(Champions champions) {
-        super(champions, "Reinforced Warlock Boots", Item.builder(Material.NETHERITE_BOOTS)
+        super(champions, translatableName("champions.item.reinforced-warlock-boots.name"), Item.builder(Material.NETHERITE_BOOTS)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.WARLOCK));

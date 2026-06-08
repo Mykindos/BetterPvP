@@ -20,8 +20,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -67,19 +71,13 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level) + " health to create",
-                "a ring of torment for " + getValueString(this::getDuration, level) + " seconds.",
-                "",
-                "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 100, "%", 0) + " more damage.",
-                "",
-                "Range: " + getValueString(this::getRange, level) + " blocks.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component healthReduction = getValueComponent(this::getHealthReduction, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component damageIncrease = getValueComponent(this::getDamageIncrease, level, 0);
+        Component range = getValueComponent(this::getRange, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.warlock.tormented-soil.description", healthReduction, duration, damageIncrease, range, cooldown);
     }
 
     public double getHealthReduction(int level) {
@@ -232,7 +230,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         double proposedHealth = player.getHealth() - getHealthReduction(level);
 
         if (proposedHealth <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.not-enough-health", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             return false;
         }
 

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.Ticked;
 import me.mykindos.betterpvp.hub.Hub;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -88,7 +89,9 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
                     .spawn();
         }, 25L);
 
-        UtilMessage.message(runner, "Store", "Our store is located at <yellow><click:open_url:'https://betterpvp.net/store'>https://betterpvp.net/store</click>");
+        UtilMessage.message(runner, "core.prefix.store", "hub.store.location",
+                Component.text("https://betterpvp.net/store", NamedTextColor.YELLOW)
+                        .clickEvent(ClickEvent.openUrl("https://betterpvp.net/store")));
     }
 
     @Override

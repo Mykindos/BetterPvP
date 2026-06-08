@@ -15,7 +15,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -52,13 +55,12 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "For each consecutive hit within " + getValueString(this::getMaxTimeBetweenShots, level),
-                "seconds of each other, you gain",
-                "increased movement speed for " + getValueString(this::getDuration, level) + " seconds",
-                "up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>"
-        };
+    public Component[] getDescription(int level) {
+        Component maxTimeBetweenShots = getValueComponent(this::getMaxTimeBetweenShots, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component speed = Translations.component("champions.skill.effect.speed",
+                Component.text(UtilFormat.getRomanNumeral(maxConsecutiveHits))).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.hunters-thrill.description", maxTimeBetweenShots, duration, speed);
     }
 
     public double getMaxTimeBetweenShots(int level) {

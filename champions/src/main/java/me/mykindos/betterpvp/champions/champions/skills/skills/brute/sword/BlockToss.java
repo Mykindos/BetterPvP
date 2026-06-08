@@ -18,9 +18,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -79,19 +82,16 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "Hold your Sword to activate",
-                "",
-                "Throw a boulder forward that",
-                "deals " + getValueString(this::getDamage, level) + " damage to all nearby",
-                "enemies.",
-                "",
-                "Boulder size increases at a rate",
-                "of " + getValueString(this::getChargePerSecond, level, 100, "%", 2) + " per level.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component charge = getValueComponent(this::getChargePerSecond, level, 100, 2, "%");
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.brute.block-toss.description",
+                damage,
+                charge,
+                cooldown
+        );
     }
 
     private double getRadius(int level) {

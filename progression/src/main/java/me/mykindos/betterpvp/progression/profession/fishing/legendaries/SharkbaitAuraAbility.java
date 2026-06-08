@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.fishing.legendaries;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -64,12 +66,12 @@ public class SharkbaitAuraAbility extends AbstractInteraction implements Listene
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Fishing Aura");
+        return Translations.component("progression.ability.fishing-aura.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Increases fishing catch speed for all nearby fishermen");
+        return Translations.component("progression.ability.fishing-aura.description");
     }
 
     @Override

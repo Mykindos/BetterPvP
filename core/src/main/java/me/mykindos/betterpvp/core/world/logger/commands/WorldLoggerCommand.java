@@ -23,7 +23,7 @@ public class WorldLoggerCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Base command for world logging";
+        return "core.command.world-logger.description";
     }
 
     @Override

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.SkillButto
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -69,14 +70,14 @@ public class SkillMenu extends AbstractGui implements Windowed {
                     if(roleBuild.getPoints() == 0) {
                         return ItemView.builder()
                                 .material(Material.BARRIER)
-                                .displayName(Component.text("No Skill Points Remaining", NamedTextColor.RED, TextDecoration.BOLD))
+                                .displayName(Translations.component("champions.menu.skill.no-points").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
                                 .build();
                     }
 
                     return ItemView.builder()
                             .material(Material.NETHER_STAR)
                             .amount(roleBuild.getPoints())
-                            .displayName(Component.text(roleBuild.getPoints() + " Skill Points Remaining", NamedTextColor.GREEN, TextDecoration.BOLD))
+                            .displayName(Translations.component("champions.menu.skill.points-remaining", Component.text(roleBuild.getPoints())).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                             .build();
                 }
             });
@@ -140,6 +141,6 @@ public class SkillMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Edit Build");
+        return Translations.component("champions.menu.skill.title");
     }
 }

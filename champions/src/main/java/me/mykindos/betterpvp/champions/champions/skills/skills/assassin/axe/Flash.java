@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -51,7 +53,9 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
         final int maxCharges = getMaxCharges(getLevel(player));
         final int newCharges = flashData.getCharges();
 
-        return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+        return Component.empty().color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                .append(getDisplayName())
+                .append(Component.text(" "))
                 .append(Component.text("\u25A0".repeat(Math.max(0, newCharges))).color(NamedTextColor.GREEN))
                 .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
@@ -76,19 +80,16 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Teleport " + getValueString(this::getTeleportDistance, level) + " blocks forward",
-                "in the direction you are facing",
-                "",
-                "Store up to " + getValueString(this::getMaxCharges, level) + " charges",
-                "",
-                "Cannot be used while <effect>Slowed</effect>",
-                "",
-                "Gain a charge every: " + getValueString(this::getRechargeSeconds, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component dist = getValueComponent(this::getTeleportDistance, level, 0);
+        Component charges = getValueComponent(this::getMaxCharges, level, 0);
+        Component recharge = getValueComponent(this::getRechargeSeconds, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.flash.description",
+                dist,
+                charges,
+                recharge
+        );
     }
 
     private int getMaxCharges(int level) {
@@ -133,7 +134,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     }
 
     private void notifyCharges(Player player, int charges) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "Flash Charges: <alt2>" + charges);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.flash.charges", Component.text(String.valueOf(charges), NamedTextColor.YELLOW));
     }
 
     public boolean canUse(Player player) {
@@ -143,7 +144,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
             return true;
         }
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You don't have any <alt>" + getName() + "</alt> charges.");
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.flash.no-charges", getDisplayName().color(NamedTextColor.GREEN));
         return false;
     }
 

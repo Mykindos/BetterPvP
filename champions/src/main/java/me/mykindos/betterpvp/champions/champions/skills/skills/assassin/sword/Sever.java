@@ -13,10 +13,14 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -50,17 +54,27 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Inflict <effect>Bleed</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.BLEED.getDescription(0)
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component bleed = Translations.component("champions.skill.effect.bleed.name").color(NamedTextColor.WHITE);
+        Component[] components = Translations.componentLines(
+                "champions.skill.assassin.sever.description",
+                duration,
+                cooldown,
+                bleed
+        );
+        Component bleedDetail = Translations.component("champions.skill.effect.bleed.name").color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.effect.bleed.detail",
+                bleedDetail,
+                Component.text("2.0", NamedTextColor.GREEN)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {
@@ -114,18 +128,18 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
 
         if (ent == null) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             return;
         }
 
         boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
         if (UtilPlayer.isCreativeOrSpectator(ent) || UtilEntity.getRelation(player, ent) == EntityProperty.FRIENDLY || !withinRange) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {
             championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
-            UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed", Component.text(ent.getName(), NamedTextColor.GREEN));
+            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed-by", Component.text(player.getName(), NamedTextColor.GREEN));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
         }
 

@@ -10,6 +10,11 @@ import java.util.List;
 
 /**
  * Renderer for displaying lore on items.
+ *
+ * <p>Implementations produce lore lines as authored, possibly <b>unresolved</b> translatable components.
+ * Server-side localization into a recipient's locale happens later, at the outgoing packet boundary (see
+ * {@code ItemPacketRemapper} / {@link me.mykindos.betterpvp.core.locale.Translations#renderItemStack}).
+ * Do not resolve translations here.</p>
  */
 @SuppressWarnings("ALL")
 public interface ItemLoreRenderer {

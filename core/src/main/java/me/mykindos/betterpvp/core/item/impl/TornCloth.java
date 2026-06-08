@@ -14,6 +14,6 @@ public class TornCloth extends BaseItem {
 
     @Inject
     private TornCloth() {
-        super("Torn Cloth", Item.model("torn_cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.torn-cloth.name"), Item.model("torn_cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 }

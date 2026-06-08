@@ -37,7 +37,7 @@ public class SpeedyBaitItem extends BaitItem {
      */
     @Inject
     public SpeedyBaitItem(Progression progression, SpeedyBaitAbility ability) {
-        super(progression, "Speedy Bait", new ItemStack(Material.ORANGE_GLAZED_TERRACOTTA), ItemRarity.UNCOMMON, ability);
+        super(progression, translatableName("progression.item.speedy-bait.name"), new ItemStack(Material.ORANGE_GLAZED_TERRACOTTA), ItemRarity.UNCOMMON, ability);
         addBaseComponent(new RestrictedAccessComponent(Set.of(AccessScope.CRAFT)));
     }
 

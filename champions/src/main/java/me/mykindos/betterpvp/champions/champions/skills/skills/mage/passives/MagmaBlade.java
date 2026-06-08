@@ -15,6 +15,10 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,13 +45,9 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "Your sword is fueled by flames,",
-                "dealing an additional " + getValueString(this::getDamage, level) + " damage",
-                "to players who are on fire but",
-                "also extinguishes them"
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        return Translations.componentLines("champions.skill.mage.magma-blade.description", damage);
     }
 
     public double getDamage(int level) {

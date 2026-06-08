@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.item.component.impl.purity;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -63,14 +64,23 @@ public enum ItemPurity {
         final TextColor foreground = Objects.requireNonNull(TextColor.fromHexString("#828282"));
 
         return Component.empty()
-                .append(Component.text("Purity:", foreground))
+                .append(Translations.component("core.item.purity.label").color(foreground))
                 .appendSpace()
-                .append(Component.text(this.displayName, this.color, TextDecoration.UNDERLINED))
+                .append(getDisplayComponent().color(this.color).decorate(TextDecoration.UNDERLINED))
                 .appendSpace()
                 .append(Component.text("(", foreground))
                 .append(stars)
                 .append(Component.text(")", foreground))
                 .decoration(TextDecoration.ITALIC, false);
+    }
+
+    /**
+     * The localized purity level name as a component (e.g. "Perfect"). {@link #getDisplayName()} returns the
+     * raw English identifier.
+     */
+    @NotNull
+    public Component getDisplayComponent() {
+        return Translations.component("core.item.purity." + name().toLowerCase() + ".name");
     }
 
     /**

@@ -14,7 +14,9 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -47,7 +49,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
 
     @Override
     public String getDescription() {
-        return "Base command for removing a punishment from a client";
+        return "core.command.punishment-remove.description";
     }
 
     @Override
@@ -58,7 +60,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 4) {
-            UtilMessage.message(sender, "Command", "Usage: /punish remove <type> <player> <revokeType> <reason>");
+            UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.remove.usage");
             return;
         }
 
@@ -71,7 +73,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                 try {
                     revokeType = RevokeType.valueOf(args[2].toUpperCase());
                 } catch (IllegalArgumentException ignored) {
-                    UtilMessage.message(sender, "Punish", "Invalid revoke type, must be APPEAL or INCORRECT");
+                    UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.remove.revoke_type.invalid");
                     return;
                 }
 
@@ -79,18 +81,21 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
 
                 List<Punishment> punishmentList = target.getPunishments().stream().filter(punishment -> punishment.isActive() && punishment.getType() == type).toList();
                 if (punishmentList.isEmpty()) {
-                    UtilMessage.message(sender, "Punish", "This client does not have any punishments of this type.");
+                    UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.remove.none_of_type");
                     return;
                 } else {
-                    UtilMessage.message(sender, "Punish", "Removed <green>%d</green> punishments from <yellow>%s</yellow>.", punishmentList.size(), target.getName());
+                    UtilMessage.message(sender, "core.prefix.command", Translations.component("core.command.punishment.remove.success",
+                            Component.text(punishmentList.size()), Component.text(target.getName())));
                     if (sender instanceof Player player) {
                         log.info("{} had {} {} revoked by {}", target.getName(), punishmentList.size(), type.getName(), player.getName())
                                 .setAction("PUNISH_REVOKE")
                                 .addClientContext(target, true)
                                 .addClientContext(player, false)
                                 .submit();
-                        clientManager.sendMessageToRank("Punish", UtilMessage.deserialize("<yellow>%s</yellow> revoked <green>%d</green> punishments from <yellow>%s</yellow>",
-                                player.getName(), punishmentList.size(), target.getName()), Rank.TRIAL_MOD);
+                        clientManager.sendMessageToRank("core.prefix.command",
+                                Translations.component("core.command.punishment.remove.staff_broadcast",
+                                        Component.text(player.getName()), Component.text(punishmentList.size()), Component.text(target.getName())),
+                                Rank.TRIAL_MOD);
                     } else {
                         log.info("{} had {} {}s revoked", target.getName(), punishmentList.size(), type.getName())
                                 .setAction("PUNISH_REVOKE")
@@ -112,7 +117,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                     punishmentRepository.revokePunishment(punishment);
                 });
             } else {
-                UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
+                UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.client.not_found");
             }
         });
     }

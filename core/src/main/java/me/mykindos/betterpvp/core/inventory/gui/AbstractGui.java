@@ -136,7 +136,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
             ItemStack cursor = ItemUtils.takeUnlessEmpty(event.getCursor());
             ItemStack clicked = ItemUtils.takeUnlessEmpty(event.getCurrentItem());
 
-            String lang = player.locale().getCountry();
+            String lang = player.getLocale();
             if (element.isSynced(lang, clicked) || didClickBackgroundItem(player, element, inventory, slot, clicked)) {
                 ItemStack technicallyClicked = element.getClickedItemStack(lang, clicked);
                 
@@ -175,8 +175,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
     }
     
     private boolean didClickBackgroundItem(Player player, me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement element, Inventory inventory, int slot, ItemStack clicked) {
-        Locale lang = player.locale();
-        return !inventory.hasItem(slot) && (isBuilderSimilar(background, lang.getCountry(), clicked) || isBuilderSimilar(element.getBackground(), lang.getCountry(), clicked));
+        String lang = player.getLocale();
+        return !inventory.hasItem(slot) && (isBuilderSimilar(background, lang, clicked) || isBuilderSimilar(element.getBackground(), lang, clicked));
     }
     
     private boolean isBuilderSimilar(ItemProvider builder, String lang, ItemStack expected) {
@@ -422,7 +422,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
         if (element instanceof SlotElement.InventorySlotElement invSlotElement) {
             Inventory inventory = invSlotElement.getInventory();
             int viSlot = invSlotElement.getSlot();
-            String lang = updateReason instanceof PlayerUpdateReason playerUpdateReason ? playerUpdateReason.getPlayer().locale().getCountry() : "";
+            String lang = updateReason instanceof PlayerUpdateReason playerUpdateReason ? playerUpdateReason.getPlayer().getLocale() : "";
             if (invSlotElement.isSynced(lang, oldStack)) {
                 ItemStack newInventoryStack = newStack;
                 ItemStack clickedStack = invSlotElement.getClickedItemStack(lang, oldStack);

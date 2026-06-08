@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.component.impl.currency.CurrencyComponent
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatAugmentationComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.purity.bias.PurityReforgeBiasRegistry;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -25,6 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -69,7 +71,7 @@ public class GuiReforge extends AbstractGui implements Windowed {
                 "000000000")
                 .addIngredient('0', Menu.INVISIBLE_BACKGROUND_ITEM)
                 .addIngredient('I', InfoTabButton.builder()
-                        .description(Component.text("Reforging an item will randomize its stats within the accepted range. Higher purities yield better results. Place an item and gold to reforge the item."))
+                        .descriptionLines(List.of(Translations.rawComponentLines("core.menu.reforge.info.description")))
                         .icon(ItemStack.of(Material.AIR))
                         .build())
                 .addIngredient('G', new PlaceholderInventorySlot(goldInventory, new ItemBuilder(createGoldPlaceholder())))
@@ -113,11 +115,8 @@ public class GuiReforge extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.text("Add Gold", NamedTextColor.GOLD))
-                .lore(Component.text("Drag gold bars from your", NamedTextColor.GRAY))
-                .lore(Component.text("inventory into this slot.", NamedTextColor.GRAY))
-                .lore(Component.text("", NamedTextColor.GRAY))
-                .lore(Component.text("Cost varies by item rarity.", NamedTextColor.GRAY))
+                .displayName(Translations.component("core.menu.reforge.gold.name").color(NamedTextColor.GOLD))
+                .lore(List.of(Translations.componentLines("core.menu.reforge.gold.lore")))
                 .build()
                 .get();
     }
@@ -129,20 +128,10 @@ public class GuiReforge extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.empty()
-                        .append(Component.text("Add Augmentation Powder", NamedTextColor.LIGHT_PURPLE))
+                .displayName(Translations.component("core.menu.reforge.powder.name").color(NamedTextColor.LIGHT_PURPLE)
                         .appendSpace()
-                        .append(Component.text("OPTIONAL", NamedTextColor.RED)))
-                .lore(Component.text("Drag an augmentation powder", NamedTextColor.GRAY))
-                .lore(Component.text("from your inventory into", NamedTextColor.GRAY))
-                .lore(Component.text("this slot.", NamedTextColor.GRAY))
-                .lore(Component.empty())
-                .lore(Component.text("An augmentation powder will", NamedTextColor.GRAY))
-                .lore(Component.text("increase the minimum random", NamedTextColor.GRAY))
-                .lore(Component.text("value for a stat.", NamedTextColor.GRAY))
-                .lore(Component.empty())
-                .lore(Component.text("Higher tiered powders", NamedTextColor.GRAY))
-                .lore(Component.text("yield better results.", NamedTextColor.GRAY))
+                        .append(Translations.component("core.menu.reforge.powder.optional").color(NamedTextColor.RED)))
+                .lore(List.of(Translations.componentLines("core.menu.reforge.powder.lore")))
                 .build()
                 .get();
     }
@@ -154,9 +143,8 @@ public class GuiReforge extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.text("Add Item", NamedTextColor.GREEN))
-                .lore(Component.text("Drag an item from your", NamedTextColor.GRAY))
-                .lore(Component.text("inventory into this slot.", NamedTextColor.GRAY))
+                .displayName(Translations.component("core.menu.reforge.item.name").color(NamedTextColor.GREEN))
+                .lore(List.of(Translations.componentLines("core.menu.reforge.item.lore")))
                 .build()
                 .get();
     }

@@ -4,11 +4,12 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -123,10 +124,16 @@ public class RoleBuild {
             return Component.empty();
         }
         skill = buildSkill.getSkill();
-        Component descriptionComponent = UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), buildSkill.getLevel());
+        Component descriptionComponent = Component.empty()
+                .append(skill.getDisplayName().color(NamedTextColor.YELLOW))
+                .append(Component.text(" ("))
+                .append(Component.text(buildSkill.getLevel(), NamedTextColor.GREEN))
+                .append(Component.text(")"));
 
-        for (Component component : skill.parseDescription(buildSkill.getLevel())) {
-            descriptionComponent = descriptionComponent.appendNewline().append(component);
+        for (Component component : skill.getDescription(buildSkill.getLevel())) {
+            // Apply default styling if absent
+            Component styled = component.colorIfAbsent(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+            descriptionComponent = descriptionComponent.appendNewline().append(styled);
         }
         return buildSkill.getComponent()
                 .clickEvent(ClickEvent.runCommand("/skilldescription " + skill.getName().replace(" ", "_") + " " + buildSkill.getLevel()))
@@ -144,13 +151,21 @@ public class RoleBuild {
         Component passiveb = getBuildSkillComponent(SkillType.PASSIVE_B);
         Component global = getBuildSkillComponent(SkillType.GLOBAL);
 
-        Component component = Component.text("Sword: ", NamedTextColor.WHITE).append(sword).appendNewline()
-                .append(Component.text("Axe: ", NamedTextColor.WHITE).append(axe).appendNewline())
-                .append(Component.text("Bow: ", NamedTextColor.WHITE).append(bow).appendNewline())
-                .append(Component.text("Passive A: ", NamedTextColor.WHITE).append(passivea).appendNewline())
-                .append(Component.text("Passive B: ", NamedTextColor.WHITE).append(passiveb).appendNewline())
-                .append(Component.text("Global: ", NamedTextColor.WHITE).append(global));
+        Component component = buildSlotLabel("sword").append(sword).appendNewline()
+                .append(buildSlotLabel("axe").append(axe).appendNewline())
+                .append(buildSlotLabel("bow").append(bow).appendNewline())
+                .append(buildSlotLabel("passive-a").append(passivea).appendNewline())
+                .append(buildSlotLabel("passive-b").append(passiveb).appendNewline())
+                .append(buildSlotLabel("global").append(global));
         return component;
+    }
+
+    /**
+     * Builds a localized build-slot label like {@code "Sword: "} from {@code champions.build.slot.<slot>}.
+     */
+    private Component buildSlotLabel(String slot) {
+        return Translations.component("champions.build.slot." + slot).color(NamedTextColor.WHITE)
+                .append(Component.text(": ", NamedTextColor.WHITE));
     }
 
     /**

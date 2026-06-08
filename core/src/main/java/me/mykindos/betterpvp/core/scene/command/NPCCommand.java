@@ -16,14 +16,14 @@ public class NPCCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "NPC Commands";
+        return "core.command.n-p-c.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "NPC", "NPC Help");
-        UtilMessage.message(player, "NPC", "<alt2>/npc spawn <type> <name></alt2> - Spawns an NPC");
-        UtilMessage.message(player, "NPC", "<alt2>/npc remove <ID></alt2> - Removes an NPC");
-        UtilMessage.message(player, "NPC", "<alt2>/npc list</alt2> - Lists all NPCs");
+        UtilMessage.message(player, "core.prefix.command", "core.command.npc.help.title");
+        UtilMessage.message(player, "core.prefix.command", "core.command.npc.help.spawn");
+        UtilMessage.message(player, "core.prefix.command", "core.command.npc.help.remove");
+        UtilMessage.message(player, "core.prefix.command", "core.command.npc.help.list");
     }
 }

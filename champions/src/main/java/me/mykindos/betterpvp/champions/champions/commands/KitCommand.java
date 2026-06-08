@@ -39,7 +39,7 @@ public class KitCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Equip a kit";
+        return "champions.command.kit.description";
     }
 
 

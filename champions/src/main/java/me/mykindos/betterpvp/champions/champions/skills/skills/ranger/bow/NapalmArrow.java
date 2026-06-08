@@ -20,7 +20,11 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -79,16 +83,12 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Shoot an ignited arrow that explodes on the ground",
-                "into a field of napalm that lasts " + getValueString(this::getDuration, level) + " seconds",
-                "and <effect>Ignites</effect> anyone inside for " + getValueString(this::getBurnDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component burnDuration = getValueComponent(this::getBurnDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component ignites = Translations.component("champions.skill.effect.ignites.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.napalm-arrow.description", duration, burnDuration, cooldown, ignites);
     }
 
     public double getBurnDuration(int level) {

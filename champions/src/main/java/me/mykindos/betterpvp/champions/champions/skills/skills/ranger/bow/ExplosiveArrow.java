@@ -20,9 +20,13 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -70,16 +74,11 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Shoot an arrow full of gunpowder which will",
-                "explode upon hitting the ground or an enemy,",
-                "dealing " + getValueString(this::getDamage, level) + " damage to players within " + getValueString(this::getRadius, level) + " blocks",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component radius = getValueComponent(this::getRadius, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.ranger.explosive-arrow.description", damage, radius, cooldown);
     }
 
     public double getDamage(int level) {

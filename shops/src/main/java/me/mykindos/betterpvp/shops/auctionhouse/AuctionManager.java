@@ -69,19 +69,19 @@ public class AuctionManager {
                         .addClientContext(player).submit();
             });
         });
-        UtilMessage.simpleMessage(player, "Auction House", "Listing created successfully.");
+        UtilMessage.message(player, "core.prefix.auction-house", "shops.auctionhouse.listing-created");
         log.info("{} has created a listing for {} for ${}", player.getName(), auction.getItemStack().getType().name(), auction.getSellPrice()).setAction("ITEM_AUCTION_LIST").submit();
     }
 
     public void buyAuction(Player player, Auction auction) {
         AuctionBuyEvent auctionBuyEvent = UtilServer.callEvent(new AuctionBuyEvent(player, auction));
         if (auctionBuyEvent.isCancelled()) {
-            UtilMessage.simpleMessage(player, "Auction House", auctionBuyEvent.getCancelReason());
+            UtilMessage.message(player, "core.prefix.auction-house", auctionBuyEvent.getCancelReason());
             return;
         }
 
         if(auctionBuyEvent.getAuction().isCancelled()) {
-            UtilMessage.simpleMessage(player, "Auction House", "This auction has been cancelled.");
+            UtilMessage.message(player, "core.prefix.auction-house", "shops.auctionhouse.auction-cancelled");
             return;
         }
 
@@ -115,17 +115,17 @@ public class AuctionManager {
     public void cancelAuction(Player player, Auction auction) {
         AuctionCancelEvent auctionCancelEvent = UtilServer.callEvent(new AuctionCancelEvent(player, auction));
         if (auctionCancelEvent.isCancelled()) {
-            UtilMessage.simpleMessage(player, "Auction House", auctionCancelEvent.getCancelReason());
+            UtilMessage.message(player, "core.prefix.auction-house", auctionCancelEvent.getCancelReason());
             return;
         }
 
         if (auction.isSold() || auction.isDelivered()) {
-            UtilMessage.simpleMessage(player, "Auction House", "This auction has already been sold.");
+            UtilMessage.message(player, "core.prefix.auction-house", "shops.auctionhouse.already-sold");
             return;
         }
 
         if(auction.isCancelled()) {
-            UtilMessage.simpleMessage(player, "Auction House", "This auction has already been cancelled.");
+            UtilMessage.message(player, "core.prefix.auction-house", "shops.auctionhouse.already-cancelled");
             return;
         }
 

@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueBut
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
@@ -119,7 +120,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
         this.logRepository = logRepository;
         setContent(List.of(new SimpleItem(ItemView.builder()
                 .material(Material.PAPER)
-                .displayName(Component.text("Loading..."))
+                .displayName(Translations.component("core.menu.button.loading.name"))
                 .build())
         ));
         refresh();
@@ -176,8 +177,8 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
             log.error("Error loading cached logs", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
-                    .displayName(Component.text("Error! Check console!"))
-                    .lore(Component.text("Please inform staff if you see this"))
+                    .displayName(Translations.component("core.menu.log.error.name"))
+                    .lore(Translations.component("core.menu.log.error.lore"))
                     .build()));
         }));
         return future.thenApply(logs -> {

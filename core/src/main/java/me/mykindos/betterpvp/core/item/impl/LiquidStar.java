@@ -14,6 +14,6 @@ public class LiquidStar extends BaseItem {
 
     @Inject
     private LiquidStar() {
-        super("Liquid Star", Item.model("liquid_star", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.liquid-star.name"), Item.model("liquid_star", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

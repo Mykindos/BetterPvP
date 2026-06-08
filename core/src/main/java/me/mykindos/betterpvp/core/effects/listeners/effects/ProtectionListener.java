@@ -56,7 +56,7 @@ public class ProtectionListener implements Listener {
 
         if (event.getItem().getOwner() == null || !event.getItem().getOwner().equals(player.getUniqueId())) {
             if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
-                UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
+                UtilMessage.message(player, "core.prefix.protection", "core.effect.protection.cannot_pickup");
                 EffectTypes.disableProtectionReminder(player);
             }
             event.setCancelled(true);
@@ -98,12 +98,12 @@ public class ProtectionListener implements Listener {
         if (event.getDamagee() instanceof Player damagee &&
                 event.getDamager() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
-                UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
+                UtilMessage.message(damager, "core.prefix.protected", "core.effect.protection.target_protected");
                 event.setResult(Event.Result.DENY);
             }
 
             if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
-                UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
+                UtilMessage.message(damager, "core.prefix.protected", "core.effect.protection.cannot_damage");
                 EffectTypes.disableProtectionReminder(damager);
                 event.setResult(Event.Result.DENY);
             }
@@ -115,12 +115,12 @@ public class ProtectionListener implements Listener {
         if (event.getDamagee() instanceof Player damagee &&
                 event.getDamager() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
-                UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
+                UtilMessage.message(damager, "core.prefix.protected", "core.effect.protection.target_protected");
                 event.setCancelled(true);
             }
 
             if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
-                UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
+                UtilMessage.message(damager, "core.prefix.protected", "core.effect.protection.cannot_damage");
                 EffectTypes.disableProtectionReminder(damager);
                 event.setCancelled(true);
             }
@@ -131,12 +131,12 @@ public class ProtectionListener implements Listener {
     public void onThrowableHit(ThrowableHitEntityEvent event) {
         if (event.getCollision() instanceof Player damagee && event.getThrowable().getThrower() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
-                UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
+                UtilMessage.message(damager, "core.prefix.protected", "core.effect.protection.target_protected");
                 event.setCancelled(true);
             }
 
             if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
-                UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
+                UtilMessage.message(damager, "core.prefix.protected", "core.effect.protection.cannot_damage");
                 EffectTypes.disableProtectionReminder(damager);
                 event.setCancelled(true);
             }

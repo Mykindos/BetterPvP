@@ -25,7 +25,7 @@ public class TemperedPin extends BaseItem {
 
     @Inject
     private TemperedPin() {
-        super("Tempered Pin", Item.model("tempered_pin", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.tempered-pin.name"), Item.model("tempered_pin", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
         addBaseComponent(new ReinforcementComponent(ItemRarity.RARE));
     }
 

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.scythe;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
@@ -137,12 +139,12 @@ public class SoulHarvestAbility extends AbstractInteraction implements Listener,
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Soul Harvest");
+        return Translations.component("champions.ability.soul-harvest.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Collect souls of fallen players and mobs to harvest their souls, gaining damage and speed.");
+        return Translations.component("champions.ability.soul-harvest.description");
     }
 
     @Override
@@ -162,7 +164,7 @@ public class SoulHarvestAbility extends AbstractInteraction implements Listener,
         // Call usage event
         var checkUsageEvent = UtilServer.callEvent(new PlayerUseItemEvent(player, itemInstance, true));
         if (checkUsageEvent.isCancelled()) {
-            UtilMessage.simpleMessage(player, "Restriction", "You cannot use this weapon here.");
+            UtilMessage.message(player, "core.prefix.restriction", "champions.item.soul-harvest.restricted");
             playerData.remove(player.getUniqueId());
             pause(player, data);
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -47,12 +49,12 @@ public class EffectRouletteAbility extends CooldownInteraction implements Displa
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Effect Roulette");
+        return Translations.component("champions.ability.effect-roulette.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Grants a random effect for a short duration. The effect can be a positive or negative one.");
+        return Translations.component("champions.ability.effect-roulette.description");
     }
 
     @Override
@@ -73,15 +75,11 @@ public class EffectRouletteAbility extends CooldownInteraction implements Displa
         EffectType randomEffect = validEffectTypes.get(UtilMath.RANDOM.nextInt(validEffectTypes.size()));
         int randomLevel = UtilMath.RANDOM.nextInt(4) + 1;
         effectManager.addEffect(entity, randomEffect, randomLevel, (long) (duration * 1000));
-        UtilMessage.message(entity, "Item",
-                Component.text("You used ", NamedTextColor.GRAY)
-                        .append(getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW))
-                        .append(Component.text(".", NamedTextColor.GRAY)));
-        UtilMessage.message(entity, "Effect",
-                Component.text("You have been granted ", NamedTextColor.GREEN)
-                        .append(Component.text(randomEffect.getName(), NamedTextColor.YELLOW))
-                        .append(Component.text(" Level " + randomLevel, NamedTextColor.GREEN))
-                        .append(Component.text(" for " + duration + " seconds.", NamedTextColor.GREEN)));
+        UtilMessage.message(entity, "core.prefix.item", "champions.item.used", getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW));
+        UtilMessage.message(entity, "core.prefix.effect", "champions.item.effect-granted",
+                Component.text(randomEffect.getName(), NamedTextColor.YELLOW),
+                Component.text(String.valueOf(randomLevel), NamedTextColor.GREEN),
+                Component.text(String.valueOf(duration), NamedTextColor.GREEN));
         UtilSound.playSound(entity, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
         return InteractionResult.Success.ADVANCE;
     }

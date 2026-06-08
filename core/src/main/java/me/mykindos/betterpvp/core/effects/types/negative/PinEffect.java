@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.effects.types.negative;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -113,5 +114,11 @@ public class PinEffect extends VanillaEffectType {
     @Override
     public String getGenericDescription() {
         return "<white>" + getName() + "</white> immobilizes the target until they jump a certain amount of times.";
+    }
+
+    @Override
+    public Component getGenericDescriptionComponent() {
+        return Translations.component("core.effect.pin.generic",
+                Component.text(getName(), NamedTextColor.WHITE));
     }
 }

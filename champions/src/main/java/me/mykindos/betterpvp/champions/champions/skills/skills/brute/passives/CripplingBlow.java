@@ -14,7 +14,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,12 +44,17 @@ public class CripplingBlow extends Skill implements PassiveSkill, DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Enemies you hit with an axe don't take knockback",
-                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component slowness = Component.text(
+                UtilFormat.getRomanNumeral(slownessStrength),
+                NamedTextColor.YELLOW
+        );
+        Component duration = getValueComponent(this::getDuration, level);
+        return Translations.componentLines(
+                "champions.skill.brute.crippling-blow.description",
+                slowness,
+                duration
+        );
     }
 
     public double getDuration(int level) {

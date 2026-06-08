@@ -22,8 +22,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -71,23 +73,14 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "Hold right click with a Sword to channel",
-                "",
-                "Charges <val>" + getValueString(this::getChargePerSecond, level, 100, "%", 0) + "</val> per second",
-                "",
-                "Release right click to pounce forward",
-                "in the direction you are looking",
-                "",
-                "Colliding with another player mid-air",
-                "will deal up to " + getValueString(this::getDamage, level) + " damage and apply",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "Taking damage cancels charge",
-                "",
-                "Cooldown: <val>" + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component chargePerSecond = getValueComponent(this::getChargePerSecond, level, 0);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component slownessII = Translations.component("champions.skill.effect.slowness",
+                Component.text("II")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.wolfs-pounce.description", chargePerSecond, damage, slowDuration, cooldown, slownessII);
     }
 
     public double getSlowDuration(int level) {
@@ -134,7 +127,7 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
     }
 
     public boolean use(Player player, ChargeData chargeData, int level) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
 
         // Velocity
         final double charge = chargeData.getCharge();
@@ -167,8 +160,8 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
         championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
         // Cues
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(damagee.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 0.5f);
     }
 
@@ -181,7 +174,7 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
         if (hasSkill(player) && charging.containsKey(player)) {
             charging.get(player).setCharge(0);
             // Cues
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.wolfs-pounce.interrupted", getDisplayName().color(NamedTextColor.GREEN));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
         }
     }
@@ -247,7 +240,7 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
         }
         if (!UtilBlock.isGrounded(player, 2)){
             if (data.canSendMessage()) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
+                UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.wolfs-pounce.air", getDisplayName().color(NamedTextColor.GREEN));
                 data.messageSent();
             }
             return TickBehavior.PAUSE;

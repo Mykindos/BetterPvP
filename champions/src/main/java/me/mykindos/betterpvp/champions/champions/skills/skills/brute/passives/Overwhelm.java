@@ -13,7 +13,11 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,16 +46,16 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Deal bonus damage based on how much higher your",
-                "Current health percentage is compared to your target's.",
-                "For every " + getValueString(this::getHealthOverTarget, level, 100, "%", 0) + " over your target's health percentage",
-                "You deal " + getValueString(this::getBonusDamage, level) + " bonus damage",
-                "",
-                "Max bonus: " + getValueString(this::getMaxDamage, level) + " damage"
-             };
+    public Component[] getDescription(int level) {
+        Component health = getValueComponent(this::getHealthOverTarget, level, 100, 0, "%");
+        Component bonus = getValueComponent(this::getBonusDamage, level);
+        Component max = getValueComponent(this::getMaxDamage, level);
+        return Translations.componentLines(
+                "champions.skill.brute.overwhelm.description",
+                health,
+                bonus,
+                max
+        );
     }
 
     public double getMaxDamage(int level) {

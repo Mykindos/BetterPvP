@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.renderer.LorePages;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Singleton
 public class ShowItemCommand extends Command {
@@ -45,7 +47,7 @@ public class ShowItemCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Sends the current held item to chat";
+        return "core.command.show-item.description";
     }
 
     @Override
@@ -70,7 +72,7 @@ public class ShowItemCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (!cooldownManager.use(player, getName(), 15d, false, true)){
-            UtilMessage.message(player, "Command", "You must wait some time between using this command again");
+            UtilMessage.message(player, "core.prefix.command", "core.command.showitem.cooldown");
             return;
         }
         ItemStack itemStack = player.getInventory().getItemInMainHand();
@@ -107,9 +109,23 @@ public class ShowItemCommand extends Command {
             }
         }
 
-        Component messageComponent = Component.text("I am currently holding [", NamedTextColor.WHITE)
+        // For BetterPvP items, itemStack was rebuilt from the translatable view above so name/lore are
+        // reconstructed from translatable components; for vanilla items it is the held item (only existing
+        // translatable name/lore will be resolved, literal text is left untouched).
+        final ItemStack shownItem = itemStack;
+        final Component itemName = Objects.requireNonNull(name);
+
+        // Per-recipient renderer: the chat pipeline calls this for each allowed recipient, so the hover item
+        // is localized into THAT recipient's locale (name + lore). Recipient selection, mute, ignore, routing,
+        // formatting and logging all stay inside the chat system.
+        final Function<Player, Component> messageRenderer = recipient -> Component.text("I am currently holding [", NamedTextColor.WHITE)
                 .decoration(TextDecoration.BOLD, false)
-                .append(Objects.requireNonNull(name).hoverEvent(itemStack.asHoverEvent()))
+                .append(itemName.hoverEvent(Translations.renderItemStack(shownItem, recipient.locale())))
                 .append(Component.text("]", NamedTextColor.WHITE));
-        UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player, client.getGamer().getChatChannel(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));    }
+
+        // Representative message (sender's locale) used by the pipeline for filtering/logging and as a fallback.
+        final Component baseMessage = messageRenderer.apply(player);
+        UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player,
+                client.getGamer().getChatChannel(), UtilMessage.deserialize("<yellow>%s:</yellow>"), baseMessage, messageRenderer)));
+    }
 }

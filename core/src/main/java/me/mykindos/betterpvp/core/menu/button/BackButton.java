@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.menu.button;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -44,8 +45,11 @@ public class BackButton extends FlashingButton<Gui> {
 
     @Override
     public ItemProvider getItemProvider(Gui gui) {
-        final Component standardComponent = Component.text(previousMenu == null ? "Close" : "Back", NamedTextColor.RED);
-        final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
+        final Component standardComponent = Translations.component(previousMenu == null
+                ? "core.menu.button.close.name" : "core.menu.button.back.name").color(NamedTextColor.RED);
+        final Component flashComponent = Component.empty()
+                .append(Translations.component("core.menu.button.click-me.name").color(NamedTextColor.GREEN))
+                .appendSpace().append(standardComponent);
 
         final ItemView.ItemViewBuilder builder = ItemView.builder();
         builder.material(Material.BARRIER);

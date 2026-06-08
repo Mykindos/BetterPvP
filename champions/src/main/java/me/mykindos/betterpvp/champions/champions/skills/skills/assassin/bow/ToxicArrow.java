@@ -12,9 +12,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -46,19 +49,30 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Your next arrow will give your target ",
-                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.POISON.getDescription(poisonStrength)
-
-        };
+    public Component[] getDescription(int level) {
+        Component poison = Translations.component("champions.skill.effect.poison",
+                Component.text(UtilFormat.getRomanNumeral(poisonStrength))).color(NamedTextColor.WHITE);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component[] components = Translations.componentLines(
+                "champions.skill.assassin.toxic-arrow.description",
+                poison,
+                duration,
+                cooldown
+        );
+        Component poisonDetail = Translations.component("champions.skill.effect.poison",
+                Component.text(UtilFormat.getRomanNumeral(poisonStrength))).color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.effect.poison.detail",
+                poisonDetail,
+                Component.text(String.valueOf(poisonStrength * 3), NamedTextColor.GREEN),
+                Component.text("1.25", NamedTextColor.YELLOW)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {
@@ -100,9 +114,9 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         championsManager.getEffects().addEffect(target, EffectTypes.POISON, poisonStrength, (long) ((baseDuration + level) * 1000L));
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @Override

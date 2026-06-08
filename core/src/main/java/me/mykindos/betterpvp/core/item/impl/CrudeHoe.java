@@ -22,7 +22,7 @@ public class CrudeHoe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 131;
 
     public CrudeHoe() {
-        super("Crude Hoe", ItemStack.of(Material.STONE_HOE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.crude-hoe.name"), ItemStack.of(Material.STONE_HOE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

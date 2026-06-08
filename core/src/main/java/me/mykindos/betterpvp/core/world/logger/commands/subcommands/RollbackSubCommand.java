@@ -51,14 +51,14 @@ public class RollbackSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Roll back block changes within a radius and time period";
+        return "core.command.rollback.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "World Logger", "Usage: /wl rollback radius:<radius> time:<time> [player:<player>]");
-            UtilMessage.message(player, "World Logger", "Example: /wl rollback radius:5 time:3h player:Mykindos");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.rollback.usage");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.rollback.example");
             return;
         }
 
@@ -72,7 +72,7 @@ public class RollbackSubCommand extends Command {
                 try {
                     radius = Integer.parseInt(arg.substring(7));
                 } catch (NumberFormatException e) {
-                    UtilMessage.message(player, "World Logger", "Invalid radius value. Must be a number.");
+                    UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.common.invalid_radius");
                     return;
                 }
             } else if (arg.startsWith("time:")) {
@@ -83,19 +83,19 @@ public class RollbackSubCommand extends Command {
         }
 
         if (radius < 0) {
-            UtilMessage.message(player, "World Logger", "You must specify a valid radius.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.common.radius_required");
             return;
         }
 
         if (timeString == null) {
-            UtilMessage.message(player, "World Logger", "You must specify a time period.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.common.time_required");
             return;
         }
 
         // Parse time string (e.g., 3h, 30m, 1d)
         long timeInMillis = parseTimeString(timeString);
         if (timeInMillis <= 0) {
-            UtilMessage.message(player, "World Logger", "Invalid time format. Use format like 3h, 30m, 1d.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.common.invalid_time_format");
             return;
         }
 
@@ -107,7 +107,7 @@ public class RollbackSubCommand extends Command {
         final int finalRadius = radius;
         final String finalTargetPlayer = targetPlayer;
 
-        UtilMessage.message(player, "World Logger", "Starting rollback process...");
+        UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.rollback.start");
 
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             var query = ctx.selectQuery();
@@ -155,17 +155,17 @@ public class RollbackSubCommand extends Command {
                 });
 
                 if (worldLogs.isEmpty()) {
-                    UtilMessage.message(player, "World Logger", "No blocks found to roll back.");
+                    UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.rollback.none");
                     return;
                 }
 
                 // Process the rollback
                 processRollback(worldLogs);
 
-                UtilMessage.message(player, "World Logger", "Rollback completed.");
+                UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.rollback.completed");
 
             } catch (Exception ex) {
-                UtilMessage.simpleMessage(player, "World Logger", "Failed to rollback blocks");
+                UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.rollback.failed");
                 log.error("Failed to rollback blocks", ex).submit();
             }
         });

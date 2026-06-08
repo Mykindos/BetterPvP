@@ -25,10 +25,9 @@ public class Hammer extends BaseItem implements NexoItem {
 
     @Inject
     private Hammer() {
-        super("Hammer", ItemStack.of(Material.PAPER), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.hammer.name"), ItemStack.of(Material.PAPER), ItemGroup.TOOL, ItemRarity.COMMON);
 
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Right-click an anvil to forge items with this hammer.")));
+        addBaseComponent(DescriptionComponent.translatable(1, "core.item.hammer.lore"));
     }
 
     @Override

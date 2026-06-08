@@ -41,7 +41,7 @@ public class PlayerPunishmentHistoryCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Shows your own punishment history";
+        return "core.command.player-punishment-history.description";
     }
 
     @Override

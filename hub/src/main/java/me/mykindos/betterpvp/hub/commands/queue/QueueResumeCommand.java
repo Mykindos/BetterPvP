@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 import me.mykindos.betterpvp.orchestration.model.QueueState;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -29,23 +31,25 @@ public class QueueResumeCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Re-open queue admissions for a server";
+        return "hub.command.queue-resume.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.simpleMessage(player, "Queue", "<red>Usage: /queue resume <server>");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.resume.usage");
             return;
         }
 
         final String serverName = args[0];
         try {
             orchestrationGateway.setQueueState(QueueCommandSupport.buildTarget(serverName), QueueState.OPEN).join();
-            UtilMessage.simpleMessage(player, "Queue", "Set queue state for <yellow>" + serverName + "</yellow> to <yellow>OPEN");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.state-set",
+                    Component.text(serverName, NamedTextColor.YELLOW),
+                    Component.text(QueueState.OPEN.name(), NamedTextColor.YELLOW));
         } catch (Exception ex) {
             QueueCommandSupport.logCommandFailure("update queue state for " + serverName + " to OPEN", ex);
-            UtilMessage.simpleMessage(player, "Queue", "<red>Failed to update queue state.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.state-set.failed");
         }
     }
 

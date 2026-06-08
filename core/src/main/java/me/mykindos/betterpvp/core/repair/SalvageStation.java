@@ -26,8 +26,7 @@ public class SalvageStation extends BaseItem {
 
     @Inject
     public SalvageStation() {
-        super("Salvage Station", ItemStack.of(Material.STONECUTTER), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and right-click with a piece of gear to salvage it into Reinforcements of matching rarity.")));
+        super(translatableName("core.item.salvage-station.name"), ItemStack.of(Material.STONECUTTER), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
+        addBaseComponent(DescriptionComponent.translatable(1, "core.item.salvage-station.lore"));
     }
 }

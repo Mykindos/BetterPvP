@@ -2,16 +2,18 @@ package me.mykindos.betterpvp.core.command.commands.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
-@CustomLog
 public class IgnoreCommand extends Command {
+
+    private static final String IGNORE_PREFIX = "core.prefix.ignore";
 
     private final ClientManager clientManager;
 
@@ -27,7 +29,7 @@ public class IgnoreCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Ignore private messages from a player";
+        return "core.command.ignore.description";
     }
 
     @Override
@@ -36,22 +38,25 @@ public class IgnoreCommand extends Command {
 
             clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isEmpty()) {
-                    UtilMessage.message(player, "Ignore", "Cannot find a player with the name <yellow>%s</yellow>", args[0]);
+                    UtilMessage.message(player, IGNORE_PREFIX, "core.command.ignore.player_not_found",
+                            Component.text(args[0], NamedTextColor.YELLOW));
                     return;
                 }
                 Client target = targetOptional.get();
                 if (client.getIgnores().contains(target.getUniqueId())) {
                     //this player is already ignored, unignore them
                     clientManager.removeIgnore(client, target);
-                    UtilMessage.message(player, "Ignore", "You have unignored <yellow>%s</yellow>", target.getName());
+                    UtilMessage.message(player, IGNORE_PREFIX, "core.command.ignore.remove.success",
+                            Component.text(target.getName(), NamedTextColor.YELLOW));
                     return;
                 }
                 clientManager.saveIgnore(client, target);
-                UtilMessage.message(player, "Ignore", "You have ignored <yellow>%s</yellow>", target.getName());
+                UtilMessage.message(player, IGNORE_PREFIX, "core.command.ignore.add.success",
+                        Component.text(target.getName(), NamedTextColor.YELLOW));
             });
 
         } else {
-            UtilMessage.simpleMessage(player, "Command", "Usage: /ignore <player>");
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.ignore.usage");
         }
     }
 

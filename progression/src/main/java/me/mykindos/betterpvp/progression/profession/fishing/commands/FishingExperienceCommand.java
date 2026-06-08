@@ -11,6 +11,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -27,7 +29,7 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
 
     @Override
     public String getDescription() {
-        return "Base fishing experience command";
+        return "progression.command.fishing-experience.description";
     }
 
     @Override
@@ -61,8 +63,8 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
 
         @Override
         public String getDescription() {
-            return "set a players woodcutting experience";
-        }
+        return "progression.command.set-fishing-experience.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -72,13 +74,14 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
         @Override
         public void execute(CommandSender sender, String[] args) {
             if (args.length < 2) {
-                UtilMessage.message(sender, "Fishing", "Usage: /fishingexp set <player> <experience>");
+                UtilMessage.message(sender, "core.prefix.fishing", "progression.command.fishingexp.usage");
                 return;
             }
 
             clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isEmpty()) {
-                    UtilMessage.message(sender, "Fishing", "Cannot find a player with the name <yellow>%s</yellow>", args[0]);
+                    UtilMessage.message(sender, "core.prefix.fishing", "progression.command.exp.player-not-found",
+                            Component.text(args[0], NamedTextColor.YELLOW));
                     return;
                 }
                 Client target = targetOptional.get();
@@ -90,7 +93,8 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
                         throw new NumberFormatException();
                     }
                 } catch (NumberFormatException ignored) {
-                    UtilMessage.message(sender, "Fishing", "<green>%s</green> is an invalid amount of experience", args[1]);
+                    UtilMessage.message(sender, "core.prefix.fishing", "progression.command.exp.invalid-amount",
+                            Component.text(args[1], NamedTextColor.GREEN));
                     return;
                 }
                 ProfessionData professionData = fishingHandler.getProfessionData(target.getUniqueId());
@@ -99,8 +103,10 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
 
                 professionProfileManager.getRepository().saveExperience(target.getUniqueId(), professionData.getProfession(), professionData.getExperience());
 
-                UtilMessage.message(sender, "Fishing", "Set <yellow>%s</yellow>'s fishing experience to <green>%s</green> (was <white>%s</white>)",
-                        target.getName(), newExperience, oldExperience);
+                UtilMessage.message(sender, "core.prefix.fishing", "progression.command.fishingexp.set",
+                        Component.text(target.getName(), NamedTextColor.YELLOW),
+                        Component.text(newExperience, NamedTextColor.GREEN),
+                        Component.text(oldExperience, NamedTextColor.WHITE));
             });
         }
 

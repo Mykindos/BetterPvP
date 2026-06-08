@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -43,8 +44,8 @@ public class SpawnTransportButton extends ControlItem<ClanTravelHubMenu> {
         ItemView.ItemViewBuilder provider = ItemView.builder()
                 .material(material)
                 .itemModel(Key.key("betterpvp", "menu/gui/waystone/button"))
-                .displayName(Component.text("Spawn", namedTextColor, TextDecoration.BOLD))
-                .action(ClickActions.LEFT, Component.text("Teleport"));
+                .displayName(Translations.component("clans.menu.travel-hub.button.spawn.name").color(namedTextColor).decorate(TextDecoration.BOLD))
+                .action(ClickActions.LEFT, Translations.component("clans.menu.travel-hub.button.transport.action.teleport"));
         if (menu.isPressed(this)) {
             provider.itemModel(Key.key("betterpvp", "menu/gui/waystone/button_selected"));
         }

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.skill.menu.button;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.progression.profession.skill.tree.NodeSlotType;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -42,8 +44,10 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
     @Override
     public ItemProvider getItemProvider(ProfessionMenu professionMenu) {
         int levelsApplied = professionData.getBuild().getSkillLevel(progressionNode);
-        Component name = UtilMessage.deserialize("%s%s <white>- %d / %d", doesMeetRequirements() ? "<green>" : "<red>",
-                progressionNode.getDisplayName(), levelsApplied, progressionNode.getMaxLevel());
+        Component name = Translations.component("progression.menu.node.name",
+                Component.text(progressionNode.getDisplayName()).color(doesMeetRequirements() ? NamedTextColor.GREEN : NamedTextColor.RED),
+                Component.text(levelsApplied),
+                Component.text(progressionNode.getMaxLevel())).color(NamedTextColor.WHITE);
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder().material(Material.YELLOW_DYE)
                 .itemModel(Key.key("minecraft", "l_skilltree_node" + getModelData(levelsApplied)))
@@ -52,8 +56,9 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
         itemViewBuilder.glow(progressionNode.isGlowing());
 
         if (progressionNode.getDescription(levelsApplied) != null) {
-            for (String description : progressionNode.getDescription(levelsApplied)) {
-                itemViewBuilder.lore(UtilMessage.deserialize(description));
+            for (Component description : progressionNode.getDescription(levelsApplied)) {
+                // Apply safe default styling similar to Champions lore elsewhere
+                itemViewBuilder.lore(description);
             }
         }
 
@@ -64,21 +69,21 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
 
 
                 if(dependencies.getRequiredLevel() > 0) {
-                    itemViewBuilder.lore(UtilMessage.deserialize("<white>Required Level: <red>%d", dependencies.getRequiredLevel()));
+                    itemViewBuilder.lore(Translations.component("progression.menu.node.required-level", Component.text(dependencies.getRequiredLevel()).color(NamedTextColor.RED)).color(NamedTextColor.WHITE));
                     itemViewBuilder.lore(Component.text(""));
                 }
 
                 if(!dependencies.getNodes().isEmpty()) {
-                    itemViewBuilder.lore(UtilMessage.deserialize("<red>You must unlock a previous node first."));
+                    itemViewBuilder.lore(Translations.component("progression.menu.node.locked").color(NamedTextColor.RED));
 
                 }
             }
         } else {
             if (levelsApplied < progressionNode.getMaxLevel()) {
-                itemViewBuilder.action(ClickActions.LEFT, Component.text("Increase Level"));
+                itemViewBuilder.action(ClickActions.LEFT, Translations.component("progression.menu.node.increase-level"));
 
                 if (progressionNode.getMaxLevel() - levelsApplied >= 5) {
-                    itemViewBuilder.action(ClickActions.LEFT_SHIFT, Component.text("Increase Level by 5"));
+                    itemViewBuilder.action(ClickActions.LEFT_SHIFT, Translations.component("progression.menu.node.increase-level-5"));
                 }
             }
 
@@ -94,19 +99,19 @@ public class NodeButton extends ControlItem<ProfessionMenu> {
         int levelsAvailable = professionHandler.getAvailableSkillPoints(professionData);
 
         if (levelsAvailable <= 0) {
-            UtilMessage.message(player, "Profession", "You do not have any skill points available!");
+            UtilMessage.message(player, "core.prefix.profession", "progression.menu.node.no-skill-points");
             SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }
 
         if (professionData.getBuild().getSkillLevel(progressionNode) >= progressionNode.getMaxLevel()) {
-            UtilMessage.message(player, "Profession", "This skill is already the max level");
+            UtilMessage.message(player, "core.prefix.profession", "progression.menu.node.already-max-level");
             SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }
 
         if (!doesMeetRequirements()) {
-            UtilMessage.message(player, "Profession", "You do not meet the requirements to unlock this skill!");
+            UtilMessage.message(player, "core.prefix.profession", "progression.menu.node.requirements-not-met");
             SoundEffect.LOW_PITCH_PLING.play(player);
             return;
         }

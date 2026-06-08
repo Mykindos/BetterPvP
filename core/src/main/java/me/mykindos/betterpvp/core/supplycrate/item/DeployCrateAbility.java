@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrate;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrateController;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrateType;
@@ -48,12 +49,13 @@ public class DeployCrateAbility extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Deploy");
+        return Translations.component("core.ability.deploy-crate.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Order a " + type.getDisplayName() + " at " + locationDescriber + ".");
+        return Translations.component("core.ability.deploy-crate.description",
+                Component.text(type.getDisplayName()), Component.text(locationDescriber));
     }
 
     @Override
@@ -69,7 +71,8 @@ public class DeployCrateAbility extends AbstractInteraction implements Displayed
         final Location playerLocation = player.getLocation();
 
         if (type.isUnique() && controller.getSupplyCrates().stream().anyMatch(crate -> crate.getType() == type)) {
-            UtilMessage.message(player, "Server", "A <red>" + type.getDisplayName() + "</red> is already active on this server!");
+            UtilMessage.message(player, "core.prefix.server", "core.supplycrate.already_active",
+                    Component.text(type.getDisplayName(), NamedTextColor.RED));
             new SoundEffect(Sound.ENTITY_ITEM_BREAK, 0.5f, 0.89f).play(player);
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
 

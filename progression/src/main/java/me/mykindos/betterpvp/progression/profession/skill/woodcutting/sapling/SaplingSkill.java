@@ -21,6 +21,12 @@ public abstract class SaplingSkill extends ProfessionSkill {
     }
 
     @Override
+    public net.kyori.adventure.text.Component[] getDescriptionComponents(int level) {
+        return me.mykindos.betterpvp.core.locale.Translations.componentLines("progression.skill.sapling.desc",
+                net.kyori.adventure.text.Component.text(getTreeName()));
+    }
+
+    @Override
     public Material getIcon() {
         return getSaplingMaterial();
     }

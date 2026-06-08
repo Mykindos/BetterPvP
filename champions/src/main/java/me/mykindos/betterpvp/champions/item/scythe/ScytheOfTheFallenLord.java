@@ -67,7 +67,7 @@ public class ScytheOfTheFallenLord extends WeaponItem implements Reloadable {
     private ScytheOfTheFallenLord(Champions champions,
                                   ItemFactory itemFactory,
                                   SoulHarvestAbility soulHarvestAbility) {
-        super(champions, "Scythe of the Fallen Lord", model, ItemRarity.LEGENDARY);
+        super(champions, translatableName("champions.item.scythe-of-the-fallen-lord.name"), model, ItemRarity.LEGENDARY);
         this.lifestealAbility = new LifestealAbility(champions, itemFactory, this, this::getHeal);
         this.soulHarvestAbility = soulHarvestAbility;
         this.itemFactory = itemFactory;

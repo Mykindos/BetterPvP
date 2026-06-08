@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.thornfang;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -64,12 +66,12 @@ public class HuntersBrand extends AbstractInteraction implements Listener, Displ
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Hunter's Brand");
+        return Translations.component("champions.ability.hunters-brand.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Land 2 consecutive Needlegrasp resets on the same target to trigger a frenzy state. Also deals bonus damage to poisoned enemies.");
+        return Translations.component("champions.ability.hunters-brand.description");
     }
 
     @Override

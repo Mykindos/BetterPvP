@@ -10,6 +10,6 @@ public class IngotCastingMold extends CastingMold {
 
     @Inject
     private IngotCastingMold() {
-        super("Ingot Casting Mold", "ingot");
+        super(translatableName("core.item.ingot-casting-mold.name"), "ingot");
     }
 }

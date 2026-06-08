@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.client.stats.display.AbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.domination.map.DominationMapStatMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -28,9 +29,9 @@ public class DominationMapStatButton extends ControlItem<AbstractStatMenu> {
 
         return ItemView.builder()
                 .material(Material.MAP)
-                .displayName(Component.text("Map Specific Stats"))
+                .displayName(Translations.component("core.menu.stats.champions.button.map-specific.name"))
                 .frameLore(true)
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }
 

@@ -18,6 +18,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -60,16 +64,30 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Smash the hilt of your sword into",
-                "your opponent, dealing " + getValueString(this::getDamage, level) + " damage and",
-                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component slowness = Translations.component("champions.skill.effect.slowness",
+                Component.text(UtilFormat.getRomanNumeral(slowStrength))).color(NamedTextColor.WHITE);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component[] components = Translations.componentLines(
+                "champions.skill.knight.hilt-smash.description",
+                damage,
+                slowness,
+                duration,
+                cooldown
+        );
+        Component slownessDetail = Translations.component("champions.skill.effect.slowness.name").color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.knight.hilt-smash.detail",
+                slownessDetail,
+                Component.text(String.valueOf(15 * slowStrength), NamedTextColor.GREEN)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDamage(int level) {
@@ -138,12 +156,12 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
         }
 
         if (ent == null || !withinRange || isFriendly) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.knight.hilt-smash.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 1.0F, 0.0F);
         } else {
-            UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
+            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(ent.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             UtilDamage.doDamage(new DamageEvent(ent, player, null, new SkillDamageCause(this), getDamage(level), getName()));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
         }

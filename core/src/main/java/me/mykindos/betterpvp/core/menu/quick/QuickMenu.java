@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.stats.menu.LeaderboardCategoryMenu;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -99,7 +100,7 @@ public class QuickMenu {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/crafting_table_icon"))
-                .displayName(Component.text("Crafting Grid", TextColor.color(255, 149, 28), TextDecoration.BOLD))
+                .displayName(Translations.component("core.menu.quick.button.crafting.name").color(TextColor.color(255, 149, 28)).decorate(TextDecoration.BOLD))
                 .build();
     }
 
@@ -107,8 +108,8 @@ public class QuickMenu {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/settings_icon"))
-                .displayName(Component.text("Settings", TextColor.color(209, 209, 209), TextDecoration.BOLD))
-                .lore(Component.text("You can also use", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.quick.button.settings.name").color(TextColor.color(209, 209, 209)).decorate(TextDecoration.BOLD))
+                .lore(Translations.component("core.menu.quick.button.settings.lore").color(NamedTextColor.GRAY)
                         .appendSpace()
                         .append(Component.text("/settings", NamedTextColor.WHITE)))
                 .build();
@@ -118,8 +119,8 @@ public class QuickMenu {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/chest_icon"))
-                .displayName(Component.text("Items & Recipes", TextColor.color(255, 205, 66), TextDecoration.BOLD))
-                .lore(Component.text("You can also use", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.quick.button.items.name").color(TextColor.color(255, 205, 66)).decorate(TextDecoration.BOLD))
+                .lore(Translations.component("core.menu.quick.button.items.lore").color(NamedTextColor.GRAY)
                         .appendSpace()
                         .append(Component.text("/items", NamedTextColor.YELLOW)))
                 .build();
@@ -129,8 +130,8 @@ public class QuickMenu {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/rank_icon"))
-                .displayName(Component.text("Leaderboards", TextColor.color(158, 255, 66), TextDecoration.BOLD))
-                .lore(Component.text("You can also use", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.quick.button.leaderboards.name").color(TextColor.color(158, 255, 66)).decorate(TextDecoration.BOLD))
+                .lore(Translations.component("core.menu.quick.button.leaderboards.lore").color(NamedTextColor.GRAY)
                         .appendSpace()
                         .append(Component.text("/top", NamedTextColor.GREEN)))
                 .build();

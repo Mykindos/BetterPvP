@@ -19,7 +19,7 @@ public class HastePowder extends BaseItem {
 
     @Inject
     public HastePowder() {
-        super("Haste Powder", Item.model("haste_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.haste-powder.name"), Item.model("haste_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
         addBaseComponent(new StatAugmentationComponent(List.of(
                 new StatAugmentation(StatTypes.MELEE_ATTACK_SPEED, 1, 0.01, StatAugmentation.Operation.ADD)
         )));

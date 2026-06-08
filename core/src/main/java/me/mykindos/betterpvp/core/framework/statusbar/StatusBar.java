@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.health.EntityHealthService;
 import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -51,10 +52,11 @@ public class StatusBar extends ActionBar {
                     .append(energy);
         }
 
-        // Send the action bar to the player
+        // Send the action bar to the player. Resolve any translatable nodes (e.g. cooldown ability names)
+        // into the recipient's locale server-side, so they never display untranslated/as raw keys.
         final Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
         if (player != null) {
-            player.sendActionBar(component);
+            player.sendActionBar(Translations.render(component, player.locale()));
         }
     }
 

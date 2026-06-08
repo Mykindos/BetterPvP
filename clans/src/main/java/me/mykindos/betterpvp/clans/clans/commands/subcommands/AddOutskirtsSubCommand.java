@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
@@ -41,7 +43,7 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Adds outskirt claims around all of your claims";
+        return "clans.command.add-outskirts.description";
     }
 
     @Override
@@ -52,14 +54,14 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
             try {
                 borderSize = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                UtilMessage.message(player, "Clans", "<yellow>%s<gray> is not an integer", args[0]);
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.add-outskirts.not-integer", Component.text(args[0], NamedTextColor.YELLOW));
                 return;
             }
         }
 
         Optional<Clan> outskirtsOptional = clanManager.getClanByName("Outskirts");
         if (outskirtsOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.add-outskirts.no-outskirts-clan");
             return;
         }
 
@@ -83,11 +85,12 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
                 }
             }
         }
-        String message = "Added <yellow>%s<gray> claims to the outskirts";
-
-        UtilMessage.simpleMessage(player, "Clans", message, claims);
-        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> " + message.toLowerCase(),
-                player.getName(), claims), Rank.TRIAL_MOD);
+        final int finalClaims = claims;
+        UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.add-outskirts.success", Component.text(finalClaims, NamedTextColor.YELLOW));
+        clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(target -> {
+            UtilMessage.message(target, CLANS_PREFIX, "clans.command.clan.add-outskirts.notification",
+                    Component.text(player.getName(), NamedTextColor.YELLOW), Component.text(finalClaims, NamedTextColor.YELLOW));
+        });
     }
 
     @Override

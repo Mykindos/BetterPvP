@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.shops.auctionhouse.menu;
 
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
@@ -47,6 +48,6 @@ public class ListingCreationMenu extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Create Listing");
+        return Translations.component("shops.menu.listing-creation.title");
     }
 }

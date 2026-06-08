@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 
@@ -25,7 +26,7 @@ public class UUIDItemButton extends LogRepositoryButton {
     public ItemProvider getItemProvider() {
         List<Component> lore = List.of(
                 Component.text(name),
-                Component.text("Click to search by UUID")
+                Translations.component("core.menu.log.button.uuid.search.lore")
         );
         return ItemView.builder()
                 .displayName(Component.text(uuid))

@@ -23,7 +23,7 @@ public class CrudePickaxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 131;
 
     public CrudePickaxe() {
-        super("Crude Pickaxe", ItemStack.of(Material.STONE_PICKAXE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.crude-pickaxe.name"), ItemStack.of(Material.STONE_PICKAXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

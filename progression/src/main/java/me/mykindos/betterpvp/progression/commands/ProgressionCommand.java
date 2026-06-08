@@ -37,7 +37,7 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Progression base command";
+        return "progression.command.progression.description";
     }
 
     @Override
@@ -83,8 +83,8 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Reload the progression plugin";
-        }
+        return "progression.command.reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -110,7 +110,7 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
                 professionProfileRepository.loadProfile(UUID.fromString(client.getUuid()));
             }
 
-            UtilMessage.message(sender, "Progression", "Successfully reloaded progression");
+            UtilMessage.message(sender, "core.prefix.progression", "progression.command.progression.reload-success");
         }
     }
 

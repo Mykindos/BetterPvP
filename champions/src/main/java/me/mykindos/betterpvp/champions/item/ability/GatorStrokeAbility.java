@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -52,12 +54,12 @@ public class GatorStrokeAbility extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Gator Stroke");
+        return Translations.component("champions.ability.gator-stroke.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Propels the user at high speed. This ability only works in water.");
+        return Translations.component("champions.ability.gator-stroke.description");
     }
 
     @Override

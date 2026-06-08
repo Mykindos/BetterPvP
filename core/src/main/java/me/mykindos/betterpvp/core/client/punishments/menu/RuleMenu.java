@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -26,7 +27,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
         List<Item> hackingItems = ruleManager.getRuleItemList("hacking");
 
         ItemProvider hackingProvider = ItemView.builder()
-                .displayName(Component.text("Hacking"))
+                .displayName(Translations.component("core.menu.rules.button.hacking.name"))
                 .material(Material.IRON_SWORD)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -39,7 +40,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
         List<Item> gameplayItems = ruleManager.getRuleItemList("gameplay");
 
         ItemProvider gameplayProvider = ItemView.builder()
-                .displayName(Component.text("Gameplay"))
+                .displayName(Translations.component("core.menu.rules.button.gameplay.name"))
                 .material(Material.ANVIL)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -52,7 +53,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
         List<Item> chatItems = ruleManager.getRuleItemList("chat");
 
         ItemProvider chatProvider = ItemView.builder()
-                .displayName(Component.text("Chat"))
+                .displayName(Translations.component("core.menu.rules.button.chat.name"))
                 .material(Material.WRITABLE_BOOK)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -65,7 +66,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
         List<Item> otherItems = ruleManager.getRuleItemList("other");
 
         ItemProvider otherProvider = ItemView.builder()
-                .displayName(Component.text("Other"))
+                .displayName(Translations.component("core.menu.rules.button.other.name"))
                 .material(Material.PAPER)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -94,6 +95,6 @@ public class RuleMenu extends AbstractGui implements Windowed {
      */
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Rules");
+        return Translations.component("core.menu.rules.title");
     }
 }

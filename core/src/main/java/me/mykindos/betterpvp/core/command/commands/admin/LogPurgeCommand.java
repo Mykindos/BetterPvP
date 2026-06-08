@@ -26,14 +26,14 @@ public class LogPurgeCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Deletes all logs that don't have an associated action";
+        return "core.command.log-purge.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
 
         if(args.length == 0) {
-            UtilMessage.simpleMessage(player, "Logs", "Correct Usage: /logpurge <days>");
+            UtilMessage.message(player, "core.prefix.logs", "core.command.logpurge.usage");
             return;
         }
 

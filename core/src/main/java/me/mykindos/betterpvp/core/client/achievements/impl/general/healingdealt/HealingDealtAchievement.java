@@ -11,11 +11,12 @@ import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -58,13 +59,14 @@ public class HealingDealtAchievement extends SingleSimpleAchievement {
     @Override
     public Description getDescription(StatContainer container, StatFilterType type, Period period) {
         List<Component> lore = new ArrayList<>(List.of(
-                UtilMessage.deserialize("<gray>Heal <yellow>%s</yellow> health", IStat.getDoubleValueOfLong(getGoal()))
+                Translations.component("core.achievement.healing-dealt.desc",
+                        Component.text(IStat.getDoubleValueOfLong(getGoal()), NamedTextColor.YELLOW))
         ));
         lore.addAll(this.getProgressComponent(container, type, period));
         lore.addAll(this.getCompletionComponent(container));
         ItemProvider itemProvider = ItemView.builder()
                 .material(Material.GOLDEN_APPLE)
-                .displayName(UtilMessage.deserialize("<white>%s", getName()))
+                .displayName(Translations.component("core.achievement.healing-dealt.name", Component.text(String.valueOf(IStat.getDoubleValueOfLong(getGoal())))).color(NamedTextColor.WHITE))
                 .lore(lore)
                 .build();
         return Description.builder()

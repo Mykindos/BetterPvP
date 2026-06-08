@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
 import me.mykindos.betterpvp.core.logging.menu.button.LocationButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -35,12 +36,11 @@ public class InventoryMoveItemLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return Component.empty().append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
-                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
-                .append(Component.text(" was moved from ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.CURRENT_LOCATION), NamedTextColor.YELLOW))
-                .append(Component.text(" to ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.NEW_LOCATION), NamedTextColor.YELLOW));
+        return Translations.component("core.log.inventory-move-item.1",
+                Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
+                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))),
+                Component.text(context.get(LogContext.CURRENT_LOCATION), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.NEW_LOCATION), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY);
 
     }
 
@@ -55,10 +55,10 @@ public class InventoryMoveItemLogFormatter implements ILogFormatter {
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
                 UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
                         context.get(LogContext.ITEM)),
-                Component.text("was moved from ", NamedTextColor.GRAY)
-                        .append(Component.text(context.get(LogContext.CURRENT_LOCATION), NamedTextColor.GREEN)),
-                UtilMessage.deserialize("to <yellow>%s</yellow>",
-                        context.get(LogContext.NEW_LOCATION)),
+                Translations.component("core.log.inventory-move-item.2",
+                        Component.text(context.get(LogContext.CURRENT_LOCATION), NamedTextColor.GREEN)).color(NamedTextColor.GRAY),
+                Translations.component("core.log.inventory-move-item.3",
+                        Component.text(context.get(LogContext.NEW_LOCATION), NamedTextColor.YELLOW)),
                 UtilMessage.DIVIDER
         );
 
@@ -76,7 +76,7 @@ public class InventoryMoveItemLogFormatter implements ILogFormatter {
         }
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(Component.text("Inventory Move Item"))
+                .displayName(Translations.component("core.log.inventory-move-item.4"))
                 .material(material)
                 .lore(lore)
                 .glow(true)

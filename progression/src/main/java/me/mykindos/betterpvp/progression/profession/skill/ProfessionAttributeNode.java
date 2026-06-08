@@ -44,24 +44,33 @@ public class ProfessionAttributeNode extends ProfessionNode {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        List<String> desc = new ArrayList<>();
+    public net.kyori.adventure.text.Component[] getDescription(int level) {
+        List<net.kyori.adventure.text.Component> desc = new ArrayList<>();
         attributes.forEach((attribute, config) -> {
-            final double value = config.getBaseValue() + (Math.max(level-1, 0) * config.getPerLevel());
+            final double value = config.getBaseValue() + (Math.max(level - 1, 0) * config.getPerLevel());
             final double displayValue = attribute.getDisplayValue(value);
 
-            String valueStr = UtilFormat.formatNumber(displayValue, 3) + attribute.getOperation();
+            final String formatted = UtilFormat.formatNumber(displayValue, 3) + attribute.getOperation();
+            final net.kyori.adventure.text.format.NamedTextColor valueColor;
+            final String prefix;
             if (displayValue > 0) {
-                valueStr = "<green>+" + valueStr + "</green>";
+                valueColor = net.kyori.adventure.text.format.NamedTextColor.GREEN;
+                prefix = "+";
             } else if (displayValue < 0) {
-                valueStr = "<red>" + valueStr + "</red>";
+                valueColor = net.kyori.adventure.text.format.NamedTextColor.RED;
+                prefix = "";
             } else {
-                valueStr = "<yellow>" + valueStr + "</yellow>";
+                valueColor = net.kyori.adventure.text.format.NamedTextColor.YELLOW;
+                prefix = "";
             }
 
-            desc.add(valueStr + " <white>" + attribute.getDescription() + "</white>");
+            // Build as components so the (translatable) attribute description resolves per-viewer.
+            desc.add(net.kyori.adventure.text.Component.text(prefix + formatted, valueColor)
+                    .append(net.kyori.adventure.text.Component.space())
+                    .append(attribute.getDescriptionComponent()
+                            .colorIfAbsent(net.kyori.adventure.text.format.NamedTextColor.WHITE)));
         });
-        return desc.toArray(new String[0]);
+        return desc.toArray(new net.kyori.adventure.text.Component[0]);
     }
 
     @Override

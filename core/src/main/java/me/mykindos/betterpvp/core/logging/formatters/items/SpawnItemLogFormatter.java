@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
 import me.mykindos.betterpvp.core.logging.menu.button.PlayerItemButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -34,12 +35,11 @@ public class SpawnItemLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)
-                .append(Component.text(" spawned a ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
-                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
-                .append(Component.text(" and gave it to ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.GREEN));
+        return Translations.component("core.log.spawn-item.1",
+                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
+                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))),
+                Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.GREEN)).color(NamedTextColor.GRAY);
 
     }
 
@@ -52,12 +52,12 @@ public class SpawnItemLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)
-                        .append(Component.text(" spawned a ", NamedTextColor.GRAY)),
+                        .append(Translations.component("core.log.spawn-item.2").color(NamedTextColor.GRAY)),
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
                 UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
                         context.get(LogContext.ITEM)),
-                UtilMessage.deserialize("and gave it to <yellow>%s</yellow>",
-                        context.get(LogContext.TARGET_CLIENT_NAME)),
+                Translations.component("core.log.spawn-item.3",
+                        Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW)),
                 UtilMessage.DIVIDER
         );
 
@@ -68,7 +68,7 @@ public class SpawnItemLogFormatter implements ILogFormatter {
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(Component.text("Spawn Item"))
+                .displayName(Translations.component("core.log.spawn-item.4"))
                 .material(Material.VILLAGER_SPAWN_EGG)
                 .lore(lore)
                 .build();

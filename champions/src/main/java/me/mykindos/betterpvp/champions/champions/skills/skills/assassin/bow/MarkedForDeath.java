@@ -13,8 +13,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,18 +50,29 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(getVulnerabilityStrength(level)) + "</effect>",
-                "for " + getValueString(this::getDuration, level) + " seconds,",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.VULNERABILITY.getDescription(getVulnerabilityStrength(level))
-        };
+    public Component[] getDescription(int level) {
+        Component strength = Translations.component("champions.skill.effect.vulnerability",
+                Component.text(UtilFormat.getRomanNumeral(getVulnerabilityStrength(level)))).color(NamedTextColor.WHITE);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component[] components = Translations.componentLines(
+                "champions.skill.assassin.marked-for-death.description",
+                strength,
+                duration,
+                cooldown
+        );
+        Component vulnerabilityDetail = Translations.component("champions.skill.effect.vulnerability",
+                Component.text(UtilFormat.getRomanNumeral(getVulnerabilityStrength(level)))).color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.effect.vulnerability.detail",
+                vulnerabilityDetail,
+                Component.text(String.valueOf(getVulnerabilityStrength(level) * 10), NamedTextColor.GREEN)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {
@@ -81,10 +95,10 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, getVulnerabilityStrength(level), (long) (getDuration(level) * 1000L));
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @Override

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -169,7 +170,7 @@ public class Restock implements Powerup {
             // Chat
             final TextColor color = TextColor.color(232, 237, 74);
             UtilMessage.message(player, Component.newline()
-                    .append(Component.text("Your inventory was restocked!", color, TextDecoration.BOLD).font(SMALL_CAPS))
+                    .append(Translations.component("game.powerup.restock.restocked").color(color).decorate(TextDecoration.BOLD).font(SMALL_CAPS))
                     .appendNewline());
 
             // Title

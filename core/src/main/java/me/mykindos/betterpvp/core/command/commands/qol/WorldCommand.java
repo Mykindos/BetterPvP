@@ -28,7 +28,7 @@ public class WorldCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Use and administrate the server's worlds.";
+        return "core.command.world.description";
     }
 
     @Override

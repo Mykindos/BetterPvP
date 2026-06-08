@@ -28,13 +28,13 @@ public class NPCRemoveCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Removes an NPC";
+        return "core.command.n-p-c-remove.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.message(player, "NPC", "<red>Usage: <yellow>/npc remove <ID>");
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.remove.usage");
             return;
         }
 
@@ -42,17 +42,17 @@ public class NPCRemoveCommand extends Command {
         try {
             id = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
-            UtilMessage.message(player, "NPC", "<red>Invalid ID: <yellow>" + args[0]);
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.remove.id.invalid", net.kyori.adventure.text.Component.text(args[0]));
             return;
         }
 
         final NPC npc = registry.getObject(id, NPC.class);
         if (npc == null) {
-            UtilMessage.message(player, "NPC", "<red>No NPC found with ID: <yellow>" + id);
+            UtilMessage.message(player, "core.prefix.command", "core.command.npc.remove.not_found", net.kyori.adventure.text.Component.text(id));
             return;
         }
 
         npc.remove();
-        UtilMessage.message(player, "NPC", "<green>Removed NPC with ID: <yellow>" + id);
+        UtilMessage.message(player, "core.prefix.command", "core.command.npc.remove.success", net.kyori.adventure.text.Component.text(id));
     }
 }

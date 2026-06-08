@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.stats.display.championsgame.ctf.CTFStat
 import me.mykindos.betterpvp.core.client.stats.display.start.ChampionsStatButton;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapNativeStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -33,8 +34,8 @@ public class CTFStatButton extends ChampionsStatButton {
         return ItemView.builder()
                 .material(Material.WHITE_BANNER)
                 .lore(getCTFStatsDescription("", ""))
-                .displayName(Component.text("Capture The Flag Stats"))
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .displayName(Translations.component("core.menu.stats.champions.button.ctf.name"))
+                .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }
 

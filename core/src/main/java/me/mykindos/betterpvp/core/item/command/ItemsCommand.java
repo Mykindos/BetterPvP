@@ -30,7 +30,7 @@ public class ItemsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View all items and their recipes";
+        return "core.command.items.description";
     }
 
     @Override
