@@ -20,7 +20,7 @@ public abstract class PlayerManager<T extends Unique> {
 
     public static final String LOAD_ENTITY_FORMAT = "Loaded entity for {}";
     public static final String UNLOAD_ENTITY_FORMAT = "Unloaded entity for {}";
-    public static final String LOAD_ERROR_FORMAT_ENTITY = "Your entity could not be loaded.";
+    public static final String LOAD_ERROR_FORMAT_ENTITY = "Your data could not be loaded, please try again.";
     public static final String LOAD_ERROR_FORMAT_SERVER = "Could not load entity for: {}";
     public static final String RETRIEVE_ERROR_FORMAT_SERVER = "Could not retrieve entity for: {}";
     

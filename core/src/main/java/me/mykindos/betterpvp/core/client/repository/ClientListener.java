@@ -162,7 +162,15 @@ public class ClientListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
 
-        final Client client = clientManager.search().online(event.getUniqueId()).orElseThrow();
+        Optional<Client> clientOptional = clientManager.search().online(event.getUniqueId());
+        if (clientOptional.isEmpty()) {
+            if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
+            }
+            return;
+        }
+
+        final Client client = clientOptional.get();
         if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_FULL || event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST) {
 
 

@@ -207,14 +207,22 @@ public class ClientSQLLayer {
                     return Set.of();
                 });
 
-        CompletableFuture<Void> propertiesFuture = loadAllPropertiesConcurrently(client)
+        CompletableFuture<Void> propertiesFuture = loadRequiredPropertiesConcurrently(client)
                 .orTimeout(5, TimeUnit.SECONDS)
+                .whenComplete((ignored, ex) -> {
+                    if (ex != null) {
+                        log.error("Error loading required properties for client {}", client.getUuid(), ex).submit();
+                    }
+                });
+
+        CompletableFuture<Void> statsFuture = loadStatsAsync(client)
+                .orTimeout(2, TimeUnit.SECONDS)
                 .exceptionally(ex -> {
-                    log.error("Error loading properties for client {}", client.getUuid(), ex).submit();
+                    log.error("Error loading stats for client {}", client.getUuid(), ex).submit();
                     return null;
                 });
 
-        CompletableFuture.allOf(punishmentsFuture, ignoresFuture, propertiesFuture).join();
+        CompletableFuture.allOf(punishmentsFuture, ignoresFuture, propertiesFuture, statsFuture).join();
 
         client.getPunishments().addAll(punishmentsFuture.getNow(List.of()));
         client.getIgnores().addAll(ignoresFuture.getNow(Set.of()));
@@ -270,9 +278,6 @@ public class ClientSQLLayer {
                     .where(CLIENT_PROPERTIES.CLIENT.eq(client.getId()))
                     .fetch();
             loadPropertiesAsync(result, client);
-        }).exceptionally(ex -> {
-            log.error("Error loading client properties for " + client.getUuid(), ex).submit();
-            return null;
         });
     }
 
@@ -291,9 +296,6 @@ public class ClientSQLLayer {
                     .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getId()))
                     .fetch();
             loadPropertiesAsync(result, gamer);
-        }).exceptionally(ex -> {
-            log.error("Error loading gamer properties for " + client.getUuid(), ex).submit();
-            return null;
         });
     }
 
@@ -323,16 +325,15 @@ public class ClientSQLLayer {
     }
 
     /**
-     * Loads both client and gamer properties concurrently.
+     * Loads required client and gamer properties concurrently.
      *
      * @param client The client to load properties for
      * @return A CompletableFuture that completes when all properties are loaded
      */
-    public CompletableFuture<Void> loadAllPropertiesConcurrently(Client client) {
+    public CompletableFuture<Void> loadRequiredPropertiesConcurrently(Client client) {
         CompletableFuture<Void> clientPropertiesFuture = loadClientPropertiesAsync(client);
         CompletableFuture<Void> gamerPropertiesFuture = loadGamerPropertiesAsync(client);
-        CompletableFuture<Void> statPropertiesFuture = loadStatsAsync(client);
-        return CompletableFuture.allOf(clientPropertiesFuture, gamerPropertiesFuture, statPropertiesFuture);
+        return CompletableFuture.allOf(clientPropertiesFuture, gamerPropertiesFuture);
     }
 
 
@@ -543,7 +544,7 @@ public class ClientSQLLayer {
                         ctxl.batch(queries).execute();
                     });
                 }).exceptionally(ex -> {
-                    log.error("Error executing queries as transaction with {} queries", ex).submit();
+                    log.error("Error executing queries as transaction with {} queries", queries.size(), ex).submit();
                     return null;
                 });
             } else {
