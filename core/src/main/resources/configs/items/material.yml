@@ -40,9 +40,9 @@ essence_rune:
 slayer_rune:
   damage: 3.0
 flawless_diamond:
-  cooldownReduction: 33.0
+  cooldownReduction: 0.33
 flawless_emerald:
-  damageIncrease: 20.0
+  damageIncrease: 0.20
 flawless_ruby:
   healthModifier: 5.0
 flawless_sapphire:

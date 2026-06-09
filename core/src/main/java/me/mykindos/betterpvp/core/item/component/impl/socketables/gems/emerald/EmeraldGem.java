@@ -25,7 +25,7 @@ public class EmeraldGem implements Socketable, Reloadable {
     private final Provider<EmeraldGemItem> itemProvider;
 
     @Getter
-    private double damageIncrease = 20.0;
+    private double damageIncrease = 0.20;
 
     @Inject
     public EmeraldGem(Provider<EmeraldGemItem> itemProvider) {
@@ -44,7 +44,7 @@ public class EmeraldGem implements Socketable, Reloadable {
 
     @Override
     public @NotNull String getDescription() {
-        return String.format("Grants <green>%s%%</green> increased damage.", UtilFormat.formatNumber(damageIncrease));
+        return String.format("Grants <green>%s%%</green> increased damage.", UtilFormat.formatNumber(damageIncrease * 100));
     }
 
     @Override
@@ -55,6 +55,6 @@ public class EmeraldGem implements Socketable, Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.damageIncrease = config.getConfig("damageIncrease", 20.0, Double.class);
+        this.damageIncrease = config.getConfig("damageIncrease", 0.20, Double.class);
     }
 }
