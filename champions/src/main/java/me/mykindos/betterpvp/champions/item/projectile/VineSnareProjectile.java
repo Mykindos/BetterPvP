@@ -143,8 +143,9 @@ public class VineSnareProjectile extends Projectile {
         effectManager.addEffect(target, caster, EffectTypes.ENTANGLED, name, entangleAmplifier, entangleDuration, false);
         if (caster != null) {
             UtilMessage.message(caster, name, "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), Component.text(name, NamedTextColor.GREEN));
+            UtilMessage.message(target, name, "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), Component.text(name, NamedTextColor.GREEN));
         }
-        UtilMessage.message(target, name, "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), Component.text(name, NamedTextColor.GREEN));
+
     }
 
     public void remove() {
