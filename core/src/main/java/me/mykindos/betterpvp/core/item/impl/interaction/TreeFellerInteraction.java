@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor;
 import me.mykindos.betterpvp.core.interaction.condition.ConditionResult;
 import me.mykindos.betterpvp.core.interaction.context.InputMeta;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -43,7 +45,7 @@ import java.util.Set;
 
 /**
  * Interaction that fells an entire tree when the player breaks a single log.
- * Attached as a base (non-serialized) component on {@link me.mykindos.betterpvp.core.item.impl.Axe},
+ * Attached as a base (non-serialized) component on axes,
  * so every axe type inherits tree-felling with zero per-subclass boilerplate.
  *
  * <p>Fires {@link TreeFellerEvent} before the tree is felled so that progression
@@ -55,6 +57,7 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
 
     private final BlockTagManager blockTagManager;
     private final EffectManager effectManager;
+    private final ItemFactory itemFactory;
 
     private final Set<Location> blocksBeingFelled = new HashSet<>();
 
@@ -75,10 +78,11 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
 
     @Inject
     public TreeFellerInteraction(BlockTagManager blockTagManager, EffectManager effectManager,
-                                  CooldownManager cooldownManager) {
+                                  CooldownManager cooldownManager, ItemFactory itemFactory) {
         super("Tree Feller", cooldownManager);
         this.blockTagManager = blockTagManager;
         this.effectManager = effectManager;
+        this.itemFactory = itemFactory;
 
         // Suppress re-entry: when our own scheduled UtilBlock.breakBlock fires a BlockBreakEvent,
         // the broken block's location will be in blocksBeingFelled, so we silently no-op.
@@ -132,12 +136,16 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
 
         UtilServer.callEvent(new TreeFellerEvent(player, initialLogLocation, initialLogType, blocksToFell));
 
-        final ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         for (int i = 0; i < blocksToFell.size(); i++) {
             Block blockToFell = blocksToFell.get(i);
             Location fellLocation = blockToFell.getLocation();
             blocksBeingFelled.add(fellLocation);
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+                final ItemStack mainHand = player.getInventory().getItemInMainHand();
+                if (itemInstance != null && !itemFactory.isItemOfType(mainHand, itemInstance.getBaseItem())) {
+                    return;
+                }
+
                 try {
                     if (isBreakableLog(blockToFell, initialLogLocation)) {
                         UtilBlock.breakBlock(player, blockToFell);
