@@ -212,6 +212,7 @@ public class ClientSQLLayer {
                 .whenComplete((ignored, ex) -> {
                     if (ex != null) {
                         log.error("Error loading required properties for client {}", client.getUuid(), ex).submit();
+                        ex.printStackTrace();
                     }
                 });
 
@@ -290,13 +291,29 @@ public class ClientSQLLayer {
     public CompletableFuture<Void> loadGamerPropertiesAsync(Client client) {
         return database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             Gamer gamer = client.getGamer();
-            Result<Record2<String, String>> result = ctx.select(GAMER_PROPERTIES.PROPERTY, GAMER_PROPERTIES.VALUE)
-                    .from(GAMER_PROPERTIES)
-                    .where(GAMER_PROPERTIES.CLIENT.eq(client.getId()))
-                    .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getId()))
-                    .fetch();
+            Result<Record2<String, String>> result = fetchGamerProperties(ctx, client.getId());
+            log.info("Fetched {} gamer properties for client {} ({})", result.size(), client.getName(), client.getUuid()).submit();
             loadPropertiesAsync(result, gamer);
         });
+    }
+
+    private Result<Record2<String, String>> fetchGamerProperties(DSLContext ctx, long clientId) {
+        return ctx.select(GAMER_PROPERTIES.PROPERTY, GAMER_PROPERTIES.VALUE)
+                .from(GAMER_PROPERTIES)
+                .where(GAMER_PROPERTIES.CLIENT.eq(clientId))
+                .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getId()))
+                .fetch();
+    }
+
+    public boolean hasCurrentRealmGamerProperties(long clientId) {
+        Integer propertyCount = database.getDslContext()
+                .selectCount()
+                .from(GAMER_PROPERTIES)
+                .where(GAMER_PROPERTIES.CLIENT.eq(clientId))
+                .and(GAMER_PROPERTIES.REALM.eq(Core.getCurrentRealm().getId()))
+                .fetchOne(0, Integer.class);
+
+        return propertyCount != null && propertyCount > 0;
     }
 
     public CompletableFuture<Void> loadStatsAsync(Client client) {

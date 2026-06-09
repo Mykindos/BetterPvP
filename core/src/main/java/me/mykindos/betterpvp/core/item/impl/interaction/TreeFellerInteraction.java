@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor;
 import me.mykindos.betterpvp.core.interaction.condition.ConditionResult;
 import me.mykindos.betterpvp.core.interaction.context.InputMeta;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
@@ -143,6 +142,8 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
                 final ItemStack mainHand = player.getInventory().getItemInMainHand();
                 if (itemInstance != null && !itemFactory.isItemOfType(mainHand, itemInstance.getBaseItem())) {
+                    blocksBeingFelled.remove(fellLocation);
+                    // Don't cancel the task to ensure blocksBeingFelled is cleaned up
                     return;
                 }
 

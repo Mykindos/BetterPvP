@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SuppliedItem;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -38,8 +39,11 @@ import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
 public class ArmorStorageEditAbility extends AbstractInteraction implements DisplayedInteraction {
 
+    private final Champions champions;
+
     public ArmorStorageEditAbility() {
         super("replace_armor");
+        this.champions = JavaPlugin.getPlugin(Champions.class);
     }
 
     @Override
@@ -63,16 +67,24 @@ public class ArmorStorageEditAbility extends AbstractInteraction implements Disp
                 .orElseThrow(() -> new IllegalStateException("Item does not have armor storage component"));
 
         final Player player = (Player) actor.getEntity();
-        new Editor(component, itemInstance).show(player);
+        Editor editor = new Editor(component, itemInstance);
+        Window window = editor.show(player);
+        window.setDropItemHandler(event -> {
+
+                player.closeInventory();
+
+        });
         return InteractionResult.Success.ADVANCE;
     }
 
     private static class Editor extends AbstractGui implements Windowed {
 
         private final SuppliedItem observedItem;
+        private final ItemInstance itemInstance;
 
         private Editor(ArmorStorageComponent component, ItemInstance item) {
             super(9, 3);
+            this.itemInstance = item;
             // Armor storage
             VirtualInventory helmet = createSlot(EquipmentSlot.HEAD, component, item);
             VirtualInventory chestplate = createSlot(EquipmentSlot.CHEST, component, item);
@@ -146,4 +158,4 @@ public class ArmorStorageEditAbility extends AbstractInteraction implements Disp
             return virtualInventory;
         }
     }
-}
+    }

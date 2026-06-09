@@ -2,15 +2,11 @@ package me.mykindos.betterpvp.core.menu;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.AdventureComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.window.Window;
-import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 /**

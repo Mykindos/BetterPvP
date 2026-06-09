@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -95,8 +96,7 @@ public class GamerListener implements Listener {
 
     @EventHandler (priority =  EventPriority.MONITOR)
     public void onClientLoad(AsyncClientLoadEvent event) {
-        final Gamer gamer = event.getClient().getGamer();
-        checkUnsetProperties(gamer);
+        checkUnsetProperties(event.getClient());
 
 
     }
@@ -124,7 +124,9 @@ public class GamerListener implements Listener {
         }
     }
 
-    private void checkUnsetProperties(Gamer gamer) {
+    private void checkUnsetProperties(Client client) {
+        Gamer gamer = client.getGamer();
+        validateExistingClientDefaults(client, gamer);
 
         Optional<Integer> coinsOptional = gamer.getProperty(GamerProperty.BALANCE);
         if(coinsOptional.isEmpty()){
@@ -146,6 +148,24 @@ public class GamerListener implements Listener {
             gamer.saveProperty(GamerProperty.PREFERRED_SPAWN, "");
         }
 
+    }
+
+    private void validateExistingClientDefaults(Client client, Gamer gamer) {
+        if (client.isNewClient()) {
+            return;
+        }
+
+        if (gamer.getProperty(GamerProperty.BALANCE).isPresent()) {
+            return;
+        }
+
+        if (!manager.getSqlLayer().hasCurrentRealmGamerProperties(client.getId())) {
+            return;
+        }
+
+        throw new IllegalStateException("Existing client " + client.getName() + " (" + client.getUuid()
+                + ") has gamer properties in realm " + Core.getCurrentRealm().getId()
+                + " but BALANCE was not loaded into memory");
     }
 
 }
