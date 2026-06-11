@@ -720,7 +720,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-86" edge="1" parent="1" source="golden_yield_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="golden_chance_5">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_1">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_1">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="3000" as="geometry" />
           </mxCell>
@@ -736,7 +736,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-278" edge="1" parent="1" source="golden_yield_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="stone_efficiency_22">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_2">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_2">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="3240" as="geometry" />
           </mxCell>
@@ -744,7 +744,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-118" edge="1" parent="1" source="golden_yield_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="golden_yield_4" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_3">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_3">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="4020" as="geometry" />
           </mxCell>
@@ -752,7 +752,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-119" edge="1" parent="1" source="golden_yield_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="golden_yield_5" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_4">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_4">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="4140" as="geometry" />
           </mxCell>
@@ -760,7 +760,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-123" edge="1" parent="1" source="golden_yield_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="golden_yield_6" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_5">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_5">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="4260" as="geometry" />
           </mxCell>
@@ -768,7 +768,7 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-126" edge="1" parent="1" source="golden_yield_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="stone_efficiency_17">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_6">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_6">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="4380" as="geometry" />
           </mxCell>
@@ -779,22 +779,22 @@
         <mxCell id="1Vpb-A6OnpxDK0nBlSpK-142" edge="1" parent="1" source="golden_yield_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="golden_chance_10">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_7">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_7">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5280" as="geometry" />
           </mxCell>
         </object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_8">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_8">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="240" y="5040" as="geometry" />
           </mxCell>
         </object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_9">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_9">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="60" y="5520" as="geometry" />
           </mxCell>
         </object>
-        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="1.0" per_level="1.0" max_level="1" id="golden_yield_10">
+        <object label="Golden&#xa;Yield" attribute_id="golden_yield" base="100.0" per_level="100.0" max_level="1" id="golden_yield_10">
           <mxCell parent="1" style="ellipse;whiteSpace=wrap;html=1;rounded=0;shadow=0;glass=0;strokeColor=default;rotatable=0;resizable=0;recursiveResize=1;collapsible=0;overflow=visible;fontFamily=Helvetica;align=center;" vertex="1">
             <mxGeometry height="60" width="60" x="420" y="5520" as="geometry" />
           </mxCell>

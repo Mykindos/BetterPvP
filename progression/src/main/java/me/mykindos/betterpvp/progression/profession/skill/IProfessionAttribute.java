@@ -12,9 +12,7 @@ public interface IProfessionAttribute {
         return getName();
     }
 
-    default double getDisplayValue(double value) {
-        return value * 100;
-    }
+    double getDisplayValue(double value);
 
     static double computeValue(Player player, String profession, IProfessionAttribute attribute, ProfessionProfileManager profileManager) {
         return profileManager.getObject(player.getUniqueId().toString())
