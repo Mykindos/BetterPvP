@@ -19,10 +19,14 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -64,19 +68,14 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Shoot an arrow that creates a sphere around the impact point,",
-                "which <effect>Silences</effect> and <effect>Shocks</effect> all enemies",
-                "within a " + getValueString(this::getRadius, level) + " block radius in bursts.",
-                "",
-                "The effect lasts for " + getValueString(this::getDuration, level) + " seconds,",
-                "applying these effects every " + getValueString(this::getBurstDuration, level) +" seconds while enemies are inside the radius.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component burstDuration = getValueComponent(this::getBurstDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component silences = Translations.component("champions.skill.effect.silences.name").color(NamedTextColor.WHITE);
+        Component shocks = Translations.component("champions.skill.effect.shocks.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.storm-sphere.description", radius, duration, burstDuration, cooldown, silences, shocks);
     }
 
     public double getRadius(int level) {
@@ -106,7 +105,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     public boolean canUse(Player player) {
         boolean use = super.canUse(player);
         if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
-            UtilMessage.message(player, "Protection", "You cannot use this skill with protection");
+            UtilMessage.message(player, "core.prefix.protection", "champions.skill.protection");
             return false;
         }
         return use;

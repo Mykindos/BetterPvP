@@ -14,6 +14,6 @@ public class Blackroot extends BaseItem {
 
     @Inject
     private Blackroot() {
-        super("Blackroot", Item.model("blackroot", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.blackroot.name"), Item.model("blackroot", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 }

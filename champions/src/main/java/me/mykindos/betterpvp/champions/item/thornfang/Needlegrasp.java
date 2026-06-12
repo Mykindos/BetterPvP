@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.thornfang;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -73,12 +75,12 @@ public class Needlegrasp extends CooldownInteraction implements Listener, Displa
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Needlegrasp");
+        return Translations.component("champions.ability.needlegrasp.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Throw a vine that pulls you and an enemy toward each other. Hit them with a melee attack to reset your cooldown.");
+        return Translations.component("champions.ability.needlegrasp.description");
     }
 
     @Override

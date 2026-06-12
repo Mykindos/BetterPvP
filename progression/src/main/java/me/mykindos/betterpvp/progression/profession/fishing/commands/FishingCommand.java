@@ -31,7 +31,7 @@ public class FishingCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Fishing command";
+        return "progression.command.fishing.description";
     }
 
     @Override

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -52,11 +53,11 @@ public class AchievementCategoryButton extends AbstractItem {
             ItemView itemView = achievementCategory.getItemView(client.getStatContainer(), type, period);
             if (!achievementCategory.getChildren().isEmpty()) {
                 return itemView.toBuilder()
-                        .action(ClickActions.ALL, Component.text("Show Sub-Category"))
+                        .action(ClickActions.ALL, Translations.component("core.menu.achievement.category.button.show-sub-category.action"))
                         .build();
             }
             return itemView.toBuilder()
-                    .action(ClickActions.ALL, Component.text("Show Achievements"))
+                    .action(ClickActions.ALL, Translations.component("core.menu.achievement.category.button.show-achievements.action"))
                     .build();
     }
 

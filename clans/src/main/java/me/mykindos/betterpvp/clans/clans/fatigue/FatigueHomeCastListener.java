@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -59,7 +60,6 @@ public class FatigueHomeCastListener implements Listener {
         final double extra = extraSecondsPerTier * tier.ordinal();
         event.setDelayInSeconds(event.getDelayInSeconds() + extra);
 
-        UtilMessage.message(player, "Battle Fatigue",
-                Component.text("Your weary body is slow to find its way home...", NamedTextColor.RED));
+        UtilMessage.message(player, "clans.fatigue.prefix", Translations.component("clans.fatigue.home-cast.slow").color(NamedTextColor.RED));
     }
 }

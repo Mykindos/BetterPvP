@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.shops.menus.buttons;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.shops.menus.ShopItemMenu;
@@ -26,7 +27,7 @@ public class SetAmountButton extends AbstractItem {
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
                 .displayName(Component.empty()
-                        .append(Component.text("Set to", NamedTextColor.GRAY))
+                        .append(Translations.component("shops.menu.shop-item.button.set-to").color(NamedTextColor.GRAY))
                         .appendSpace()
                         .append(Component.text(value, NamedTextColor.WHITE)))
                 .build();

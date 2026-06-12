@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.item.component.impl.currency.CurrencyComponent
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.impl.AttunementStone;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -77,7 +79,7 @@ public class GuiAttunement extends AbstractGui implements Windowed {
                 "000000000")
                 .addIngredient('0', Menu.INVISIBLE_BACKGROUND_ITEM)
                 .addIngredient('I', InfoTabButton.builder()
-                        .description(Component.text("Place an item, gold, and an attunement stone to reveal the item's hidden purity information. Hover over the action button for error information."))
+                        .descriptionLines(List.of(Translations.rawComponentLines("core.menu.attunement.info.description")))
                         .icon(ItemStack.of(Material.AIR))
                         .build())
                 .addIngredient('G', new PlaceholderInventorySlot(goldInventory, new ItemBuilder(createGoldPlaceholder())))
@@ -121,11 +123,8 @@ public class GuiAttunement extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.text("Add Gold", NamedTextColor.GOLD))
-                .lore(Component.text("Drag gold bars from your", NamedTextColor.GRAY))
-                .lore(Component.text("inventory into this slot.", NamedTextColor.GRAY))
-                .lore(Component.text("", NamedTextColor.GRAY))
-                .lore(Component.text("Cost varies by item rarity.", NamedTextColor.GRAY))
+                .displayName(Translations.component("core.menu.attunement.gold.name").color(NamedTextColor.GOLD))
+                .lore(List.of(Translations.componentLines("core.menu.attunement.gold.lore")))
                 .build()
                 .get();
     }
@@ -137,10 +136,8 @@ public class GuiAttunement extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.text("Add Attunement Stone", NamedTextColor.LIGHT_PURPLE))
-                .lore(Component.text("Drag an attunement stone", NamedTextColor.GRAY))
-                .lore(Component.text("from your inventory into", NamedTextColor.GRAY))
-                .lore(Component.text("this slot.", NamedTextColor.GRAY))
+                .displayName(Translations.component("core.menu.attunement.stone.name").color(NamedTextColor.LIGHT_PURPLE))
+                .lore(List.of(Translations.componentLines("core.menu.attunement.stone.lore")))
                 .build()
                 .get();
     }
@@ -152,9 +149,8 @@ public class GuiAttunement extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.text("Add Item", NamedTextColor.GREEN))
-                .lore(Component.text("Drag an item from your", NamedTextColor.GRAY))
-                .lore(Component.text("inventory into this slot.", NamedTextColor.GRAY))
+                .displayName(Translations.component("core.menu.attunement.item.name").color(NamedTextColor.GREEN))
+                .lore(List.of(Translations.componentLines("core.menu.attunement.item.lore")))
                 .build()
                 .get();
     }

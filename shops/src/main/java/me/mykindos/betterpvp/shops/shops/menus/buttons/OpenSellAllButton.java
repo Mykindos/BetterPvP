@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.shops.menus.buttons;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.shops.menus.SellAllMenu;
@@ -25,7 +26,7 @@ public class OpenSellAllButton extends AbstractItem {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
-                .displayName(Component.text("Sell All", NamedTextColor.YELLOW))
+                .displayName(Translations.component("shops.menu.shop.button.sell-all.name").color(NamedTextColor.YELLOW))
                 .build();
     }
 

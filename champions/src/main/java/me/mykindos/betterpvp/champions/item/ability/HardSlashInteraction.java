@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.destroystokyo.paper.ParticleBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,12 +69,12 @@ public class HardSlashInteraction extends CooldownInteraction implements Display
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Hard Slash");
+        return Translations.component("champions.ability.hard-slash.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Deal damage to nearby enemies and knock them back with a fiery slash.");
+        return Translations.component("champions.ability.hard-slash.description");
     }
 
     @Override

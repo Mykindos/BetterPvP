@@ -16,8 +16,10 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonReloadEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -43,12 +45,12 @@ public class CannonballReloadAbility extends AbstractInteraction implements Disp
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Cannonball Reload");
+        return Translations.component("core.ability.cannonball-reload.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Load a cannon with this cannonball");
+        return Translations.component("core.ability.cannonball-reload.description");
     }
 
     @Override
@@ -97,7 +99,8 @@ public class CannonballReloadAbility extends AbstractInteraction implements Disp
 
     private boolean canUse(Player player) {
         if (!Compatibility.MODEL_ENGINE) {
-            UtilMessage.message(player, "Combat", "Cannons are not supported on this server. <red>Please contact an administrator.");
+            UtilMessage.message(player, "core.prefix.combat", "core.cannon.not_supported",
+                    Translations.component("core.cannon.contact_admin").color(NamedTextColor.RED));
             return false;
         }
         return true;

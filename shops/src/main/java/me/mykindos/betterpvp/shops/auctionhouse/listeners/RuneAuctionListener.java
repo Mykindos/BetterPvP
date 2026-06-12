@@ -52,7 +52,7 @@ public class RuneAuctionListener implements Listener {
 
             item.getComponent(SocketableContainerComponent.class).ifPresent(container -> {
                 if (container.getSocketables().isEmpty()) {
-                    event.cancel("You cannot list this type of item unless it has a rune applied.");
+                    event.cancel("shops.listener.auctionhouse.requires-rune");
                 }
             });
         });
@@ -76,10 +76,10 @@ public class RuneAuctionListener implements Listener {
         final Optional<SocketableContainerComponent> containerOpt = itemInstance.getComponent(SocketableContainerComponent.class);
         if (containerOpt.isPresent()) {
             if (containerOpt.get().getSocketables().isEmpty()) {
-                event.cancel("You cannot list this type of item unless it has a rune applied.");
+                event.cancel("shops.listener.auctionhouse.requires-rune");
             }
         } else {
-            event.cancel("You cannot list items sold at shops.");
+            event.cancel("shops.listener.auctionhouse.cannot-list-shop-item");
         }
     }
 

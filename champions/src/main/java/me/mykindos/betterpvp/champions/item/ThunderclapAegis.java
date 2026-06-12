@@ -53,7 +53,7 @@ public class ThunderclapAegis extends WeaponItem implements Reloadable {
     private ThunderclapAegis(Champions champions,
                             VolticBashAbility volticBashAbility,
                             ItemFactory itemFactory) {
-        super(champions, "Thunderclap Aegis", model, ItemRarity.LEGENDARY);
+        super(champions, translatableName("champions.item.thunderclap-aegis.name"), model, ItemRarity.LEGENDARY);
         this.volticBashAbility = volticBashAbility;
 
         addBaseComponent(InteractionContainerComponent.builder()

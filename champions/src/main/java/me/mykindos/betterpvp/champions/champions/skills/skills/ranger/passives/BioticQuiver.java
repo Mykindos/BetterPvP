@@ -19,8 +19,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -71,19 +75,12 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
      */
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Shooting yourself or an ally with an arrow",
-                "instantly restores " + getValueString(this::getFriendlyHealthRestoredOnHit, level) + " health.",
-                "",
-                "Shooting an enemy with an arrow",
-                "gives them <effect>Anti Heal</effect> for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.ANTI_HEAL.getDescription(0)
-
-        };
+    public Component[] getDescription(int level) {
+        Component friendlyHealth = getValueComponent(this::getFriendlyHealthRestoredOnHit, level);
+        Component antiHealDuration = getValueComponent(this::getNaturalRegenerationDisabledDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component antiHeal = Translations.component("champions.skill.effect.anti-heal.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.biotic-quiver.description", friendlyHealth, antiHealDuration, cooldown, antiHeal);
     }
 
     @Override
@@ -241,15 +238,15 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
 
-            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
+            UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             if (!damager.equals(target)) {
-                UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+                UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by-alt", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             }
 
         } else {
             championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration(level) * 1000));
-            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green>.", target.getName(), getName(), level));
-            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green>.", damager.getName(), getName(), level));
+            UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+            UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         }
 
     }

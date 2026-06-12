@@ -4,8 +4,8 @@ import lombok.With;
 import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.PageItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -64,9 +64,12 @@ public class PageForwardButton extends PageItem {
         final ItemView.ItemViewBuilder builder = ItemView.of(itemProvider.get().get()).toBuilder();
         builder.clearLore();
         if (gui.hasNextPage()) {
-            builder.displayName(UtilMessage.deserialize("<green>Next Page <gray>(<white>%d</white>/%d)", gui.getCurrentPage() + 2, gui.getPageAmount()));
+            builder.displayName(Translations.component("core.menu.button.next-page.name").color(NamedTextColor.GREEN)
+                    .append(Component.text(" (", NamedTextColor.GRAY))
+                    .append(Component.text(gui.getCurrentPage() + 2, NamedTextColor.WHITE))
+                    .append(Component.text("/" + gui.getPageAmount() + ")", NamedTextColor.GRAY)));
         } else {
-            builder.displayName(Component.text("No next page", NamedTextColor.RED));
+            builder.displayName(Translations.component("core.menu.button.no-next-page.name").color(NamedTextColor.RED));
         }
         return builder.build();
     }

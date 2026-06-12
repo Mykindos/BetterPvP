@@ -14,7 +14,7 @@ public class GoblinMask extends BaseItem {
 
     @Inject
     private GoblinMask() {
-        super("Goblin Mask", Item.model("goblin_mask", 1), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.goblin-mask.name"), Item.model("goblin_mask", 1), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 
 }

@@ -39,26 +39,26 @@ public class SendTipCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Send a specific tip to a player";
+        return "core.command.send-tip.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "Tips", UtilMessage.deserialize("<green>Usage: /sendtip <player> <tipname>"));
+            UtilMessage.message(player, "core.prefix.command", "core.command.sendtip.usage");
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            UtilMessage.message(player, "Tips", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid online player.", args[0]));
+            UtilMessage.message(player, "core.prefix.command", "core.command.sendtip.target.invalid", Component.text(args[0]));
             return;
         }
 
         String tipName = args[1].toLowerCase();
         Optional<Tip> tipOptional = tipManager.getObject(tipName);
         if (tipOptional.isEmpty()) {
-            UtilMessage.message(player, "Tips", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid tip name.", args[1]));
+            UtilMessage.message(player, "core.prefix.command", "core.command.sendtip.tip.invalid", Component.text(args[1]));
             return;
         }
 
@@ -73,7 +73,7 @@ public class SendTipCommand extends Command {
         UtilMessage.message(target, Component.empty());
         new SoundEffect(Sound.BLOCK_NOTE_BLOCK_CHIME, 1.5f, 1.0f).play(target);
 
-        UtilMessage.message(player, "Tips", UtilMessage.deserialize("Sent tip <yellow>%s</yellow> to <yellow>%s</yellow>.", tip.getName(), target.getName()));
+        UtilMessage.message(player, "core.prefix.command", "core.command.sendtip.sent", Component.text(tip.getName()), Component.text(target.getName()));
     }
 
     @Override

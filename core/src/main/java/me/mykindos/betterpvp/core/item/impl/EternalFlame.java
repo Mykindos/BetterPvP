@@ -14,6 +14,6 @@ public class EternalFlame extends BaseItem {
 
     @Inject
     private EternalFlame() {
-        super("Eternal Flame", Item.model("eternal_flame", 1), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.eternal-flame.name"), Item.model("eternal_flame", 1), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

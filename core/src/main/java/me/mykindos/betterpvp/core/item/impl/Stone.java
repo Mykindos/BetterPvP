@@ -14,7 +14,7 @@ public class Stone extends BaseItem {
 
     @Inject
     private Stone() {
-        super("Stone", Item.model("stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.stone.name"), Item.model("stone", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 
 }

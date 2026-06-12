@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.item.component.impl.blueprint;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -86,12 +88,12 @@ public class BlueprintItem extends BaseItem {
 
         @Override
         public @NotNull Component getDisplayName() {
-            return Component.text("Add Blueprint");
+            return Translations.component("core.ability.add-blueprint.name");
         }
 
         @Override
         public @NotNull Component getDisplayDescription() {
-            return Component.text("Use this on a Workbench to add the blueprint");
+            return Translations.component("core.ability.add-blueprint.description");
         }
 
         @Override

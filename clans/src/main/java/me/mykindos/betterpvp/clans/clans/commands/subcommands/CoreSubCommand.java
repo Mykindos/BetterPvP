@@ -31,7 +31,7 @@ public class CoreSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Teleport to your clan core";
+        return "clans.command.core.description";
     }
 
     @Override
@@ -39,7 +39,7 @@ public class CoreSubCommand extends ClanSubCommand {
         clanManager.getClanByPlayer(player).ifPresent(playerClan -> {
             ClanCore core = playerClan.getCore();
             if (!core.isSet()) {
-                UtilMessage.simpleMessage(player, "Clans", "Your clan core has not been set yet. Use <yellow>/clan setcore</yellow> to set it.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.core.not-set");
                 return;
             }
 

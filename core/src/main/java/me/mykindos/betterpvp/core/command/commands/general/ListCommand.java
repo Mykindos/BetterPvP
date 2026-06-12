@@ -30,7 +30,7 @@ public class ListCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "get a list of all players online";
+        return "core.command.list.description";
     }
 
     @Override
@@ -43,8 +43,8 @@ public class ListCommand extends Command {
         }
 
         Component list = Component.join(JoinConfiguration.separator(Component.text(", ", NamedTextColor.GRAY)), players.toArray(new Component[0]));
-        UtilMessage.message(player, "List", "There are currently <alt2>" + size + "</alt2> players online.");
-        UtilMessage.message(player, "List", list);
+        UtilMessage.message(player, "core.prefix.list", "core.command.list.online_count", Component.text(size));
+        UtilMessage.message(player, "core.prefix.list", list);
 
     }
 }

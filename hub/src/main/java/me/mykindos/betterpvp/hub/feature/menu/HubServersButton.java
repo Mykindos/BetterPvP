@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.framework.SelectableServerType;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
 import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
@@ -35,7 +36,7 @@ public class HubServersButton extends AbstractItem {
     @Override
     public ItemProvider getItemProvider() {
         return ItemView.builder().material(Material.CLOCK)
-                .displayName(Component.text("Hub", NamedTextColor.YELLOW, TextDecoration.BOLD))
+                .displayName(Translations.component("hub.menu.server-selector.button.hub.name").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
     }

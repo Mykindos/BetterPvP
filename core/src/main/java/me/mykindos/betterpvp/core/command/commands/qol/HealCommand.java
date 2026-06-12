@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -18,7 +19,7 @@ public class HealCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Heal yourself or another player to full health";
+        return "core.command.heal.description";
     }
 
     @Override
@@ -26,12 +27,12 @@ public class HealCommand extends Command {
 
         if (args.length == 0) {
             player.setHealth(UtilPlayer.getMaxHealth(player));
-            UtilMessage.message(player, "Heal", "Successfully healed to full health.");
+            UtilMessage.message(player, "core.prefix.heal", "core.command.heal.self.success");
         } else {
             Player target = Bukkit.getPlayer(args[0]);
             if (target != null) {
                 target.setHealth(UtilPlayer.getMaxHealth(target));
-                UtilMessage.simpleMessage(player, "Heal", "Successfully healed <yellow>%s<gray> to full health.", target.getName());
+                UtilMessage.message(player, "core.prefix.heal", "core.command.heal.other.success", Component.text(target.getName()));
             }
         }
     }

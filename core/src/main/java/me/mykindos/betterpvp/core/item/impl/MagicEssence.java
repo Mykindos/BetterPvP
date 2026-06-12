@@ -14,6 +14,6 @@ public class MagicEssence extends BaseItem {
 
     @Inject
     private MagicEssence() {
-        super("Magic Essence", Item.model("magic_essence", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.magic-essence.name"), Item.model("magic_essence", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 }

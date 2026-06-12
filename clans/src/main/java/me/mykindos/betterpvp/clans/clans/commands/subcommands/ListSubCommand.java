@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,7 +38,7 @@ public class ListSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "List all clans.";
+        return "clans.command.list.description";
     }
 
     @Override public String getUsage() {
@@ -62,7 +63,7 @@ public class ListSubCommand extends ClanSubCommand {
         Collections.sort(clansList, Comparator.comparing(Clan::getOnlineMemberCount));
         Collections.reverse(clansList);
 
-        Component component = UtilMessage.deserialize("<yellow>Clan List<gray>: ");
+        Component component = Translations.component("clans.command.clan.list.header");
 
         int count = 0;
         int start = (pageNumber - 1) * numPerPage;
@@ -76,7 +77,9 @@ public class ListSubCommand extends ClanSubCommand {
         Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
 
-        component = component.append(UtilMessage.deserialize("<white>" + pageNumber + "<gray> / <white>" + totalPages));
+        component = component.append(Translations.component("clans.command.clan.pagination",
+                Component.text(pageNumber, NamedTextColor.WHITE),
+                Component.text(totalPages, NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
 
         if (start <= size) {
             if (end > size) end = size;
@@ -86,7 +89,7 @@ public class ListSubCommand extends ClanSubCommand {
                 count++;
             }
         }
-        UtilMessage.message(player, "Clans", component);
+        UtilMessage.message(player, CLANS_PREFIX, component);
     }
 
 

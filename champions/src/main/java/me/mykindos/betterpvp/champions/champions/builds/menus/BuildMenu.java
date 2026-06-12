@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -51,10 +52,10 @@ public class BuildMenu extends AbstractGui implements Windowed {
         }
 
         setItem(((this.getWidth() * this.getHeight()) - 1), backButton);
-        setItem(9, new SimpleItem(getItemView(role.getHelmet(), role, " Helmet")));
-        setItem(18, new SimpleItem(getItemView(role.getChestplate(), role, " Chestplate")));
-        setItem(27, new SimpleItem(getItemView(role.getLeggings(), role, " Leggings")));
-        setItem(36, new SimpleItem(getItemView(role.getBoots(), role, " Boots")));
+        setItem(9, new SimpleItem(getItemView(role.getHelmet(), role, Translations.component("champions.menu.build.armor.helmet", role.getDisplayName()))));
+        setItem(18, new SimpleItem(getItemView(role.getChestplate(), role, Translations.component("champions.menu.build.armor.chestplate", role.getDisplayName()))));
+        setItem(27, new SimpleItem(getItemView(role.getLeggings(), role, Translations.component("champions.menu.build.armor.leggings", role.getDisplayName()))));
+        setItem(36, new SimpleItem(getItemView(role.getBoots(), role, Translations.component("champions.menu.build.armor.boots", role.getDisplayName()))));
         int slot = 11;
         for (int build = 1; build < 5; build++) {
 
@@ -87,10 +88,10 @@ public class BuildMenu extends AbstractGui implements Windowed {
         }, previous);
     }
 
-    private static ItemView getItemView(Material material, Role role, String name) {
+    private static ItemView getItemView(Material material, Role role, Component name) {
         return ItemView.builder()
                 .material(material)
-                .displayName(Component.text(role.getName() + name, role.getColor(), TextDecoration.BOLD))
+                .displayName(name.color(role.getColor()).decorate(TextDecoration.BOLD))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
     }
@@ -98,6 +99,6 @@ public class BuildMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text(role.getName() + " Builds");
+        return Translations.component("champions.menu.build.title", role.getDisplayName());
     }
 }

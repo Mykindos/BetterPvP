@@ -14,6 +14,6 @@ public class OverchargedCrystal extends BaseItem {
 
     @Inject
     private OverchargedCrystal() {
-        super("Overcharged Crystal", Item.model("overcharged_crystal", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.overcharged-crystal.name"), Item.model("overcharged_crystal", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

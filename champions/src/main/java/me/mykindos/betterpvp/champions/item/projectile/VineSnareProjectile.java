@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -140,9 +142,10 @@ public class VineSnareProjectile extends Projectile {
         entity.setVelocity(new Vector());
         effectManager.addEffect(target, caster, EffectTypes.ENTANGLED, name, entangleAmplifier, entangleDuration, false);
         if (caster != null) {
-            UtilMessage.simpleMessage(caster, name, "You hit <yellow>%s</yellow> with <alt>%s</alt>.", target.getName(), name);
+            UtilMessage.message(caster, name, "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), Component.text(name, NamedTextColor.GREEN));
+            UtilMessage.message(target, name, "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), Component.text(name, NamedTextColor.GREEN));
         }
-        UtilMessage.simpleMessage(target, name, "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), name);
+
     }
 
     public void remove() {

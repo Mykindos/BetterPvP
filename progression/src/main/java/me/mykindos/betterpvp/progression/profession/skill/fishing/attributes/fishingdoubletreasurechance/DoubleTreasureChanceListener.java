@@ -17,9 +17,9 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingDoubleTreasureDropEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingTreasureDropEvent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -111,13 +111,9 @@ public class DoubleTreasureChanceListener implements Listener {
             }
         }
 
-        TextComponent message = Component.text("You found ")
-                .append(Component.text(UtilFormat.formatNumber(itemStack.getAmount())))
-                .append(Component.text(" "))
-                .append(name)
-                .append(Component.text(" (doubled!)"));
-
-        UtilMessage.message(player, "Fishing", message);
+        UtilMessage.message(player, "core.prefix.fishing", Translations.component("progression.fishing.treasure.found-doubled",
+                Component.text(UtilFormat.formatNumber(itemStack.getAmount())),
+                name));
 
         log.info("{} found {}x {} from fishing treasure (doubled)", player.getName(), itemStack.getAmount(),
                         itemStack.getType().name().toLowerCase())

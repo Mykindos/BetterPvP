@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.recipe.crafting.menu.AbstractCraftingGui;
@@ -61,7 +62,7 @@ public class GuiCraftingTableAdvanced extends AbstractCraftingGui {
                 .addIngredient('V', new QuickCraftViewerButton())
                 .addIngredient('B', new BlueprintHolder(itemFactory, blueprintInventory))
                 .addIngredient('I', InfoTabButton.builder()
-                        .description(Component.text("Use this workbench to craft items using blueprints and ingredients in your inventory."))
+                        .descriptionLines(List.of(Translations.rawComponentLines("core.menu.workbench.advanced.info.description")))
                         .build()));
     }
 
@@ -78,10 +79,8 @@ public class GuiCraftingTableAdvanced extends AbstractCraftingGui {
         return ItemView.builder()
                 .material(Material.BARRIER)
                 .itemModel(Resources.ItemModel.STOP)
-                .displayName(Component.text("Add Blueprint", NamedTextColor.GREEN))
-                .lore(Component.text("Drag a blueprint from your", NamedTextColor.GRAY))
-                .lore(Component.text("inventory into this slot to", NamedTextColor.GRAY))
-                .lore(Component.text("use it.", NamedTextColor.GRAY))
+                .displayName(Translations.component("core.menu.workbench.blueprint.add.name").color(NamedTextColor.GREEN))
+                .lore(List.of(Translations.componentLines("core.menu.workbench.blueprint.add.lore")))
                 .build()
                 .get();
     }
@@ -106,7 +105,7 @@ public class GuiCraftingTableAdvanced extends AbstractCraftingGui {
             return ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(Key.key("betterpvp", "menu/icon/regular/book_icon"))
-                    .displayName(Component.text("More Quick Crafts", TextColor.color(0, 207, 41)))
+                    .displayName(Translations.component("core.menu.workbench.more-quick-crafts.name").color(TextColor.color(0, 207, 41)))
                     .build();
         }
 

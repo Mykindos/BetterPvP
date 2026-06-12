@@ -6,6 +6,7 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,7 +28,7 @@ public class ItemInfoCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Displays hidden information for this item";
+        return "core.command.item-info.description";
     }
 
     @Override
@@ -35,40 +36,40 @@ public class ItemInfoCommand extends Command {
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemInMainHand.getItemMeta();
 
-        UtilMessage.simpleMessage(player, "Info", "<yellow>Type: <gray>%s", itemInMainHand.getType().name());
+        UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.type", itemInMainHand.getType().name());
         if (itemMeta == null) {
-            UtilMessage.simpleMessage(player, "Info", "<red>Item has no meta data");
+            UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.no_meta");
             return;
         }
 
         if (itemMeta.hasDisplayName()) {
-            UtilMessage.message(player, Component.text("Info>", NamedTextColor.BLUE)
-                    .append(Component.text(" Name: ", NamedTextColor.YELLOW).append(Objects.requireNonNull(itemMeta.displayName()))));
+            UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.name", Objects.requireNonNull(itemMeta.displayName()));
         }
 
         if (itemMeta.hasCustomModelData()) {
-            UtilMessage.simpleMessage(player, "Info", "<yellow>Custom Model Data: <green>%d", itemMeta.getCustomModelData());
+            UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.model_data", itemMeta.getCustomModelData());
         }
 
         if (itemInMainHand.hasData(DataComponentTypes.MAX_DAMAGE)) {
             int maxDamage = itemInMainHand.getData(DataComponentTypes.MAX_DAMAGE);
-            UtilMessage.simpleMessage(player, "Info", "<yellow>Max Durability: <green>%s", maxDamage);
+            UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.max_durability", maxDamage);
 
             if (itemInMainHand.hasData(DataComponentTypes.DAMAGE)) {
                 int damage = itemInMainHand.getData(DataComponentTypes.DAMAGE);
-                UtilMessage.simpleMessage(player, "Info", "<yellow>Durability: <green>%s", maxDamage - damage);
+                UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.durability", maxDamage - damage);
             }
         }
 
         if (args.length > 0 && args[0].equalsIgnoreCase("true")) {
             for (DataComponentType dataType : itemInMainHand.getDataTypes()) {
                 if (dataType instanceof DataComponentType.Valued<?> valued) {
-                    UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s",
-                            dataType.getKey(),
-                            itemInMainHand.getData(valued).toString());
+                    UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.data_entry",
+                            Component.text(String.valueOf(dataType.getKey()), NamedTextColor.YELLOW),
+                            Component.text(itemInMainHand.getData(valued).toString(), NamedTextColor.GRAY));
                 } else {
-                    UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <green>true",
-                            dataType.getKey());
+                    UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.data_entry",
+                            Component.text(String.valueOf(dataType.getKey()), NamedTextColor.YELLOW),
+                            Translations.component("core.command.iteminfo.true").color(NamedTextColor.GREEN));
                 }
             }
         }
@@ -77,7 +78,9 @@ public class ItemInfoCommand extends Command {
         if (persistentData.getKeys().isEmpty()) return;
 
         persistentData.getRaw().forEach((key, value) -> {
-            UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s", key, value.toString());
+            UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.data_entry",
+                    Component.text(String.valueOf(key), NamedTextColor.YELLOW),
+                    Component.text(value.toString(), NamedTextColor.GRAY));
         });
     }
 

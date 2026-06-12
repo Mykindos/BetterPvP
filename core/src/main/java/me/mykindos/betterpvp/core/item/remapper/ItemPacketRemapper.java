@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.pagination.LorePageService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.bukkit.GameMode;
@@ -35,6 +36,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -102,8 +104,11 @@ public class ItemPacketRemapper implements PacketListener {
         }
 
         final ItemInstance item = itemOpt.get();
+        final Locale locale = player.locale();
         final org.bukkit.inventory.ItemStack existing = SpigotConversionUtil.toBukkitItemStack(stack);
-        final org.bukkit.inventory.ItemStack view = item.getView().get();
+        // The client echoes back the localized item we sent it, so compare against the view rendered into
+        // the same locale.
+        final org.bukkit.inventory.ItemStack view = Translations.renderItemStack(item.getView().get(), locale);
         if (existing.equals(view)) {
             event.setCancelled(true);
         } else {
@@ -210,21 +215,47 @@ public class ItemPacketRemapper implements PacketListener {
         packet.setItem(mapTo(packet.getItem(), viewer));
     }
 
+    /**
+     * Maps an outgoing protocol item into what the recipient should actually see:
+     * <ol>
+     *   <li>bare custom items (no name/lore yet) are expanded into their rendered view for the lore page the
+     *       recipient is viewing, and</li>
+     *   <li>any translatable name/lore is resolved server-side into the recipient's locale.</li>
+     * </ol>
+     * The canonical/stored stack is never mutated; only the outgoing packet copy is changed, and only when
+     * something actually needs rendering.
+     */
     private ItemStack mapTo(ItemStack protocolItemStack, Player viewer) {
         if (protocolItemStack == null) return null;
 
+        final Locale locale = viewer != null ? viewer.locale() : Locale.ENGLISH;
+
         try {
             final org.bukkit.inventory.ItemStack previous = SpigotConversionUtil.toBukkitItemStack(protocolItemStack);
-            if (previous.isEmpty() || previous.hasItemMeta() && (previous.getItemMeta().hasLore() || previous.getItemMeta().hasDisplayName())) {
+            if (previous.isEmpty()) {
                 return protocolItemStack;
             }
 
+            // Items that already carry a name/lore (menu items, already-expanded items) only need their
+            // translatable components resolved into the recipient's locale.
+            if (previous.hasItemMeta() && (previous.getItemMeta().hasLore() || previous.getItemMeta().hasDisplayName())) {
+                final org.bukkit.inventory.ItemStack localized = Translations.renderItemStack(previous, locale);
+                if (localized == previous) {
+                    return protocolItemStack; // nothing translatable to resolve
+                }
+                return SpigotConversionUtil.fromBukkitItemStack(localized);
+            }
+
+            // Bare custom items: expand into their (unresolved) view, then localize for the recipient.
             final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(previous.clone());
-            final org.bukkit.inventory.ItemStack result = itemOpt.map(itemInstance -> {
-                // Render the page this specific viewer is looking at (defaults to most relevant).
-                final Integer page = viewer != null ? lorePageService.resolve(viewer.getUniqueId(), itemInstance) : null;
-                return itemInstance.getView().get(null, page);
-            }).orElse(previous).clone();
+            if (itemOpt.isEmpty()) {
+                return protocolItemStack;
+            }
+            // Expand into the view for the lore page this specific viewer is looking at (defaults to most
+            // relevant), then localize that (unresolved) view into the recipient's locale.
+            final Integer page = viewer != null ? lorePageService.resolve(viewer.getUniqueId(), itemOpt.get()) : null;
+            final org.bukkit.inventory.ItemStack view = itemOpt.get().getView().get(null, page);
+            final org.bukkit.inventory.ItemStack result = Translations.renderItemStack(view, locale);
             return SpigotConversionUtil.fromBukkitItemStack(result);
         } catch (Exception e) {
             return protocolItemStack;

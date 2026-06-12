@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.ReferencingInventory;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -41,8 +42,7 @@ public class TransactionButton extends ControlItem<ShopItemMenu> {
             return ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(Resources.ItemModel.INVISIBLE)
-                    .displayName(Component.empty()
-                            .append(Component.text("You cannot sell this!", NamedTextColor.RED)))
+                    .displayName(Translations.component("shops.menu.shop-item.button.cannot-sell.name").color(NamedTextColor.RED))
                     .build();
         }
 
@@ -50,11 +50,11 @@ public class TransactionButton extends ControlItem<ShopItemMenu> {
                 .material(Material.PAPER)
                 .itemModel(Resources.ItemModel.INVISIBLE)
                 .displayName(Component.empty()
-                        .append(Component.text(buy ? "Buy" : "Sell", NamedTextColor.GREEN))
+                        .append(Translations.component(buy ? "shops.menu.shop-item.button.buy.name" : "shops.menu.shop-item.button.sell.name").color(NamedTextColor.GREEN))
                         .appendSpace()
                         .append(Component.text(amount, NamedTextColor.WHITE))
                         .appendSpace()
-                        .append(Component.text("for", NamedTextColor.GRAY))
+                        .append(Translations.component("shops.menu.shop-item.button.for").color(NamedTextColor.GRAY))
                         .appendSpace()
                         .append(component))
                 .build();

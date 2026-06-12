@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.world.menu.button.KeepSpawnLoadedButton;
 import me.mykindos.betterpvp.core.world.menu.button.SetSeedButton;
 import me.mykindos.betterpvp.core.world.menu.button.StructuresButton;
 import me.mykindos.betterpvp.core.world.menu.button.VoidButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -41,7 +42,7 @@ public class GuiCreateWorld extends AbstractGui implements Windowed {
             case NETHER -> Material.NETHERRACK;
             case THE_END -> Material.END_STONE;
             case CUSTOM -> Material.GLASS;
-        }, type -> Component.text("Dimension: ", NamedTextColor.GRAY).append(switch (type) {
+        }, type -> Translations.component("core.menu.world.create.button.dimension.name").color(NamedTextColor.GRAY).append(switch (type) {
             case NORMAL -> Component.text("Normal", TextColor.color(82, 199, 85));
             case NETHER -> Component.text("Nether", TextColor.color(214, 92, 92));
             case THE_END -> Component.text("The End", TextColor.color(223, 224, 119));
@@ -52,7 +53,7 @@ public class GuiCreateWorld extends AbstractGui implements Windowed {
             case NORMAL -> Material.MEDIUM_AMETHYST_BUD;
             case LARGE_BIOMES -> Material.LARGE_AMETHYST_BUD;
             case AMPLIFIED -> Material.AMETHYST_CLUSTER;
-        }, type -> Component.text("World Type: ", NamedTextColor.GRAY).append(switch (type) {
+        }, type -> Translations.component("core.menu.world.create.button.world-type.name").color(NamedTextColor.GRAY).append(switch (type) {
             case FLAT -> Component.text("Flat", TextColor.color(147, 252, 129));
             case NORMAL -> Component.text("Normal", TextColor.color(240, 252, 131));
             case LARGE_BIOMES -> Component.text("Large Biomes", TextColor.color(245, 174, 113));
@@ -68,6 +69,6 @@ public class GuiCreateWorld extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Create a World");
+        return Translations.component("core.menu.world.create.title");
     }
 }

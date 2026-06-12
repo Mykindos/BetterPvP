@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.CreateListingButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.MyListingsButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.ViewListingsButton;
@@ -25,6 +26,6 @@ public class AuctionHouseMenu extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Auction House");
+        return Translations.component("shops.menu.auction-house.title");
     }
 }

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -43,7 +44,7 @@ public class FarmingInfoSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "See information about your clan's farming capabilities.";
+        return "clans.command.farming-info.description";
     }
 
     @Override
@@ -52,19 +53,19 @@ public class FarmingInfoSubCommand extends ClanSubCommand {
 
         final int minY = ClanPerkManager.getInstance().computeFarmingLevelMinY(clan, baseFarmingY, baseFarmingLevels);
 
-        Component message = Component.text("Farming Info:")
+        Component message = Translations.component("clans.command.clan.farming.header")
                 .append(Component.newline())
-                .append(Component.text("Farming Y Levels: ", NamedTextColor.WHITE))
+                .append(Translations.component("clans.command.clan.farming.y-levels"))
                 .append(Component.text( baseFarmingY + " to " + minY, NamedTextColor.GREEN));
 
-        final String offlineGrowingText = offlineGrowing ? "No" : "Yes";
+        final Component offlineGrowingText = offlineGrowing ? Translations.component("clans.command.clan.farming.no") : Translations.component("clans.command.clan.farming.yes");
         final NamedTextColor offlineGrowingColor = offlineGrowing ? NamedTextColor.RED : NamedTextColor.GREEN;
 
         message = message
                 .append(Component.newline())
-                .append(Component.text("Clan must be online for crops to grow: ", NamedTextColor.WHITE))
-                .append(Component.text(offlineGrowingText, offlineGrowingColor));
+                .append(Translations.component("clans.command.clan.farming.online-growing-required"))
+                .append(offlineGrowingText.color(offlineGrowingColor));
 
-        UtilMessage.message(player, "Clans", message);
+        UtilMessage.message(player, CLANS_PREFIX, message);
     }
 }

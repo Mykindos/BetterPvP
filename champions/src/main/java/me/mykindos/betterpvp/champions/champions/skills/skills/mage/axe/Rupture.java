@@ -45,6 +45,9 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.WeakHashMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 
 @Singleton
 @BPvPListener
@@ -70,18 +73,13 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Rupture the earth in the direction",
-                "you are facing, dealing " + getValueString(this::getDamage, level) + " damage,",
-                "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> to enemies",
-                "hit for " + getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component slownessIII = Translations.component("champions.skill.effect.slowness",
+                Component.text("III")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.rupture.description", damage, slowDuration, cooldown, slownessIII);
     }
 
     public double getDamage(int level) {

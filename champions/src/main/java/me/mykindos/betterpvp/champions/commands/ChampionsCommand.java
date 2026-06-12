@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,7 +32,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Base champions command";
+        return "champions.command.champions.description";
     }
 
     @Override
@@ -77,8 +79,8 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Reload the champions plugin";
-        }
+        return "champions.command.reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -95,7 +97,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             buildManager.reloadBuilds();
             tipManager.reloadTips(champions);
 
-            UtilMessage.message(sender, "Champions", "Successfully reloaded champions");
+            UtilMessage.message(sender, "core.prefix.champions", "champions.command.reloaded");
         }
     }
 
@@ -119,8 +121,8 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Change validation of players stats";
-        }
+        return "champions.command.validate.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -136,7 +138,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
                     final Client targetClient = targetOptional.get();
                     stats.validate(targetClient, isValid);
 
-                    UtilMessage.simpleMessage(sender, "Champions", "Successfully invalidated <yellow>%s's</yellow> stats", targetClient.getName());
+                    UtilMessage.message(sender, "core.prefix.champions", "champions.command.invalidated", Component.text(targetClient.getName() + "'s", NamedTextColor.YELLOW));
                 }
 
             });

@@ -35,6 +35,7 @@ import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.leaderboards.CoreLeaderboardLoader;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.logging.LoggerFactory;
 import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
@@ -88,6 +89,8 @@ public class Core extends BPvPPlugin {
     public void onEnable() {
         saveDefaultConfig();
         ConfigurationSerialization.registerClass(OrientedVector.class);
+        TranslationService.registerGlobalTranslator();
+        TranslationService.registerBundle(this, "translations.core");
 
 
         // Add this appender first to ensure we still capture all logs before database is initialized

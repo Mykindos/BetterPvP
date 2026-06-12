@@ -29,7 +29,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Button that shows a description and wiki entries.
@@ -39,6 +41,16 @@ import java.util.Map;
 public class InfoTabButton extends AbstractItem {
 
     private final @Nullable Component description;
+
+    /**
+     * Pre-split description lines. When non-empty these are used verbatim (first line becomes the display
+     * name, the rest become lore) instead of word-wrapping {@link #description}. This is the localization
+     * path: a translatable description cannot be word-wrapped at build time (its text is unresolved until
+     * the packet boundary), so callers pass already-wrapped translatable lines via
+     * {@code Translations.rawComponentLines(key)}.
+     */
+    @Singular("descriptionLine")
+    private final List<Component> descriptionLines;
 
     @Singular("wikiEntry")
     private final Map<String, URL> wikiEntries;
@@ -62,7 +74,16 @@ public class InfoTabButton extends AbstractItem {
         }
 
         boolean started = false;
-        if (description != null) {
+        if (descriptionLines != null && !descriptionLines.isEmpty()) {
+            // Pre-split (translatable) lines: use as-is, no word-wrapping. White fallback so unresolved
+            // lines render white once localized at the packet boundary.
+            final LinkedList<Component> components = descriptionLines.stream()
+                    .map(line -> line.applyFallbackStyle(NamedTextColor.WHITE))
+                    .collect(Collectors.toCollection(LinkedList::new));
+            builder.displayName(components.poll());
+            builder.lore(components);
+            started = true;
+        } else if (description != null) {
             final Component descriptionComponent = description.applyFallbackStyle(NamedTextColor.WHITE);
             final LinkedList<Component> components = new LinkedList<>(ComponentWrapper.wrapLine(descriptionComponent, 40, true));
             Preconditions.checkState(!components.isEmpty(), "Description must have at least one line");

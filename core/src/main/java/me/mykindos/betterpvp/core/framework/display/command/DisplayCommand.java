@@ -16,7 +16,7 @@ public class DisplayCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Modify a block display";
+        return "core.command.display.description";
     }
 
     @Override
@@ -28,11 +28,11 @@ public class DisplayCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if (args.length != 0) return;
 
-        UtilMessage.simpleMessage(player, "Display", "Display commands:");
-        UtilMessage.simpleMessage(player, "Display", "/display summon <type> [options] - Summon a display entity");
-        UtilMessage.simpleMessage(player, "Display", "/display select - Select a display by punching it");
-        UtilMessage.simpleMessage(player, "Display", "/display deselect - Deselect a display");
-        UtilMessage.simpleMessage(player, "Display", "/display remove - Despawn the selected display");
-        UtilMessage.simpleMessage(player, "Display", "/display transform <action> [options] - Transform the selected display");
+        UtilMessage.message(player, "core.prefix.display", "core.display.help.header");
+        UtilMessage.message(player, "core.prefix.display", "core.display.help.summon");
+        UtilMessage.message(player, "core.prefix.display", "core.display.help.select");
+        UtilMessage.message(player, "core.prefix.display", "core.display.help.deselect");
+        UtilMessage.message(player, "core.prefix.display", "core.display.help.remove");
+        UtilMessage.message(player, "core.prefix.display", "core.display.help.transform");
     }
 }

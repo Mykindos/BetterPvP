@@ -12,6 +12,6 @@ import org.bukkit.Material;
 @ItemKey("progression:compacted_log")
 public class CompactedLog extends BaseItem {
     public CompactedLog() {
-        super("Compacted Log", ItemView.builder().material(Material.OAK_WOOD).glow(true).build().get(), ItemGroup.BLOCK, ItemRarity.COMMON);
+        super(translatableName("progression.item.compacted-log.name"), ItemView.builder().material(Material.OAK_WOOD).glow(true).build().get(), ItemGroup.BLOCK, ItemRarity.COMMON);
     }
 }

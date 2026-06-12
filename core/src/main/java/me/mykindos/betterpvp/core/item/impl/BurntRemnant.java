@@ -14,6 +14,6 @@ public class BurntRemnant extends BaseItem {
 
     @Inject
     private BurntRemnant() {
-        super("Burnt Remnant", Item.model("burnt_remnant", 1), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.burnt-remnant.name"), Item.model("burnt_remnant", 1), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 }

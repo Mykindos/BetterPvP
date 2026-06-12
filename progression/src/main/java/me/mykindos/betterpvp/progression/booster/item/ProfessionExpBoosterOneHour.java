@@ -18,7 +18,7 @@ public class ProfessionExpBoosterOneHour extends BaseItem {
 
     @Inject
     public ProfessionExpBoosterOneHour(BoosterManager boosterManager) {
-        super("One Hour Profession Experience Booster", ItemStack.of(Material.EXPERIENCE_BOTTLE), ItemGroup.CONSUMABLE, ItemRarity.EPIC);
+        super(translatableName("progression.item.profession-exp-booster-one-hour.name"), ItemStack.of(Material.EXPERIENCE_BOTTLE), ItemGroup.CONSUMABLE, ItemRarity.EPIC);
         
         // 1 hours = 60 * 60 * 1000
         long durationMillis = 60L * 60L * 1000L;

@@ -43,7 +43,7 @@ public class AdminMessageCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Send an admin message to a player";
+        return "core.command.admin-message.description";
     }
 
     @Override
@@ -52,12 +52,12 @@ public class AdminMessageCommand extends Command {
         final var search = clientManager.search(player);
 
         if (args.length == 0) {
-            UtilMessage.message(player, "Core", "Usage: <player> <message>");
+            UtilMessage.message(player, "core.prefix.core", "core.command.adminmessage.usage");
             return;
         }
 
         if (args.length == 1) {
-            UtilMessage.message(player, "Core", "You must specify a message");
+            UtilMessage.message(player, "core.prefix.core", "core.command.adminmessage.message_required");
             return;
         }
 

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,12 +44,12 @@ public class EnergyBoost extends CooldownInteraction implements DisplayedInterac
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Energy Boost");
+        return Translations.component("champions.ability.energy-boost.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Instantly grants a flat energy boost when used.");
+        return Translations.component("champions.ability.energy-boost.description");
     }
 
     @Override
@@ -63,9 +65,7 @@ public class EnergyBoost extends CooldownInteraction implements DisplayedInterac
         }
 
         energyService.regenerateEnergy(player, energy, EnergyEvent.Cause.USE);
-        UtilMessage.message(player, "Item", Component.text("You used ", NamedTextColor.GRAY)
-                .append(getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW))
-                .append(Component.text(".", NamedTextColor.GRAY)));
+        UtilMessage.message(player, "core.prefix.item", "champions.item.used", getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW));
         soundEffect.play(player);
         return InteractionResult.Success.ADVANCE;
     }

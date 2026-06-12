@@ -316,7 +316,7 @@ public class TreeRespawnManager {
 
                 Location bufferedLocation = location.clone().add(offsetX, 0, offsetZ);
                 Optional<Clan> nearbyClan = clanManager.getClanByLocation(bufferedLocation);
-                if (nearbyClan.filter(clan -> !clan.isAdmin()).isPresent()) {
+                if (nearbyClan.isPresent()) {
                     return true;
                 }
             }

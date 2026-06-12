@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.vote.menu;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -63,7 +64,7 @@ public class VotingCrateMenu extends AbstractGui {
         }
 
         // Target indicators
-        ItemProvider target = new ItemWrapper(ItemView.builder().material(Material.HOPPER).displayName(Component.text("Winning Slot", NamedTextColor.YELLOW)).build().toItemStack());
+        ItemProvider target = new ItemWrapper(ItemView.builder().material(Material.HOPPER).displayName(Translations.component("core.menu.vote.button.winning-slot.name").color(NamedTextColor.YELLOW)).build().toItemStack());
         setSlotElement(4, new SlotElement.ItemSlotElement(new SimpleItem(target)));
         setSlotElement(22, new SlotElement.ItemSlotElement(new SimpleItem(target)));
 
@@ -123,13 +124,13 @@ public class VotingCrateMenu extends AbstractGui {
 
     public void show(Player player) {
         if (lootTable.getWeightedLoot().isEmpty()) {
-            UtilMessage.simpleMessage(player, "Voting", "<red>The voting crate is currently empty. Please contact an administrator.");
+            UtilMessage.message(player, "core.prefix.voting", Translations.component("core.vote.empty").color(NamedTextColor.RED));
             return;
         }
 
         Window.single()
                 .setGui(this)
-                .setTitle(Component.text("Voting Crate", NamedTextColor.DARK_AQUA))
+                .setTitle(Translations.component("core.menu.vote.title").color(NamedTextColor.DARK_AQUA))
                 .open(player);
 
         startRolling(player);
@@ -173,9 +174,9 @@ public class VotingCrateMenu extends AbstractGui {
                                     Component.translatable(winner.getType().translationKey()));
                         }
                         Component winText = Component.text("You won: ", NamedTextColor.YELLOW)
-                                .append(name.hoverEvent(winner))
+                                .append(name.hoverEvent(Translations.renderItemStack(winner, player.locale())))
                                 .append(Component.text("!", NamedTextColor.YELLOW));
-                        UtilMessage.simpleMessage(player, "Voting", winText);
+                        UtilMessage.message(player, "core.prefix.voting", winText);
                         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                         UtilItem.insert(player, winner);
                     }

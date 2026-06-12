@@ -112,12 +112,12 @@ public final class ClanCore {
 
         player.teleportAsync(teleportLocation).thenAccept(success -> {
             if (Boolean.FALSE.equals(success)) {
-                UtilMessage.message(player, "Clans", "<red>Failed to teleport to clan core");
+                UtilMessage.message(player, "clans.prefix", "clans.core.teleport.failed");
                 return;
             }
 
             if (feedback) {
-                UtilMessage.message(player, "Clans", "Teleported to clan core");
+                UtilMessage.message(player, "clans.prefix", "clans.core.teleport.success");
             }
 
             client.getStatContainer().incrementStat(ClientStat.CLANS_TELEPORT_CORE, 1);

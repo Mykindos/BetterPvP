@@ -33,19 +33,19 @@ public class PlayerAdminCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Send a message to staff";
+        return "core.command.player-admin.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Core", "You must specify a message");
+            UtilMessage.message(player, "core.prefix.core", "core.command.admin.message_required");
             return;
         }
 
         if (client.hasPunishment(PunishmentTypes.MUTE)) {
             if (!cooldownManager.use(player, getName(), 120, false, false)) {
-                UtilMessage.message(player, "Core", "You must wait 2 minutes between using this command.");
+                UtilMessage.message(player, "core.prefix.core", "core.command.admin.cooldown");
                 return;
             }
         }

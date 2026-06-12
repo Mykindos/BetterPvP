@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -23,12 +24,12 @@ public class CustomEffectCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Apply/remove a custom effect to a player";
+        return "core.command.custom-effect.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.simpleMessage(player, "<yellow>Usage:</yellow> /customeffect <give|clear>");
+        UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.usage");
     }
 
     @Override
@@ -50,19 +51,19 @@ public class CustomEffectCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Give a player a custom effect";
-        }
+        return "core.command.custom-effect-give.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 2) {
-                UtilMessage.simpleMessage(player, "<yellow>Usage:</yellow> /customeffect give <player> <effect> [duration] [amplifier]");
+                UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.give.usage");
                 return;
             }
 
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid target (does not exist)", args[0]));
+                UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.invalid_target", Component.text(args[0]));
                 return;
             }
 
@@ -71,7 +72,7 @@ public class CustomEffectCommand extends Command {
                     .findFirst()
                     .orElse(null);
             if(effect == null) {
-                UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid effect", args[1]));
+                UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.invalid_effect", Component.text(args[1]));
                 return;
             }
 
@@ -80,7 +81,7 @@ public class CustomEffectCommand extends Command {
                 try {
                     duration = Integer.parseInt(args[2]);
                 } catch (NumberFormatException e) {
-                    UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid number", args[2]));
+                    UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.invalid_number", Component.text(args[2]));
                     return;
                 }
 
@@ -91,14 +92,19 @@ public class CustomEffectCommand extends Command {
                 try {
                     strength = Integer.parseInt(args[3]);
                 } catch (NumberFormatException e) {
-                    UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid number", args[2]));
+                    UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.invalid_number", Component.text(args[3]));
                     return;
                 }
 
             }
             effectManager.addEffect(target, effect, strength, duration * 1000L);
-            Component message = UtilMessage.deserialize("<yellow>%s</yellow> applied <white>%s %s</white> to <yellow>%s</yellow> for <green>%s</green> seconds", player.getName(), effect.getName(), strength, target.getName(), duration);
-            gamerManager.sendMessageToRank("Effect", message, Rank.TRIAL_MOD);
+            Component message = Translations.component("core.command.customeffect.give.success",
+                    Component.text(player.getName()),
+                    Component.text(effect.getName()),
+                    Component.text(strength),
+                    Component.text(target.getName()),
+                    Component.text(duration));
+            gamerManager.sendMessageToRank("core.prefix.effect", message, Rank.TRIAL_MOD);
         }
 
         @Override
@@ -123,26 +129,28 @@ public class CustomEffectCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Clear effects from a player";
-        }
+        return "core.command.custom-effect-clear.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 1) {
-                UtilMessage.simpleMessage(player, "<yellow>Usage:</yellow> /customeffect clear <player> [effect]");
+                UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.clear.usage");
                 return;
             }
 
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid target (does not exist)", args[0]));
+                UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.invalid_target", Component.text(args[0]));
                 return;
             }
 
             if (args.length < 2) {
                 effectManager.removeAllEffects(target);
-                Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed all effects from <yellow>%s</yellow>", player.getName(), target.getName());
-                gamerManager.sendMessageToRank("Effect", message, Rank.TRIAL_MOD);
+                Component message = Translations.component("core.command.customeffect.clear.all.success",
+                        Component.text(player.getName()),
+                        Component.text(target.getName()));
+                gamerManager.sendMessageToRank("core.prefix.effect", message, Rank.TRIAL_MOD);
                 return;
             }
 
@@ -152,13 +160,16 @@ public class CustomEffectCommand extends Command {
                     .findFirst()
                     .orElse(null);
             if(effect == null) {
-                UtilMessage.message(player, "Core", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid effect", args[1]));
+                UtilMessage.message(player, "core.prefix.effect", "core.command.customeffect.invalid_effect", Component.text(args[1]));
                 return;
             }
 
             effectManager.removeEffect(target, effect);
-            Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed <white>%s</white> from <yellow>%s</yellow>", player.getName(), effect.getName(), target.getName());
-            gamerManager.sendMessageToRank("Effect", message, Rank.TRIAL_MOD);
+            Component message = Translations.component("core.command.customeffect.clear.effect.success",
+                    Component.text(player.getName()),
+                    Component.text(effect.getName()),
+                    Component.text(target.getName()));
+            gamerManager.sendMessageToRank("core.prefix.effect", message, Rank.TRIAL_MOD);
         }
 
         @Override

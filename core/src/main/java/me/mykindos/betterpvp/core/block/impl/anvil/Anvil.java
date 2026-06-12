@@ -12,9 +12,11 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.Hammer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -115,7 +117,7 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
     private void handleItemPlacement(@NotNull AnvilData data, @NotNull Player player, @NotNull ItemInstance itemInstance) {
         // Check if anvil is full
         if (data.isFull()) {
-            UtilMessage.message(player, "Anvil", "<red>This anvil is full!");
+            UtilMessage.message(player, "core.prefix.anvil", Translations.component("core.block.anvil.full").color(NamedTextColor.RED));
             new SoundEffect(Sound.BLOCK_ANVIL_BREAK, 0.5f, 0.5f).play(player);
             return;
         }

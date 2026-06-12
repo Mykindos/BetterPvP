@@ -38,7 +38,7 @@ public class ClansSkillListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onChampionsSkill(PlayerUseSkillEvent event) {
         if (!clanManager.canCast(event.getPlayer())) {
-            UtilMessage.message(event.getPlayer(), "Restriction", "You cannot use this skill here.");
+            UtilMessage.message(event.getPlayer(), "core.prefix.restriction", "clans.combat.skill-here-denied");
             event.setCancelled(true);
         }
     }
@@ -108,7 +108,7 @@ public class ClansSkillListener implements Listener {
     @EventHandler
     public void disableSafezone(PlayerCanUseSkillEvent event) {
         if (!clanManager.canCast(event.getPlayer())) {
-            UtilMessage.message(event.getPlayer(), "Restriction", "You cannot use this skill here.");
+            UtilMessage.message(event.getPlayer(), "core.prefix.restriction", "clans.combat.skill-here-denied");
             event.setCancelled(true);
         }
     }

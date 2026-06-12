@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.settings.menus;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -27,8 +28,8 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.IRON_BARS)
-                    .displayName(Component.text("Sidebar", color))
-                    .lore(Component.text("Whether to display the sidebar or not", NamedTextColor.GRAY))
+                    .displayName(Translations.component("clans.menu.settings.button.sidebar.name").color(color))
+                    .lore(Translations.component("clans.menu.settings.button.sidebar.lore").color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -44,8 +45,8 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.MAP)
-                    .displayName(Component.text("Map Points of Interest", color))
-                    .lore(Component.text("Whether to show points of interest on the map or not", NamedTextColor.GRAY))
+                    .displayName(Translations.component("clans.menu.settings.button.map-poi.name").color(color))
+                    .lore(Translations.component("clans.menu.settings.button.map-poi.lore").color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -59,8 +60,8 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.FILLED_MAP)
-                    .displayName(Component.text("Map Player Names", color))
-                    .lore(Component.text("Whether or not to display player names on the map", NamedTextColor.GRAY))
+                    .displayName(Translations.component("clans.menu.settings.button.map-player-names.name").color(color))
+                    .lore(Translations.component("clans.menu.settings.button.map-player-names.lore").color(NamedTextColor.GRAY))
                     .hideAdditionalTooltip(true)
                     .frameLore(true)
                     .build()
@@ -75,8 +76,8 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
                     .material(Material.WRITABLE_BOOK)
-                    .displayName(Component.text("Territory Popups", color))
-                    .lore(Component.text("Whether or not to display territory popups", NamedTextColor.GRAY))
+                    .displayName(Translations.component("clans.menu.settings.button.territory-popups.name").color(color))
+                    .lore(Translations.component("clans.menu.settings.button.territory-popups.lore").color(NamedTextColor.GRAY))
                     .hideAdditionalTooltip(true)
                     .frameLore(true)
                     .build()
@@ -89,7 +90,7 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Clans Settings");
+        return Translations.component("clans.menu.settings.title");
     }
 
     @Override
@@ -97,8 +98,8 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
         return Description.builder()
                 .icon(ItemView.builder()
                         .material(Material.IRON_DOOR)
-                        .displayName(Component.text("Clans Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
-                        .lore(Component.text("View generic settings related to the clans gamemode", NamedTextColor.GRAY))
+                        .displayName(Translations.component("clans.menu.settings.tab.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                        .lore(Translations.component("clans.menu.settings.tab.lore").color(NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
                         .frameLore(true)
                         .build())

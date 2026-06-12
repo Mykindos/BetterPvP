@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.champions.champions.builds;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @AllArgsConstructor
 @Data
@@ -30,7 +30,11 @@ public class BuildSkill {
         if (boosted) {
             displayLevel++;
         }
-        return UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), displayLevel);
+        return Component.empty()
+                .append(skill.getDisplayName().color(NamedTextColor.YELLOW))
+                .append(Component.text(" ("))
+                .append(Component.text(displayLevel, NamedTextColor.GREEN))
+                .append(Component.text(")"));
     }
 
     public BuildSkill copy() {

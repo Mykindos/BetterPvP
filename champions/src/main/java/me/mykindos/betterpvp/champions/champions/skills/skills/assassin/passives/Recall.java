@@ -17,9 +17,13 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -59,15 +63,16 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
-                "Drop your Sword / Axe to activate",
-                "",
-                "Teleports you back in time " + getValueString(this::getDuration, level) + " seconds, increasing",
-                "your health by " + getValueString(this::getPercentHealthRecovered, level, 100, "%", 0) + " of your maximum health",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component health = getValueComponent(this::getPercentHealthRecovered, level, 100, 0, "%");
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.recall.description",
+                duration,
+                health,
+                cooldown
+        );
     }
 
     private double getPercentHealthRecovered(int level) {

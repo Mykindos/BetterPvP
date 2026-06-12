@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.effects;
 
 import lombok.Data;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 
 @Data
@@ -40,6 +41,17 @@ public abstract class EffectType {
 
     public String getGenericDescription() {
         return "";
+    }
+
+    /**
+     * The player-facing, translatable generic description of this effect type. Defaults to an empty
+     * component; effect types with a generic description should override this with a translatable
+     * component (e.g. {@code core.effect.bleed.generic}).
+     *
+     * @return the translatable generic-description component
+     */
+    public Component getGenericDescriptionComponent() {
+        return Component.empty();
     }
 
     public boolean mustBeManuallyRemoved() {

@@ -18,7 +18,7 @@ public class IronPlate extends BaseItem {
 
     @Inject
     private IronPlate() {
-        super("Iron Plate", Item.model("iron_plate", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.iron-plate.name"), Item.model("iron_plate", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
         addBaseComponent(new ReinforcementComponent(ItemRarity.COMMON));
     }
 }

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.menu.viewer.ItemButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
@@ -64,7 +66,7 @@ public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
         final ItemInstance hammer = itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:hammer"));
         final TextComponent hammerName = Component.text(recipe.getHammerSwings(), NamedTextColor.YELLOW)
                 .appendSpace()
-                .append(Component.text("Hammer Swings", NamedTextColor.GREEN));
+                .append(Translations.component("core.menu.recipe.hammering.swings.label").color(NamedTextColor.GREEN));
         setItem(33, new SimpleItem(ItemView.of(hammer.getView().get()).toBuilder()
                 .amount(recipe.getRequiredHammerSwings())
                 .displayName(hammerName)
@@ -76,7 +78,7 @@ public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:anvil")).createItemStack())
                 .wikiEntry("Test", url)
-                .description(Component.text("Click on an ingredient to look at its recipes. Anvil recipes require a certain amount of hammer swings to execute."))
+                .descriptionLines(List.of(Translations.rawComponentLines("core.menu.recipe.hammering.info.description")))
                 .build());
         setBackground(Menu.INVISIBLE_BACKGROUND_ITEM);
     }

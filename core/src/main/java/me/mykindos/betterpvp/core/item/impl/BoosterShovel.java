@@ -22,7 +22,7 @@ public class BoosterShovel extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 32;
 
     public BoosterShovel() {
-        super("Booster Shovel", ItemStack.of(Material.GOLDEN_SHOVEL), ItemGroup.TOOL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.booster-shovel.name"), ItemStack.of(Material.GOLDEN_SHOVEL), ItemGroup.TOOL, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

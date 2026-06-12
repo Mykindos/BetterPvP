@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -41,7 +42,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
     private static final SimpleItem EMPTY_MEMBER_SLOT = new SimpleItem(ItemView.builder()
             .material(Material.RED_STAINED_GLASS_PANE)
             .displayName(Component.empty())
-            .lore(Component.text("EMPTY SLOT!", NamedTextColor.RED))
+            .lore(Translations.component("clans.menu.clan.button.member.empty.lore.1").color(NamedTextColor.RED))
             .lore(Component.empty())
             .build());
 
@@ -124,6 +125,6 @@ public class ClanMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("View " + clan.getName());
+        return Translations.component("clans.menu.clan.title", Component.text(clan.getName()));
     }
 }

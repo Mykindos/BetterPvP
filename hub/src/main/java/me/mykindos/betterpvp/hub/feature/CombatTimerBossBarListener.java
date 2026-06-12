@@ -7,10 +7,12 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarColor;
 import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -44,6 +46,8 @@ public class CombatTimerBossBarListener implements Listener {
         final long remainingMillis = gamer.getRemainingCombatMillis();
         final int seconds = (int) Math.ceil(remainingMillis / 1000.0D);
         final float progress = (float) remainingMillis / DamageLog.EXPIRY;
-        return new BossBarData(UtilMessage.deserialize("<red>In Combat: <dark_red>%s", seconds), progress);
+        return new BossBarData(Translations.component("hub.combat-timer.boss-bar",
+                Component.text("In Combat:", NamedTextColor.RED),
+                Component.text(seconds, NamedTextColor.DARK_RED)), progress);
     }
 }

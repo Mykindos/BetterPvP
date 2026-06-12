@@ -49,7 +49,7 @@ public class RestoreChunkSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Restore all block changes in the current chunk to their last known state";
+        return "core.command.restore-chunk.description";
     }
 
     @Override
@@ -60,7 +60,9 @@ public class RestoreChunkSubCommand extends Command {
         int minZ = chunk.getZ() << 4;
         int maxZ = minZ + 15;
 
-        UtilMessage.message(player, "World Logger", "Starting chunk restore process for chunk at " + chunk.getX() + ", " + chunk.getZ() + "...");
+        UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restorechunk.start",
+                net.kyori.adventure.text.Component.text(chunk.getX()),
+                net.kyori.adventure.text.Component.text(chunk.getZ()));
 
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             var query = ctx.selectQuery();
@@ -104,17 +106,17 @@ public class RestoreChunkSubCommand extends Command {
                 });
 
                 if (worldLogs.isEmpty()) {
-                    UtilMessage.message(player, "World Logger", "No logs found for this chunk.");
+                    UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restorechunk.none");
                     return;
                 }
 
                 // Process the restore
                 processRestore(worldLogs);
 
-                UtilMessage.message(player, "World Logger", "Chunk restore completed.");
+                UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restorechunk.completed");
 
             } catch (Exception ex) {
-                UtilMessage.simpleMessage(player, "World Logger", "Failed to restore chunk");
+                UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restorechunk.failed");
                 log.error("Failed to restore chunk", ex).submit();
             }
         });

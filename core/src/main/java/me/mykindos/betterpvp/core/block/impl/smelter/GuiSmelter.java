@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.fuel.FuelComponent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.metal.casting.CastingMold;
@@ -198,9 +199,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 .addIngredient('g', new ProgressArrow(true))
                 .addIngredient('W', new WarningIcon())
                 .addIngredient('I', InfoTabButton.builder()
-                        .description(Component.text("The smelter allows you to melt down metals and " +
-                                "alloys into liquid form, which can then be cast into various shapes using casting molds." +
-                                " It requires fuel to operate and has a temperature system that affects the smelting process."))
+                        .descriptionLines(List.of(Translations.rawComponentLines("core.menu.smelter.info.description")))
                         // todo: wiki entry
                         .wikiEntry("", URI.create("https://wiki.betterpvp.net/").toURL())
                         .build())
@@ -263,7 +262,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         private Component getFuelComponent() {
             final float percentage = Math.max(0, Math.min(1, data.getBurnTime() / (float) data.getFuelManager().getLastBurnTime()));
             final ProgressColor progressColor = new ProgressColor(percentage);
-            return Component.text("Burn Time:", TextColor.color(214, 214, 214))
+            return Translations.component("core.menu.smelter.fuel.label").color(TextColor.color(214, 214, 214))
                     .appendSpace()
                     .append(Component.text((int) Math.ceil(data.getBurnTime() / 1000.) + "s", progressColor.getTextColor()));
         }
@@ -271,7 +270,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         private Component getTemperatureComponent() {
             final float temperature = data.getTemperature();
             final TextColor color = new ProgressColor(temperature / 1_000).inverted().getTextColor();
-            return Component.text("Temperature:", TextColor.color(214, 214, 214))
+            return Translations.component("core.menu.smelter.temperature.label").color(TextColor.color(214, 214, 214))
                     .appendSpace()
                     .append(Component.text((int) temperature + " °C", color));
         }
@@ -348,20 +347,20 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             final String bucketsString = buckets == 1 ? "bucket" : "buckets";
 
             builder.material(Material.PAPER);
-            builder.lore(Component.text("Stored:", TextColor.color(214, 214, 214))
+            builder.lore(Translations.component("core.menu.smelter.alloy.stored.label").color(TextColor.color(214, 214, 214))
                             .appendSpace()
                             .append(Component.text(UtilFormat.formatNumber(buckets, 1) + " " + bucketsString, storedColor)));
-            builder.lore(Component.text("Max Capacity:", TextColor.color(214, 214, 214))
+            builder.lore(Translations.component("core.menu.smelter.alloy.max-capacity.label").color(TextColor.color(214, 214, 214))
                             .appendSpace()
                             .append(Component.text(UtilFormat.formatNumber(maxMillibuckets / 1000, 1) + " buckets", TextColor.color(255, 0, 0))));
-            builder.action(ClickActions.RIGHT_SHIFT, Component.text("Clear", NamedTextColor.RED));
+            builder.action(ClickActions.RIGHT_SHIFT, Translations.component("core.menu.smelter.alloy.clear.name").color(NamedTextColor.RED));
 
             final float progress = millibuckets / (float) maxMillibuckets;
             final int phase = Math.max(0, Math.min(15, Math.round(progress * 15))); // 16 available phases
             if (storedLiquid == null || phase == 0) {
                 return builder
                         .itemModel(Resources.ItemModel.INVISIBLE)
-                        .displayName(Component.text("Empty", TextColor.color(255, 86, 74)))
+                        .displayName(Translations.component("core.menu.smelter.alloy.empty.name").color(TextColor.color(255, 86, 74)))
                         .build();
             }
 
@@ -393,14 +392,14 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.BARRIER)
                         .itemModel(Resources.ItemModel.STOP)
-                        .displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED))
-                        .action(ClickActions.ALL, Component.text("Select a casting mold"))
+                        .displayName(Translations.component("core.menu.smelter.no-mold.name").color(NamedTextColor.RED))
+                        .action(ClickActions.ALL, Translations.component("core.menu.smelter.select-mold.action"))
                         .build();
             }
 
             final ItemInstance instance = itemFactory.create(castingMold);
             return ItemView.of(instance.getView().get()).toBuilder()
-                    .action(ClickActions.ALL, Component.text("Select a casting mold"))
+                    .action(ClickActions.ALL, Translations.component("core.menu.smelter.select-mold.action"))
                     .build();
         }
 
@@ -424,8 +423,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
-                        .displayName(Component.text("No smelting recipe found!", NamedTextColor.RED))
-                        .lore(Component.text("No matching smelting recipe was found for the given items.", NamedTextColor.GRAY))
+                        .displayName(Translations.component("core.menu.smelter.warning.no-recipe.name").color(NamedTextColor.RED))
+                        .lore(Translations.component("core.menu.smelter.warning.no-recipe.lore").color(NamedTextColor.GRAY))
                         .build();
             }
 
@@ -434,8 +433,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
-                        .displayName(Component.text("Not burning!", NamedTextColor.RED))
-                        .lore(Component.text("The smelter is not currently burning. Add fuel to start the smelting process.", NamedTextColor.GRAY))
+                        .displayName(Translations.component("core.menu.smelter.warning.not-burning.name").color(NamedTextColor.RED))
+                        .lore(Translations.component("core.menu.smelter.warning.not-burning.lore").color(NamedTextColor.GRAY))
                         .build();
             }
 
@@ -444,8 +443,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
-                        .displayName(Component.text("No casting recipe found!", NamedTextColor.RED))
-                        .lore(Component.text("No matching casting recipe was found for the given items.", NamedTextColor.GRAY))
+                        .displayName(Translations.component("core.menu.smelter.warning.no-cast-recipe.name").color(NamedTextColor.RED))
+                        .lore(Translations.component("core.menu.smelter.warning.no-cast-recipe.lore").color(NamedTextColor.GRAY))
                         .build();
             }
 
@@ -455,8 +454,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
-                        .displayName(Component.text("Incompatible alloy!", NamedTextColor.RED))
-                        .lore(Component.text("The smelter already contains a different type of alloy.", NamedTextColor.GRAY))
+                        .displayName(Translations.component("core.menu.smelter.warning.incompatible.name").color(NamedTextColor.RED))
+                        .lore(Translations.component("core.menu.smelter.warning.incompatible.lore").color(NamedTextColor.GRAY))
                         .build();
             }
 
@@ -466,8 +465,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
-                        .displayName(Component.text("Not enough liquid capacity!", NamedTextColor.RED))
-                        .lore(Component.text("The smelter does not have enough capacity to store the resulting liquid.", NamedTextColor.GRAY))
+                        .displayName(Translations.component("core.menu.smelter.warning.no-capacity.name").color(NamedTextColor.RED))
+                        .lore(Translations.component("core.menu.smelter.warning.no-capacity.lore").color(NamedTextColor.GRAY))
                         .build();
             }
 
@@ -476,8 +475,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
-                        .displayName(Component.text("Liquid storage full!", NamedTextColor.RED))
-                        .lore(Component.text("The smelter's liquid storage is full. Clear some space to continue smelting.", NamedTextColor.GRAY))
+                        .displayName(Translations.component("core.menu.smelter.warning.storage-full.name").color(NamedTextColor.RED))
+                        .lore(Translations.component("core.menu.smelter.warning.storage-full.lore").color(NamedTextColor.GRAY))
                         .build();
             }
 
@@ -489,8 +488,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 return ItemView.builder()
                         .material(Material.PAPER)
                         .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_furnace_disabled"))
-                        .displayName(Component.text("Insufficient temperature!", NamedTextColor.RED))
-                        .lore(Component.text("The smelter's temperature is too low. Minimum required: ", TextColor.color(214, 214, 214))
+                        .displayName(Translations.component("core.menu.smelter.warning.low-temp.name").color(NamedTextColor.RED))
+                        .lore(Translations.component("core.menu.smelter.warning.low-temp.lore").color(TextColor.color(214, 214, 214))
                                 .appendSpace()
                                 .append(Component.text((int) correctTemp + " °C", color)))
                         .build();

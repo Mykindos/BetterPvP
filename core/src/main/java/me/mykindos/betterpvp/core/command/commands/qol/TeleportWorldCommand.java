@@ -15,6 +15,8 @@ import org.bukkit.entity.Player;
 @Singleton
 public class TeleportWorldCommand extends Command {
 
+    private static final String TELEPORT_PREFIX = "core.prefix.teleport";
+
     @WithReflection
     public TeleportWorldCommand() {
         aliases.add("tpworld");
@@ -28,7 +30,7 @@ public class TeleportWorldCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Teleport to a specific world.";
+        return "core.command.teleport-world.description";
     }
 
     @Override
@@ -37,7 +39,7 @@ public class TeleportWorldCommand extends Command {
             final String worldName = String.join(" ", args);
             World world = Bukkit.getWorld(worldName);
             if (world == null) {
-                UtilMessage.message(player, "Teleport", "World does not exist, creating it...");
+                UtilMessage.message(player, TELEPORT_PREFIX, "core.command.teleportworld.creating");
                 WorldCreator worldCreator = new WorldCreator(args[0]).generateStructures(false);
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("void")) {
@@ -53,10 +55,10 @@ public class TeleportWorldCommand extends Command {
             if (world != null) {
                 player.teleport(world.getSpawnLocation());
             } else {
-                UtilMessage.message(player, "Teleport", "Could not find world, something went wrong");
+                UtilMessage.message(player, TELEPORT_PREFIX, "core.command.teleportworld.failed");
             }
         } else {
-            UtilMessage.message(player, "Teleport", "You must specify a world name");
+            UtilMessage.message(player, TELEPORT_PREFIX, "core.command.teleportworld.usage");
         }
     }
 

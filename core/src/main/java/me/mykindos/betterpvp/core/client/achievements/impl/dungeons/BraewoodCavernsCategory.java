@@ -5,8 +5,9 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.types.DungeonsCategory;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
 @Singleton
@@ -24,7 +25,7 @@ public class BraewoodCavernsCategory extends AchievementCategory {
     public ItemView getItemView() {
         return ItemView.builder()
                 .material(Material.OAK_SAPLING)
-                .displayName(UtilMessage.deserialize("<white>Defeat Braewood Caverns"))
+                .displayName(Translations.component("core.achievement.category.braewood-caverns.name").color(NamedTextColor.WHITE))
                 .build();
     }
 }

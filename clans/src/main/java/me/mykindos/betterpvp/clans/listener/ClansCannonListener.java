@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,13 +44,13 @@ public class ClansCannonListener implements Listener {
         final String clanName = pdc.getOrDefault(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING, "");
         final Optional<Clan> clanOpt = clanManager.getClanByName(clanName);
         if (clanOpt.isEmpty()) {
-            UtilMessage.message(player, "Clans", "This cannon is not owned by a clan.");
+            UtilMessage.message(player, "core.prefix.clans", "clans.cannon.not-owned");
             return false;
         } else {
             final Clan clan = clanOpt.get();
             final Clan otherClan = clanManager.getClanByPlayer(player).orElse(null);
             if (clan != otherClan) {
-                UtilMessage.message(player, "Clans", "This cannon is owned by <alt2>%s</alt2>.", clan.getName());
+                UtilMessage.message(player, "core.prefix.clans", "clans.cannon.owned-by", Component.text(clan.getName(), NamedTextColor.YELLOW));
                 return false;
             }
         }
@@ -80,14 +82,15 @@ public class ClansCannonListener implements Listener {
     public void onPrePlace(PreCannonPlaceEvent event) {
         if(event.getPlayer().getWorld().getName().equalsIgnoreCase(BPvPWorld.BOSS_WORLD_NAME)) {
             event.cancel("Cannot place cannons here.");
-            UtilMessage.message(event.getPlayer(), "Clans", "You cannot place a cannon here.");
+            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.cannon.place-here-denied");
             return;
         }
 
         final Optional<Clan> clanByPlayer = clanManager.getClanByPlayer(event.getPlayer());
         if (clanByPlayer.isEmpty()) {
             event.cancel("No Clan");
-            UtilMessage.message(event.getPlayer(), "Clans", "You must be in a <alt2>Clan</alt2> to place a <alt2>cannon</alt2>.");
+            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.cannon.must-be-in-clan",
+                    Component.text("Clan", NamedTextColor.YELLOW), Component.text("cannon", NamedTextColor.YELLOW));
             return;
         }
 
@@ -98,7 +101,7 @@ public class ClansCannonListener implements Listener {
 
         if (clanByPlayer.get() != clanByLocation.get()) {
             event.cancel("Not Your Clan");
-            UtilMessage.message(event.getPlayer(), "Clans", "You cannot place a cannon in another clan's territory.");
+            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.cannon.place-other-territory-denied");
         }
     }
 

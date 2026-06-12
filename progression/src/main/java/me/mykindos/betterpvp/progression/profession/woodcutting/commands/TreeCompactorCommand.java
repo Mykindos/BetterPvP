@@ -10,11 +10,13 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.treecompactor.TreeCompactor;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -84,12 +86,9 @@ public class TreeCompactorCommand extends Command {
     }
 
     public Component getUsage() {
-        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>treecompactor <logType>");
-    }
-
-    private void feedbackMessage(@NotNull Player player, @NotNull String content) {
-        final String PREFIX = "TreeCompactor";
-        UtilMessage.simpleMessage(player, PREFIX, content);
+        return Translations.component("progression.command.treecompactor.usage",
+                Component.text("Usage", NamedTextColor.YELLOW),
+                Component.text("treecompactor <logType>", NamedTextColor.GREEN));
     }
 
     /**
@@ -114,7 +113,7 @@ public class TreeCompactorCommand extends Command {
             final @NotNull ItemStack result = itemFactory.create(compactedLog).createItemStack();
             result.setAmount(64);
             player.getInventory().addItem(result);
-            feedbackMessage(player, "Because you are in creative, you get 64 compacted logs");
+            UtilMessage.message(player, "core.prefix.treecompactor", "progression.command.treecompactor.creative-logs");
             return;
         }
 
@@ -122,13 +121,14 @@ public class TreeCompactorCommand extends Command {
 
             int skillLevel = treeCompactor.getSkillLevel(profile);
             if (skillLevel <= 0) {
-                feedbackMessage(player, "You do not have this command unlocked. See <green>/woodcutting");
+                UtilMessage.message(player, "core.prefix.treecompactor", "progression.command.treecompactor.not-unlocked",
+                        Component.text("/woodcutting", NamedTextColor.GREEN));
                 return;
             }
 
             // Only 1 argument is acceptable
             if (args.length != 1) {
-                UtilMessage.message(player, "Command", getUsage());
+                UtilMessage.message(player, "core.prefix.command", getUsage());
                 return;
             }
 
@@ -137,7 +137,8 @@ public class TreeCompactorCommand extends Command {
 
 
             if (inputtedLogTypeAsMaterial == null) {
-                feedbackMessage(player, "Unknown log type, <white>" + inputtedLogType);
+                UtilMessage.message(player, "core.prefix.treecompactor", "progression.command.treecompactor.unknown-log-type",
+                        Component.text(inputtedLogType, NamedTextColor.WHITE));
                 return;
             }
 
@@ -169,7 +170,8 @@ public class TreeCompactorCommand extends Command {
                 }
             }
 
-            feedbackMessage(player, "Compacted your logs <green>" + logsAfterCompaction + "x");
+            UtilMessage.message(player, "core.prefix.treecompactor", "progression.command.treecompactor.compacted",
+                    Component.text(logsAfterCompaction + "x", NamedTextColor.GREEN));
 
             if (logsAfterCompaction == 0) cooldownManager.removeCooldown(player, TREE_COMPACTOR, true);
 

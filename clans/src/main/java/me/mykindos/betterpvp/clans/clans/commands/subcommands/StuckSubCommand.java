@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.zone.Zone;
@@ -42,27 +43,26 @@ public class StuckSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Teleport out of a claim if you are stuck.";
+        return "clans.command.stuck.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if(!cooldownManager.use(player, getName(), 5, false, true)){
-            UtilMessage.message(player, "Clans", "Try again in a few seconds");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.stuck.cooldown");
             return;
         }
-        
+
         Zone zone = zoneManager.getZone(player);
         if (zone == null) {
-            UtilMessage.message(player, "Clans", Component.text("You must be in a territory to use ", NamedTextColor.GRAY)
-                    .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.stuck.not-claimed");
             return;
         }
 
 
         Optional<Location> nearestWilderness = clanManager.closestWilderness(player);
         if (nearestWilderness.isEmpty()) {
-            UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.stuck.no-wilderness");
             return;
         }
 

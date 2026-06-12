@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapStat;
 import me.mykindos.betterpvp.core.client.stats.impl.game.GameTeamMapWrapperStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -37,10 +38,10 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
 
         return ItemView.builder()
                 .material(Material.IRON_SWORD)
-                .displayName(Component.text("Champions Stats"))
+                .displayName(Translations.component("core.menu.stats.button.champions.name"))
                 .lore(getChampionsStatsDescription("", "", ""))
                 .frameLore(true)
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }
 

@@ -31,6 +31,9 @@ import org.bukkit.util.Vector;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 
 @Singleton
 @BPvPListener
@@ -67,16 +70,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hold right click with a Sword to channel.",
-                "",
-                "Release a blizzard that freezes enemies, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushing them back.",
-                "",
-                "Energy: " + getValueString(this::getEnergy, level)
-        };
+    public Component[] getDescription(int level) {
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component energy = getValueComponent(this::getEnergy, level);
+        Component slownessIII = Translations.component("champions.skill.effect.slowness",
+                Component.text("III")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.blizzard.description", slowDuration, energy, slownessIII);
     }
 
     public double getSlowDuration(int level) {

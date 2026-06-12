@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -43,7 +45,7 @@ public class TreeRespawnCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Queues a chunk for tree-respawn evaluation";
+        return "clans.command.tree-respawn.description";
     }
 
     @Override
@@ -57,16 +59,15 @@ public class TreeRespawnCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         World world = Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME);
         if (world == null) {
-            UtilMessage.simpleMessage(player, "TreeRespawn", "Main world not found.");
+            UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.no-world");
             return;
         }
 
         // /treerespawn status
         if (args.length == 1 && args[0].equalsIgnoreCase("status")) {
-            UtilMessage.simpleMessage(player, "TreeRespawn",
-                    "Queue size: <yellow>%d</yellow> | Enabled: <yellow>%s</yellow>",
-                    treeRespawnManager.getQueueSize(),
-                    treeRespawnManager.isEnabled());
+            UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.status",
+                    Component.text(treeRespawnManager.getQueueSize(), NamedTextColor.YELLOW),
+                    Component.text(treeRespawnManager.isEnabled(), NamedTextColor.YELLOW));
             return;
         }
 
@@ -78,15 +79,13 @@ public class TreeRespawnCommand extends Command {
                 chunkX = Integer.parseInt(args[0]);
                 chunkZ = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
-                UtilMessage.simpleMessage(player, "TreeRespawn",
-                        "Usage: <white>/treerespawn [chunkX chunkZ]</white>");
+                UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.usage");
                 return;
             }
 
             if (!world.isChunkLoaded(chunkX, chunkZ)) {
-                UtilMessage.simpleMessage(player, "TreeRespawn",
-                        "Chunk <yellow>%d, %d</yellow> is not loaded. Only loaded chunks can be queued.",
-                        chunkX, chunkZ);
+                UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.chunk-not-loaded",
+                        Component.text(chunkX, NamedTextColor.YELLOW), Component.text(chunkZ, NamedTextColor.YELLOW));
                 return;
             }
 
@@ -98,16 +97,14 @@ public class TreeRespawnCommand extends Command {
         // /treerespawn  (no args – use the player's current chunk)
         if (args.length == 0) {
             if (!player.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
-                UtilMessage.simpleMessage(player, "TreeRespawn",
-                        "You must be in the main world to queue your current chunk.");
+                UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.not-main-world");
                 return;
             }
             queueAndReport(player, player.getChunk());
             return;
         }
 
-        UtilMessage.simpleMessage(player, "TreeRespawn",
-                "Usage: <white>/treerespawn [chunkX chunkZ | status]</white>");
+        UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.usage");
     }
 
     private void queueAndReport(Player player, Chunk chunk) {
@@ -116,14 +113,12 @@ public class TreeRespawnCommand extends Command {
         int sizeAfter = treeRespawnManager.getQueueSize();
 
         if (sizeAfter > sizeBefore) {
-            UtilMessage.simpleMessage(player, "TreeRespawn",
-                    "Chunk <yellow>%d, %d</yellow> queued for tree-respawn evaluation. Queue size: <yellow>%d</yellow>.",
-                    chunk.getX(), chunk.getZ(), sizeAfter);
+            UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.queued",
+                    Component.text(chunk.getX(), NamedTextColor.YELLOW), Component.text(chunk.getZ(), NamedTextColor.YELLOW),
+                    Component.text(sizeAfter, NamedTextColor.YELLOW));
         } else {
-            UtilMessage.simpleMessage(player, "TreeRespawn",
-                    "Chunk <yellow>%d, %d</yellow> was <red>not queued</red> "
-                            + "(already queued, claimed, queue full, or system disabled).",
-                    chunk.getX(), chunk.getZ());
+            UtilMessage.message(player, "clans.prefix", "clans.command.tree-respawn.not-queued",
+                    Component.text(chunk.getX(), NamedTextColor.YELLOW), Component.text(chunk.getZ(), NamedTextColor.YELLOW));
         }
     }
 }

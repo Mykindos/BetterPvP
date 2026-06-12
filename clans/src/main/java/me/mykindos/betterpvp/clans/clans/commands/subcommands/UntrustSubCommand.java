@@ -33,7 +33,7 @@ public class UntrustSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Revoke trust with an ally clan.";
+        return "clans.command.untrust.description";
     }
 
     @Override
@@ -44,25 +44,25 @@ public class UntrustSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You did not input a clan name");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.untrust.no-args");
             return;
         }
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
         if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Only the clan admins can revoke trust between clans.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.untrust.no-rank");
             return;
         }
 
         Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if (targetClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "The clan you want revoke trust with does not exist.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.untrust.not-found");
             return;
         }
 
         Clan targetClan = targetClanOptional.get();
         if (clan.equals(targetClan)) {
-            UtilMessage.message(player, "Clans", "You cannot revoke trust with your own clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.untrust.self");
             return;
         }
 
@@ -70,7 +70,7 @@ public class UntrustSubCommand extends ClanSubCommand {
         clan.getAlliance(targetClan).ifPresentOrElse(clanAlliance -> {
             UtilServer.callEvent(new ClanUntrustEvent(player, clan, targetClan));
         }, () -> {
-            UtilMessage.message(player, "Clans", "You cannot revoke trust with a clan you are not allied with.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.untrust.not-allied");
         });
 
     }

@@ -43,7 +43,7 @@ public class BowListener implements Listener {
         final ItemFactory itemFactory = champions.getInjector().getInstance(ItemFactory.class);
         if (!itemFactory.isCustomItem(event.getBow())) {
             event.setCancelled(true);
-            UtilMessage.simpleMessage(player, "Combat", "Crossbows are disabled.");
+            UtilMessage.message(player, "core.prefix.combat", "champions.combat.crossbows-disabled");
         }
 
        // if (crossbowTracker.containsKey(player.getUniqueId())) {

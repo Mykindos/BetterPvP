@@ -9,6 +9,10 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
@@ -58,16 +62,10 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Swinging your sword launches a glacial",
-                "shard that deals " + getValueString(this::getDamage, level) + " damage to enemies",
-                "",
-                "Will not work within melee range",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.mage.glacial-blade.description", damage, cooldown);
     }
 
     public double getDamage(int level){

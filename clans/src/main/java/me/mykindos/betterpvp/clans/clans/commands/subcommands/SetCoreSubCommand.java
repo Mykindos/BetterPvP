@@ -32,14 +32,14 @@ public class SetCoreSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Set the clan core location for your clan";
+        return "clans.command.set-core.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "You must be a clan admin or above to use this command");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.set-core.no-rank");
             return;
         }
 

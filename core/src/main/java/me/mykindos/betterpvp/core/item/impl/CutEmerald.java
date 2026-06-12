@@ -14,6 +14,6 @@ public class CutEmerald extends BaseItem {
 
     @Inject
     private CutEmerald() {
-        super("Cut Emerald", Item.model("cut_emerald", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.cut-emerald.name"), Item.model("cut_emerald", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
     }
 }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -58,7 +59,8 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             builder.prelore(skill.getTags());
         }
 
-        builder.lore(Arrays.stream(skill.parseDescription(displayLevel)).toList());
+        builder.lore(Arrays.stream(skill.getDescription(displayLevel)).map(c -> c.colorIfAbsent(NamedTextColor.GRAY)
+                .decoration(TextDecoration.ITALIC, false)).toList());
 
         // if this is the correct role/build, configure flashing and desired level
         int desiredLevel = configurePromptState(builder);
@@ -71,11 +73,11 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         }
 
         if (displayLevel < skill.getMaxLevel()) {
-            builder.action(ClickActions.LEFT, Component.text("Increase Level"));
+            builder.action(ClickActions.LEFT, Translations.component("champions.menu.skill.increase-level"));
         }
 
         if (level > 0) {
-            builder.action(ClickActions.RIGHT, Component.text("Decrease Level"));
+            builder.action(ClickActions.RIGHT, Translations.component("champions.menu.skill.decrease-level"));
         }
 
         return builder.hideAdditionalTooltip(true).frameLore(true).build();
@@ -120,12 +122,13 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         builder.glow(true);
         builder.amount(displayLevel);
 
-        Component standardComponent = Component.text(
-                skill.getName() + " (" + displayLevel + " / " + skill.getMaxLevel() + ")",
-                NamedTextColor.GREEN,
-                TextDecoration.BOLD);
+        Component standardComponent = Component.empty()
+                .color(NamedTextColor.GREEN)
+                .decorate(TextDecoration.BOLD)
+                .append(skill.getDisplayName())
+                .append(Component.text(" (" + displayLevel + " / " + skill.getMaxLevel() + ")"));
         Component flashingComponent = Component.empty()
-                .append(Component.text("Click Me!", NamedTextColor.RED).appendSpace())
+                .append(Translations.component("core.menu.button.click-me.name").color(NamedTextColor.RED).appendSpace())
                 .append(standardComponent).appendSpace()
                 .append(Component.text("(" + desiredLevel + ")", NamedTextColor.GOLD));
 
@@ -135,9 +138,9 @@ public class SkillButton extends FlashingButton<SkillMenu> {
     private void buildInactiveItem(ItemView.ItemViewBuilder builder, int desiredLevel) {
         builder.material(Material.PAPER).itemModel(Key.key("minecraft", "book"));
 
-        Component standardComponent = Component.text(skill.getName(), NamedTextColor.RED);
+        Component standardComponent = skill.getDisplayName().color(NamedTextColor.RED);
         Component flashingComponent = Component.empty()
-                .append(Component.text("Click Me!", NamedTextColor.GREEN).appendSpace())
+                .append(Translations.component("core.menu.button.click-me.name").color(NamedTextColor.GREEN).appendSpace())
                 .append(standardComponent).appendSpace()
                 .append(Component.text("(" + desiredLevel + ")", NamedTextColor.GOLD));
 
@@ -158,7 +161,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
 
             // Return if skill isn't enabled
             if (!skill.isEnabled()) {
-                UtilMessage.simpleMessage(player, "Skills", "This skill is not enabled.");
+                UtilMessage.message(player, "core.prefix.skills", Translations.component("champions.menu.skill.not-enabled"));
                 UtilSound.playSound(player, Sound.ENTITY_ITEM_BREAK, 1f, 1f, false);
                 return;
             }

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -46,9 +47,9 @@ public class ApplyBuildButton extends ControlItem<BuildMenu> {
         };
 
         boolean selected = builds.getActiveBuilds().get(role.getName()).getId() == build;
-        Component buildName = Component.text("Apply Build " + build, NamedTextColor.GRAY);
+        Component buildName = Translations.component("champions.menu.build.button.apply.name", Component.text(build)).color(NamedTextColor.GRAY);
         if (selected) {
-            buildName = Component.text("\u00BB Build " + build + " \u00AB", NamedTextColor.GREEN);
+            buildName = Translations.component("champions.menu.build.button.apply.selected", Component.text(build)).color(NamedTextColor.GREEN);
         }
 
 
@@ -72,27 +73,27 @@ public class ApplyBuildButton extends ControlItem<BuildMenu> {
 
         List<Component> lore = Arrays.asList(
                 Component.text()
-                        .append(Component.text("Sword: ", NamedTextColor.YELLOW))
+                        .append(Translations.component("champions.menu.build.slot.sword").color(NamedTextColor.YELLOW)).appendSpace()
                         .append(Component.text((sword != null ? sword.getString() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
-                        .append(Component.text("Axe: ", NamedTextColor.YELLOW))
+                        .append(Translations.component("champions.menu.build.slot.axe").color(NamedTextColor.YELLOW)).appendSpace()
                         .append(Component.text((axe != null ? axe.getString() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
-                        .append(Component.text("Bow: ", NamedTextColor.YELLOW))
+                        .append(Translations.component("champions.menu.build.slot.bow").color(NamedTextColor.YELLOW)).appendSpace()
                         .append(Component.text((bow != null ? bow.getString() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
-                        .append(Component.text("Passive A: ", NamedTextColor.YELLOW))
+                        .append(Translations.component("champions.menu.build.slot.passive-a").color(NamedTextColor.YELLOW)).appendSpace()
                         .append(Component.text((passiveA != null ? passiveA.getString() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
-                        .append(Component.text("Passive B: ", NamedTextColor.YELLOW))
+                        .append(Translations.component("champions.menu.build.slot.passive-b").color(NamedTextColor.YELLOW)).appendSpace()
                         .append(Component.text((passiveB != null ? passiveB.getString() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
-                        .append(Component.text("Global: ", NamedTextColor.YELLOW))
+                        .append(Translations.component("champions.menu.build.slot.global").color(NamedTextColor.YELLOW)).appendSpace()
                         .append(Component.text((global != null ? global.getString() : ""), NamedTextColor.WHITE))
                         .build()
         );

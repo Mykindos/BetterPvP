@@ -15,9 +15,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -43,14 +46,13 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Create an aura that gives",
-                "yourself <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
-                "and allies within " + getValueString(this::getRadius, level) + " blocks",
-                "<effect>Regeneration " + UtilFormat.getRomanNumeral(allyRegenerationStrength) + "</effect>.",
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component regenerationI = Translations.component("champions.skill.effect.regeneration",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        Component regenerationII = Translations.component("champions.skill.effect.regeneration",
+                Component.text("II")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.holy-light.description", radius, regenerationI, regenerationII);
     }
 
     public double getRadius(int level) {

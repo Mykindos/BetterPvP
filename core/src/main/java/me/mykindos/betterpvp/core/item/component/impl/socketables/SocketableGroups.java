@@ -15,34 +15,34 @@ public final class SocketableGroups {
     /**
      * Group representing all item types.
      */
-    public static final SocketableGroup ALL = new SocketableGroup("Everything", item -> true);
+    public static final SocketableGroup ALL = new SocketableGroup("core.socketable.group.everything", item -> true);
 
     // <editor-fold desc="Equipment Types">
 
     /**
      * Group representing all armor pieces.
      */
-    public static final SocketableGroup ARMOR = new SocketableGroup("Armor", item -> item.getItemGroup() == ItemGroup.ARMOR);
+    public static final SocketableGroup ARMOR = new SocketableGroup("core.socketable.group.armor", item -> item.getItemGroup() == ItemGroup.ARMOR);
 
     /**
      * Group for helmets.
      */
-    public static final SocketableGroup HELMET = new SocketableGroup("Helmets", item -> getItemStack(item).getType().name().contains("HELMET"));
+    public static final SocketableGroup HELMET = new SocketableGroup("core.socketable.group.helmets", item -> getItemStack(item).getType().name().contains("HELMET"));
 
     /**
      * Group for chestplates.
      */
-    public static final SocketableGroup CHESTPLATE = new SocketableGroup("Chestplates", item -> getItemStack(item).getType().name().contains("CHESTPLATE"));
+    public static final SocketableGroup CHESTPLATE = new SocketableGroup("core.socketable.group.chestplates", item -> getItemStack(item).getType().name().contains("CHESTPLATE"));
 
     /**
      * Group for leggings.
      */
-    public static final SocketableGroup LEGGINGS = new SocketableGroup("Leggings", item -> getItemStack(item).getType().name().contains("LEGGINGS"));
+    public static final SocketableGroup LEGGINGS = new SocketableGroup("core.socketable.group.leggings", item -> getItemStack(item).getType().name().contains("LEGGINGS"));
 
     /**
      * Group for boots.
      */
-    public static final SocketableGroup BOOTS = new SocketableGroup("Boots", item -> getItemStack(item).getType().name().contains("BOOTS"));
+    public static final SocketableGroup BOOTS = new SocketableGroup("core.socketable.group.boots", item -> getItemStack(item).getType().name().contains("BOOTS"));
 
     // </editor-fold>
 
@@ -51,7 +51,7 @@ public final class SocketableGroups {
     /**
      * Group representing all melee weapons.
      */
-    public static final SocketableGroup MELEE_WEAPON = new SocketableGroup("Melee Weapons", item -> {
+    public static final SocketableGroup MELEE_WEAPON = new SocketableGroup("core.socketable.group.melee-weapons", item -> {
         if (item.getItemGroup() != ItemGroup.WEAPON) {
             return false;
         }
@@ -63,7 +63,7 @@ public final class SocketableGroups {
     /**
      * Group representing all ranged weapons.
      */
-    public static final SocketableGroup RANGED_WEAPON = new SocketableGroup("Ranged Weapons", item -> {
+    public static final SocketableGroup RANGED_WEAPON = new SocketableGroup("core.socketable.group.ranged-weapons", item -> {
         if (item.getItemGroup() != ItemGroup.WEAPON) {
             return false;
         }
@@ -72,7 +72,7 @@ public final class SocketableGroups {
         return baseItem instanceof WeaponItem weaponItem && weaponItem.getGroups().contains(WeaponItem.Group.RANGED);
     });
 
-    public static final SocketableGroup BOW = new SocketableGroup("Bows", item -> getItemStack(item).getType().name().contains("BOW"));
+    public static final SocketableGroup BOW = new SocketableGroup("core.socketable.group.bows", item -> getItemStack(item).getType().name().contains("BOW"));
 
     // </editor-fold>
 
@@ -81,32 +81,32 @@ public final class SocketableGroups {
     /**
      * Group representing any tool.
      */
-    public static final SocketableGroup TOOL = new SocketableGroup("Tools", item -> item.getItemGroup() == ItemGroup.TOOL || getItemStack(item).hasData(DataComponentTypes.TOOL));
+    public static final SocketableGroup TOOL = new SocketableGroup("core.socketable.group.tools", item -> item.getItemGroup() == ItemGroup.TOOL || getItemStack(item).hasData(DataComponentTypes.TOOL));
 
     /**
      * Group for pickaxes.
      */
-    public static final SocketableGroup PICKAXE = new SocketableGroup("Pickaxes", item -> getItemStack(item).getType().name().contains("_PICKAXE"));
+    public static final SocketableGroup PICKAXE = new SocketableGroup("core.socketable.group.pickaxes", item -> getItemStack(item).getType().name().contains("_PICKAXE"));
 
     /**
      * Group for axes.
      */
-    public static final SocketableGroup AXE = new SocketableGroup("Axes", item -> getItemStack(item).getType().name().contains("_AXE"));
+    public static final SocketableGroup AXE = new SocketableGroup("core.socketable.group.axes", item -> getItemStack(item).getType().name().contains("_AXE"));
 
     /**
      * Group for hoes.
      */
-    public static final SocketableGroup HOE = new SocketableGroup("Hoes", item -> getItemStack(item).getType().name().contains("HOE"));
+    public static final SocketableGroup HOE = new SocketableGroup("core.socketable.group.hoes", item -> getItemStack(item).getType().name().contains("HOE"));
 
     /**
      * Group for shovels.
      */
-    public static final SocketableGroup SHOVEL = new SocketableGroup("Shovels", item -> getItemStack(item).getType().name().contains("SHOVEL"));
+    public static final SocketableGroup SHOVEL = new SocketableGroup("core.socketable.group.shovels", item -> getItemStack(item).getType().name().contains("SHOVEL"));
 
     /**
      * Group for fishing rods.
      */
-    public static final SocketableGroup FISHING_ROD = new SocketableGroup("Fishing Rods", item -> getItemStack(item).getType().equals(Material.FISHING_ROD));
+    public static final SocketableGroup FISHING_ROD = new SocketableGroup("core.socketable.group.fishing-rods", item -> getItemStack(item).getType().equals(Material.FISHING_ROD));
 
     // </editor-fold>
     

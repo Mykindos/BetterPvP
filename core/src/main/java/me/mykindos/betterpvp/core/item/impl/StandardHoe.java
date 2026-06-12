@@ -22,7 +22,7 @@ public class StandardHoe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 250;
 
     public StandardHoe() {
-        super("Standard Hoe", ItemStack.of(Material.IRON_HOE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.standard-hoe.name"), ItemStack.of(Material.IRON_HOE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

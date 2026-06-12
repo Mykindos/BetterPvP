@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.Inventory;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.shops.menus.SellAllMenu;
 import net.kyori.adventure.text.Component;
@@ -58,7 +59,7 @@ public class SellAllSlot extends SlotElement.InventorySlotElement {
         IShopItem shopItem = menu.getContext().getSellService().findMatchingShopItem(itemStack, menu.getContext().getShopItemsByKey());
         if (shopItem == null || shopItem.getSellPrice() <= 0) {
             builder.lore(Component.empty());
-            builder.lore(Component.text("You cannot sell this!", NamedTextColor.RED));
+            builder.lore(Translations.component("shops.menu.sell-all.slot.cannot-sell").color(NamedTextColor.RED));
             return builder.build().get();
         }
 
@@ -69,11 +70,11 @@ public class SellAllSlot extends SlotElement.InventorySlotElement {
         // Add buy/sell
         builder.lore(Component.empty());
         builder.lore(Component.empty()
-                .append(Component.text("Sell: ", NamedTextColor.GRAY))
-                .append(menu.getContext().buildPriceComponent(shopCurrency, unitPrice).append(Component.text(" ea."))));
+                .append(Translations.component("shops.menu.sell-all.slot.sell-price").color(NamedTextColor.GRAY)).appendSpace()
+                .append(menu.getContext().buildPriceComponent(shopCurrency, unitPrice).append(Translations.component("shops.menu.shop.label.ea").color(NamedTextColor.GRAY))));
 
         builder.lore(Component.empty()
-                .append(Component.text("This stack sells for ", NamedTextColor.GRAY))
+                .append(Translations.component("shops.menu.sell-all.slot.stack-price").color(NamedTextColor.GRAY)).appendSpace()
                 .append(menu.getContext().buildPriceComponent(shopCurrency, stackPrice)));
 
         return builder.build().get();

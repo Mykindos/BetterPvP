@@ -20,8 +20,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -68,20 +72,18 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "",
-                "While active, you take " + getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage",
-                "from all melee attacks in front of you",
-                "",
-                "Players who attack you receive " + getValueString(this::getDamage, level) + " damage,",
-                "and get knocked back",
-                "",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
-                "Cooldown: " + getValueString(this::getCooldown, level, 2),
-        };
+    public Component[] getDescription(int level) {
+        Component reduction = getValueComponent(this::getDamageReduction, level, 100, 0, "%");
+        Component damage = getValueComponent(this::getDamage, level);
+        Component energy = getValueComponent(this::getEnergy, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.defensive-stance.description",
+                reduction,
+                damage,
+                energy,
+                cooldown
+        );
     }
 
     /**

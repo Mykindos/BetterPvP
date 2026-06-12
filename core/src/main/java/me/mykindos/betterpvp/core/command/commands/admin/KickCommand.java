@@ -7,8 +7,11 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.search.SearchEngineHuman;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -30,7 +33,7 @@ public class KickCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Kick a player from the server";
+        return "core.command.kick.description";
     }
 
     @Override
@@ -41,7 +44,7 @@ public class KickCommand extends Command implements IConsoleCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            UtilMessage.message(sender, "Command", "You must specify a player and a reason");
+            UtilMessage.message(sender, "core.prefix.command", "core.command.kick.usage");
             return;
         }
 
@@ -54,8 +57,13 @@ public class KickCommand extends Command implements IConsoleCommand {
         final Client target = matches.iterator().next();
         final Player toKick = Objects.requireNonNull(target.getGamer().getPlayer());
         String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        toKick.kick(UtilMessage.deserialize("<red>[Kick] <gray>" + reason), PlayerKickEvent.Cause.KICK_COMMAND);
-        UtilMessage.simpleBroadcast("Kick", "<alt2>%s</alt2> kicked <alt2>%s</alt2> for <alt>%s</alt>", sender.getName(), target.getName(), reason);
+        toKick.kick(Translations.component("core.command.kick.screen",
+                Translations.component("core.command.kick.screen_label").color(NamedTextColor.RED),
+                Component.text(reason, NamedTextColor.GRAY)), PlayerKickEvent.Cause.KICK_COMMAND);
+        UtilMessage.broadcast("core.prefix.command", "core.command.kick.broadcast",
+                Component.text(sender.getName(), NamedTextColor.YELLOW),
+                Component.text(target.getName(), NamedTextColor.YELLOW),
+                Component.text(reason, NamedTextColor.YELLOW));
     }
 
     @Override

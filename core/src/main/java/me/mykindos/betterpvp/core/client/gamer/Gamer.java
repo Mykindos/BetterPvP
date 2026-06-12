@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -214,7 +216,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
                 return;
             }
 
-            UtilMessage.simpleMessage(player, "Chat", "Channel: <green>" + event.getNewChannel().getChannel().name().toLowerCase());
+            UtilMessage.message(player, "core.prefix.chat", "core.client.gamer.channel",
+                    Component.text(event.getNewChannel().getChannel().name().toLowerCase(), NamedTextColor.GREEN));
             this.chatChannel = event.getNewChannel();
         }
 

@@ -22,7 +22,7 @@ public class TeleportHereCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Teleport a target player to yourself";
+        return "core.command.teleport-here.description";
     }
 
     @Override

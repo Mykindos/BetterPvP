@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
 import me.mykindos.betterpvp.core.logging.menu.button.PlayerItemButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -35,11 +36,10 @@ public class AuctionCancelItemLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return Component.text(context.get(LogContext.CLIENT_NAME) != null ? context.get(LogContext.CLIENT_NAME) : "NULL", NamedTextColor.YELLOW)
-                .append(Component.text(" cancelled ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
-                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
-                .append(Component.text(" from the auction house", NamedTextColor.GRAY));
+        return Translations.component("core.log.auction-cancel-item.1",
+                Component.text(context.get(LogContext.CLIENT_NAME) != null ? context.get(LogContext.CLIENT_NAME) : "NULL", NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
+                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM))))).color(NamedTextColor.GRAY);
 
     }
 
@@ -52,10 +52,11 @@ public class AuctionCancelItemLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME) != null ? context.get(LogContext.CLIENT_NAME) : "NULL", NamedTextColor.YELLOW)
-                        .append(Component.text(" cancelled", NamedTextColor.GRAY)),
+                        .append(Translations.component("core.log.auction-cancel-item.2").color(NamedTextColor.GRAY)),
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
-                UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
-                        context.get(LogContext.ITEM)),
+                Component.text("(", NamedTextColor.LIGHT_PURPLE)
+                        .append(Component.text(context.get(LogContext.ITEM)))
+                        .append(Component.text(")")),
                 UtilMessage.DIVIDER
         );
 
@@ -66,7 +67,7 @@ public class AuctionCancelItemLogFormatter implements ILogFormatter {
 
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(Component.text("Auction House Cancel"))
+                .displayName(Translations.component("core.log.auction-cancel-item.3"))
                 .material(Material.BARRIER)
                 .lore(lore)
                 .build();

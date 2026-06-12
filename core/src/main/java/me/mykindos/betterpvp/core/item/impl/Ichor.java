@@ -26,7 +26,7 @@ public class Ichor extends BaseItem {
 
     @Inject
     private Ichor() {
-        super("Ichor", Item.model("ichor", 64), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
+        super(translatableName("core.item.ichor.name"), Item.model("ichor", 64), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
         addBaseComponent(new ReinforcementComponent(ItemRarity.MYTHICAL));
     }
 

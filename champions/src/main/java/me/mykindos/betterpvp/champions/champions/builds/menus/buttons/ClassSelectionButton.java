@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
@@ -69,12 +70,12 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
 
     @Override
     public ItemProvider getItemProvider(ClassSelectionMenu gui) {
-        final Component standardComponent = Component.text(role.getName(), role.getColor(), TextDecoration.BOLD);
-        final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
+        final Component standardComponent = role.getDisplayName().color(role.getColor()).decorate(TextDecoration.BOLD);
+        final Component flashComponent = Component.empty().append(Translations.component("core.menu.button.click-me.name").color(NamedTextColor.GREEN)).appendSpace().append(standardComponent);
 
         List<Component> roleLore = new ArrayList<>(List.of(
                 Component.empty()
-                        .append(Component.text("Health:", NamedTextColor.GRAY))
+                        .append(Translations.component("champions.menu.class.health").color(NamedTextColor.GRAY))
                         .appendSpace()
                         .append(Component.text(UtilFormat.formatNumber(reduction), TextColor.color(255, 0, 0)))
                         .appendSpace()
@@ -87,10 +88,10 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
             // Use a default because not every role has a passive
             ArrayList<RoleEffect> roleEffects = RoleManager.rolePassiveDescs.getOrDefault(role, null);
             if (roleEffects == null) {
-                roleLore.add(Component.text("No Effects", NamedTextColor.WHITE, TextDecoration.BOLD));
+                roleLore.add(Translations.component("champions.menu.class.no-effects").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD));
                 roleLore.add(Component.text(""));
             } else {
-                roleLore.add(Component.text("Effects:", NamedTextColor.WHITE, TextDecoration.BOLD));
+                roleLore.add(Translations.component("champions.menu.class.effects").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD));
                 for (RoleEffect roleEffect : roleEffects) {
                     roleLore.add(Component.text("- ").append(roleEffect.getDescription()));
                 }
@@ -99,7 +100,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
 
         }
 
-        roleLore.add(UtilMessage.deserialize("Click to manage your builds."));
+        roleLore.add(Translations.component("champions.menu.class.manage-builds").color(NamedTextColor.GRAY));
 
         return ItemView.builder().material(role.getChestplate())
                 .displayName(this.isFlashing() ? flashComponent : standardComponent)

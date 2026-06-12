@@ -28,7 +28,7 @@ public class BuildCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Open the build editor";
+        return "champions.command.build.description";
     }
 
     @Override

@@ -23,9 +23,9 @@ import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.progression.profession.fishing.event.FishingTreasureChanceDropTableEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerFishingTreasureDropEvent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -139,12 +139,9 @@ public class TreasureChanceListener implements Listener, Reloadable {
             }
         }
 
-        TextComponent message = Component.text("You found ")
-                .append(Component.text(UtilFormat.formatNumber(itemStack.getAmount())))
-                .append(Component.text(" "))
-                .append(name);
-
-        UtilMessage.message(player, "Fishing", message);
+        UtilMessage.message(player, "core.prefix.fishing", Translations.component("progression.fishing.treasure.found",
+                Component.text(UtilFormat.formatNumber(itemStack.getAmount())),
+                name));
 
         log.info("{} found {}x {} from fishing treasure", player.getName(), itemStack.getAmount(),
                         itemStack.getType().name().toLowerCase())

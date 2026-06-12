@@ -36,14 +36,14 @@ public class LogsSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Get logs associated with your clan";
+        return "clans.command.logs.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         if (clan == null) {
-            UtilMessage.message(player, "Clans", "You must be in a Clan to run this command");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.logs.no-clan");
             return;
         }
 

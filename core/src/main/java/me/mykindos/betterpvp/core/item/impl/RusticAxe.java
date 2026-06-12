@@ -23,7 +23,7 @@ public class RusticAxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 59;
 
     public RusticAxe() {
-        super("Rustic Axe", ItemStack.of(Material.WOODEN_AXE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.rustic-axe.name"), ItemStack.of(Material.WOODEN_AXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

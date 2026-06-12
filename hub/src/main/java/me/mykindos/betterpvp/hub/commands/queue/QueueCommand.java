@@ -27,24 +27,24 @@ public class QueueCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View or manage queue state";
+        return "hub.command.queue.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length > 0) {
-            UtilMessage.simpleMessage(player, "Queue", "Usage:");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.usage-header");
             UtilMessage.message(player, QueueCommandSupport.buildUsageMessage(client));
             return;
         }
 
         final QueueStatusUpdate status = queueStatusRegistry.getStatus(player.getUniqueId()).orElse(null);
         if (status == null) {
-            UtilMessage.simpleMessage(player, "Queue", "<gray>You are not currently queued for any server.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.not-queued-any");
             return;
         }
 
-        UtilMessage.simpleMessage(player, "Queue", "Queue Status:");
+        UtilMessage.message(player, "core.prefix.queue", "hub.queue.status-header");
         UtilMessage.message(player, QueueCommandSupport.buildQueueMessage(status));
     }
 

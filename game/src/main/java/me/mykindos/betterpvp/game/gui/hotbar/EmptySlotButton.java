@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.game.gui.hotbar;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -21,9 +23,9 @@ public class EmptySlotButton extends ControlItem<HotBarEditor> {
     @Override
     public ItemProvider getItemProvider(HotBarEditor gui) {
         return ItemView.builder()
-                .displayName(Component.text("Empty Slot"))
+                .displayName(Translations.component("game.menu.hotbar.empty-slot.name"))
                 .material(Material.LIGHT_GRAY_STAINED_GLASS_PANE)
-                .action(ClickActions.ALL, Component.text("Set Selected"))
+                .action(ClickActions.ALL, Translations.component("game.menu.hotbar.empty-slot.action"))
                 .build();
     }
 

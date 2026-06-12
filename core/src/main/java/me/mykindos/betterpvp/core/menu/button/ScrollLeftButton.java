@@ -5,8 +5,8 @@ import me.mykindos.betterpvp.core.inventory.gui.ScrollGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.PageItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ScrollItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -49,9 +49,9 @@ public class ScrollLeftButton extends ScrollItem {
         final ItemView.ItemViewBuilder builder = ItemView.of(itemProvider.get().get()).toBuilder();
         builder.clearLore();
         if (gui.canScroll(-1)) {
-            builder.displayName(Component.text("Scroll Left", NamedTextColor.WHITE));
+            builder.displayName(Translations.component("core.menu.button.scroll-left.name").color(NamedTextColor.WHITE));
         } else {
-            builder.displayName(Component.text("Can't scroll further", NamedTextColor.RED));
+            builder.displayName(Translations.component("core.menu.button.cannot-scroll.name").color(NamedTextColor.RED));
         }
         return builder.build();
     }

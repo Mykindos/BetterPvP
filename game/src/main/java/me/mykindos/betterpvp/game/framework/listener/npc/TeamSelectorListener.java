@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.TeamGame;
@@ -115,11 +116,10 @@ public class TeamSelectorListener implements Listener {
         if (success) {
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
             log.info("Player {} joined team {}", player.getName(), properties.name()).submit();
-            UtilMessage.message(player, "Team", Component.text("You joined ", NamedTextColor.GRAY)
-                    .append(Component.text(properties.name(), properties.color(), TextDecoration.BOLD))
-                    .append(Component.text(" team.", NamedTextColor.GRAY)));
+            UtilMessage.message(player, "core.prefix.team", "game.team.joined",
+                    Component.text(properties.name(), properties.color(), TextDecoration.BOLD));
         } else {
-            UtilMessage.simpleMessage(player, "<red>This team is full!");
+            UtilMessage.message(player, Translations.component("game.team.full").colorIfAbsent(NamedTextColor.RED));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 2.0f);
         }
     }

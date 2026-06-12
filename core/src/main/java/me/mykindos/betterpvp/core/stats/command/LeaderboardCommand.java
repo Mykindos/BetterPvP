@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.stats.menu.LeaderboardCategoryMenu;
 import me.mykindos.betterpvp.core.stats.menu.LeaderboardMenu;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,7 +40,7 @@ public class LeaderboardCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Leaderboard base command";
+        return "core.command.leaderboard.description";
     }
 
     @Override
@@ -51,7 +53,7 @@ public class LeaderboardCommand extends Command {
         final String name = String.join(" ", args);
         final Optional<Leaderboard<?, ?>> leaderboardOpt = leaderboards.getViewableByName(name);
         if (leaderboardOpt.isEmpty() || !leaderboardOpt.get().isViewable()) {
-            UtilMessage.message(player, "Leaderboard", "Leaderboard not found [<alt2>%s</alt2>].", name);
+            UtilMessage.message(player, "core.prefix.stats", "core.command.leaderboard.not_found", Component.text(name, NamedTextColor.YELLOW));
             return;
         }
 

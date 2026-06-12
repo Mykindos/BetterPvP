@@ -15,8 +15,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,19 +48,14 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Drop your Sword / Axe to toggle",
-                "",
-                "While in void form, you receive",
-                "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>, and take no knockback",
-                "",
-                "Every point of damage you take will be",
-                "reduced by " + getValueString(this::getDamageReduction, level) + " and drain " + getValueString(this::getEnergyReduction, level) + " energy",
-                "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level)
-        };
+    public Component[] getDescription(int level) {
+        Component damageReduction = getValueComponent(this::getDamageReduction, level);
+        Component energyReduction = getValueComponent(this::getEnergyReduction, level);
+        Component energyStartCost = getValueComponent(this::getEnergyStartCost, level);
+        Component energy = getValueComponent(this::getEnergy, level);
+        Component slownessIII = Translations.component("champions.skill.effect.slowness",
+                Component.text("III")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.void.description", damageReduction, energyReduction, energyStartCost, energy, slownessIII);
     }
 
     public double getDamageReduction(int level) {
@@ -88,7 +86,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.void.on", Translations.component("champions.skill.toggle.on").color(NamedTextColor.GREEN));
         } else {
             cancel(player);
         }

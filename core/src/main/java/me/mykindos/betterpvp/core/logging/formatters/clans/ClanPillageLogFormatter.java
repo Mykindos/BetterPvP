@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,8 +28,9 @@ public class ClanPillageLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> pillaged clan <yellow>%s</yellow>",
-                context.get(LogContext.CLAN_NAME), context.get(LogContext.TARGET_CLAN_NAME));
+        return Translations.component("core.log.clan-pillage.1",
+                Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW));
     }
 
     @Override
@@ -40,14 +42,16 @@ public class ClanPillageLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.YELLOW),
-                Component.text("pillaged ", NamedTextColor.LIGHT_PURPLE).append(Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW)),
+                Translations.component("core.log.clan-pillage.2").color(NamedTextColor.LIGHT_PURPLE).append(Component.text(" ")).append(Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW)),
                 UtilMessage.DIVIDER
 
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <light_purple>pillaged</light_purple> <yellow>%s</yellow>" ,
-                        context.get(LogContext.CLAN_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
+                .displayName(Translations.component("core.log.clan-pillage.3",
+                        Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.YELLOW),
+                        Translations.component("core.log.clan-pillage.4").color(NamedTextColor.LIGHT_PURPLE),
+                        Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW)))
                 .material(Material.GOAT_HORN)
                 .lore(lore)
                 .frameLore(false)

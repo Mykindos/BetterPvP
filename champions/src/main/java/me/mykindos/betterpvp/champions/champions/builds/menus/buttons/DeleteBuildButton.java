@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
@@ -29,7 +30,7 @@ public class DeleteBuildButton extends SimpleItem {
 
     public DeleteBuildButton(GamerBuilds builds, Role role, int build, Windowed parent) {
         super(ItemView.builder().material(Material.RED_CONCRETE)
-                .displayName(Component.text("Delete Build " + build , NamedTextColor.RED))
+                .displayName(Translations.component("champions.menu.build.button.delete.name", Component.text(build)).color(NamedTextColor.RED))
                 .build());
         this.builds = builds;
         this.role = role;

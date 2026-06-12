@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,12 +59,12 @@ public class ThrowingWebAbility extends CooldownInteraction implements Throwable
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Throwing Web");
+        return Translations.component("champions.ability.throwing-web.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Throw a web that temporarily places cobwebs on impact. This can be used to trap enemies.");
+        return Translations.component("champions.ability.throwing-web.description");
     }
 
     @Override

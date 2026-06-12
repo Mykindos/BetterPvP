@@ -25,7 +25,7 @@ public class BronzePlate extends BaseItem {
 
     @Inject
     private BronzePlate() {
-        super("Bronze Plate", Item.model("bronze_plate", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.bronze-plate.name"), Item.model("bronze_plate", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
         addBaseComponent(new ReinforcementComponent(ItemRarity.UNCOMMON));
     }
 

@@ -20,7 +20,11 @@ import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -79,17 +83,14 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Throw your axe, dealing " + getValueString(this::getDamage, level) + " damage",
-                "",
-                "After colliding with anything, it",
-                "will be magnetized back to you",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.magnetic-axe.description",
+                damage,
+                cooldown
+        );
     }
 
     public double getSpeed() {

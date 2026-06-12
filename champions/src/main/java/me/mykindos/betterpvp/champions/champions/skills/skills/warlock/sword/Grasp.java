@@ -18,13 +18,17 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -78,18 +82,11 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Create a wall of skulls that closes in on",
-                "you from " + getValueString(this::getDistance, level) + " blocks away, dragging along",
-                "all enemies and dealing " + getValueString(this::getDamage, level) + " damage",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-
-        };
+    public Component[] getDescription(int level) {
+        Component distance = getValueComponent(this::getDistance, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.warlock.grasp.description", distance, damage, cooldown);
     }
 
     public double getDistance(int level) {
@@ -259,7 +256,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         int level = getLevel(player);
         Block block = player.getTargetBlock(null, (int) getDistance(level));
         if (block.getLocation().distance(player.getLocation()) < 3) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> this close.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.warlock.grasp.too-close", getDisplayName().color(NamedTextColor.GREEN));
             return false;
         }
 

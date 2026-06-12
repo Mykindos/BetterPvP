@@ -24,7 +24,7 @@ public class DisplayRemoveSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Remove a display entity";
+        return "core.command.display-remove.description";
     }
 
     @Override
@@ -32,11 +32,11 @@ public class DisplayRemoveSubCommand extends Command {
         final Display selectedDisplay = displayEditorManager.getSelectedDisplay(player);
         final boolean deselected = displayEditorManager.selectDisplay(player, null);
         if (!deselected) {
-            UtilMessage.simpleMessage(player, "Display", "You are not selecting a display.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.not_selecting");
             return;
         }
 
         selectedDisplay.remove();
-        UtilMessage.simpleMessage(player, "Display", "Despawned selected display.");
+        UtilMessage.message(player, "core.prefix.display", "core.display.despawned");
     }
 }

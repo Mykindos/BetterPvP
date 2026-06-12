@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingResult;
@@ -306,8 +307,8 @@ public abstract class AbstractCraftingGui extends AbstractGui {
             return ItemView.builder()
                     .material(Material.BARRIER)
                     .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_crafting_table_disabled"))
-                    .displayName(Component.text("You cannot craft this!", NamedTextColor.RED))
-                    .lore(Component.text("This recipe cannot be crafted by you.", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.crafting.cannot-craft.name").color(NamedTextColor.RED))
+                    .lore(Translations.component("core.menu.crafting.cannot-craft.lore").color(NamedTextColor.GRAY))
                     .build()
                     .get();
         }
@@ -317,8 +318,8 @@ public abstract class AbstractCraftingGui extends AbstractGui {
             return ItemView.builder()
                     .material(Material.BARRIER)
                     .itemModel(Key.key("betterpvp", "menu/icon/regular/mini_crafting_table_disabled"))
-                    .displayName(Component.text("You need a blueprint to craft this!", NamedTextColor.RED))
-                    .lore(Component.text("This recipe requires a blueprint to be crafted.", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.crafting.needs-blueprint.name").color(NamedTextColor.RED))
+                    .lore(Translations.component("core.menu.crafting.needs-blueprint.lore").color(NamedTextColor.GRAY))
                     .build()
                     .get();
         }

@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.effects.types.negative;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffectType;
@@ -30,7 +32,8 @@ public class SilenceEffect extends VanillaEffectType {
         super.onReceive(livingEntity, effect);
 
         livingEntity.getWorld().playSound(livingEntity.getLocation(), Sound.ENTITY_BAT_AMBIENT, 2.0F, 1.0F);
-        UtilMessage.simpleMessage(livingEntity, "Silence", "You have been silenced for <alt>%s</alt> seconds.", effect.getRawLength() / 1000d);
+        UtilMessage.message(livingEntity, "core.prefix.silence", "core.effect.silence.received",
+                Component.text(String.valueOf(effect.getRawLength() / 1000d), NamedTextColor.GREEN));
     }
 
     @Override

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
@@ -54,12 +56,12 @@ public class DashInteraction extends CooldownInteraction implements DisplayedInt
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Dodge");
+        return Translations.component("champions.ability.dodge.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Quickly dash horizontally to dodge incoming attacks.");
+        return Translations.component("champions.ability.dodge.description");
     }
 
     @Override

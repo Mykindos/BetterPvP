@@ -23,7 +23,7 @@ public class WaterBlock extends BaseItem {
     private transient boolean registered;
 
     public WaterBlock() {
-        super("Water Block", ItemStack.of(Material.LAPIS_BLOCK), ItemGroup.BLOCK, ItemRarity.COMMON);
+        super(translatableName("clans.item.water-block.name"), ItemStack.of(Material.LAPIS_BLOCK), ItemGroup.BLOCK, ItemRarity.COMMON);
     }
 
     @Inject

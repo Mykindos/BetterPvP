@@ -14,6 +14,6 @@ public class ToxicCrystal extends BaseItem {
 
     @Inject
     private ToxicCrystal() {
-        super("Toxic Crystal", Item.model("toxic_crystal", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.toxic-crystal.name"), Item.model("toxic_crystal", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
     }
 }

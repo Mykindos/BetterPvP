@@ -9,11 +9,14 @@ import me.mykindos.betterpvp.core.command.SpigotCommandWrapper;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 @CustomLog
@@ -59,8 +62,12 @@ public class CommandLoader extends Loader {
             Command command = (Command) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(command);
 
+            // The Bukkit command registration takes a plain string and is not per-viewer, so resolve the
+            // description's translation key to English server-side here.
+            final String description = PlainTextComponentSerializer.plainText()
+                    .serialize(Translations.render(command.getDescriptionComponent(), (Locale) null));
             SpigotCommandWrapper commandWrapper = new SpigotCommandWrapper(command, command.getName(),
-                    command.getDescription(), "", command.getAliases());
+                    description, "", command.getAliases());
             plugin.getInjector().injectMembers(commandWrapper);
             Bukkit.getCommandMap().register(command.getName(), commandWrapper);
 

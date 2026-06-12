@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.progression.profession.skill;
 
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public interface IProfessionAttribute {
@@ -10,6 +12,22 @@ public interface IProfessionAttribute {
 
     default String getDescription() {
         return getName();
+    }
+
+    /**
+     * The localized attribute description as a component, resolved per-viewer. Uses the
+     * {@code progression.attribute.<nodeId>.description} key (derived from the {@link NodeId} annotation)
+     * when present, else falls back to the raw English {@link #getDescription()}.
+     */
+    default Component getDescriptionComponent() {
+        final NodeId nodeId = getClass().getAnnotation(NodeId.class);
+        if (nodeId != null) {
+            final String key = "progression.attribute." + nodeId.value() + ".description";
+            if (Translations.hasTranslation(key)) {
+                return Translations.component(key);
+            }
+        }
+        return Component.text(getDescription());
     }
 
     double getDisplayValue(double value);

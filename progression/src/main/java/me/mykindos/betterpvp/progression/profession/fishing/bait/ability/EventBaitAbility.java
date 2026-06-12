@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.fishing.bait.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
@@ -40,12 +42,12 @@ public class EventBaitAbility extends BaitAbility {
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Event Bait");
+        return Translations.component("progression.ability.event-bait.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Reduces the waiting time for fish to bite. This bait has a bigger radius than usual.");
+        return Translations.component("progression.ability.event-bait.description");
     }
 
     @Override

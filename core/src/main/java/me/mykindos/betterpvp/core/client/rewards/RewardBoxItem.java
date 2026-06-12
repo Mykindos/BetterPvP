@@ -45,7 +45,7 @@ public class RewardBoxItem extends ControlItem<GuiRewardBox> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (player.getInventory().firstEmpty() == -1) {
-            UtilMessage.simpleMessage(player, "Rewards", "You cannot withdraw items while your inventory is full.");
+            UtilMessage.message(player, "core.prefix.rewards", "core.rewards.inventory_full");
             return;
         }
         if (clickType.isLeftClick()) {

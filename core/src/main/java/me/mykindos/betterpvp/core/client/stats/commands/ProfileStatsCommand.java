@@ -89,7 +89,7 @@ public class ProfileStatsCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Seed realistic filtered-stat-heavy profiling data into one or more online players";
+        return "core.command.profile-stats.description";
     }
 
     @Override
@@ -131,14 +131,11 @@ public class ProfileStatsCommand extends Command implements IConsoleCommand {
         }
 
         final int perPlayer = parsed.targets().isEmpty() ? 0 : totalEntries / parsed.targets().size();
-        UtilMessage.simpleMessage(sender, "Stats",
-                "Seeded <green>%s</green> entries across <green>%s</green> realms for <green>%s</green> player(s) (~<green>%s</green>/player, ×<green>%s</green>).",
+        UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.seeded",
                 totalEntries, profilingRealms.size(), parsed.targets().size(), perPlayer, parsed.multiplier());
-        UtilMessage.simpleMessage(sender, "Stats",
-                "Read phase: <green>%s</green> getFilteredStat queries across all targets in <green>%s ms</green>.",
+        UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.read_phase",
                 totalReads, totalReadMs);
-        UtilMessage.simpleMessage(sender, "Stats",
-                "Profiling data is hot. Use <green>/spark profiler</green> then trigger stat menus or achievement checks.");
+        UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.hot_data");
     }
 
     private ParsedArgs parseArgs(CommandSender sender, String[] args) {
@@ -157,7 +154,7 @@ public class ProfileStatsCommand extends Command implements IConsoleCommand {
 
         if (isInteger(args[0])) {
             if (!(sender instanceof Player player)) {
-                UtilMessage.simpleMessage(sender, "Stats", "Console must specify a <player> or <all> target before the multiplier.");
+                UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.console_target");
                 return null;
             }
             return new ParsedArgs(List.of(player), UtilMath.getInteger(args[0], 1, 50));
@@ -169,14 +166,14 @@ public class ProfileStatsCommand extends Command implements IConsoleCommand {
         } else {
             Player target = Bukkit.getPlayerExact(args[0]);
             if (target == null) {
-                UtilMessage.simpleMessage(sender, "Stats", "Could not find online player <red>%s</red>.", args[0]);
+                UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.player_not_found", args[0]);
                 return null;
             }
             targets = List.of(target);
         }
 
         if (targets.isEmpty()) {
-            UtilMessage.simpleMessage(sender, "Stats", "There are no matching online players to seed.");
+            UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.no_players");
             return null;
         }
 
@@ -185,8 +182,8 @@ public class ProfileStatsCommand extends Command implements IConsoleCommand {
     }
 
     private void sendUsage(CommandSender sender) {
-        UtilMessage.simpleMessage(sender, "Stats", "Usage: /profilestats [player|all|multiplier] [multiplier]");
-        UtilMessage.simpleMessage(sender, "Stats", "Examples: /profilestats | /profilestats 3 | /profilestats all 2 | /profilestats Owen 5");
+        UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.usage");
+        UtilMessage.message(sender, "core.prefix.stats", "core.command.stats.profilestats.examples");
     }
 
     private boolean isInteger(String value) {

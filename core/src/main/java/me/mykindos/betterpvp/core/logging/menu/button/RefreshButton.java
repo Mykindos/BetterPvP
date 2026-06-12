@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -38,12 +39,12 @@ public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRef
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder();
         if (isRefreshing) {
             itemViewBuilder
-                    .displayName(Component.text("Reloading...", NamedTextColor.RED))
+                    .displayName(Translations.component("core.menu.log.button.refresh.reloading.name").color(NamedTextColor.RED))
                     .material(Material.REDSTONE_BLOCK);
         } else {
             itemViewBuilder
-                    .displayName(Component.text("Reload", NamedTextColor.GREEN))
-                    .lore(Component.text("click to reload"))
+                    .displayName(Translations.component("core.menu.log.button.refresh.name").color(NamedTextColor.GREEN))
+                    .lore(Translations.component("core.menu.log.button.refresh.lore"))
                     .material(Material.EMERALD_BLOCK);
         }
 

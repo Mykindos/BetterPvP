@@ -36,9 +36,8 @@ public class ImbuementPedestalItem extends BaseItem implements NexoItem {
 
     @Inject
     private ImbuementPedestalItem() {
-        super("Imbuement Pedestal", model, ItemGroup.BLOCK, ItemRarity.RARE);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and right-click with ingredients to imbue them.")));
+        super(translatableName("core.item.imbuement-pedestal.name"), model, ItemGroup.BLOCK, ItemRarity.RARE);
+        addBaseComponent(DescriptionComponent.translatable(1, "core.item.imbuement-pedestal.lore"));
     }
 
     @Override

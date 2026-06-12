@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
-import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static me.mykindos.betterpvp.core.utilities.UtilMessage.miniMessage;
 
 @AllArgsConstructor
 public class SocketableDescriptionComponent implements ItemComponent, LoreComponent {
@@ -33,15 +32,15 @@ public class SocketableDescriptionComponent implements ItemComponent, LoreCompon
 
     @Override
     public List<Component> getLines(ItemInstance item) {
-        final List<Component> components = ComponentWrapper.wrapLine(miniMessage.deserialize("<gray>" + socketable.getDescription()));
+        final List<Component> components = new ArrayList<>(socketable.getDescriptionLines());
         components.add(Component.empty());
-        components.add(Component.text("Applies to:", NamedTextColor.GRAY, TextDecoration.UNDERLINED));
+        components.add(Translations.component("core.socketable.applies-to")
+                .color(NamedTextColor.GRAY).decorate(TextDecoration.UNDERLINED));
         for (SocketableGroup value : socketable.getGroups()) {
-            final String displayName = value.getDisplayName();
             components.add(Component.text("[", NamedTextColor.GRAY)
                     .append(Component.text("✔", NamedTextColor.GREEN))
                     .append(Component.text("] ", NamedTextColor.GRAY))
-                    .append(Component.text(displayName, NamedTextColor.WHITE)));
+                    .append(value.getDisplayComponent().color(NamedTextColor.WHITE)));
         }
         return components;
     }

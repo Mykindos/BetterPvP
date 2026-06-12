@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponen
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatType;
 import me.mykindos.betterpvp.core.item.purity.bias.PurityReforgeBias;
 import me.mykindos.betterpvp.core.item.purity.bias.PurityReforgeBiasRegistry;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -66,13 +67,13 @@ public class ReforgingButton extends ControlItem<Gui> {
             ItemView.ItemViewBuilder builder = ItemView.builder()
                     .material(Material.PAPER)
                     .itemModel(visible ? Key.key("betterpvp", "menu/gui/reforge/button_success") : Material.AIR.getKey())
-                    .displayName(Component.text("GO!", NamedTextColor.GREEN, TextDecoration.BOLD));
+                    .displayName(Translations.component("core.menu.reforge.button.go.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
 
             // Add stat preview lore
             List<Component> deltaPreview = generateDeltaPreview();
             if (!deltaPreview.isEmpty()) {
                 builder.lore(Component.empty());
-                builder.lore(Component.text("Stats:", NamedTextColor.YELLOW, TextDecoration.BOLD));
+                builder.lore(Translations.component("core.menu.reforge.button.stats.header").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
                 deltaPreview.forEach(builder::lore);
                 builder.lore(Component.empty());
             }
@@ -84,36 +85,36 @@ public class ReforgingButton extends ControlItem<Gui> {
             final long cost = getReforgingCost(rarity);
             final String currency = cost == 1 ? "Gold Bar" : "Gold Bars";
             builder.lore(Component.empty()
-                    .append(Component.text("Cost:", NamedTextColor.GOLD, TextDecoration.BOLD))
+                    .append(Translations.component("core.menu.reforge.button.cost.label").color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD))
                     .appendSpace()
                     .append(Component.text(cost + "x " + currency, NamedTextColor.YELLOW)));
 
             // Indicators
             final PurityComponent purityComponent = item.getComponent(PurityComponent.class).orElse(null);
             final Component purity = purityComponent == null || !purityComponent.isAttuned()
-                    ? Component.text("None", NamedTextColor.RED)
-                    : Component.text(purityComponent.getPurity().getDisplayName(), purityComponent.getPurity().getColor());
+                    ? Translations.component("core.menu.reforge.button.purity.none").color(NamedTextColor.RED)
+                    : purityComponent.getPurity().getDisplayComponent().color(purityComponent.getPurity().getColor());
             builder.lore(Component.empty());
             builder.lore(Component.empty()
                     .append(Component.text("[", NamedTextColor.GRAY))
                     .append(Component.text("!", NamedTextColor.YELLOW, TextDecoration.BOLD))
                     .append(Component.text("]", NamedTextColor.GRAY))
                     .appendSpace()
-                    .append(Component.text("Stronger purities yield better results!", NamedTextColor.GRAY)));
+                    .append(Translations.component("core.menu.reforge.button.purity.hint").color(NamedTextColor.GRAY)));
             builder.lore(Component.empty()
-                    .append(Component.text("➙ Item Purity:"))
+                    .append(Translations.component("core.menu.reforge.button.purity.label"))
                     .appendSpace()
                     .append(purity));
 
             builder.lore(Component.empty());
             builder.lore(Component.empty()
-                    .append(Component.text("WARNING:", NamedTextColor.RED, TextDecoration.BOLD))
+                    .append(Translations.component("core.menu.reforge.button.warning.prefix").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
                     .appendSpace()
                     .append(Component.text("All", NamedTextColor.GRAY, TextDecoration.ITALIC))
                     .appendSpace()
                     .append(Component.text("stats", NamedTextColor.RED, TextDecoration.ITALIC, TextDecoration.UNDERLINED))
                     .appendSpace()
-                    .append(Component.text("will be randomized!", NamedTextColor.GRAY, TextDecoration.ITALIC)));
+                    .append(Translations.component("core.menu.reforge.button.warning.message").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)));
             return builder.build();
         } else {
             // Error state
@@ -149,26 +150,26 @@ public class ReforgingButton extends ControlItem<Gui> {
         // Check if item slot has an item
         ItemStack itemStack = itemInventory.getItem(0);
         if (itemStack == null) {
-            errors.add(Component.text("No item to reforge", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.reforge.error.no-item").color(NamedTextColor.RED));
             return errors; // Can't validate further
         }
 
         // Get ItemInstance
         Optional<ItemInstance> itemInstanceOpt = itemFactory.fromItemStack(itemStack);
         if (itemInstanceOpt.isEmpty()) {
-            errors.add(Component.text("Invalid item", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.reforge.error.invalid-item").color(NamedTextColor.RED));
             return errors;
         }
 
         ItemInstance itemInstance = itemInstanceOpt.get();
         if (itemInstance.getItemStack().getAmount() > 1) {
-            errors.add(Component.text("Cannot reforge multiple items", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.reforge.error.multiple-items").color(NamedTextColor.RED));
         }
 
         // Check for StatContainerComponent
         Optional<StatContainerComponent> purityOpt = itemInstance.getComponent(StatContainerComponent.class);
         if (purityOpt.isEmpty()) {
-            errors.add(Component.text("Item cannot hold stats", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.reforge.error.no-stats").color(NamedTextColor.RED));
             return errors;
         }
 
@@ -191,7 +192,7 @@ public class ReforgingButton extends ControlItem<Gui> {
             }
 
             if (!compatible) {
-                errors.add(Component.text("No compatible stats to reforge", NamedTextColor.RED));
+                errors.add(Translations.component("core.menu.reforge.error.incompatible-stats").color(NamedTextColor.RED));
             }
         }
 
@@ -199,7 +200,7 @@ public class ReforgingButton extends ControlItem<Gui> {
         ItemStack goldStack = goldInventory.getItem(0);
         long cost = getReforgingCost(itemInstance.getRarity());
         if (goldStack == null) {
-            errors.add(Component.text("Need " + cost + " gold", NamedTextColor.RED));
+            errors.add(Translations.component("core.menu.reforge.error.need-gold", Component.text(cost)).color(NamedTextColor.RED));
         } else {
             // Validate gold amount
             Optional<ItemInstance> goldInstanceOpt = itemFactory.fromItemStack(goldStack);
@@ -207,7 +208,7 @@ public class ReforgingButton extends ControlItem<Gui> {
                 ItemInstance goldInstance = goldInstanceOpt.get();
 
                 if (!CurrencyUtils.canSubtract(goldInstance, cost)) {
-                    errors.add(Component.text("Need " + cost + " gold", NamedTextColor.RED));
+                    errors.add(Translations.component("core.menu.reforge.error.need-gold", Component.text(cost)).color(NamedTextColor.RED));
                 }
             }
         }
@@ -297,7 +298,9 @@ public class ReforgingButton extends ControlItem<Gui> {
                 ItemStat<?> newStat = matchingAugmentation.apply(stat);
 
                 Component line = Component.empty()
-                        .append(Component.text("  " + statType.getShortName() + ": ", NamedTextColor.GRAY))
+                        .append(Component.text("  ", NamedTextColor.GRAY))
+                        .append(statType.getShortNameComponent().color(NamedTextColor.GRAY))
+                        .append(Component.text(": ", NamedTextColor.GRAY))
                         .append(Component.text(formatStatValue(stat), NamedTextColor.WHITE))
                         .append(Component.text(" → ", NamedTextColor.DARK_GRAY))
                         .append(Component.text(formatStatValue(newStat), NamedTextColor.GREEN));
@@ -306,7 +309,9 @@ public class ReforgingButton extends ControlItem<Gui> {
             } else {
                 // This stat is not being augmented, just show the range
                 Component line = Component.empty()
-                        .append(Component.text("  " + statType.getShortName() + ": ", NamedTextColor.GRAY))
+                        .append(Component.text("  ", NamedTextColor.GRAY))
+                        .append(statType.getShortNameComponent().color(NamedTextColor.GRAY))
+                        .append(Component.text(": ", NamedTextColor.GRAY))
                         .append(Component.text(formatStatValue(stat), NamedTextColor.WHITE));
 
                 preview.add(line);
@@ -319,8 +324,11 @@ public class ReforgingButton extends ControlItem<Gui> {
                 Optional<? extends ItemStat<?>> statOpt = statContainer.getStat(augmentation.getType());
                 if (statOpt.isEmpty()) {
                     Component voidedLine = Component.empty()
-                            .append(Component.text("  " + augmentation.getType().getShortName(), NamedTextColor.DARK_GRAY, TextDecoration.STRIKETHROUGH))
-                            .append(Component.text(" (no stat)", NamedTextColor.DARK_GRAY));
+                            .append(Component.text("  ", NamedTextColor.DARK_GRAY))
+                            .append(augmentation.getType().getShortNameComponent().color(NamedTextColor.DARK_GRAY).decorate(TextDecoration.STRIKETHROUGH))
+                            .append(Component.text(" (", NamedTextColor.DARK_GRAY))
+                            .append(Translations.component("core.menu.reforge.button.voided.no-stat").color(NamedTextColor.DARK_GRAY))
+                            .append(Component.text(")", NamedTextColor.DARK_GRAY));
                     voidedReforges.add(voidedLine);
                 }
             }
@@ -331,7 +339,7 @@ public class ReforgingButton extends ControlItem<Gui> {
             if (!preview.isEmpty()) {
                 preview.add(Component.empty()); // Spacing
             }
-            preview.add(Component.text("Voided Augmentations:", NamedTextColor.RED, TextDecoration.BOLD));
+            preview.add(Translations.component("core.menu.reforge.button.voided.header").color(NamedTextColor.RED).decorate(TextDecoration.BOLD));
             preview.addAll(voidedReforges);
         }
 

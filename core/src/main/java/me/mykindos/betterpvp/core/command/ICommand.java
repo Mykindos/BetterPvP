@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.command;
 
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,7 +19,19 @@ public interface ICommand {
 
     List<String> getAliases();
 
+    /**
+     * The command's description. Implementations return a translation key (resolved per-viewer via
+     * {@link #getDescriptionComponent()}); the raw key is used for the Bukkit command registration,
+     * where it is resolved to English server-side.
+     */
     String getDescription();
+
+    /**
+     * The localized command description as a component, resolved per-viewer when rendered.
+     */
+    default Component getDescriptionComponent() {
+        return Translations.component(getDescription());
+    }
 
     void execute(Player player, Client client, String... args);
 

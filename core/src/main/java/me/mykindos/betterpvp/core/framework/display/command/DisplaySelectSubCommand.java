@@ -6,7 +6,10 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.display.DisplayEditorManager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -23,13 +26,15 @@ public class DisplaySelectSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Select a display entity";
+        return "core.command.display-select.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         displayEditorManager.startSelecting(player);
-        UtilMessage.simpleMessage(player, "Display", "Punch a display entity in the next <alt2>15</alt2> seconds to <alt>select</alt> it .");
+        UtilMessage.message(player, "core.prefix.display", "core.display.select.prompt",
+                Component.text("15", NamedTextColor.YELLOW),
+                Translations.component("core.display.select.action").color(NamedTextColor.GREEN));
     }
 
 }

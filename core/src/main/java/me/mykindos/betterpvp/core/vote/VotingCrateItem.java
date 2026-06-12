@@ -19,7 +19,7 @@ public class VotingCrateItem extends BaseItem {
 
     @Inject
     public VotingCrateItem(VotingCrateAbility votingCrateAbility) {
-        super("Voting Crate", ItemStack.of(Material.CHEST_MINECART),
+        super(translatableName("core.item.voting-crate.name"), ItemStack.of(Material.CHEST_MINECART),
                 ItemGroup.MISC,
                 ItemRarity.UNCOMMON
         );

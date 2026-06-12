@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.generator.VoidWorldGenerator;
 import me.mykindos.betterpvp.core.world.menu.GuiCreateWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -23,9 +24,11 @@ public class VoidButton extends ControlItem<GuiCreateWorld> {
     public ItemProvider getItemProvider(GuiCreateWorld gui) {
         return ItemView.builder()
                 .material(Material.BLACK_CONCRETE)
-                .displayName(Component.text("Void World: ", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.world.create.button.void.name").color(NamedTextColor.GRAY)
                         .append(Component.text(this.voidWorld, this.voidWorld ? NamedTextColor.GREEN : NamedTextColor.RED)))
-                .action(ClickActions.ALL, Component.text(this.voidWorld ? "Disable" : "Enable"))
+                .action(ClickActions.ALL, this.voidWorld
+                        ? Translations.component("core.menu.world.create.button.disable.action")
+                        : Translations.component("core.menu.world.create.button.enable.action"))
                 .build();
     }
 

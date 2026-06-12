@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.tracking.ActivitySnapshot;
 import me.mykindos.betterpvp.core.tracking.PlayerActivityService;
 import me.mykindos.betterpvp.core.tracking.model.GridKey;
 import me.mykindos.betterpvp.core.tracking.model.HeatCell;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tracking.model.ZoneClassification;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -30,12 +31,12 @@ public class HeatmapCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Inspect the player activity heatmap";
+        return "core.command.heatmap.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Heatmap", UtilMessage.deserialize("<green>Usage: /heatmap <top|here>"));
+        UtilMessage.message(player, "core.prefix.heatmap", Translations.component("core.heatmap.usage").color(NamedTextColor.GREEN));
     }
 
     @Override
@@ -67,14 +68,14 @@ public class HeatmapCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "List the hottest grid cells";
-        }
+        return "core.command.top.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             ActivitySnapshot snapshot = activityService.getSnapshot();
             if (snapshot == null) {
-                UtilMessage.message(player, "Heatmap", "No snapshot available yet — wait up to 30 seconds.");
+                UtilMessage.message(player, "core.prefix.heatmap", "core.heatmap.no_snapshot");
                 return;
             }
 
@@ -87,37 +88,35 @@ public class HeatmapCommand extends Command {
 
             List<ActivitySnapshot.Entry> top = snapshot.entries().stream().limit(limit).toList();
             if (top.isEmpty()) {
-                UtilMessage.message(player, "Heatmap", "No activity recorded yet.");
+                UtilMessage.message(player, "core.prefix.heatmap", "core.heatmap.no_activity");
                 return;
             }
 
-            UtilMessage.message(player, "Heatmap", UtilMessage.deserialize(
-                    "Top <yellow>%d</yellow> hotspots (snapshot age: <yellow>%ds</yellow>):",
-                    top.size(),
-                    (System.currentTimeMillis() - snapshot.timestamp()) / 1000
-            ));
+            UtilMessage.message(player, "core.prefix.heatmap", "core.heatmap.top.header",
+                    Component.text(top.size(), NamedTextColor.YELLOW),
+                    Component.text((System.currentTimeMillis() - snapshot.timestamp()) / 1000, NamedTextColor.YELLOW));
 
             for (int i = 0; i < top.size(); i++) {
                 ActivitySnapshot.Entry entry = top.get(i);
                 int blockX = entry.key().chunkX() * 16 + 8;
                 int blockZ = entry.key().chunkZ() * 16 + 8;
 
-                Component line = UtilMessage.deserialize(
-                        "<gray>#%d</gray> <yellow>%s</yellow> (<aqua>%d, %d</aqua>) <gray>|</gray> %s <gray>|</gray> Heat: <yellow>%.1f</yellow> <gray>|</gray> Players: <green>%d</green> <gray>|</gray> Combat: <red>%d</red>",
-                        i + 1,
-                        entry.key().world(),
-                        blockX, blockZ,
+                Component line = Translations.component("core.heatmap.top.entry",
+                        Component.text("#" + (i + 1), NamedTextColor.GRAY),
+                        Component.text(entry.key().world(), NamedTextColor.YELLOW),
+                        Component.text(blockX, NamedTextColor.AQUA),
+                        Component.text(blockZ, NamedTextColor.AQUA),
                         zoneColor(entry.classification()),
-                        entry.heatValue(),
-                        entry.currentPlayers(),
-                        entry.combatEvents()
+                        Component.text(String.format("%.1f", entry.heatValue()), NamedTextColor.YELLOW),
+                        Component.text(entry.currentPlayers(), NamedTextColor.GREEN),
+                        Component.text(entry.combatEvents(), NamedTextColor.RED)
                 ).clickEvent(ClickEvent.suggestCommand(String.format("/minecraft:tp %d ~ %d", blockX, blockZ)))
                  .hoverEvent(HoverEvent.showText(
-                         Component.text("Teleport to ", NamedTextColor.GRAY)
+                         Translations.component("core.heatmap.teleport_to").color(NamedTextColor.GRAY)
                                  .append(Component.text(blockX + ", " + blockZ, NamedTextColor.AQUA))
                  ));
 
-                UtilMessage.message(player, "Heatmap", line);
+                UtilMessage.message(player, "core.prefix.heatmap", line);
             }
         }
 
@@ -145,8 +144,8 @@ public class HeatmapCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Show heat data for the cell you are standing in";
-        }
+        return "core.command.here.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -156,25 +155,26 @@ public class HeatmapCommand extends Command {
             int blockX = key.chunkX() * 16 + 8;
             int blockZ = key.chunkZ() * 16 + 8;
 
-            UtilMessage.message(player, "Heatmap", UtilMessage.deserialize(
-                    "Cell <yellow>%s</yellow> (<aqua>%d, %d</aqua>) chunk (<gray>%d, %d</gray>)",
-                    key.world(), blockX, blockZ, key.chunkX(), key.chunkZ()
-            ));
+            UtilMessage.message(player, "core.prefix.heatmap", "core.heatmap.here.cell",
+                    Component.text(key.world(), NamedTextColor.YELLOW),
+                    Component.text(blockX, NamedTextColor.AQUA),
+                    Component.text(blockZ, NamedTextColor.AQUA),
+                    Component.text(key.chunkX(), NamedTextColor.GRAY),
+                    Component.text(key.chunkZ(), NamedTextColor.GRAY));
 
             if (cell == null) {
-                UtilMessage.message(player, "Heatmap", UtilMessage.deserialize("Zone: <gray>EMPTY</gray> — no activity recorded here."));
+                UtilMessage.message(player, "core.prefix.heatmap", "core.heatmap.here.empty",
+                        Translations.component("core.heatmap.zone.empty").color(NamedTextColor.GRAY));
                 return;
             }
 
             ZoneClassification zone = activityService.classify(cell.getHeatValue());
-            UtilMessage.message(player, "Heatmap", UtilMessage.deserialize(
-                    "Zone: %s <gray>|</gray> Heat: <yellow>%.2f</yellow> <gray>|</gray> Peak: <yellow>%.2f</yellow> <gray>|</gray> Visits: <green>%d</green> <gray>|</gray> Combat: <red>%d</red>",
+            UtilMessage.message(player, "core.prefix.heatmap", "core.heatmap.here.stats",
                     zoneColor(zone),
-                    cell.getHeatValue(),
-                    cell.getPeakHeat(),
-                    cell.getTotalVisits(),
-                    cell.getCombatEvents()
-            ));
+                    Component.text(String.format("%.2f", cell.getHeatValue()), NamedTextColor.YELLOW),
+                    Component.text(String.format("%.2f", cell.getPeakHeat()), NamedTextColor.YELLOW),
+                    Component.text(cell.getTotalVisits(), NamedTextColor.GREEN),
+                    Component.text(cell.getCombatEvents(), NamedTextColor.RED));
         }
 
         @Override
@@ -183,12 +183,12 @@ public class HeatmapCommand extends Command {
         }
     }
 
-    private static String zoneColor(ZoneClassification zone) {
+    private static Component zoneColor(ZoneClassification zone) {
         return switch (zone) {
-            case HOTSPOT -> "<red>HOTSPOT</red>";
-            case ACTIVE  -> "<gold>ACTIVE</gold>";
-            case QUIET   -> "<yellow>QUIET</yellow>";
-            case EMPTY   -> "<gray>EMPTY</gray>";
+            case HOTSPOT -> Translations.component("core.heatmap.zone.hotspot").color(NamedTextColor.RED);
+            case ACTIVE  -> Translations.component("core.heatmap.zone.active").color(NamedTextColor.GOLD);
+            case QUIET   -> Translations.component("core.heatmap.zone.quiet").color(NamedTextColor.YELLOW);
+            case EMPTY   -> Translations.component("core.heatmap.zone.empty").color(NamedTextColor.GRAY);
         };
     }
 

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
 import me.mykindos.betterpvp.core.logging.menu.button.LocationButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -35,10 +36,10 @@ public class ItemDespawnLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return Component.empty().append(Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
-                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))))
-                .append(Component.text(" despawned at ", NamedTextColor.GRAY))
-                .append(Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW));
+        return Translations.component("core.log.item-despawn.1",
+                Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN)
+                        .hoverEvent(HoverEvent.showText(Component.text(context.get(LogContext.ITEM)))),
+                Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY);
 
     }
 
@@ -53,8 +54,8 @@ public class ItemDespawnLogFormatter implements ILogFormatter {
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
                 UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
                         context.get(LogContext.ITEM)),
-                UtilMessage.deserialize("despawned at <yellow>%s</yellow>",
-                        context.get(LogContext.LOCATION)),
+                Translations.component("core.log.item-despawn.2",
+                        Component.text(context.get(LogContext.LOCATION), NamedTextColor.YELLOW)),
                 UtilMessage.DIVIDER
         );
 
@@ -64,7 +65,7 @@ public class ItemDespawnLogFormatter implements ILogFormatter {
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(Component.text("Item Despawn"))
+                .displayName(Translations.component("core.log.item-despawn.3"))
                 .material(Material.CAMPFIRE)
                 .lore(lore)
                 .build();

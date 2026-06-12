@@ -13,9 +13,11 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -52,20 +54,20 @@ public class CustomGiveCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Give a custom item to a player";
+        return "core.command.custom-give.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "Command", getUsage());
+            UtilMessage.message(player, "core.prefix.command", getUsage());
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
 
         if (target == null) {
-            UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid player name.", args[0]));
+            UtilMessage.message(player, "core.prefix.command", "core.command.give.invalid_player", Component.text(args[0], NamedTextColor.RED));
             return;
         }
 ;
@@ -73,12 +75,12 @@ public class CustomGiveCommand extends Command {
         if (baseItem == null) {
             final @NotNull Map<NamespacedKey, BaseItem> options = itemRegistry.getItemsByKey(args[1]);
             if (options.isEmpty()) {
-                UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid item", args[1]));
+                UtilMessage.message(player, "core.prefix.command", "core.command.give.invalid_item", Component.text(args[1], NamedTextColor.GREEN));
                 return;
             }
 
             if (options.size() > 1) {
-                UtilMessage.message(player, "Command", UtilMessage.deserialize("Found too many matches for key <green>%s</green>, please include a namespace.", args[1]));
+                UtilMessage.message(player, "core.prefix.command", "core.command.give.too_many_matches", Component.text(args[1], NamedTextColor.RED));
                 return;
             }
 
@@ -92,11 +94,11 @@ public class CustomGiveCommand extends Command {
             try {
                 count = Integer.parseInt(args[2]);
                 if (count < 1) {
-                    UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid number (must be greater than 1)", count));
+                    UtilMessage.message(player, "core.prefix.command", "core.command.give.amount_positive", Component.text(count, NamedTextColor.RED));
                     return;
                 }
             } catch (NumberFormatException ignored) {
-                UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid number", args[2]));
+                UtilMessage.message(player, "core.prefix.command", "core.command.give.invalid_number", Component.text(args[2], NamedTextColor.RED));
                 return;
             }
         }
@@ -125,15 +127,15 @@ public class CustomGiveCommand extends Command {
             toGive -= giveAmount;
         }
 
-        clientManager.sendMessageToRank("Core", UtilMessage.deserialize("<yellow>%s</yellow> gave <yellow>%s</yellow> [<green>%s</green>] x<green>%s</green>",
-                player.getName(),
-                target.getName(),
-                namespacedKey,
-                count), Rank.HELPER);
+        clientManager.sendMessageToRank("core.prefix.core", Translations.component("core.command.give.success",
+                Component.text(player.getName(), NamedTextColor.YELLOW),
+                Component.text(target.getName(), NamedTextColor.YELLOW),
+                Component.text(namespacedKey.toString(), NamedTextColor.GREEN),
+                Component.text(count, NamedTextColor.GREEN)), Rank.HELPER);
     }
 
     public Component getUsage() {
-        return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>give <player> <item> [amount]");
+        return Translations.component("core.command.give.usage");
     }
 
     @Override

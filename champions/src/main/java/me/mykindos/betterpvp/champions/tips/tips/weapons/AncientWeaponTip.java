@@ -4,17 +4,21 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.tips.ChampionsTip;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class AncientWeaponTip extends ChampionsTip {
     @Inject
     public AncientWeaponTip(Champions champions) {
-        super(champions, 1, 1,
-                UtilMessage.deserialize("<dark_purple>Ancient</dark_purple> weapons (<dark_purple>Netherite</dark_purple> weapons) combine " +
-                        "the effects of <gold>booster</gold> and <aqua>power</aqua> weapons, boosting the corresponding skill by " +
-                        "<yellow>1</yellow> level and increasing melee damage by <yellow>1</yellow>")
-        );
+        super(champions, 1, 1, Translations.component("champions.tip.ancientweapontip",
+                Component.text("Ancient", NamedTextColor.DARK_PURPLE),
+                Component.text("Netherite", NamedTextColor.DARK_PURPLE),
+                Component.text("booster", NamedTextColor.GOLD),
+                Component.text("power", NamedTextColor.AQUA),
+                Component.text("1", NamedTextColor.YELLOW),
+                Component.text("1", NamedTextColor.YELLOW)));
     }
 
     @Override

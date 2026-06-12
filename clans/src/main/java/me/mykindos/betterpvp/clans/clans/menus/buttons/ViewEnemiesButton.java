@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.gui.TabGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.TabButton;
@@ -70,8 +71,8 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
                 ));
 
         sortedMap.forEach((key, value) -> {
-            final List<Component> lore = List.of(Component.text("Dominance: ", NamedTextColor.GRAY)
-                    .append(Component.text("-" + value.getDominance(), NamedTextColor.RED)));
+            final List<Component> lore = List.of(Translations.component("clans.menu.clan.button.enemies.lore.dominance").color(NamedTextColor.GRAY)
+                    .appendSpace().append(Component.text("-" + value.getDominance(), NamedTextColor.RED)));
             negativeEnemies.add(new ViewClanButton(viewerClan, key, lore));
         });
 
@@ -80,8 +81,8 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
         Comparator<ClanEnemy> positiveComparator = Comparator.comparingDouble(ClanEnemy::getDominance).reversed();
         final List<Item> positiveEnemies = clan.getEnemies().stream().sorted(positiveComparator).filter(enemy -> enemy.getDominance() > 0).map(enemy -> {
             final Clan enemyClan = (Clan) enemy.getClan();
-            final List<Component> lore = List.of(Component.text("Dominance: ", NamedTextColor.GRAY)
-                    .append(Component.text("+" + enemy.getDominance(), NamedTextColor.GREEN)));
+            final List<Component> lore = List.of(Translations.component("clans.menu.clan.button.enemies.lore.dominance").color(NamedTextColor.GRAY)
+                    .appendSpace().append(Component.text("+" + enemy.getDominance(), NamedTextColor.GREEN)));
             return (Item) new ViewClanButton(viewerClan, enemyClan, lore);
         }).toList();
 
@@ -90,14 +91,14 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
 
         ItemView positiveBuilder = ItemView.builder()
                 .material(Material.GREEN_CONCRETE)
-                .displayName(Component.text("Positive", NamedTextColor.GREEN))
-                .lore(Component.text("View " + clan.getName() + "'s positive enemies", NamedTextColor.GRAY))
+                .displayName(Translations.component("clans.menu.clan.enemies.tab.positive.name").color(NamedTextColor.GREEN))
+                .lore(Translations.component("clans.menu.clan.enemies.tab.positive.lore", Component.text(clan.getName())).color(NamedTextColor.GRAY))
                 .build();
 
         ItemView negativeBuilder = ItemView.builder()
                 .material(Material.RED_CONCRETE)
-                .displayName(Component.text("Negative", NamedTextColor.RED))
-                .lore(Component.text("View " + clan.getName() + "'s negative enemies", NamedTextColor.GRAY))
+                .displayName(Translations.component("clans.menu.clan.enemies.tab.negative.name").color(NamedTextColor.RED))
+                .lore(Translations.component("clans.menu.clan.enemies.tab.negative.lore", Component.text(clan.getName())).color(NamedTextColor.GRAY))
                 .build();
 
         final TabGui gui = TabGui.normal()
@@ -114,7 +115,7 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
                 .setTabs(List.of(negativeMenu, positiveMenu))
                 .build();
 
-        Window.single().setTitle("Enemies").setGui(gui).setViewer(player).open(player);
+        Window.single().setTitle(Translations.component("clans.menu.clan.enemies.title")).setGui(gui).setViewer(player).open(player);
     }
 
     @Override

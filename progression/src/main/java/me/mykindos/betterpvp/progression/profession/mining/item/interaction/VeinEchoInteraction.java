@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.mining.item.interaction;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.blockbreak.event.ScriptedBlockPlaceEvent;
@@ -196,12 +198,12 @@ public class VeinEchoInteraction extends AbstractInteraction implements Displaye
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Vein Echo");
+        return Translations.component("progression.ability.vein-echo.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Breaking stone grants stacking mining speed. Ores may resonate, respawning instantly and granting bonus stacks.");
+        return Translations.component("progression.ability.vein-echo.description");
     }
 
     private static final class EchoState {

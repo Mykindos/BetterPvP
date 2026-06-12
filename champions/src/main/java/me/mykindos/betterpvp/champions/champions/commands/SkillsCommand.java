@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -42,7 +45,7 @@ public class SkillsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View your current skills";
+        return "champions.command.skills.description";
     }
 
     @Override
@@ -50,12 +53,12 @@ public class SkillsCommand extends Command {
         if (args.length > 0 && client.hasRank(Rank.valueOf(seeOtherPlayerSkillsRankString.toUpperCase()))) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid player", args[0]));
+                UtilMessage.message(player, "core.prefix.skills", "champions.command.skills.invalid-player", Component.text(args[0], NamedTextColor.YELLOW));
                 return;
             }
             Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(target.getUniqueId().toString());
             if (gamerBuildsOptional.isEmpty()) {
-                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have any builds", target.getName()));
+                UtilMessage.message(player, "core.prefix.skills", "champions.command.skills.no-builds", Component.text(target.getName(), NamedTextColor.YELLOW));
                 return;
             }
 
@@ -63,7 +66,7 @@ public class SkillsCommand extends Command {
             GamerBuilds builds = gamerBuildsOptional.get();
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-                UtilMessage.message(player, "Skills", UtilMessage.deserialize("<yellow>%s</yellow>'s Build:", target.getName()).appendNewline().append(build.getBuildComponent()));
+                UtilMessage.message(player, "core.prefix.skills", Translations.component("champions.command.skills.target-build", Component.text(target.getName(), NamedTextColor.YELLOW)).appendNewline().append(build.getBuildComponent()));
                 return;
             }
 
@@ -76,7 +79,7 @@ public class SkillsCommand extends Command {
             Role role = roleManager.getRole(player);
             RoleBuild build = builds.getActiveBuilds().get(role.getName());
             if (build != null) {
-                UtilMessage.message(player, "Skills", UtilMessage.deserialize("Your Build:").appendNewline().append(build.getBuildComponent()));
+                UtilMessage.message(player, "core.prefix.skills", Translations.component("champions.command.skills.your-build").appendNewline().append(build.getBuildComponent()));
             }
         }
     }

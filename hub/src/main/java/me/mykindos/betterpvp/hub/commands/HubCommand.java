@@ -24,7 +24,7 @@ public class HubCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Hub base command";
+        return "hub.command.hub.description";
     }
 
     @Override
@@ -65,8 +65,8 @@ public class HubCommand extends Command implements IConsoleCommand {
 
         @Override
         public String getDescription() {
-            return "Reload the hub plugin";
-        }
+        return "hub.command.reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
@@ -78,7 +78,7 @@ public class HubCommand extends Command implements IConsoleCommand {
             hub.reload();
             hub.getReloadables().forEach(Reloadable::reload);
             commandLoader.reload(hub.getClass().getPackageName());
-            UtilMessage.message(sender, "Hub", "Successfully reloaded hub");
+            UtilMessage.message(sender, "core.prefix.hub", "hub.command.reload.success");
         }
     }
 

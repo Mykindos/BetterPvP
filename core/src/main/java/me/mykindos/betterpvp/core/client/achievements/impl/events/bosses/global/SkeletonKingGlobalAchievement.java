@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,7 +46,9 @@ public class SkeletonKingGlobalAchievement extends SingleSimpleAchievement {
                 .build()
         );
         boolean killedSkeletonKing = skeletonKingStat.getStat(container, StatFilterType.ALL, null) >= 1;
-        return Component.text(killedSkeletonKing ? getName() : "???", NamedTextColor.WHITE);
+        return killedSkeletonKing
+                ? Translations.component(translationBase() + ".name").color(NamedTextColor.WHITE)
+                : Component.text("???", NamedTextColor.WHITE);
     }
 
     @Override

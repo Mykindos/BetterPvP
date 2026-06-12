@@ -14,6 +14,6 @@ public class MirrorOfKalandra extends BaseItem {
 
     @Inject
     private MirrorOfKalandra() {
-        super("Mirror of Kalandra", Item.model("mirror_of_kalandra", 1), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
+        super(translatableName("core.item.mirror-of-kalandra.name"), Item.model("mirror_of_kalandra", 1), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
     }
 }

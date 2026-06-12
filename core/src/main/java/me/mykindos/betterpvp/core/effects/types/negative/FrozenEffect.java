@@ -35,7 +35,7 @@ public class FrozenEffect extends EffectType {
         if (livingEntity instanceof Player player) {
             previousGamemode.putIfAbsent(player.getUniqueId(), player.getGameMode());
             player.setGameMode(GameMode.ADVENTURE);
-            UtilMessage.message(player, "Frozen", "You have been frozen");
+            UtilMessage.message(player, "core.prefix.frozen", "core.effect.frozen.received");
         }
     }
 
@@ -45,7 +45,7 @@ public class FrozenEffect extends EffectType {
         if (livingEntity instanceof Player player) {
             player.setGameMode(previousGamemode.remove(player.getUniqueId()));
             if (notify) {
-                UtilMessage.message(player, "Frozen", "You are unfrozen");
+                UtilMessage.message(player, "core.prefix.frozen", "core.effect.frozen.expired");
             }
         }
     }

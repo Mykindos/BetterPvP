@@ -14,6 +14,6 @@ public class EmeraldTalisman extends BaseItem {
 
     @Inject
     private EmeraldTalisman() {
-        super("Emerald Talisman", Item.model("emerald_talisman", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.emerald-talisman.name"), Item.model("emerald_talisman", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

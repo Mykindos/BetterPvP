@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.injector.ShopsInjectorModule;
 import me.mykindos.betterpvp.shops.listener.ShopsListenerLoader;
@@ -46,6 +47,7 @@ public class Shops extends BPvPPlugin {
 
         var core = (Core) Bukkit.getPluginManager().getPlugin("Core");
         if (core != null) {
+            TranslationService.registerBundle(this, "translations.shops");
 
             Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
             Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);

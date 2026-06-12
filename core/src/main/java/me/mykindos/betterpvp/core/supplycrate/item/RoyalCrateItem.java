@@ -14,7 +14,8 @@ import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.DescriptionComponent;
 import me.mykindos.betterpvp.core.supplycrate.SupplyCrateController;
 import me.mykindos.betterpvp.core.supplycrate.impl.RoyalCrateType;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -27,11 +28,12 @@ public class RoyalCrateItem extends BaseItem {
 
     @Inject
     private RoyalCrateItem(SupplyCrateController controller, RoyalCrateType type) {
-        super("Royal Crate Deployment", Item.model("supply_crate", 1), ItemGroup.MISC, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.royal-supply-crate.name"), Item.model("supply_crate", 1), ItemGroup.MISC, ItemRarity.LEGENDARY);
         final DeployCrateAbility ability = new DeployCrateAbility(controller, type, "the center of the map", this::getLocation, true);
         ability.setConsumesItem(true);
-        addBaseComponent(new DescriptionComponent(1,
-                UtilMessage.deserialize("<white>Drops between <yellow>%d</yellow> and <yellow>%d</yellow> items, based on total players online", 3, 10)));
+        addBaseComponent(DescriptionComponent.translatable(1, "core.item.royal-supply-crate.lore",
+                Component.text(3, NamedTextColor.YELLOW),
+                Component.text(10, NamedTextColor.YELLOW)));
         addBaseComponent(InteractionContainerComponent.builder()
                 .root(InteractionInputs.RIGHT_CLICK, ability)
                 .build());

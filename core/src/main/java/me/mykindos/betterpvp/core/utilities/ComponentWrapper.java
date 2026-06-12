@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
@@ -21,8 +22,61 @@ public class ComponentWrapper {
     private static final TextComponent UNSUPPORTED = text("ERROR WRAPPING").color(DARK_RED);
     private static final int DEFAULT_LINE_LENGTH = 30;
 
+    /**
+     * Sentinel font namespace used to flag a (possibly translatable) component so that it is word-wrapped
+     * <i>after</i> being resolved into the viewer's locale. The wrap width is encoded in the font key's value.
+     * <p>
+     * Wrapping cannot happen when lore is authored, because the text is still an unresolved translatable
+     * component (no measurable length) and the viewer's language is unknown. Instead, the line is marked here
+     * and the wrapping is deferred to the packet/render boundary where the resolved length is available.
+     *
+     * @see #markForWrap(Component, int)
+     * @see #wrapIfMarked(Component)
+     */
+    private static final String WRAP_NAMESPACE = "bpvp_wrap";
+
     public static List<Component> wrapLine(final Component component) {
         return wrapLine(component, DEFAULT_LINE_LENGTH);
+    }
+
+    /**
+     * Marks a component so that it is word-wrapped once it has been resolved into a viewer's locale.
+     * <p>
+     * Use this for translatable lore that must wrap nicely: the actual wrapping is performed later by
+     * {@link #wrapIfMarked(Component)} (called at the packet/render boundary), where the resolved, measurable
+     * text is available. The marker is carried on the component's font and is stripped before wrapping.
+     *
+     * @param component the (possibly translatable) component to wrap later
+     * @param length    the maximum line length to wrap at
+     * @return the component flagged for deferred wrapping
+     */
+    public static Component markForWrap(final Component component, final int length) {
+        return component.font(Key.key(WRAP_NAMESPACE, String.valueOf(length)));
+    }
+
+    /**
+     * If the (already resolved) component was flagged via {@link #markForWrap(Component, int)}, strips the
+     * marker and word-wraps it at the encoded width, returning one component per wrapped line. Otherwise the
+     * component is returned unchanged as a single-element list.
+     *
+     * @param component a resolved component, possibly carrying the wrap marker
+     * @return the wrapped lines, or the component itself if it was not marked
+     */
+    public static List<Component> wrapIfMarked(final Component component) {
+        final Key font = component.style().font();
+        if (font == null || !WRAP_NAMESPACE.equals(font.namespace())) {
+            return Collections.singletonList(component);
+        }
+
+        int length = DEFAULT_LINE_LENGTH;
+        try {
+            length = Integer.parseInt(font.value());
+        } catch (NumberFormatException ignored) {
+            // fall back to the default width
+        }
+
+        final Component stripped = component.style(component.style().toBuilder().font(null).build());
+        return wrapLine(stripped, length, true);
     }
 
     public static List<Component> wrapLine(final Component component, final int length) {

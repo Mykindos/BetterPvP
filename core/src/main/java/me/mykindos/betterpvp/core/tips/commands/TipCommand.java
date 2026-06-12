@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.tips.TipEvent;
+import net.kyori.adventure.text.Component;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public class TipCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Get a valid tip";
+        return "core.command.tip.description";
     }
 
     @Override
@@ -44,11 +45,11 @@ public class TipCommand extends Command {
                 if (amount <= 0) {
                     throw new NumberFormatException("Number must be greater than 0");
                 } else if(amount > 20){
-                    UtilMessage.message(player, "Tips", UtilMessage.deserialize("<green>Cannot send more than 20 tips at once."));
+                    UtilMessage.message(player, "core.prefix.command", "core.command.tip.limit");
                     return;
                 }
             } catch (NumberFormatException e) {
-                UtilMessage.message(player, "Tips", UtilMessage.deserialize("<green>%d</green> is not a valid integer."));
+                UtilMessage.message(player, "core.prefix.command", "core.command.tip.invalid_int", Component.text(args[0]));
             }
         }
         for (int i = 0; i < Math.min(amount, 20); i++) {

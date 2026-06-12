@@ -33,6 +33,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 
 @Singleton
 @BPvPListener
@@ -62,19 +65,18 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Launch an electric orb that upon directly hitting a player",
-                "or after " + getValueString(this::getDelay, level) + " seconds will strike enemies within " + getValueString(this::getRadius, level) + " blocks",
-                "with lightning, dealing " + getValueString(this::getDamage, level) + " damage, <effect>Shocking</effect> them for " + getValueString(this::getShockDuration, level),
-                "seconds, and giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.SHOCK.getDescription(0),
-        };
+    public Component[] getDescription(int level) {
+        Component delay = getValueComponent(this::getDelay, level);
+        Component radius = getValueComponent(this::getRadius, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component shockDuration = getValueComponent(this::getShockDuration, level);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component shocking = Translations.component("champions.skill.effect.shocking.name").color(NamedTextColor.WHITE);
+        Component slownessII = Translations.component("champions.skill.effect.slowness",
+                Component.text("II")).color(NamedTextColor.WHITE);
+        Component shock = Translations.component("champions.skill.effect.shock.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.lightning-orb.description", delay, radius, damage, shockDuration, slowDuration, cooldown, shocking, slownessII, shock);
     }
 
     public double getDelay(int level) {

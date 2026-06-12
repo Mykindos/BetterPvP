@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -37,8 +38,9 @@ public class CoreTransportButton extends ControlItem<ClanTravelHubMenu> {
         ItemView.ItemViewBuilder provider = ItemView.builder()
                 .material(CORE_BLOCK)
                 .itemModel(Key.key("betterpvp", "menu/gui/waystone/button"))
-                .displayName(Component.text("Clan Home - ", NamedTextColor.GOLD).append(Component.text(clan.getName(), NamedTextColor.AQUA, TextDecoration.BOLD)))
-                .action(ClickActions.LEFT, Component.text("Teleport"));
+                .displayName(Translations.component("clans.menu.travel-hub.button.core.name").color(NamedTextColor.GOLD)
+                        .appendSpace().append(Component.text(clan.getName(), NamedTextColor.AQUA, TextDecoration.BOLD)))
+                .action(ClickActions.LEFT, Translations.component("clans.menu.travel-hub.button.transport.action.teleport"));
         if (menu.isPressed(this)) {
             provider.itemModel(Key.key("betterpvp", "menu/gui/waystone/button_selected"));
         }
@@ -52,7 +54,7 @@ public class CoreTransportButton extends ControlItem<ClanTravelHubMenu> {
         }
 
         if (!clan.getCore().isSet()) {
-            UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a core set!");
+            UtilMessage.message(player, "clans.prefix", "clans.core.not-set");
             return;
         }
 

@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.progression.tips.tips;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.IRunCommand;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.tips.ProgressionTip;
@@ -22,8 +22,7 @@ public class FishingExperienceTip extends ProgressionTip implements IRunCommand 
     @Override
     public Component getComponent() {
         Component runComponent = runCommand("/fishing");
-        return UtilMessage.deserialize("Level up your fishing by catching fish. " +
-                "You can spend your skill points in ").append(runComponent);
+        return Translations.component("progression.tip.fishingexperiencetip", runComponent);
     }
 
     @Override

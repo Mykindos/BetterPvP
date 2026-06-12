@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.game.impl.domination.listener;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.model.team.TeamProperties;
 import me.mykindos.betterpvp.game.guice.GameScoped;
@@ -39,7 +40,7 @@ public class DominationSidebarListener implements Listener {
         builder.addBlankLine();
         builder.addDynamicLine(() -> {
             final int score = game.getConfiguration().getScoreToWinAttribute().getValue();
-            return Component.text(String.format("First to %,d", score), NamedTextColor.WHITE);
+            return Translations.component("game.sidebar.domination.first-to", Component.text(String.format("%,d", score))).color(NamedTextColor.WHITE);
         });
         builder.addBlankLine();
 
@@ -49,7 +50,7 @@ public class DominationSidebarListener implements Listener {
                 .forEach(entry -> {
                     TeamProperties properties = entry.getKey();
                     Team team = entry.getValue();
-                    builder.addStaticLine(Component.text(properties.name() + " Team", properties.color()));
+                    builder.addStaticLine(Translations.component("game.sidebar.domination.team", Component.text(properties.name())).color(properties.color()));
                     builder.addDynamicLine(() -> {
                         final int score = controller.getScores().getOrDefault(team, 0);
                         return Component.text(String.format("%,d", score), NamedTextColor.WHITE);

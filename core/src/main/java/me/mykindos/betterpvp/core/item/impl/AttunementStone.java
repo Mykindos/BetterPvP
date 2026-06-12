@@ -22,7 +22,7 @@ public class AttunementStone extends BaseItem {
 
     @Inject
     private AttunementStone() {
-        super("Attunement Stone", Item.model("attunement_stone", 1), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.attunement-stone.name"), Item.model("attunement_stone", 1), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 
     @Inject

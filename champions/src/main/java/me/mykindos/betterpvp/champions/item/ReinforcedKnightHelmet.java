@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 public class ReinforcedKnightHelmet extends ArmorItem {
     @Inject
     private ReinforcedKnightHelmet(Champions champions) {
-        super(champions, "Reinforced Knight Helmet", Item.builder(Material.IRON_HELMET)
+        super(champions, translatableName("champions.item.reinforced-knight-helmet.name"), Item.builder(Material.IRON_HELMET)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.KNIGHT));

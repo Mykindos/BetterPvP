@@ -90,8 +90,8 @@ public class PunishmentListener implements Listener {
 
         if (client.getGamer().getChatChannel().getChannel() != ChatChannel.SERVER) return;
         client.getPunishment(PunishmentTypes.MUTE).ifPresent(mute -> {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently muted and cannot send messages!");
-            UtilMessage.message(event.getPlayer(), "Punish", mute.getInformation());
+            UtilMessage.message(event.getPlayer(), "core.prefix.punish", "core.punishment.muted");
+            UtilMessage.message(event.getPlayer(), "core.prefix.punish", mute.getInformation());
             event.cancel("Player is muted");
         });
     }
@@ -105,8 +105,8 @@ public class PunishmentListener implements Listener {
         final Client client = clientManager.search().online(damager);
         client.getPunishment(PunishmentTypes.PVP_LOCK).ifPresent(pvpLock -> {
 
-            UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
-            UtilMessage.message(damager, "Punish", pvpLock.getInformation());
+            UtilMessage.message(damager, "core.prefix.punish", "core.punishment.pvp_locked");
+            UtilMessage.message(damager, "core.prefix.punish", pvpLock.getInformation());
             event.setCancelled(true);
 
         });
@@ -118,8 +118,8 @@ public class PunishmentListener implements Listener {
         final Client client = clientManager.search().online(event.getPlayer());
 
         client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
-            UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
+            UtilMessage.message(event.getPlayer(), "core.prefix.punish", "core.punishment.build_locked_place");
+            UtilMessage.message(event.getPlayer(), "core.prefix.punish", buildLock.getInformation());
             event.setCancelled(true);
         });
     }
@@ -129,8 +129,8 @@ public class PunishmentListener implements Listener {
         final Client client = clientManager.search().online(event.getPlayer());
 
         client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot break blocks!");
-            UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
+            UtilMessage.message(event.getPlayer(), "core.prefix.punish", "core.punishment.build_locked_break");
+            UtilMessage.message(event.getPlayer(), "core.prefix.punish", buildLock.getInformation());
             event.setCancelled(true);
         });
     }

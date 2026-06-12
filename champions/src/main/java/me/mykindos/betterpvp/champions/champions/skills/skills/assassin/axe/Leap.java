@@ -14,12 +14,16 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -53,19 +57,10 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate.",
-                "",
-                "Take a great leap forward",
-                "",
-                "Activate while your back is to a wall to perform",
-                "a wall-kick, which will not affect the cooldown",
-                "",
-                "Cannot be used while <effect>Slowed</effect>",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        final Component cooldown = getValueComponent(this::getCooldown, level);
+        final Component slowed = Translations.component("champions.skill.effect.slowed.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.assassin.leap.description", cooldown, slowed);
     }
 
     @Override
@@ -86,7 +81,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
             vec.setY(0);
             VelocityData velocityData = new VelocityData(vec, wallKickStrength, false, 0.0D, 0.8D, 2.0D, true);
             UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
-            UtilMessage.message(player, getClassType().getName(), "You used <alt>Wall Kick</alt>.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.leap.wall-kick", Translations.component("champions.skill.assassin.leap.wall-kick-name").color(NamedTextColor.GREEN));
         }
 
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);

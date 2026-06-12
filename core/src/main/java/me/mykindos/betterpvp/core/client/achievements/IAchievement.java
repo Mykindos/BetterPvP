@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -141,7 +142,21 @@ public interface IAchievement {
      * @return
      */
     default Component getDisplayName(final StatContainer container, StatFilterType type, @Nullable("When type is ALL") Period period) {
+        final String nameKey = translationBase() + ".name";
+        if (Translations.hasTranslation(nameKey)) {
+            return Translations.component(nameKey).color(NamedTextColor.WHITE);
+        }
         return Component.text(getName(), NamedTextColor.WHITE);
+    }
+
+    /**
+     * Base translation key for this achievement, derived from its {@link #getNamespacedKey()}:
+     * {@code core.achievement.<namespace>.<key>}. Used for the localized {@code .name} and {@code .desc}
+     * (multi-line) keys; when those keys are absent the framework falls back to {@link #getName()} /
+     * {@link #getStringDescription}.
+     */
+    default String translationBase() {
+        return "core.achievement." + getNamespacedKey().getNamespace() + "." + getNamespacedKey().getKey();
     }
 
     /**
@@ -183,9 +198,16 @@ public interface IAchievement {
      * @return
      */
     default List<Component> getLore(final StatContainer container, StatFilterType type, Period period) {
-        List<Component> lore = new ArrayList<>(getStringDescription(container, type, period).stream()
-                .map(UtilMessage::deserialize)
-                .toList());
+        final String descBase = translationBase() + ".desc";
+        final List<Component> lore = new ArrayList<>();
+        if (Translations.hasTranslation(descBase + ".lines")) {
+            // Localized, multi-line description (resolved per-viewer at the packet boundary).
+            lore.addAll(List.of(Translations.componentLines(descBase)));
+        } else {
+            lore.addAll(getStringDescription(container, type, period).stream()
+                    .map(UtilMessage::deserialize)
+                    .toList());
+        }
         lore.addAll(this.getProgressComponent(container, type, period));
         lore.addAll(this.getCompletionComponent(container));
         return lore;

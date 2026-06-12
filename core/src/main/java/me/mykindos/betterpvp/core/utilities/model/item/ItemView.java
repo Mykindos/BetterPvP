@@ -10,6 +10,7 @@ import lombok.Singular;
 import lombok.Value;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.key.Key;
@@ -190,7 +191,15 @@ public class ItemView implements ItemProvider {
 
     @Override
     public ItemStack get(@Nullable String lang) {
-        return get();
+        final ItemStack itemStack = toItemStack();
+        // When InvUI supplies the viewer's language (menu rendering), resolve translatable name/lore into
+        // that locale now. Relying solely on the packet layer is not enough for menu items: their components
+        // can be rendered to the server default (English) before the remapper sees them. With no language
+        // (real items), keep them unresolved so the packet remapper localizes per recipient.
+        if (lang == null) {
+            return itemStack;
+        }
+        return Translations.renderItemStack(itemStack, Translations.toLocale(lang));
     }
 
     @Override

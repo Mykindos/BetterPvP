@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,7 +32,7 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
     @Override
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You have already prepared <alt>%s</alt>.", getName());
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.already-prepared", getDisplayName().color(NamedTextColor.GREEN));
             return false;
         }
 

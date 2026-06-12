@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Period;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -64,7 +65,7 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
     public Description getDescription(StatContainer container, StatFilterType type, Period period) {
         List<Component> lore = new ArrayList<>(
                 List.of(
-                        UtilMessage.deserialize("<gray>Use all skills for 1 minute")
+                        Translations.component("champions.achievement.use-all-skills.description").color(NamedTextColor.GRAY)
                 ));
         lore.addAll(getRemainingElements(container));
         lore.addAll(this.getProgressComponent(container, type, period));
@@ -105,7 +106,7 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
                 .toList();
         List<Component> components = new ArrayList<>();
         if (neededStats.isEmpty()) return List.of();
-        components.add(Component.text("Needed:"));
+        components.add(Translations.component("champions.achievement.use-all-skills.needed"));
         final int toShow = Math.min(neededStats.size(), 3);
         for (int i = 0; i < toShow; i++) {
             components.add(Component.text(Objects.requireNonNull(neededStats.get(i).getSkillName()), NamedTextColor.WHITE));

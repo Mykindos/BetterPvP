@@ -19,7 +19,7 @@ public class VitalityPowder extends BaseItem {
 
     @Inject
     public VitalityPowder() {
-        super("Vitality Powder", Item.model("vitality_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.vitality-powder.name"), Item.model("vitality_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
         addBaseComponent(new StatAugmentationComponent(List.of(
                 new StatAugmentation(StatTypes.HEALTH, 1, 0.01, StatAugmentation.Operation.ADD)
         )));

@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -29,9 +30,9 @@ public class CancelItem extends ControlItem<BannerMenu> {
     public ItemProvider getItemProvider(BannerMenu gui) {
         return ItemView.builder()
                 .material(Material.TNT)
-                .displayName(Component.text("Cancel", NamedTextColor.RED, TextDecoration.BOLD))
-                .action(ClickActions.LEFT, Component.text("Reset Changes"))
-                .action(ClickActions.SHIFT, Component.text("Wipe Banner"))
+                .displayName(Translations.component("clans.menu.banner.button.cancel.name").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
+                .action(ClickActions.LEFT, Translations.component("clans.menu.banner.button.cancel.action.reset"))
+                .action(ClickActions.SHIFT, Translations.component("clans.menu.banner.button.cancel.action.wipe"))
                 .build();
     }
 

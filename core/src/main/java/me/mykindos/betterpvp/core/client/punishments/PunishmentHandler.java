@@ -16,11 +16,13 @@ import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -88,28 +90,53 @@ public class PunishmentHandler {
 
         Component staffPunishMessage;
         if (duration == -1) {
-            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been <green>permanently <reset>%s.", target.getName(), type.getChatLabel());
-            staffPunishMessage = punisher != null
-                    ? UtilMessage.deserialize("<yellow>%s<reset> was <green>permanently <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName())
-                    : UtilMessage.deserialize("<yellow>%s<reset> was <green>permanently <reset>%s by <yellow>Server<reset>.", target.getName(), type.getChatLabel());
+            if (punisher != null) {
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.with_punisher.permanent",
+                        Component.text(punisher.getName()), Component.text(type.getChatLabel()), Component.text(target.getName()));
+            } else {
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.no_punisher.permanent",
+                        Component.text(target.getName()), Component.text(type.getChatLabel()));
+            }
+            staffPunishMessage = Translations.component("core.punishment.staff.permanent",
+                    Component.text(target.getName(), NamedTextColor.YELLOW),
+                    Component.text("permanently", NamedTextColor.GREEN),
+                    Component.text(type.getChatLabel()),
+                    Component.text(punisher != null ? punisher.getName() : "Server", NamedTextColor.YELLOW));
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <green>permanently</green> <yellow>%s</yellow>. Reason: <red>%s",
                     type.getChatLabel(), punishment.getReason());
         } else if (duration == 0) {
-            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been <reset>%s.", target.getName(), type.getChatLabel());
-            staffPunishMessage = punisher != null
-                    ? UtilMessage.deserialize("<yellow>%s<reset> was <reset>%s by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), punisher.getName())
-                    : UtilMessage.deserialize("<yellow>%s<reset> was <reset>%s by <yellow>Server<reset>.", target.getName(), type.getChatLabel());
+            // Treat 0 duration as a temporary punishment with a 0s duration for broadcast consistency
+            String zero = UtilTime.getTime(0, 1);
+            if (punisher != null) {
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.with_punisher.temp",
+                        Component.text(punisher.getName()), Component.text(type.getChatLabel()), Component.text(target.getName()), Component.text(zero));
+            } else {
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.no_punisher.temp",
+                        Component.text(target.getName()), Component.text(type.getChatLabel()), Component.text(zero));
+            }
+            staffPunishMessage = Translations.component("core.punishment.staff.applied",
+                    Component.text(target.getName(), NamedTextColor.YELLOW),
+                    Component.text(type.getChatLabel()),
+                    Component.text(punisher != null ? punisher.getName() : "Server", NamedTextColor.YELLOW));
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <yellow>%s</yellow>. Reason: <red>%s",
                     type.getChatLabel(), punishment.getReason());
         } else {
-            UtilMessage.broadcast("Punish", "<yellow>%s<reset> has been %s for <green>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime);
-            staffPunishMessage = punisher != null
-                    ? UtilMessage.deserialize("<yellow>%s<reset> was %s for <green>%s<reset> by <yellow>%s<reset>.", target.getName(), type.getChatLabel(), formattedTime, punisher.getName())
-                    : UtilMessage.deserialize("<yellow>%s<reset> was %s for <green>%s<reset> by <yellow>Server<reset>.", target.getName(), type.getChatLabel(), formattedTime);
+            if (punisher != null) {
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.with_punisher.temp",
+                        Component.text(punisher.getName()), Component.text(type.getChatLabel()), Component.text(target.getName()), Component.text(formattedTime));
+            } else {
+                UtilMessage.broadcast("core.prefix.command", "core.command.punishment.broadcast.no_punisher.temp",
+                        Component.text(target.getName()), Component.text(type.getChatLabel()), Component.text(formattedTime));
+            }
+            staffPunishMessage = Translations.component("core.punishment.staff.temp",
+                    Component.text(target.getName(), NamedTextColor.YELLOW),
+                    Component.text(type.getChatLabel()),
+                    Component.text(formattedTime, NamedTextColor.GREEN),
+                    Component.text(punisher != null ? punisher.getName() : "Server", NamedTextColor.YELLOW));
             offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
                     OfflineMessage.Action.PUNISHMENT,
                     "You were <yellow>%s</yellow> for <green>%s</green>. Reason: <red>%s",
@@ -132,10 +159,12 @@ public class PunishmentHandler {
 
         if (!reason.isEmpty()) {
             Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
-            Component reasonComponent = UtilMessage.deserialize("<red>Reason<reset>: <reset>%s", reason);
+            Component reasonComponent = Translations.component("core.punishment.staff.reason",
+                    Translations.component("core.punishment.staff.reason_label").color(NamedTextColor.RED),
+                    Component.text(reason));
 
             if (targetPlayer != null) {
-                UtilMessage.message(targetPlayer, "Punish", reasonComponent);
+                UtilMessage.message(targetPlayer, "core.prefix.punish", reasonComponent);
             }
 
             clientManager.sendMessageToRank("Punish", reasonComponent, Rank.TRIAL_MOD);

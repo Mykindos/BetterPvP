@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -31,20 +33,21 @@ public class WipeSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "";
+        return "progression.command.wipe.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if(args.length == 0) {
-            UtilMessage.simpleMessage(player, "Command", "Usage: /progression wipe <player>");
+            UtilMessage.message(player, "core.prefix.command", "progression.command.wipe.usage");
             return;
         }
 
         String targetName = args[0];
         clientManager.search().offline(targetName).thenAcceptAsync(targetOptional -> {
             if(targetOptional.isEmpty()) {
-                UtilMessage.simpleMessage(player, "Command", "Cannot find a player with the name <yellow>%s</yellow>", targetName);
+                UtilMessage.message(player, "core.prefix.command", "progression.command.wipe.player-not-found",
+                        Component.text(targetName, NamedTextColor.YELLOW));
                 return;
             }
 
@@ -57,7 +60,8 @@ public class WipeSubCommand extends Command {
                 });
             });
 
-            UtilMessage.simpleMessage(player, "Command", "Wiped <yellow>%s</yellow>'s progression data", target.getName());
+            UtilMessage.message(player, "core.prefix.command", "progression.command.wipe.success",
+                    Component.text(target.getName(), NamedTextColor.YELLOW));
         });
     }
 }

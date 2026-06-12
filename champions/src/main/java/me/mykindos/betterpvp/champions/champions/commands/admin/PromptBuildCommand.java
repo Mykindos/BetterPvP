@@ -36,7 +36,7 @@ public class PromptBuildCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Open a prompt build (for testing)";
+        return "champions.command.prompt-build.description";
     }
 
     @Override

@@ -118,7 +118,7 @@ public class EffectTypes {
                 .clickEvent(ClickEvent.runCommand("/protection"))
                 .hoverEvent(HoverEvent.showText(Component.text("/protection")));
         Component component = Component.text("Use ").append(runComponent).append(Component.text(" to disable this permanently"));
-        UtilMessage.message(player, "Protection", component);
+        UtilMessage.message(player, "core.prefix.protection", component);
     }
 
 }

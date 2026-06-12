@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -45,12 +47,12 @@ public class RegenerationAbility extends CooldownInteraction implements Displaye
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Regeneration");
+        return Translations.component("champions.ability.regeneration.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Gain a small regeneration effect for a short duration.");
+        return Translations.component("champions.ability.regeneration.description");
     }
 
     @Override
@@ -64,10 +66,7 @@ public class RegenerationAbility extends CooldownInteraction implements Displaye
         LivingEntity entity = actor.getEntity();
 
         effectManager.addEffect(entity, EffectTypes.REGENERATION, level, (long) (duration * 1000));
-        UtilMessage.message(entity, "Item",
-                Component.text("You used ", NamedTextColor.GRAY)
-                        .append(getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW))
-                        .append(Component.text(".", NamedTextColor.GRAY)));
+        UtilMessage.message(entity, "core.prefix.item", "champions.item.used", getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW));
         UtilSound.playSound(entity, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
         return InteractionResult.Success.ADVANCE;
     }

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.core.mailbox;
 import me.mykindos.betterpvp.clans.clans.core.menu.CoreMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -23,10 +24,10 @@ public class ClanMailboxButton extends FlashingButton<CoreMenu> {
 
     private static final ItemView MAILBOX_ITEM = ItemView.builder()
             .material(Material.CHEST)
-            .displayName(Component.text("Mailbox", TextColor.color(84, 115, 255), TextDecoration.BOLD))
+            .displayName(Translations.component("clans.menu.core.button.mailbox.name").color(TextColor.color(84, 115, 255)).decorate(TextDecoration.BOLD))
             .frameLore(true)
-            .lore(Component.text("The mailbox stores items that have", NamedTextColor.GRAY))
-            .lore(Component.text("been delivered to your clan.", NamedTextColor.GRAY))
+            .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.1").color(NamedTextColor.GRAY))
+            .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.2").color(NamedTextColor.GRAY))
             .build();
 
     private final ClanMailbox mailbox;
@@ -44,10 +45,10 @@ public class ClanMailboxButton extends FlashingButton<CoreMenu> {
     public ItemProvider getItemProvider(CoreMenu gui) {
         return ItemView.builder()
                 .material(Material.SMOKER)
-                .displayName(Component.text("Mailbox", TextColor.color(84, 115, 255), TextDecoration.BOLD))
+                .displayName(Translations.component("clans.menu.core.button.mailbox.name").color(TextColor.color(84, 115, 255)).decorate(TextDecoration.BOLD))
                 .frameLore(true)
-                .lore(Component.text("The mailbox stores items that have", NamedTextColor.GRAY))
-                .lore(Component.text("been delivered to your clan.", NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.1").color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.2").color(NamedTextColor.GRAY))
                 .glow(this.isFlash())
                 .build();
     }
@@ -55,7 +56,7 @@ public class ClanMailboxButton extends FlashingButton<CoreMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (mailbox.isLocked()) {
-            UtilMessage.message(player, "Clans", "<red>The mailbox is currently in use by: <dark_red>%s</dark_red>.", mailbox.getLockedBy());
+            UtilMessage.message(player, "clans.prefix", "clans.core.mailbox.locked", Component.text(mailbox.getLockedBy(), NamedTextColor.DARK_RED));
             return;
         }
 

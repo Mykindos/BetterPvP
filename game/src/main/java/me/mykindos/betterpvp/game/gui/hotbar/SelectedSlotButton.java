@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -17,13 +19,10 @@ public class SelectedSlotButton extends FlashingButton<HotBarEditor> {
 
     @Override
     public ItemProvider getItemProvider(HotBarEditor gui) {
-        List<Component> lore = List.of(
-                Component.text("Click the inventory above", NamedTextColor.WHITE),
-                Component.text("To select an item for this slot", NamedTextColor.WHITE)
-        );
+        List<Component> lore = List.of(Translations.componentLines("game.menu.hotbar.selected.lore"));
         ItemView.ItemViewBuilder builder = ItemView.builder()
                 .material(Material.LIME_STAINED_GLASS)
-                .displayName(Component.text("Selected Slot", NamedTextColor.GREEN))
+                .displayName(Translations.component("game.menu.hotbar.selected.name").color(NamedTextColor.GREEN))
                 .lore(lore)
                 .glow(this.isFlash());
         return builder.build();

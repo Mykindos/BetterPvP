@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -20,9 +22,12 @@ import java.util.Optional;
 @SubCommand(ClanCommand.class)
 public class JoinSubCommand extends ClanSubCommand {
 
+    private final ZoneManager zoneManager;
+
     @Inject
-    public JoinSubCommand(ClanManager clanManager, ClientManager clientManager) {
+    public JoinSubCommand(ClanManager clanManager, ClientManager clientManager, ZoneManager zoneManager) {
         super(clanManager, clientManager);
+        this.zoneManager = zoneManager;
     }
 
     @Override
@@ -32,7 +37,7 @@ public class JoinSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Join a clan that you have been invited to";
+        return "clans.command.join.description";
     }
 
     @Override
@@ -43,13 +48,13 @@ public class JoinSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a clan to join.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.join.no-args");
             return;
         }
 
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
         if (clanOptional.isPresent()) {
-            UtilMessage.message(player, "Clans", "You are already in a clan");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.join.already-in-clan");
             return;
         }
 
@@ -58,8 +63,8 @@ public class JoinSubCommand extends ClanSubCommand {
             Optional<Clan> clanByLocationOptional = clanManager.getClanByLocation(player.getLocation());
             if (clanByLocationOptional.isPresent()) {
                 Clan locationClan = clanByLocationOptional.get();
-                if(!locationClan.isSafe() && locationClan.getId() != targetClan.getId()) {
-                    UtilMessage.message(player, "Clans", "You must be in wilderness or safe territory to join another clan");
+                if (!zoneManager.hasTagAt(player.getLocation(), Zones.SAFE) && locationClan.getId() != targetClan.getId()) {
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.join.unsafe-location");
                     return;
                 }
             }

@@ -40,7 +40,7 @@ public class ShopsNPCListener implements Listener {
     @EventHandler
     public void onDamage(DamageEvent event) {
         if (isShopsNPC(event.getDamagee())) {
-            event.cancel("Cannot damage shopkeepers");
+            event.cancel("shops.listener.npc.cannot-damage");
         }
     }
 

@@ -22,7 +22,7 @@ public class AncientSword extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 2031;
 
     public AncientSword() {
-        super("Ancient Sword", ItemStack.of(Material.NETHERITE_SWORD), ItemGroup.WEAPON, ItemRarity.RARE);
+        super(translatableName("core.item.ancient-sword.name"), ItemStack.of(Material.NETHERITE_SWORD), ItemGroup.WEAPON, ItemRarity.RARE);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

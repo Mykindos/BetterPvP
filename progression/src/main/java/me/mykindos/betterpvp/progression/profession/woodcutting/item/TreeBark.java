@@ -15,16 +15,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class TreeBark extends BaseItem {
 
     public TreeBark() {
-        super("Tree Bark", Item.model("tree_bark", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("A currency used to purchase items.")
-                        .append(Component.text("\n"))
-                        .append(Component.text("\n"))
-                        .append(
-                                Component.text("See the" + " ")
-                                        .append(Component.text("Lumberjack").color(NamedTextColor.AQUA))
-                                        .append(Component.text(" " + "at Shops."))
-                        )
-        ));
+        super(translatableName("progression.item.tree-bark.name"), Item.model("tree_bark", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        addBaseComponent(DescriptionComponent.translatable(1, "progression.item.tree-bark.lore",
+                Component.text("Lumberjack", NamedTextColor.AQUA)));
     }
 }

@@ -15,8 +15,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -58,15 +62,10 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Each subsequent arrow hit will",
-                "increase your damage by " + getValueString(this::getDamage, level),
-                "",
-                "Stacks up to " + getValueString(this::getMaxConsecutiveHits, level) + " times",
-                "",
-                "Missing a shot or taking damage will reset Sharpshooter",
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component maxConsecutiveHits = getValueComponent(this::getMaxConsecutiveHits, level, 0);
+        return Translations.componentLines("champions.skill.ranger.sharpshooter.description", damage, maxConsecutiveHits);
     }
 
     private boolean isValidProjectile(Projectile projectile) {
@@ -128,7 +127,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
             double bonusDamage = Math.min(hitData.getCharge(), getMaxConsecutiveHits(level) + 1) * getDamage(level) - getDamage(level);
             event.addModifier(new SkillDamageModifier.Flat(this, bonusDamage));
             if(bonusDamage > 0) {
-                UtilMessage.simpleMessage(damager, getClassType().getName(), "<yellow>%d<gray> consecutive hits (<green>+%.2f damage<gray>)", hitData.getCharge(), bonusDamage);
+                UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.ranger.sharpshooter.hits", Component.text(String.valueOf(hitData.getCharge()), NamedTextColor.YELLOW), Component.text(String.format("%.2f", bonusDamage), NamedTextColor.GREEN));
                 damager.playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, (0.8f + (float) (hitData.getCharge() * 0.2)));
             }
         }
@@ -186,7 +185,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
             if (System.currentTimeMillis() > entry.getValue().getLastHit() + (getDuration(getLevel(entry.getKey())) * 1000L)) {
                 Player player = entry.getKey();
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.75f);
-                UtilMessage.simpleMessage(player, getClassType().getName(), "<green>%s %d<gray> has ended at <yellow>%s<gray> damage", getName(), getLevel(player), (Math.min(getMaxConsecutiveHits(getLevel(player)), data.get(player).getCharge()) * getDamage(getLevel(player))));
+                UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.sharpshooter.ended", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(getLevel(player)), NamedTextColor.GREEN), Component.text(String.valueOf(Math.min(getMaxConsecutiveHits(getLevel(player)), data.get(player).getCharge()) * getDamage(getLevel(player))), NamedTextColor.YELLOW));
                 return true;
             }
             return false;

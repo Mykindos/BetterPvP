@@ -95,7 +95,7 @@ public class DeathsCurseEffect extends VanillaEffectType {
             }, 1L);
         } else {
             if (notify) {
-                UtilMessage.message(livingEntity, "Death's Curse", "You are no longer cursed to death.");
+                UtilMessage.message(livingEntity, "core.prefix.deaths-curse", "core.effect.deaths_curse.expired");
             }
         }
     }

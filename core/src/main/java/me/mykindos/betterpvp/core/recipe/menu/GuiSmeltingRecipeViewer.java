@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.fuel.FuelComponent;
 import me.mykindos.betterpvp.core.item.menu.viewer.AlloyButton;
 import me.mykindos.betterpvp.core.item.menu.viewer.ItemButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -66,7 +67,7 @@ public class GuiSmeltingRecipeViewer extends AbstractGui implements Windowed {
         List<ItemProvider> indicatorCycles = new ArrayList<>();
         final float temperature = recipe.getMinimumTemperature();
         final TextColor color = new ProgressColor(temperature / 1_000).inverted().getTextColor();
-        final Component indicatorName = Component.text("Temperature:", TextColor.color(214, 214, 214))
+        final Component indicatorName = Translations.component("core.menu.recipe.smelting.temperature.label").color(TextColor.color(214, 214, 214))
                 .appendSpace()
                 .append(Component.text((int) temperature + " °C", color));
         for (int i = 0; i < 13; i++) {
@@ -94,12 +95,12 @@ public class GuiSmeltingRecipeViewer extends AbstractGui implements Windowed {
         setItem(33, new AutoCycleItem(10, fuelItems.toArray(new ItemProvider[0])));
 
         final SmeltingResult result = recipe.previewResult();
-        setItem(15, new AlloyButton(result.getPrimaryResult().getAlloyType(), result.getTotalMillibuckets(), true, "Yields"));
+        setItem(15, new AlloyButton(result.getPrimaryResult().getAlloyType(), result.getTotalMillibuckets(), true, Translations.component("core.menu.alloy.prefix.yields")));
         setItem(5, InfoTabButton.builder()
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())
                 .wikiEntry("Test", url)
-                .description(Component.text("Click on an ingredient to look at its recipes. Each recipe requires fuel and a minimum temperature to smelt the alloy."))
+                .descriptionLines(List.of(Translations.rawComponentLines("core.menu.recipe.smelting.info.description")))
                 .build());
         setBackground(Menu.INVISIBLE_BACKGROUND_ITEM);
     }

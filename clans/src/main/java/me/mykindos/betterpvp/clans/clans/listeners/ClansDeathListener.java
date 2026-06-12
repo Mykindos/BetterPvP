@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -120,14 +121,18 @@ public class ClansDeathListener extends ClanListener implements Listener {
         if (clanManager.getRelation(killedClan, killerClan) != ClanRelation.ENEMY) return 0;
 
         if (killerClan.isNoDominanceCooldownActive() && pillageProtection) {
-            killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
-            killedClan.messageClan("You did not lose any dominance as <yellow>" + killerClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
+            killerClan.messageClan("clans.death.no-dominance-gained-own", null, null, true);
+            killedClan.messageClan("clans.death.no-dominance-lost-other", new Object[]{
+                    Component.text(killerClan.getName(), NamedTextColor.YELLOW)
+            }, null, true);
             return 0;
         }
 
         if (killedClan.isNoDominanceCooldownActive() && pillageProtection) {
-            killedClan.messageClan("You did not lose any dominance as your clan is a new clan or was recently pillaged.", null, true);
-            killerClan.messageClan("You did not gain any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
+            killedClan.messageClan("clans.death.no-dominance-lost-own", null, null, true);
+            killerClan.messageClan("clans.death.no-dominance-gained-other", new Object[]{
+                    Component.text(killedClan.getName(), NamedTextColor.YELLOW)
+            }, null, true);
             return 0;
         }
 

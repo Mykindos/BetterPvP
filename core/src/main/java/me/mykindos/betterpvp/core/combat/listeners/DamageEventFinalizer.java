@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -231,28 +232,31 @@ public class DamageEventFinalizer {
                 categories.add(category.name());
             }
 
-            UtilMessage.simpleMessage(player, "");
-            UtilMessage.simpleMessage(player, "Damage", "<u>Details:");
-            UtilMessage.simpleMessage(player, "Damage", "Time: <alt2>" + LocalDateTime.now().toString());
-            UtilMessage.simpleMessage(player, "Damage", "Cancelled: <alt2>"+ event.isCancelled());
-            UtilMessage.simpleMessage(player, "Damage", "Cancel Reason: <alt2>"+ event.getCancelReason());
-            UtilMessage.simpleMessage(player, "Damage", "Raw Damage: <alt2>" + event.getRawDamage());
-            UtilMessage.simpleMessage(player, "Damage", "Damage: <alt2>" + event.getDamage());
-            UtilMessage.simpleMessage(player, "Damage", "Final Damage: <alt2>" + modifiedDamage);
-            UtilMessage.simpleMessage(player, "Damage", "Projectile: " + (event.isProjectile() ? "<green>Yes" : "<red>No"));
-            UtilMessage.simpleMessage(player, "Damage", "Knockback: " + (event.isKnockback() ? "<green>Yes" : "<red>No"));
-            UtilMessage.simpleMessage(player, "Damage", "Hurt Animation: " + (event.isHurtAnimation() ? "<green>Yes" : "<red>No"));
-            UtilMessage.simpleMessage(player, "Damage", "Living Damagee: " + (event.isDamageeLiving() ? "<green>Yes" : "<red>No"));
-            UtilMessage.simpleMessage(player, "Damage", "Damage Delay: <alt2>" + event.getDamageDelay() + "ms");
-            UtilMessage.simpleMessage(player, "Damage", "Reasons: <alt2>" + String.join(", ", event.getReasons()));
-            UtilMessage.simpleMessage(player, "Damage", "");
-            UtilMessage.simpleMessage(player, "Damage", "<u>Cause Breakdown:");
-            UtilMessage.simpleMessage(player, "Damage", "Cause: <alt2>" + event.getCause().getDisplayName());
-            UtilMessage.simpleMessage(player, "Damage", "Bukkit Cause: <alt2>" + event.getCause().getBukkitCause());
-            UtilMessage.simpleMessage(player, "Damage", "Damage Categories: <alt2>" + String.join(", ", categories));
-            UtilMessage.simpleMessage(player, "Damage", "True Damage: <alt2>" + event.getCause().isTrueDamage());
-            UtilMessage.simpleMessage(player, "Damage", "");
-            UtilMessage.simpleMessage(player, "Damage", "<u>Modifiers:");
+            final Component yes = Translations.component("core.damage.debug.yes").color(NamedTextColor.GREEN);
+            final Component no = Translations.component("core.damage.debug.no").color(NamedTextColor.RED);
+
+            UtilMessage.message(player, "");
+            UtilMessage.message(player, "core.prefix.damage", Translations.component("core.damage.debug.details").decorate(TextDecoration.UNDERLINED));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.time", Component.text(LocalDateTime.now().toString(), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.cancelled", Component.text(String.valueOf(event.isCancelled()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.cancel_reason", Component.text(String.valueOf(event.getCancelReason()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.raw_damage", Component.text(String.valueOf(event.getRawDamage()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.damage", Component.text(String.valueOf(event.getDamage()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.final_damage", Component.text(String.valueOf(modifiedDamage), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.projectile", event.isProjectile() ? yes : no);
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.knockback", event.isKnockback() ? yes : no);
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.hurt_animation", event.isHurtAnimation() ? yes : no);
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.living_damagee", event.isDamageeLiving() ? yes : no);
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.damage_delay", Component.text(event.getDamageDelay() + "ms", NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.reasons", Component.text(String.join(", ", event.getReasons()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "");
+            UtilMessage.message(player, "core.prefix.damage", Translations.component("core.damage.debug.cause_breakdown").decorate(TextDecoration.UNDERLINED));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.cause", Component.text(String.valueOf(event.getCause().getDisplayName()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.bukkit_cause", Component.text(String.valueOf(event.getCause().getBukkitCause()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.damage_categories", Component.text(String.join(", ", categories), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.true_damage", Component.text(String.valueOf(event.getCause().isTrueDamage()), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "");
+            UtilMessage.message(player, "core.prefix.damage", Translations.component("core.damage.debug.modifiers").decorate(TextDecoration.UNDERLINED));
 
             final List<DamageModifier> appliedModifiers = event.getAppliedModifiers();
             final Multimap<ModifierType, DamageModifier> modifiers = event.getModifiers();
@@ -290,7 +294,7 @@ public class DamageEventFinalizer {
 
                 player.sendMessage(builder.build());
             }
-            UtilMessage.simpleMessage(player, "");
+            UtilMessage.message(player, "");
         }
     }
 }

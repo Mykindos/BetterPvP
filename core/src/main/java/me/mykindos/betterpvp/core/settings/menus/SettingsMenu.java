@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.Click;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.settings.menus.event.SettingsFetchEvent;
@@ -46,6 +47,6 @@ public class SettingsMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Settings");
+        return Translations.component("core.menu.settings.title");
     }
 }

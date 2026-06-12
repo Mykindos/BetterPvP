@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -34,12 +35,12 @@ public class ChatFilterCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Manage general chat filter words";
+        return "core.command.chat-filter.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Command", UtilMessage.deserialize("<gray>Usage: /chatfilter <add | remove | list | reload></gray>"));
+        UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.usage");
     }
 
     @Override
@@ -65,13 +66,13 @@ public class ChatFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Add a word to the chat filter list";
-        }
+        return "core.command.chat-filter-add.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 1) {
-                UtilMessage.message(player, "Filter", UtilMessage.deserialize("<green>Usage: /chatfilter add <word></green>"));
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.add.usage");
                 return;
             }
 
@@ -79,9 +80,11 @@ public class ChatFilterCommand extends Command {
 
             filterService.addFilteredWord(word).thenAccept(success -> {
                 if (success) {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Added <yellow>%s</yellow> to the chat filter list", word));
+                    UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.add.success",
+                            Component.text(word, NamedTextColor.YELLOW));
                 } else {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is already in the chat filter list", word));
+                    UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.add.exists",
+                            Component.text(word, NamedTextColor.YELLOW));
                 }
             });
         }
@@ -104,13 +107,13 @@ public class ChatFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Remove a word from the chat filter list";
-        }
+        return "core.command.chat-filter-remove.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (args.length < 1) {
-                UtilMessage.message(player, "Filter", UtilMessage.deserialize("<green>Usage: /chatfilter remove <word></green>"));
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.remove.usage");
                 return;
             }
 
@@ -118,9 +121,11 @@ public class ChatFilterCommand extends Command {
 
             filterService.removeFilteredWord(word).thenAccept(success -> {
                 if (success) {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("Removed <yellow>%s</yellow> from the chat filter list", word));
+                    UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.remove.success",
+                            Component.text(word, NamedTextColor.YELLOW));
                 } else {
-                    UtilMessage.message(player, "Filter", UtilMessage.deserialize("<yellow>%s</yellow> is not in the chat filter list", word));
+                    UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.remove.notfound",
+                            Component.text(word, NamedTextColor.YELLOW));
                 }
             });
         }
@@ -143,19 +148,19 @@ public class ChatFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "List all chat filtered words";
-        }
+        return "core.command.chat-filter-list.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             Set<String> filteredWords = filterService.getFilteredWords();
 
             if (filteredWords.isEmpty()) {
-                UtilMessage.message(player, "Filter", "There are no words in the chat filter list");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.list.empty");
                 return;
             }
 
-            Component message = Component.text("Chat Filtered Words:", NamedTextColor.GREEN);
+            Component message = Translations.component("core.command.chatfilter.list.header").color(NamedTextColor.GREEN);
             List<String> sortedWords = new ArrayList<>(filteredWords);
             sortedWords.sort(String::compareTo);
 
@@ -164,7 +169,7 @@ public class ChatFilterCommand extends Command {
                         .append(Component.text(word, NamedTextColor.YELLOW));
             }
 
-            UtilMessage.message(player, "Filter", message);
+            UtilMessage.message(player, COMMAND_PREFIX, message);
         }
     }
 
@@ -185,14 +190,14 @@ public class ChatFilterCommand extends Command {
 
         @Override
         public String getDescription() {
-            return "Reload the chat filter list from the database";
-        }
+        return "core.command.chat-filter-reload.description";
+    }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             if (filterService instanceof DatabaseFilterService databaseFilterService) {
                 databaseFilterService.loadFilteredWords();
-                UtilMessage.message(player, "Filter", "Reloaded chat filter list from database");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.chatfilter.reload.done");
             }
         }
     }

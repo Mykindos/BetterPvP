@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.progression.settings;
 
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -27,7 +28,7 @@ public class ProfessionSettingsMenu extends AbstractGui implements SettingCatego
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Profession Settings");
+        return Translations.component("progression.menu.settings.title");
     }
 
     @Override
@@ -35,8 +36,8 @@ public class ProfessionSettingsMenu extends AbstractGui implements SettingCatego
         return Description.builder()
                 .icon(ItemView.builder()
                         .material(Material.DIAMOND_PICKAXE)
-                        .displayName(Component.text("Profession Settings", NamedTextColor.GREEN, TextDecoration.BOLD))
-                        .lore(Component.text("View settings related to Professions", NamedTextColor.GRAY))
+                        .displayName(Translations.component("progression.menu.settings.button.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                        .lore(Translations.component("progression.menu.settings.button.lore").color(NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
                         .hideAdditionalTooltip(true)
                         .frameLore(true)

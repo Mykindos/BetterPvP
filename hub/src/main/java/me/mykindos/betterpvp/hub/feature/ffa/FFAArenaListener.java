@@ -11,8 +11,11 @@ import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.framework.TeleportRules;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.core.world.zone.PlayerEnterZoneEvent;
 import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
@@ -109,7 +112,7 @@ public class FFAArenaListener implements Listener {
 
         if (isCombatLocked(player)) {
             event.setTo(event.getFrom());
-            UtilMessage.message(player, "FFA", "You cannot leave the arena while in combat.");
+            UtilMessage.message(player, "core.prefix.ffa", "hub.ffa.combat-locked");
         }
     }
 
@@ -131,7 +134,7 @@ public class FFAArenaListener implements Listener {
 
         if (isCombatLocked(player)) {
             event.setCancelled(true);
-            UtilMessage.message(player, "FFA", "You cannot leave the arena while in combat.");
+            UtilMessage.message(player, "core.prefix.ffa", "hub.ffa.combat-locked");
         }
     }
 
@@ -171,12 +174,13 @@ public class FFAArenaListener implements Listener {
     private void sendSubtitle(Player player, boolean entered) {
         new SoundEffect(Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, entered ? 1.7f: 1.3f).play(player);
 
-        final String action = entered ? "Entered" : "Exited";
+        final Component action = Translations.component(entered ? "hub.ffa.action.entered" : "hub.ffa.action.exited")
+                .color(NamedTextColor.GRAY);
         final Gamer gamer = clientManager.search().online(player).getGamer();
         gamer.getTitleQueue().add(50, TitleComponent.subtitle(0.15,
                 1.2,
                 0.2,
                 false,
-                gmr -> UtilMessage.deserialize("<gray>" + action + " <yellow>FFA")));
+                gmr -> Translations.component("hub.ffa.subtitle", action, Component.text("FFA", NamedTextColor.YELLOW))));
     }
 }

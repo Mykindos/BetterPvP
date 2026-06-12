@@ -37,19 +37,19 @@ public class MockItemCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Mock an item by setting your currently held item to a base item's ID";
+        return "core.command.mock-item.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length != 1) {
-            UtilMessage.message(player, "<yellow>Usage<gray>: <green>/mockitem <Item ID>");
+            UtilMessage.message(player, "core.prefix.mock", "core.command.mockitem.usage");
             return;
         }
 
         final ItemStack mainHand = player.getEquipment().getItemInMainHand();
         if (mainHand.getType().isAir()) {
-            UtilMessage.message(player, "<red>You must be holding an item to use it as a mock.");
+            UtilMessage.message(player, "core.prefix.mock", "core.command.mockitem.holding_item");
             return;
         }
 
@@ -57,12 +57,12 @@ public class MockItemCommand extends Command {
         if (baseItem == null) {
             final @NotNull Map<NamespacedKey, BaseItem> options = registry.getItemsByKey(args[0]);
             if (options.isEmpty()) {
-                UtilMessage.message(player, "Command", UtilMessage.deserialize("<green>%s</green> is not a valid item", args[0]));
+                UtilMessage.message(player, "core.prefix.command", "core.command.mockitem.invalid_item", net.kyori.adventure.text.Component.text(args[0]));
                 return;
             }
 
             if (options.size() > 1) {
-                UtilMessage.message(player, "Command", UtilMessage.deserialize("Found too many matches for key <green>%s</green>, please include a namespace.", args[0]));
+                UtilMessage.message(player, "core.prefix.command", "core.command.mockitem.too_many_matches", net.kyori.adventure.text.Component.text(args[0]));
                 return;
             }
 
@@ -77,6 +77,7 @@ public class MockItemCommand extends Command {
         pdc.copyTo(meta.getPersistentDataContainer(), true);
         mainHand.setItemMeta(meta);
         player.getInventory().setItemInMainHand(mainHand);
-        UtilMessage.message(player, "Mock", "<green>Successfully mocked item to <yellow>%s<green>.", registry.getKey(baseItem).toString());
+        UtilMessage.message(player, "core.prefix.mock", "core.command.mockitem.success",
+                net.kyori.adventure.text.Component.text(registry.getKey(baseItem).toString(), net.kyori.adventure.text.format.NamedTextColor.YELLOW));
     }
 }

@@ -11,8 +11,8 @@ import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.RoleStat;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -60,14 +60,15 @@ public class JackOfAllTradesAchievement extends NSingleGoalSimpleAchievement {
     public Description getDescription(StatContainer container, StatFilterType type, Period period) {
         List<Component> lore = new ArrayList<>(
                 List.of(
-                        UtilMessage.deserialize("<gray>Play each role for <yellow>1 hour")
+                        Translations.component("core.achievement.jack-of-all-trades.desc",
+                                Translations.component("core.achievement.jack-of-all-trades.one-hour").color(NamedTextColor.YELLOW)).color(NamedTextColor.GRAY)
                 ));
         lore.addAll(getRemainingRoles(container));
         lore.addAll(this.getProgressComponent(container, type, period));
         lore.addAll(this.getCompletionComponent(container));
         ItemProvider itemProvider = ItemView.builder()
                 .material(Material.ENCHANTED_BOOK)
-                .displayName(UtilMessage.deserialize("<white>%s", getName()))
+                .displayName(Translations.component("core.achievement.jack-of-all-trades.name").color(NamedTextColor.WHITE))
                 .lore(lore)
                 .build();
         return Description.builder()
@@ -84,7 +85,9 @@ public class JackOfAllTradesAchievement extends NSingleGoalSimpleAchievement {
         List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, type, period));
         Component bar = progressComponent.getFirst();
         progressComponent.removeFirst();
-        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", completed, total)));
+        progressComponent.addFirst(bar.append(Translations.component("core.achievement.jack-of-all-trades.fraction",
+                Component.text(completed, NamedTextColor.GREEN),
+                Component.text(total, NamedTextColor.YELLOW))));
         return progressComponent;
     }
 
@@ -96,18 +99,23 @@ public class JackOfAllTradesAchievement extends NSingleGoalSimpleAchievement {
 
         List<Component> components = new ArrayList<>();
         if (remaining.isEmpty()) return List.of();
-        components.add(Component.text("Remaining:", NamedTextColor.GRAY));
+        components.add(Translations.component("core.achievement.jack-of-all-trades.remaining").color(NamedTextColor.GRAY));
         final int toShow = Math.min(remaining.size(), 3);
         for (int i = 0; i < toShow; i++) {
             RoleStat roleStat = (RoleStat) remaining.get(i).getStat();
             Role role = roleStat.getRole();
             long currentMs = roleStat.getStat(statContainer, StatFilterType.ALL, null);
             Duration timeRemaining = Duration.of(Math.max(0, GOAL_MS - currentMs), ChronoUnit.MILLIS);
-            String roleName = role != null ? role.getName() : "Unknown";
-            components.add(UtilMessage.deserialize("<white>%s <gray>(%s left)", roleName, UtilTime.humanReadableFormat(timeRemaining)));
+            Component roleName = role != null
+                    ? role.getDisplayName().color(NamedTextColor.WHITE)
+                    : Translations.component("core.achievement.jack-of-all-trades.unknown-role").color(NamedTextColor.WHITE);
+            components.add(Translations.component("core.achievement.jack-of-all-trades.role-remaining",
+                    roleName,
+                    Component.text(UtilTime.humanReadableFormat(timeRemaining), NamedTextColor.GRAY)).color(NamedTextColor.GRAY));
         }
         if (remaining.size() > 3) {
-            components.add(UtilMessage.deserialize("<white>+<green>%s <gray>more", remaining.size() - toShow));
+            components.add(Translations.component("core.achievement.jack-of-all-trades.more",
+                    Component.text(remaining.size() - toShow, NamedTextColor.GREEN)).color(NamedTextColor.WHITE));
         }
         return components;
     }

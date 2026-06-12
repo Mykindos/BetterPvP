@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.shops.menus.buttons.direction;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -27,7 +28,7 @@ public class DisabledPageButton extends AbstractItem {
                 .itemModel(invisible
                         ? Resources.ItemModel.INVISIBLE
                         : Key.key("betterpvp", "menu/gui/shop/page_" + (forward ? "forward" : "backward") + "_disabled"))
-                .displayName(Component.text(forward ? "No next page" : "No previous page", NamedTextColor.RED))
+                .displayName(Translations.component(forward ? "core.menu.button.no-next-page.name" : "core.menu.button.no-previous-page.name").color(NamedTextColor.RED))
                 .build();
     }
 

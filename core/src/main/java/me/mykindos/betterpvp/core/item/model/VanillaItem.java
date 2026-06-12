@@ -35,6 +35,10 @@ public class VanillaItem extends BaseItem {
     }
 
     public VanillaItem(String name, ItemStack proxy, ItemRarity rarity) {
+        this(Component.text(name), proxy, rarity);
+    }
+
+    public VanillaItem(Component name, ItemStack proxy, ItemRarity rarity) {
         super(name, proxy, switch (Objects.requireNonNullElse(proxy.getType().getCreativeCategory(), CreativeCategory.MISC)) {
             case BUILDING_BLOCKS, DECORATIONS -> ItemGroup.BLOCK;
             case REDSTONE, TRANSPORTATION, MISC, BREWING -> ItemGroup.MATERIAL;

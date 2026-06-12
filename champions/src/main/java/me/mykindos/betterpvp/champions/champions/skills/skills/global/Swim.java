@@ -13,10 +13,14 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,13 +43,12 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Tap crouch to Swim forwards",
-                "",
-                "Energy: " + getValueString(this::getEnergy, level),
-        };
+    public Component[] getDescription(int level) {
+        Component energy = getValueComponent(this::getEnergy, level);
+        return Translations.componentLines(
+                "champions.skill.global.swim.description",
+                energy
+        );
     }
 
     @Override
@@ -69,7 +72,7 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
         }
 
         if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE)) {
-            UtilMessage.message(player, getName(), "You cannot use Swim while silenced!");
+            UtilMessage.message(player, getName(), "champions.skill.global.swim.silenced");
             return;
         }
 

@@ -41,7 +41,7 @@ public class RewardsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Open the rewards menu";
+        return "core.command.rewards.description";
     }
 
     @Override
@@ -51,7 +51,7 @@ public class RewardsCommand extends Command {
                 RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
 
                 if(rewardBox.getContents().isEmpty()) {
-                    UtilMessage.simpleMessage(player, "Inventory", "You have no items to claim.");
+                    UtilMessage.message(player, "core.prefix.inventory", "core.command.rewards.none");
                     return;
                 }
 
@@ -73,7 +73,7 @@ public class RewardsCommand extends Command {
                 return null;
             });
         } else {
-            UtilMessage.simpleMessage(player, "Inventory", "You have checked your inventory recently, please wait a bit before checking again.");
+            UtilMessage.message(player, "core.prefix.inventory", "core.command.rewards.cooldown");
         }
     }
 }

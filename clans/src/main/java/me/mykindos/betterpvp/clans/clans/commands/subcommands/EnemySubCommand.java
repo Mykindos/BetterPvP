@@ -33,7 +33,7 @@ public class EnemySubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Wage war with another clan";
+        return "clans.command.enemy.description";
     }
 
     @Override
@@ -44,13 +44,13 @@ public class EnemySubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a clan to enemy.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.enemy.no-args");
             return;
         }
 
         Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0]);
         if (targetClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "The target clan does not exist.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.enemy.not-found");
             return;
         }
 
@@ -58,28 +58,28 @@ public class EnemySubCommand extends ClanSubCommand {
         Clan targetClan = targetClanOptional.get();
 
         if (playerClan.equals(targetClan)) {
-            UtilMessage.message(player, "Clans", "You cannot enemy your own clan");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.enemy.self");
             return;
         }
 
         if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "Only the clan admins can enemy other clans.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.enemy.no-rank");
             return;
         }
 
         if (playerClan.isEnemy(targetClan)) {
-            UtilMessage.message(player, "Clans", "You are already enemy with this clan.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.enemy.already-enemy");
             return;
         }
 
         if(playerClan.isAllied(targetClan)) {
-            UtilMessage.message(player, "Clans", "You cannot enemy a clan you are allied with.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.enemy.allied");
             return;
         }
 
         if (clanManager.getPillageHandler().isPillaging(playerClan, targetClan)
                 || clanManager.getPillageHandler().isPillaging(targetClan, playerClan)) {
-            UtilMessage.message(player, "Clans", "You cannot enemy this clan while a pillage is active.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.enemy.pillage");
             return;
         }
 

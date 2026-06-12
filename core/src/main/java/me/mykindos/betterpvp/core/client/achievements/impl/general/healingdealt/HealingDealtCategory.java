@@ -5,8 +5,9 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.types.CombatCategory;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
 @Singleton
@@ -23,7 +24,7 @@ public class HealingDealtCategory extends AchievementCategory {
     public ItemView getItemView() {
         return ItemView.builder()
                 .material(Material.GOLDEN_APPLE)
-                .displayName(UtilMessage.deserialize("<white>Healing Dealt"))
+                .displayName(Translations.component("core.achievement.category.healing-dealt.name").color(NamedTextColor.WHITE))
                 .build();
     }
 }

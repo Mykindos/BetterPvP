@@ -40,7 +40,7 @@ public class IronDoor extends BaseItem {
     private transient boolean registered;
 
     public IronDoor() {
-        super("Iron Door", ItemStack.of(Material.IRON_DOOR), ItemGroup.BLOCK, ItemRarity.COMMON);
+        super(translatableName("clans.item.iron-door.name"), ItemStack.of(Material.IRON_DOOR), ItemGroup.BLOCK, ItemRarity.COMMON);
     }
 
     @Inject

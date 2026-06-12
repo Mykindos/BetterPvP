@@ -16,8 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -56,11 +59,10 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Nearby enemies that fall below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
-                "take " + getValueString(this::getDamagePercent, level, 100, "%", 0) + " more damage from your melee attacks"
-        };
+    public Component[] getDescription(int level) {
+        Component healthPercent = Component.text(String.format("%.0f", getHealthPercent(level) * 100), NamedTextColor.GREEN);
+        Component damagePercent = Component.text(String.format("%.0f", getDamagePercent(level) * 100), NamedTextColor.GREEN);
+        return Translations.componentLines("champions.skill.warlock.frailty.description", healthPercent, damagePercent);
     }
 
     public double getHealthPercent(int level) {

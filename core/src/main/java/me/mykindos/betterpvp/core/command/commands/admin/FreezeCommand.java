@@ -34,7 +34,7 @@ public class FreezeCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Freeze/unfreeze another player";
+        return "core.command.freeze.description";
     }
 
     @Override
@@ -46,26 +46,34 @@ public class FreezeCommand extends Command implements IConsoleCommand {
     public void execute(CommandSender sender, String[] args) {
 
         if (args.length < 1) {
-            UtilMessage.message(sender, "Freeze", "You must specify a player ");
+            UtilMessage.message(sender, "core.prefix.freeze", "core.command.freeze.usage");
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            UtilMessage.message(sender, "Freeze", "<yellow>%s</yellow> is not a valid player name", args[0]);
+            UtilMessage.message(sender, "core.prefix.freeze", "core.command.freeze.target_not_found", args[0]);
             return;
         }
 
         if (effectManager.hasEffect(target, EffectTypes.FROZEN)) {
-            UtilMessage.message(target, "Freeze", "You have been unfrozen by a staff member");
+            UtilMessage.message(target, "core.prefix.freeze", "core.command.freeze.unfrozen_target");
 
             effectManager.removeEffect(target, EffectTypes.FROZEN);
-            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> unfroze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.TRIAL_MOD);
+            clientManager.sendMessageToRank("core.prefix.freeze",
+                    me.mykindos.betterpvp.core.locale.Translations.component("core.command.freeze.unfrozen_staff",
+                            net.kyori.adventure.text.Component.text(sender.getName(), net.kyori.adventure.text.format.NamedTextColor.YELLOW),
+                            net.kyori.adventure.text.Component.text(target.getName(), net.kyori.adventure.text.format.NamedTextColor.YELLOW)),
+                    Rank.TRIAL_MOD);
         } else {
-            UtilMessage.message(target, "Freeze", "You have been frozen by a staff member");
+            UtilMessage.message(target, "core.prefix.freeze", "core.command.freeze.frozen_target");
 
             effectManager.addEffect(target, null, EffectTypes.FROZEN, "Freeze", 1, 1000, true, true);
-            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> froze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.TRIAL_MOD);
+            clientManager.sendMessageToRank("core.prefix.freeze",
+                    me.mykindos.betterpvp.core.locale.Translations.component("core.command.freeze.frozen_staff",
+                            net.kyori.adventure.text.Component.text(sender.getName(), net.kyori.adventure.text.format.NamedTextColor.YELLOW),
+                            net.kyori.adventure.text.Component.text(target.getName(), net.kyori.adventure.text.format.NamedTextColor.YELLOW)),
+                    Rank.TRIAL_MOD);
         }
 
     }

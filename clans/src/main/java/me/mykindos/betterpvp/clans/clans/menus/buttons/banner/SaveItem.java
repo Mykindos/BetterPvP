@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.events.ClanBannerUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -32,8 +33,8 @@ public class SaveItem extends ControlItem<BannerMenu> implements CooldownButton 
     public ItemProvider getItemProvider(BannerMenu gui) {
         return ItemView.builder()
                 .material(Material.EMERALD)
-                .displayName(Component.text("Save", NamedTextColor.GREEN, TextDecoration.BOLD))
-                .action(ClickActions.ALL, Component.text("Save"))
+                .displayName(Translations.component("clans.menu.banner.button.save.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                .action(ClickActions.ALL, Translations.component("clans.menu.banner.button.save.action"))
                 .build();
     }
 

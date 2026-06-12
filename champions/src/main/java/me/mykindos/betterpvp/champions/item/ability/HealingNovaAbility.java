@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -69,15 +70,15 @@ public class HealingNovaAbility extends CooldownInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Healing Nova");
+        return Translations.component("champions.ability.healing-nova.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Launches a nova that heals nearby allies for ", NamedTextColor.GRAY)
-                .append(Component.text("12", NamedTextColor.YELLOW))
-                .append(Component.text(" ❤", TextColor.color(255, 0, 0)))
-                .append(Component.text(" when it lands.", NamedTextColor.GRAY));
+        return Translations.component("champions.ability.healing-nova.description",
+                        Component.text("12", NamedTextColor.YELLOW),
+                        Component.text("❤", TextColor.color(255, 0, 0)))
+                .color(NamedTextColor.GRAY);
     }
 
     @Override

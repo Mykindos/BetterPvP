@@ -20,7 +20,11 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -81,18 +85,14 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Your next arrow will ensnare enemies within " + getValueString(this::getRadius, level) + " blocks",
-                "for " + getValueString(this::getDuration, level) + " seconds, hindering them from escaping",
-                "",
-                "If they do escape, the tether will snap, dealing",
-                getValueString(this::getDamage, level) + " damage and <effect>Slowing</effect> them for " + getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component slowing = Translations.component("champions.skill.effect.slowing.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.tether-shot.description", radius, duration, damage, slowDuration, cooldown, slowing);
     }
 
     public double getDuration(int level) {
@@ -129,7 +129,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     public boolean canUse(Player player) {
         boolean use = super.canUse(player);
         if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
-            UtilMessage.message(player, "Protection", "You cannot use this skill with protection");
+            UtilMessage.message(player, "core.prefix.protection", "champions.skill.protection");
             return false;
         }
         return use;
@@ -200,8 +200,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 b.setMetadata("isTetherBat", new FixedMetadataValue(champions, true));
             });
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You tethered <alt2>%s</alt2>", enemy.getName());
-            UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> tethered you", player.getName());
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.tether-shot.tethered", Component.text(enemy.getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(enemy, getClassType().getDisplayName(), "champions.skill.ranger.tether-shot.tethered-by", Component.text(player.getName(), NamedTextColor.YELLOW));
 
             bat.setLeashHolder(enemy);
 
@@ -361,8 +361,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
         player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", enemy.getName(), getName(), level);
-        UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", player.getName(), getName(), level);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(enemy.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(enemy, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @EventHandler

@@ -35,19 +35,19 @@ public class LootCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View a specific loot table";
+        return "core.command.loot.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if(args.length == 0) {
-            UtilMessage.simpleMessage(player, "Command", "Usage: /loot <name>");
+            UtilMessage.message(player, "core.prefix.command", "core.command.loot.usage");
             return;
         }
 
         LootTable table = lootTableRegistry.getLoaded().get(args[0]);
         if (table == null) {
-            UtilMessage.simpleMessage(player, "Command", "No loot table found with that name");
+            UtilMessage.message(player, "core.prefix.command", "core.command.loot.not_found");
             return;
         }
 

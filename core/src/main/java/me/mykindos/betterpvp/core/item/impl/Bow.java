@@ -22,7 +22,7 @@ public class Bow extends VanillaItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 384;
 
     public Bow() {
-        super("Bow", ItemStack.of(Material.BOW), ItemRarity.COMMON);
+        super(translatableName("core.item.bow.name"), ItemStack.of(Material.BOW), ItemRarity.COMMON);
         addSerializableComponent(new SocketableContainerComponent(0, 0));
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());

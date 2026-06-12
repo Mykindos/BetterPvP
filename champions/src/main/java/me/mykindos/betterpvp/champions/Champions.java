@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
@@ -107,6 +108,9 @@ public class Champions extends BPvPPlugin {
 
             // We do this to force the static initializer to run, can be removed if we import this class anywhere
             Class.forName("me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes");
+
+            // Register champions translation bundle
+            TranslationService.registerBundle(this, "translations.champions");
         }
     }
 

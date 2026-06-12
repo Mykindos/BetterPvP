@@ -29,7 +29,7 @@ public class DisplayScaleSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Scale a display entity";
+        return "core.command.display-scale.description";
     }
 
     @Override
@@ -46,19 +46,19 @@ public class DisplayScaleSubCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         args = Arrays.copyOfRange(args, 1, args.length);
         if (args.length != 4) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display transform scale <set|add> <x> <y> <z>");
+            UtilMessage.message(player, "core.prefix.display", "core.display.scale.usage");
             return;
         }
 
         final Display selectedDisplay = displayEditorManager.getSelectedDisplay(player);
         if (selectedDisplay == null) {
-            UtilMessage.simpleMessage(player, "Display", "You are not selecting a display.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.not_selecting");
             return;
         }
 
         final String type = args[0];
         if (!type.equalsIgnoreCase("add") && !type.equalsIgnoreCase("set")) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display transform scale <set|add> <x> <y> <z>");
+            UtilMessage.message(player, "core.prefix.display", "core.display.scale.usage");
             return;
         }
 
@@ -68,7 +68,7 @@ public class DisplayScaleSubCommand extends Command {
             y = Float.parseFloat(args[2]);
             z = Float.parseFloat(args[3]);
         } catch (NumberFormatException e) {
-            UtilMessage.simpleMessage(player, "Display", "Invalid scale values. Must be numbers.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.scale.invalid_values");
             return;
         }
 
@@ -81,6 +81,6 @@ public class DisplayScaleSubCommand extends Command {
         }
 
         selectedDisplay.setTransformation(permutated);
-        UtilMessage.simpleMessage(player, "Display", "Scaled display entity.");
+        UtilMessage.message(player, "core.prefix.display", "core.display.scale.success");
     }
 }

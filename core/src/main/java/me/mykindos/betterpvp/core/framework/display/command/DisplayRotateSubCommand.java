@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.display.DisplayEditorManager;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public class DisplayRotateSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Rotate a display entity";
+        return "core.command.display-rotate.description";
     }
 
     @Override
@@ -56,26 +57,27 @@ public class DisplayRotateSubCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         args = Arrays.copyOfRange(args, 1, args.length);
         if (args.length != 7 && args.length != 6) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display transform rotate <left|right> <set|add> <w> <x> <y> <z> [pivot]");
+            UtilMessage.message(player, "core.prefix.display", "core.display.rotate.usage");
             return;
         }
 
         final Display selectedDisplay = displayEditorManager.getSelectedDisplay(player);
         if (selectedDisplay == null) {
-            UtilMessage.simpleMessage(player, "Display", "You are not selecting a display.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.not_selecting");
             return;
         }
 
         final String direction = args[0];
         boolean right = direction.equalsIgnoreCase("right") || direction.equalsIgnoreCase("r");
         if (!right && !direction.equalsIgnoreCase("left") && !direction.equalsIgnoreCase("l")) {
-            UtilMessage.simpleMessage(player, "Display", "Invalid direction: " + direction + ". Must be left or right.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.rotate.invalid_direction",
+                    Component.text(direction));
             return;
         }
 
         final String type = args[1];
         if (!type.equalsIgnoreCase("add") && !type.equalsIgnoreCase("set")) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display transform rotate <left|right> <set|add> <angle|quaternion|quad> <w> <x> <y> <z>");
+            UtilMessage.message(player, "core.prefix.display", "core.display.rotate.usage_type");
             return;
         }
 
@@ -89,7 +91,7 @@ public class DisplayRotateSubCommand extends Command {
             y = Float.parseFloat(args[4]);
             z = Float.parseFloat(args[5]);
         } catch (NumberFormatException e) {
-            UtilMessage.simpleMessage(player, "Display", "Invalid rotation values. Must be numbers.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.rotate.invalid_values");
             return;
         }
 
@@ -97,7 +99,8 @@ public class DisplayRotateSubCommand extends Command {
         final Quaternionf rotation = right ? permutated.getRightRotation() : permutated.getLeftRotation();
         boolean pivot = args.length == 7 && args[6].equalsIgnoreCase("pivot");
         if (args.length == 7 && !pivot) {
-            UtilMessage.simpleMessage(player, "Display", "Invalid argument: " + args[7] + ". Must be 'pivot'.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.rotate.invalid_argument",
+                    Component.text(args[7]));
             return;
         } else if (pivot) {
             x += permutated.getTranslation().x + permutated.getScale().x / 2;
@@ -113,6 +116,6 @@ public class DisplayRotateSubCommand extends Command {
         }
 
         selectedDisplay.setTransformation(permutated);
-        UtilMessage.simpleMessage(player, "Display", "Rotated display entity.");
+        UtilMessage.message(player, "core.prefix.display", "core.display.rotate.success");
     }
 }

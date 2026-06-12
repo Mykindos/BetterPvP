@@ -14,6 +14,6 @@ public class ShadowQuill extends BaseItem {
 
     @Inject
     private ShadowQuill() {
-        super("Shadow Quill", Item.model("shadow_quill", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.shadow-quill.name"), Item.model("shadow_quill", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 }

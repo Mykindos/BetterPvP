@@ -5,8 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.tips.ChampionsTip;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -14,12 +15,12 @@ public class ArticArmourTip extends ChampionsTip {
 
     @Inject
     public ArticArmourTip(Champions champions) {
-        super(champions, 1, 1, Component.empty()
-                .append(Component.text("While active,")).appendSpace()
-                .append(Component.text("Mage", Role.MAGE.getColor()))
-                .append(UtilMessage.deserialize("'s Passive A Skill <white>Arctic Armour</white> gives " +
-                        "nearby allies <white>Resistance</white> and nearby enemies <white>slowness</white>. " +
-                        "Additionally, it will <white>freeze</white> nearby water, so try not to get trapped underneath! ")));
+        super(champions, 1, 1, Translations.component("champions.tip.arcticarmourtip",
+                Role.MAGE.getDisplayName().color(Role.MAGE.getColor()),
+                Component.text("Arctic Armour", NamedTextColor.WHITE),
+                Component.text("Resistance", NamedTextColor.WHITE),
+                Component.text("slowness", NamedTextColor.WHITE),
+                Component.text("freeze", NamedTextColor.WHITE)));
     }
 
     @Override

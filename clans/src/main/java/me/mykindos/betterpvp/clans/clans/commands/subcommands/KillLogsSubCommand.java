@@ -29,7 +29,7 @@ public class KillLogsSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Get kill logs associated with your clan";
+        return "clans.command.kill-logs.description";
     }
 
     @Override
@@ -37,7 +37,7 @@ public class KillLogsSubCommand extends ClanSubCommand {
 
         Clan clan = clanManager.getClanByPlayer(player).orElse(null);
         if (clan == null) {
-            UtilMessage.message(player, "Clans", "You must be in a Clan to run this command");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.kill-logs.no-clan");
             return;
         }
         new ClanKillLogMenu(clan, clanManager).show(player);

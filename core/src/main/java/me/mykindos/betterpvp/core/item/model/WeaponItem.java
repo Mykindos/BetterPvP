@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponen
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -22,7 +23,7 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
     private final BPvPPlugin plugin;
     private final List<Group> groups;
 
-    protected WeaponItem(BPvPPlugin plugin, String name, ItemStack model, ItemRarity rarity, List<Group> groups) {
+    protected WeaponItem(BPvPPlugin plugin, Component name, ItemStack model, ItemRarity rarity, List<Group> groups) {
         super(name, model, ItemGroup.WEAPON, rarity);
         this.plugin = plugin;
         this.groups = groups;
@@ -37,7 +38,7 @@ public abstract class WeaponItem extends BaseItem implements Reloadable {
         }
     }
 
-    protected WeaponItem(BPvPPlugin plugin, String name, ItemStack model, ItemRarity rarity) {
+    protected WeaponItem(BPvPPlugin plugin, Component name, ItemStack model, ItemRarity rarity) {
         this(plugin, name, model, rarity, List.of(Group.MELEE));
     }
 

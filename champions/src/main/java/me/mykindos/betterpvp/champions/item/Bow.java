@@ -41,7 +41,7 @@ public class Bow extends WeaponItem implements Listener, Reloadable {
 
     @Inject
     private Bow(Champions champions, ItemFactory itemFactory, RoleManager roleManager) {
-        super(champions, "Bow", ItemStack.of(Material.BOW), ItemRarity.COMMON);
+        super(champions, translatableName("champions.item.bow.name"), ItemStack.of(Material.BOW), ItemRarity.COMMON);
         this.itemFactory = itemFactory;
         this.roleManager = roleManager;
     }
@@ -55,14 +55,14 @@ public class Bow extends WeaponItem implements Listener, Reloadable {
 
         final LivingEntity livingEntity = event.getEntity();
         if (UtilBlock.isInLiquid(livingEntity)) {
-            UtilMessage.message(livingEntity, "Bow", "You cannot shoot this bow in liquid.");
+            UtilMessage.message(livingEntity, "core.prefix.bow", "champions.item.bow.liquid");
             event.setCancelled(true);
             return;
         }
 
         final Role role = roleManager.getRole(livingEntity).orElse(null);
         if (role != Role.ASSASSIN && role != Role.RANGER) {
-            UtilMessage.message(livingEntity, "Bow", "You can't shoot this bow without Assassin or Ranger equipped.");
+            UtilMessage.message(livingEntity, "core.prefix.bow", "champions.item.bow.no-role");
             event.setCancelled(true);
         }
     }

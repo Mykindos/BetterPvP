@@ -13,6 +13,10 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,12 +41,13 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Deal an extra " + getValueString(this::getPercentage, level, 100, "%", 0) + " melee damage,",
-                "but you now also take " + getValueString(this::getPercentage, level, 100, "%", 0),
-                "extra damage from melee attacks"
-        };
+    public Component[] getDescription(int level) {
+        Component percentage = getValueComponent(this::getPercentage, level, 100, 0, "%");
+        return Translations.componentLines(
+                "champions.skill.knight.sacrifice.description",
+                percentage,
+                percentage
+        );
     }
 
     public double getPercentage(int level) {

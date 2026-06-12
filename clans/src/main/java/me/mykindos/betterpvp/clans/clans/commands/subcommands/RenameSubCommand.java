@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -37,26 +40,26 @@ public class RenameSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Rename a clan to a specific name";
+        return "clans.command.rename.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
 
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a new name!");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.rename.no-args");
             return;
         }
 
         Optional<Clan> clanOptional = clanManager.getClanByClient(client);
         if (clanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not in a clan!");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.rename.no-clan");
             return;
         }
 
         String clanName = args[0];
         if (!client.isAdministrating() && clanName.matches("^.*[^a-zA-Z0-9].*$")) {
-            UtilMessage.message(player, "Command", "Invalid characters in Clan name.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.rename.invalid-chars");
             return;
         }
 
@@ -68,14 +71,21 @@ public class RenameSubCommand extends ClanSubCommand {
             Clan clan = clanOptional.get();
             String oldName = clan.getName();
             clan.setName(clanName);
-            clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> has renamed a clan from <yellow>%s<gray> to <yellow>%s<gray>!",
-                    client.getName(), oldName, clanName), Rank.ADMIN);
+
+            Component notification = Translations.component("clans.command.clan.rename.notification",
+                    Component.text(client.getName(), NamedTextColor.YELLOW),
+                    Component.text(oldName, NamedTextColor.YELLOW),
+                    Component.text(clanName, NamedTextColor.YELLOW));
+
+            clientManager.getPlayersOfRank(Rank.ADMIN).forEach(target -> {
+                UtilMessage.message(target, Translations.component(CLANS_PREFIX), notification);
+            });
             clanManager.updateClanName(clan);
 
             log.info("{} has renamed a clan from {} to {}!", client.getName(), oldName, clanName)
                     .setAction("CLAN_RENAME").addClientContext(client, false).addClanContext(clan).submit();
         } else {
-            UtilMessage.message(player, "Command", "A clan with that name already exists.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.rename.already-exists");
         }
 
     }

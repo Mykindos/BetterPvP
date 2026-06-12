@@ -7,10 +7,10 @@ import me.mykindos.betterpvp.clans.clans.fatigue.events.PlayerFatigueTierChangeE
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
@@ -32,31 +32,31 @@ public class BattleFatigueMessages implements Listener {
 
     // Minor accumulation — a low growl, chat only.
     private static final String[] MINOR = {
-            "Your limbs grow heavy from the ceaseless fray...",
-            "A dull ache settles into your bones.",
-            "Your breath comes harder than it once did.",
-            "The weight of battle presses upon your shoulders."
+            "clans.fatigue.flavor.minor.0",
+            "clans.fatigue.flavor.minor.1",
+            "clans.fatigue.flavor.minor.2",
+            "clans.fatigue.flavor.minor.3"
     };
 
     // Crossed into a worse tier — felt, with a title.
     private static final String[] WORN = {
-            "Your body protests the endless slaughter.",
-            "Fatigue creeps into your sword-arm."
+            "clans.fatigue.flavor.worn.0",
+            "clans.fatigue.flavor.worn.1"
     };
     private static final String[] WEARY = {
-            "Your vision swims; the battlefield will not forgive this.",
-            "Every wound you have ignored now cries out at once."
+            "clans.fatigue.flavor.weary.0",
+            "clans.fatigue.flavor.weary.1"
     };
     private static final String[] EXHAUSTED = {
-            "Your body is spent. Death comes easy to the reckless.",
-            "You can barely lift your blade. Rest, or be broken."
+            "clans.fatigue.flavor.exhausted.0",
+            "clans.fatigue.flavor.exhausted.1"
     };
 
     // Recovered back down a tier — relief.
     private static final String[] RECOVERED = {
-            "Strength seeps back into your bones.",
-            "Your breathing steadies. The ache fades.",
-            "The fog of exhaustion lifts a little."
+            "clans.fatigue.flavor.recovered.0",
+            "clans.fatigue.flavor.recovered.1",
+            "clans.fatigue.flavor.recovered.2"
     };
 
     private final ClientManager clientManager;
@@ -97,8 +97,8 @@ public class BattleFatigueMessages implements Listener {
         }
 
         title(player,
-                Component.text(tier.getDisplayName(), tier.getColor(), TextDecoration.BOLD),
-                Component.text(line, NamedTextColor.GRAY, TextDecoration.ITALIC),
+                Translations.component(tier.getDisplayName()).color(tier.getColor()).decorate(TextDecoration.BOLD),
+                Translations.component(line).color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC),
                 1.5);
         flavor(player, line);
     }
@@ -106,12 +106,11 @@ public class BattleFatigueMessages implements Listener {
     /** Shown by {@link RespawnHoldService} the instant the hold begins. */
     public void onRespawnHoldStart(Player player, FatigueTier tier, double seconds) {
         title(player,
-                Component.text("Broken", tier.getColor(), TextDecoration.BOLD),
-                Component.text("Your body refuses to rise...", NamedTextColor.GRAY, TextDecoration.ITALIC),
+                Translations.component("clans.fatigue.hold.broken").color(tier.getColor()).decorate(TextDecoration.BOLD),
+                Translations.component("clans.fatigue.hold.refuse").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC),
                 2.0);
 
-        final String format = String.format("Recklessness has its price. You will rise in %.0f seconds...", Math.ceil(seconds));
-        final TextComponent text = Component.text(format, NamedTextColor.RED, TextDecoration.ITALIC);
+        final Component text = Translations.component("clans.fatigue.hold.price", Component.text(Math.ceil(seconds))).color(NamedTextColor.RED).decorate(TextDecoration.ITALIC);
         UtilMessage.message(player, Component.empty());
         UtilMessage.message(player, text);
         UtilMessage.message(player, Component.empty());
@@ -121,8 +120,8 @@ public class BattleFatigueMessages implements Listener {
     public void onRespawnHoldRelease(Player player, FatigueTier tier) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
         gamer.getTitleQueue().add(1, TitleComponent.subtitle(0.3, 1.5, 0.5, false,
-                gmr -> Component.text("You stagger to your feet...", NamedTextColor.GRAY, TextDecoration.ITALIC)));
-        final TextComponent text = Component.text("Tread carefully. Your body remembers.", NamedTextColor.RED, TextDecoration.ITALIC);
+                gmr -> Translations.component("clans.fatigue.hold.stagger").color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)));
+        final Component text = Translations.component("clans.fatigue.hold.remember").color(NamedTextColor.RED).decorate(TextDecoration.ITALIC);
         UtilMessage.message(player, Component.empty());
         UtilMessage.message(player, text);
         UtilMessage.message(player, Component.empty());
@@ -135,7 +134,7 @@ public class BattleFatigueMessages implements Listener {
     }
 
     private void flavor(Player player, String line) {
-        UtilMessage.message(player, Component.text(line, NamedTextColor.GRAY, TextDecoration.ITALIC));
+        UtilMessage.message(player, "clans.fatigue.prefix", Translations.component(line).color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC));
     }
 
     private static String pick(String[] pool) {

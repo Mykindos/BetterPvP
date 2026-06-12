@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -48,7 +49,7 @@ public class EnergyButton extends AbstractItem {
         final int energy = clan.getEnergy();
         final String currentEnergy = NumberFormat.getInstance().format(energy);
 
-        final Component progressText = Component.text("Current Energy:", NamedTextColor.GRAY)
+        final Component progressText = Translations.component("clans.menu.clan.button.energy.lore.current").color(NamedTextColor.GRAY)
                 .appendSpace()
                 .append(Component.text(currentEnergy, NamedTextColor.YELLOW));
 
@@ -56,23 +57,24 @@ public class EnergyButton extends AbstractItem {
         final ItemView.ItemViewBuilder builder = ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/sun_icon"))
-                .displayName(Component.text("Energy", TextColor.color(179, 79, 255), TextDecoration.BOLD))
+                .displayName(Translations.component("clans.menu.clan.button.energy.name").color(TextColor.color(179, 79, 255)).decorate(TextDecoration.BOLD))
                 .frameLore(true)
-                .lore(Component.text("Energy is required to upkeep your", NamedTextColor.GRAY))
-                .lore(Component.text("clan core and territory. Without it", NamedTextColor.GRAY))
-                .lore(Component.text("your clan will disband.", NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.clan.button.energy.lore.description.1").color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.clan.button.energy.lore.description.2").color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.clan.button.energy.lore.description.3").color(NamedTextColor.GRAY))
                 .lore(Component.empty())
                 .lore(progressText)
-                .lore(Component.text("Disbands in: ", NamedTextColor.GRAY).append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.YELLOW)))
+                .lore(Translations.component("clans.menu.clan.button.energy.lore.disbands").color(NamedTextColor.GRAY)
+                        .appendSpace().append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.YELLOW)))
                 .lore(Component.empty())
-                .lore(Component.text("To get more energy, you can:", NamedTextColor.GRAY))
-                .lore(Component.text("\u25AA ").append(Component.text("Kill other players", highlight)))
-                .lore(Component.text("\u25AA ").append(Component.text("Complete dungeons and raids", highlight)))
-                .lore(Component.text("\u25AA ").append(Component.text("Mine it in the world or at Fields", highlight)))
-                .lore(Component.text("\u25AA ").append(Component.text("Participate in world events", highlight)));
+                .lore(Translations.component("clans.menu.clan.button.energy.lore.get-more").color(NamedTextColor.GRAY))
+                .lore(Component.text("\u25AA ").append(Translations.component("clans.menu.clan.button.energy.lore.method.kill").color(highlight)))
+                .lore(Component.text("\u25AA ").append(Translations.component("clans.menu.clan.button.energy.lore.method.dungeons").color(highlight)))
+                .lore(Component.text("\u25AA ").append(Translations.component("clans.menu.clan.button.energy.lore.method.mine").color(highlight)))
+                .lore(Component.text("\u25AA ").append(Translations.component("clans.menu.clan.button.energy.lore.method.events").color(highlight)));
 
         if (deposit) {
-            builder.action(ClickActions.ALL, Component.text("Deposit Energy Item on Cursor"));
+            builder.action(ClickActions.ALL, Translations.component("clans.menu.clan.button.energy.action.deposit"));
         }
 
         return builder.build();

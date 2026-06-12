@@ -32,7 +32,7 @@ public class MiningCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Mining command";
+        return "progression.command.mining.description";
     }
 
     @Override

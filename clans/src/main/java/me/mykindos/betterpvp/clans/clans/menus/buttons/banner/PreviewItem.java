@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons.banner;
 import me.mykindos.betterpvp.clans.clans.menus.BannerMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.GuiSelectColor;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -21,15 +22,15 @@ public class PreviewItem extends ControlItem<BannerMenu> {
     @Override
     public ItemProvider getItemProvider(BannerMenu gui) {
         return ItemView.of(gui.getBuilder().build().get()).toBuilder()
-                .displayName(Component.text("Preview", NamedTextColor.GREEN, TextDecoration.BOLD))
+                .displayName(Translations.component("clans.menu.banner.button.preview.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                 .hideAdditionalTooltip(true)
-                .action(ClickActions.ALL, Component.text("Change Base Color"))
+                .action(ClickActions.ALL, Translations.component("clans.menu.banner.button.preview.action"))
                 .build();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        GuiSelectColor guiSelectColor = new GuiSelectColor(Component.text("Select a Base Color"), dyeColor -> {
+        GuiSelectColor guiSelectColor = new GuiSelectColor(Translations.component("clans.menu.banner.select-color.title"), dyeColor -> {
             getGui().getBuilder().baseColor(BannerColor.fromDye(dyeColor));
             getGui().show(player);
         });

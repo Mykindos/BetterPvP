@@ -5,6 +5,9 @@ import com.google.common.collect.Multimap;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.projectile.VineProjectile;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
@@ -189,6 +192,12 @@ public class EntangledEffect extends EffectType {
     @Override
     public String getGenericDescription() {
         return "<white>" + getName() + "</white> players will be reached by vines and pulled down to the ground, slowing them down.";
+    }
+
+    @Override
+    public Component getGenericDescriptionComponent() {
+        return Translations.component("core.effect.entangled.generic",
+                Component.text(getName(), NamedTextColor.WHITE));
     }
 
     private static class VineDecoration {

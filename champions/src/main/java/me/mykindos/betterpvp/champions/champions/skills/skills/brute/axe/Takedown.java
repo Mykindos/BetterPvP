@@ -20,6 +20,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -78,19 +82,21 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Hurl yourself forwards, dealing " + getValueString(this::getDamage, level) + " damage",
-                "and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
-                "to yourself and the target for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cannot be used while grounded",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component slowness = Component.text(
+                UtilFormat.getRomanNumeral(slownessStrength),
+                NamedTextColor.YELLOW
+        );
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.brute.takedown.description",
+                damage,
+                slowness,
+                duration,
+                cooldown
+        );
     }
 
     public double getDamage(int level) {
@@ -172,10 +178,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.GREEN), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), "Takedown"));
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName() + " " + level);
+        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.GREEN), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         UtilDamage.doDamage(new DamageEvent(player, target, null, new SkillDamageCause(this), getRecoilDamage(level), "Takedown Recoil"));
 
         long duration = (long) (getDuration(level) * 1000L);
@@ -191,7 +197,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public boolean canUse(Player p) {
 
         if (UtilBlock.isGrounded(p)) {
-            UtilMessage.simpleMessage(p, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> while grounded.");
+            UtilMessage.message(p, getClassType().getDisplayName(), "champions.skill.brute.takedown.grounded", getDisplayName().color(NamedTextColor.GREEN));
             return false;
         }
 

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
@@ -63,12 +65,12 @@ public class MagnetismAbility extends AbstractInteraction implements DisplayedIn
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Magnetism");
+        return Translations.component("champions.ability.magnetism.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Spawn a cone of particles in front of you that pulls entities inwards.");
+        return Translations.component("champions.ability.magnetism.description");
     }
 
     @Override

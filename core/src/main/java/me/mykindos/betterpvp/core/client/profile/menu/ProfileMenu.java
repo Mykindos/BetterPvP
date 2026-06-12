@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -76,7 +77,7 @@ public class ProfileMenu extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text(client.getName() + "'s Profile");
+        return Translations.component("core.menu.profile.title", Component.text(client.getName()));
     }
 
     private class StatsButton extends AbstractItem {
@@ -84,9 +85,9 @@ public class ProfileMenu extends AbstractGui implements Windowed {
         public ItemProvider getItemProvider() {
             return ItemView.builder()
                     .material(Material.BOOK)
-                    .displayName(Component.text("Stats", NamedTextColor.YELLOW))
-                    .lore(Component.text("View your detailed statistics", NamedTextColor.GRAY))
-                    .action(ClickActions.ALL, Component.text("Open Stats Menu"))
+                    .displayName(Translations.component("core.menu.profile.button.stats.name").color(NamedTextColor.YELLOW))
+                    .lore(Translations.component("core.menu.profile.button.stats.lore.1").color(NamedTextColor.GRAY))
+                    .action(ClickActions.ALL, Translations.component("core.menu.profile.button.stats.action"))
                     .build();
         }
 
@@ -101,9 +102,9 @@ public class ProfileMenu extends AbstractGui implements Windowed {
         public ItemProvider getItemProvider() {
             return ItemView.builder()
                     .material(Material.NETHER_STAR)
-                    .displayName(Component.text("Achievements", NamedTextColor.YELLOW))
-                    .lore(Component.text("View your earned achievements", NamedTextColor.GRAY))
-                    .action(ClickActions.ALL, Component.text("Open Achievements Menu"))
+                    .displayName(Translations.component("core.menu.profile.button.achievements.name").color(NamedTextColor.YELLOW))
+                    .lore(Translations.component("core.menu.profile.button.achievements.lore.1").color(NamedTextColor.GRAY))
+                    .action(ClickActions.ALL, Translations.component("core.menu.profile.button.achievements.action"))
                     .build();
         }
 
@@ -117,9 +118,10 @@ public class ProfileMenu extends AbstractGui implements Windowed {
         public RecentAchievementItem(IAchievement achievement, AchievementCompletion completion) {
             super(ItemView.builder()
                     .material(achievement.getMaterial(completion.getClient().getStatContainer(), StatFilterType.ALL, null))
-                    .displayName(Component.text("Recent Achievement: ", NamedTextColor.GREEN)
-                            .append(Component.text(achievement.getName(), NamedTextColor.YELLOW)))
-                    .lore(Component.text("Completed " + UtilTime.getTime(System.currentTimeMillis() - java.sql.Timestamp.valueOf(completion.getTimestamp()).getTime(), 1) + " ago", NamedTextColor.GRAY))
+                    .displayName(Translations.component("core.menu.profile.recent-achievement.name",
+                            Component.text(achievement.getName(), NamedTextColor.YELLOW)))
+                    .lore(Translations.component("core.menu.profile.recent-achievement.lore.1",
+                            Component.text(UtilTime.getTime(System.currentTimeMillis() - java.sql.Timestamp.valueOf(completion.getTimestamp()).getTime(), 1))).color(NamedTextColor.GRAY))
                     .build());
         }
     }

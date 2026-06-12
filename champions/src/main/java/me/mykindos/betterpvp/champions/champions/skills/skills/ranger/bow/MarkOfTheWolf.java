@@ -19,10 +19,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -81,21 +83,16 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Shoot an arrow that gives hit players",
-                "<effect>Mark Of The Wolf</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Allies will gain <effect>Speed " + UtilFormat.getRomanNumeral(getSpeedStrength(level)) + " </effect> and their next melee",
-                "hit will deal <effect>" + getValueString(this::getExtraDamage, level) + "</effect> extra damage",
-                "",
-                "Enemies will be given <effect>Glowing",
-                "and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component extraDamage = getValueComponent(this::getExtraDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component markOfTheWolf = Translations.component("champions.skill.ranger.mark-of-the-wolf.name").color(NamedTextColor.WHITE);
+        Component speedIII = Translations.component("champions.skill.effect.speed",
+                Component.text("III")).color(NamedTextColor.WHITE);
+        Component glowing = Translations.component("champions.skill.effect.glowing.name").color(NamedTextColor.WHITE);
+        Component darkness = Translations.component("champions.skill.effect.darkness.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.mark-of-the-wolf.description", duration, extraDamage, cooldown, markOfTheWolf, speedIII, glowing, darkness);
     }
 
     @Override
@@ -199,9 +196,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             championsManager.getEffects().addEffect(target, damager, EffectTypes.SPEED, getSpeedStrength(level), (long) (getDuration(level) * 1000L));
         }
 
-        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         if (!damager.equals(target) && target instanceof Player targetPlayer) {
-            UtilMessage.message(targetPlayer, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+            UtilMessage.message(targetPlayer, getClassType().getDisplayName(), "champions.skill.hit-by-alt", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         }
 
     }
@@ -223,8 +220,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                     event.addModifier(new SkillDamageModifier.Flat(this, getExtraDamage(level)));
                     iterator.remove();
                     event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
-                    UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s %s</green>", event.getDamagee().getName(), getName(), level));
-                    UtilMessage.message(event.getDamagee(), getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", event.getDamager().getName(), getName(), level));
+                    UtilMessage.message(event.getDamager(), getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(event.getDamagee().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                    UtilMessage.message(event.getDamagee(), getClassType().getDisplayName(), "champions.skill.hit-by-alt", Component.text(event.getDamager().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
                 }
             }
         }

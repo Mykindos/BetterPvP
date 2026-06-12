@@ -14,6 +14,6 @@ public class ColossusFragment extends BaseItem {
 
     @Inject
     private ColossusFragment() {
-        super("Colossus Fragment", Item.model("colossus_fragment", 64), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.colossus-fragment.name"), Item.model("colossus_fragment", 64), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 }

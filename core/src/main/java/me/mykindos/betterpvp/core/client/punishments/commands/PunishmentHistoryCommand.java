@@ -45,13 +45,13 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
 
     @Override
     public String getDescription() {
-        return "Punish History Command";
+        return "core.command.punishment-history.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.message(player, "Punish", "Usage: /punish history <name>");
+            UtilMessage.message(player, "core.prefix.command", "core.command.punishment.history.usage");
             return;
         }
 
@@ -72,12 +72,11 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
                                 punishment.getRevokeReason(),
                                 null))
                         .map(Item.class::cast).toList();
-                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                    new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
-                });
+                // Note: Menu title currently requires a String; leaving literal until API accepts translated Components
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player));
 
             } else {
-                UtilMessage.message(player, "Punish", "Could not find a client with this name.");
+                UtilMessage.message(player, "core.prefix.command", "core.command.punishment.client.not_found");
             }
         });
     }
@@ -85,7 +84,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            UtilMessage.message(sender, "Punish", "Usage: /punish add <type> <player> <time> <unit> [reason...]");
+            UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.history.usage");
             return;
         }
 
@@ -95,13 +94,13 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
 
                 processHistory(sender, target);
             } else {
-                UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
+                UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.client.not_found");
             }
         });
     }
 
     protected void processHistory(CommandSender sender, Client target) {
-        UtilMessage.message(sender, "Punish", "Punishment History for <yellow>%s</yellow>", target.getName());
+        UtilMessage.message(sender, "core.prefix.command", "core.command.punishment.history.header", net.kyori.adventure.text.Component.text(target.getName()));
         target.getPunishments().sort(Comparator.comparingLong(Punishment::getExpiryTime).reversed());
         target.getPunishments().forEach(punishment -> {
             UtilMessage.message(sender, "", punishment.getPunishmentInformation(clientManager));

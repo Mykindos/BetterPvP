@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.item.impl.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,12 +37,12 @@ public class EnhancedMiningAbility extends AbstractInteraction implements Displa
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Enhanced Mining");
+        return Translations.component("core.ability.enhanced-mining.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Grants enhanced mining speed for stone-based blocks. Works exactly like a pickaxe.");
+        return Translations.component("core.ability.enhanced-mining.description");
     }
 
     @Override

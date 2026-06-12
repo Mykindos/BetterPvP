@@ -19,8 +19,7 @@ public class BuildSelector extends BaseItem {
 
     @Inject
     public BuildSelector() {
-        super("Build Editor", ItemStack.of(Material.ENCHANTING_TABLE), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and right-click this to edit your build.")));
+        super(translatableName("champions.item.build-editor.name"), ItemStack.of(Material.ENCHANTING_TABLE), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
+        addBaseComponent(DescriptionComponent.translatable(1, "champions.item.build-editor.lore"));
     }
 }

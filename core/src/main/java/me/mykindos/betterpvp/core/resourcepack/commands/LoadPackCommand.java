@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePack;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -34,13 +35,13 @@ public class LoadPackCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Load a resource pack by name";
+        return "core.command.load-pack.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.simpleMessage(player, "Usage: /loadpack <player> <pack>");
+            UtilMessage.message(player, Translations.component("core.command.loadpack.usage"));
             return;
         }
 
@@ -50,7 +51,7 @@ public class LoadPackCommand extends Command {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
             ResourcePack pack = resourcePackHandler.getResourcePack(args[1]).join();
             if (pack == null) {
-                UtilMessage.simpleMessage(player, "Resource pack not found");
+                UtilMessage.message(player, Translations.component("core.command.resourcepack.not_found"));
                 return;
             }
 

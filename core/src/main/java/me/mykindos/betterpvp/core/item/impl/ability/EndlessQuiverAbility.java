@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.item.impl.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
@@ -110,12 +112,12 @@ public class EndlessQuiverAbility extends AbstractInteraction implements Listene
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Endless Quiver");
+        return Translations.component("core.ability.endless-quiver.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Automatically conjures arrows, letting any quiver fire endlessly without requiring ammunition.");
+        return Translations.component("core.ability.endless-quiver.description");
     }
 
     @Override

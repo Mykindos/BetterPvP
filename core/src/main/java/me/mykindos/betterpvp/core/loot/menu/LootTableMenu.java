@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.loot.Loot;
 import me.mykindos.betterpvp.core.loot.LootTable;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
@@ -97,7 +98,7 @@ public class LootTableMenu extends AbstractPagedGui<Item> implements Windowed {
                     rarity = String.format("1 in %.1f", oneInX);
                 }
 
-                lore.add(Component.text("Drop Chance: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text(rarity + " (" + percentage + "%)", NamedTextColor.WHITE)));
+                lore.add(Translations.component("core.menu.loot.button.drop-chance.name").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text(rarity + " (" + percentage + "%)", NamedTextColor.WHITE)));
 
                 meta.lore(lore);
                 meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
@@ -113,7 +114,7 @@ public class LootTableMenu extends AbstractPagedGui<Item> implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Drop Table");
+        return Translations.component("core.menu.loot.title");
     }
 
     @Override

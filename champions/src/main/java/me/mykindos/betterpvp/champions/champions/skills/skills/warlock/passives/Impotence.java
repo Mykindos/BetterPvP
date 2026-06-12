@@ -12,7 +12,11 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -41,17 +45,13 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "For each enemy within " + getValueString(this::getRadius, level) + " blocks you take",
-                "reduced damage from all sources, at a",
-                "maximum of " + getValueString(this::getMaxEnemies, level) + " players",
-                "",
-                "Damage Reduction:",
-                "1 nearby enemy = <stat>" + String.format("%.1f",(calculateReduction(level, 1)) * 100)  + "%</stat>",
-                "2 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 2)) * 100) + "%</stat>",
-                "3 nearby enemies = <stat>" + String.format("%.1f",(calculateReduction(level, 3)) * 100) + "%</stat>"
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component maxEnemies = getValueComponent(this::getMaxEnemies, level);
+        Component reduction1 = Component.text(String.format("%.1f", calculateReduction(level, 1) * 100), NamedTextColor.GREEN);
+        Component reduction2 = Component.text(String.format("%.1f", calculateReduction(level, 2) * 100), NamedTextColor.GREEN);
+        Component reduction3 = Component.text(String.format("%.1f", calculateReduction(level, 3) * 100), NamedTextColor.GREEN);
+        return Translations.componentLines("champions.skill.warlock.impotence.description", radius, maxEnemies, reduction1, reduction2, reduction3);
     }
 
     private double getRadius(int level) {

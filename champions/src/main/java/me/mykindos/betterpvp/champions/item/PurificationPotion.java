@@ -34,7 +34,7 @@ public class PurificationPotion extends BaseItem implements Reloadable {
 
     @Inject
     private PurificationPotion(EffectManager effectManager, CooldownManager cooldownManager) {
-        super("Purification Potion", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.purification-potion.name"), model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.cleanseAbility = new CleanseAbility(effectManager, cooldownManager);
         this.cleanseAbility.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()

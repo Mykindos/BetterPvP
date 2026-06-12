@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponent;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
@@ -48,12 +50,12 @@ public class ArmorStorageEditAbility extends AbstractInteraction implements Disp
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Replace Armor");
+        return Translations.component("champions.ability.replace-armor.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Add or remove equipment stored on this item.");
+        return Translations.component("champions.ability.replace-armor.description");
     }
 
     @Override

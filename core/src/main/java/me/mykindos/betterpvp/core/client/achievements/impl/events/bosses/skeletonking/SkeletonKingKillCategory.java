@@ -9,9 +9,10 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +28,7 @@ public class SkeletonKingKillCategory extends AchievementCategory {
     public ItemView getItemView() {
         return ItemView.builder()
                 .material(Material.SKELETON_SKULL)
-                .displayName(UtilMessage.deserialize("<white>Kill the Skeleton King"))
+                .displayName(Translations.component("core.achievement.category.skeleton-king.name").color(NamedTextColor.WHITE))
                 .build();
     }
 
@@ -41,7 +42,9 @@ public class SkeletonKingKillCategory extends AchievementCategory {
         boolean killedSkeletonKing = skeletonKingStat.getStat(container, StatFilterType.ALL, null) >= 1;
         return ItemView.builder()
                 .material(Material.SKELETON_SKULL)
-                .displayName(UtilMessage.deserialize("<white>" + (killedSkeletonKing ? "Kill the Skeleton King" : "???")))
+                .displayName((killedSkeletonKing
+                        ? Translations.component("core.achievement.category.skeleton-king.name")
+                        : Translations.component("core.achievement.category.skeleton-king.hidden")).color(NamedTextColor.WHITE))
                 .build();
     }
 }

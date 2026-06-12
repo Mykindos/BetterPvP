@@ -26,7 +26,7 @@ public class SettingsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View or modify your settings";
+        return "core.command.settings.description";
     }
 
     @Override

@@ -14,7 +14,7 @@ public class HealthPotion extends BaseItem {
 
     @Inject
     private HealthPotion() {
-        super("Health Potion", Item.model("health_potion", 1), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.health-potion.name"), Item.model("health_potion", 1), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
     }
 
 }

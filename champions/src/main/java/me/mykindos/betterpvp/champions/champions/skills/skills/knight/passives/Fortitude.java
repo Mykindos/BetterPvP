@@ -16,8 +16,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,18 +52,16 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "After taking damage, you regenerate",
-                "up to " + getValueString(this::getMaxHeal, level) + " of the health you lost.",
-                "",
-                "You restore health at a rate of",
-                getValueString(this::getHealRate, level) + " health per " + getValueString(this::getHealInterval, level) + " seconds.",
-                "",
-                "This does not stack, and is reset if",
-                "you are hit again."
-        };
+    public Component[] getDescription(int level) {
+        Component maxHeal = getValueComponent(this::getMaxHeal, level);
+        Component healRate = getValueComponent(this::getHealRate, level);
+        Component healInterval = getValueComponent(this::getHealInterval, level);
+        return Translations.componentLines(
+                "champions.skill.knight.fortitude.description",
+                maxHeal,
+                healRate,
+                healInterval
+        );
     }
 
     public double getMaxHeal(int level) {

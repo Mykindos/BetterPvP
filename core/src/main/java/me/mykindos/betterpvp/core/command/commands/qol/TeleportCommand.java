@@ -22,7 +22,7 @@ public class TeleportCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Teleport to a target play";
+        return "core.command.teleport.description";
     }
 
     @Override

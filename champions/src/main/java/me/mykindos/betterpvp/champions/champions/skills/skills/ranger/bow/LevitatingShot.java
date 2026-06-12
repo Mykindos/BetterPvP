@@ -15,6 +15,9 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -43,20 +46,13 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Your next arrow is tipped with mysterious magic causing",
-                "the target to receive <effect>Levitation " + UtilFormat.getRomanNumeral(levitationStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Players with levitation are unable to use abilities",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.LEVITATION.getDescription(levitationStrength),
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component levitationIV = Translations.component("champions.skill.effect.levitation",
+                Component.text("IV")).color(NamedTextColor.WHITE);
+        Component levitation = Translations.component("champions.skill.effect.levitation.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.levitating-shot.description", duration, cooldown, levitationIV, levitation);
     }
 
     public double getDuration(int level) {
@@ -85,8 +81,8 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
     public void onHit(Player damager, LivingEntity target, int level) {
 
         championsManager.getEffects().addEffect(target, damager, EffectTypes.LEVITATION, levitationStrength, (int) (getDuration(level) * 1000));
-        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level));
-        UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by-alt", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
 
     }
 

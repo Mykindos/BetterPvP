@@ -8,13 +8,14 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +39,7 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         List<Item> hackingItems = punishmentHandler.getApplyPunishmentItemList(punisher, "hacking", target, reason, this);
 
         ItemProvider hackingProvider = ItemView.builder()
-                .displayName(Component.text("Hacking"))
+                .displayName(Translations.component("core.menu.punishment.button.hacking.name"))
                 .material(Material.IRON_SWORD)
                 .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -51,7 +52,7 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         List<Item> gameplayItems = punishmentHandler.getApplyPunishmentItemList(punisher, "gameplay", target, reason, this);
 
         ItemProvider gameplayProvider = ItemView.builder()
-                .displayName(Component.text("Gameplay"))
+                .displayName(Translations.component("core.menu.punishment.button.gameplay.name"))
                 .material(Material.ANVIL)
                 .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -64,7 +65,7 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         List<Item> chatItems = punishmentHandler.getApplyPunishmentItemList(punisher, "chat", target, reason, this);
 
         ItemProvider chatProvider = ItemView.builder()
-                .displayName(Component.text("Chat"))
+                .displayName(Translations.component("core.menu.punishment.button.chat.name"))
                 .material(Material.WRITABLE_BOOK)
                 .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -77,7 +78,7 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         List<Item> otherItems = punishmentHandler.getApplyPunishmentItemList(punisher, "other", target, reason, this);
 
         ItemProvider otherProvider = ItemView.builder()
-                .displayName(Component.text("Other"))
+                .displayName(Translations.component("core.menu.punishment.button.other.name"))
                 .material(Material.PAPER)
                 .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -101,10 +102,10 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
                 .map(Item.class::cast).toList();
 
         ItemProvider historyProvider = ItemView.builder()
-                .displayName(Component.text("Full Punish History"))
+                .displayName(Translations.component("core.menu.punishment.button.history.name"))
                 .material(Material.ENCHANTING_TABLE)
                 .customModelData(1)
-                .lore(UtilMessage.deserialize("<white>Click</white> to view full punish history"))
+                .lore(Translations.component("core.menu.punishment.button.history.lore.1").color(NamedTextColor.WHITE))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -142,6 +143,6 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
      */
     @Override
     public @NotNull Component getTitle() {
-        return Component.text(target.getName() + "'s Punishment Menu");
+        return Translations.component("core.menu.punishment.title", Component.text(target.getName()));
     }
 }

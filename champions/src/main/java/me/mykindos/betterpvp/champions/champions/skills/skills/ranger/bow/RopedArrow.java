@@ -15,8 +15,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -50,15 +54,9 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Your next arrow will pull you",
-                "towards the location it hits",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.ranger.roped-arrow.description", cooldown);
     }
 
     @Override

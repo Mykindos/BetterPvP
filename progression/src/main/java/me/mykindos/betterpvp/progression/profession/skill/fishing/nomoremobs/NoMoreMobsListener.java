@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.loot.event.LootAwardedEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -52,6 +54,7 @@ public class NoMoreMobsListener implements Listener {
                     .spawn();
         }, 1L);
 
-        UtilMessage.message(player, "Fishing", "<alt>No More Mobs</alt> removed nearby swimmers!");
+        UtilMessage.message(player, "core.prefix.fishing", "progression.fishing.no-more-mobs.removed-swimmers",
+                Component.text("No More Mobs", NamedTextColor.GREEN));
     }
 }

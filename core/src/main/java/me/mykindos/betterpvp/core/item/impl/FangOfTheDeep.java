@@ -14,6 +14,6 @@ public class FangOfTheDeep extends BaseItem {
 
     @Inject
     private FangOfTheDeep() {
-        super("Fang of the Deep", Item.model("fang_of_the_deep", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.fang-of-the-deep.name"), Item.model("fang_of_the_deep", 64), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

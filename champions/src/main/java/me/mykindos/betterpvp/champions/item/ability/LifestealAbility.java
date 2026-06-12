@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,12 +49,12 @@ public class LifestealAbility extends AbstractInteraction implements Listener, D
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Lifesteal");
+        return Translations.component("champions.ability.lifesteal.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Heal for a portion of the damage dealt to an enemy from melee attacks.");
+        return Translations.component("champions.ability.lifesteal.description");
     }
 
     @Override

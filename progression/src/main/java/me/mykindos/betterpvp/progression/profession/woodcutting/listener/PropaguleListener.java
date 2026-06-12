@@ -98,7 +98,7 @@ public class PropaguleListener implements Listener {
                 item.getType() == Material.BONE_MEAL) {
 
             event.setCancelled(true);
-            UtilMessage.simpleMessage(event.getPlayer(), "Progression", "You cannot use bone meal on mangrove leaves.");
+            UtilMessage.message(event.getPlayer(), "core.prefix.progression", "progression.woodcutting.bone-meal-denied");
         }
     }
 }

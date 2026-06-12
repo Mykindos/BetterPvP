@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.PageBackwardButton;
 import me.mykindos.betterpvp.core.menu.button.PageForwardButton;
@@ -19,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuiRewardBox extends AbstractPagedGui<Item> implements Windowed {
-
-    private final String title;
 
     public GuiRewardBox(RewardBox rewardBox, ItemFactory itemFactory, @Nullable Windowed previous) {
         super(9, 6, false, new Structure(
@@ -35,7 +34,6 @@ public class GuiRewardBox extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('<', new PageBackwardButton())
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new PageForwardButton()));
-        this.title = "Rewards";
         rewardBox.setLocked(true);
 
         List<Item> mailboxItems = rewardBox.getContents().stream().map(item -> new RewardBoxItem(rewardBox, item, itemFactory))
@@ -47,7 +45,7 @@ public class GuiRewardBox extends AbstractPagedGui<Item> implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text(title);
+        return Translations.component("core.menu.reward.title");
     }
 
     @Override

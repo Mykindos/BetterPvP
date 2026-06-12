@@ -49,7 +49,7 @@ public class Mjolnir extends WeaponItem implements Reloadable, NexoItem {
 
     @Inject
     private Mjolnir(Champions champions, CooldownManager cooldownManager, ItemFactory itemFactory, EffectManager effectManager, ClientManager clientManager) {
-        super(champions, "Mjolnir", Item.model(Material.TRIDENT, "mjolnir"), ItemRarity.MYTHICAL, List.of(Group.MELEE, Group.RANGED));
+        super(champions, translatableName("champions.item.mjolnir.name"), Item.model(Material.TRIDENT, "mjolnir"), ItemRarity.MYTHICAL, List.of(Group.MELEE, Group.RANGED));
         this.champions = champions;
         this.skyforgedAscent = new SkyforgedAscent(effectManager, cooldownManager, itemFactory, clientManager);
         this.heavensplitter = new Heavensplitter(this, itemFactory);

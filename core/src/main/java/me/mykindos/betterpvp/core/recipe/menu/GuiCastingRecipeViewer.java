@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.PaginatedLoreItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.menu.viewer.AlloyButton;
 import me.mykindos.betterpvp.core.item.menu.viewer.ItemButton;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
@@ -40,7 +42,7 @@ public class GuiCastingRecipeViewer extends AbstractGui implements Windowed {
 
 
         setItem(12, new ItemButton(itemFactory.createPreview(recipe.getBaseMold())));
-        setItem(19, new AlloyButton(recipe.getAlloy(), recipe.getRequiredMillibuckets(), false, "Required"));
+        setItem(19, new AlloyButton(recipe.getAlloy(), recipe.getRequiredMillibuckets(), false, Translations.component("core.menu.alloy.prefix.required")));
         setItem(26, new ItemButton(itemFactory.createPreview(recipe.getResult())));
 
         setItem(15, new PaginatedLoreItem(recipe.previewResult(), null));
@@ -48,7 +50,7 @@ public class GuiCastingRecipeViewer extends AbstractGui implements Windowed {
                 // todo: wiki entry
                 .icon(itemFactory.createPreview(itemFactory.getItemRegistry().getItem("core:smelter")).createItemStack())
                 .wikiEntry("Test", url)
-                .description(Component.text("Click on an ingredient to look at its recipes. Casting recipes require an alloy to be stored in the smelter first. Click on the alloy to view its recipe."))
+                .descriptionLines(List.of(Translations.rawComponentLines("core.menu.recipe.casting.info.description")))
                 .build());
         setBackground(Menu.INVISIBLE_BACKGROUND_ITEM);
     }

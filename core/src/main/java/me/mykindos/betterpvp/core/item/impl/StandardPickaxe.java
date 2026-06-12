@@ -21,7 +21,7 @@ public class StandardPickaxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 250;
 
     public StandardPickaxe() {
-        super("Standard Pickaxe", ItemStack.of(Material.IRON_PICKAXE), ItemGroup.TOOL, ItemRarity.COMMON);
+        super(translatableName("core.item.standard-pickaxe.name"), ItemStack.of(Material.IRON_PICKAXE), ItemGroup.TOOL, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

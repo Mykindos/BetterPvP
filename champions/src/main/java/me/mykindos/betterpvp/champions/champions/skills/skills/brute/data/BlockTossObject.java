@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -326,13 +328,14 @@ public final class BlockTossObject {
                         new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
                         damage,
                         skill.getName()));
-                UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
+                UtilMessage.message(ent, skill.getName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
             }
         }
 
         if (!damaged.isEmpty()) {
-            final String nameList = damaged.stream().map(player -> "<alt2>" + player.getName() + "</alt2>").collect(Collectors.joining(", "));
-            UtilMessage.simpleMessage(caster, skill.getName(), "You hit %s with <alt>%s</alt>.", nameList, skill.getName());
+            Component nameList = Component.join(net.kyori.adventure.text.JoinConfiguration.separator(Component.text(", ")),
+                    damaged.stream().map(player -> Component.text(player.getName(), NamedTextColor.YELLOW)).toList());
+            UtilMessage.message(caster, skill.getName(), "champions.skill.hit-target", nameList, skill.getDisplayName().color(NamedTextColor.GREEN));
             caster.playSound(caster.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0F, 1.0F);
         }
 

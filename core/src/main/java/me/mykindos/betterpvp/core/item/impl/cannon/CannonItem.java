@@ -27,7 +27,7 @@ public class CannonItem extends BaseItem implements Reloadable {
 
     @Inject
     private CannonItem(Core core, CannonPlaceAbility cannonPlaceAbility) {
-        super("Cannon", Item.model("cannon", 64), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.cannon.name"), Item.model("cannon", 64), ItemGroup.WEAPON, ItemRarity.UNCOMMON);
         this.cannonPlaceAbility = cannonPlaceAbility;
         this.cannonPlaceAbility.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()

@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -76,10 +78,9 @@ public class ClansSmartBlockListener implements Listener {
             cancel.run();
 
             final ClanRelation relation = this.clanManager.getRelation(clan, locationClan);
-            UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
-                    UtilFormat.cleanString(smartBlockInstance.getType().getName()),
-                    relation.getPrimaryMiniColor() + "Clan " + locationClan.getName()
-            );
+            UtilMessage.message(player, "clans.prefix", "clans.world.use.denied",
+                    Component.text(UtilFormat.cleanString(smartBlockInstance.getType().getName()), NamedTextColor.GREEN),
+                    Component.text("Clan " + locationClan.getName(), relation.getPrimary()));
         });
     }
 }

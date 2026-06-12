@@ -19,6 +19,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -74,18 +78,33 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Release a roar, inflicting all enemies hit",
-                "with <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "and dealing " + getValueString(this::getDamage, level) + " damage",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
-        };
+    public Component[] getDescription(int level) {
+        Component vul = Component.text(
+                UtilFormat.getRomanNumeral(vulnerabilityStrength),
+                NamedTextColor.YELLOW
+        );
+        Component duration = getValueComponent(this::getDuration, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component[] components = Translations.componentLines(
+                "champions.skill.brute.threatening-shout.description",
+                vul,
+                duration,
+                damage,
+                cooldown
+        );
+        Component vulnerabilityDetail = Translations.component("champions.skill.effect.vulnerability",
+                Component.text(UtilFormat.getRomanNumeral(vulnerabilityStrength))).color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.effect.vulnerability.detail",
+                vulnerabilityDetail,
+                Component.text(String.valueOf(vulnerabilityStrength * 10), NamedTextColor.GREEN)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {
@@ -164,7 +183,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                                         getDamage(level),
                                         "Threatening Shout"));
                                 championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                                UtilMessage.simpleMessage(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", target.getName());
+                                UtilMessage.message(player, getName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
                                 damagedEntities.add(target);
                             }
                         }

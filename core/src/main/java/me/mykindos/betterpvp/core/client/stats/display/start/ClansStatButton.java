@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonNativeStat;
 import me.mykindos.betterpvp.core.client.stats.impl.events.BossStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -51,12 +52,12 @@ public class ClansStatButton<T extends IAbstractStatMenu> extends ControlItem<T>
             clanName = clanGui.getClanContext().getClanName();
             clanId = clanGui.getClanContext().getClanId();
         } else {
-            itemViewBuilder.action(ClickActions.ALL, Component.text("Show Detailed Stats"));
+            itemViewBuilder.action(ClickActions.ALL, Translations.component("core.menu.stats.button.clans.action"));
         }
         return itemViewBuilder
                 .material(Material.TNT)
                 .lore(getClanStats(clanName, clanId))
-                .displayName(Component.text("Clans Stats"))
+                .displayName(Translations.component("core.menu.stats.button.clans.name"))
                 .build();
     }
 

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.shops.menus.buttons.direction;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -28,7 +29,7 @@ public class BackToPreviousButton extends AbstractItem {
                 .itemModel(invisible
                         ? Resources.ItemModel.INVISIBLE
                         : Key.key("betterpvp", "menu/gui/shop/page_backward"))
-                .displayName(Component.text("Back", NamedTextColor.GREEN))
+                .displayName(Translations.component("core.menu.button.back.name").color(NamedTextColor.GREEN))
                 .build();
     }
 

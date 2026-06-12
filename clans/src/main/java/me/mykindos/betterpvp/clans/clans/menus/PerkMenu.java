@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.clans.clans.leveling.ClanPerk;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -62,6 +63,6 @@ public class PerkMenu extends AbstractGui implements Windowed {
     @NotNull
     @Override
     public Component getTitle() {
-        return Component.text("Perks for " + clan.getName());
+        return Translations.component("clans.menu.perks.title", Component.text(clan.getName()));
     }
 }

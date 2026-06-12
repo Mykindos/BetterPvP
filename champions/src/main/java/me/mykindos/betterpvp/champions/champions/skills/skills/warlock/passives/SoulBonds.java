@@ -15,10 +15,14 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -67,22 +71,14 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Drop your Sword / Axe to toggle",
-                "",
-                "Connect the souls of yourself and your allies",
-                "within " + getValueString(this::getRadius, level) + " blocks, causing the highest health player in the",
-                "radius to transfer their health to the lowest health player every " + getValueString(this::getHealSpeed, level) + " seconds.",
-                "The lowest health player receives " + getValueString(this::getReceiveMultiplier, level, 100, "%", 0) + " of what was taken",
-                "",
-                "Melee attacks heal you for " + getValueString(this::getHealOnHit, level) + " health",
-                "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level)
-
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component healSpeed = getValueComponent(this::getHealSpeed, level);
+        Component receiveMultiplier = Component.text(String.format("%.0f", getReceiveMultiplier(level) * 100), NamedTextColor.GREEN);
+        Component healOnHit = getValueComponent(this::getHealOnHit, level);
+        Component energyStart = getValueComponent(this::getEnergyStartCost, level);
+        Component energyPerSec = getValueComponent(this::getEnergy, level);
+        return Translations.componentLines("champions.skill.warlock.soul-bonds.description", radius, healSpeed, receiveMultiplier, healOnHit, energyStart, energyPerSec);
     }
 
     public double getRadius(int level) {
@@ -136,7 +132,7 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Soul Bonds: <green>On");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.warlock.soul-bonds.on", Translations.component("champions.skill.toggle.on").color(NamedTextColor.GREEN));
         }
     }
 

@@ -32,7 +32,7 @@ public class ReinforcedWarlockLeggings extends ArmorItem {
 
     @Inject
     private ReinforcedWarlockLeggings(Champions champions) {
-        super(champions, "Reinforced Warlock Leggings", Item.builder(Material.NETHERITE_LEGGINGS)
+        super(champions, translatableName("champions.item.reinforced-warlock-leggings.name"), Item.builder(Material.NETHERITE_LEGGINGS)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.WARLOCK));

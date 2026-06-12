@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.vote;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
@@ -36,12 +38,12 @@ public class VotingCrateAbility extends AbstractInteraction implements Displayed
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Open");
+        return Translations.component("core.ability.voting-crate.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Opens the voting crate.");
+        return Translations.component("core.ability.voting-crate.description");
     }
 
 

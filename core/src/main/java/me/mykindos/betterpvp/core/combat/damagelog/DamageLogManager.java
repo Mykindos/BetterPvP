@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.combat.damagelog;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -99,9 +100,10 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
     public void showDamageSummary(long now, Player player, Player viewer, final ConcurrentLinkedDeque<DamageLog> logQueue) {
         final TextComponent.Builder component = Component.empty().toBuilder();
         if (logQueue == null || logQueue.isEmpty()) {
-            component.append(Component.text("No damage logs found."));
+            component.append(Translations.component("core.damage.summary.none"));
         } else {
-            component.append(UtilMessage.deserialize("<yellow>%s</yellow>'s Damage Summary:", player.getName()));
+            component.append(Translations.component("core.damage.summary.header",
+                    Component.text(player.getName(), NamedTextColor.YELLOW)));
 
             logQueue.stream().collect(SUMMARY_COLLECTOR).forEach((source, logs) -> {
                 String cause = logs.getFirst().getDamageCause().getDisplayName();
@@ -138,7 +140,8 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
                 }
 
                 builder.append(Component.text("[", NamedTextColor.GRAY))
-                        .append(Component.text(String.format("%.1f Seconds Prior", timePrior), NamedTextColor.GREEN))
+                        .append(Translations.component("core.damage.summary.seconds_prior",
+                                Component.text(String.format("%.1f", timePrior))).color(NamedTextColor.GREEN))
                         .append(Component.text("]", NamedTextColor.GRAY))
                         .appendSpace();
 
@@ -146,7 +149,7 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
             });
         }
 
-        UtilMessage.message(viewer, "Damage", component.build());
+        UtilMessage.message(viewer, "core.prefix.damage", component.build());
     }
 
     private ConcurrentLinkedDeque<DamageLog> getFreshLogQueue(String identifier) {

@@ -42,6 +42,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 
 @Singleton
 @BPvPListener
@@ -65,20 +68,13 @@ public class StaticLazer extends ChargeSkill implements InteractSkill, EnergyCha
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "",
-                "Charge static electricity and",
-                "release right click to fire a lazer",
-                "",
-                "Charges " + getValueString(this::getChargePerSecond, level, 100, "%", 0) + " per second,",
-                "dealing up to " + getValueString(this::getDamage, level) + " damage and",
-                "traveling up to " + getValueString(this::getRange, level) + " blocks",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Energy: " + getValueString(this::getEnergyPerSecond, level)
-        };
+    public Component[] getDescription(int level) {
+        Component chargePerSecond = Component.text(String.format("%.0f%%", getChargePerSecond(level) * 100), NamedTextColor.GREEN);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component range = getValueComponent(this::getRange, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component energy = getValueComponent(this::getEnergyPerSecond, level);
+        return Translations.componentLines("champions.skill.mage.static-lazer.description", chargePerSecond, damage, range, cooldown, energy);
     }
 
     private float getEnergyPerSecond(int level) {
@@ -229,7 +225,7 @@ public class StaticLazer extends ChargeSkill implements InteractSkill, EnergyCha
         }
 
         // Cues
-        UtilMessage.message(player, getClassType().getName(), "You fired <alt>%s %s</alt>.", getName(), level);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.static-lazer.fired", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.5f + player.getExp(), 1.75f - charge);
     }
 

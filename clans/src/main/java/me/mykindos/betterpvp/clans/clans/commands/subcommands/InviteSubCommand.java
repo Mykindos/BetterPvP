@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -40,7 +42,7 @@ public class InviteSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Invite a player to your clan";
+        return "clans.command.invite.description";
     }
 
     @Override
@@ -51,51 +53,52 @@ public class InviteSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You did not input a player to invite.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.no-args");
             return;
         }
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();;
 
         if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)){
-            UtilMessage.message(player, "Clans", "Only the Clan Leader and Admins can send invites.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.no-rank");
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null){
-            UtilMessage.message(player, "Clans", "The player you want to invite must be online");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.not-online");
             return;
         }
 
         if (target.equals(player)){
-            UtilMessage.message(player, "Clans", "You cannot invite yourself");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.self");
             return;
         }
 
         Optional<Clan> targetClan = clanManager.getClanByPlayer(target);
         if (targetClan.isPresent()) {
-            UtilMessage.simpleMessage(player, "Clans", "<alt2>" + target.getName() + "</alt2> is apart of <alt2>Clan " + targetClan.get().getName() + "</alt2>.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.already-in-clan",
+                    Component.text(target.getName(), NamedTextColor.YELLOW),
+                    Component.text(targetClan.get().getName(), NamedTextColor.YELLOW));
             return;
         }
 
         if (clan.getSquadCount() >= maxClanMembers){
-            UtilMessage.message(player, "Clans", "Your clan has too many members or allies to invite another member.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.limit");
             return;
         }
 
         boolean allySquadCountTooHigh = false;
         for (ClanAlliance clanAlliance : clan.getAlliances()) {
             if (clanAlliance.getClan().getSquadCount() + 1 > maxClanMembers) {
-                UtilMessage.message(player, "Clans",
-                        "You cannot invite more members, as it would cause <yellow>%s</yellow> to have too many allies. You must either reduce your squad size, or have your ally reduce their squad size.",
-                        clanAlliance.getClan().getName());
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.ally-limit",
+                        Component.text(clanAlliance.getClan().getName(), NamedTextColor.YELLOW));
                 allySquadCountTooHigh = true;
             }
         }
 
         if(clanManager.getPillageHandler().isBeingPillaged(clan)) {
-            UtilMessage.message(player, "Clans", "You cannot invite members while being pillaged.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.invite.pillaged");
             return;
         }
 

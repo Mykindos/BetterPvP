@@ -32,7 +32,7 @@ public class ReinforcedWarlockChestplate extends ArmorItem {
 
     @Inject
     private ReinforcedWarlockChestplate(Champions champions) {
-        super(champions, "Reinforced Warlock Chestplate", Item.builder(Material.NETHERITE_CHESTPLATE)
+        super(champions, translatableName("champions.item.reinforced-warlock-chestplate.name"), Item.builder(Material.NETHERITE_CHESTPLATE)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
                 .build(), ItemRarity.COMMON);
         addBaseComponent(new RoleArmorComponent(Role.WARLOCK));

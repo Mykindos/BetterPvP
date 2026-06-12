@@ -19,8 +19,7 @@ public class ClassSelector extends BaseItem {
 
     @Inject
     public ClassSelector() {
-        super("Class Selector", ItemStack.of(Material.SCULK_SHRIEKER), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
-        addBaseComponent(new DescriptionComponent(1,
-                Component.text("Place and right-click this to change your class.")));
+        super(translatableName("champions.item.class-selector.name"), ItemStack.of(Material.SCULK_SHRIEKER), ItemGroup.BLOCK, ItemRarity.UNCOMMON);
+        addBaseComponent(DescriptionComponent.translatable(1, "champions.item.class-selector.lore"));
     }
 }

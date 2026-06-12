@@ -14,7 +14,7 @@ public class StormInABottle extends BaseItem {
 
     @Inject
     private StormInABottle() {
-        super("Storm in a Bottle", Item.model("storm_in_a_bottle"), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
+        super(translatableName("core.item.storm-in-a-bottle.name"), Item.model("storm_in_a_bottle"), ItemGroup.MATERIAL, ItemRarity.MYTHICAL);
     }
 
 }

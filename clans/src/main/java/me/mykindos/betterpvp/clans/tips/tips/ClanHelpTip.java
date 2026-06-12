@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.IRunCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,7 +28,7 @@ public class ClanHelpTip extends ClanTip implements IRunCommand {
     @Override
     public Component generateComponent() {
         Component runComponent = runCommand("/c help");
-        return Component.text("You can see a list of commands by running ", NamedTextColor.GRAY).append(runComponent);
+        return Translations.component("clans.tip.help", runComponent).colorIfAbsent(NamedTextColor.GRAY);
     }
 
     public boolean isValid(Player player, Clan clan) {

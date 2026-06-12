@@ -23,7 +23,7 @@ public class BuildLockPunishmentType implements IPunishmentType {
     public void onExpire(UUID client, Punishment punishment) {
         Player player = Bukkit.getPlayer(client);
         if (player != null) {
-            UtilMessage.message(player, "Punish", "Your build lock punishment has expired");
+            UtilMessage.message(player, "core.prefix.punish", "core.punishment.buildlock.expired");
         }
     }
 }

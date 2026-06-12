@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
@@ -71,12 +72,14 @@ public class ShopContext {
         ShopCurrency shopCurrency = getCurrency(shopItem);
         builder.lore(Component.empty());
         builder.lore(Component.empty()
-                .append(Component.text("Buy: ", NamedTextColor.GRAY))
-                .append(buildPriceComponent(shopCurrency, shopItem.getBuyPrice()).append(Component.text(" ea."))));
+                .append(Translations.component("shops.menu.shop.label.buy").color(NamedTextColor.GRAY)).appendSpace()
+                .append(buildPriceComponent(shopCurrency, shopItem.getBuyPrice())
+                        .appendSpace().append(Translations.component("shops.menu.shop.label.ea").color(NamedTextColor.GRAY))));
         if (shopItem.getSellPrice() > 0) {
             builder.lore(Component.empty()
-                    .append(Component.text("Sell: ", NamedTextColor.GRAY))
-                    .append(buildPriceComponent(shopCurrency, shopItem.getSellPrice()).append(Component.text(" ea."))));
+                    .append(Translations.component("shops.menu.shop.label.sell").color(NamedTextColor.GRAY)).appendSpace()
+                    .append(buildPriceComponent(shopCurrency, shopItem.getSellPrice())
+                            .appendSpace().append(Translations.component("shops.menu.shop.label.ea").color(NamedTextColor.GRAY))));
         }
 
         return builder.build();

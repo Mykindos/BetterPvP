@@ -15,8 +15,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,17 +56,21 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "You gain <stat>1</stat> charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds.",
-                "You can store a maximum of " + getValueString(this::getMaxCharges, level, 0) + " charges",
-                "",
-                "You do not gain charges until " + getValueString(this::getTimeOutOfCombat, level) + " seconds after taking damage",
-                "",
-                "When attacked, the damage you take is",
-                "reduced by " + getValueString(this::getDamageReductionPerCharge, level) + " damage per charge",
-        };
+    public Component[] getDescription(int level) {
+        Component timeBetween = getValueComponent(this::getTimeBetweenCharges, level);
+        Component maxCharges = Component.text(
+                String.valueOf(getMaxCharges(level)),
+                NamedTextColor.YELLOW
+        );
+        Component timeOutOfCombat = getValueComponent(this::getTimeOutOfCombat, level);
+        Component reduction = getValueComponent(this::getDamageReductionPerCharge, level);
+        return Translations.componentLines(
+                "champions.skill.knight.deflection.description",
+                timeBetween,
+                maxCharges,
+                timeOutOfCombat,
+                reduction
+        );
     }
 
     public int getMaxCharges(int level) {
@@ -120,7 +128,7 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
                         int charge = charges.get(cur.getUniqueId());
                         if (charge < getMaxCharges(level)) {
                             charge = Math.min(getMaxCharges(level), charge + 1);
-                            UtilMessage.simpleMessage(cur, getClassType().getName(), "Deflection charge: <yellow>%d", charge);
+                            UtilMessage.message(cur, getClassType().getDisplayName(), "champions.skill.knight.deflection.charge", Component.text(String.valueOf(charge), NamedTextColor.YELLOW));
                             charges.put(cur.getUniqueId(), charge);
                         }
                     }

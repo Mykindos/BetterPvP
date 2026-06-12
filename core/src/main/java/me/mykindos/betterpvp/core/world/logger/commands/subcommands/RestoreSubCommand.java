@@ -54,14 +54,14 @@ public class RestoreSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Restore block changes within a radius and time period";
+        return "core.command.restore.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "World Logger", "Usage: /wl restore radius:<radius> time:<time> [player:<player>]");
-            UtilMessage.message(player, "World Logger", "Example: /wl restore radius:5 time:3h player:Mykindos");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.usage");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.example");
             return;
         }
 
@@ -75,7 +75,7 @@ public class RestoreSubCommand extends Command {
                 try {
                     radius = Integer.parseInt(arg.substring(7));
                 } catch (NumberFormatException e) {
-                    UtilMessage.message(player, "World Logger", "Invalid radius value. Must be a number.");
+                    UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.radius.invalid");
                     return;
                 }
             } else if (arg.startsWith("time:")) {
@@ -86,19 +86,19 @@ public class RestoreSubCommand extends Command {
         }
 
         if (radius < 0) {
-            UtilMessage.message(player, "World Logger", "You must specify a valid radius.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.radius.required");
             return;
         }
 
         if (timeString == null) {
-            UtilMessage.message(player, "World Logger", "You must specify a time period.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.time.required");
             return;
         }
 
         // Parse time string (e.g., 3h, 30m, 1d)
         long timeInMillis = parseTimeString(timeString);
         if (timeInMillis <= 0) {
-            UtilMessage.message(player, "World Logger", "Invalid time format. Use format like 3h, 30m, 1d.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.time.invalid");
             return;
         }
 
@@ -110,7 +110,7 @@ public class RestoreSubCommand extends Command {
         final int finalRadius = radius;
         final String finalTargetPlayer = targetPlayer;
 
-        UtilMessage.message(player, "World Logger", "Starting restore process...");
+        UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.start");
 
         database.getAsyncDslContext().executeAsyncVoid(ctx -> {
             var query = ctx.selectQuery();
@@ -163,17 +163,17 @@ public class RestoreSubCommand extends Command {
                 });
 
                 if (worldLogs.isEmpty()) {
-                    UtilMessage.message(player, "World Logger", "No blocks found to restore.");
+                    UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.none");
                     return;
                 }
 
                 // Process the restore
                 processRestore(worldLogs);
 
-                UtilMessage.message(player, "World Logger", "Restore completed.");
+                UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.completed");
 
             } catch (Exception ex) {
-                UtilMessage.simpleMessage(player, "World Logger", "Failed to restore blocks");
+                UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.restore.failed");
                 log.error("Failed to restore blocks", ex).submit();
             }
         });

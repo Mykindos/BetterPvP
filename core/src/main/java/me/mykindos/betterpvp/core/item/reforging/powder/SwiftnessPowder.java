@@ -19,7 +19,7 @@ public class SwiftnessPowder extends BaseItem {
 
     @Inject
     public SwiftnessPowder() {
-        super("Swiftness Powder", Item.model("swiftness_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.swiftness-powder.name"), Item.model("swiftness_powder", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
         addBaseComponent(new StatAugmentationComponent(List.of(
                 new StatAugmentation(StatTypes.MOVEMENT, 1, 0.01, StatAugmentation.Operation.ADD)
         )));

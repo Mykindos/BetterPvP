@@ -14,6 +14,6 @@ public class LeatherCloth extends BaseItem {
 
     @Inject
     private LeatherCloth() {
-        super("Leather Cloth", Item.model("leather_cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.leather-cloth.name"), Item.model("leather_cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 }

@@ -3,10 +3,11 @@ package me.mykindos.betterpvp.core.client.achievements.types;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 
 import java.util.ArrayList;
@@ -45,7 +46,9 @@ public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchieveme
         final List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, type, period));
         final Component bar = progressComponent.getFirst();
         progressComponent.removeFirst();
-        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", value, goal)));
+        progressComponent.addFirst(bar.append(Translations.component("core.achievement.progress-fraction",
+                Component.text(value, NamedTextColor.GREEN),
+                Component.text(goal, NamedTextColor.YELLOW))));
         return progressComponent;
     }
 }

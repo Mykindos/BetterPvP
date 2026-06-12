@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,12 +32,12 @@ public class UnderwaterBreathingAbility extends AbstractInteraction implements D
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Underwater Breathing");
+        return Translations.component("champions.ability.underwater-breathing.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Grants instant underwater breathing when holding this item in water.");
+        return Translations.component("champions.ability.underwater-breathing.description");
     }
 
     @Override

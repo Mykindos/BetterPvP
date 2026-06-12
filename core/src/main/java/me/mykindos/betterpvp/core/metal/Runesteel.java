@@ -37,7 +37,7 @@ public class Runesteel {
     public static class OreBlockItem extends MetalBlockItem {
         @Inject
         public OreBlockItem() {
-            super("Runeblood Ore", "runeblood_stone_ore", ItemRarity.MYTHICAL);
+            super(translatableName("core.item.runeblood-ore.name"), "runeblood_stone_ore", ItemRarity.MYTHICAL);
         }
     }
 
@@ -46,7 +46,7 @@ public class Runesteel {
     public static class Fragment extends MetalItem {
         @Inject
         public Fragment() {
-            super("Runeblood Fragment", "runeblood_fragment", ItemRarity.MYTHICAL);
+            super(translatableName("core.item.runeblood-fragment.name"), "runeblood_fragment", ItemRarity.MYTHICAL);
         }
     }
 
@@ -55,7 +55,7 @@ public class Runesteel {
     public static class Ingot extends MetalItem {
         @Inject
         public Ingot() {
-            super("Runesteel Ingot", "runesteel_ingot", ItemRarity.MYTHICAL);
+            super(translatableName("core.item.runesteel-ingot.name"), "runesteel_ingot", ItemRarity.MYTHICAL);
         }
     }
 
@@ -67,7 +67,7 @@ public class Runesteel {
 
         @Inject
         public Billet() {
-            super("Runesteel Billet", "runesteel_billet", ItemRarity.MYTHICAL);
+            super(translatableName("core.item.runesteel-billet.name"), "runesteel_billet", ItemRarity.MYTHICAL);
         }
 
         @Inject
@@ -101,7 +101,7 @@ public class Runesteel {
 
         @Inject
         public BlockItem() {
-            super("Runesteel Block", "runesteel_block", ItemRarity.MYTHICAL);
+            super(translatableName("core.item.runesteel-block.name"), "runesteel_block", ItemRarity.MYTHICAL);
         }
 
         @Inject

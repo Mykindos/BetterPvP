@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -142,7 +143,7 @@ public class StringFilterValueButton<G extends Gui> extends ControlItem<G> imple
 
 
         return ItemView.builder()
-                .displayName(Component.text("Select Value", NamedTextColor.WHITE, TextDecoration.BOLD))
+                .displayName(Translations.component("core.menu.log.button.select-value.name").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD))
                 .material(Material.PAPER)
                 .lore(lore)
                 .build();

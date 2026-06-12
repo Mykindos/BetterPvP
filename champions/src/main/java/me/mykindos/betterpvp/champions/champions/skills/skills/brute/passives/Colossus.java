@@ -12,6 +12,10 @@ import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -36,11 +40,15 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "You take <val>" + ((reductionPerLevel * 100) * level) + "</val>% reduced knockback"
-        };
+    public Component[] getDescription(int level) {
+        Component reduction = Component.text(
+                UtilFormat.formatNumber(reductionPerLevel * level * 100, 0, true) + "%",
+                NamedTextColor.YELLOW
+        );
+        return Translations.componentLines(
+                "champions.skill.brute.colossus.description",
+                reduction
+        );
     }
 
     @Override

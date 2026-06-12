@@ -42,7 +42,7 @@ public class MeridianScepter extends WeaponItem implements Listener, Reloadable 
     private MeridianScepter(Champions champions,
                            HealingNovaAbility healingNovaAbility,
                            MeridianBeamAbility meridianBeamAbility) {
-        super(champions, "Meridian Scepter", Item.model("meridian_scepter"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
+        super(champions, translatableName("champions.item.meridian-scepter.name"), Item.model("meridian_scepter"), ItemRarity.LEGENDARY, List.of(Group.RANGED));
         this.healingNovaAbility = healingNovaAbility;
         this.meridianBeamAbility = meridianBeamAbility;
 

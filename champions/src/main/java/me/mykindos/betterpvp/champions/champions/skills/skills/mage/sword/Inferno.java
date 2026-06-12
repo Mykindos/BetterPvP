@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -41,6 +42,9 @@ import org.bukkit.util.Vector;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 
 @Singleton
 @BPvPListener
@@ -68,17 +72,11 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "",
-                "You spray fire at high speed igniting",
-                "anything it hits for " + getValueString(this::getFireDuration, level) + " seconds",
-                "and dealing " + getValueString(this::getDamage, level) + " damage on hit.",
-                "",
-                "Energy: " + getValueString(this::getEnergyPerSecond, level),
-        };
+    public Component[] getDescription(int level) {
+        Component fireDuration = getValueComponent(this::getFireDuration, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component energy = getValueComponent(this::getEnergyPerSecond, level);
+        return Translations.componentLines("champions.skill.mage.inferno.description", fireDuration, damage, energy);
     }
 
     public double getFireDuration(int level) {

@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.client.stats.display.IAbstractStatMenu;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.DominationStatButton;
 import me.mykindos.betterpvp.core.client.stats.display.championsgame.ctf.team.CTFTeamMapStatMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -37,10 +38,11 @@ public class CTFTeamStatButton extends DominationStatButton {
 
         return ItemView.builder()
                 .material(material)
-                .displayName(Component.text(teamName + " Team Stats"))
+                .displayName(Translations.component("core.menu.stats.champions.button.team.name",
+                        Component.text(teamName)))
                 .lore(getDominationStatsDescription(teamName, ""))
                 .frameLore(true)
-                .action(ClickActions.ALL, Component.text("Show Detailed Stats"))
+                .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }
 

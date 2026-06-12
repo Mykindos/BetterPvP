@@ -33,24 +33,24 @@ public class SilenceChatCommand extends Command implements Listener  {
 
     @Override
     public String getDescription() {
-        return "Prevent non-ranked players from sending messages";
+        return "core.command.silence-chat.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (isChatSilenced) {
-            UtilMessage.broadcast("Chat", "Chat is no longer silenced");
+            UtilMessage.broadcast("core.prefix.chat", "core.command.silencechat.off");
             isChatSilenced = false;
             return;
         }
-        UtilMessage.broadcast("Chat", "Chat is now silenced");
+        UtilMessage.broadcast("core.prefix.chat", "core.command.silencechat.on");
         isChatSilenced = true;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChatSent(ChatSentEvent event) {
         if (isChatSilenced && !clientManager.search().online(event.getPlayer()).hasRank(Rank.TRIAL_MOD)) {
-            UtilMessage.message(event.getPlayer(), "Chat", "Chat is currently silenced, you cannot send a message in global chat");
+            UtilMessage.message(event.getPlayer(), "core.prefix.chat", "core.command.silencechat.denied");
             event.cancel("Chat is silenced");
         }
     }

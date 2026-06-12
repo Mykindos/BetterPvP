@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.framework.ServerType;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.hub.feature.queue.HubQueueStatusRegistry;
@@ -56,12 +57,12 @@ public class ServerItemButton extends AbstractItem {
 
         if (serverType instanceof ClansServerType clansServerType) {
             final int squadSize = clansServerType.getSquadSize();
-            builder = builder.lore(Component.text("Clan Size: ", NamedTextColor.GRAY).append(Component.text(squadSize, NamedTextColor.YELLOW)));
+            builder = builder.lore(Translations.component("hub.menu.server-selector.button.server.lore.clan-size").color(NamedTextColor.GRAY).append(Component.text(" ").append(Component.text(squadSize, NamedTextColor.YELLOW))));
         }
 
         if (online) {
             final int playerCount = counts.getOrDefault(serverName, 0);
-            builder = builder.lore(Component.text("Players: ", NamedTextColor.GRAY).append(Component.text(playerCount, NamedTextColor.GREEN)));
+            builder = builder.lore(Translations.component("hub.menu.server-selector.button.server.lore.players").color(NamedTextColor.GRAY).append(Component.text(" ").append(Component.text(playerCount, NamedTextColor.GREEN))));
         }
 
         builder = builder.lore(Component.empty());

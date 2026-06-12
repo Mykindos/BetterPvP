@@ -13,7 +13,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -48,11 +51,17 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Every enemy facing towards you within " + getValueString(this::getRadius, level),
-                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength)
-        };
+    public Component[] getDescription(int level) {
+        Component rad = getValueComponent(this::getRadius, level, 0);
+        Component slowness = Component.text(
+                UtilFormat.getRomanNumeral(slownessStrength),
+                NamedTextColor.YELLOW
+        );
+        return Translations.componentLines(
+                "champions.skill.brute.intimidation.description",
+                rad,
+                slowness
+        );
     }
 
     @Override

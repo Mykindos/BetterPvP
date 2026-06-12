@@ -26,7 +26,7 @@ public class StatsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Stats base command";
+        return "progression.command.stats.description";
     }
 
     @Override

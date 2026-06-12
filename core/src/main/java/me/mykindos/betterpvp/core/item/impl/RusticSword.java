@@ -22,7 +22,7 @@ public class RusticSword extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 59;
 
     public RusticSword() {
-        super("Rustic Sword", ItemStack.of(Material.WOODEN_SWORD), ItemGroup.WEAPON, ItemRarity.COMMON);
+        super(translatableName("core.item.rustic-sword.name"), ItemStack.of(Material.WOODEN_SWORD), ItemGroup.WEAPON, ItemRarity.COMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
     }

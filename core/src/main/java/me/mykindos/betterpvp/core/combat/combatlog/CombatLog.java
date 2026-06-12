@@ -70,7 +70,9 @@ public class CombatLog {
 
         UtilServer.callEvent(new PlayerClickCombatLogEvent(player, this));
 
-        UtilMessage.broadcast("Log", "<yellow>%s</yellow> caused <yellow>%s</yellow> to drop their inventory for combat logging.", player.getName(), playerName);
+        UtilMessage.broadcast("core.prefix.logs", "core.combatlog.drop",
+                Component.text(player.getName(), NamedTextColor.YELLOW),
+                Component.text(playerName, NamedTextColor.YELLOW));
 
         inventory.clear();
         UtilInventory.saveOfflineInventory(owner, inventory);

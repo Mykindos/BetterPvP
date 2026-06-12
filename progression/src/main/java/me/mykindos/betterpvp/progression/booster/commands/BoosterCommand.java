@@ -29,19 +29,18 @@ public class BoosterCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Check your remaining profession experience booster time";
+        return "progression.command.booster.description";
     }
 
     @Override
     public void execute(Player player, Client client, String[] args) {
         long remaining = boosterManager.getRemainingTime(player.getUniqueId());
         if (remaining <= 0) {
-            UtilMessage.simpleMessage(player, "Booster", "You do not have an active profession experience booster.");
+            UtilMessage.message(player, "core.prefix.booster", "progression.booster.none-active");
             return;
         }
 
-        UtilMessage.simpleMessage(player, "Booster", Component.text("You have ", NamedTextColor.GRAY)
-                .append(Component.text(UtilTime.getTime(remaining, 1), NamedTextColor.GREEN))
-                .append(Component.text(" of profession experience booster remaining.", NamedTextColor.GRAY)));
+        UtilMessage.message(player, "core.prefix.booster", "progression.booster.remaining",
+                Component.text(UtilTime.getTime(remaining, 1), NamedTextColor.GREEN));
     }
 }

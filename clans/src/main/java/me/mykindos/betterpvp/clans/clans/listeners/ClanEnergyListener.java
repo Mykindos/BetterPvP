@@ -111,8 +111,8 @@ public class ClanEnergyListener extends ClanListener {
         Component subTitle = Component.text("Time Remaining: ", NamedTextColor.YELLOW)
                 .append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN));
         player.showTitle(Title.title(title, subTitle));
-        UtilMessage.message(player, "Clans", title);
-        UtilMessage.message(player, "Clans", subTitle);
+        UtilMessage.message(player, "core.prefix.clans", title);
+        UtilMessage.message(player, "core.prefix.clans", subTitle);
     }
 
     @UpdateEvent(delay = 60_000 * 5)
@@ -132,7 +132,7 @@ public class ClanEnergyListener extends ClanListener {
                 UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new ClanDisbandEvent(null, clan)), 1);
             } else if (clan.getEnergy() - depletion <= 0) {
                 // Otherwise, check if they will disband after next depletion
-                clan.messageClan("If your clan does not acquire more energy soon, your clan will disband!", null, true);
+                clan.messageClan("clans.energy.low-warning", null, null, true);
             }
         });
     }

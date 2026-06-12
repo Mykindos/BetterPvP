@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.Zones;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -69,7 +71,7 @@ public class ClansCombatListener implements Listener {
         if (event.getDamager() instanceof Player damager && event.getDamagee() instanceof Player damagee) {
             if (!clanManager.canHurt(damager, damagee)) {
 
-                UtilMessage.message(damager, "Clans", "You cannot hurt <yellow>%s<gray>.", damagee.getName());
+                UtilMessage.message(damager, "core.prefix.clans", "clans.combat.cannot-hurt", Component.text(damagee.getName(), NamedTextColor.YELLOW));
                 event.setCancelled(true);
                 return;
             }
@@ -136,7 +138,7 @@ public class ClansCombatListener implements Listener {
         final Client client = clientManager.search().online(event.getPlayer());
         final Gamer gamer = client.getGamer();
         if (gamer.isInCombat()) {
-            UtilMessage.message(event.getPlayer(), "Clans", "You cannot leave a clan while in combat!");
+            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.combat.cannot-leave");
             event.setCancelled(true);
         }
     }
@@ -145,7 +147,7 @@ public class ClansCombatListener implements Listener {
     public void onMemberKickClan(ClanKickMemberEvent event) {
         final Gamer gamer = event.getTarget().getGamer();
         if (gamer.isInCombat()) {
-            UtilMessage.message(event.getPlayer(), "Clans", "You cannot kick <yellow>%s</yellow>, they are in combat!", event.getTarget().getName());
+            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.combat.cannot-kick", Component.text(event.getTarget().getName(), NamedTextColor.YELLOW));
             event.setCancelled(true);
         }
     }
@@ -155,7 +157,7 @@ public class ClansCombatListener implements Listener {
         final Client client = clientManager.search().online(event.getPlayer());
         final Gamer gamer = client.getGamer();
         if (gamer.isInCombat()) {
-            UtilMessage.message(event.getPlayer(), "Clans", "You cannot join a clan while in combat!");
+            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.combat.cannot-join");
             event.setCancelled(true);
         }
     }

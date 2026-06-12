@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
@@ -51,10 +52,12 @@ public class WeaponListener implements Listener {
         final Component name = item.getView().getName();
         final String sourceId = event.getSource().getId();
         final String sourceDisplay = event.getSource().getDisplayName();
-        UtilMessage.broadcast(Component.text("Announcement> ", NamedTextColor.BLUE)
+        final ItemStack hoverStack = item.getView().get();
+        // Per recipient: the hover ItemStack is rendered into each viewer's locale before the hover is built.
+        UtilMessage.broadcastLocalized(locale -> Component.text("Announcement> ", NamedTextColor.BLUE)
                 .append(Component.text(sourceDisplay, NamedTextColor.RED)
                         .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
-                        .append(name.hoverEvent(item.getView().get()))));
+                        .append(name.hoverEvent(Translations.renderItemStack(hoverStack, locale)))));
         log.info("A legendary weapon was dropped by {}! ({})", sourceDisplay, clazzName)
                 .addLocationContext(event.getLocation())
                 .addContext("Source", sourceId).submit();

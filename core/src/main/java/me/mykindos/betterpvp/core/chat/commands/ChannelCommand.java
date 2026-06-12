@@ -12,7 +12,7 @@ public class ChannelCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Change chat channel";
+        return "core.command.channel.description";
     }
 
     @Override

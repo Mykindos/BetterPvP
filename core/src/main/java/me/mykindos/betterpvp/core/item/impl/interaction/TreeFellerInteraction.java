@@ -20,9 +20,11 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.interaction.event.TreeFellerEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -158,7 +160,8 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
         }
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
-        UtilMessage.simpleMessage(player, "Woodcutting", "You used <alt>Tree Feller</alt>");
+        UtilMessage.message(player, "core.prefix.woodcutting", "core.interaction.tree_feller.used",
+                Translations.component("core.interaction.tree_feller.name").color(NamedTextColor.GREEN));
 
         return InteractionResult.Success.ADVANCE;
     }
@@ -211,11 +214,11 @@ public class TreeFellerInteraction extends CooldownInteraction implements Displa
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Tree Feller");
+        return Translations.component("core.ability.tree-feller.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Fells the entire tree when you break a log.");
+        return Translations.component("core.ability.tree-feller.description");
     }
 }

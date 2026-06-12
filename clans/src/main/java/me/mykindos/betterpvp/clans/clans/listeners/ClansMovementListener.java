@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTelepo
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -27,7 +28,9 @@ import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -69,11 +72,11 @@ public class ClansMovementListener extends ClanListener {
         if (popupSetting) {
             TitleComponent titleComponent = new TitleComponent(0, .75, .25, false,
                     gamer -> Component.text("", NamedTextColor.GRAY),
-                    gamer -> Component.text("Wilderness", NamedTextColor.GRAY));
+                    gamer -> Translations.component("clans.territory.wilderness").color(NamedTextColor.GRAY));
             client.getGamer().getTitleQueue().add(9, titleComponent);
         }
 
-        UtilMessage.message(player, "Territory", Component.text("Wilderness", NamedTextColor.GRAY));
+        UtilMessage.message(player, "core.prefix.territory", Translations.component("clans.territory.wilderness").color(NamedTextColor.GRAY));
     }
 
     public void displayZone(Player player, Zone zone) {
@@ -88,7 +91,9 @@ public class ClansMovementListener extends ClanListener {
                 final Clan self = clanManager.getClanByPlayer(player).orElse(null);
                 final ClanRelation relation = clanManager.getRelation(self, owner);
                 if (relation == ClanRelation.ALLY_TRUST) {
-                    append = UtilMessage.deserialize(" <gray>(<yellow>Trusted</yellow>)</gray>");
+                    append = Component.text(" (", NamedTextColor.GRAY)
+                            .append(Translations.component("clans.territory.trusted").color(NamedTextColor.YELLOW))
+                            .append(Component.text(")", NamedTextColor.GRAY));
                 } else if (relation == ClanRelation.ENEMY && self != null) {
                     append = UtilMessage.deserialize(clanManager.getDominanceString(self, owner));
                 }
@@ -96,7 +101,9 @@ public class ClansMovementListener extends ClanListener {
         }
 
         if (zone.hasTag(ClanZones.FIELDS)) {
-            append = UtilMessage.deserialize("<red><bold>                    Warning! <gray> PvP Hotspot</gray></bold></red>");
+            append = Translations.component("clans.territory.pvp-hotspot",
+                    Component.text("Warning!", NamedTextColor.RED).decorate(TextDecoration.BOLD),
+                    Component.text("PvP Hotspot", NamedTextColor.GRAY).decorate(TextDecoration.BOLD));
         }
 
         final Client client = clientManager.search().online(player);
@@ -112,9 +119,10 @@ public class ClansMovementListener extends ClanListener {
         if (owner != null) {
             final Clan finalOwner = owner;
             UtilServer.runTaskAsync(clans, () ->
-                    UtilMessage.simpleMessage(player, "Territory", message, clanManager.getClanTooltip(player, finalOwner)));
+                    UtilMessage.message(player, Translations.component("core.prefix.territory"),
+                            message.hoverEvent(HoverEvent.showText(clanManager.getClanTooltip(player, finalOwner)))));
         } else {
-            UtilMessage.message(player, "Territory", message);
+            UtilMessage.message(player, "core.prefix.territory", message);
         }
     }
 
@@ -142,14 +150,14 @@ public class ClansMovementListener extends ClanListener {
         Player player = event.getPlayer();
 
         if (!clanManager.canTeleport(player)) {
-            UtilMessage.message(player, "Clans", "You cannot teleport while combat tagged.");
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.core.no-combat");
             event.setCancelled(true);
             return;
         }
 
         String worldName = event.getPlayer().getWorld().getName();
         if (!worldName.equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME) && !worldName.equalsIgnoreCase(BPvPWorld.BOSS_WORLD_NAME)) {
-            UtilMessage.message(player, "Clans", "You cannot teleport to your clan home from this world.");
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.core.invalid-world");
             event.setCancelled(true);
             return;
         }
@@ -197,7 +205,8 @@ public class ClansMovementListener extends ClanListener {
         }
 
         if (event.getDelayInSeconds() > 0) {
-            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan core in <alt>%.1f</alt> seconds, don't move!", event.getDelayInSeconds());
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.core.teleporting",
+                    Component.text(String.format("%.1f", (double) event.getDelayInSeconds()), NamedTextColor.YELLOW));
         }
     }
 
@@ -208,7 +217,7 @@ public class ClansMovementListener extends ClanListener {
         Player player = event.getPlayer();
 
         if (!clanManager.canTeleport(player)) {
-            UtilMessage.message(player, "Clans", "You cannot teleport while combat tagged.");
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.stuck.no-combat");
             event.setCancelled(true);
             return;
         }
@@ -216,15 +225,14 @@ public class ClansMovementListener extends ClanListener {
         Optional<Location> nearestWilderness = clanManager.closestWilderness(player);
 
         if (nearestWilderness.isEmpty()) {
-            UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.stuck.no-wilderness");
             return;
         }
 
         Optional<Clan> territoryOptional = clanManager.getClanByLocation(player.getLocation());
 
         if (territoryOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", Component.text("You must be in a claimed territory to use ", NamedTextColor.GRAY)
-                    .append(Component.text("/c stuck", NamedTextColor.YELLOW)));
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.stuck.not-claimed");
             event.cancel("In wilderness.");
             return;
         }
@@ -232,7 +240,8 @@ public class ClansMovementListener extends ClanListener {
         event.setDelayInSeconds(30);
 
         if (event.getDelayInSeconds() > 0) {
-            UtilMessage.simpleMessage(player, "Clans", "Teleporting to nearest wilderness in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.stuck.teleporting",
+                    Component.text(String.format("%.1f", (double) event.getDelayInSeconds()), NamedTextColor.GREEN));
         }
     }
 
@@ -246,7 +255,7 @@ public class ClansMovementListener extends ClanListener {
         }
 
         if (clanManager.getClanByLocation(event.getPlayer().getLocation()).isPresent()) {
-            UtilMessage.message(event.getPlayer(), "Spawn", "You can only teleport to spawn from the wilderness.");
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.spawn.not-wilderness");
             event.setCancelled(true);
         } else {
             event.setDelayInSeconds(30);

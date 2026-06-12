@@ -13,9 +13,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -41,14 +44,10 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Your senses are heightened, allowing you",
-                "to detect nearby enemies below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
-                "",
-                "While running towards weak enemies,",
-                "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>"
-        };
+    public Component[] getDescription(int level) {
+        Component healthPercent = Component.text(String.format("%.0f", getHealthPercent(level) * 100), NamedTextColor.GREEN);
+        Component speedRoman = Component.text(UtilFormat.getRomanNumeral(speedStrength), NamedTextColor.GREEN);
+        return Translations.componentLines("champions.skill.warlock.bloodthirst.description", healthPercent, speedRoman);
     }
 
     public double getHealthPercent(int level) {

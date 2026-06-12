@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.stats.menu;
 
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
@@ -25,16 +26,16 @@ public class LeaderboardCategoryMenu extends AbstractGui implements Windowed {
     }
 
     private void populate() {
-        final ItemView clansItem = ItemView.builder().material(Material.IRON_DOOR).displayName(Component.text("Clans", NamedTextColor.DARK_RED, TextDecoration.BOLD)).build();
+        final ItemView clansItem = ItemView.builder().material(Material.IRON_DOOR).displayName(Translations.component("core.menu.leaderboard.category.button.clans.name").color(NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD)).build();
         setItem(10, new SimpleItem(clansItem, click -> new LeaderboardListMenu(manager, LeaderboardCategory.CLANS, this).show(click.getPlayer())));
 
-        final ItemView championsItem = ItemView.builder().material(Material.GOLDEN_CHESTPLATE).flag(ItemFlag.HIDE_ATTRIBUTES).displayName(Component.text("Champions", NamedTextColor.RED, TextDecoration.BOLD)).build();
+        final ItemView championsItem = ItemView.builder().material(Material.GOLDEN_CHESTPLATE).flag(ItemFlag.HIDE_ATTRIBUTES).displayName(Translations.component("core.menu.leaderboard.category.button.champions.name").color(NamedTextColor.RED).decorate(TextDecoration.BOLD)).build();
         setItem(12, new SimpleItem(championsItem, click -> new LeaderboardListMenu(manager, LeaderboardCategory.CHAMPIONS, this).show(click.getPlayer())));
 
-        final ItemView professionItem = ItemView.builder().material(Material.COD_BUCKET).displayName(Component.text("Professions", NamedTextColor.GREEN, TextDecoration.BOLD)).build();
+        final ItemView professionItem = ItemView.builder().material(Material.COD_BUCKET).displayName(Translations.component("core.menu.leaderboard.category.button.professions.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD)).build();
         setItem(14, new SimpleItem(professionItem, click -> new LeaderboardListMenu(manager, LeaderboardCategory.PROFESSION, this).show(click.getPlayer())));
 
-        final ItemView dungeonsItem = ItemView.builder().material(Material.SPAWNER).hideAdditionalTooltip(true).displayName(Component.text("Dungeons", NamedTextColor.YELLOW, TextDecoration.BOLD)).build();
+        final ItemView dungeonsItem = ItemView.builder().material(Material.SPAWNER).hideAdditionalTooltip(true).displayName(Translations.component("core.menu.leaderboard.category.button.dungeons.name").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)).build();
         setItem(16, new SimpleItem(dungeonsItem, click -> new LeaderboardListMenu(manager, LeaderboardCategory.DUNGEONS, this).show(click.getPlayer())));
 
         setBackground(Menu.BACKGROUND_ITEM);
@@ -42,6 +43,6 @@ public class LeaderboardCategoryMenu extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Leaderboard");
+        return Translations.component("core.menu.leaderboard.category.title");
     }
 }

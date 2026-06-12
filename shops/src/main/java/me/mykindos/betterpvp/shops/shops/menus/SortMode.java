@@ -8,15 +8,17 @@ import java.util.Comparator;
 @Getter
 public enum SortMode {
 
-    ORDER("Default Order", Comparator.comparingInt(IShopItem::getOrder)),
-    PRICE_ASC("Price: Low to High", Comparator.comparingInt(IShopItem::getBuyPrice)),
-    PRICE_DESC("Price: High to Low", Comparator.comparingInt(IShopItem::getBuyPrice).reversed());
+    ORDER("Default Order", "shops.menu.shop.button.sort.order", Comparator.comparingInt(IShopItem::getOrder)),
+    PRICE_ASC("Price: Low to High", "shops.menu.shop.button.sort.price-asc", Comparator.comparingInt(IShopItem::getBuyPrice)),
+    PRICE_DESC("Price: High to Low", "shops.menu.shop.button.sort.price-desc", Comparator.comparingInt(IShopItem::getBuyPrice).reversed());
 
     private final String displayName;
+    private final String translationKey;
     private final Comparator<IShopItem> comparator;
 
-    SortMode(String displayName, Comparator<IShopItem> comparator) {
+    SortMode(String displayName, String translationKey, Comparator<IShopItem> comparator) {
         this.displayName = displayName;
+        this.translationKey = translationKey;
         this.comparator = comparator;
     }
 

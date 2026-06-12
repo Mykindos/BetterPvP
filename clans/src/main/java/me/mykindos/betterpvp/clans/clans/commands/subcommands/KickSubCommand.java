@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,7 +41,7 @@ public class KickSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Kick a member from your clan";
+        return "clans.command.kick.description";
     }
 
     @Override
@@ -50,7 +52,7 @@ public class KickSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.message(player, "Clans", "You must specify a member to kick.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.kick.no-args");
             return;
         }
 
@@ -65,12 +67,12 @@ public class KickSubCommand extends ClanSubCommand {
                 Client target = result.get();
                 ClanMember ourMember = clan.getMember(player.getUniqueId());
                 if (!ourMember.hasRank(ClanMember.MemberRank.ADMIN)) {
-                    UtilMessage.message(player, "Clans", "Only the Clan Leader and Admins can kick members.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.kick.no-rank");
                     return;
                 }
 
                 if (target.getUuid().equals(player.getUniqueId().toString())) {
-                    UtilMessage.message(player, "Clans", "You cannot kick yourself.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.kick.self");
                     return;
                 }
 
@@ -79,7 +81,7 @@ public class KickSubCommand extends ClanSubCommand {
                     ClanMember member = memberOptional.get();
 
                     if (member.getRank().getPrivilege() >= ourMember.getRank().getPrivilege()) {
-                        UtilMessage.message(player, "Clans", "You are not a high enough rank to kick this member");
+                        UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.kick.low-rank");
                         return;
                     }
 
@@ -90,7 +92,7 @@ public class KickSubCommand extends ClanSubCommand {
                         if (locationClanOptional.isPresent()) {
                             Clan locationClan = locationClanOptional.get();
                             if (clan.isEnemy(locationClan)) {
-                                UtilMessage.simpleMessage(player, "Clans", "You cannot kick <aqua>%s</aqua> while they are in enemy territory.", targetPlayer.getName());
+                                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.kick.enemy-territory", Component.text(targetPlayer.getName(), NamedTextColor.AQUA));
                                 return;
                             }
                         }
@@ -100,7 +102,7 @@ public class KickSubCommand extends ClanSubCommand {
                     UtilServer.callEvent(new ClanKickMemberEvent(player, clan, target));
 
                 } else {
-                    UtilMessage.simpleMessage(player, "Clans", "<alt2>" + target.getName() + "</alt2> is not in your clan.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.kick.not-in-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
                 }
             });
 

@@ -19,7 +19,9 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
@@ -92,18 +94,21 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "For every nearby enemy",
-                "outnumbering nearby allies",
-                "Your damage is increased by " + getValueString(this::getDamage, level),
-                "And you take " + getValueString(this::getDamageReduction, level) + " less damage",
-                "",
-                "Damage can be altered by a maximum of " + getValueString(this::getMaxEnemies, level),
-                "Non-player enemies are counted as 0.5 enemies each",
-                "",
-                "Radius: " + getValueString(this::getRadius, level),
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component reduction = getValueComponent(this::getDamageReduction, level);
+        Component maxEnemies = Component.text(
+                String.valueOf(getMaxEnemies(level)),
+                NamedTextColor.YELLOW
+        );
+        Component radius = getValueComponent(this::getRadius, level);
+        return Translations.componentLines(
+                "champions.skill.global.level-field.description",
+                damage,
+                reduction,
+                maxEnemies,
+                radius
+        );
     }
 
     public int getMaxEnemies(int level) {

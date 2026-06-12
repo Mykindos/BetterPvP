@@ -32,13 +32,13 @@ public class PingCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Show your ping";
+        return "core.command.ping.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
-            UtilMessage.simpleMessage(player, "Ping", "Your ping is %s.", this.formatPing(UtilPlayer.getPing(player)));
+            UtilMessage.message(player, COMMAND_PREFIX, "core.command.ping.self", this.formatPing(UtilPlayer.getPing(player)));
             return;
         }
 
@@ -53,7 +53,9 @@ public class PingCommand extends Command {
                     return;
                 }
 
-                UtilMessage.simpleMessage(player, "Ping", "The ping for <yellow>%s</yellow> is %s.", targetClient.getName(), this.formatPing(UtilPlayer.getPing(targetPlayer)));
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.ping.other",
+                        Component.text(targetClient.getName(), NamedTextColor.YELLOW),
+                        this.formatPing(UtilPlayer.getPing(targetPlayer)));
             });
         }
     }
@@ -67,7 +69,7 @@ public class PingCommand extends Command {
         return ArgumentType.NONE.name();
     }
 
-    private String formatPing(final int ping) {
+    private Component formatPing(final int ping) {
         NamedTextColor namedTextColor = NamedTextColor.DARK_RED;
 
         if (ping <= 0) {
@@ -86,6 +88,6 @@ public class PingCommand extends Command {
 
         TextComponent textComponent = Component.text(ping).color(namedTextColor).append(Component.text("ms").color(NamedTextColor.GRAY));
 
-        return UtilMessage.miniMessage.serialize(textComponent);
+        return textComponent;
     }
 }

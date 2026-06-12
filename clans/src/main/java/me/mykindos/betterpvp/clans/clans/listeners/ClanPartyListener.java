@@ -38,7 +38,7 @@ public class ClanPartyListener implements Listener {
         if (player == null) return;
 
         if (!zoneManager.hasTagAt(player.getLocation(), Zones.SAFE)) {
-            UtilMessage.simpleMessage(player, "You must be at shops to form a party.");
+            UtilMessage.message(player, "clans.prefix", "clans.party.shops-only");
             return;
         }
 

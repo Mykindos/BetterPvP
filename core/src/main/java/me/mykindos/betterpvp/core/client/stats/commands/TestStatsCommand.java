@@ -28,7 +28,7 @@ public class TestStatsCommand extends Command implements IStringName {
 
     @Override
     public String getDescription() {
-        return "Show stats for yourself";
+        return "core.command.test-stats.description";
     }
 
     @Override

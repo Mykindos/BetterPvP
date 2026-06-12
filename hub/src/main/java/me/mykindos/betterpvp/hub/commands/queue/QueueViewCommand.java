@@ -29,24 +29,24 @@ public class QueueViewCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View queue details for a server";
+        return "hub.command.queue-view.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.simpleMessage(player, "Queue", "<red>Usage: /queue view <server>");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.view.usage");
             return;
         }
 
         final String serverName = args[0];
         try {
             final QueueSnapshot snapshot = orchestrationGateway.getQueueSnapshot(QueueCommandSupport.buildTarget(serverName)).join();
-            UtilMessage.simpleMessage(player, "Queue", "Queue Snapshot:");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.view.snapshot-header");
             UtilMessage.message(player, QueueCommandSupport.buildQueueSnapshotMessage(snapshot));
         } catch (Exception ex) {
             QueueCommandSupport.logCommandFailure("load queue snapshot for " + serverName, ex);
-            UtilMessage.simpleMessage(player, "Queue", "<red>Failed to load queue snapshot from orchestration.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.view.failed");
         }
     }
 

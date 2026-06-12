@@ -42,7 +42,7 @@ public class ClanChatCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Toggle clan only chat";
+        return "clans.command.clan-chat.description";
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ClanChatCommand extends Command {
         final Gamer gamer = client.getGamer();
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
         if (clanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You must be in a Clan to send a Clan Message");
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan-chat.no-clan");
             return;
         }
 

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -45,7 +46,7 @@ public class ClearCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Clear your inventory";
+        return "core.command.clear.description";
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ClearCommand extends Command {
                 doClear(player, target);
             }
         } else {
-            UtilMessage.message(player, "CLear", "Usage: /clear [name], use /minecraft:clear for advanced usage");
+            UtilMessage.message(player, "core.prefix.clear", "core.command.clear.usage");
         }
     }
 
@@ -76,14 +77,17 @@ public class ClearCommand extends Command {
 
     private void doClear(Player runner, Player target) {
         Map<ItemInstance, UUID> uuidItems = getUUIDItems(target);
-        Component successFeedback = UtilMessage.deserialize("<yellow>%s</yellow> cleared <yellow>%s</yellow>'s inventory",
-                runner.getName(), target.getName());
+        Component successFeedback = Translations.component("core.command.clear.success",
+                Component.text(runner.getName()),
+                Component.text(target.getName()));
         if (uuidItems.isEmpty()) {
             target.getInventory().clear();
-            clientManager.sendMessageToRank("Clear", successFeedback, Rank.TRIAL_MOD);
+            clientManager.sendMessageToRank("core.prefix.clear", successFeedback, Rank.TRIAL_MOD);
             return;
         }
 
+        // NOTE: ConfirmationMenu currently requires a String, so we cannot pass a translatable Component here.
+        // Key present in bundles: core.command.clear.confirmation_title (intentional skip for now)
         new ConfirmationMenu("Inventory has UUIDItems, confirm clear", (success) -> {
             if (Boolean.TRUE.equals(success)) {
                 getUUIDItems(target).forEach((item, uuid) -> {
@@ -96,7 +100,7 @@ public class ClearCommand extends Command {
                             .submit();
                 });
                 target.getInventory().clear();
-                clientManager.sendMessageToRank("Clear", successFeedback, Rank.TRIAL_MOD);
+                clientManager.sendMessageToRank("core.prefix.clear", successFeedback, Rank.TRIAL_MOD);
             }
         }).show(runner);
     }

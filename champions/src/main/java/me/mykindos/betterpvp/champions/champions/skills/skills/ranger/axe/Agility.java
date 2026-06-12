@@ -23,6 +23,9 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -67,19 +70,13 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Sprint with great agility, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and ",
-                getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage while active",
-                "",
-                "Agility ends if you interact",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component speed = Translations.component("champions.skill.effect.speed",
+                Component.text(UtilFormat.getRomanNumeral(speedStrength))).color(NamedTextColor.WHITE);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component damageReduction = getValueComponent(this::getDamageReduction, level, 100, 0);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.ranger.agility.description", speed, duration, damageReduction, cooldown);
     }
 
     public double getDuration(int level) {
@@ -194,7 +191,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public void deactivate(Player player) {
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ended", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(getLevel(player)), NamedTextColor.GREEN));
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.01F);
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
         missedSwings.remove(player);

@@ -52,7 +52,7 @@ public class DeepResonator extends BaseItem implements Reloadable {
 
     @Inject
     private DeepResonator(Progression progression, GlobalBlockBreakRules globalRules) {
-        super("Deep Resonator",
+        super(translatableName("progression.item.deep-resonator.name"),
                 Item.model(Material.DIAMOND_PICKAXE, "deep_resonator"),
                 ItemGroup.TOOL,
                 ItemRarity.EPIC);

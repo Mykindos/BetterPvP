@@ -27,7 +27,7 @@ public class PageSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View results of a specific page in your session";
+        return "core.command.page.description";
     }
 
     @Override
@@ -37,14 +37,14 @@ public class PageSubCommand extends Command {
         try {
             int page = Integer.parseInt(args[0]);
             if (page > session.getPages()) {
-                UtilMessage.message(player, "World Logger", "Invalid page number.");
+                UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.page.invalid");
                 return;
             }
 
             session.setCurrentPage(page);
             worldLogHandler.displayResults(player, session, page);
         } catch (NumberFormatException ex) {
-            UtilMessage.message(player, "World Logger", "Invalid page number.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.worldlogger.page.invalid");
         }
     }
 }

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.world.WorldHandler;
 import me.mykindos.betterpvp.core.world.menu.button.FolderButton;
 import me.mykindos.betterpvp.core.world.menu.button.WorldButton;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -99,7 +100,7 @@ public class GuiWorldManager extends ViewCollectionMenu {
         setContent(items);
 
         setItem(getSize() - 1, new SimpleItem(ItemView.builder()
-                .displayName(Component.text("Create World", NamedTextColor.GREEN, TextDecoration.BOLD))
+                .displayName(Translations.component("core.menu.world.manager.button.create-world.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                 .material(Material.GREEN_CONCRETE)
                 .build(), click -> createWorld(click.getPlayer())));
     }
@@ -120,17 +121,17 @@ public class GuiWorldManager extends ViewCollectionMenu {
 
     private void createWorld(Player player) {
         player.closeInventory();
-        UtilMessage.message(player, "World", "Enter the name of the new world:");
+        UtilMessage.message(player, "core.prefix.world", "core.world.enter_name");
         this.chatCallbacks.listen(player, message -> UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
             final String worldName = (message instanceof TextComponent textComponent) ? textComponent.content() : message.toString();
             final NamespacedKey namespace = NamespacedKey.fromString(worldName.toLowerCase().replace(" ", "_"));
             if (namespace == null) {
-                UtilMessage.message(player, "World", "Invalid world name.");
+                UtilMessage.message(player, "core.prefix.world", "core.world.invalid_name");
                 return;
             }
 
             if (Bukkit.getWorld(worldName) != null || Bukkit.getWorld(Objects.requireNonNull(namespace)) != null) {
-                UtilMessage.message(player, "World", "A world with that name already exists.");
+                UtilMessage.message(player, "core.prefix.world", "core.world.already_exists");
                 return;
             }
 

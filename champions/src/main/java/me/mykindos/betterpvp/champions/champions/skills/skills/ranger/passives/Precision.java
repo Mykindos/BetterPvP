@@ -11,6 +11,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -38,11 +42,9 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Your arrows deal " + getValueString(this::getDamage, level) + " bonus damage on hit"
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        return Translations.componentLines("champions.skill.ranger.precision.description", damage);
     }
 
     public double getDamage(int level) {

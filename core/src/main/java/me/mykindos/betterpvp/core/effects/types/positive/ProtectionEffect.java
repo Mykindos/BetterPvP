@@ -24,7 +24,7 @@ public class ProtectionEffect extends EffectType {
     public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
         super.onExpire(livingEntity, effect, notify);
         if (notify) {
-            UtilMessage.message(livingEntity, "Protection", "Your protection has expired.");
+            UtilMessage.message(livingEntity, "core.prefix.protection", "core.effect.protection.expired");
         }
     }
 

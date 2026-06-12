@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.ListingCreationMenu;
@@ -26,7 +27,7 @@ public class ListingDurationButton extends ControlItem<ListingCreationMenu> {
     public ItemProvider getItemProvider(ListingCreationMenu gui) {
         return ItemView.builder().material(Material.CLOCK)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .displayName(Component.text("Listing Duration", NamedTextColor.YELLOW))
+                .displayName(Translations.component("shops.menu.listing-creation.button.duration.name").color(NamedTextColor.YELLOW))
                 .lore(Component.text(auction.getListingDuration().getDisplay(), NamedTextColor.GREEN))
                 //.lore(Component.text(""))
                 //.lore(Component.text("Left-click to cycle the duration", NamedTextColor.GRAY))

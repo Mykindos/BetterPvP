@@ -14,7 +14,10 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -68,12 +71,12 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Wind Dash");
+        return Translations.component("champions.ability.wind-dash.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Take a leap forward. The first enemy you hit, will be launched into the air.");
+        return Translations.component("champions.ability.wind-dash.description");
     }
 
     @Override
@@ -84,7 +87,7 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
         }
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, "Wind Dash", "You cannot use this ability while in liquid");
+            UtilMessage.message(player, "core.prefix.wind-dash", "champions.item.wind-dash.liquid");
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
@@ -109,7 +112,7 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
         new SoundEffect(Sound.ITEM_TRIDENT_THROW, 0.5F, 2.0F).play(player.getLocation());
 
         // VFX
-        UtilMessage.message(player, "Wind Blade", "You used <alt>" + "Wind Dash" + "</alt>.");
+        UtilMessage.message(player, "core.prefix.wind-blade", "champions.item.wind-dash.used", Translations.component("champions.item.wind-dash.name").color(NamedTextColor.GREEN));
         new BukkitRunnable() {
             int ticks = 0;
 
@@ -193,8 +196,8 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
             // SFX & VFX
             new SoundEffect(Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 2).play(target.getLocation());
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
-            UtilMessage.message(player, "Wind Blade", "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + "Wind Dash" + "</alt>.");
-            UtilMessage.message(target, "Wind Blade", "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + "Wind Dash" + "</alt>.");
+            UtilMessage.message(player, "core.prefix.wind-blade", "champions.item.wind-dash.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), Translations.component("champions.item.wind-dash.name").color(NamedTextColor.GREEN));
+            UtilMessage.message(target, "core.prefix.wind-blade", "champions.item.wind-dash.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), Translations.component("champions.item.wind-dash.name").color(NamedTextColor.GREEN));
         }
     }
 

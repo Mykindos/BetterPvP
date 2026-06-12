@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -32,7 +33,7 @@ public class SetProtectionCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Set a players PvP protection in minutes";
+        return "core.command.set-protection.description";
     }
 
     public String getUsage() {
@@ -42,13 +43,15 @@ public class SetProtectionCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "Protection", "Usage: %s", getUsage());
+            UtilMessage.message(player, "core.prefix.protection", "core.command.setprotection.usage",
+                    net.kyori.adventure.text.Component.text(getUsage()));
             return;
         }
 
         clientManager.search().offline(args[0]).thenAccept(clientOptional -> {
             if (clientOptional.isEmpty()) {
-                UtilMessage.message(player, "Protection", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
+                UtilMessage.message(player, "core.prefix.protection", "core.command.protection.invalid_player",
+                        net.kyori.adventure.text.Component.text(args[0], net.kyori.adventure.text.format.NamedTextColor.YELLOW));
                 return;
             }
 
@@ -59,7 +62,8 @@ public class SetProtectionCommand extends Command {
                     throw new NumberFormatException();
                 }
             } catch (NumberFormatException ignored) {
-                UtilMessage.message(player, "Protection", UtilMessage.deserialize("<green>%s</green> is not a valid duration.", args[1]));
+                UtilMessage.message(player, "core.prefix.protection", "core.command.setprotection.invalid_duration",
+                        net.kyori.adventure.text.Component.text(args[1], net.kyori.adventure.text.format.NamedTextColor.GREEN));
                 return;
             }
 
@@ -72,12 +76,16 @@ public class SetProtectionCommand extends Command {
             if (targetPlayer != null) {
                 effectManager.removeEffect(targetPlayer, EffectTypes.PROTECTION);
                 effectManager.addEffect(targetPlayer, EffectTypes.PROTECTION, newDuration);
-                UtilMessage.message(targetPlayer, "Protection", "Your protection timer was set for <green>%s</green>", timeString);
+                UtilMessage.message(targetPlayer, "core.prefix.protection", "core.command.setprotection.target_set",
+                        net.kyori.adventure.text.Component.text(timeString, net.kyori.adventure.text.format.NamedTextColor.GREEN));
             }
 
-            clientManager.sendMessageToRank("Protection",
-                    UtilMessage.deserialize("<yellow>%s</yellow> set <yellow>%s</yellow>'s protection timer for <green>%s</green>",
-                            player.getName(), target.getName(), timeString),
+            clientManager.sendMessageToRank("core.prefix.protection",
+                    Translations.component("core.command.setprotection.broadcast",
+                            net.kyori.adventure.text.Component.text(player.getName(), net.kyori.adventure.text.format.NamedTextColor.YELLOW),
+                            net.kyori.adventure.text.Component.text(target.getName(), net.kyori.adventure.text.format.NamedTextColor.YELLOW),
+                            net.kyori.adventure.text.Component.text(timeString, net.kyori.adventure.text.format.NamedTextColor.GREEN)
+                    ),
                     Rank.TRIAL_MOD);
         });
 

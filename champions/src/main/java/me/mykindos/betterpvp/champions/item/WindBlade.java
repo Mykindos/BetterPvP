@@ -47,7 +47,7 @@ public class WindBlade extends WeaponItem implements Listener, Reloadable {
     @Inject
     private WindBlade(Champions champions, ChampionsManager championsManager, ItemFactory itemFactory,
                      CooldownManager cooldownManager, EnergyService energyService) {
-        super(champions, "Wind Blade", Item.model("windblade"), ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
+        super(champions, translatableName("champions.item.wind-blade.name"), Item.model("windblade"), ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
         this.featherFeetAbility = new FeatherFeetAbility(itemFactory);
 
         // Create abilities

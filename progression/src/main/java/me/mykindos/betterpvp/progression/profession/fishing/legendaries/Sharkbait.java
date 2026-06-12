@@ -37,7 +37,7 @@ public class Sharkbait extends BaseItem implements Reloadable {
     public Sharkbait(Progression progression, 
                      ItemFactory itemFactory,
                      SharkbaitAuraAbility auraAbility) {
-        super("Sharkbait", Item.model(Material.FISHING_ROD, "sharkbait", 1), ItemGroup.TOOL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.sharkbait.name"), Item.model(Material.FISHING_ROD, "sharkbait", 1), ItemGroup.TOOL, ItemRarity.LEGENDARY);
         this.progression = progression;
         this.auraAbility = auraAbility;
         

@@ -14,8 +14,10 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.WorldHandler;
 import me.mykindos.betterpvp.core.world.menu.GuiWorldManager;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -44,12 +46,14 @@ public class WorldButton extends DescriptionButton {
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder builder = ItemView.of(super.getItemProvider().get()).toBuilder();
         if (world.isLoaded()) {
-            builder.action(ClickActions.LEFT, Component.text("Teleport"));
+            builder.action(ClickActions.LEFT, Translations.component("core.menu.world.button.teleport.action"));
         }
 
-        return builder.action(ClickActions.RIGHT, Component.text(world.isLoaded() ? "Unload" : "Load"))
-                .action(ClickActions.RIGHT_SHIFT, Component.text("Delete"))
-                .action(ClickActions.LEFT_SHIFT, Component.text("Duplicate"))
+        return builder.action(ClickActions.RIGHT, world.isLoaded()
+                        ? Translations.component("core.menu.world.button.unload.action")
+                        : Translations.component("core.menu.world.button.load.action"))
+                .action(ClickActions.RIGHT_SHIFT, Translations.component("core.menu.world.button.delete.action"))
+                .action(ClickActions.LEFT_SHIFT, Translations.component("core.menu.world.button.duplicate.action"))
                 .build();
     }
 
@@ -80,7 +84,7 @@ public class WorldButton extends DescriptionButton {
 
     private void duplicateWorld(Player player) {
         player.closeInventory();
-        UtilMessage.message(player, "World", "Enter the name of the new world:");
+        UtilMessage.message(player, "core.prefix.world", "core.world.enter_name");
         this.chatCallbacks.listen(player, message -> UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
             final String worldName = (message instanceof TextComponent textComponent) ? textComponent.content() : message.toString();
             if (isWorldNameValid(worldName, player)) {
@@ -92,12 +96,12 @@ public class WorldButton extends DescriptionButton {
     private boolean isWorldNameValid(String worldName, Player player) {
         final NamespacedKey namespace = NamespacedKey.fromString(worldName.toLowerCase().replace(" ", "_"));
         if (namespace == null) {
-            UtilMessage.message(player, "World", "Invalid world name.");
+            UtilMessage.message(player, "core.prefix.world", "core.world.invalid_name");
             return false;
         }
 
         if (Bukkit.getWorld(worldName) != null || Bukkit.getWorld(Objects.requireNonNull(namespace)) != null) {
-            UtilMessage.message(player, "World", "A world with that name already exists.");
+            UtilMessage.message(player, "core.prefix.world", "core.world.already_exists");
             return false;
         }
 
@@ -105,10 +109,10 @@ public class WorldButton extends DescriptionButton {
     }
 
     private void createDuplicateWorld(String worldName, Player player) {
-        UtilMessage.message(player, "World", "Duplicating world...");
+        UtilMessage.message(player, "core.prefix.world", "core.world.duplicating");
         final BPvPWorld newWorld = world.duplicate(worldName);
         newWorld.createWorld();
-        UtilMessage.message(player, "World", "World duplicated!");
+        UtilMessage.message(player, "core.prefix.world", "core.world.duplicated");
         SoundEffect.HIGH_PITCH_PLING.play(player);
         new GuiWorldManager(worldHandler, chatCallbacks, null).show(player);
     }
@@ -133,19 +137,22 @@ public class WorldButton extends DescriptionButton {
     private void deleteWorld(Player player) {
         worldHandler.deleteWorld(world);
         SoundEffect.HIGH_PITCH_PLING.play(player);
-        UtilMessage.message(player, "World", "Deleted <alt2>" + world.getName() + "</alt2>.");
+        UtilMessage.message(player, "core.prefix.world", "core.world.deleted",
+                Component.text(world.getName(), NamedTextColor.YELLOW));
     }
 
     private void toggleWorldLoad(Player player) {
         if (world.isLoaded()) {
             world.unloadWorld();
             SoundEffect.HIGH_PITCH_PLING.play(player);
-            UtilMessage.message(player, "World", "Unloaded <alt2>" + world.getName() + "</alt2>.");
+            UtilMessage.message(player, "core.prefix.world", "core.world.unloaded",
+                    Component.text(world.getName(), NamedTextColor.YELLOW));
             notifyWindows();
         } else {
             world.createWorld();
             SoundEffect.HIGH_PITCH_PLING.play(player);
-            UtilMessage.message(player, "World", "Loaded <alt2>" + world.getName() + "</alt2>.");
+            UtilMessage.message(player, "core.prefix.world", "core.world.loaded",
+                    Component.text(world.getName(), NamedTextColor.YELLOW));
             notifyWindows();
         }
     }

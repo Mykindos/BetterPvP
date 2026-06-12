@@ -44,6 +44,9 @@ import org.bukkit.event.block.Action;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import me.mykindos.betterpvp.core.locale.Translations;
 
 
 @Singleton
@@ -75,21 +78,13 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Fissure the earth in front of you,",
-                "creating an impassable wall",
-                "",
-                "Players struck by the wall will receive",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds and take",
-                getValueString(this::getDamage, level) + " damage for every block fissure",
-                "has travelled",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component slowness = Translations.component("champions.skill.effect.slowness",
+                Component.text("II")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.fissure.description", slowDuration, damage, cooldown, slowness);
     }
 
     public double getDamage(int blocksTraveled, int level) {
@@ -121,7 +116,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public boolean canUse(Player player) {
         if (!UtilBlock.isGrounded(player)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You can only use <alt>" + getName() + "</alt> while grounded.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.fissure.grounded", getDisplayName().color(NamedTextColor.GREEN));
             return false;
         }
 
@@ -195,8 +190,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doDamage(new DamageEvent(livingEntity, fissureCast.getPlayer(), null, new SkillDamageCause(this), damage, "Fissure"));
 
-            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit <alt2>" + livingEntity.getName() + "</alt2> with <alt>" + getName());
-            UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "<alt2>" + fissureCast.getPlayer().getName() + "</alt2> hit you with <alt>" + getName());
+            UtilMessage.message(fissureCast.getPlayer(), getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(livingEntity.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(livingEntity, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(fissureCast.getPlayer().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
 
             fissureCast.getEntitiesHit().add(livingEntity.getUniqueId());
         }

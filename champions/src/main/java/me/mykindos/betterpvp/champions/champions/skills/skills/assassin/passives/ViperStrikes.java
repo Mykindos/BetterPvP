@@ -14,7 +14,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,13 +44,28 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener, Debuf
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Your attacks give enemies",
-                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                EffectTypes.POISON.getDescription(poisonStrength)
-        };
+    public Component[] getDescription(int level) {
+        Component poison = Translations.component("champions.skill.effect.poison",
+                Component.text(UtilFormat.getRomanNumeral(poisonStrength))).color(NamedTextColor.WHITE);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component[] components = Translations.componentLines(
+                "champions.skill.assassin.viper-strikes.description",
+                poison,
+                duration
+        );
+        Component poisonDetail = Translations.component("champions.skill.effect.poison",
+                Component.text(UtilFormat.getRomanNumeral(poisonStrength))).color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.effect.poison.detail",
+                poisonDetail,
+                Component.text(String.valueOf(poisonStrength * 3), NamedTextColor.GREEN),
+                Component.text("1.25", NamedTextColor.YELLOW)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     private double getDuration(int level) {

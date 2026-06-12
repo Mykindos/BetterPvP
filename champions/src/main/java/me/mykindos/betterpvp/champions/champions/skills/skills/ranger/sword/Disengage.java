@@ -19,7 +19,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -61,17 +64,13 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "",
-                "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
-                "you successfully disengage, leaping backwards",
-                "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for",
-                getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component channelDuration = getValueComponent(this::getChannelDuration, level);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component slownessIV = Translations.component("champions.skill.effect.slowness",
+                Component.text("IV")).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.ranger.disengage.description", channelDuration, slowDuration, cooldown, slownessIV);
     }
 
     public double getSlowDuration(int level) {
@@ -115,7 +114,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
             championsManager.getEffects().addEffect(damagee, EffectTypes.NO_FALL, 3000);
             championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
-            UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged.");
+            UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.ranger.disengage.success");
 
             active.remove(damagee.getUniqueId());
             handRaisedTime.remove(damagee.getUniqueId());
@@ -154,7 +153,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         iterator.remove();
         handRaisedTime.remove(playerId);
         if (player != null) {
-            UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(getLevel(player)), NamedTextColor.GREEN));
         }
     }
 

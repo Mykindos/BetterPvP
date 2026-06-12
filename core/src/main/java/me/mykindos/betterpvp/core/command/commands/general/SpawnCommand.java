@@ -27,7 +27,7 @@ public class SpawnCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Teleport to spawn";
+        return "core.command.spawn.description";
     }
 
     @Override

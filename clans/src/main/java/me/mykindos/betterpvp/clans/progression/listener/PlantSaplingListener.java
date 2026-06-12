@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.forestflourisher.ForestFlourisher;
+import net.kyori.adventure.text.Component;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -56,7 +57,7 @@ public class PlantSaplingListener implements Listener, ConfigAccessor {
                 Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
                 if (targetBlockLocationClanOptional.isPresent()) {
                     if (playerClan == null || !playerClan.equals(targetBlockLocationClanOptional.get())) {
-                        UtilMessage.message(player, "Clans", "Saplings must be placed a minimum of "  + saplingPlantDistance + " blocks away from foreign claims.");
+                        UtilMessage.message(player, "core.prefix.clans", "clans.world.sapling-distance-denied", Component.text(saplingPlantDistance));
                         event.setCancelled(true);
                         return;
                     }

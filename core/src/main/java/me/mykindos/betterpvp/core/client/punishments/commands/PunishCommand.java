@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -35,24 +36,25 @@ public class PunishCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Base command for punishing system";
+        return "core.command.punish.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.message(player, "Punish", "Usage: /punish <player> <reason...>");
+            UtilMessage.message(player, "core.prefix.command", "core.command.punish.usage");
             return;
         }
 
         clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isEmpty()) {
-                UtilMessage.message(player, "Punish", "Could not find a client with the name <yellow>%s</yellow>", args[0]);
+                UtilMessage.message(player, "core.prefix.command", "core.command.punish.client.not_found",
+                        net.kyori.adventure.text.Component.text(args[0], NamedTextColor.YELLOW));
                 return;
             }
             Client target = clientOptional.get();
             if (target.getRank().getId() >= client.getRank().getId()) {
-                UtilMessage.message(player, "Punish", "You cannot punish a client with the same or higher rank.");
+                UtilMessage.message(player, "core.prefix.command", "core.command.punish.rank.too_high");
                 return;
             }
 

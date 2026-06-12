@@ -30,8 +30,11 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -99,24 +102,19 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Summon a clone that lasts for " + getValueString(this::getDuration, level) + " seconds which has " + getValueString(this::getBaseHealth, level) + " health",
-                "",
-                "Every hit your clone gets on an enemy player, ",
-                "restore " + getValueString(this::getHealthRegen, level) + " health, whilst inflicting the following effects:",
-                "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>, and <effect>Knockback</effect>",
-                "",
-                "These effects last for " + getValueString(this::getBaseEffectDuration, level) + " seconds",
-                "",
-                "<green>Hint:</green>",
-                "This clone switches target to the player you are attacking",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds",
-
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component baseHealth = getValueComponent(this::getBaseHealth, level);
+        Component healthRegen = getValueComponent(this::getHealthRegen, level);
+        Component effectDuration = getValueComponent(this::getBaseEffectDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component blindnessII = Translations.component("champions.skill.effect.blindness",
+                Component.text("II")).color(NamedTextColor.WHITE);
+        Component slownessI = Translations.component("champions.skill.effect.slowness",
+                Component.text("I")).color(NamedTextColor.WHITE);
+        Component knockback = Translations.component("champions.skill.effect.knockback.name").color(NamedTextColor.WHITE);
+        Component hint = Translations.component("champions.skill.label.hint").color(NamedTextColor.GREEN);
+        return Translations.componentLines("champions.skill.warlock.clone.description", duration, baseHealth, healthRegen, effectDuration, cooldown, blindnessII, slownessI, knockback, hint);
     }
 
     private double getBaseHealth(int level) {
@@ -143,7 +141,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     public boolean activate(Player player, int level) {
 
         if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
-            UtilMessage.message(player, "Clone", "You cannot use this skill with protection");
+            UtilMessage.message(player, "core.prefix.clone", "champions.skill.protection");
             return false;
         }
         //Check if player already has a clone - mainly to prevent op'd players from spamming clones
@@ -378,7 +376,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         double proposedHealth = player.getHealth() - getHealthReduction(level);
 
         if (proposedHealth <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.not-enough-health", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             return false;
         }
 

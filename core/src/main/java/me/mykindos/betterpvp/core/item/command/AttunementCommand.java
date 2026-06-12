@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.attunement.GuiAttunement;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -46,7 +47,7 @@ public class AttunementCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Admin command to attune/unattune items";
+        return "core.command.attunement.description";
     }
 
     @Override
@@ -64,7 +65,7 @@ public class AttunementCommand extends Command {
 
         // Validate we have a subcommand after removing --all
         if (commandArgs.length == 0) {
-            UtilMessage.message(player, "Attunement", "<yellow>Usage: /attune <set|toggle> [true|false] [--all]");
+            UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.usage");
             return;
         }
 
@@ -75,7 +76,7 @@ public class AttunementCommand extends Command {
             // Process held item only
             ItemStack heldItem = player.getInventory().getItemInMainHand();
             if (heldItem.getType().isAir()) {
-                UtilMessage.message(player, "Attunement", "<red>You must be holding an item!");
+                UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.holding_item");
                 return;
             }
             processItem(player, heldItem, commandArgs, -1);
@@ -99,9 +100,9 @@ public class AttunementCommand extends Command {
         }
 
         if (processedCount == 0) {
-            UtilMessage.message(player, "Attunement", "<red>No items with purity found in inventory!");
+            UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.no_purity_found");
         } else {
-            UtilMessage.message(player, "Attunement", "<green>Processed <yellow>%d<green> items!", processedCount);
+            UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.processed", processedCount);
         }
     }
 
@@ -119,7 +120,7 @@ public class AttunementCommand extends Command {
         Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(item);
         if (instanceOpt.isEmpty()) {
             if (slot == -1) {
-                UtilMessage.message(player, "Attunement", "<red>Could not read item!");
+                UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.read_error");
             }
             return false;
         }
@@ -130,7 +131,7 @@ public class AttunementCommand extends Command {
         Optional<PurityComponent> purityOpt = instance.getComponent(PurityComponent.class);
         if (purityOpt.isEmpty()) {
             if (slot == -1) {
-                UtilMessage.message(player, "Attunement", "<red>This item does not have purity!");
+                UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.no_purity");
             }
             return false;
         }
@@ -146,13 +147,13 @@ public class AttunementCommand extends Command {
             }
             case "set" -> {
                 if (args.length < 2) {
-                    UtilMessage.message(player, "Attunement", "<yellow>Usage: /attune set <true|false> [--all]");
+                    UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.set.usage");
                     return false;
                 }
                 newAttunedState = Boolean.parseBoolean(args[1]);
             }
             default -> {
-                UtilMessage.message(player, "Attunement", "<red>Unknown subcommand. Use 'set' or 'toggle'");
+                UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.unknown_subcommand");
                 return false;
             }
         }
@@ -165,7 +166,8 @@ public class AttunementCommand extends Command {
         if (slot == -1) {
             player.getInventory().setItemInMainHand(newInstance.createItemStack());
             String state = newAttunedState ? "attuned" : "unattuned";
-            UtilMessage.message(player, "Attunement", "<green>Item is now <yellow>%s<green>!", state);
+            UtilMessage.message(player, "core.prefix.attunement", "core.command.attune.success",
+                    Translations.component("core.command.attune.state." + state).color(net.kyori.adventure.text.format.NamedTextColor.YELLOW));
         } else {
             player.getInventory().setItem(slot, newInstance.createItemStack());
         }

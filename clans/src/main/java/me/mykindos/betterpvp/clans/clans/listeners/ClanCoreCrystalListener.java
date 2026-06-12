@@ -21,6 +21,9 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -97,7 +100,10 @@ public class ClanCoreCrystalListener extends ClanListener implements Listener {
             final SoundEffect sound = new SoundEffect(Sound.ENTITY_WITHER_DEATH, 2f, 0.8f);
             final List<String> clanNames = new ArrayList<>();
             for (final Pillage pillage : this.clanManager.getPillageHandler().getPillagesOn(clan)) {
-                pillage.getPillager().messageClan("<red>" + clan.getName() + "</red>'s core has been destroyed. <green><b>Full block access enabled.", null, true);
+                pillage.getPillager().messageClan("clans.core.destroyed-enemy", new Object[]{
+                        Component.text(clan.getName(), NamedTextColor.RED),
+                        Component.text("Full block access enabled.", NamedTextColor.GREEN).decorate(TextDecoration.BOLD)
+                }, null, true);
                 clanNames.add(pillage.getPillager().getName());
                 for (final Player player : pillage.getPillager().getMembersAsPlayers()) {
                     sound.play(player);
@@ -105,7 +111,10 @@ public class ClanCoreCrystalListener extends ClanListener implements Listener {
             }
 
             final String names = String.join(", ", clanNames);
-            clan.messageClan("<red>Your core has been destroyed. <green><b>Full block access enabled for " + names + ".", null, true);
+            clan.messageClan("clans.core.destroyed-own", new Object[]{
+                    Component.text("Your core has been destroyed.", NamedTextColor.RED),
+                    Component.text("Full block access enabled for " + names + ".", NamedTextColor.GREEN).decorate(TextDecoration.BOLD)
+            }, null, true);
             for (final Player player : clan.getMembersAsPlayers()) {
                 sound.play(player);
             }
@@ -149,7 +158,7 @@ public class ClanCoreCrystalListener extends ClanListener implements Listener {
         final Long clanId = Objects.requireNonNull(pdc.get(ClansNamespacedKeys.CLAN, PersistentDataType.LONG));
         final Clan clan = this.clanManager.getClanById(clanId).orElseThrow();
         if (this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null) != clan) {
-            UtilMessage.message(event.getPlayer(), "Clans", "You cannot use this clan core.");
+            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.world.core-use-denied");
             return;
         }
 

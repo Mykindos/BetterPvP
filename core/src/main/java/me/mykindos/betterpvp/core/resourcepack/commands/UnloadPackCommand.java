@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePack;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -31,13 +32,13 @@ public class UnloadPackCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Unload a resource pack by name";
+        return "core.command.unload-pack.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 2) {
-            UtilMessage.simpleMessage(player, "Usage: /unloadpack <player> <pack>");
+            UtilMessage.message(player, Translations.component("core.command.unloadpack.usage"));
             return;
         }
 
@@ -46,7 +47,7 @@ public class UnloadPackCommand extends Command {
 
         ResourcePack pack = resourcePackHandler.getResourcePack(args[1]).join();
         if (pack == null) {
-            UtilMessage.simpleMessage(player, "Resource pack not found");
+            UtilMessage.message(player, Translations.component("core.command.resourcepack.not_found"));
             return;
         }
 

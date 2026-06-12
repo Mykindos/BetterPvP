@@ -87,11 +87,6 @@ public class InteractionContainerComponent implements ItemComponent, LoreCompone
             InteractionChainNode root = displayedRoots.get(i);
             AbilityDisplay display = root.getDisplayInfo();
 
-            // Apply fallback style (white) to description - custom colors override
-            Component descriptionWithFallback = display.description()
-                    .applyFallbackStyle(Style.style(NamedTextColor.WHITE));
-            List<Component> components = ComponentWrapper.wrapLine(descriptionWithFallback, 30, true);
-
             // Apply fallback style (yellow) to name - custom colors override
             Component nameWithFallback = display.name()
                     .applyFallbackStyle(Style.style(NamedTextColor.YELLOW));
@@ -100,7 +95,16 @@ public class InteractionContainerComponent implements ItemComponent, LoreCompone
                     .appendSpace()
                     .append(root.getTriggerInput().getDisplayName().applyFallbackStyle(
                             Style.style(NamedTextColor.YELLOW, TextDecoration.BOLD)));
-            components.addFirst(title);
+
+            List<Component> components = new ArrayList<>();
+            components.add(title);
+
+            // Apply fallback style (white) to description - custom colors override. The description may be a
+            // translatable component, so it is flagged for wrapping and actually wrapped at the packet/render
+            // boundary once resolved into the viewer's locale (see ComponentWrapper.markForWrap).
+            Component descriptionWithFallback = display.description()
+                    .applyFallbackStyle(Style.style(NamedTextColor.WHITE));
+            components.add(ComponentWrapper.markForWrap(descriptionWithFallback, 30));
 
             if (i < displayedRoots.size() - 1) {
                 components.add(Component.empty());

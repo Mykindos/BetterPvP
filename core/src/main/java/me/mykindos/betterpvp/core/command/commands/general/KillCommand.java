@@ -10,11 +10,14 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Singleton
 public class KillCommand extends Command {
+
     private final EffectManager effectManager;
 
     @Inject
@@ -29,7 +32,7 @@ public class KillCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Kill a player";
+        return "core.command.kill.description";
     }
 
     @Override
@@ -37,19 +40,19 @@ public class KillCommand extends Command {
         if (args.length == 0) {
             if (effectManager.hasEffect(player, EffectTypes.FROZEN))
             {
-                UtilMessage.message(player, "Command", "You are unable to die");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.kill.self.blocked");
                 return;
             }
             UtilServer.callEvent(new PlayerSuicideEvent(player, () -> {
                 player.setHealth(0);
-                UtilMessage.message(player, "Command", "You killed yourself");
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.kill.self.success");
             }));
 
         } else {
 
             if (client.hasRank(Rank.ADMIN)) {
                 if (args.length != 1) {
-                    UtilMessage.message(player, "Command", "You must specify a player to kill");
+                    UtilMessage.message(player, COMMAND_PREFIX, "core.command.kill.other.usage");
                     return;
                 }
 
@@ -57,7 +60,8 @@ public class KillCommand extends Command {
                 if (target != null) {
 
                     target.setHealth(0);
-                    UtilMessage.message(player, "Command", "You killed " + target.getName());
+                    UtilMessage.message(player, COMMAND_PREFIX, "core.command.kill.other.success",
+                            Component.text(target.getName(), NamedTextColor.YELLOW));
                 }
             }
         }

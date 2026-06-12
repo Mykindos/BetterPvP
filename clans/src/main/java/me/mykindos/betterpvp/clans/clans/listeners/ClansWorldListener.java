@@ -394,19 +394,23 @@ public class ClansWorldListener extends ClanListener {
         final String blockName = UtilFormat.cleanString(block.getType().name());
         if (!locationClan.equals(clan)) {
             final ClanRelation relation = this.clanManager.getRelation(clan, locationClan);
-            final String owner = relation.getPrimaryMiniColor() + "Clan " + locationClan.getName();
+            final Component owner = Component.text("Clan " + locationClan.getName(), relation.getPrimary());
             switch (event.getInteraction()) {
-                case BREAK -> UtilMessage.simpleMessage(player, "Clans", "You cannot break <green>%s <gray>in %s<gray>.", blockName, owner);
-                case PLACE -> UtilMessage.simpleMessage(player, "Clans", "You cannot place <green>%s <gray>in %s<gray>.", blockName, owner);
-                case INTERACT -> UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.", blockName, owner);
+                case BREAK -> UtilMessage.message(player, "clans.prefix", "clans.world.break.denied",
+                        Component.text(blockName, NamedTextColor.GREEN), owner);
+                case PLACE -> UtilMessage.message(player, "clans.prefix", "clans.world.place.denied",
+                        Component.text(blockName, NamedTextColor.GREEN), owner);
+                case INTERACT -> UtilMessage.message(player, "clans.prefix", "clans.world.use.denied",
+                        Component.text(blockName, NamedTextColor.GREEN), owner);
                 default -> {
                 }
             }
         } else {
             switch (event.getInteraction()) {
-                case BREAK -> UtilMessage.message(player, "Clans", "Clan Recruits cannot break blocks.");
-                case PLACE -> UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot place blocks.");
-                case INTERACT -> UtilMessage.simpleMessage(player, "Clans", "Clan Recruits cannot access <green>%s<gray>.", blockName);
+                case BREAK -> UtilMessage.message(player, "clans.prefix", "clans.world.recruit-break-denied");
+                case PLACE -> UtilMessage.message(player, "clans.prefix", "clans.world.recruit-place-denied");
+                case INTERACT -> UtilMessage.message(player, "clans.prefix", "clans.world.recruit-access-denied",
+                        Component.text(blockName, NamedTextColor.GREEN));
                 default -> {
                 }
             }
@@ -428,7 +432,7 @@ public class ClansWorldListener extends ClanListener {
         event.setUseInteractedBlock(Event.Result.DENY);
         final Clan clan = clanOpt.get();
         if (clan.getMemberByUUID(event.getPlayer().getUniqueId()).isEmpty()) {
-            UtilMessage.message(event.getPlayer(), "Clans", "You cannot use this clan core.");
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.world.core-use-denied");
             return;
         }
 
@@ -456,7 +460,7 @@ public class ClansWorldListener extends ClanListener {
             }
 
             event.setCancelled(true);
-            UtilMessage.simpleMessage(event.getPlayer(), "Restriction", "You cannot place pistons in the wilderness");
+            UtilMessage.message(event.getPlayer(), "core.prefix.restriction", "clans.world.piston-wilderness-denied");
         }
     }
 
@@ -620,7 +624,7 @@ public class ClansWorldListener extends ClanListener {
 
         if (locationClanOptional.isEmpty() || playerClanOptional.isEmpty() || !locationClanOptional.equals(playerClanOptional)) {
             if (event.getBlock().getLocation().getY() > 32) {
-                UtilMessage.message(event.getPlayer(), "Clans", "You can only place water in your own territory.");
+                UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.world.water-own-territory-only");
                 event.setCancelled(true);
                 return;
             }
@@ -644,12 +648,12 @@ public class ClansWorldListener extends ClanListener {
             final Player player = event.getPlayer();
             event.setCancelled(true);
             if (this.zoneManager.hasTagAt(event.getBlock().getLocation(), Zones.NO_BUILD)) {
-                UtilMessage.simpleMessage(player, "Server", "You cannot break <yellow>Obsidian<gray>.");
+                UtilMessage.message(player, "core.prefix.server", "clans.world.obsidian-break-denied");
                 return;
             }
 
             event.getBlock().setType(Material.AIR);
-            UtilMessage.simpleMessage(player, "Server", "You cannot break <yellow>Obsidian<gray>.");
+            UtilMessage.message(player, "core.prefix.server", "clans.world.obsidian-break-denied");
         }
     }
 
@@ -921,7 +925,7 @@ public class ClansWorldListener extends ClanListener {
 
         event.setUseItemInHand(Event.Result.DENY);
         event.getPlayer().getInventory().remove(Material.WATER_BUCKET);
-        UtilMessage.message(event.getPlayer(), "Clans", "Your <yellow>Bucket</yellow> broke!");
+        UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.world.bucket-broke-styled", Component.text("Bucket", NamedTextColor.YELLOW));
     }
 
     @EventHandler
@@ -1007,7 +1011,7 @@ public class ClansWorldListener extends ClanListener {
                     Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
                     if (targetBlockLocationClanOptional.isPresent()) {
                         if (playerClan == null || !playerClan.equals(targetBlockLocationClanOptional.get())) {
-                            UtilMessage.message(player, "Clans", "You cannot place this block on the edge of a claim.");
+                            UtilMessage.message(player, "core.prefix.clans", "clans.world.place-edge-of-claim-denied");
                             event.setCancelled(true);
                             return;
                         }
@@ -1179,7 +1183,7 @@ public class ClansWorldListener extends ClanListener {
 
         ClanRelation relation = clanManager.getRelation(playerLocationClan, playerClanOptional.orElse(null));
         if (relation != ClanRelation.SELF && relation != ClanRelation.ALLY) {
-            playerMountEvent.cancel("You cannot mount while in another clans territory");
+            playerMountEvent.cancel("clans.world.mount-territory-denied");
         }
     }
 

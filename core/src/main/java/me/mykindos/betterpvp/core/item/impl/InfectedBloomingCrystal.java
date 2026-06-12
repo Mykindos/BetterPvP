@@ -14,7 +14,7 @@ public class InfectedBloomingCrystal extends BaseItem {
 
     @Inject
     private InfectedBloomingCrystal() {
-        super("Infected Blooming Crystal", Item.model("infected_blooming_crystal", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
+        super(translatableName("core.item.infected-blooming-crystal.name"), Item.model("infected_blooming_crystal", 64), ItemGroup.MATERIAL, ItemRarity.RARE);
     }
 
 }

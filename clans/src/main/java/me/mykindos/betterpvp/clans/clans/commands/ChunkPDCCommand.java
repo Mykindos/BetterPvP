@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -32,7 +34,7 @@ public class ChunkPDCCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Assigns PDC to all clan chunks";
+        return "clans.command.chunk-p-d-c.description";
     }
 
     @Override
@@ -49,6 +51,6 @@ public class ChunkPDCCommand extends Command {
             });
         });
 
-        UtilMessage.simpleMessage(player, "Command", "Loaded PDC data for <yellow>%d</yellow> chunks", count.get());
+        UtilMessage.message(player, "clans.prefix", "clans.command.chunk-pdc.success", Component.text(count.get(), NamedTextColor.YELLOW));
     }
 }

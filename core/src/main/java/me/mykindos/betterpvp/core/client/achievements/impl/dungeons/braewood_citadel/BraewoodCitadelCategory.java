@@ -5,8 +5,9 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.types.DungeonsCategory;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
 @Singleton
@@ -24,7 +25,7 @@ public class BraewoodCitadelCategory extends AchievementCategory {
     public ItemView getItemView() {
         return ItemView.builder()
                 .material(Material.CHISELED_STONE_BRICKS)
-                .displayName(UtilMessage.deserialize("<white>Defeat Braewood Citadel"))
+                .displayName(Translations.component("core.achievement.category.braewood-citadel.name").color(NamedTextColor.WHITE))
                 .build();
     }
 }

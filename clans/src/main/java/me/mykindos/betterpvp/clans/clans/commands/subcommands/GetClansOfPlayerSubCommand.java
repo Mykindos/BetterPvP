@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,7 +35,7 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Get clans associated with a player";
+        return "clans.command.get-clans-of-player.description";
     }
 
     @Override
@@ -45,13 +47,13 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
     public void execute(Player player, Client client, String... args) {
 
         if (args.length < 1) {
-            UtilMessage.message(player, "Clan", getUsage());
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.player-clans.usage", Component.text(getUsage()));
             return;
         }
 
         clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isEmpty()) {
-                UtilMessage.message(player, "Clan", "<green>%s</green> is not a valid player", args[0]);
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.player-clans.not-found", Component.text(args[0], NamedTextColor.GREEN));
                 return;
             }
             Client targetClient = clientOptional.get();

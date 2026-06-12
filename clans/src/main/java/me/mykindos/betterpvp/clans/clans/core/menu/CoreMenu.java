@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -43,37 +44,37 @@ public class CoreMenu extends AbstractGui implements Windowed {
         final TextColor highlight2 = TextColor.color(115, 140, 255);
         final ItemView.ItemViewBuilder vaultItem = ItemView.builder()
                 .material(Material.ENDER_CHEST)
-                .displayName(Component.text("Clan Vault", TextColor.color(84, 115, 255), TextDecoration.BOLD))
+                .displayName(Translations.component("clans.menu.core.button.vault.name").color(TextColor.color(84, 115, 255)).decorate(TextDecoration.BOLD))
                 .frameLore(true)
-                .lore(Component.text("The clan vault is a shared storage", NamedTextColor.GRAY))
-                .lore(Component.text("for your clan members. It is a safe", NamedTextColor.GRAY))
-                .lore(Component.text("place to store your items.", NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.vault.lore.description.1").color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.vault.lore.description.2").color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.vault.lore.description.3").color(NamedTextColor.GRAY))
                 .lore(Component.empty())
-                .lore(Component.text("Only clan members ranked Admin and", NamedTextColor.GRAY))
-                .lore(Component.text("above can access the vault.", NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.vault.lore.description.4").color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.vault.lore.description.5").color(NamedTextColor.GRAY))
                 .lore(Component.empty())
-                .lore(Component.text("Your vault has limited slots. To", NamedTextColor.GRAY))
-                .lore(Component.text("gain more slots, you can:", NamedTextColor.GRAY))
-                .lore(Component.text("\u25AA ").append(Component.text("Level up your clan", highlight2)))
-                .lore(Component.text("\u25AA ").append(Component.text("Purchase more slots in the shop", highlight2)));
+                .lore(Translations.component("clans.menu.core.button.vault.lore.description.6").color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.menu.core.button.vault.lore.description.7").color(NamedTextColor.GRAY))
+                .lore(Component.text("\u25AA ").append(Translations.component("clans.menu.core.button.vault.lore.method.level").color(highlight2)))
+                .lore(Component.text("\u25AA ").append(Translations.component("clans.menu.core.button.vault.lore.description.8").color(highlight2)));
 
         final ClanVault vault = clan.getCore().getVault();
         if (vault.hasPermission(player)) {
-            vaultItem.action(ClickActions.ALL, Component.text("Open"));
+            vaultItem.action(ClickActions.ALL, Translations.component("clans.menu.core.button.vault.action"));
         } else {
             vaultItem.lore(Component.empty())
-                    .lore(Component.text("You cannot access the Clan Vault", TextColor.color(255, 71, 93), TextDecoration.BOLD));
+                    .lore(Translations.component("clans.menu.core.button.vault.lore.no-permission").color(TextColor.color(255, 71, 93)).decorate(TextDecoration.BOLD));
         }
 
         setItem(13, new SimpleItem(vaultItem.build(), click -> {
             final Player viewer = click.getPlayer();
             if (!vault.hasPermission(viewer)) {
-                UtilMessage.message(viewer, "Clans", "You do not have permission to access the clan vault.");
+                UtilMessage.message(viewer, "clans.prefix", "clans.core.vault.no-permission");
                 return;
             }
 
             if (vault.isLocked()) {
-                UtilMessage.message(viewer, "Clans", "<red>The clan vault is currently in use by: <dark_red>%s</dark_red>.", vault.getLockedBy());
+                UtilMessage.message(viewer, "clans.prefix", "clans.core.vault.locked", Component.text(vault.getLockedBy(), NamedTextColor.DARK_RED));
                 return;
             }
 
@@ -90,6 +91,6 @@ public class CoreMenu extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("Clan Core");
+        return Translations.component("clans.menu.core.title");
     }
 }

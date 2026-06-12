@@ -73,6 +73,13 @@ public class BuriedCache extends ProfessionSkill {
     }
 
     @Override
+    public net.kyori.adventure.text.Component[] getDescriptionComponents(int level) {
+        double chance = UtilMath.round(getTriggerChance(level) * 100.0, 2);
+        return me.mykindos.betterpvp.core.locale.Translations.componentLines("progression.skill.buried_cache.desc",
+                net.kyori.adventure.text.Component.text(chance + "%", net.kyori.adventure.text.format.NamedTextColor.GREEN));
+    }
+
+    @Override
     public Material getIcon() {
         return Material.CHEST;
     }

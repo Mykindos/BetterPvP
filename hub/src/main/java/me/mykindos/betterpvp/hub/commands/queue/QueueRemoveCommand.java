@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -31,33 +33,35 @@ public class QueueRemoveCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Remove a player from the queue";
+        return "hub.command.queue-remove.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.simpleMessage(player, "Queue", "<red>Usage: /queue remove <player>");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.remove.usage");
             return;
         }
 
         final Client target = clientManager.search().offline(args[0]).join().orElse(null);
         if (target == null) {
-            UtilMessage.simpleMessage(player, "Queue", "<red>Unable to find that player.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.player-not-found");
             return;
         }
 
         try {
             final boolean removed = orchestrationGateway.removeQueuedPlayer(target.getUniqueId()).join();
             if (!removed) {
-                UtilMessage.simpleMessage(player, "Queue", "<yellow>" + target.getName() + "</yellow> is not currently queued.");
+                UtilMessage.message(player, "core.prefix.queue", "hub.queue.not-queued",
+                        Component.text(target.getName(), NamedTextColor.YELLOW));
                 return;
             }
 
-            UtilMessage.simpleMessage(player, "Queue", "Removed <yellow>" + target.getName() + "</yellow> from the queue.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.remove.success",
+                    Component.text(target.getName(), NamedTextColor.YELLOW));
         } catch (Exception ex) {
             QueueCommandSupport.logCommandFailure("remove queued player " + target.getName(), ex);
-            UtilMessage.simpleMessage(player, "Queue", "<red>Failed to remove player from queue.");
+            UtilMessage.message(player, "core.prefix.queue", "hub.queue.remove.failed");
         }
     }
 

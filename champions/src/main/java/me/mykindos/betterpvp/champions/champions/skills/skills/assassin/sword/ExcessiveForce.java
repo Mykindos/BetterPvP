@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
@@ -73,7 +74,9 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
                 final String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(timeLeftInSeconds, 1);
 
                 // ex: Excessive Force: 2.6s
-                return Component.text(getName() + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                return Component.empty().color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                        .append(getDisplayName())
+                        .append(Component.text(": "))
                         .append(Component.text(timeLeftWithOneDecimalPlace + "s").color(NamedTextColor.GREEN).decoration(TextDecoration.BOLD, false));
             }
     );
@@ -97,17 +100,14 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "For the next " + getValueString(this::getDuration, level) + " seconds",
-                "your attacks deal standard knockback to enemies",
-                "",
-                "Does not ignore anti-knockback abilities",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.excessive-force.description",
+                duration,
+                cooldown
+        );
     }
 
     /**
@@ -224,8 +224,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
                 this::shouldDisplayActionBar);
 
         // Notify
-        Component messageToSend = UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), level);
-        UtilMessage.message(player, getClassType().getName(), messageToSend);
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ended", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
     }
 
     @Override

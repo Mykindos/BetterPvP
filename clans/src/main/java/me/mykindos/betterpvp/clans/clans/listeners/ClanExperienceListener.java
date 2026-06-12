@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,11 +39,15 @@ public class ClanExperienceListener extends ClanListener {
         clan.grantExperience(event.getExperience());
 
         if(event.getExperience() >= 1) { // Don't show the message for low amounts of XP
-            clan.messageClan("Your clan earned <green>" + event.getExperience() + "<reset> experience.", null, true);
+            clan.messageClan("clans.experience.earned", new Object[]{
+                    Component.text(event.getExperience(), NamedTextColor.GREEN)
+            }, null, true);
         }
 
         if(clan.getLevel() > currentLevel){
-            clan.messageClan("Your clan has levelled up to level <green>" + clan.getLevel() + "<reset>!", null, true);
+            clan.messageClan("clans.experience.level-up", new Object[]{
+                    Component.text(clan.getLevel(), NamedTextColor.GREEN)
+            }, null, true);
         }
     }
 }

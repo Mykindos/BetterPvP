@@ -118,14 +118,14 @@ public class HubQueueDisplayListener implements Listener {
 
     private void sendQueuePosition(Client client, QueueStatusUpdate status, boolean firstSeen) {
         if (firstSeen) {
-            UtilMessage.simpleMessage(client.getGamer().getPlayer(), "Queue",
+            UtilMessage.message(client.getGamer().getPlayer(), "core.prefix.queue",
                     "<gray>You were added to the queue for <yellow>" + status.queuedTarget().serverName()
                             + "<gray> at position <yellow>#"
                             + Math.max(1, status.position()) + "<gray>.");
             return;
         }
 
-        UtilMessage.simpleMessage(client.getGamer().getPlayer(), "Queue",
+        UtilMessage.message(client.getGamer().getPlayer(), "core.prefix.queue",
                 "<gray>Your queue position for <yellow>" + status.queuedTarget().serverName()
                         + "<gray> is <yellow>#"
                         + status.position()

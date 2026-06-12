@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.game.achievements.loader.GameAchievementLoader;
 import me.mykindos.betterpvp.game.command.loader.GameCommandLoader;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -73,6 +74,9 @@ public final class GamePlugin extends BPvPPlugin {
 
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:game-migrations/postgres", "game");
         Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Game"));
+
+        // Register game translation bundle
+        TranslationService.registerBundle(this, "translations.game");
 
         var listenerLoader = injector.getInstance(GameListenerLoader.class);
         listenerLoader.registerListeners(PACKAGE);

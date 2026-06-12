@@ -35,19 +35,19 @@ public class TeamChatCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Toggle team only chat";
+        return "game.command.team-chat.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (!(serverController.getCurrentGame() instanceof TeamGame<?> teamGame)) {
-            UtilMessage.message(player, "Game", "You must be in a team game to use team chat");
+            UtilMessage.message(player, "core.prefix.game", "game.command.teamchat.not-team-game");
             return;
         }
         final Gamer gamer = client.getGamer();
         final Team playerTeam = teamGame.getPlayerTeam(player);
         if (playerTeam == null) {
-            UtilMessage.message(player, "Clans", "You must be on a Team to send a Team chat");
+            UtilMessage.message(player, "core.prefix.clans", "game.command.teamchat.not-on-team");
             return;
         }
         if (args.length > 0) {

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -28,7 +29,7 @@ public class ProgressionClansStatButton extends ControlItem<IAbstractClansStatMe
         return ItemView.builder()
                 .material(Material.FISHING_ROD)
                 .lore(getProgressionStats())
-                .displayName(Component.text("Profession Stats"))
+                .displayName(Translations.component("core.menu.stats.clans.button.progression.name"))
                 .build();
     }
 

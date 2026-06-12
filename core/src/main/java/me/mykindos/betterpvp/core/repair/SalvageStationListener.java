@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -120,8 +121,8 @@ public class SalvageStationListener implements Listener {
             // a swap (different stack) and a drop (held becomes AIR -> different instance).
             final ItemStack nowHeld = player.getInventory().getItemInMainHand();
             if (!nowHeld.equals(held)) {
-                UtilMessage.message(player, "Salvage", Component.text(
-                        "You are no longer holding the item you wanted to salvage.", NamedTextColor.RED));
+                UtilMessage.message(player, "core.prefix.salvage",
+                        Translations.component("core.salvage.no_longer_holding").color(NamedTextColor.RED));
                 return;
             }
             execute(player, nowHeld, plan);
@@ -141,10 +142,9 @@ public class SalvageStationListener implements Listener {
         final Location loc = player.getLocation();
         loc.getWorld().playSound(loc, Sound.UI_STONECUTTER_TAKE_RESULT, 1.0f, 1.0f);
 
-        UtilMessage.message(player, "Salvage", Component.text("You salvaged ", NamedTextColor.GRAY)
-                .append(Component.text("x" + plan.getYield() + " ", NamedTextColor.YELLOW))
-                .append(displayName(produced))
-                .append(Component.text(".", NamedTextColor.GRAY)));
+        UtilMessage.message(player, "core.prefix.salvage", "core.salvage.success",
+                Component.text("x" + plan.getYield(), NamedTextColor.YELLOW),
+                displayName(produced));
     }
 
     private static Component displayName(ItemInstance instance) {
@@ -152,8 +152,7 @@ public class SalvageStationListener implements Listener {
     }
 
     private void tellNotSalvageable(Player player) {
-        UtilMessage.message(player, "Salvage",
-                Component.text("Hold a piece of repairable gear to salvage it here.", NamedTextColor.GRAY));
+        UtilMessage.message(player, "core.prefix.salvage", "core.salvage.hold_gear");
     }
 
     private static String plain(Component component) {

@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.core.stats;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
@@ -371,10 +374,11 @@ public abstract class Leaderboard<E, T> implements Describable {
         }
 
         final String playerName = player.getName();
-        UtilMessage.simpleBroadcast("Leaderboard", "<dark_green>%s <green>has reached <dark_green>#%d</dark_green> on the seasonal %s leaderboard!",
-                playerName,
-                highestEntry,
-                this.getName());
+        UtilMessage.broadcast("core.prefix.leaderboard",
+                Translations.component("core.leaderboard.seasonal-reached",
+                        Component.text(playerName, NamedTextColor.DARK_GREEN),
+                        Component.text(highestEntry, NamedTextColor.DARK_GREEN),
+                        Component.text(this.getName())).color(NamedTextColor.GREEN));
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             UtilSound.playSound(onlinePlayer, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0F, 1.0F, true);

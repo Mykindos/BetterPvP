@@ -16,9 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
@@ -93,15 +95,10 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Your arrows no longer deal knockback, and instead",
-                "the velocity is stored for up to " + getValueString(this::getDamageResetTime, level) + " seconds",
-                "",
-                "Double Jump to activate this stored velocity on yourself",
-                "",
-                "Can store up to " + getValueString(this::getStoredVelocityCount, level) + " levels of velocity"
-        };
+    public Component[] getDescription(int level) {
+        Component damageResetTime = getValueComponent(this::getDamageResetTime, level);
+        Component storedVelocityCount = getValueComponent(this::getStoredVelocityCount, level, 0);
+        return Translations.componentLines("champions.skill.ranger.kinetics.description", damageResetTime, storedVelocityCount);
     }
 
     @Override

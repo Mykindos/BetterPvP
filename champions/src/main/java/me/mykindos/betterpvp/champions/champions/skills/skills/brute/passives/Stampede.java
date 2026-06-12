@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -27,6 +28,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -67,18 +70,21 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "You slowly build up speed as you",
-                "sprint, gaining one level of <effect>Speed</effect>",
-                "for every " + getValueString(this::getDurationPerStack, level) + " seconds, up to a max",
-                "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength) + "</effect>",
-                "",
-                "Attacking during stampede deals " + getValueString(this::getDamage, level) + " bonus",
-                "bonus damage and " + getValueString(this::getBonusKnockback, level, 100, "%", 1) + " extra knockback",
-                "per speed level"
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDurationPerStack, level);
+        Component speed = Translations.component("champions.skill.effect.speed",
+                Component.text(UtilFormat.getRomanNumeral(maxSpeedStrength))).color(NamedTextColor.WHITE);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component knockback = getValueComponent(this::getBonusKnockback, level, 100, 0, "%");
+        Component speedLabel = Translations.component("champions.skill.effect.speed.name").color(NamedTextColor.WHITE);
+        return Translations.componentLines(
+                "champions.skill.brute.stampede.description",
+                duration,
+                speed,
+                damage,
+                knockback,
+                speedLabel
+        );
     }
 
     @Override
@@ -162,7 +168,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
 
                         championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), data.getSprintStrength(), 2200, true);
                         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * data.getSprintStrength() + 1.2F);
-                        UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", data.getSprintStrength());
+                        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.brute.stampede.level", Component.text(String.valueOf(data.getSprintStrength()), NamedTextColor.YELLOW));
                         spawnParticles(player.getLocation(), (maxSpeedStrength + 2 + 3) * 2);
                     }
                 }

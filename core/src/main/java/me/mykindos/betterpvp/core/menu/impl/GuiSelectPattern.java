@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -44,7 +45,7 @@ public class GuiSelectPattern extends AbstractGui implements Windowed {
     }
 
     public GuiSelectPattern(Consumer<Pattern> callback) {
-        this(Component.text("Select a Pattern"), callback);
+        this(Translations.component("core.menu.select-pattern.title"), callback);
     }
 
     protected void populateInventory() {
@@ -84,7 +85,7 @@ public class GuiSelectPattern extends AbstractGui implements Windowed {
             String name = UtilFormat.cleanString(key.value());
             ItemView item = ItemView.builder()
                     .with(banner.get())
-                    .displayName(Component.text("Select ", NamedTextColor.WHITE, TextDecoration.BOLD)
+                    .displayName(Translations.component("core.menu.select-pattern.button.select.name").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
                             .append(Component.text(name, NamedTextColor.GREEN, TextDecoration.BOLD)))
                     .hideAdditionalTooltip(true)
                     .build();
@@ -93,7 +94,7 @@ public class GuiSelectPattern extends AbstractGui implements Windowed {
                 @Override
                 public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
                     SoundEffect.HIGH_PITCH_PLING.play(player);
-                    new GuiSelectColor(Component.text("Select Pattern Color"), dyeColor -> {
+                    new GuiSelectColor(Translations.component("core.menu.select-color.title.pattern"), dyeColor -> {
                         Pattern pattern = new Pattern(dyeColor, type);
                         callback.accept(pattern);
                     }).show(player);

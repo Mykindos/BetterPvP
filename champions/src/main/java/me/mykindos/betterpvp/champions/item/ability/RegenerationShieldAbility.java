@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
@@ -54,12 +56,12 @@ public class RegenerationShieldAbility extends AbstractInteraction implements Di
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Shield");
+        return Translations.component("champions.ability.shield.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Gain an amplified regeneration effect while using this ability.");
+        return Translations.component("champions.ability.shield.description");
     }
 
     @Override

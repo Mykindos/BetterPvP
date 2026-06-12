@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,12 +67,12 @@ public class VineSnareAbility extends AbstractInteraction implements DisplayedIn
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Vine Snare");
+        return Translations.component("champions.ability.vine-snare.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Bolts release vines that ensnare enemies and anchor them to the ground.");
+        return Translations.component("champions.ability.vine-snare.description");
     }
 
     @Override

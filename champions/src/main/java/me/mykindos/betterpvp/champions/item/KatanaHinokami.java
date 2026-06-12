@@ -61,7 +61,7 @@ public class KatanaHinokami extends WeaponItem implements Reloadable {
 
     @Inject
     private KatanaHinokami(Champions champions, EffectManager effectManager, CooldownManager cooldownManager) {
-        super(champions, "Hinokami Katana", Item.model("hinokami_katana"), ItemRarity.MYTHICAL, List.of(Group.MELEE));
+        super(champions, translatableName("champions.item.hinokami-katana.name"), Item.model("hinokami_katana"), ItemRarity.MYTHICAL, List.of(Group.MELEE));
         this.config = Config.item(champions, this);
 
         // Config entries

@@ -16,7 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
@@ -47,16 +51,16 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Pulls all enemies within " + getValueString(this::getDistance, level) + " blocks towards you",
-                "and deals " + getValueString(this::getDamage, level) + " damage",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component distance = getValueComponent(this::getDistance, level);
+        Component damage = getValueComponent(this::getDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.brute.whirlwind-sword.description",
+                distance,
+                damage,
+                cooldown
+        );
     }
 
     public double getDistance(int level) {
@@ -99,7 +103,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                     VelocityData velocityData = new VelocityData(velocity, 1.0D, true, 0.0D, 0.25D, 4.0D, true);
                     UtilVelocity.velocity(target, player, velocityData);
                     UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), getName()));
-                    UtilMessage.simpleMessage(target, getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
+                    UtilMessage.message(target, getName(), "champions.skill.brute.whirlwind-sword.hit-by", Component.text(player.getName(), NamedTextColor.GREEN), getDisplayName().color(NamedTextColor.GREEN));
                 }
 
             }

@@ -11,11 +11,12 @@ import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -53,13 +54,15 @@ public class CastFireball extends SingleSimpleAchievement {
     public Description getDescription(StatContainer container, StatFilterType type, Period period) {
         List<Component> lore = new ArrayList<>(
                 List.of(
-                        UtilMessage.deserialize("<gold>Use <white>Fire Blast <yellow>100 <gray>times")
+                        Translations.component("core.achievement.cast-fireball.desc",
+                                Translations.component("champions.skill.mage.fire-blast.name").color(NamedTextColor.WHITE),
+                                Component.text(100, NamedTextColor.YELLOW)).color(NamedTextColor.GOLD)
                 ));
         lore.addAll(this.getProgressComponent(container, type, period));
         lore.addAll(this.getCompletionComponent(container));
         ItemProvider itemProvider = ItemView.builder()
                 .material(Material.FIRE_CHARGE)
-                .displayName(UtilMessage.deserialize("<white>%s", getName()))
+                .displayName(Translations.component("core.achievement.cast-fireball.name").color(NamedTextColor.WHITE))
                 .lore(lore)
                 .build();
         return Description.builder()

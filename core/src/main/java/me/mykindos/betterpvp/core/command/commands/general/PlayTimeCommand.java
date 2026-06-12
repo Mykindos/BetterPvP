@@ -28,16 +28,16 @@ public class PlayTimeCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Check your time played";
+        return "core.command.play-time.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         String totalTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) client.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
-        UtilMessage.simpleMessage(player, "Command", "You have played for <white>" + totalTimePlayed + "</white>.");
+        UtilMessage.message(player, "core.prefix.command", "core.command.playtime.total", totalTimePlayed);
         if(Bukkit.getPluginManager().getPlugin("Clans") != null) {
             String seasonTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) client.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)));
-            UtilMessage.simpleMessage(player, "Command", "You have played for <white>" + seasonTimePlayed + "</white> this season.");
+            UtilMessage.message(player, "core.prefix.command", "core.command.playtime.season", seasonTimePlayed);
         }
     }
 }

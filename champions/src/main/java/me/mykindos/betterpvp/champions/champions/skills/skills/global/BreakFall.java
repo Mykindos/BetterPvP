@@ -16,6 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @Singleton
 @BPvPListener
@@ -36,13 +40,12 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "You roll when you hit the ground",
-                "",
-                "Fall damage is reduced by " + getValueString(this::getDamageReduction, level),
-        };
+    public Component[] getDescription(int level) {
+        Component reduction = getValueComponent(this::getDamageReduction, level);
+        return Translations.componentLines(
+                "champions.skill.global.break-fall.description",
+                reduction
+        );
     }
 
     public double getDamageReduction(int level) {

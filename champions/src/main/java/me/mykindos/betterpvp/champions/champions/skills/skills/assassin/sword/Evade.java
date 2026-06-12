@@ -19,8 +19,12 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -73,20 +77,16 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hold right click with a Sword to channel",
-                "For a maximum of " + getValueString(this::getActiveDuration, level) + " seconds",
-                "",
-                "If a player hits you while Evading, you",
-                "will teleport behind the attacker and your",
-                "cooldown will be set to a minimum of " + getValueString(this::getSuccessCooldown, level) + " seconds ",
-                "",
-                "Hold crouch while Evading to teleport backwards",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getActiveDuration, level);
+        Component cooldown = getValueComponent(this::getSuccessCooldown, level);
+        Component baseCooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.evade.description",
+                duration,
+                cooldown,
+                baseCooldown
+        );
     }
 
     @Override
@@ -167,10 +167,10 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             cooldownManager.use(player, getName(), newCooldown, true);
             handRaisedTime.remove(player.getUniqueId());
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
 
             if (ent instanceof Player temp) {
-                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used <green>%s %s</green>!", player.getName(), getName(), level);
+                UtilMessage.message(temp, getClassType().getDisplayName(), "champions.skill.assassin.evade.target-used", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             }
 
             active.remove(player.getUniqueId());
@@ -198,7 +198,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                     if (!player.isHandRaised()) {
                         handRaisedTime.remove(player.getUniqueId());
                         it.remove();
-                        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), level));
+                        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                     } else if (!handRaisedTime.containsKey(player.getUniqueId())) {
                         it.remove();
@@ -212,7 +212,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                         it.remove();
                     } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) (getActiveDuration(level) * 1000))) {
                         handRaisedTime.remove(player.getUniqueId());
-                        UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
+                        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(getLevel(player)), NamedTextColor.GREEN));
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                         it.remove();
                     }

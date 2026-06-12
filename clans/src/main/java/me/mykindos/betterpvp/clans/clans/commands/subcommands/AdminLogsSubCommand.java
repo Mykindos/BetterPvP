@@ -14,6 +14,8 @@ import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,7 +41,7 @@ public class AdminLogsSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Get logs associated with the specified clan";
+        return "clans.command.admin-logs.description";
     }
 
     @Override
@@ -50,7 +52,8 @@ public class AdminLogsSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 1) {
-            UtilMessage.message(player, "Logs", getUsage());
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.admin-logs.usage", Component.text(getUsage()));
+            return;
         }
         Optional<Clan> clanOptional = clanManager.getClanByName(args[0]);
 
@@ -63,7 +66,7 @@ public class AdminLogsSubCommand extends ClanSubCommand {
         try {
              clanId = UUID.fromString(args[0]);
         } catch (IllegalArgumentException ignored) {
-            UtilMessage.message(player, "Logs", "<yellow>%s</yellow> is not a valid ID", args[0]);
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.admin-logs.invalid-id", Component.text(args[0], NamedTextColor.YELLOW));
             return;
         }
         new CachedLogMenu(args[0], LogContext.CLAN, clanId.toString(), null, CachedLogMenu.CLANS, JavaPlugin.getPlugin(Clans.class), logRepository, null).show(player);

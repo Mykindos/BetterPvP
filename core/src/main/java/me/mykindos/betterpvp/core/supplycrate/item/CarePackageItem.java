@@ -24,7 +24,7 @@ public class CarePackageItem extends BaseItem {
 
     @Inject
     private CarePackageItem(SupplyCrateController controller, CarePackageType type) {
-        super("Care Package Deployment", Item.model("supply_crate", 1), ItemGroup.MISC, ItemRarity.EPIC);
+        super(translatableName("core.item.care-package.name"), Item.model("supply_crate", 1), ItemGroup.MISC, ItemRarity.EPIC);
         final DeployCrateAbility ability = new DeployCrateAbility(controller, type, "your current location", this::getLocation, false);
         ability.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()

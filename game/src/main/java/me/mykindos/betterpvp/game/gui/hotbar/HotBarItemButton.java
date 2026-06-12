@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -47,17 +49,17 @@ public class HotBarItemButton extends ControlItem<HotBarEditor> {
                 .appendSpace()
                 .append(Component.text("●", NamedTextColor.GRAY))
                 .appendSpace()
-                .append(Component.text(String.format("%d Item Tokens", hotBarItem.getTokenCost()), NamedTextColor.GOLD)))
+                .append(Translations.component("game.menu.hotbar.item.token-cost", Component.text(hotBarItem.getTokenCost())).color(NamedTextColor.GOLD)))
                 .amount(hotBarItem.getAmount());
 
         // Lore and fallback
         if (!getGui().getInProgress().canAddItem(hotBarItem)) {
             builder.lore(Component.empty());
-            builder.lore(Component.text("Not enough item tokens!", TextColor.color(255, 0, 0)));
+            builder.lore(Translations.component("game.menu.hotbar.item.not-enough-tokens").color(TextColor.color(255, 0, 0)));
         } else {
             builder
                     .amount(hotBarItem.getAmount())
-                    .action(ClickActions.ALL, Component.text("Add"));
+                    .action(ClickActions.ALL, Translations.component("game.menu.hotbar.item.add"));
         }
 
         return builder

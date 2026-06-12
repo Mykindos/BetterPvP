@@ -14,6 +14,6 @@ public class UnholyGrail extends BaseItem {
 
     @Inject
     private UnholyGrail() {
-        super("Unholy Grail", Item.model("unholy_grail", 1), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.unholy-grail.name"), Item.model("unholy_grail", 1), ItemGroup.MATERIAL, ItemRarity.LEGENDARY);
     }
 }

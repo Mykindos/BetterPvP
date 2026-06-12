@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.logger.formatters.WorldLogFormatter;
 import net.kyori.adventure.text.Component;
@@ -78,11 +79,12 @@ public class WorldLogHandler extends Manager<String, WorldLogSession> {
             session.getData().sort(Comparator.comparing(WorldLog::getTime));
 
             if(session.getData().isEmpty()) {
-                UtilMessage.simpleMessage(player, "World Logger", "No results found.");
+                UtilMessage.message(player, "core.prefix.world-logger", "core.worldlogger.no_results");
                 return;
             }
 
-            UtilMessage.simpleMessage(player, "World Logger", "Displaying results for page " + session.getCurrentPage() + " of " + session.getPages());
+            UtilMessage.message(player, "core.prefix.world-logger", "core.worldlogger.displaying_page",
+                    Component.text(session.getCurrentPage()), Component.text(session.getPages()));
 
             for (WorldLog worldLog : session.getData()) {
 
@@ -98,12 +100,14 @@ public class WorldLogHandler extends Manager<String, WorldLogSession> {
 
 
                 UtilMessage.message(player, component.clickEvent(ClickEvent.runCommand("/tppos " + worldLog.getBlockX() + " " + worldLog.getBlockY() + " " + worldLog.getBlockZ()))
-                        .hoverEvent(HoverEvent.showText(Component.text("Teleport to " + worldLog.getBlockX() + " " + worldLog.getBlockY() + " " + worldLog.getBlockZ()))));
+                        .hoverEvent(HoverEvent.showText(Translations.component("core.worldlogger.teleport_to",
+                                Component.text(worldLog.getBlockX() + " " + worldLog.getBlockY() + " " + worldLog.getBlockZ())))));
             }
 
             if (session.getPages() > 1) {
                 List<Component> pages = generatePagination(session.getCurrentPage(), session.getPages());
-                Component pageComponent = Component.text("Page ", NamedTextColor.DARK_AQUA)
+                Component pageComponent = Translations.component("core.worldlogger.page_label").color(NamedTextColor.DARK_AQUA)
+                        .append(Component.space())
                         .append(Component.text(session.getCurrentPage(), NamedTextColor.WHITE))
                         .append(Component.text("/", NamedTextColor.WHITE)).append(Component.text(session.getPages(), NamedTextColor.WHITE))
                         .append(Component.text(" (", NamedTextColor.GRAY));

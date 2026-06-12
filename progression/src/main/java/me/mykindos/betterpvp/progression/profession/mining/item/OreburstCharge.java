@@ -58,7 +58,7 @@ public class OreburstCharge extends BaseItem implements Reloadable {
                            CooldownManager cooldownManager,
                            ThrowableHandler throwableHandler,
                            BlockTagManager blockTagManager) {
-        super("Oreburst Charge", ItemStack.of(Material.FIREWORK_STAR), ItemGroup.CONSUMABLE, ItemRarity.RARE);
+        super(translatableName("progression.item.oreburst-charge.name"), ItemStack.of(Material.FIREWORK_STAR), ItemGroup.CONSUMABLE, ItemRarity.RARE);
         this.progression = progression;
 
         this.oreburstChargeInteraction = new OreburstChargeInteraction(

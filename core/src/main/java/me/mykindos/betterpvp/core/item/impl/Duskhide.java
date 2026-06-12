@@ -14,6 +14,6 @@ public class Duskhide extends BaseItem {
 
     @Inject
     private Duskhide() {
-        super("Duskhide", Item.model("duskhide", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.duskhide.name"), Item.model("duskhide", 16), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 }

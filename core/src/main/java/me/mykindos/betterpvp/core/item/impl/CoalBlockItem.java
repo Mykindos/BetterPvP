@@ -24,7 +24,7 @@ public class CoalBlockItem extends BaseItem {
 
     @Inject
     private CoalBlockItem() {
-        super("Coal Block", model, ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.coal-block.name"), model, ItemGroup.MATERIAL, ItemRarity.COMMON);
         addBaseComponent(new FuelComponent(90_000L, 800.0f));
     }
 } 

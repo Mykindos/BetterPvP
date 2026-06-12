@@ -16,7 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,16 +55,27 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hit a player " + getValueString(this::getHitsNeeded, level, 0) + " consecutive times without letting",
-                getValueString(this::getTimeSpan, level) + " seconds pass to <effect>Slow</effect> them for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Every hit <effect>Shock</effect>'s the target",
-                "",
-                EffectTypes.SHOCK.getDescription(0)
-        };
+    public Component[] getDescription(int level) {
+        Component hits = getValueComponent(this::getHitsNeeded, level, 0);
+        Component time = getValueComponent(this::getTimeSpan, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component slow = Translations.component("champions.skill.effect.slow.name").color(NamedTextColor.WHITE);
+        Component shock = Translations.component("champions.skill.effect.shock.name").color(NamedTextColor.WHITE);
+        Component[] components = Translations.componentLines(
+                "champions.skill.assassin.shocking-strikes.description",
+                hits,
+                time,
+                duration,
+                slow,
+                shock
+        );
+        Component shockDetail = Translations.component("champions.skill.effect.shock.name").color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines("champions.skill.assassin.shocking-strikes.detail", shockDetail);
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {

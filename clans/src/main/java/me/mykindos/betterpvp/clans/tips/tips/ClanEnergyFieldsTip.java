@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.ISuggestCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -32,7 +33,7 @@ public class ClanEnergyFieldsTip extends ClanTip implements ISuggestCommand {
 
     @Override
     public Component generateComponent() {
-        return Component.text("You can earn energy at fields by mining amethyst clusters.", NamedTextColor.GRAY);
+        return Translations.component("clans.tip.energy-fields").colorIfAbsent(NamedTextColor.GRAY);
     }
 
     @Override

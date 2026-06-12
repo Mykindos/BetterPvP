@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.tips.types.IRunCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,8 +28,7 @@ public class ClanStuckTip extends ClanTip implements IRunCommand {
     @Override
     public Component generateComponent() {
         Component runComponent = runCommand("/c stuck");
-        return Component.text("If you ever get stuck in another clans territory, you can run ", NamedTextColor.GRAY)
-                .append(runComponent).append(Component.text(" to be teleported to the nearest wilderness."));
+        return Translations.component("clans.tip.stuck", runComponent).colorIfAbsent(NamedTextColor.GRAY);
     }
 
     @Override

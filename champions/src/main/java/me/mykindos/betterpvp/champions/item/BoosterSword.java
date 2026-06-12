@@ -38,7 +38,7 @@ public class BoosterSword extends WeaponItem {
 
     @Inject
     private BoosterSword(Champions champions) {
-        super(champions, "Booster Sword", model, ItemRarity.UNCOMMON);
+        super(champions, translatableName("champions.item.booster-sword.name"), model, ItemRarity.UNCOMMON);
     }
 
     @Inject

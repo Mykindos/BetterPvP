@@ -24,7 +24,7 @@ public class ElderwoodCore extends BaseItem {
 
     @Inject
     private ElderwoodCore() {
-        super("Elderwood Core", Item.model("elderwood_core"), ItemGroup.MATERIAL, ItemRarity.EPIC);
+        super(translatableName("core.item.elderwood-core.name"), Item.model("elderwood_core"), ItemGroup.MATERIAL, ItemRarity.EPIC);
     }
 
     @Inject

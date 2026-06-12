@@ -6,9 +6,11 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -34,7 +36,7 @@ public class BroadcastCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getDescription() {
-        return "Send an emphasized message to the server";
+        return "core.command.broadcast.description";
     }
 
     @Override
@@ -46,16 +48,19 @@ public class BroadcastCommand extends Command implements IConsoleCommand {
     public void execute(CommandSender sender, String[] args) {
 
         if(args.length == 0) {
-            UtilMessage.message(sender, "Core", "You must specify a message");
+            UtilMessage.message(sender, "core.prefix.core", "core.command.broadcast.message_required");
             return;
         }
         Component message;
         if (sender instanceof Player player) {
             Client client = clientManager.search(player).online(player);
             message = Component.empty().append(client.getRank().getPlayerNameMouseOver(player.getName()).decorate(TextDecoration.BOLD))
-                    .append(UtilMessage.deserialize(" <red>%s", String.join(" ", args)));
+                    .append(Translations.component("core.command.broadcast.player_message",
+                            Component.text(String.join(" ", args), NamedTextColor.RED)));
         } else {
-            message = UtilMessage.deserialize("<bold><white>SERVER</white></bold> <red>%s", String.join(" ", args));
+            message = Translations.component("core.command.broadcast.server_message",
+                    Translations.component("core.command.broadcast.server_label").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD),
+                    Component.text(String.join(" ", args), NamedTextColor.RED));
         }
 
         filterService.filterMessage(message).thenAcceptAsync(filteredMessage -> {

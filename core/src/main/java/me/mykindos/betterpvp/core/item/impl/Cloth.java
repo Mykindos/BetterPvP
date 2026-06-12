@@ -24,7 +24,7 @@ public class Cloth extends BaseItem {
 
     @Inject
     private Cloth() {
-        super("Cloth", Item.model("cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
+        super(translatableName("core.item.cloth.name"), Item.model("cloth", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
     }
 
     @Inject

@@ -34,11 +34,13 @@ import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
@@ -391,14 +393,15 @@ public class CannonListener implements Listener {
 
             if (player.isSneaking()) {
                 if (!loaded) {
-                    UtilMessage.message(player, "Combat", "This cannon is not loaded! Place a <alt2>Cannonball</alt2> in it to shoot.");
+                    UtilMessage.message(player, "core.prefix.combat", "core.cannon.not_loaded",
+                            Translations.component("core.item.cannonball.name").color(NamedTextColor.YELLOW));
                     SoundEffect.LOW_PITCH_PLING.play(player);
                     return;
                 }
 
                 final long expiry = (long) ((this.cannonManager.getShootCooldownSeconds() + this.cannonManager.getFuseSeconds()) * 1000L);
                 if (!UtilTime.elapsed(cannon.getLastFuseTime(), expiry)) {
-                    UtilMessage.message(player, "Combat", "This cannon is still cooling down!");
+                    UtilMessage.message(player, "core.prefix.combat", "core.cannon.cooling_down");
                     SoundEffect.LOW_PITCH_PLING.play(player);
                     return;
                 }

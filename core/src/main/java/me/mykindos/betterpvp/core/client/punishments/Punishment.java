@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -133,10 +133,14 @@ public class Punishment {
      */
     public Component getInformation() {
         if (!this.isActive()) {
-            return UtilMessage.deserialize("You are no longer <red>%s</red>", this.type.getChatLabel());
+            return Translations.component("core.punishment.information.no_longer",
+                    Component.text(this.type.getChatLabel(), NamedTextColor.RED));
         }
         String formattedTime = new PrettyTime().format(new Date(this.getExpiryTime())).replace(" from now", "");
-        return UtilMessage.deserialize("You are <red>%s</red> for <green>%s</green> for <yellow>%s</yellow>", this.type.getChatLabel(), formattedTime, this.getReason());
+        return Translations.component("core.punishment.information.active",
+                Component.text(this.type.getChatLabel(), NamedTextColor.RED),
+                Component.text(formattedTime, NamedTextColor.GREEN),
+                Component.text(this.getReason(), NamedTextColor.YELLOW));
     }
 
     /**
@@ -163,29 +167,29 @@ public class Punishment {
         if (this.isActive()) {
             currentComp = currentComp.append(Component.text("A ", NamedTextColor.GREEN));
             if (expiryTime > 0) {
-                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
-                                        UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1),
-                                        UtilTime.getTime((double) expiryTime - applyTime, 1),
-                                        UtilTime.getTime((double) expiryTime - System.currentTimeMillis(), 1)));
+                currentComp = currentComp.append(Translations.component("core.punishment.entry.duration",
+                                        Component.text(UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1), NamedTextColor.YELLOW),
+                                        Component.text(UtilTime.getTime((double) expiryTime - applyTime, 1), NamedTextColor.GREEN),
+                                        Component.text(UtilTime.getTime((double) expiryTime - System.currentTimeMillis(), 1), NamedTextColor.RED)));
             } else {
-                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
-                        UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1),
-                        "PERM",
-                        "n/a"));
+                currentComp = currentComp.append(Translations.component("core.punishment.entry.duration",
+                        Component.text(UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1), NamedTextColor.YELLOW),
+                        Component.text("PERM", NamedTextColor.GREEN),
+                        Component.text("n/a", NamedTextColor.RED)));
             }
 
         } else if (isRevoked()) {
             currentComp = currentComp.append(Component.text("R ", NamedTextColor.LIGHT_PURPLE))
                     .append(Component.text(revokerName, NamedTextColor.LIGHT_PURPLE))
-                            .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("Time: <green>%s</green> ago Type: <yellow>%s</yellow> Reason: <white>%s</white>",
-                                    UtilTime.getTime((double) System.currentTimeMillis() - revokeTime, 1),
-                                    revokeType != null ? revokeType.name() : null,
-                                    revokeReason)));
+                            .hoverEvent(HoverEvent.showText(Translations.component("core.punishment.entry.revoke_hover",
+                                    Component.text(UtilTime.getTime((double) System.currentTimeMillis() - revokeTime, 1), NamedTextColor.GREEN),
+                                    Component.text(revokeType != null ? revokeType.name() : "null", NamedTextColor.YELLOW),
+                                    Component.text(revokeReason == null ? "null" : revokeReason, NamedTextColor.WHITE))));
         } else {
-            currentComp = currentComp.append(Component.text("E ", NamedTextColor.RED)).append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
-                    UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1),
-                    UtilTime.getTime((double) expiryTime - applyTime, 1),
-                    "n/a", 1));
+            currentComp = currentComp.append(Component.text("E ", NamedTextColor.RED)).append(Translations.component("core.punishment.entry.duration",
+                    Component.text(UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1), NamedTextColor.YELLOW),
+                    Component.text(UtilTime.getTime((double) expiryTime - applyTime, 1), NamedTextColor.GREEN),
+                    Component.text("n/a", NamedTextColor.RED)));
         }
         return Component.empty().append(currentComp).appendSpace()
                 .append(Component.text(this.type.getName(), NamedTextColor.WHITE)).appendSpace()
@@ -216,50 +220,48 @@ public class Punishment {
         Rule rule = this.getRule();
 
         List<Component> lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("<white>%s</white>",
-                        UtilTime.getDateTime(this.getApplyTime()), 1));
-        lore.add(UtilMessage.deserialize("<white>%s</white> ago",
-                UtilTime.getTime(System.currentTimeMillis() - this.getApplyTime(), 1)));
-        lore.add(UtilMessage.deserialize("<gray>Type:</gray> <white>%s</white>",
-                this.getType().getName()));
+        lore.add(Component.text(UtilTime.getDateTime(this.getApplyTime()), NamedTextColor.WHITE));
+        lore.add(Translations.component("core.punishment.item.ago",
+                Component.text(UtilTime.getTime(System.currentTimeMillis() - this.getApplyTime(), 1), NamedTextColor.WHITE)));
+        lore.add(Translations.component("core.punishment.item.type",
+                Component.text(this.getType().getName(), NamedTextColor.WHITE)));
         if (this.getExpiryTime() > 0 && this.getType().hasDuration()) {
-            lore.add(UtilMessage.deserialize("<gray>Duration:</gray> <green>%s</green>",
-                    UtilTime.getTime(this.getExpiryTime() - this.getApplyTime(), 1)));
+            lore.add(Translations.component("core.punishment.item.duration",
+                    Component.text(UtilTime.getTime(this.getExpiryTime() - this.getApplyTime(), 1), NamedTextColor.GREEN)));
         } else if (this.getType().hasDuration()) {
-            lore.add(UtilMessage.deserialize("<gray>Duration:</gray> <red>%s</red>",
-                    "Permanent"));
+            lore.add(Translations.component("core.punishment.item.duration",
+                    Translations.component("core.punishment.item.permanent").color(NamedTextColor.RED)));
         }
         if (this.isActive()) {
             if (this.getExpiryTime() > 0 && this.getType().hasDuration()) {
-                lore.add(UtilMessage.deserialize("<gray>Remaining Time:</gray> <red>%s</red>",
-                        UtilTime.getTime(this.getExpiryTime() - System.currentTimeMillis(), 1)));
+                lore.add(Translations.component("core.punishment.item.remaining_time",
+                        Component.text(UtilTime.getTime(this.getExpiryTime() - System.currentTimeMillis(), 1), NamedTextColor.RED)));
             } else if (this.getType().hasDuration()) {
-                lore.add(UtilMessage.deserialize("<Red>PERMANENT</red>"));
+                lore.add(Translations.component("core.punishment.item.permanent_caps").color(NamedTextColor.RED));
             }
         }
-        lore.add(UtilMessage.deserialize("<gray>Reason:</gray> <white>%s</white>",
-                this.getReason()));
+        lore.add(Translations.component("core.punishment.item.reason",
+                Component.text(this.getReason(), NamedTextColor.WHITE)));
         if (showPunisher) {
-            lore.add(UtilMessage.deserialize("<gray>Punisher:</gray> <yellow>%s</yellow>",
-                    punisherNameVar));
+            lore.add(Translations.component("core.punishment.item.punisher",
+                    Component.text(punisherNameVar, NamedTextColor.YELLOW)));
         }
 
         if (this.isRevoked()) {
 
-            lore.add(Component.text(" REVOKED:", NamedTextColor.RED));
+            lore.add(Translations.component("core.punishment.item.revoked_header").color(NamedTextColor.RED));
 
-            lore.add(UtilMessage.deserialize("<white>%s</white>",
-                    UtilTime.getDateTime(this.getRevokeTime()), 1));
-            lore.add(UtilMessage.deserialize("<white>%s</white> ago",
-                    UtilTime.getTime(System.currentTimeMillis() - this.getRevokeTime(), 1)));
+            lore.add(Component.text(UtilTime.getDateTime(this.getRevokeTime()), NamedTextColor.WHITE));
+            lore.add(Translations.component("core.punishment.item.ago",
+                    Component.text(UtilTime.getTime(System.currentTimeMillis() - this.getRevokeTime(), 1), NamedTextColor.WHITE)));
             if (showPunisher) {
-                lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
-                        revokerNameVar));
+                lore.add(Translations.component("core.punishment.item.revoker",
+                        Component.text(revokerNameVar, NamedTextColor.YELLOW)));
             }
-            lore.add(UtilMessage.deserialize("<gray>Revoke Type:</gray> <green>%s</green>",
-                    getRevokeType() != null ? this.getRevokeType().name() : null));
-            lore.add(UtilMessage.deserialize("<gray>Revoke Reason:</gray> <white>%s</white>",
-                    this.getRevokeReason()));
+            lore.add(Translations.component("core.punishment.item.revoke_type",
+                    Component.text(getRevokeType() != null ? this.getRevokeType().name() : "null", NamedTextColor.GREEN)));
+            lore.add(Translations.component("core.punishment.item.revoke_reason",
+                    Component.text(this.getRevokeReason() == null ? "null" : this.getRevokeReason(), NamedTextColor.WHITE)));
         }
 
 

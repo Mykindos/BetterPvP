@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -68,12 +70,12 @@ public class BlackHoleAbility extends CooldownInteraction implements DisplayedIn
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Black Hole");
+        return Translations.component("champions.ability.black-hole.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Creates a black hole that pulls nearby entities for a short period of time.");
+        return Translations.component("champions.ability.black-hole.description");
     }
 
     @Override

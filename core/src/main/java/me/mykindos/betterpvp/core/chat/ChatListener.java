@@ -91,7 +91,12 @@ public class ChatListener implements Listener {
 
         filterService.filterMessage(event.getMessage()).thenAccept(filteredMessage -> {
             for (Player onlinePlayer : event.getChannel().getAudience()) {
-                ChatReceivedEvent chatReceived = UtilServer.callEvent(new ChatReceivedEvent(player, client, onlinePlayer, event.getChannel().getChannel(), event.getPrefix(), filteredMessage));
+                // If a per-recipient renderer is provided (e.g. /showitem localizing its hover item into the
+                // recipient's locale), use it for this recipient; otherwise deliver the shared filtered message.
+                final Component recipientMessage = event.getMessageRenderer() != null
+                        ? event.getMessageRenderer().apply(onlinePlayer)
+                        : filteredMessage;
+                ChatReceivedEvent chatReceived = UtilServer.callEvent(new ChatReceivedEvent(player, client, onlinePlayer, event.getChannel().getChannel(), event.getPrefix(), recipientMessage));
                 if (chatReceived.isCancelled()) {
                     log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason()).submit();
                 }

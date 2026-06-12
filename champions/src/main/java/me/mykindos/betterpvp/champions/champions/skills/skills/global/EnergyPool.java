@@ -13,6 +13,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.energy.events.UpdateMaxEnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -34,19 +38,17 @@ public class EnergyPool extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public Component[] getDescription(int level) {
+        Component incComp = getValueComponent(this::getEnergyIncrease, level);
+        Component baseComp = Component.text(UtilFormat.formatNumber(this.championsManager.getEnergy().getMaxEnergy(), 0, true), NamedTextColor.YELLOW);
+        Component regenComp = Component.text(UtilFormat.formatNumber(this.championsManager.getEnergy().getEnergyPerSecond(), 1, true), NamedTextColor.YELLOW);
 
-        return new String[] {
-                "Increase your energy pool",
-                "by " + getValueString(this::getEnergyIncrease, level),
-                "",
-                "Energy Information:",
-                "<white>Always Active</white>",
-                "Base Energy: <stat>" + this.championsManager.getEnergy().getMaxEnergy(),
-                //Energy is updated every 50ms.
-                "Energy Regeneration / Second: <stat>" + (this.championsManager.getEnergy().getEnergyPerSecond()),
-
-        };
+        return Translations.componentLines(
+                "champions.skill.global.energy-pool.description",
+                incComp,
+                baseComp,
+                regenComp
+        );
     }
 
     public double getEnergyIncrease(int level) {

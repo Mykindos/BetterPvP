@@ -15,7 +15,11 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -41,12 +45,12 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hitting an enemy from behind will",
-                "increase your damage by " + getValueString(this::getDamageModifier, level, 1, "", 1),
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamageModifier, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.backstab.description",
+                damage
+        );
     }
 
     public double getDamageModifier(int level) {

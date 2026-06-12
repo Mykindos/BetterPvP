@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -172,7 +174,7 @@ public final class BloodSphereProjectile extends Projectile {
 
             final double gained = this.damageDealt * this.impactHealthMultiplier;
             UtilPlayer.slowHealth(JavaPlugin.getPlugin(Champions.class), caster, gained, (int) (healthSeconds * 20), true);
-            UtilMessage.message(caster, NAME, "You gained <alt2>%s</alt2> health.", UtilFormat.formatNumber(gained));
+            UtilMessage.message(caster, NAME, "champions.skill.gained-health", Component.text(UtilFormat.formatNumber(gained), NamedTextColor.YELLOW));
             this.markForRemoval = true;
         }
     }

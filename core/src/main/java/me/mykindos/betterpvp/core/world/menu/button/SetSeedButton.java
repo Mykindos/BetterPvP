@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.menu.GuiCreateWorld;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,9 +29,9 @@ public class SetSeedButton extends ControlItem<GuiCreateWorld> {
     public ItemProvider getItemProvider(GuiCreateWorld gui) {
         return ItemView.builder()
                 .material(Material.WHEAT_SEEDS)
-                .displayName(Component.text("Seed: ", NamedTextColor.GRAY)
+                .displayName(Translations.component("core.menu.world.create.button.seed.name").color(NamedTextColor.GRAY)
                         .append(Component.text(gui.getCreator().seed(), NamedTextColor.DARK_GREEN)))
-                .action(ClickActions.ALL, Component.text("Set seed"))
+                .action(ClickActions.ALL, Translations.component("core.menu.world.create.button.seed.action"))
                 .build();
     }
 
@@ -38,7 +39,7 @@ public class SetSeedButton extends ControlItem<GuiCreateWorld> {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         final AtomicReference<String> seed = new AtomicReference<>();
         final SimpleItem item = new SimpleItem(ItemView.builder()
-                .displayName(Component.text("Set Seed", NamedTextColor.GREEN, TextDecoration.BOLD))
+                .displayName(Translations.component("core.menu.world.create.button.seed.confirm.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                 .material(Material.GREEN_CONCRETE)
                 .build(), click -> {
             if (seed.get() == null || seed.get().trim().isEmpty()) {
@@ -57,7 +58,7 @@ public class SetSeedButton extends ControlItem<GuiCreateWorld> {
                 .setGui(Gui.of(new Structure("x#p")
                         .addIngredient('x', ItemView.builder()
                                 .material(Material.PAPER)
-                                .displayName(Component.text("World Seed", NamedTextColor.GRAY))
+                                .displayName(Translations.component("core.menu.world.create.button.seed.anvil-label").color(NamedTextColor.GRAY))
                                 .build())
                         .addIngredient('p', item)))
                 .setTitle("Enter Seed")

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,12 +62,12 @@ public class SkyforgedAscent extends CooldownInteraction implements DisplayedInt
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Skyforged Ascent");
+        return Translations.component("champions.ability.skyforged-ascent.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Throw the weapon to ascend skyward, riding its divine force, granting you a burst of speed.");
+        return Translations.component("champions.ability.skyforged-ascent.description");
     }
 
     @Override

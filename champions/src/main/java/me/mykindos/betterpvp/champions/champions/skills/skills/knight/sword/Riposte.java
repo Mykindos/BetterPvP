@@ -23,7 +23,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -76,17 +80,18 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Hold right click with a Sword to activate",
-                "",
-                "If an enemy hits you within " + getValueString(this::getDuration, level) + " seconds,",
-                "You will heal " + getValueString(this::getHealing, level) + " health and your next",
-                "attack will deal " + getValueString(this::getBonusDamage, level) + " extra damage",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component healing = getValueComponent(this::getHealing, level);
+        Component bonusDamage = getValueComponent(this::getBonusDamage, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.knight.riposte.description",
+                duration,
+                healing,
+                bonusDamage,
+                cooldown
+        );
     }
 
     public double getDuration(int level) {
@@ -134,9 +139,9 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             double actualHeal = UtilEntity.health(player, newHealth);
             championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_RIPOSTE, actualHeal);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             if (ent instanceof Player target) {
-                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used <green>%s %d</green>", player.getName(), getName(), level);
+                UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.knight.riposte.target-used", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             }
 
             active.remove(player.getUniqueId());
@@ -206,7 +211,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     private void failRiposte(Player player) {
         handRaisedTime.remove(player.getUniqueId());
-        UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(getLevel(player)), NamedTextColor.GREEN));
         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
     }
 
@@ -226,7 +231,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             }
             int level = getLevel(player);
             if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), (long) (getBonusDamageDuration(level) * 1000))) {
-                UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
+                UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.knight.riposte.lost-boost");
                 player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 boostedIterator.remove();
             }

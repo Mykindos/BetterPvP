@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.game.framework.AbstractGame;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.listener.state.TransitionHandler;
@@ -83,7 +84,7 @@ public class GameSidebarListener implements Listener {
             return;
         }
         builder.addBlankLine();
-        builder.addStaticLine(Component.text("Players", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        builder.addStaticLine(Translations.component("game.sidebar.players").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
         builder.addDynamicLine(() -> {
             final AbstractGame<?, ?> game = serverController.getCurrentGame();
             final int online = playerController.getParticipants().size();
@@ -95,30 +96,30 @@ public class GameSidebarListener implements Listener {
             TextComponent text = Component.text(online + "/" + max);
             final int need = game.getAttribute(RequiredPlayersAttribute.class).getValue() - online;
             if (need > 0) {
-                text = text.appendSpace().append(Component.text("(Need " + need + ")", TextColor.color(255, 158, 158)));
+                text = text.appendSpace().append(Translations.component("game.sidebar.need", Component.text(need)).color(TextColor.color(255, 158, 158)));
             }
             return text;
         });
         builder.addBlankLine();
-        builder.addStaticLine(Component.text("Kit", NamedTextColor.RED, TextDecoration.BOLD));
+        builder.addStaticLine(Translations.component("game.sidebar.kit").color(NamedTextColor.RED).decorate(TextDecoration.BOLD));
         builder.addDynamicLine(() -> {
             return Component.text(selectorManager.getRole(player).getName());
         });
         builder.addBlankLine();
-        builder.addStaticLine(Component.text("Game", NamedTextColor.GREEN, TextDecoration.BOLD));
+        builder.addStaticLine(Translations.component("game.sidebar.game").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
         builder.addDynamicLine(() -> {
             final AbstractGame<?, ?> game = serverController.getCurrentGame();
             if (game == null) {
-                return Component.text("None", NamedTextColor.WHITE);
+                return Translations.component("game.sidebar.none").color(NamedTextColor.WHITE);
             }
             return Component.text(game.getConfiguration().getName(), NamedTextColor.WHITE);
         });
         builder.addBlankLine();
-        builder.addStaticLine(Component.text("Map", NamedTextColor.AQUA, TextDecoration.BOLD));
+        builder.addStaticLine(Translations.component("game.sidebar.map").color(NamedTextColor.AQUA).decorate(TextDecoration.BOLD));
         builder.addDynamicLine(() -> {
             final MappedWorld currentMap = mapManager.getCurrentMap();
             if (currentMap == null) {
-                return Component.text("None", NamedTextColor.WHITE);
+                return Translations.component("game.sidebar.none").color(NamedTextColor.WHITE);
             }
             return Component.text(currentMap.getMetadata().getName(), NamedTextColor.WHITE);
         });
@@ -136,13 +137,15 @@ public class GameSidebarListener implements Listener {
         if (serverController.getCurrentState() != GameState.ENDING && serverController.getCurrentState() != GameState.IN_GAME) {
             final SidebarComponent waitingTitle = SidebarComponent.dynamicLine(() -> {
                 if (serverController.getCurrentState() == GameState.WAITING) {
-                    return Component.text("Waiting for players...", NamedTextColor.GREEN, TextDecoration.BOLD);
+                    return Translations.component("game.sidebar.waiting").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD);
                 } else {
                     final long estimatedTransitionTime = transitionHandler.getEstimatedTransitionTime();
                     final int remainingSeconds = (int) (Math.max(0, estimatedTransitionTime - System.currentTimeMillis()) / 1000);
-                    final String qualifier = remainingSeconds == 1 ? "Second" : "Seconds";
-                    return Component.text("Starting in ", NamedTextColor.WHITE, TextDecoration.BOLD)
-                            .append(Component.text(remainingSeconds + " " + qualifier, NamedTextColor.GREEN, TextDecoration.BOLD));
+                    final String qualifierKey = remainingSeconds == 1 ? "game.sidebar.second" : "game.sidebar.seconds";
+                    return Translations.component("game.sidebar.starting-in").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                            .append(Component.text(" ").decorate(TextDecoration.BOLD))
+                            .append(Component.text(remainingSeconds + " ").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                            .append(Translations.component(qualifierKey).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
                 }
             });
             return new Sidebar(gamer, waitingTitle,  SidebarType.GENERAL);

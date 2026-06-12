@@ -20,10 +20,14 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -66,18 +70,12 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with a Sword to activate",
-                "",
-                "Create a soul link with your target, and up to " + getValueString(this::getMaximumEnemies, level) + " enemies",
-                "within " + getValueString(this::getRange, level) + " blocks of your target.",
-                "",
-                "Linked targets have " + getValueString(this::getLeechedHealth, level) + " health leeched per second",
-                "You may target up to " + getValueString(this::getMaximumEnemies, level, 0),
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component maximumEnemies = getValueComponent(this::getMaximumEnemies, level);
+        Component range = getValueComponent(this::getRange, level);
+        Component leechedHealth = getValueComponent(this::getLeechedHealth, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines("champions.skill.warlock.leech.description", maximumEnemies, range, leechedHealth, cooldown);
     }
 
     public double getRange(int level) {

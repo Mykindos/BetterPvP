@@ -23,7 +23,7 @@ public class PowerPickaxe extends BaseItem implements Reloadable {
     private static final int DEFAULT_DURABILITY = 1561;
 
     public PowerPickaxe() {
-        super("Power Pickaxe", ItemStack.of(Material.DIAMOND_PICKAXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.power-pickaxe.name"), ItemStack.of(Material.DIAMOND_PICKAXE), ItemGroup.TOOL, ItemRarity.UNCOMMON);
         addSerializableComponent(new DurabilityComponent(DEFAULT_DURABILITY));
         addSerializableComponent(new RepairableComponent());
         addSerializableComponent(new SocketableContainerComponent());

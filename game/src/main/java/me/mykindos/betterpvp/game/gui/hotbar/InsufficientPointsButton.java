@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -23,11 +25,8 @@ public class InsufficientPointsButton extends AbstractItem {
     @Override
     public ItemProvider getItemProvider() {
         return ItemView.builder()
-                .displayName(Component.text("Insufficient Points", NamedTextColor.RED))
-                .lore(List.of(
-                  Component.text("Items to the right"),
-                  Component.text("Cannot be added")
-                ))
+                .displayName(Translations.component("game.menu.hotbar.insufficient.name").color(NamedTextColor.RED))
+                .lore(List.of(Translations.componentLines("game.menu.hotbar.insufficient.lore")))
                 .material(Material.RED_CONCRETE)
                 .build();
     }

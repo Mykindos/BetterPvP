@@ -5,10 +5,10 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.AbstractItemComponent;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -49,8 +49,11 @@ public class StatAugmentationComponent extends AbstractItemComponent implements 
 
     @Override
     public List<Component> getLines(ItemInstance item) {
-        final TextComponent description = Component.text("Apply this to an item at a Reforge NPC to augment its stats.", NamedTextColor.GRAY, TextDecoration.ITALIC);
-        List<Component> lines = new ArrayList<>(ComponentWrapper.wrapLine(description));
+        // Translatable hint; wrapping is deferred to the per-viewer render boundary (see ComponentWrapper.markForWrap).
+        final Component description = Translations.component("core.stat.augmentation.apply-hint")
+                .color(NamedTextColor.GRAY).decorate(TextDecoration.ITALIC);
+        List<Component> lines = new ArrayList<>();
+        lines.add(ComponentWrapper.markForWrap(description, 30));
 
         for (StatAugmentation augmentation : augmentations) {
             lines.add(Component.empty());
@@ -58,9 +61,9 @@ public class StatAugmentationComponent extends AbstractItemComponent implements 
 
             // Declare the type
             lines.add(Component.empty()
-                    .append(Component.text("Stat:", NamedTextColor.GRAY))
+                    .append(Translations.component("core.stat.augmentation.stat-label").color(NamedTextColor.GRAY))
                     .appendSpace()
-                    .append(Component.text(type.getName(), type.getDisplayColor(), TextDecoration.UNDERLINED)));
+                    .append(type.getNameComponent().color(type.getDisplayColor()).decorate(TextDecoration.UNDERLINED)));
 
             // Declare the value
             final TextColor tierColor = switch (augmentation.getTier()) {
@@ -70,9 +73,10 @@ public class StatAugmentationComponent extends AbstractItemComponent implements 
                 default -> TextColor.color(255, 0, 0);
             };
             lines.add(Component.empty()
-                    .append(Component.text("Augmentation:", NamedTextColor.GRAY))
+                    .append(Translations.component("core.stat.augmentation.tier-label").color(NamedTextColor.GRAY))
                     .appendSpace()
-                    .append(Component.text("Tier " + UtilFormat.getRomanNumeral(augmentation.getTier()), tierColor)));
+                    .append(Translations.component("core.stat.augmentation.tier-value",
+                            Component.text(UtilFormat.getRomanNumeral(augmentation.getTier()))).color(tierColor)));
         }
 
         return lines;

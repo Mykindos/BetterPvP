@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.game.gui.hotbar;
 import com.google.common.base.Preconditions;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -44,10 +46,10 @@ public class HotBarItemDisplayButton extends ControlItem<HotBarEditor> {
                 .appendSpace()
                 .append(Component.text("●", NamedTextColor.GRAY))
                 .appendSpace()
-                .append(Component.text(String.format("%d Item Tokens", hotBarItem.getTokenCost()), NamedTextColor.GOLD)))
+                .append(Translations.component("game.menu.hotbar.item.token-cost", Component.text(hotBarItem.getTokenCost())).color(NamedTextColor.GOLD)))
                 .amount(hotBarItem.getAmount())
-                .action(ClickActions.RIGHT, Component.text("Remove"))
-                .action(ClickActions.LEFT, Component.text("Remove + Select"));
+                .action(ClickActions.RIGHT, Translations.component("game.menu.hotbar.item.remove"))
+                .action(ClickActions.LEFT, Translations.component("game.menu.hotbar.item.remove-select"));
 
         return builder
                 .flag(ItemFlag.HIDE_ATTRIBUTES)

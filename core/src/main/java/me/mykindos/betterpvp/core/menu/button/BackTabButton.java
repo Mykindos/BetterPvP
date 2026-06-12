@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -47,7 +48,7 @@ public class BackTabButton extends AbstractItem {
         return ItemView.builder()
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/tab/back"))
-                .displayName(Component.text("Back", TextColor.color(245, 71, 59)))
+                .displayName(Translations.component("core.menu.button.back.name").color(TextColor.color(245, 71, 59)))
                 .build();
     }
 

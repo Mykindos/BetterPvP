@@ -13,7 +13,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -35,11 +39,9 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Your sword sucks " + getValueString(this::getSiphonedEnergy, level) + " energy from",
-                "opponents with every attack"
-        };
+    public Component[] getDescription(int level) {
+        Component siphonedEnergy = getValueComponent(this::getSiphonedEnergy, level);
+        return Translations.componentLines("champions.skill.mage.null-blade.description", siphonedEnergy);
     }
 
     @Override

@@ -13,9 +13,12 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -36,7 +39,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Unclaim the territory you are standing on";
+        return "clans.command.unclaim.description";
     }
 
     @Override
@@ -44,7 +47,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
 
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
         if(locationClanOptional.isEmpty()) {
-            UtilMessage.message(player, "Clans", "You are not standing on claimed territory");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.not-claimed");
             return;
         }
 
@@ -53,7 +56,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
 
         if (playerClan.equals(locationClan)) {
             if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-                UtilMessage.message(player, "Clans", "You must be an admin or above to unclaim territory");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.no-rank");
                 return;
             }
 
@@ -61,26 +64,30 @@ public class UnclaimSubCommand extends ClanSubCommand {
 
                 // Pass territory 2d array into algorithm.
                 if(UtilClans.isClaimRequired(UtilClans.getClaimLayout(player, locationClan))){
-                    UtilMessage.message(player, "Clans", "Unclaiming this chunk would split your territory. Please unclaim a different chunk.");
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.split-territory");
                     return;
                 }
             }
-        }else {
+        } else {
             if (!client.isAdministrating()) {
                 if (locationClan.getTerritory().size() <= clanManager.getMaximumClaimsForClan(locationClan) && !client.isAdministrating()) {
-                    UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has enough members to keep this territory.",
-                            locationClan.getName());
+                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.not-enough-members",
+                            Component.text(locationClan.getName(), NamedTextColor.YELLOW));
                     return;
                 }
             } else {
-                clientManager.sendMessageToRank("Clans",
-                        UtilMessage.deserialize("<yellow>%s<gray> force unclaimed <yellow>%s</yellow> from <yellow>%s<gray>",
-                                player.getName(), UtilWorld.chunkToPrettyString(player.getLocation().getChunk()), locationClan.getName()), Rank.TRIAL_MOD);
+                Component notification = Translations.component("clans.command.clan.unclaim.mod-notification",
+                        Component.text(player.getName(), NamedTextColor.YELLOW),
+                        Component.text(UtilWorld.chunkToPrettyString(player.getLocation().getChunk()), NamedTextColor.YELLOW),
+                        Component.text(locationClan.getName(), NamedTextColor.YELLOW));
+                clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(target -> {
+                    UtilMessage.message(target, Translations.component(CLANS_PREFIX), notification);
+                });
             }
 
 
             if (UtilClans.isClaimRequired(UtilClans.getClaimLayout(player, locationClan))){
-                UtilMessage.message(player, "Clans", "Unclaiming this chunk would split their territory. Please unclaim a different chunk.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.other-split-territory");
                 return;
             }
 
@@ -89,10 +96,15 @@ public class UnclaimSubCommand extends ClanSubCommand {
                 if (clientOpt.isPresent()) {
                     final Client online = clientOpt.get();
                     if (online.isAdministrating()) {
-                        UtilMessage.message(player, "Clans", "You may not unclaim territory from this Clan at this time.");
-                        clientManager.sendMessageToRank("Clans",
-                                UtilMessage.deserialize("<yellow>%s<gray> prevented <yellow>%s<gray> from unclaiming <yellow>%s<gray>'s territory because they are in adminstrator mode",
-                                        online.getName(), player.getName(), locationClan.getName()), Rank.TRIAL_MOD);
+                        UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.prevented");
+
+                        Component notification = Translations.component("clans.command.clan.unclaim.prevented-mod-notification",
+                                Component.text(online.getName(), NamedTextColor.YELLOW),
+                                Component.text(player.getName(), NamedTextColor.YELLOW),
+                                Component.text(locationClan.getName(), NamedTextColor.YELLOW));
+                        clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(target -> {
+                            UtilMessage.message(target, Translations.component(CLANS_PREFIX), notification);
+                        });
                         return;
                     }
                 }

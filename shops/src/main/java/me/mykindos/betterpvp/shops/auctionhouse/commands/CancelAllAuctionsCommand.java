@@ -24,7 +24,7 @@ public class CancelAllAuctionsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Cancel all auctions";
+        return "shops.command.cancel-all-auctions.description";
     }
 
     @Override

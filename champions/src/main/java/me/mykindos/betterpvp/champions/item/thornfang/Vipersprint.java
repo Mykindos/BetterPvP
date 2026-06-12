@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.thornfang;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -92,12 +94,12 @@ public class Vipersprint extends AbstractInteraction implements Listener, Displa
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Vipersprint");
+        return Translations.component("champions.ability.vipersprint.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Dash forward at high speed, curving your path with your aim while cutting through anything in your way. Hitting an enemy resets your cooldown.");
+        return Translations.component("champions.ability.vipersprint.description");
     }
 
     @Override

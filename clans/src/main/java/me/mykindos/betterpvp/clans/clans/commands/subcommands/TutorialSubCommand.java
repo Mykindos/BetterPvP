@@ -9,27 +9,52 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Singleton
 @SubCommand(ClanCommand.class)
 public class TutorialSubCommand extends ClanSubCommand {
 
+    private static final NamedTextColor LIGHT_PURPLE = NamedTextColor.LIGHT_PURPLE;
+    private static final NamedTextColor DARK_PURPLE = NamedTextColor.DARK_PURPLE;
+    private static final NamedTextColor DARK_AQUA = NamedTextColor.DARK_AQUA;
+    private static final NamedTextColor DARK_GREEN = NamedTextColor.DARK_GREEN;
+    private static final NamedTextColor DARK_RED = NamedTextColor.DARK_RED;
+    private static final NamedTextColor BLUE = NamedTextColor.BLUE;
+
+    private static Component clans() {
+        return Component.text("Clans", NamedTextColor.GOLD);
+    }
+
+    private static Component bold(Component component) {
+        return component.decoration(TextDecoration.BOLD, true);
+    }
+
     //no yellow or white, it is not easy to read in a book
     private static final List<Component> tutorialText = new ArrayList<>(List.of(
-            UtilMessage.deserialize("<black>Welcome to <gold>Clans</gold>! <gold>Clans</gold> is a long term factions like gamemode, with <light_purple>special weapons</light_purple>, <dark_purple>classes</dark_purple>, and <dark_aqua>bosses</dark_aqua>")
+            Translations.component("clans.tutorial.intro",
+                            clans(), clans(),
+                            Component.text("special weapons", LIGHT_PURPLE),
+                            Component.text("classes", DARK_PURPLE),
+                            Component.text("bosses", DARK_AQUA))
+                    .color(NamedTextColor.BLACK)
                     .appendNewline()
                     .appendNewline()
-                    .append(UtilMessage.deserialize("<black>You can open this book again at any time by running "))
+                    .append(Translations.component("clans.tutorial.reopen").color(NamedTextColor.BLACK).append(Component.text(" ")))
                     .append(UtilMessage.copyCommand("/c tutorial")),
-            UtilMessage.deserialize("<black><b>Table of contents</b>").appendNewline()
+            bold(Translations.component("clans.tutorial.toc-title")).color(NamedTextColor.BLACK).appendNewline()
+                    // SKIPPED: tableOfContentsEntry takes a plain String embedded into a clickable
+                    // changePage() component; cannot accept a translatable key. Entry labels left literal.
                     .append(UtilMessage.tableOfContentsEntry("Overview", 4)).appendNewline()
                     .append(UtilMessage.tableOfContentsEntry("Clan", 6)).appendNewline()
                     .append(UtilMessage.tableOfContentsEntry("Territory", 7)).appendNewline()
@@ -45,7 +70,7 @@ public class TutorialSubCommand extends ClanSubCommand {
                     .append(UtilMessage.tableOfContentsEntry("Ranger", 18)).appendNewline()
 
             ,
-            UtilMessage.deserialize("<black><b>Table of contents</b>").appendNewline()
+            bold(Translations.component("clans.tutorial.toc-title")).color(NamedTextColor.BLACK).appendNewline()
                     .append(UtilMessage.tableOfContentsEntry("Mage", 19)).appendNewline()
                     .append(UtilMessage.tableOfContentsEntry("Warlock", 20)).appendNewline()
                     .append(UtilMessage.tableOfContentsEntry("Custom Items", 21)).appendNewline()
@@ -56,73 +81,150 @@ public class TutorialSubCommand extends ClanSubCommand {
                     .append(UtilMessage.tableOfContentsEntry("Mining", 27)).appendNewline()
                     .append(UtilMessage.tableOfContentsEntry("Woodcutting", 28)).appendNewline()
             ,
-            /*4*/ UtilMessage.deserialize("<black><gold>Clans</gold> can be a difficult game, it is possible to lose everything and start from scratch. This is not common, but can happen. <dark_green>Seasons</dark_green> periodically reset, and everyone starts from scratch."),
-            /*5*/ UtilMessage.deserialize("<black>Enjoy the game how you want to play, there is no right way to play <gold>Clans</gold>. If you like <blue>building</blue>, <dark_red>combat</dark_red>, <dark_green>farming</dark_green>, <dark_aqua>bosses</dark_aqua>, and more, there is something for you.\nPlay with up to <green>7</green> friends and see where your journey takes you."),
-            /*6*/ UtilMessage.deserialize("<black>The core of <gold>Clans</gold> is the <aqua>Clan</aqua>. You can make one by running ")
+            /*4*/ Translations.component("clans.tutorial.difficulty",
+                            clans(),
+                            Component.text("Seasons", DARK_GREEN))
+                    .color(NamedTextColor.BLACK),
+            /*5*/ Translations.component("clans.tutorial.enjoy",
+                            clans(),
+                            Component.text("building", BLUE),
+                            Component.text("combat", DARK_RED),
+                            Component.text("farming", DARK_GREEN),
+                            Component.text("bosses", DARK_AQUA),
+                            Component.text("7", NamedTextColor.GREEN))
+                    .color(NamedTextColor.BLACK),
+            /*6*/ Translations.component("clans.tutorial.clan-core",
+                            clans(),
+                            Component.text("Clan", NamedTextColor.AQUA))
+                    .color(NamedTextColor.BLACK).append(Component.text(" "))
                     .append(UtilMessage.copyCommand("/c create <name>", "/c create "))
-                    .append(UtilMessage.deserialize("<black>, invite friends by running "))
+                    .append(Translations.component("clans.tutorial.clan-invite").color(NamedTextColor.BLACK).append(Component.text(" ")))
                     .append(UtilMessage.copyCommand("/c invite <player>", "/c invite ")
-                    .append(UtilMessage.deserialize("<black>, and join a <aqua>Clan</aqua> you are invited to by running "))
+                    .append(Translations.component("clans.tutorial.clan-join",
+                                    Component.text("Clan", NamedTextColor.AQUA))
+                            .color(NamedTextColor.BLACK).append(Component.text(" ")))
                     .append(UtilMessage.copyCommand("/c join <clan>", "/c join "))),
-            /*7*/ UtilMessage.deserialize("<black><aqua>Clans</aqua> can claim territory by running ")
+            /*7*/ Translations.component("clans.tutorial.territory-claim",
+                            Component.text("Clans", NamedTextColor.AQUA))
+                    .color(NamedTextColor.BLACK).append(Component.text(" "))
                     .append(UtilMessage.copyCommand("/c claim", "/c help claim"))
-                    .append(UtilMessage.deserialize("<black>, which you can use to store items. <red>Enemy</red> <aqua>Clans</aqua> can use cannons to besiege you, after reaching <green>100</green> <red>dominance</red> on you."))
+                    .append(Translations.component("clans.tutorial.territory-info",
+                                    Component.text("Enemy", NamedTextColor.RED),
+                                    Component.text("Clans", NamedTextColor.AQUA),
+                                    Component.text("100", NamedTextColor.GREEN),
+                                    Component.text("dominance", NamedTextColor.RED))
+                            .color(NamedTextColor.BLACK))
                     .appendNewline()
-                    .append(UtilMessage.deserialize("<black><i>Related commands:</i>"))
+                    .append(Translations.component("clans.tutorial.related-commands").color(NamedTextColor.BLACK).decoration(TextDecoration.ITALIC, true))
                     .appendNewline()
                     .append(UtilMessage.copyCommand("/c unclaim", "/c help unclaim"))
                     .appendNewline()
                     .append(UtilMessage.copyCommand("/c enemy <clan>", "/c help enemy"))
                     .appendNewline()
                     .append(UtilMessage.copyCommand("/c neutral <clan>", "/c help neutral")),
-            /*8*/ UtilMessage.deserialize("<black>In your territory, you can set a location by running ")
+            /*8*/ Translations.component("clans.tutorial.core-set").color(NamedTextColor.BLACK).append(Component.text(" "))
                     .append(UtilMessage.copyCommand("/c setcore", "/c help setcore"))
-                    .append(UtilMessage.deserialize("<black> that you can teleport back to by running "))
+                    .append(Translations.component("clans.tutorial.core-teleport").color(NamedTextColor.BLACK))
                     .append(UtilMessage.copyCommand("/c core", "/c help home"))
-                    .append(UtilMessage.deserialize("<black>. You can <green><bold>ally</bold></green> with other <aqua>Clans</aqua> by running "))
+                    .append(Translations.component("clans.tutorial.core-ally",
+                                    bold(Component.text("ally", NamedTextColor.GREEN)),
+                                    Component.text("Clans", NamedTextColor.AQUA))
+                            .color(NamedTextColor.BLACK).append(Component.text(" ")))
                     .append(UtilMessage.copyCommand("/c ally <clan>", "/c ally "))
-                    .append(UtilMessage.deserialize("<black> and optionally trust them by running "))
+                    .append(Translations.component("clans.tutorial.core-trust").color(NamedTextColor.BLACK))
                     .append(UtilMessage.copyCommand("/c trust <clan>", "/c help trust")),
-            /*9*/ UtilMessage.deserialize("<black>You may only have up to <green>8</green> players between <green><bold>Allied</bold></green> and <aqua><bold>Own</bold></aqua> <aqua>Clans</aqua>. See ")
+            /*9*/ Translations.component("clans.tutorial.alliance-limit",
+                            Component.text("8", NamedTextColor.GREEN),
+                            bold(Component.text("Allied", NamedTextColor.GREEN)),
+                            bold(Component.text("Own", NamedTextColor.AQUA)),
+                            Component.text("Clans", NamedTextColor.AQUA))
+                    .color(NamedTextColor.BLACK).append(Component.text(" "))
                     .append(UtilMessage.copyCommand("/c help", "/c help"))
-                    .append(UtilMessage.deserialize("<black> for more information on Clan commands.")),
-            /*10*/ UtilMessage.deserialize("<black>There are a few different areas to explore in the world. Use ")
+                    .append(Translations.component("clans.tutorial.alliance-help").color(NamedTextColor.BLACK)),
+            /*10*/ Translations.component("clans.tutorial.map-intro").color(NamedTextColor.BLACK).append(Component.text(" "))
                     .append(UtilMessage.copyCommand("/map"))
-                    .append(UtilMessage.deserialize("<black> to see the map and find your way around. Maps show your clanmates. During a pillage, they also show enemies.")),
-            /*11*/ UtilMessage.deserialize("<black>In each cardinal direction there is a <green>Safezone</green> that contains <gray>Shops</gray>. Here, you can sell most items, buy essential goods, access dungeons, and change your class. " +
-                    "\nYou can teleport here from the world spawn."),
-            /*12*/ UtilMessage.deserialize("<black>In the center of the map is <gray>Fields</gray>. A high traffic area, here you can find ores, places to fish, and a teleporter to events."),
-            /*13*/ UtilMessage.deserialize("<black>Periodically events will occur, which you can access by using the portal in <gray>Fields</gray>. These events can drop <light_purple><bold>Legendary Weapons</bold></light_purple>. These are strong, special weapons, imbued with unique capabilities. You can also find runes and dungeon tokens here."),
-            /*14*/ UtilMessage.deserialize("<black>There are currently <green>6</green> <gold>Champions</gold> <dark_purple>classes</dark_purple>, one for each armor set. Each has its strengths and weaknesses. There are many different <gray>skills</gray> to choose between, pick and choose the ones that fit your playstyle most. You can adjust <gray>skills</gray> for any <dark_purple>class</dark_purple> at an enchanting table."),
-            /*15*/ Component.text(Role.ASSASSIN.getName(), Role.ASSASSIN.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize(Role.ASSASSIN.getDescription()).color(NamedTextColor.BLACK)),
-            /*16*/ Component.text(Role.KNIGHT.getName(), Role.KNIGHT.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize(Role.KNIGHT.getDescription()).color(NamedTextColor.BLACK)),
-            /*17*/ Component.text(Role.BRUTE.getName(), Role.BRUTE.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize(Role.BRUTE.getDescription()).color(NamedTextColor.BLACK)),
-            /*18*/ Component.text(Role.RANGER.getName(), Role.RANGER.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize(Role.RANGER.getDescription()).color(NamedTextColor.BLACK)),
-            /*19*/ Component.text(Role.MAGE.getName(), Role.MAGE.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize(Role.MAGE.getDescription()).color(NamedTextColor.BLACK)),
-            /*20*/ Component.text(Role.WARLOCK.getName(), Role.WARLOCK.getColor()).appendNewline()
-                    .append(UtilMessage.deserialize(Role.WARLOCK.getDescription()).color(NamedTextColor.BLACK)),
-            /*21*/ UtilMessage.deserialize("<black>There are custom items that you can find, buy, or craft. You can see the craftable items and their recipes by running ")
+                    .append(Translations.component("clans.tutorial.map-info").color(NamedTextColor.BLACK)),
+            /*11*/ Translations.component("clans.tutorial.shops",
+                            Component.text("Safezone", NamedTextColor.GREEN),
+                            Component.text("Shops", NamedTextColor.GRAY))
+                    .color(NamedTextColor.BLACK),
+            /*12*/ Translations.component("clans.tutorial.fields",
+                            Component.text("Fields", NamedTextColor.GRAY))
+                    .color(NamedTextColor.BLACK),
+            /*13*/ Translations.component("clans.tutorial.events",
+                            Component.text("Fields", NamedTextColor.GRAY),
+                            bold(Component.text("Legendary Weapons", LIGHT_PURPLE)))
+                    .color(NamedTextColor.BLACK),
+            /*14*/ Translations.component("clans.tutorial.classes",
+                            Component.text("6", NamedTextColor.GREEN),
+                            Component.text("Champions", NamedTextColor.GOLD),
+                            Component.text("classes", DARK_PURPLE),
+                            Component.text("skills", NamedTextColor.GRAY),
+                            Component.text("skills", NamedTextColor.GRAY),
+                            Component.text("class", DARK_PURPLE))
+                    .color(NamedTextColor.BLACK),
+            /*15*/ Role.ASSASSIN.getDisplayName().color(Role.ASSASSIN.getColor()).appendNewline()
+                    .append(Role.ASSASSIN.getDescriptionComponent().color(NamedTextColor.BLACK)),
+            /*16*/ Role.KNIGHT.getDisplayName().color(Role.KNIGHT.getColor()).appendNewline()
+                    .append(Role.KNIGHT.getDescriptionComponent().color(NamedTextColor.BLACK)),
+            /*17*/ Role.BRUTE.getDisplayName().color(Role.BRUTE.getColor()).appendNewline()
+                    .append(Role.BRUTE.getDescriptionComponent().color(NamedTextColor.BLACK)),
+            /*18*/ Role.RANGER.getDisplayName().color(Role.RANGER.getColor()).appendNewline()
+                    .append(Role.RANGER.getDescriptionComponent().color(NamedTextColor.BLACK)),
+            /*19*/ Role.MAGE.getDisplayName().color(Role.MAGE.getColor()).appendNewline()
+                    .append(Role.MAGE.getDescriptionComponent().color(NamedTextColor.BLACK)),
+            /*20*/ Role.WARLOCK.getDisplayName().color(Role.WARLOCK.getColor()).appendNewline()
+                    .append(Role.WARLOCK.getDescriptionComponent().color(NamedTextColor.BLACK)),
+            /*21*/ Translations.component("clans.tutorial.custom-items").color(NamedTextColor.BLACK).append(Component.text(" "))
                     .append(UtilMessage.copyCommand("/c recipes"))
-                    .append(UtilMessage.deserialize("<black>. These items can be used to give you an edge in combat, or to help you gather resources.")),
-            /*22*/ UtilMessage.deserialize("<black>Some of these items are only available from events, dungeons, or raids, so keep an eye out for those."),
-            /*23*/ UtilMessage.deserialize("<black>Classes/Kits are identified by armor, you automatically have a class. You can craft the specific armor set to get the reinforced set. You may only wear the reinforced set of your class. Reinforced pieces give increased health."),
-            /*24*/ UtilMessage.deserialize("<black>Your basic weapons can be upgraded. <gold>Booster</gold> (made with gold blocks) or <aqua>Power</aqua> (made with diamond blocks). <gold>Booster</gold> increase the relevant <gray>skill</gray> by <gold>+1</gold> and <aqua>Power</aqua> increases damage by <gold>+0.5</gold>. <dark_purple>Ancient</dark_purple> weapons (found from events) combine the effects of both!"),
-            /*25*/ UtilMessage.deserialize("<black>There is more than just combat, you could also level up other areas. Level up your Progression in <blue>Fishing</blue>, <gray>Mining</gray>, and <dark_red>Woodcutting</dark_red>"),
-            /*26*/ Component.text("Fishing", NamedTextColor.BLUE).appendNewline()
-                    .append(UtilMessage.deserialize("<black>Take your rod and cast it into the <blue>Lake</blue>, fishing around for fish and treasures. Level up with catches, cast baits to entice fish, and upgrade your rod to catch heavier fish. Take your catch and sell it at shops, or take your treasure home.")),
-            /*27*/ Component.text("Mining", NamedTextColor.GRAY).appendNewline()
-                    .append(UtilMessage.deserialize("<black>Take your pick and make your way to the mines, for there are riches in store. Earn experience, with 5x more in <gray>Fields</gray>. Higher levels lead to more drops and faster mining speeds.")),
-            /*28*/ Component.text("Woodcutting", NamedTextColor.DARK_RED).appendNewline()
-                    .append(UtilMessage.deserialize("<black>Take your axe and find a tree to chop. Level up with each log you chop, giving you access to new perks and abilities.")),
-            /*29*/ UtilMessage.deserialize("<black>Good luck in your adventures and remember to have fun.")
+                    .append(Translations.component("clans.tutorial.custom-items-info").color(NamedTextColor.BLACK)),
+            /*22*/ Translations.component("clans.tutorial.custom-items-rare").color(NamedTextColor.BLACK),
+            /*23*/ Translations.component("clans.tutorial.reinforced").color(NamedTextColor.BLACK),
+            /*24*/ Translations.component("clans.tutorial.upgraded-weapons",
+                            Component.text("Booster", NamedTextColor.GOLD),
+                            Component.text("Power", NamedTextColor.AQUA),
+                            Component.text("Booster", NamedTextColor.GOLD),
+                            Component.text("skill", NamedTextColor.GRAY),
+                            Component.text("+1", NamedTextColor.GOLD),
+                            Component.text("Power", NamedTextColor.AQUA),
+                            Component.text("+0.5", NamedTextColor.GOLD),
+                            Component.text("Ancient", DARK_PURPLE))
+                    .color(NamedTextColor.BLACK),
+            /*25*/ Translations.component("clans.tutorial.progression",
+                            Component.text("Fishing", BLUE),
+                            Component.text("Mining", NamedTextColor.GRAY),
+                            Component.text("Woodcutting", DARK_RED))
+                    .color(NamedTextColor.BLACK),
+            /*26*/ Translations.component("clans.tutorial.fishing-title").color(BLUE).appendNewline()
+                    .append(Translations.component("clans.tutorial.fishing",
+                                    Component.text("Lake", BLUE))
+                            .color(NamedTextColor.BLACK)),
+            /*27*/ Translations.component("clans.tutorial.mining-title").color(NamedTextColor.GRAY).appendNewline()
+                    .append(Translations.component("clans.tutorial.mining",
+                                    Component.text("Fields", NamedTextColor.GRAY))
+                            .color(NamedTextColor.BLACK)),
+            /*28*/ Translations.component("clans.tutorial.woodcutting-title").color(DARK_RED).appendNewline()
+                    .append(Translations.component("clans.tutorial.woodcutting").color(NamedTextColor.BLACK)),
+            /*29*/ Translations.component("clans.tutorial.good-luck").color(NamedTextColor.BLACK)
     ));
 
     public static final Book book = Book.book(Component.text("Clans Tutorial", NamedTextColor.GOLD), Component.text("BetterPvP", NamedTextColor.GOLD), tutorialText);
+
+    /**
+     * Builds a copy of the tutorial book with every (translatable) page resolved into the viewer's locale.
+     * <p>
+     * The static {@link #book} is a language-neutral template; book content is NOT run through the
+     * per-viewer {@code GlobalTranslator} on send (unlike chat/action bars), so opening it directly shows
+     * raw translation keys. Resolve server-side here for the recipient instead.
+     */
+    public static Book localizedBook(Player player) {
+        final Locale locale = player.locale();
+        final List<Component> pages = new ArrayList<>(tutorialText.size());
+        for (Component page : tutorialText) {
+            pages.add(Translations.render(page, locale));
+        }
+        return Book.book(Translations.render(book.title(), locale), Translations.render(book.author(), locale), pages);
+    }
 
     @Inject
     public TutorialSubCommand(ClanManager clanManager, ClientManager clientManager) {
@@ -136,12 +238,12 @@ public class TutorialSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Opens the tutorial for clans";
+        return "clans.command.tutorial.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        player.openBook(book);
+        player.openBook(localizedBook(player));
     }
 
     @Override

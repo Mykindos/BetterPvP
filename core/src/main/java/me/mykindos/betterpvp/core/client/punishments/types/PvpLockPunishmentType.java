@@ -22,7 +22,7 @@ public class PvpLockPunishmentType implements IPunishmentType {
     public void onExpire(UUID client, Punishment punishment) {
         Player player = Bukkit.getPlayer(client);
         if (player != null) {
-            UtilMessage.message(player, "Punish", "Your pvp lock punishment has expired");
+            UtilMessage.message(player, "core.prefix.punish", "core.punishment.pvplock.expired");
         }
     }
 

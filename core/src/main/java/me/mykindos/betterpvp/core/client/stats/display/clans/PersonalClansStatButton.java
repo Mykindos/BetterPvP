@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.impl.clans.ClanWrapperStat;
 import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.server.Period;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -33,7 +34,7 @@ public class PersonalClansStatButton extends ControlItem<IAbstractClansStatMenu>
                 .material(Material.IRON_SWORD)
                 .lore(getPersonalStats())
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
-                .displayName(Component.text("Personal Stats"))
+                .displayName(Translations.component("core.menu.stats.clans.button.personal.name"))
                 .build();
     }
 

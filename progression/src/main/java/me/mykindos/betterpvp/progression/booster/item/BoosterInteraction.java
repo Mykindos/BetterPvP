@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.actor.PlayerInteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.booster.BoosterManager;
 import net.kyori.adventure.text.Component;
@@ -41,20 +42,19 @@ public class BoosterInteraction extends AbstractInteraction implements Displayed
 
         boosterManager.activateBooster(uuid, durationMillis);
 
-        UtilMessage.simpleMessage(player, "Booster", Component.text("You have activated a ", NamedTextColor.GRAY)
-                .append(Component.text("Profession Experience Booster", NamedTextColor.GREEN))
-                .append(Component.text("!", NamedTextColor.GRAY)));
+        UtilMessage.message(player, "core.prefix.booster", "progression.booster.activated",
+                Component.text("Profession Experience Booster", NamedTextColor.GREEN));
         
         return InteractionResult.Success.ADVANCE;
     }
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Activate Booster", NamedTextColor.GREEN);
+        return Translations.component("progression.ability.booster.name").color(NamedTextColor.GREEN);
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Activates a 20% Profession Experience Booster for 24 hours.", NamedTextColor.GRAY);
+        return Translations.component("progression.ability.booster.description").color(NamedTextColor.GRAY);
     }
 }

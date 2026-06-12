@@ -33,7 +33,7 @@ public class RabbitStew extends BaseItem implements Reloadable {
 
     @Inject
     private RabbitStew(SpeedBoostAbility speedBoostAbility) {
-        super("Rabbit Stew", model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
+        super(translatableName("champions.item.rabbit-stew.name"), model, ItemGroup.CONSUMABLE, ItemRarity.UNCOMMON);
         this.speedBoostAbility = speedBoostAbility;
         this.speedBoostAbility.setConsumesItem(true);
         addBaseComponent(InteractionContainerComponent.builder()

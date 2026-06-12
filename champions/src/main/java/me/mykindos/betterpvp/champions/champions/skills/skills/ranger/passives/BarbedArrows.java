@@ -15,9 +15,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -65,15 +68,13 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Hitting an arrow will stick a barb into the target",
-                "your melee hits on that target will rip the barb out,",
-                "dealing " + getValueString(this::getDamage, level) + " extra damage and giving the target",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " second",
-                "",
-                "The barb will fall out after " + getValueString(this::getDamageResetTime, level) + " seconds"
-        };
+    public Component[] getDescription(int level) {
+        Component damage = getValueComponent(this::getDamage, level);
+        Component slowness = Translations.component("champions.skill.effect.slowness",
+                Component.text(UtilFormat.getRomanNumeral(slownessStrength))).color(NamedTextColor.WHITE);
+        Component slowDuration = getValueComponent(this::getSlowDuration, level);
+        Component damageResetTime = getValueComponent(this::getDamageResetTime, level);
+        return Translations.componentLines("champions.skill.ranger.barbed-arrows.description", damage, slowness, slowDuration, damageResetTime);
     }
 
     public double getDamage(int level) {
@@ -157,7 +158,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             event.addModifier(new SkillDamageModifier.Flat(this, extraDamage));
             championsManager.getEffects().addEffect(damagee, EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.barbed-arrows.extra-damage", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(extraDamage), NamedTextColor.YELLOW));
             player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
 
             targetsMap.remove(event.getLivingDamagee());
@@ -206,7 +207,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 BarbedTargetData barbedData = targetEntry.getValue();
 
                 if (currentTime - barbedData.hitTime > damageResetTimeMs) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "Your <alt>%s</alt> in %s have fallen out.", getName(), target.getName());
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.barbed-arrows.fallen-out", getDisplayName().color(NamedTextColor.GREEN), Component.text(target.getName()));
                     targetIterator.remove();
                 }
             }

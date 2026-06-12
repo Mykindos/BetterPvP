@@ -16,7 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,17 +46,28 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with a Sword to prepare",
-                "",
-                "Your next hit will <effect>Concuss</effect> the target for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.CONCUSSED.getDescription(concussionStrength)
-        };
+    public Component[] getDescription(int level) {
+        Component duration = getValueComponent(this::getDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        Component concuss = Translations.component("champions.skill.effect.concuss.name").color(NamedTextColor.WHITE);
+        Component[] components = Translations.componentLines(
+                "champions.skill.assassin.concussion.description",
+                duration,
+                cooldown,
+                concuss
+        );
+        Component concussionDetail = Translations.component("champions.skill.effect.concussion",
+                Component.text(UtilFormat.getRomanNumeral(concussionStrength))).color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.assassin.concussion.detail",
+                concussionDetail,
+                Component.text(String.valueOf(concussionStrength * 25), NamedTextColor.GREEN)
+        );
+        Component[] result = new Component[components.length + 1 + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        result[components.length] = Component.empty();
+        System.arraycopy(detail, 0, result, components.length + 1, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {
@@ -86,14 +101,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         if (active.contains(damager.getUniqueId())) {
             event.addReason("Concussion");
             if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
-                UtilMessage.simpleMessage(damager, getName(), "<alt>%s</alt> is already concussed.", damagee.getName());
+                UtilMessage.message(damager, getName(), "champions.skill.assassin.concussion.already-concussed", Component.text(damagee.getName(), NamedTextColor.GREEN));
                 return;
             }
 
             championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
 
-            UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
-            UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
+            UtilMessage.message(damager, getName(), "champions.skill.assassin.concussion.gave", Component.text(damagee.getName(), NamedTextColor.GREEN));
+            UtilMessage.message(damagee, getName(), "champions.skill.assassin.concussion.received", Component.text(damager.getName(), NamedTextColor.GREEN));
             active.remove(damager.getUniqueId());
         }
     }
@@ -101,7 +116,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
     @Override
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>" + getName() + "</alt> is already active.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.concussion.already-active", getDisplayName().color(NamedTextColor.GREEN));
             return false;
         }
 

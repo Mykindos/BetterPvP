@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,8 +28,9 @@ public class DisbandClanLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> disbanded clan <yellow>%s</yellow>",
-                context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME));
+        return Translations.component("core.log.disband-clan.1",
+                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.YELLOW));
     }
 
     @Override
@@ -40,14 +42,16 @@ public class DisbandClanLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("disbanded ").append(Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)),
+                Translations.component("core.log.disband-clan.2").append(Component.text(" ")).append(Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)),
                 UtilMessage.DIVIDER
 
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>disbanded</red> <aqua>%s</aqua>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME)))
+                .displayName(Translations.component("core.log.disband-clan.3",
+                        Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                        Translations.component("core.log.disband-clan.4").color(NamedTextColor.RED),
+                        Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)))
                 .material(Material.BARRIER)
                 .lore(lore)
                 .frameLore(false)

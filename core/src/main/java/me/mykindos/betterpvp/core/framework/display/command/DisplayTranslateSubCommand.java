@@ -29,7 +29,7 @@ public class DisplayTranslateSubCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Translate a display entity";
+        return "core.command.display-translate.description";
     }
 
     @Override
@@ -46,19 +46,19 @@ public class DisplayTranslateSubCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         args = Arrays.copyOfRange(args, 1, args.length);
         if (args.length != 4) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display transform translate <set|add> <x> <y> <z>");
+            UtilMessage.message(player, "core.prefix.display", "core.display.translate.usage");
             return;
         }
 
         final Display selectedDisplay = displayEditorManager.getSelectedDisplay(player);
         if (selectedDisplay == null) {
-            UtilMessage.simpleMessage(player, "Display", "You are not selecting a display.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.not_selecting");
             return;
         }
 
         final String type = args[0];
         if (!type.equalsIgnoreCase("add") && !type.equalsIgnoreCase("set")) {
-            UtilMessage.simpleMessage(player, "Display", "Usage: /display transform translate <set|add> <x> <y> <z>");
+            UtilMessage.message(player, "core.prefix.display", "core.display.translate.usage");
             return;
         }
 
@@ -68,7 +68,7 @@ public class DisplayTranslateSubCommand extends Command {
             y = Float.parseFloat(args[2]);
             z = Float.parseFloat(args[3]);
         } catch (NumberFormatException e) {
-            UtilMessage.simpleMessage(player, "Display", "Invalid translation values. Must be numbers.");
+            UtilMessage.message(player, "core.prefix.display", "core.display.translate.invalid_values");
             return;
         }
 
@@ -81,6 +81,6 @@ public class DisplayTranslateSubCommand extends Command {
         }
 
         selectedDisplay.setTransformation(permutated);
-        UtilMessage.simpleMessage(player, "Display", "Translated display entity.");
+        UtilMessage.message(player, "core.prefix.display", "core.display.translate.success");
     }
 }

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.pagination.LoreRotationClock;
 import me.mykindos.betterpvp.core.item.renderer.LorePages;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
@@ -76,10 +77,10 @@ public class ItemButton extends ControlItem<AbstractGui> implements LoreRotation
     private void onLoaded() {
         final List<ItemProvider> providers = new ArrayList<>();
         if (cachedResult == null) {
-            providers.add(ItemView.of(itemInstance.getView().get())
+            providers.add(localized(ItemView.of(itemInstance.getView().get())
                     .toBuilder()
-                    .lore(Component.text("Error loading recipes"))
-                    .build());
+                    .lore(Translations.component("core.menu.items.error-recipes"))
+                    .build()));
         } else {
             for (int page : LorePages.visiblePages(itemInstance)) {
                 providers.add(buildProvider(page));
@@ -97,23 +98,23 @@ public class ItemButton extends ControlItem<AbstractGui> implements LoreRotation
         ItemView.ItemViewBuilder builder = ItemView.of(itemInstance.getView().get(null, page)).toBuilder();
         if (cachedResult != null) {
             if (!cachedResult.recipes.isEmpty()) {
-                builder.action(ClickActions.LEFT, Component.text("View Recipes"));
+                builder.action(ClickActions.LEFT, Translations.component("core.menu.items.button.view-recipes.name"));
             }
             if (!cachedResult.usages.isEmpty()) {
-                builder.action(ClickActions.RIGHT, Component.text("View Usages"));
+                builder.action(ClickActions.RIGHT, Translations.component("core.menu.items.button.view-usages.name"));
             }
         }
-        return builder.build();
+        return localized(builder.build());
     }
 
     @Override
     public ItemProvider getItemProvider(AbstractGui gui) {
         final List<ItemProvider> providers = pageProviders;
         if (providers == null || providers.isEmpty()) {
-            return ItemView.of(itemInstance.getView().get())
+            return localized(ItemView.of(itemInstance.getView().get())
                     .toBuilder()
-                    .lore(Component.text(loadFuture.isDone() ? "Error loading recipes" : "Loading recipes..."))
-                    .build();
+                    .lore(Translations.component(loadFuture.isDone() ? "core.menu.items.error-recipes" : "core.menu.items.loading-recipes"))
+                    .build());
         }
         return providers.get(Math.min(pageIndex, providers.size() - 1));
     }
@@ -147,6 +148,18 @@ public class ItemButton extends ControlItem<AbstractGui> implements LoreRotation
         if (providers != null && providers.size() > 1 && !getWindows().isEmpty()) {
             rotationClock.register(this);
         }
+    }
+
+    /**
+     * Wraps an (unresolved) preview view in a provider that resolves its translatable name/lore into the
+     * viewer's locale at draw time. The menu framework calls {@link ItemProvider#get(String)} per viewer
+     * with that viewer's language, so each player sees the item in their own language. This is needed
+     * because item previews are built from {@code getView().get()} with their PDC stripped, so the outgoing
+     * packet remapper cannot re-expand them — we localize here instead.
+     */
+    private ItemProvider localized(ItemView view) {
+        final var base = view.get();
+        return lang -> Translations.renderItemStack(base, Translations.toLocale(lang));
     }
 
     @Override

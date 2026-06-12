@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.settings.menus.buttons;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -53,7 +54,8 @@ public class EnumSettingsButton extends AbstractItem implements CooldownButton {
     @Override
     public ItemProvider getItemProvider() {
         final Enum<?> nextValue = getNextValue(getCurrentValue());
-        final Component action = Component.text("Set: ", NamedTextColor.WHITE).append(Component.text(nextValue.name(), NamedTextColor.YELLOW));
+        final Component action = Translations.component("core.menu.settings.button.set.action",
+                Component.text(nextValue.name(), NamedTextColor.YELLOW));
 
         ItemProvider icon = description.getIcon();
         return ItemView.builder().with(icon.get())

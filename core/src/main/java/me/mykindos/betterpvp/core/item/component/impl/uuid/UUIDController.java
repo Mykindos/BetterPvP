@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.PendingLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -23,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -380,7 +382,7 @@ public class UUIDController implements Listener {
             if (event.getAction().equals(InventoryAction.CLONE_STACK)) {
                 getUUIDItem(event.getCurrentItem()).ifPresent(uuidItem -> {
                     event.setCancelled(true);
-                    UtilMessage.message(player, "Core", "You cannot clone this item.");
+                    UtilMessage.message(player, "core.prefix.core", "core.item.uuid.cannot_clone");
                 });
             }
         }
@@ -397,7 +399,7 @@ public class UUIDController implements Listener {
             if (getUUIDItem(event.getCursor()).isPresent()) {
                 event.setCancelled(true);
                 if (event.getWhoClicked() instanceof Player player) {
-                    UtilMessage.message(player, "Core", UtilMessage.deserialize("You cannot use this item as fuel."));
+                    UtilMessage.message(player, "core.prefix.core", "core.item.uuid.cannot_fuel");
                 }
             }
         }
@@ -521,15 +523,19 @@ public class UUIDController implements Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             getUUIDItems(player).forEach((uuidItem, item) -> {
                 if (!uuidSet.add(uuidItem.getUuid())) {
-                    Component component = UtilMessage.deserialize("<red>WARNING</red> Potential duplicate UUID found in ")
-                            .append(UtilMessage.deserialize("<yellow>%s</yellow>", player.getName())
+                    Component component = Translations.component("core.item.uuid.duplicate_warning",
+                                    Translations.component("core.item.uuid.duplicate_warning_label").color(NamedTextColor.RED))
+                            .append(Component.text(player.getName(), NamedTextColor.YELLOW)
                                     .clickEvent(ClickEvent.runCommand("/search player " + player.getName()))
-                                    .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to search by Player"))))
+                                    .hoverEvent(HoverEvent.showText(Translations.component("core.item.uuid.search_by_player",
+                                            Translations.component("core.item.uuid.click").color(NamedTextColor.WHITE)))))
                             .appendSpace()
-                            .append(UtilMessage.deserialize("<light_purple>%s</light_purple>", uuidItem.getUuid().toString())
+                            .append(Component.text(uuidItem.getUuid().toString(), NamedTextColor.LIGHT_PURPLE)
                                     .clickEvent(ClickEvent.runCommand("/search item " + uuidItem.getUuid().toString()))
-                                    .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to search by UUID"))))
-                            .append(UtilMessage.deserialize(" (<green>%s</green>)", uuidItem.getIdentifier()));
+                                    .hoverEvent(HoverEvent.showText(Translations.component("core.item.uuid.search_by_uuid",
+                                            Translations.component("core.item.uuid.click").color(NamedTextColor.WHITE)))))
+                            .append(Translations.component("core.item.uuid.duplicate_identifier",
+                                    Component.text(uuidItem.getIdentifier(), NamedTextColor.GREEN)));
                     clientManager.sendMessageToRank("Core", component, Rank.TRIAL_MOD);
                     log.info("Potential duplicate ({}) found in player {}", uuidItem.getUuid(), player.getUniqueId()).submit();
                     duplicates.getAndIncrement();

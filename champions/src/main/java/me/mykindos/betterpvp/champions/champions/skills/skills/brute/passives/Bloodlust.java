@@ -16,7 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -57,18 +61,26 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "When you kill an enemy, you go into a Bloodlust,",
-                "which heals you for " + getValueString(this::getHealth, level) + " health,",
-                "and you receive <effect>Speed I</effect>, and <effect>Strength I</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "",
-                "Bloodlust can stack up to " + getValueString(this::getMaxStacks, level) + " times",
-                "boosting the level of <effect>Speed</effect> and <effect>Strength</effect> by <yellow>1</yellow>",
-                "",
-                EffectTypes.STRENGTH.getGenericDescription()
-        };
+    public Component[] getDescription(int level) {
+        Component health = getValueComponent(this::getHealth, level);
+        Component duration = getValueComponent(this::getDuration, level);
+        Component stacks = getValueComponent(this::getMaxStacks, level, 0);
+        Component[] components = Translations.componentLines(
+                "champions.skill.brute.bloodlust.description",
+                health,
+                duration,
+                stacks
+        );
+        Component strength = Translations.component("champions.skill.effect.strength.name").color(NamedTextColor.WHITE);
+        Component[] detail = Translations.componentLines(
+                "champions.skill.brute.bloodlust.detail",
+                strength,
+                Component.text("1.5", NamedTextColor.GREEN)
+        );
+        Component[] result = new Component[components.length + detail.length];
+        System.arraycopy(components, 0, result, 0, components.length);
+        System.arraycopy(detail, 0, result, components.length, detail.length);
+        return result;
     }
 
     public double getDuration(int level) {
@@ -113,7 +125,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
             double actualHealth = UtilEntity.health(player, health);
             championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_BLOODLUST, actualHealth);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.brute.bloodlust.entered", Component.text(String.valueOf(Math.min(tempStr, maxStacks)), NamedTextColor.YELLOW));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
         }
 
@@ -132,7 +144,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
         if (System.currentTimeMillis() > time.get(player)) {
             int tempStr = str.get(player);
             str.remove(player);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Your bloodlust has ended at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.brute.bloodlust.ended", Component.text(String.valueOf(Math.min(tempStr, maxStacks)), NamedTextColor.YELLOW));
             time.remove(player);
         }
 

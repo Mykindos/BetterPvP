@@ -22,7 +22,7 @@ public class BuildersBox extends BaseItem {
 
     @Inject
     private BuildersBox(LootTableRegistry lootTableRegistry) {
-        super("Builder's Box", Item.model("builders_box", 1), ItemGroup.MISC, ItemRarity.LEGENDARY);
+        super(translatableName("core.item.builders-box.name"), Item.model("builders_box", 1), ItemGroup.MISC, ItemRarity.LEGENDARY);
         this.lootTableRegistry = lootTableRegistry;
         final BuildersBoxAbility ability = new BuildersBoxAbility(this::getLootTable, "Builder's Box");
         ability.setConsumesItem(true);

@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,8 +28,9 @@ public class ClanRequestNeutralLogFormatter implements ILogFormatter {
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> requested to neutral with <yellow>%s</yellow>",
-                context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME));
+        return Translations.component("core.log.clan-request-neutral.1",
+                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW));
     }
     @Override
     public Description getDescription(CachedLog cachedLog, LogRepository logRepository, Windowed previous) {
@@ -39,15 +41,17 @@ public class ClanRequestNeutralLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("requested neutral with"),
+                Translations.component("core.log.clan-request-neutral.2"),
                 Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.GREEN),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <gray>request neutral</gray> <red>%s</red>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
+                .displayName(Translations.component("core.log.clan-request-neutral.3",
+                        Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
+                        Translations.component("core.log.clan-request-neutral.4").color(NamedTextColor.GRAY),
+                        Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.RED)))
                 .material(Material.GRAY_DYE)
                 .lore(lore)
                 .glow(false)

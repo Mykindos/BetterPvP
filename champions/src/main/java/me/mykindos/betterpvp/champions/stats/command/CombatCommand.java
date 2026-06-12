@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,13 +51,13 @@ public class CombatCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View combat stats for a player";
+        return "champions.command.combat.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length > 2) {
-            UtilMessage.message(player, "Combat", "Usage: <alt2>/combat [role] [player]");
+            UtilMessage.message(player, "core.prefix.combat", "champions.combat.usage", Component.text("/combat [role] [player]", NamedTextColor.YELLOW));
             return;
         }
 
@@ -89,26 +90,26 @@ public class CombatCommand extends Command {
                 }
             }
         } catch (IllegalArgumentException exception) {
-            UtilMessage.message(caster, "Combat", "Invalid role.");
+            UtilMessage.message(caster, "core.prefix.combat", "champions.combat.invalid-role");
             return;
         }
 
         if (!loaded.isDone()) {
-            UtilMessage.message(caster, "Combat", "Retrieving player data...");
+            UtilMessage.message(caster, "core.prefix.combat", "champions.combat.retrieving");
         }
 
         final String targetName = target.getName();
         loaded.whenComplete((data, throwable) -> {
             if (throwable != null) {
-                UtilMessage.message(caster, "Combat", "There was an error retrieving this player data.");
+                UtilMessage.message(caster, "core.prefix.combat", "champions.combat.error");
                 log.error("There was an error retrieving player data for {}", targetName, throwable).submit();
                 return;
             }
 
-            UtilMessage.message(caster, "Combat", "Combat data for <alt2>%s</alt2>:", targetName);
-            UtilMessage.message(caster, "Combat", "Type: <alt>%s", filter.getName());
+            UtilMessage.message(caster, "core.prefix.combat", "champions.combat.data-for", Component.text(targetName, NamedTextColor.YELLOW));
+            UtilMessage.message(caster, "core.prefix.combat", "champions.combat.type", Component.text(filter.getName(), NamedTextColor.GREEN));
             for (Component component : data.getDescription()) {
-                UtilMessage.message(caster, "Combat", component);
+                UtilMessage.message(caster, "core.prefix.combat", component);
             }
         });
     }

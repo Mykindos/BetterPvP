@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.framework.blockbreak.rule.preset.BlockGroup;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.AbstractItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -92,11 +93,13 @@ public class ToolComponent extends AbstractItemComponent implements LoreComponen
             if (r.matcher() instanceof BlockGroup blockGroup) {
                 final String type = blockGroup.getId();
                 final int breakSpeed = r.properties().getBreakSpeed();
-                final Component component = Component.empty()
-                        .append(Component.text("Break speed (", NamedTextColor.GRAY))
-                        .append(Component.text(type, NamedTextColor.GRAY))
-                        .append(Component.text("): ", NamedTextColor.GRAY))
-                        .append(Component.text(breakSpeed, NamedTextColor.GREEN));
+                final String groupKey = "core.block-group." + type + ".name";
+                final Component groupName = Translations.hasTranslation(groupKey)
+                        ? Translations.component(groupKey)
+                        : Component.text(type);
+                final Component component = Translations.component("core.item.tool.break-speed-typed",
+                                groupName, Component.text(breakSpeed, NamedTextColor.GREEN))
+                        .color(NamedTextColor.GRAY);
                 lines.add(component);
             }
         }
@@ -107,9 +110,9 @@ public class ToolComponent extends AbstractItemComponent implements LoreComponen
                     .mapToInt(r -> r.properties().getBreakSpeed())
                     .max()
                     .orElse(0);
-            final Component component = Component.empty()
-                    .append(Component.text("Break speed: ", NamedTextColor.GRAY))
-                    .append(Component.text(maxSpeed, NamedTextColor.GREEN));
+            final Component component = Translations.component("core.item.tool.break-speed",
+                            Component.text(maxSpeed, NamedTextColor.GREEN))
+                    .color(NamedTextColor.GRAY);
             lines.add(component);
         }
 

@@ -1,7 +1,10 @@
 package me.mykindos.betterpvp.core.effects.types.negative;
 
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.potion.PotionEffectType;
 
 public class PoisonEffect extends VanillaEffectType {
@@ -29,6 +32,14 @@ public class PoisonEffect extends VanillaEffectType {
     @Override
     public String getGenericDescription() {
         return "<white>" + getName() + "</white>" + " deals <green>2</green> damage per level every <yellow>" + (25d/20d) + "</yellow> seconds";
+    }
+
+    @Override
+    public Component getGenericDescriptionComponent() {
+        return Translations.component("core.effect.poison.generic",
+                Component.text(getName(), NamedTextColor.WHITE),
+                Component.text("3", NamedTextColor.GREEN),
+                Component.text(String.valueOf(25d / 20d), NamedTextColor.YELLOW));
     }
 }
 

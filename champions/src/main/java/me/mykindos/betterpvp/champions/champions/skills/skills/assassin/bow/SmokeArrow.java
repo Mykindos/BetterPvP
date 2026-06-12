@@ -12,7 +12,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Color;
@@ -46,15 +49,19 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Left click with a Bow to prepare",
-                "",
-                "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for " + getValueString(this::getEffectDuration, level) + " seconds.",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component slowness = Component.text(
+                UtilFormat.getRomanNumeral(slownessStrength),
+                NamedTextColor.YELLOW
+        );
+        Component duration = getValueComponent(this::getEffectDuration, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.smoke-arrow.description",
+                slowness,
+                duration,
+                cooldown
+        );
     }
 
     private double getEffectDuration(int level) {
@@ -104,13 +111,13 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .receivers(60)
                 .spawn();
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", target.getName(), getName(), level);
+        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @Override
     public void onFire(Player shooter) {
-        UtilMessage.message(shooter, getClassType().getName(), "You fired <alt>" + getName() + "<alt>.");
+        UtilMessage.message(shooter, getClassType().getDisplayName(), "champions.skill.assassin.smoke-arrow.fired", getDisplayName().color(NamedTextColor.GREEN));
     }
 
     @Override

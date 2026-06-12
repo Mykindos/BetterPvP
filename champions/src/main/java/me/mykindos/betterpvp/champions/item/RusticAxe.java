@@ -17,7 +17,7 @@ public class RusticAxe extends WeaponItem {
 
     @Inject
     private RusticAxe(Champions champions) {
-        super(champions, "Rustic Axe", ItemStack.of(Material.WOODEN_AXE), ItemRarity.COMMON);
+        super(champions, translatableName("champions.item.rustic-axe.name"), ItemStack.of(Material.WOODEN_AXE), ItemRarity.COMMON);
     }
 
 }

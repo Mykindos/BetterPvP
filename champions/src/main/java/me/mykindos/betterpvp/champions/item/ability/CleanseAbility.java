@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -46,12 +48,12 @@ public class CleanseAbility extends CooldownInteraction implements DisplayedInte
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Cleanse");
+        return Translations.component("champions.ability.cleanse.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Cleanses negative effects and grants immunity for a short duration.");
+        return Translations.component("champions.ability.cleanse.description");
     }
 
     @Override
@@ -69,10 +71,7 @@ public class CleanseAbility extends CooldownInteraction implements DisplayedInte
             }
         }
 
-        UtilMessage.message(entity, "Item",
-                Component.text("You used ", NamedTextColor.GRAY)
-                        .append(getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW))
-                        .append(Component.text(".", NamedTextColor.GRAY)));
+        UtilMessage.message(entity, "core.prefix.item", "champions.item.used", getDisplayName().applyFallbackStyle(NamedTextColor.YELLOW));
         UtilSound.playSound(entity, Sound.ENTITY_GENERIC_DRINK, 1f, 1f, false);
         UtilSound.playSound(entity.getWorld(), entity.getLocation(), Sound.ENTITY_GENERIC_DRINK, 0.8f, 1.2f);
         effectManager.addEffect(entity, EffectTypes.IMMUNE, (long) (duration * 1000L));

@@ -40,25 +40,25 @@ public class AdminReplyCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Send an admin message to a player";
+        return "core.command.admin-reply.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         final Gamer gamer = client.getGamer();
         if (args.length == 0) {
-            UtilMessage.message(player, "Core", "You must specify a message");
+            UtilMessage.message(player, "core.prefix.core", "core.command.adminreply.message_required");
             return;
         }
         if (gamer.getLastAdminMessenger() == null) {
-            UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No previous player to reply to"));
+            UtilMessage.message(player, "core.prefix.core", "core.command.adminreply.no_previous_target");
             return;
         }
 
         clientManager.search(player).offline(UUID.fromString(gamer.getLastAdminMessenger())).thenAccept(optionalReceiver -> {
             if (optionalReceiver.isEmpty()) {
                 UtilServer.runTask(core, () ->
-                        UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No online player to reply to found")));
+                        UtilMessage.message(player, "core.prefix.core", "core.command.adminreply.no_online_target"));
                 return;
             }
 
@@ -66,7 +66,7 @@ public class AdminReplyCommand extends Command {
             crossServerMessageService.isPlayerOnline(receivingClient.getName()).thenAccept(isOnline ->
                     UtilServer.runTask(core, () -> {
                         if (!isOnline) {
-                            UtilMessage.message(player, "Core", UtilMessage.deserialize("<gray>No online player to reply to found"));
+                            UtilMessage.message(player, "core.prefix.core", "core.command.adminreply.no_online_target");
                             return;
                         }
 

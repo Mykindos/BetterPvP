@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemInstanceView;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -125,7 +126,9 @@ public class DeathListener implements Listener {
 
                     String namePlainText = PlainTextComponentSerializer.plainText().serialize(name).replaceAll("[\\[\\]]", "");
                     final String article = UtilFormat.getIndefiniteArticle(namePlainText);
-                    reason = Component.text(article + " ", NamedTextColor.GRAY).append(name.hoverEvent(itemStack));
+                    // Death messages are dispatched per receiver, so localize the hover item to the recipient.
+                    reason = Component.text(article + " ", NamedTextColor.GRAY)
+                            .append(name.hoverEvent(Translations.renderItemStack(itemStack, event.getReceiver().locale())));
                     with = true;
                 }
             }
@@ -169,6 +172,6 @@ public class DeathListener implements Listener {
                     .append(Component.text(round, NamedTextColor.GREEN))).appendNewline();
         }
 
-        UtilMessage.simpleMessage(event.getReceiver(), "Death", message, hoverComponent);
+        UtilMessage.message(event.getReceiver(), "core.prefix.death", message, hoverComponent);
     }
 }

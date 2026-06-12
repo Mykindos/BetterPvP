@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -39,7 +40,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "List all available commands.";
+        return "clans.command.clan-help.description";
     }
 
     @Override public String getUsage() {
@@ -64,7 +65,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
         List<ICommand> clanSubCommands = clanCommand.getSubCommands();
         clanSubCommands.sort(Comparator.comparing(ICommand::getName));
 
-        Component component = UtilMessage.deserialize("<yellow>Help<gray>: ");
+        Component component = Translations.component("clans.command.clan.help.header");
 
         if (!commandName.isEmpty()){
             Optional<ICommand> subCommandOptional = clanCommand.getSubCommand(commandName);
@@ -73,12 +74,12 @@ public class ClanHelpSubCommand extends ClanSubCommand {
                 if(subCommand instanceof ClanSubCommand clanSubCommand) {
                     component = component.append(Component.text(commandName, NamedTextColor.YELLOW))
                             .append(addHelpCommandComponent(clanSubCommand, client).appendNewline()
-                            .append(Component.text("Usage: ", NamedTextColor.YELLOW))
+                            .append(Translations.component("clans.command.clan.help.usage-prefix"))
                             .append(Component.text("/clan ", NamedTextColor.GRAY)).append(Component.text(clanSubCommand.getUsage(), NamedTextColor.GRAY)));
                 }
             }
             else {
-                component = Component.text("No Clan command named ", NamedTextColor.RED).append(Component.text(commandName, NamedTextColor.YELLOW).append(Component.text(" exists.", NamedTextColor.RED)));
+                component = Translations.component("clans.command.clan.help.not-found", Component.text(commandName, NamedTextColor.YELLOW));
             }
         }
         else {
@@ -91,7 +92,9 @@ public class ClanHelpSubCommand extends ClanSubCommand {
                 totalPages++;
             }
 
-            component = component.append(UtilMessage.deserialize("<white>" + pageNumber + "<gray> / <white>" + totalPages));
+            component = component.append(Translations.component("clans.command.clan.pagination",
+                    Component.text(pageNumber, NamedTextColor.WHITE),
+                    Component.text(totalPages, NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
 
             if (start <= size) {
                 if (end > size) end = size;
@@ -104,7 +107,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
                 }
             }
         }
-        UtilMessage.message(player, "Clans", component);
+        UtilMessage.message(player, CLANS_PREFIX, component);
 
     }
 
@@ -114,7 +117,7 @@ public class ClanHelpSubCommand extends ClanSubCommand {
         if (!command.requiresServerAdmin() || client.hasRank(Rank.ADMIN)) {
             component = component.appendNewline();
             component = component.append(Component.text("/c " + command.getName(), color).append(Component.text(": ", color))
-                    .append(Component.text(command.getDescription(), NamedTextColor.GRAY)));
+                    .append(command.getDescriptionComponent().color(NamedTextColor.GRAY)));
         }
         return component;
     }

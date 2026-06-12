@@ -19,8 +19,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -52,19 +56,24 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "You gain 1 charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds,",
-                "storing up to a maximum of " + getValueString(this::getMaxCharges, level) + " charges",
-                "",
-                "You do not gain charges until " + getValueString(this::getTimeOutOfCombat, level) + " seconds after taking damage",
-                "",
-                "When you attack, your damage is increased",
-                "by <stat>" + getDamage(1, level) + "</stat> for each charge you have",
-                "",
-                "This only applies to swords"
-        };
+    public Component[] getDescription(int level) {
+        Component timeBetween = getValueComponent(this::getTimeBetweenCharges, level);
+        Component maxCharges = Component.text(
+                String.valueOf(getMaxCharges(level)),
+                NamedTextColor.YELLOW
+        );
+        Component timeOutOfCombat = getValueComponent(this::getTimeOutOfCombat, level);
+        Component damagePerCharge = Component.text(
+                UtilFormat.formatNumber(getDamage(1, level), 1, true),
+                NamedTextColor.YELLOW
+        );
+        return Translations.componentLines(
+                "champions.skill.knight.swordsmanship.description",
+                timeBetween,
+                maxCharges,
+                timeOutOfCombat,
+                damagePerCharge
+        );
     }
 
     public double getDamage(int charge, int level) {
@@ -125,7 +134,7 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
                         int charge = charges.get(cur);
                         if (charge < level) {
                             charge = Math.min(level, charge + 1);
-                            UtilMessage.simpleMessage(cur, getClassType().getName(), "Swordsmanship charge: <yellow>%d", charge);
+                            UtilMessage.message(cur, getClassType().getDisplayName(), "champions.skill.knight.swordsmanship.charge", Component.text(String.valueOf(charge), NamedTextColor.YELLOW));
                             charges.put(cur, charge);
                         }
                     }

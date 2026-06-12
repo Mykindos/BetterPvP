@@ -39,7 +39,7 @@ public class RewardsTestCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Open the rewards menu";
+        return "core.command.rewards-test.description";
     }
 
     @Override

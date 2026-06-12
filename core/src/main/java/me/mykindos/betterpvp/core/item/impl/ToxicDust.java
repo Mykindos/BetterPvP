@@ -14,6 +14,6 @@ public class ToxicDust extends BaseItem {
 
     @Inject
     private ToxicDust() {
-        super("Toxic Moss", Item.model("toxic_moss", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
+        super(translatableName("core.item.toxic-moss.name"), Item.model("toxic_moss", 64), ItemGroup.MATERIAL, ItemRarity.UNCOMMON);
     }
 }

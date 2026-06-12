@@ -22,23 +22,23 @@ public final class StatTypes {
 
     // Constants for built-in stat types
     public static final StatType<Double> HEALTH = StatType.builder(new NamespacedKey("betterpvp", "health"), Double.class)
-            .name("Health")
-            .description("Increases the health of the wearer.")
+            .name("core.stat.health.name")
+            .description("core.stat.health.description")
             .displayColor(TextColor.color(255, 0, 0))
             .build();
 
     public static final StatType<Double> MELEE_DAMAGE = StatType.builder(new NamespacedKey("betterpvp", "melee-damage"), Double.class)
-            .name("Damage")
+            .name("core.stat.melee-damage.name")
             .displayColor(TextColor.color(255, 179, 28))
-            .description("Increases the melee damage dealt by the item.")
+            .description("core.stat.melee-damage.description")
             .valuePredicate(value -> value >= 0)
             .build();
 
     public static final StatType<Double> MELEE_ATTACK_SPEED = StatType.builder(new NamespacedKey("betterpvp", "melee-attack-speed"), Double.class)
-            .name("Melee Attack Speed")
+            .name("core.stat.melee-attack-speed.name")
             .displayColor(TextColor.color(229, 235, 52))
-            .shortName("Attacks/second")
-            .description("Increases the melee attack speed of the holder.")
+            .shortName("core.stat.melee-attack-speed.short-name")
+            .description("core.stat.melee-attack-speed.description")
             .percentage(true)
             .stringValueProvider(value -> {
                 double hitsPerSecond = 1000L / (DamageCause.DEFAULT_DELAY / (1 + value));
@@ -48,9 +48,9 @@ public final class StatTypes {
             .build();
 
     public static final StatType<Double> MOVEMENT = StatType.builder(new NamespacedKey("betterpvp", "move-speed"), Double.class)
-            .name("Movement")
+            .name("core.stat.move-speed.name")
             .displayColor(TextColor.color(66, 221, 245))
-            .description("Increases the walking speed of the holder.")
+            .description("core.stat.move-speed.description")
             .percentage(true)
             .valuePredicate(value -> value > 0)
             .lifecycleHooks(new StatType.ItemStatLifecycleHooks<>() {
@@ -77,8 +77,8 @@ public final class StatTypes {
             .build();
 
     public static final StatType<Double> ENERGY = StatType.builder(new NamespacedKey("betterpvp", "energy"), Double.class)
-            .name("Energy")
-            .description("Increases the energy pool of the holder.")
+            .name("core.stat.energy.name")
+            .description("core.stat.energy.description")
             .displayColor(TextColor.color(66, 221, 245))
             .build();
 

@@ -5,8 +5,9 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.types.ClansCategory;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 
 @Singleton
@@ -20,7 +21,7 @@ public class DemolisherCategory extends AchievementCategory {
     public ItemView getItemView() {
         return ItemView.builder()
                 .material(Material.TNT)
-                .displayName(UtilMessage.deserialize("<white>Demolisher"))
+                .displayName(Translations.component("core.achievement.category.demolisher.name").color(NamedTextColor.WHITE))
                 .build();
     }
 }

@@ -17,7 +17,7 @@ public class StandardAxe extends WeaponItem {
 
     @Inject
     private StandardAxe(Champions champions) {
-        super(champions, "Standard Axe", ItemStack.of(Material.IRON_AXE), ItemRarity.COMMON);
+        super(champions, translatableName("champions.item.standard-axe.name"), ItemStack.of(Material.IRON_AXE), ItemRarity.COMMON);
     }
 
 }

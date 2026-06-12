@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
@@ -36,12 +37,16 @@ public class RaritySearchButton extends AbstractItem implements CooldownButton {
         boolean titled = false;
         for (ItemRarity itemRarity : valuesWithAll()) {
             TextColor color = selected == itemRarity ? TextColor.color(itemRarity == null ? NamedTextColor.YELLOW : itemRarity.getColor()) : NamedTextColor.GRAY;
-            String name = itemRarity == null ? "All Rarities" : itemRarity.getName();
+            // Per-rarity names come from ItemRarity#getName() (rarity localization is a separate concern); the
+            // "all" option is menu chrome and is translated here.
+            Component name = itemRarity == null
+                    ? Translations.component("core.menu.button.rarity.all").color(color)
+                    : Component.text(itemRarity.getName(), color);
             if (!titled) {
-                builder.displayName(Component.text(name, color));
+                builder.displayName(name);
                 titled = true;
             } else {
-                builder.lore(Component.text(name, color));
+                builder.lore(name);
             }
         }
 

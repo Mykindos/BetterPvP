@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.progression.profession.mining.item.interaction;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
@@ -98,11 +100,11 @@ public class ExplosiveExcavationInteraction extends AbstractInteraction implemen
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Component.text("Explosive Excavation");
+        return Translations.component("progression.ability.explosive-excavation.name");
     }
 
     @Override
     public @NotNull Component getDisplayDescription() {
-        return Component.text("Mining has a chance to carve an underground crater whose walls are lined with ore.");
+        return Translations.component("progression.ability.explosive-excavation.description");
     }
 }

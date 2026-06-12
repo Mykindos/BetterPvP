@@ -21,8 +21,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -75,19 +79,18 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Leap up and slam into the ground, knocking up",
-                "players within " + getValueString(this::getRadius, level) + " blocks",
-                "and dealing " + getValueString(this::getSlamDamage, level) + " damage",
-                "",
-                "For every 10 blocks vertically travelled,",
-                "deal an additional " + getValueString(this::getBonusDamagePerTenBlocks, level) + " damage",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component radius = getValueComponent(this::getRadius, level);
+        Component damage = getValueComponent(this::getSlamDamage, level);
+        Component bonusDamage = getValueComponent(this::getBonusDamagePerTenBlocks, level);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.brute.seismic-slam.description",
+                radius,
+                damage,
+                bonusDamage,
+                cooldown
+        );
     }
 
     public double getSlamDamage(int level) {
@@ -168,7 +171,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             double damage = calculateDamage(player, target, data);
             UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), damage, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("<yellow>%s</yellow> hit you with <green>%s %s</green>", player.getName(), getName(), level));
+                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             }
         }
 

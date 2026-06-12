@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.FishLoot;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,8 +59,9 @@ public class FishingCatchLootListener implements Listener {
             final Fish fish = fishLoot.getCurrentFish();
             if (fish != null) {
                 fishingHandler.addFish(player, fish);
-                UtilMessage.message(player, "Fishing", "You caught a <alt>%s</alt> (<alt2>%slb</alt2>)!",
-                        fish.getTypeName(), UtilFormat.formatNumber(fish.getWeight()));
+                UtilMessage.message(player, "core.prefix.fishing", "progression.fishing.caught-fish",
+                        Component.text(fish.getTypeName(), NamedTextColor.GREEN),
+                        Component.text(UtilFormat.formatNumber(fish.getWeight()), NamedTextColor.YELLOW));
             }
         }
     }

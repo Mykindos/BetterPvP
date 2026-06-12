@@ -33,13 +33,13 @@ public class SpectatorChatCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Toggle spectator only chat";
+        return "game.command.spectator-chat.description";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (!(playerController.getParticipant(player).isSpectating())) {
-            UtilMessage.message(player, "Game", "You must be spectating to use spectator chat");
+            UtilMessage.message(player, "core.prefix.game", "game.command.spectatorchat.not-spectating");
             return;
         }
         final Gamer gamer = client.getGamer();

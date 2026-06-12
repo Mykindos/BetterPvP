@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -25,7 +27,7 @@ public class TokensButton extends ControlItem<HotBarEditor> {
                 .displayName(UtilMessage.deserialize("<green>%s</green>/<yellow>%s</yellow>", remaining, max))
                 .material(material)
                 .lore(
-                        List.of(Component.text("Number of item tokens remaining"))
+                        List.of(Translations.component("game.menu.hotbar.tokens.lore"))
                 )
                 .amount(remaining == 0 ? 1 : remaining)
                 .build();

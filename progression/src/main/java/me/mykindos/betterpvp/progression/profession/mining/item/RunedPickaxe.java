@@ -57,7 +57,7 @@ public class RunedPickaxe extends BaseItem implements Reloadable {
                          CooldownManager cooldownManager,
                          ClientManager clientManager,
                          ItemFactory itemFactory) {
-        super("Runed Pickaxe",
+        super(translatableName("progression.item.runed-pickaxe.name"),
                 Item.model(Material.DIAMOND_PICKAXE, "runed_pickaxe"),
                 ItemGroup.TOOL,
                 ItemRarity.EPIC);

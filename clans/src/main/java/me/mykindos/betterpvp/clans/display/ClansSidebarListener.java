@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.Zones;
@@ -68,11 +69,11 @@ public class ClansSidebarListener implements Listener {
                     Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
                     // Clan
-                    lineDrawable.drawLine(empty().append(Component.text("Clan", TextColor.color(0xFAB95B), TextDecoration.BOLD)));
+                    lineDrawable.drawLine(empty().append(Translations.component("clans.sidebar.clan-header").color(TextColor.color(0xFAB95B)).decorate(TextDecoration.BOLD)));
                     lineDrawable.drawLine(empty()
                             .append(Component.text("<glyph:shield_icon_2>", NamedTextColor.GRAY))
                             .appendSpace()
-                            .append(Component.text("Clan:", TextColor.color(0xFAEB92)))
+                            .append(Translations.component("clans.sidebar.clan").color(TextColor.color(0xFAEB92)))
                             .appendSpace()
                             .append(Component.text(clan.getName(), ClanRelation.SELF.getPrimary())));
 
@@ -80,19 +81,19 @@ public class ClansSidebarListener implements Listener {
                     lineDrawable.drawLine(empty()
                             .append(Component.text("<glyph:hourglass_icon>", NamedTextColor.GRAY))
                             .appendSpace()
-                            .append(Component.text("Energy:", TextColor.color(0xFAEB92)))
+                            .append(Translations.component("clans.sidebar.energy").color(TextColor.color(0xFAEB92)))
                             .appendSpace()
                             .append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN)));
                     lineDrawable.drawLine(empty());
                 })
-                .addStaticLine(Component.text("Info", TextColor.color(0xFAB95B), TextDecoration.BOLD))
+                .addStaticLine(Translations.component("clans.sidebar.info-header").color(TextColor.color(0xFAB95B)).decorate(TextDecoration.BOLD))
                 .addDynamicLine(() -> {
                     final int coins = (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0);
                     final TextComponent coinsText = Component.text(UtilFormat.formatNumber(coins), NamedTextColor.GOLD);
                     return empty()
                             .append(Component.text("<glyph:coins_icon>"))
                             .appendSpace()
-                            .append(Component.text("Coins:", TextColor.color(0xFAEB92)))
+                            .append(Translations.component("clans.sidebar.coins").color(TextColor.color(0xFAEB92)))
                             .appendSpace()
                             .append(coinsText);
                 })
@@ -103,7 +104,7 @@ public class ClansSidebarListener implements Listener {
                     final Component territory;
                     if (zone == null) {
                         emoji = Component.text("<glyph:floating_island_icon>", NamedTextColor.WHITE);
-                        territory = Component.text("Wilderness", NamedTextColor.GRAY);
+                        territory = Translations.component("clans.sidebar.wilderness").color(NamedTextColor.GRAY);
                     } else if (zone.hasTag(Zones.SAFE)) {
                         emoji = Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
                         territory = zone.getDisplayName().applyFallbackStyle(ClanRelation.SAFE.getPrimary());
@@ -125,7 +126,7 @@ public class ClansSidebarListener implements Listener {
                     return empty()
                             .append(emoji)
                             .appendSpace()
-                            .append(Component.text("Territory:", TextColor.color(0xFAEB92)))
+                            .append(Translations.component("clans.sidebar.territory").color(TextColor.color(0xFAEB92)))
                             .appendSpace()
                             .append(territory);
                 })

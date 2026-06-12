@@ -12,12 +12,15 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -45,7 +48,7 @@ public class ClaimSubCommand extends ClanSubCommand {
 
     @Override
     public String getDescription() {
-        return "Claim territory for your clan";
+        return "clans.command.claim.description";
     }
 
     @Override
@@ -55,23 +58,26 @@ public class ClaimSubCommand extends ClanSubCommand {
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
         if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
-            UtilMessage.message(player, "Clans", "You need to be a clan admin to claim land");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.no-rank");
             return;
         }
 
         if (player.getWorld().getEnvironment().equals(World.Environment.NETHER) && !client.isAdministrating()) {
-            UtilMessage.message(player, "Clans", "You cannot claim land in the nether.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.nether");
             return;
         }
 
         if (clan.getTerritory().size() >= clanManager.getMaximumClaimsForClan(clan)) {
             if (!client.isAdministrating()) {
-                UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.limit");
                 return;
             } else {
-                clientManager.sendMessageToRank("Clans",
-                        UtilMessage.deserialize("<yellow>%s<gray> is attempting to claim territory over the limit for <yellow>%s",
-                                player.getName(), clan.getName()), Rank.TRIAL_MOD);
+                Component notification = Translations.component("clans.command.clan.claim.limit-mod-notification",
+                        Component.text(player.getName(), NamedTextColor.YELLOW),
+                        Component.text(clan.getName(), NamedTextColor.YELLOW));
+                clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(target -> {
+                    UtilMessage.message(target, Translations.component(CLANS_PREFIX), notification);
+                });
             }
         }
 
@@ -79,9 +85,9 @@ public class ClaimSubCommand extends ClanSubCommand {
         if (locationClanOptional.isPresent()) {
             Clan locationClan = locationClanOptional.get();
             if (locationClan.equals(clan)) {
-                UtilMessage.message(player, "Clans", "Your clan already owns this territory");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.already-owned");
             } else {
-                UtilMessage.message(player, "Clans", "This territory is owned by <alt2>Clan " + locationClan.getName() + "</alt2>.");
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.other-clan-owned", Component.text(locationClan.getName(), NamedTextColor.YELLOW));
             }
             return;
         }
@@ -104,7 +110,7 @@ public class ClaimSubCommand extends ClanSubCommand {
                     if (clanManager.canHurt(player, target)) {
                         Optional<Clan> targetClanOptional = clanManager.getClanByPlayer(target);
                         if (targetClanOptional.isEmpty()) continue;
-                        UtilMessage.message(player, "Clans", "You cannot claim Territory containing enemies.");
+                        UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.enemies-present");
                         return;
                     }
 
@@ -113,36 +119,38 @@ public class ClaimSubCommand extends ClanSubCommand {
         }
 
         if (clanManager.adjacentToWorldBorder(chunk)) {
-            UtilMessage.message(player, "Clans", "You cannot claim territory next to the world border.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.world-border");
             return;
         }
 
         if (clanManager.adjacentOtherClans(player.getChunk(), clan)) {
-            UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.adjacent-enemy");
             return;
         }
 
         if (!chunk.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
-            UtilMessage.simpleMessage(player, "Clans", "You can only claim territory in the main world.");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.not-main-world");
             return;
         }
 
         if (!clan.getTerritory().isEmpty() && !clanManager.adjacentToOwnClan(player.getChunk(), clan)) {
-            UtilMessage.message(player, "Clans", "You must claim next to your own territory");
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.not-adjacent-own");
             return;
         }
 
         long claimCooldown = clanManager.getRemainingClaimCooldown(chunk);
         if (claimCooldown > 0) {
             if (!client.isAdministrating()) {
-                UtilMessage.message(player, "Clans",
-                        "This territory was recently disbanded and cannot be claimed for <green>%s</green>",
-                        UtilTime.getTime(claimCooldown, 1));
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.claim.cooldown", Component.text(UtilTime.getTime(claimCooldown, 1), NamedTextColor.GREEN));
                 return;
             }
-            clientManager.sendMessageToRank("Clans",
-                    UtilMessage.deserialize("<yellow>%s</yellow> claimed territory on claim cooldown for <yellow>%s</yellow>", player.getName(), clan.getName()),
-                    Rank.TRIAL_MOD);
+
+            Component notification = Translations.component("clans.command.clan.claim.cooldown-mod-notification",
+                    Component.text(player.getName(), NamedTextColor.YELLOW),
+                    Component.text(clan.getName(), NamedTextColor.YELLOW));
+            clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(target -> {
+                UtilMessage.message(target, Translations.component(CLANS_PREFIX), notification);
+            });
         }
 
 

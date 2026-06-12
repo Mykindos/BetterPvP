@@ -13,10 +13,13 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -53,20 +56,16 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
-
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Instantly teleport forwards " + getValueString(this::getMaxTravelDistance, level) + " Blocks",
-                "",
-                "Using again within " + getValueString(this::getDeblinkTime, level) + " seconds De-Blinks,",
-                "returning you to your original location",
-                "",
-                "Cannot be used while <effect>Slowed</effect>",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
-        };
+    public Component[] getDescription(int level) {
+        Component dist = getValueComponent(this::getMaxTravelDistance, level, 0);
+        Component deblink = getValueComponent(this::getDeblinkTime, level, 0);
+        Component cooldown = getValueComponent(this::getCooldown, level);
+        return Translations.componentLines(
+                "champions.skill.assassin.blink.description",
+                dist,
+                deblink,
+                cooldown
+        );
     }
 
     public int getDeblinkTime(int level){
@@ -107,9 +106,9 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             if (!championsManager.getCooldowns().hasCooldown(player, "Deblink") || force) {
 
                 if (!force) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Deblink " + getLevel(player) + "</alt>.");
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.blink.deblink", Translations.component("champions.skill.assassin.blink.deblink-name", Component.text(String.valueOf(getLevel(player)))).color(NamedTextColor.GREEN));
                 } else {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "The target location was invalid, Blink cooldown has been reduced.");
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.blink.invalid-location");
                     championsManager.getCooldowns().removeCooldown(player, "Blink", true);
                     championsManager.getCooldowns().use(player, "Blink", 2, true);
                 }

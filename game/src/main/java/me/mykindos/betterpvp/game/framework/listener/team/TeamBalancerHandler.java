@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStartS
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -185,9 +184,8 @@ public class TeamBalancerHandler implements Listener {
 
             teamGame.removePlayerFromTeam(event.getParticipant());
             teamGame.addPlayerToTeam(event.getParticipant(), lowestTeam);
-            UtilMessage.message(event.getPlayer(), "Team", Component.text("You were moved to ", NamedTextColor.GRAY)
-                    .append(Component.text(lowestTeam.getProperties().name(), lowestTeam.getProperties().color(), TextDecoration.BOLD))
-                    .append(Component.text(" team for balance.", NamedTextColor.GRAY)));
+            UtilMessage.message(event.getPlayer(), "core.prefix.team", "game.team.moved-for-balance",
+                    Component.text(lowestTeam.getProperties().name(), lowestTeam.getProperties().color(), TextDecoration.BOLD));
 
             //if the game is now balanced, end the balance task
             if (teamGame.isBalanced()) {

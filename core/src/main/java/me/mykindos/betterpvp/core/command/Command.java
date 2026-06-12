@@ -16,6 +16,8 @@ import java.util.Optional;
 @Getter
 public abstract class Command implements ICommand {
 
+    protected static final String COMMAND_PREFIX = "core.prefix.command";
+
     @Setter
     private boolean enabled;
 
