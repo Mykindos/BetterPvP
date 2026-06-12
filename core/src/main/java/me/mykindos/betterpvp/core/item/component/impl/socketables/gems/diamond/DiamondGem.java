@@ -25,7 +25,7 @@ public class DiamondGem implements Socketable, Reloadable {
     private final Provider<DiamondGemItem> itemProvider;
 
     @Getter
-    private double cooldownReduction = 33.0;
+    private double cooldownReduction = 0.33;
 
     @Inject
     public DiamondGem(Provider<DiamondGemItem> itemProvider) {
@@ -44,7 +44,7 @@ public class DiamondGem implements Socketable, Reloadable {
 
     @Override
     public @NotNull String getDescription() {
-        return String.format("Grants <green>%s%%</green> cooldown reduction.", UtilFormat.formatNumber(cooldownReduction));
+        return String.format("Grants <green>%s%%</green> cooldown reduction.", UtilFormat.formatNumber(cooldownReduction * 100));
     }
 
     @Override
@@ -55,6 +55,6 @@ public class DiamondGem implements Socketable, Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.cooldownReduction = config.getConfig("cooldownReduction", 33.0, Double.class);
+        this.cooldownReduction = config.getConfig("cooldownReduction", 0.33, Double.class);
     }
 }

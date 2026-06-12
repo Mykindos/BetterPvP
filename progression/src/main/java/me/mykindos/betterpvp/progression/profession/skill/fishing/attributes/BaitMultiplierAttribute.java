@@ -14,4 +14,9 @@ public class BaitMultiplierAttribute implements IProfessionAttribute {
     public String getOperation() {
         return "%";
     }
+
+    @Override
+    public double getDisplayValue(double value) {
+        return value * 100;
+    }
 }

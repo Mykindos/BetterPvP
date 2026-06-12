@@ -31,6 +31,41 @@ disabled:
     - GOLDEN_SPEAR
     - COPPER_SPEAR
     - NETHERITE_SPEAR
+    - TNT
+    - SLIME_BLOCK
+    - DISPENSER
+    - ENCHANTING_TABLE
+    - PISTON
+    - BREWING_STAND
+    - GOLDEN_CARROT
+    - MAGMA_BLOCK
+    - CAMPFIRE
+    - SOUL_CAMPFIRE
+    - COOKIE
+    - BEEHIVE
+    - DARK_PRISMARINE
+    - ARMOR_STAND
+    - STONECUTTER
+    - GRINDSTONE
+    - BIRCH_BOAT
+    - BIRCH_CHEST_BOAT
+    - BUNDLE
+    - BLACK_BUNDLE
+    - BLUE_BUNDLE
+    - BROWN_BUNDLE
+    - CYAN_BUNDLE
+    - GRAY_BUNDLE
+    - GREEN_BUNDLE
+    - LIGHT_BLUE_BUNDLE
+    - LIGHT_GRAY_BUNDLE
+    - LIME_BUNDLE
+    - MAGENTA_BUNDLE
+    - ORANGE_BUNDLE
+    - PINK_BUNDLE
+    - PURPLE_BUNDLE
+    - RED_BUNDLE
+    - WHITE_BUNDLE
+    - YELLOW_BUNDLE
 
   # Disable specific vanilla recipes by their full NamespacedKey, e.g.: minecraft:oak_boat
   keys:
@@ -63,3 +98,38 @@ disabled:
     - minecraft:diamond_spear
     - minecraft:copper_spear
     - minecraft:netherite_spear
+    - minecraft:tnt
+    - minecraft:dispenser
+    - minecraft:slime_block
+    - minecraft:piston
+    - minecraft:enchanting_table
+    - minecraft:brewing_stand
+    - minecraft:golden_carrot
+    - minecraft:magma_block
+    - minecraft:campfire
+    - minecraft:soul_campfire
+    - minecraft:cookie
+    - minecraft:beehive
+    - minecraft:dark_prismarine
+    - minecraft:armor_stand
+    - minecraft:stonecutter
+    - minecraft:grindstone
+    - minecraft:birch_boat
+    - minecraft:birch_chest_boat
+    - minecraft:bundle
+    - minecraft:black_bundle
+    - minecraft:blue_bundle
+    - minecraft:brown_bundle
+    - minecraft:cyan_bundle
+    - minecraft:gray_bundle
+    - minecraft:green_bundle
+    - minecraft:light_blue_bundle
+    - minecraft:light_gray_bundle
+    - minecraft:lime_bundle
+    - minecraft:magenta_bundle
+    - minecraft:orange_bundle
+    - minecraft:pink_bundle
+    - minecraft:purple_bundle
+    - minecraft:red_bundle
+    - minecraft:white_bundle
+    - minecraft:yellow_bundle

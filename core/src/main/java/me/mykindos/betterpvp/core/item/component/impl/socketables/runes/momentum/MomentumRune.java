@@ -27,10 +27,10 @@ public class MomentumRune implements Socketable, Reloadable {
     private final Provider<MomentumRuneItem> itemProvider;
 
     @Getter
-    private double scalar = 0.15;
+    private double scalar = 0.05;
 
     @Getter
-    private double maximumReduction = 0.75;
+    private double maximumReduction = 0.3;
 
     @Getter
     private double expirySeconds = 1.0;
@@ -67,8 +67,8 @@ public class MomentumRune implements Socketable, Reloadable {
     @Override
     public void reload() {
         final Config config = Config.item(Core.class, itemProvider.get());
-        this.scalar = config.getConfig("scalar", 0.15, Double.class);
-        this.maximumReduction = config.getConfig("maximumReduction", 0.75, Double.class);
-        this.expirySeconds = config.getConfig("expirySeconds", 1.0, Double.class);
+        this.scalar = config.getConfig("scalar", scalar, Double.class);
+        this.maximumReduction = config.getConfig("maximumReduction", maximumReduction, Double.class);
+        this.expirySeconds = config.getConfig("expirySeconds", expirySeconds, Double.class);
     }
 }

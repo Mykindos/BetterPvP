@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
@@ -135,6 +136,14 @@ public class WindowManager implements Listener {
         AbstractWindow window = (AbstractWindow) getOpenWindow((Player) event.getWhoClicked());
         if (window != null) {
             window.handleDragEvent(event);
+        }
+    }
+
+    @EventHandler
+    private void handlePlayerDropItem(PlayerDropItemEvent event) {
+        AbstractWindow window = (AbstractWindow) getOpenWindow(event.getPlayer());
+        if (window != null) {
+            window.handleDropItem(event);
         }
     }
 

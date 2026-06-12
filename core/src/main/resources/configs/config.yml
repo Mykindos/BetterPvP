@@ -21,8 +21,8 @@ core:
     enabled: true
 pvp:
   enableOldPvP: true
-  hitboxExpansion: 0.05
-  hitboxCooldown: 0.1
+  hitboxExpansion: 0.0
+  hitboxCooldown: 0.0
   mythic-damage-indicators:
     duration: 1.5
     enabled: true
@@ -35,13 +35,18 @@ gamer:
     coins: 5000
     fragments: 0
     pvpprotection: 3600.0
-ping:
-  onlyStaffCanSeeOthers: true
 hunger:
   enabled: false
 discord:
   chatWebhook: ''
-  invite: https://discord.gg/qg2kmSffKA
+  invite: https://discord.gg/Q4XvxH7
+resourcepack:
+  enabled: false
+  force: false
+  sha: 972f72a7b2c8cca7ce2ad8087ddf0a256b146700
+  url: https://betterpvp.net/latestpack.zip
+  filepath: pack.zip
+  selfhost: false
 weather:
   enabled: false
 items:
@@ -50,13 +55,16 @@ items:
   drop-protection:
     required-drops: 5
     expiry-seconds: 2.0
+  treeFeller:
+    cooldown: 20.0
+    maxBlocks: 130
 command:
+  promote:
+    enabled: true
+    requiredRank: ADMIN
   list:
     enabled: true
-    requiredRank: PLAYER
-  ping:
-    enabled: true
-    requiredRank: PLAYER
+    requiredRank: ADMIN
   teleport:
     enabled: true
     requiredRank: ADMIN
@@ -78,6 +86,15 @@ command:
     demote:
       enabled: true
       requiredRank: ADMIN
+    count:
+      enabled: true
+      requiredRank: ADMIN
+    setmediachannel:
+      enabled: true
+      requiredRank: ADMIN
+  admin:
+    enabled: true
+    requiredRank: PLAYER
   teleportworld:
     enabled: true
     requiredRank: ADMIN
@@ -99,6 +116,9 @@ command:
   teleporthere:
     enabled: true
     requiredRank: ADMIN
+  test:
+    enabled: true
+    requiredRank: ADMIN
   gamemode:
     enabled: true
     requiredRank: ADMIN
@@ -114,6 +134,9 @@ command:
     spectator:
       enabled: true
       requiredRank: ADMIN
+      test:
+        enabled: true
+        requiredRank: ADMIN
   setspawn:
     enabled: true
     requiredRank: ADMIN
@@ -138,39 +161,30 @@ command:
     give:
       enabled: true
       requiredRank: ADMIN
-    set:
-      enabled: true
-      requiredRank: ADMIN
     get:
+      enabled: true
+      requiredRank: PLAYER
+    set:
       enabled: true
       requiredRank: ADMIN
   iteminfo:
     enabled: true
     requiredRank: ADMIN
-  kill:
-    enabled: true
-    requiredRank: PLAYER
   spawn:
     enabled: true
     requiredRank: ADMIN
+  kill:
+    enabled: true
+    requiredRank: PLAYER
   leaderboard:
     enabled: true
     requiredRank: PLAYER
   staffchat:
     enabled: true
-    requiredRank: HELPER
-  messageadmin:
-    enabled: true
-    requiredRank: HELPER
-  replyadmin:
-    enabled: true
-    requiredRank: HELPER
+    requiredRank: TRIAL_MOD
   display:
     enabled: true
     requiredRank: ADMIN
-    remove:
-      enabled: true
-      requiredRank: ADMIN
     select:
       enabled: true
       requiredRank: ADMIN
@@ -180,13 +194,22 @@ command:
     summon:
       enabled: true
       requiredRank: ADMIN
+      rotate:
+        enabled: true
+        requiredRank: ADMIN
+    remove:
+      enabled: true
+      requiredRank: ADMIN
     transform:
       enabled: true
       requiredRank: ADMIN
+      rotate:
+        enabled: true
+        requiredRank: ADMIN
       scale:
         enabled: true
         requiredRank: ADMIN
-      rotate:
+      Translate:
         enabled: true
         requiredRank: ADMIN
       translate:
@@ -195,12 +218,21 @@ command:
     interpolation:
       enabled: true
       requiredRank: ADMIN
+  messageadmin:
+    enabled: true
+    requiredRank: HELPER
+  replyadmin:
+    enabled: true
+    requiredRank: HELPER
   broadcast:
     enabled: true
     requiredRank: MODERATOR
   invsee:
     enabled: true
     requiredRank: ADMIN
+  hat:
+    enabled: true
+    requiredRank: PLAYER
   customeffect:
     enabled: true
     requiredRank: ADMIN
@@ -225,6 +257,12 @@ command:
   setviewdistance:
     enabled: true
     requiredRank: ADMIN
+  log:
+    enabled: true
+    requiredRank: ADMIN
+    legend:
+      enabled: true
+      requiredRank: ADMIN
   world:
     enabled: true
     requiredRank: ADMIN
@@ -236,7 +274,7 @@ command:
       requiredRank: TRIAL_MOD
     remove:
       enabled: true
-      requiredRank: MODERATOR
+      requiredRank: TRIAL_MOD
     history:
       enabled: true
       requiredRank: TRIAL_MOD
@@ -250,41 +288,41 @@ command:
     enabled: true
     requiredRank: MODERATOR
   daily:
-    enabled: false
-    requiredRank: PLAYER
-  discord:
     enabled: true
-    requiredRank: PLAYER
-  admin:
-    enabled: true
-    requiredRank: PLAYER
+    requiredRank: ADMIN
   showitem:
     enabled: true
     requiredRank: PLAYER
   showeffects:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
   setprotection:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: MODERATOR
   protection:
-    enabled: true
-    requiredRank: PLAYER
-  vanish:
-    enabled: true
-    requiredRank: ADMIN
-  ignore:
     enabled: true
     requiredRank: PLAYER
   silencechat:
     enabled: true
     requiredRank: MODERATOR
-  punishmenthistory:
-    enabled: true
-    requiredRank: PLAYER
   unloadpack:
     enabled: true
     requiredRank: ADMIN
+  logout:
+    enabled: true
+    requiredRank: PLAYER
+  playtime:
+    enabled: true
+    requiredRank: PLAYER
+  ignore:
+    enabled: true
+    requiredRank: PLAYER
+  vanish:
+    enabled: true
+    requiredRank: ADMIN
+  punishmenthistory:
+    enabled: true
+    requiredRank: PLAYER
   legacypunish:
     enabled: true
     requiredRank: ADMIN
@@ -300,21 +338,152 @@ command:
     remove:
       enabled: true
       requiredRank: ADMIN
-  logout:
+  rules:
     enabled: true
     requiredRank: PLAYER
   clear:
     enabled: true
     requiredRank: ADMIN
-  playtime:
+  npc:
+    enabled: true
+    requiredRank: ADMIN
+    list:
+      enabled: true
+      requiredRank: ADMIN
+    spawn:
+      enabled: true
+      requiredRank: ADMIN
+    remove:
+      enabled: true
+      requiredRank: ADMIN
+  logpurge:
+    enabled: true
+    requiredRank: ADMIN
+  offlinemessages:
     enabled: true
     requiredRank: PLAYER
-  rules:
+  adminofflinemessages:
+    enabled: true
+    requiredRank: ADMIN
+  worldlogger:
+    enabled: true
+    requiredRank: MODERATOR
+    inspect:
+      enabled: true
+      requiredRank: MODERATOR
+    page:
+      enabled: true
+      requiredRank: MODERATOR
+    rollback:
+      enabled: true
+      requiredRank: ADMIN
+    restore:
+      enabled: true
+      requiredRank: ADMIN
+    restorechunk:
+      enabled: true
+      requiredRank: ADMIN
+  channel:
+    enabled: true
+    requiredRank: ADMIN
+  centerself:
+    enabled: true
+    requiredRank: ADMIN
+  droptable:
     enabled: true
     requiredRank: PLAYER
-
+  rewardstest:
+    enabled: true
+    requiredRank: ADMIN
+  rewards:
+    enabled: true
+    requiredRank: PLAYER
+  chatfilter:
+    enabled: true
+    requiredRank: MODERATOR
+    add:
+      enabled: true
+      requiredRank: ADMIN
+    reload:
+      enabled: true
+      requiredRank: ADMIN
+    remove:
+      enabled: true
+      requiredRank: ADMIN
+    list:
+      enabled: true
+      requiredRank: MODERATOR
+  recipe:
+    enabled: true
+    requiredRank: PLAYER
+  items:
+    enabled: true
+    requiredRank: PLAYER
+  give:
+    enabled: true
+    requiredRank: ADMIN
+  mockitem:
+    enabled: true
+    requiredRank: ADMIN
+  loot:
+    enabled: true
+    requiredRank: PLAYER
+  attune:
+    enabled: true
+    requiredRank: ADMIN
+  reforge:
+    enabled: true
+    requiredRank: ADMIN
+  achievements:
+    enabled: true
+    requiredRank: PLAYER
+  profile:
+    enabled: true
+    requiredRank: PLAYER
+  statsmenu:
+    enabled: true
+    requiredRank: PLAYER
+  heatmap:
+    enabled: true
+    requiredRank: ADMIN
+    here:
+      enabled: true
+      requiredRank: ADMIN
+    top:
+      enabled: true
+      requiredRank: ADMIN
+  shadowfilter:
+    enabled: true
+    requiredRank: ADMIN
+    list:
+      enabled: true
+      requiredRank: ADMIN
+    reload:
+      enabled: true
+      requiredRank: ADMIN
+    remove:
+      enabled: true
+      requiredRank: ADMIN
+    add:
+      enabled: true
+      requiredRank: ADMIN
+  profilestats:
+    enabled: true
+    requiredRank: ADMIN
+  refreshitemcache:
+    enabled: true
+    requiredRank: ADMIN
+  discord:
+    enabled: true
+    requiredRank: PLAYER
+  ping:
+    enabled: true
+    requiredRank: PLAYER
+  sendtip:
+    enabled: true
+    requiredRank: ADMIN
 tab:
-  title: Welcome to BetterPvP Clans!
+  title: Welcome to BetterPvP!
   website: https://betterpvp.net
   server: Clans-1
   shop: /store
@@ -326,95 +495,25 @@ energy:
   energy-per-tick-nerfed: 4.0
   update-rate: 50
   energy-per-second: 15.0
-combat:
-  crit-arrows: false
 server:
-  unlimitedPlayers: false
-  maxPlayers: 150
+  unlimitedPlayers: true
+  maxPlayers: 999
 combatlog:
-  enabled: true
   valuable-items:
     - TNT
+    - MUSIC_DISC_PIGSTEP
+    - MUSIC_DISC_WAIT
+    - MUSIC_DISC_13
+  enabled: true
 update-event:
   allow-rollover: false
-spawns:
-  NorthSpawn: world, -8.510855573650886, 181.0, -601.5063510988538, -0.2960205, 1.5005822
-  SouthSpawn: world, -8.49615239736855, 181.0, 600.3614975986515, -179.39966, 1.4999776
 daily:
-  coinsAmount: 15000
-recipe:
-  minecraft:
-    # Champions
-    diamond_axe: false
-    diamond_sword: false
-    golden_axe: false
-    golden_sword: false
-    netherite_sword: false
-    netherite_axe: false
-    netherise_pickaxe: false
-    netherite_hoe: false
-    glass_bottle: false
-    shulker_box: false
-    mushroom_stew: false
-    # Clans
-    tnt: false
-    dispenser: false
-    slime_block: false
-    piston: false
-    enchanting_table: false
-    brewing_stand: false
-    golden_apple: false
-    golden_carrot: false
-    anvil: false
-    magma_block: false
-    crossbow: false
-    campfire: false
-    soul_campfire: false
-    cookie: false
-    beehive: false
-    dark_prismarine: false
-    armor_stand: false
-    stonecutter: false
-    grindstone: false
-    # Clans - Boats
-    acacia_boat: false
-    birch_boat: false
-    cherry_boat: false
-    dark_oak_boat: false
-    jungle_boat: false
-    mangrove_boat: false
-    oak_boat: false
-    spruce_boat: false
-    bamboo_raft: false
-    acacia_chest_boat: false
-    birch_chest_boat: false
-    cherry_chest_boat: false
-    dark_oak_chest_boat: false
-    jungle_chest_boat: false
-    mangrove_chest_boat: false
-    oak_chest_boat: false
-    spruce_chest_boat: false
-    bamboo_chest_raft: false
-    # Clans - Bundles
-    bundle: false
-    black_bundle: false
-    blue_bundle: false
-    brown_bundle: false
-    cyan_bundle: false
-    gray_bundle: false
-    green_bundle: false
-    light_blue_bundle: false
-    light_gray_bundle: false
-    lime_bundle: false
-    magenta_bundle: false
-    orange_bundle: false
-    pink_bundle: false
-    purple_bundle: false
-    red_bundle: false
-    white_bundle: false
-    yellow_bundle: false
-protection:
-  drop-pickup-time: 10.0
+  coinsAmount: 5000
+spawns:
+  RedShops: world, -448.5, 69.0, -472.5, 0.90197754, 3.4725707
+  YellowShops: world, -447.5, 69.0, 473.5, -179.39539, -0.47505057
+  BlueShops: world, 447.5, 68.0, -473.5, 0.16472624, -0.023868788
+  GreenShops: world, 448.5, 68.0, 473.5, -179.7284, -0.31821498
 tips:
   speedtip:
     enabled: true
@@ -440,11 +539,46 @@ tips:
     enabled: true
     categoryWeight: 1
     weight: 2
-# Web Config settings
-# If enabled, the plugin will load from local files first,
-# then override any values found in the web configuration.
-# The web configuration supports directories for each plugin, e.g.:
-# core/resourcepacks.yml, champions/skills/skills.yml, clans/config.yml
-webconfig:
+  craftingtip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+protection:
+  drop-pickup-time: 10.0
+  reserve-time: 10.0
+clans:
+  coins:
+    dropCoinsOnDeath: true
+    percentCoinsDroppedOnDeath: 0.1
+activity:
+  threshold:
+    active: 10.0
+    hotspot: 25.0
+    quiet: 5.0
+  weight:
+    combat: 1.0
+    kill: 5.0
+    presence: 1.0
+  decay:
+    dead-cell: 0.01
+    factor: 0.85
+  min-damage-threshold: 5.0
+stats:
   enabled: true
-  url: https://betterpvp.net/configs
+achievements:
+  enabled: true
+ping:
+  onlyStaffCanSeeOthers: true
+repair:
+  baseFraction: 0.33
+  lifetimeMultiplier: 3
+  reinforcementsPerPurityOrder: 3
+  requiredSwings: 3
+salvage:
+  maxYield: 3
+  minYield: 1
+  purityBonus:
+    high: 2
+    low: 0
+    mid: 1
+  tierUpgradeChance: 0.2

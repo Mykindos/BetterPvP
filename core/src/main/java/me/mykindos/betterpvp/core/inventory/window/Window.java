@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentW
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
@@ -25,6 +26,13 @@ import java.util.function.Supplier;
  * @see CartographyWindow
  */
 public interface Window {
+    
+    /**
+     * Sets the handler for when a player drops an item while this window is open.
+     *
+     * @param dropItemHandler The {@link Consumer} to handle the {@link PlayerDropItemEvent}.
+     */
+    void setDropItemHandler(@Nullable Consumer<PlayerDropItemEvent> dropItemHandler);
     
     /**
      * Creates a new {@link Builder.Normal.Single Window Builder} for a normal single window.

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -19,6 +20,7 @@ import org.bukkit.block.Block;
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -38,6 +40,8 @@ import java.util.Set;
 @CustomLog
 @Singleton
 public class TreeRespawnManager {
+
+    private static final int PLAYER_TERRITORY_BUFFER_BLOCKS = 3;
 
     // -----------------------------------------------------------------------
     // Dependencies
@@ -88,12 +92,17 @@ public class TreeRespawnManager {
      * and (b) the key can still be removed from {@link #queuedChunkKeys} even after
      * the referent has been collected.
      */
-    private record ChunkRef(long key, WeakReference<Chunk> ref) {}
+    private record ChunkRef(long key, WeakReference<Chunk> ref) {
+    }
 
-    /** Chunks waiting to be evaluated for tree respawn. */
+    /**
+     * Chunks waiting to be evaluated for tree respawn.
+     */
     private final Queue<ChunkRef> pendingChunks = new ArrayDeque<>();
 
-    /** Tracks the keys of chunks currently in {@link #pendingChunks} for O(1) dedup. */
+    /**
+     * Tracks the keys of chunks currently in {@link #pendingChunks} for O(1) dedup.
+     */
     private final Set<Long> queuedChunkKeys = new HashSet<>();
 
     // -----------------------------------------------------------------------
@@ -106,7 +115,9 @@ public class TreeRespawnManager {
     }
 
 
-    /** Returns the number of chunks currently waiting in the processing queue. */
+    /**
+     * Returns the number of chunks currently waiting in the processing queue.
+     */
     public int getQueueSize() {
         return pendingChunks.size();
     }
@@ -187,6 +198,8 @@ public class TreeRespawnManager {
         Location spot = findValidTreeSpot(chunk, random);
         if (spot == null) return; // no valid spot exists (terrain altered, etc.)
 
+        if(isWithinPlayerTerritoryBuffer(spot)) return;
+
         // Determine tree type from biome at that spot
         Biome biome = world.getBiome(spot.getBlockX(), spot.getBlockY(), spot.getBlockZ());
         TreeType treeType = getTreeTypeForBiome(biome, random);
@@ -242,7 +255,7 @@ public class TreeRespawnManager {
      * </ul>
      *
      * @return a planting {@link Location}, or {@code null} if no valid spot was found
-     *         after 8 attempts (e.g., the terrain has been built over or is fully shaded)
+     * after 8 attempts (e.g., the terrain has been built over or is fully shaded)
      */
     private Location findValidTreeSpot(Chunk chunk, Random random) {
         World world = chunk.getWorld();
@@ -272,7 +285,9 @@ public class TreeRespawnManager {
     // Helpers
     // -----------------------------------------------------------------------
 
-    /** Encodes chunk coordinates into a single {@code long} for fast dedup. */
+    /**
+     * Encodes chunk coordinates into a single {@code long} for fast dedup.
+     */
     private static long chunkKey(Chunk chunk) {
         return ((long) chunk.getX() << 32) | (chunk.getZ() & 0xFFFFFFFFL);
     }
@@ -287,6 +302,27 @@ public class TreeRespawnManager {
             case GRASS_BLOCK, DIRT, COARSE_DIRT, PODZOL, ROOTED_DIRT, MYCELIUM -> true;
             default -> false;
         };
+    }
+
+    /**
+     * Prevents trees from respawning too close to non-admin clan claims, while still
+     * allowing admin-owned map regions to behave as before.
+     */
+    private boolean isWithinPlayerTerritoryBuffer(Location location) {
+
+        for (int offsetX = -PLAYER_TERRITORY_BUFFER_BLOCKS; offsetX <= PLAYER_TERRITORY_BUFFER_BLOCKS; offsetX++) {
+            for (int offsetZ = -PLAYER_TERRITORY_BUFFER_BLOCKS; offsetZ <= PLAYER_TERRITORY_BUFFER_BLOCKS; offsetZ++) {
+                if (offsetX == 0 && offsetZ == 0) continue;
+
+                Location bufferedLocation = location.clone().add(offsetX, 0, offsetZ);
+                Optional<Clan> nearbyClan = clanManager.getClanByLocation(bufferedLocation);
+                if (nearbyClan.filter(clan -> !clan.isAdmin()).isPresent()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

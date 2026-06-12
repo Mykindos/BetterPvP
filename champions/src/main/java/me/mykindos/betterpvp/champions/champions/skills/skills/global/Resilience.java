@@ -72,11 +72,12 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
         if (!(event.getTarget() instanceof Player player)) return;
 
         WeakReference<LivingEntity> applierRef = event.getEffect().getApplier();
-        if(applierRef != null) {
+        if (applierRef != null) {
             LivingEntity applier = applierRef.get();
-            if(applier != null && applier.equals(player)) return;
+            if (applier != null && applier.equals(player)) return;
         }
         if (!event.getEffect().getEffectType().isNegative()) return;
+        if (event.getEffect().getEffectType().isSpecial()) return;
 
         int level = getLevel(player);
         if (level > 0) {

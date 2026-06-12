@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -35,12 +36,22 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
         logs.add(damageLog);
     }
 
+    @Override
+    public Optional<ConcurrentLinkedDeque<DamageLog>> getObject(String identifier) {
+        return Optional.ofNullable(getFreshLogQueue(identifier));
+    }
+
+    @Override
+    public Optional<ConcurrentLinkedDeque<DamageLog>> getObject(UUID identifier) {
+        return getObject(identifier.toString());
+    }
+
     public DamageLog getLastDamage(LivingEntity damagee) {
-        ConcurrentLinkedDeque<DamageLog> logQueue = objects.get(damagee.getUniqueId().toString());
+        ConcurrentLinkedDeque<DamageLog> logQueue = getFreshLogQueue(damagee.getUniqueId().toString());
         if (logQueue == null || logQueue.isEmpty()) {
             return null;
         } else {
-            return logQueue.getLast();
+            return logQueue.peekLast();
         }
     }
 
@@ -53,7 +64,7 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
      * @return The damage log for the given damagee.
      */
     public DamageLog getLastDamager(LivingEntity damagee) {
-        ConcurrentLinkedDeque<DamageLog> logQueue = objects.get(damagee.getUniqueId().toString());
+        ConcurrentLinkedDeque<DamageLog> logQueue = getFreshLogQueue(damagee.getUniqueId().toString());
         if (logQueue != null) {
             Iterator<DamageLog> iterator = logQueue.descendingIterator();
             DamageLog nonDamagerLog = null;
@@ -74,7 +85,7 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
 
     public List<KeyValue<String, Double>> getDamageBreakdown(LivingEntity damagee) {
         List<KeyValue<String, Double>> breakdown = new ArrayList<>();
-        ConcurrentLinkedDeque<DamageLog> logQueue = objects.get(damagee.getUniqueId().toString());
+        ConcurrentLinkedDeque<DamageLog> logQueue = getFreshLogQueue(damagee.getUniqueId().toString());
         if (logQueue != null) {
             var collector = Collectors.groupingBy(log -> log.getDamager() != null ? UtilFormat.stripColor(log.getDamager().getName()) : "Other",
                     Collectors.summingDouble(DamageLog::getDamage));
@@ -136,5 +147,24 @@ public class DamageLogManager extends Manager<String, ConcurrentLinkedDeque<Dama
         }
 
         UtilMessage.message(viewer, "Damage", component.build());
+    }
+
+    private ConcurrentLinkedDeque<DamageLog> getFreshLogQueue(String identifier) {
+        ConcurrentLinkedDeque<DamageLog> logs = objects.get(identifier);
+        if (logs == null) {
+            return null;
+        }
+
+        pruneExpiredLogs(identifier, logs);
+        return logs.isEmpty() ? null : logs;
+    }
+
+    private void pruneExpiredLogs(String identifier, ConcurrentLinkedDeque<DamageLog> logs) {
+        final long now = System.currentTimeMillis();
+        logs.removeIf(log -> log.getExpiry() <= now);
+
+        if (logs.isEmpty()) {
+            objects.remove(identifier, logs);
+        }
     }
 }

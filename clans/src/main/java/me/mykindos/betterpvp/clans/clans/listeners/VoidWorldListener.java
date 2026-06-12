@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.fatigue.RespawnHoldService;
@@ -29,6 +30,7 @@ import java.util.Optional;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class VoidWorldListener implements Listener {
 
     private final ClientManager clientManager;
@@ -59,6 +61,10 @@ public class VoidWorldListener implements Listener {
 
         Optional<String> property = gamer.getProperty(GamerProperty.PREFERRED_SPAWN);
         if (!player.hasPlayedBefore() || property.isEmpty() || property.get().isEmpty()) {
+            if (player.hasPlayedBefore()) {
+                log.warn("Opening travel hub for existing player {} ({}) because preferred spawn is {}",
+                        player.getName(), player.getUniqueId(), property.map(value -> value.isEmpty() ? "blank" : value).orElse("missing")).submit();
+            }
             player.teleport(voidWorld.getSpawnLocation());
             player.setGameMode(GameMode.ADVENTURE);
             new ClanTravelHubMenu(player, client, clanManager).show(player);

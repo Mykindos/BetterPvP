@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -16,6 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -112,9 +112,7 @@ public class HealingNova extends Projectile {
     }
 
     private void applyHeal(LivingEntity entity) {
-        double maxHealth = UtilPlayer.getMaxHealth(entity);
-        double newHealth = Math.min(entity.getHealth() + healAmount, maxHealth);
-        entity.setHealth(newHealth);
+        UtilEntity.health(entity, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
         entity.getWorld().spawnParticle(Particle.HEART, entity.getLocation().add(0, 2, 0), 4, 0.3, 0.3, 0.3, 0);
         new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2f, 1.5f).play(entity.getLocation());
     }

@@ -39,7 +39,7 @@ public class PoisonListener implements Listener {
                 return;
             }
 
-            event.setDamage(Math.min(damagee.getHealth(), effect.getAmplifier() * 3));
+            event.setDamage(Math.min(damagee.getHealth(), effect.getAmplifier() * 2));
             if (damagee.getHealth() - event.getDamage() < 2) {
                 //set damage to make the final damage leave the player at 2 health
                 event.setDamage(damagee.getHealth() - 2);

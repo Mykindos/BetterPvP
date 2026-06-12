@@ -116,9 +116,8 @@ public class ClansExplosionListener extends ClanListener {
         return result == null || result.getHitBlock() == null;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onExplode(final EntityExplodeEvent event) {
-        if (event.isCancelled()) return;
         event.setCancelled(true);
 
         if (!(event.getEntity() instanceof final TNTPrimed tnt)) {

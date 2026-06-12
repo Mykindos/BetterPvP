@@ -43,7 +43,7 @@ public class EnergyService {
 
     @Getter
     @Inject
-    @Config(path = "energy.energy-per-second", defaultValue = "10.0")
+    @Config(path = "energy.energy-per-second", defaultValue = "15.0")
     public double energyPerSecond = 10D;
 
     @Getter

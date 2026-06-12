@@ -32,6 +32,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -66,6 +67,7 @@ public abstract class AbstractWindow implements Window, GuiParent {
     private List<Runnable> openHandlers;
     private List<Runnable> closeHandlers;
     private List<Consumer<InventoryClickEvent>> outsideClickHandlers;
+    private Consumer<PlayerDropItemEvent> dropItemHandler;
     private ComponentWrapper title;
     private boolean closeable;
     private boolean currentlyOpen;
@@ -77,6 +79,17 @@ public abstract class AbstractWindow implements Window, GuiParent {
         this.title = title;
         this.closeable = closeable;
         this.elementsDisplayed = new SlotElement[size];
+    }
+
+    @Override
+    public void setDropItemHandler(@Nullable Consumer<PlayerDropItemEvent> dropItemHandler) {
+        this.dropItemHandler = dropItemHandler;
+    }
+
+    public void handleDropItem(PlayerDropItemEvent event) {
+        if (dropItemHandler != null) {
+            dropItemHandler.accept(event);
+        }
     }
 
     /**
