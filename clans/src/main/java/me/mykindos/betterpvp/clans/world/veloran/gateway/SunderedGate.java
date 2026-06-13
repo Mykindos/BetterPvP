@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.core.world.zone.discovery.ZoneDiscovery;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -112,7 +111,9 @@ public class SunderedGate implements WorldContent {
                 markerLocation,
                 portalRegion.get(),
                 LABEL);
-        return List.of(new SceneSpawn(prop, spawnLabelEntity(world, markerLocation)));
+        // Chunk-managed: the label entity is (re)spawned by this factory whenever the gate's chunk loads, so the portal
+        // survives players leaving and returning to Veloran instead of vanishing on the first chunk unload.
+        return List.of(new SceneSpawn(prop, markerLocation, this::spawnLabelEntity));
     }
 
     /**
@@ -137,8 +138,8 @@ public class SunderedGate implements WorldContent {
                 .build();
     }
 
-    /** Spawns the backing label entity at the top-centre of the portal volume. */
-    private TextDisplay spawnLabelEntity(@NotNull World world, @NotNull Location labelLocation) {
-        return world.spawn(labelLocation, TextDisplay.class);
+    /** Spawns the backing label entity at the given anchor; called on every materialization of the gate. */
+    private TextDisplay spawnLabelEntity(@NotNull Location labelLocation) {
+        return labelLocation.getWorld().spawn(labelLocation, TextDisplay.class);
     }
 }

@@ -48,11 +48,11 @@ public abstract class ModeledProp extends Prop implements HasModeledEntity {
     }
 
     @Override
-    public void remove() {
+    protected void onDematerialize() {
         final ModeledEntity me = getModeledEntity();
         if (me != null) {
             me.markRemoved();
         }
-        super.remove();
+        super.onDematerialize();
     }
 }

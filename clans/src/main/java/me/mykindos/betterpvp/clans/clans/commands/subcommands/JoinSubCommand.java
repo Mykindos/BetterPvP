@@ -58,19 +58,20 @@ public class JoinSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> targetClanOptional = clanManager.getClanByName(args[0].replace("_", " "));
-        targetClanOptional.ifPresent(targetClan -> {
-            Optional<Clan> clanByLocationOptional = clanManager.getClanByLocation(player.getLocation());
-            if (clanByLocationOptional.isPresent()) {
-                Clan locationClan = clanByLocationOptional.get();
-                if (!zoneManager.hasTagAt(player.getLocation(), Zones.SAFE) && locationClan.getId() != targetClan.getId()) {
-                    UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.join.unsafe-location");
-                    return;
-                }
-            }
+        final boolean safe = clanManager.isSafe(player.getLocation());
+        final Clan targetClan = clanManager.getClanByName(args[0].replace("_", " ")).orElse(null);
+        if (targetClan == null) {
+            UtilMessage.message(player, "Clans", "That clan does not exist.");
+            return;
+        }
 
-            UtilServer.callEvent(new MemberJoinClanEvent(player, targetClan));
-        });
+        final Clan clanAt = clanManager.getClanByLocation(player.getLocation()).orElse(null);
+        if (!safe && clanAt != null && targetClan.getId() != clanAt.getId()) {
+            UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.join.unsafe-location");
+            return;
+        }
+
+        UtilServer.callEvent(new MemberJoinClanEvent(player, targetClan));
     }
 
     @Override

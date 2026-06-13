@@ -7,12 +7,13 @@ import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.scene.SceneObjectFactoryManager;
 import me.mykindos.betterpvp.core.scene.loader.LoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.MapperSceneLoader;
 import me.mykindos.betterpvp.core.scene.loader.ModelEngineLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
-import me.mykindos.betterpvp.core.scene.SceneObjectFactoryManager;
+import me.mykindos.betterpvp.core.scene.loader.ServerStartLoadStrategy;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
@@ -54,7 +55,7 @@ public class ClansSceneLoader extends MapperSceneLoader {
 
     @Override
     public List<LoadStrategy> getStrategies() {
-        return List.of(new ModelEngineLoadStrategy(), new ModuleReloadLoadStrategy());
+        return List.of(new ServerStartLoadStrategy(), new ModelEngineLoadStrategy(), new ModuleReloadLoadStrategy());
     }
 
     @Override

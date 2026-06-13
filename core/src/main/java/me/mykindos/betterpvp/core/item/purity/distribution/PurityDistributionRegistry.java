@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
-import me.mykindos.betterpvp.core.item.purity.loader.SupabasePurityDistributionLoader;
+import me.mykindos.betterpvp.core.item.purity.loader.DatabasePurityDistributionLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -21,10 +21,10 @@ public class PurityDistributionRegistry {
 
     private final Map<String, PurityDistribution> distributions = new ConcurrentHashMap<>();
     private PurityDistribution defaultDistribution;
-    private final SupabasePurityDistributionLoader loader;
+    private final DatabasePurityDistributionLoader loader;
 
     @Inject
-    public PurityDistributionRegistry(SupabasePurityDistributionLoader loader) {
+    public PurityDistributionRegistry(DatabasePurityDistributionLoader loader) {
         this.loader = loader;
         reload();
     }
@@ -35,13 +35,10 @@ public class PurityDistributionRegistry {
     public void reload() {
         log.info("Reloading purity distributions...").submit();
 
-        // Reload credentials
-        loader.reloadCredentials();
-
         // Clear existing distributions
         distributions.clear();
 
-        // Load from Supabase
+        // Load from the game database
         Map<String, PurityDistribution> loaded = loader.loadDistributions();
         distributions.putAll(loaded);
 

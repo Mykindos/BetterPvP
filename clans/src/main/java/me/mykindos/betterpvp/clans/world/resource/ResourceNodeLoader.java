@@ -45,7 +45,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -352,13 +351,17 @@ public class ResourceNodeLoader extends SceneObjectLoader {
                 .append(Component.text("Level " + level, NamedTextColor.GRAY));
 
         final List<Location> labelLocations = resolveLabelLocations(bounds, regions, world);
-        final TextDisplay entity = world.spawn(labelLocations.getFirst(), TextDisplay.class);
-        final ResourceNodeProp prop = new ResourceNodeProp(factory, definition, archetype, region, level, zone, label, labelLocations);
-        spawn(prop, entity, registry);
+        final ResourceNodeProp prop = new ResourceNodeProp(factory, definition, archetype, region, level, zone, label, labelLocations, labelService);
+
+        // Capture the archetype's world state once at load (ore snapshot / tree placement) - it works off the region and
+        // definition, not the label entity, so it runs before the prop materializes and persists across chunk cycles.
+        archetype.onActivate(prop);
+
+        // Chunk-managed: the label entities and respawn tick (re)materialize with the node's chunk; the first label is
+        // re-spawned by this factory on every materialization. Harvest routing (manager) is keyed by the stable zone, so
+        // it is registered once here and works regardless of the labels' materialization state.
+        spawn(prop, labelLocations.getFirst(), loc -> loc.getWorld().spawn(loc, TextDisplay.class), registry);
         manager.register(prop);
-        if (prop.getLabels().size() > 1) {
-            labelService.register(prop);
-        }
     }
 
     /**

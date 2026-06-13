@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
-import me.mykindos.betterpvp.core.item.runeslot.loader.SupabaseRuneSlotDistributionLoader;
+import me.mykindos.betterpvp.core.item.runeslot.loader.DatabaseRuneSlotDistributionLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -25,10 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RuneSlotDistributionRegistry {
 
     private final Map<ItemPurity, RuneSlotDistribution> distributions = new ConcurrentHashMap<>();
-    private final SupabaseRuneSlotDistributionLoader loader;
+    private final DatabaseRuneSlotDistributionLoader loader;
 
     @Inject
-    public RuneSlotDistributionRegistry(SupabaseRuneSlotDistributionLoader loader) {
+    public RuneSlotDistributionRegistry(DatabaseRuneSlotDistributionLoader loader) {
         this.loader = loader;
         reload();
     }
@@ -40,13 +40,10 @@ public class RuneSlotDistributionRegistry {
     public void reload() {
         log.info("Reloading rune slot distributions...").submit();
 
-        // Reload credentials
-        loader.reloadCredentials();
-
         // Clear existing distributions
         distributions.clear();
 
-        // Load from Supabase
+        // Load from the game database
         Map<ItemPurity, RuneSlotDistribution> loaded = loader.loadDistributions();
         distributions.putAll(loaded);
 

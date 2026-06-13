@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.loot.loader.ContentLootTableLoader;
 import me.mykindos.betterpvp.core.loot.loader.LootTableLoader;
-import me.mykindos.betterpvp.core.loot.loader.SupabaseLootTableLoader;
 import me.mykindos.betterpvp.core.loot.session.LootSession;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import net.kyori.adventure.audience.Audience;
@@ -33,8 +33,8 @@ public class LootTableRegistry implements Reloadable {
     private final LootTableLoader loader;
 
     @Inject
-    private LootTableRegistry(SupabaseLootTableLoader supabaseLoader) {
-        this.loader = supabaseLoader;
+    private LootTableRegistry(ContentLootTableLoader contentLoader) {
+        this.loader = contentLoader;
     }
 
     /**
@@ -63,7 +63,6 @@ public class LootTableRegistry implements Reloadable {
      */
     @Override
     public void reload() {
-        ((SupabaseLootTableLoader) this.loader).reloadCredentials();
         this.lootTables.clear();
         for (LootTable lootTable : loader.load()) {
             this.lootTables.put(lootTable.getId(), lootTable);

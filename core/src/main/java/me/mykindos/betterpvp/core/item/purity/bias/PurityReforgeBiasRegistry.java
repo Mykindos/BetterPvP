@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
-import me.mykindos.betterpvp.core.item.purity.loader.SupabasePurityReforgeBiasLoader;
+import me.mykindos.betterpvp.core.item.purity.loader.DatabasePurityReforgeBiasLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -27,10 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PurityReforgeBiasRegistry {
 
     private final Map<ItemPurity, PurityReforgeBias> biases = new ConcurrentHashMap<>();
-    private final SupabasePurityReforgeBiasLoader loader;
+    private final DatabasePurityReforgeBiasLoader loader;
 
     @Inject
-    public PurityReforgeBiasRegistry(SupabasePurityReforgeBiasLoader loader) {
+    public PurityReforgeBiasRegistry(DatabasePurityReforgeBiasLoader loader) {
         this.loader = loader;
         reload();
     }
@@ -42,13 +42,10 @@ public class PurityReforgeBiasRegistry {
     public void reload() {
         log.info("Reloading purity reforge biases...").submit();
 
-        // Reload credentials
-        loader.reloadCredentials();
-
         // Clear existing biases
         biases.clear();
 
-        // Load from Supabase
+        // Load from the game database
         Map<ItemPurity, PurityReforgeBias> loaded = loader.loadBiases();
         biases.putAll(loaded);
 

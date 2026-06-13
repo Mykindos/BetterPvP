@@ -20,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @BPvPListener
 @Singleton
@@ -39,7 +38,11 @@ public class OffhandListener implements Listener {
 
     @EventHandler
     public void onJoin(ClientJoinEvent event) {
-        event.getClient().getGamer().setOffhandExecutor(offhandController.getDefaultExecutor());
+        final OffhandExecutor defaultExecutor = offhandController.getDefaultExecutor();
+        if (defaultExecutor != null) {
+            // Fallback slot, below the per-feature executors registered elsewhere.
+            event.getClient().getGamer().setOffhandExecutor(-1, defaultExecutor);
+        }
     }
 
     /**
@@ -53,21 +56,14 @@ public class OffhandListener implements Listener {
 
         final Client client = clientManager.search().online(event.getPlayer());
         final Gamer gamer = client.getGamer();
-        final OffhandExecutor executor = gamer.getOffhandExecutor();
-        if (executor == null) {
-            actionBar(gamer);
-            return; // No offhand executor, nothing to do.
-        }
 
-        final Optional<ItemInstance> item = itemFactory.fromItemStack(event.getOffHandItem());
-        if (item.isEmpty()) {
-            actionBar(gamer);
-            return; // No item in the main hand, nothing to do.
+        final ItemInstance item = itemFactory.fromItemStack(event.getOffHandItem()).orElse(null);
+        for (OffhandExecutor executor : gamer.getOffhandExecutors().values()) {
+            if (executor.trigger(client, item)) {
+                return;
+            }
         }
-
-        if (!executor.trigger(client, item.get())) {
-            actionBar(gamer);
-        }
+        actionBar(gamer);
     }
 
     private void actionBar(Gamer gamer) {

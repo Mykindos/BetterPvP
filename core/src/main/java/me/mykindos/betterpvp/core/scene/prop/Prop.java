@@ -17,7 +17,7 @@ import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
  * with the prop.
  * <p>
  * Like NPCs, props support {@link me.mykindos.betterpvp.core.scene.behavior.SceneBehavior}s
- * via {@link #addBehavior} - for example, {@link me.mykindos.betterpvp.core.npc.behavior.BoneTagBehavior}
+ * via {@link #addBehavior} - for example, {@link me.mykindos.betterpvp.core.scene.behavior.TagBehavior}
  * or {@link me.mykindos.betterpvp.core.npc.behavior.AnimationSequenceBehavior}.
  * {@link me.mykindos.betterpvp.core.npc.behavior.WaypointPatrolBehavior} is intentionally
  * NPC-only and should not be applied to props.

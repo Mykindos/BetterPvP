@@ -4,10 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import org.bukkit.Chunk;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
@@ -20,7 +22,6 @@ import org.bukkit.block.Block;
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -48,6 +49,7 @@ public class TreeRespawnManager {
     // -----------------------------------------------------------------------
 
     private final ClanManager clanManager;
+    private final ZoneManager zoneManager;
 
     // -----------------------------------------------------------------------
     // Config
@@ -110,8 +112,9 @@ public class TreeRespawnManager {
     // -----------------------------------------------------------------------
 
     @Inject
-    public TreeRespawnManager(ClanManager clanManager) {
+    public TreeRespawnManager(ClanManager clanManager, ZoneManager zoneManager) {
         this.clanManager = clanManager;
+        this.zoneManager = zoneManager;
     }
 
 
@@ -315,9 +318,9 @@ public class TreeRespawnManager {
                 if (offsetX == 0 && offsetZ == 0) continue;
 
                 Location bufferedLocation = location.clone().add(offsetX, 0, offsetZ);
-                Optional<Clan> nearbyClan = clanManager.getClanByLocation(bufferedLocation);
-                if (nearbyClan.isPresent()) {
-                    return true;
+                final Zone zoneAt = zoneManager.getZoneAt(bufferedLocation);
+                if (zoneAt != null && zoneAt.hasTag(ClanZones.TERRITORY)) {
+                    return true; // if it's a clan territory return true
                 }
             }
         }

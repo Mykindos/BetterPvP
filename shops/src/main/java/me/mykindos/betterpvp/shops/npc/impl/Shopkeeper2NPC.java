@@ -4,9 +4,9 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.animation.ModelState;
 import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
-import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
-import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
+import me.mykindos.betterpvp.core.scene.behavior.BoneTagAnchor;
+import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -44,7 +44,7 @@ public class Shopkeeper2NPC extends ModeledNPC implements Actor {
         this.getModeledEntity().addModel(model, true);
         ModelEngineHelper.remapModel(this.model, ModelEngineAPI.getBlueprint(skinBlueprint));
 
-        BoneTagBehavior.addNameplate(this,
+        BoneTagAnchor.addNameplate(this,
                 this.model,
                 "head",
                 shopkeeperName,

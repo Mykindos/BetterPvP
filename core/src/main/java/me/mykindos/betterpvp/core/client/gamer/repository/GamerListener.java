@@ -72,7 +72,7 @@ public class GamerListener implements Listener {
         try {
             this.manager.getOnline().forEach(client -> {
                 final Gamer gamer = client.getGamer();
-                gamer.getActionBar().show(gamer);
+                gamer.getDisplayedActionBar().show(gamer);
                 gamer.getTitleQueue().show(gamer);
                 gamer.getPlayerList().show(gamer);
                 gamer.getExperienceBar().show(gamer);

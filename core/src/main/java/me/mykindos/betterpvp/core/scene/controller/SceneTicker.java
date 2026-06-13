@@ -29,7 +29,11 @@ public class SceneTicker implements Listener {
     @UpdateEvent
     public void onUpdate() {
         for (SceneEntity entity : registry.getObjects(SceneEntity.class)) {
-            entity.tick();
+            // Dormant (despawned) objects have no entity and no live behaviours - skip them so hundreds of
+            // out-of-render props cost nothing per tick.
+            if (entity.isMaterialized()) {
+                entity.tick();
+            }
         }
     }
 

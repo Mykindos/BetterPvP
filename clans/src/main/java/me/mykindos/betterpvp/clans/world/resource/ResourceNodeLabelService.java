@@ -46,9 +46,17 @@ public class ResourceNodeLabelService implements Listener {
 
     /**
      * Registers a node's labels for closest-only visibility. Call only when {@code prop.getLabels().size() > 1}.
+     * <p>
+     * Labels are chunk-managed, so a node re-registers with fresh {@link TextDisplay} entities on every materialization;
+     * the group is keyed by node id so {@link #unregister} can drop the stale group on dematerialization.
      */
     public void register(@NotNull ResourceNodeProp prop) {
-        groups.add(new LabelGroup(prop.getLabels()));
+        groups.add(new LabelGroup(prop.getId(), prop.getLabels()));
+    }
+
+    /** Removes the node's label group (its displays were despawned on dematerialization). */
+    public void unregister(@NotNull ResourceNodeProp prop) {
+        groups.removeIf(group -> group.nodeId == prop.getId());
     }
 
     public void clear() {
@@ -134,6 +142,7 @@ public class ResourceNodeLabelService implements Listener {
      * than re-fetched (and re-allocated) via {@code getLocation()} on the hot path.
      */
     private static final class LabelGroup {
+        private final int nodeId;
         private final List<TextDisplay> displays;
         private final double[] labelX;
         private final double[] labelY;
@@ -144,7 +153,8 @@ public class ResourceNodeLabelService implements Listener {
         private final double radius;
         private final ConcurrentHashMap<UUID, Integer> shown = new ConcurrentHashMap<>();
 
-        private LabelGroup(List<TextDisplay> displays) {
+        private LabelGroup(int nodeId, List<TextDisplay> displays) {
+            this.nodeId = nodeId;
             this.displays = List.copyOf(displays);
             final int count = this.displays.size();
             this.labelX = new double[count];

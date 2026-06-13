@@ -33,9 +33,10 @@ public class ClansSceneObjectFactory extends SceneObjectFactory {
     @Override
     public NPC spawnDefault(@NotNull Location location, @NotNull String type) {
         return switch (type) {
+            // Chunk-managed: the backing entity is (re)spawned when the NPC's chunk loads, so it survives chunk cycling.
             case "traveler" -> spawn(
                     new TravelerNPC(this, "Travel Hub", "Tavish", "npc_librarian", clanManager, clientManager),
-                    backingEntity(location));
+                    location, this::backingEntity);
             default -> throw new IllegalArgumentException("Invalid clans NPC type: " + type);
         };
     }

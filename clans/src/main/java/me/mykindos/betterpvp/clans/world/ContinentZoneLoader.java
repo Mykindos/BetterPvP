@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.scene.loader.LoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.ServerStartLoadStrategy;
+import me.mykindos.betterpvp.core.scene.loader.WorldLoadStrategy;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.world.zone.ZoneLoader;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
@@ -31,7 +32,8 @@ public class ContinentZoneLoader extends ZoneLoader {
 
     @Override
     public List<LoadStrategy> getStrategies() {
-        return List.of(new ServerStartLoadStrategy(), new ModuleReloadLoadStrategy());
+        // WorldLoadStrategy ensures the continent's zones register even when its world loads after server-start.
+        return List.of(new ServerStartLoadStrategy(), new WorldLoadStrategy(continent.worldName()), new ModuleReloadLoadStrategy());
     }
 
     @Override

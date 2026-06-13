@@ -61,15 +61,22 @@ public abstract class SceneEntity extends SceneObject implements Ticked {
     }
 
     /**
-     * Registers a child entity to be removed automatically when this entity is removed.
-     * Typically used for decorative display entities spawned in {@link #onInit()}.
+     * Registers a child entity to be removed automatically when this entity is despawned (chunk unload) or removed.
+     * Typically used for decorative display entities spawned in {@link #onInit()}; because {@code onInit} re-runs on
+     * every materialization, such children are naturally re-created when the entity comes back.
      */
     protected void attachToLifecycle(Entity entity) {
         attached.add(entity);
     }
 
+    /**
+     * Stops and clears all behaviours and removes all attached child entities. Runs on every dematerialization (chunk
+     * unload) and on permanent {@link #remove()}. Behaviours are cleared - not retained - because {@link #onInit()}
+     * re-adds them on the next materialization; constructor-added behaviours are therefore <b>not</b> chunk-safe and
+     * should only be used on eager (non-chunk-managed) objects.
+     */
     @Override
-    public void remove() {
+    protected void onDematerialize() {
         behaviors.forEach(SceneBehavior::stop);
         behaviors.clear();
         for (Entity attachedEntity : attached) {
@@ -78,6 +85,6 @@ public abstract class SceneEntity extends SceneObject implements Ticked {
             }
         }
         attached.clear();
-        super.remove();
+        super.onDematerialize();
     }
 }

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.scene.loader.LoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
 import me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader;
 import me.mykindos.betterpvp.core.scene.loader.ServerStartLoadStrategy;
+import me.mykindos.betterpvp.core.scene.loader.WorldLoadStrategy;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -33,7 +34,9 @@ public class ContinentSceneLoader extends SceneObjectLoader {
 
     @Override
     public List<LoadStrategy> getStrategies() {
-        return List.of(new ServerStartLoadStrategy(), new ModuleReloadLoadStrategy());
+        // WorldLoadStrategy covers continents whose world loads after server-start (e.g. on-demand worlds): without it
+        // the one-shot server-start pass runs before the world exists and silently finds nothing.
+        return List.of(new ServerStartLoadStrategy(), new WorldLoadStrategy(continent.worldName()), new ModuleReloadLoadStrategy());
     }
 
     @Override
@@ -47,7 +50,8 @@ public class ContinentSceneLoader extends SceneObjectLoader {
         final Collection<Region> regions = MapperHelper.getRegions(world);
         for (WorldContent content : continent.content()) {
             for (SceneSpawn spawn : content.sceneObjects(world, regions)) {
-                spawn(spawn.getObject(), spawn.getEntity(), registry);
+                // Register chunk-managed: the body is spawned by entityFactory when the anchor chunk loads, not now.
+                spawn(spawn.getObject(), spawn.getAnchor(), spawn.getEntityFactory(), registry);
             }
         }
     }

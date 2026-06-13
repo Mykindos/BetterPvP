@@ -57,6 +57,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -341,10 +342,10 @@ public class InteractionListener implements Listener, PacketListener {
 
     @EventHandler
     public void onGamerJoin(ClientJoinEvent event) {
-        event.getClient().getGamer().setOffhandExecutor(this::onSwapHand);
+        event.getClient().getGamer().setOffhandExecutor(0, this::onSwapHand);
     }
 
-    public boolean onSwapHand(@NotNull Client client, @NotNull ItemInstance itemInstance) {
+    public boolean onSwapHand(@NotNull Client client, @Nullable ItemInstance itemInstance) {
         Player player = Objects.requireNonNull(client.getGamer().getPlayer());
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         if (itemStack.getType() == Material.AIR) {

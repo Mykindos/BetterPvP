@@ -76,12 +76,12 @@ public class ModeledNPC extends NPC implements HasModeledEntity {
     }
 
     @Override
-    public void remove() {
+    protected void onDematerialize() {
         final ModeledEntity modeledEntity = getModeledEntity();
         if (modeledEntity != null) {
             modeledEntity.markRemoved();
         }
-        super.remove();
+        super.onDematerialize();
     }
 
 }

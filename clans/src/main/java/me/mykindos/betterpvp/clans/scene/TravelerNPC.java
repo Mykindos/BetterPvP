@@ -7,9 +7,9 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.transport.ClanTravelHubMenu;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
-import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
+import me.mykindos.betterpvp.core.scene.behavior.BoneTagAnchor;
+import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,7 +44,7 @@ public class TravelerNPC extends ModeledNPC {
                 new AnimationHandler.DefaultProperty(ModelState.IDLE, "idle", 0, 0, 1));
         getModeledEntity().addModel(model, true);
 
-        BoneTagBehavior.addNameplate(this,
+        BoneTagAnchor.addNameplate(this,
                 model,
                 "head",
                 name,

@@ -7,9 +7,9 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.attunement.GuiAttunement;
 import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
-import me.mykindos.betterpvp.core.scene.behavior.BoneTagBehavior;
-import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
+import me.mykindos.betterpvp.core.scene.behavior.BoneTagAnchor;
+import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -49,7 +49,7 @@ public class AttunerNPC extends ModeledNPC implements Actor {
         this.getModeledEntity().addModel(model, true);
         ModelEngineHelper.remapModel(this.model, ModelEngineAPI.getBlueprint(skinBlueprint));
 
-        BoneTagBehavior.addNameplate(this,
+        BoneTagAnchor.addNameplate(this,
                 this.model,
                 "head",
                 shopkeeperName,

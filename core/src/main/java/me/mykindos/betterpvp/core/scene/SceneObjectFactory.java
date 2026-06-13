@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
 /**
  * Abstract factory for command-spawnable {@link SceneObject} types.
  * <p>
@@ -57,6 +59,25 @@ public abstract class SceneObjectFactory {
      */
     public <T extends SceneObject> T spawn(@NotNull T object, @NotNull Entity entity) {
         object.init(entity);
+        registry.register(object);
+        return object;
+    }
+
+    /**
+     * Registers {@code object} as <b>chunk-managed</b>: dormant until its anchor chunk's entities load, then spawned via
+     * {@code entityFactory} and re-spawned across chunk cycles by {@code SceneMaterializationController}. Prefer this
+     * over {@link #spawn(SceneObject, Entity)} for objects outside force-loaded chunks so they survive players leaving
+     * and returning to render range.
+     *
+     * @param object        the uninitialized scene object
+     * @param anchor        where the object lives
+     * @param entityFactory builds the backing entity at the anchor; invoked on every materialization
+     * @param <T>           the concrete scene object type
+     * @return the same object, now configured and registered
+     */
+    public <T extends SceneObject> T spawn(@NotNull T object, @NotNull Location anchor,
+                                           @NotNull Function<Location, Entity> entityFactory) {
+        object.configureMaterialization(anchor, entityFactory);
         registry.register(object);
         return object;
     }

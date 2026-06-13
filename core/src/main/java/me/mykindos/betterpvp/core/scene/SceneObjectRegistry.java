@@ -4,11 +4,10 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.scene.controller.SceneMaterializationController;
+import me.mykindos.betterpvp.core.scene.npc.HumanNpcInteractController;
 import me.mykindos.betterpvp.core.scene.npc.PlayerListPacketController;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,21 +32,42 @@ public final class SceneObjectRegistry {
 
     private final Map<Integer, SceneObject> objects = new ConcurrentHashMap<>();
 
+    /**
+     * Set once by {@link SceneMaterializationController} on construction. Null only in the brief window before that
+     * singleton is created, or on servers where the scene system is unused.
+     */
+    @Nullable
+    private SceneMaterializationController materializationController;
+
     @Inject
     private SceneObjectRegistry() {
         PacketEvents.getAPI().getEventManager()
                 .registerListener(new PlayerListPacketController(this), PacketListenerPriority.NORMAL);
+        PacketEvents.getAPI().getEventManager()
+                .registerListener(new HumanNpcInteractController(this), PacketListenerPriority.NORMAL);
     }
 
     /**
-     * Registers a scene object. Stamps the NPC PDC marker on its entity and
-     * back-links this registry so the object can auto-unregister on removal.
+     * Sets the controller that drives chunk-managed materialization. Called once by
+     * {@link SceneMaterializationController} on construction.
+     */
+    public void setMaterializationController(@NotNull SceneMaterializationController controller) {
+        this.materializationController = controller;
+    }
+
+    /**
+     * Registers a scene object and back-links this registry so the object can auto-unregister on removal. The object
+     * may be dormant (no entity yet) - the PDC marker is stamped by the object itself when it materializes. If the
+     * object is {@link SceneObject#isChunkManaged() chunk-managed}, it is handed to the
+     * {@link SceneMaterializationController}, which materializes it now (if its chunk is loaded) and re-spawns it across
+     * chunk cycles thereafter.
      */
     public void register(@NotNull SceneObject object) {
         object.registry = this;
-        object.getEntity().getPersistentDataContainer()
-                .set(CoreNamespaceKeys.SCENE_OBJECT, PersistentDataType.BOOLEAN, true);
         objects.put(object.getId(), object);
+        if (materializationController != null && object.isChunkManaged()) {
+            materializationController.manage(object);
+        }
     }
 
     /**
@@ -57,6 +77,9 @@ public final class SceneObjectRegistry {
     public void unregister(@NotNull SceneObject object) {
         objects.remove(object.getId());
         object.registry = null;
+        if (materializationController != null && object.isChunkManaged()) {
+            materializationController.unmanage(object);
+        }
     }
 
     @Nullable
@@ -78,7 +101,7 @@ public final class SceneObjectRegistry {
     @Nullable
     public SceneObject getObject(@NotNull UUID uuid) {
         for (SceneObject obj : objects.values()) {
-            if (obj.getEntity().getUniqueId().equals(uuid)) {
+            if (obj.isInitialized() && obj.getEntity().getUniqueId().equals(uuid)) {
                 return obj;
             }
         }

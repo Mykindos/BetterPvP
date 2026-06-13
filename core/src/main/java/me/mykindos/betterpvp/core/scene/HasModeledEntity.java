@@ -6,10 +6,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Marks a {@link SceneEntity} that is backed by a ModelEngine {@link ModeledEntity}.
  * <p>
- * Implemented by both {@link me.mykindos.betterpvp.core.npc.model.ModeledNPC} and
- * {@link me.mykindos.betterpvp.core.scene.prop.ModeledProp}, allowing behaviors such as
- * {@link me.mykindos.betterpvp.core.npc.behavior.BoneTagBehavior} and
- * {@link me.mykindos.betterpvp.core.npc.behavior.AnimationSequenceBehavior} to operate
+ * Implemented by both {@link me.mykindos.betterpvp.core.scene.npc.ModeledNPC} and
+ * {@link me.mykindos.betterpvp.core.scene.prop.ModeledProp}, allowing model-aware code such as
+ * {@link me.mykindos.betterpvp.core.scene.behavior.BoneTagAnchor} to operate
  * on either without coupling to the NPC hierarchy.
  */
 public interface HasModeledEntity {

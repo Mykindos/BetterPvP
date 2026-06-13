@@ -4,7 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scene.SceneObject;
+import me.mykindos.betterpvp.core.scene.SceneObjectInteractEvent;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -41,9 +43,18 @@ public class SceneInteractListener implements Listener {
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         if (!EquipmentSlot.HAND.equals(event.getHand())) return;
         final SceneObject obj = registry.getObject(event.getRightClicked());
-        if (!(obj instanceof Actor actor)) return;
+        if (obj == null) return;
         event.setCancelled(true);
-        actor.act(event.getPlayer());
+        // Funnel real-entity interactions through the same seam packet-only objects use, so all
+        // downstream listeners (act dispatch below, quest-givers, etc.) see one event type.
+        UtilServer.callEvent(new SceneObjectInteractEvent(event.getPlayer(), obj));
+    }
+
+    @EventHandler
+    public void onSceneInteract(SceneObjectInteractEvent event) {
+        if (event.getSceneObject() instanceof Actor actor) {
+            actor.act(event.getPlayer());
+        }
     }
 
     // Cancel the event so click an NPC only does the NPC's action

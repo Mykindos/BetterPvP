@@ -36,7 +36,7 @@ public class Resources {
         /**
          * Input 16, used for item lore and menus
          */
-        public static final Key INPUT = Key.key("betterpvp", "input");
+        public static final Key INPUT = Key.key("betterpvp", "input/center");
 
         /**
          * 3d font, used for overlays

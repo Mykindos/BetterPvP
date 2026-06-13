@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBar;
+import me.mykindos.betterpvp.core.utilities.model.display.actionbar.ActionBarOverrides;
 import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarOverlay;
 import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarQueue;
 import me.mykindos.betterpvp.core.utilities.model.display.experience.ExperienceBar;
@@ -37,6 +38,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -51,6 +55,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private final long id;
     private final String uuid;
     private ActionBar actionBar = new ActionBar();
+    private final ActionBarOverrides actionBarOverrides = new ActionBarOverrides();
     private TitleQueue titleQueue = new TitleQueue();
     private PlayerList playerList = new PlayerList();
     private ExperienceBar experienceBar = new ExperienceBar();
@@ -59,7 +64,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private BossBarOverlay bossBarOverlay = new BossBarOverlay();
     private Sidebar sidebar = null;
     private @NotNull IChatChannel chatChannel = ServerChatChannel.getInstance();
-    private OffhandExecutor offhandExecutor = null;
+    private final NavigableMap<Integer, OffhandExecutor> offhandExecutors = new TreeMap<>(Comparator.reverseOrder());
 
     private long lastDamaged = -1;
     private long lastDeath = -1;
@@ -74,6 +79,29 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         this.id = id;
         this.uuid = uuid;
         this.properties.registerListener(this);
+    }
+
+    /**
+     * The action bar to render this tick: the winning override if one is active,
+     * otherwise the base action bar. Systems should keep adding components via
+     * {@link #getActionBar()} — the base queue is preserved while overridden.
+     */
+    /**
+     * Registers an offhand executor in the given priority slot, replacing whatever
+     * occupied it. On an offhand press, executors are consulted highest priority
+     * first until one consumes the press.
+     */
+    public void setOffhandExecutor(int priority, OffhandExecutor executor) {
+        offhandExecutors.put(priority, executor);
+    }
+
+    public void removeOffhandExecutor(int priority) {
+        offhandExecutors.remove(priority);
+    }
+
+    public ActionBar getDisplayedActionBar() {
+        final ActionBar override = actionBarOverrides.peek();
+        return override != null ? override : actionBar;
     }
 
     public long timeSinceLastBlock() {

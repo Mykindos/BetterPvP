@@ -70,6 +70,12 @@ import java.util.UUID;
  * driver, while {@link Navigator} (manual pathfinding) still works. Mobs run on a bare vanilla
  * entity; setting a {@link #setModelId(String) modelId} binds a ModelEngine model and hides the
  * vanilla entity. Ticking is gated on player proximity ({@link #getActivationRadius()}).
+ * <p>
+ * <b>Eager, not chunk-managed.</b> Unlike static props and NPCs, a mob is spawned via the eager
+ * {@code factory.spawn(mob, entity)} path and is deliberately left out of chunk-driven materialization. A roaming
+ * combat entity wanders away from its spawn anchor, so anchor-keyed respawn would diverge from where it actually is;
+ * and its lifetime belongs to the encounter/spawner that created it, which decides when it (re)spawns. On chunk unload
+ * it simply despawns (non-persistent) and the owning system re-spawns it as appropriate.
  */
 @Getter
 public class SceneMob extends NPC implements HasModeledEntity {
