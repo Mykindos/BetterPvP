@@ -71,6 +71,10 @@ public class QuickMenuPacketListener implements PacketListener {
         }
 
         final Player player = event.getPlayer();
+        if (!QuickMenu.shouldDisplay(player)) {
+            return;
+        }
+
         final Client client = clientManager.search().online(player);
 
         if (QuickMenu.useQuickMenuButton(client, player, packet.getSlot())) {
@@ -102,6 +106,10 @@ public class QuickMenuPacketListener implements PacketListener {
             return; // Not player inventory
         }
 
+        if (!QuickMenu.shouldDisplay(event.getPlayer())) {
+            return; // Creative/spectator are client-authoritative; ghost items would materialize
+        }
+
         final List<ItemStack> items = packet.getItems();
         for (int i = 1; i <= 4; i++) {
             final ItemProvider quickMenuButton = QuickMenu.getQuickMenuButton(i);
@@ -113,6 +121,10 @@ public class QuickMenuPacketListener implements PacketListener {
     private void onSetSlot(PacketSendEvent event) {
         final WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(event);
         if (!UtilInventory.isPlayerInventory(event.getPlayer(), packet.getWindowId())) {
+            return;
+        }
+
+        if (!QuickMenu.shouldDisplay(event.getPlayer())) {
             return;
         }
 

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.menu.viewer.GuiItemViewer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
 import me.mykindos.betterpvp.core.recipe.crafting.menu.GuiCraftingTable;
 import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;
@@ -13,12 +14,12 @@ import me.mykindos.betterpvp.core.stats.menu.LeaderboardCategoryMenu;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +27,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 @UtilityClass
 public class QuickMenu {
+
+    public static boolean shouldDisplay(Player player) {
+        final GameMode mode = player.getGameMode();
+        return mode == GameMode.SURVIVAL || mode == GameMode.ADVENTURE;
+    }
 
     public static boolean isQuickMenuButton(ItemStack itemStack) {
         if (itemStack == null) return false;
