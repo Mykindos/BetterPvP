@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum ClientProperty {
 
-    SIDEBAR_ENABLED,
+    SIDEBAR_MODE,
     TIPS_ENABLED,
     DROP_PROTECTION_ENABLED,
     COOLDOWN_DISPLAY,

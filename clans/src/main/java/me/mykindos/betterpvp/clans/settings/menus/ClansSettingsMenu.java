@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.clans.settings.menus;
 
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.framework.sidebar.SidebarMode;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.settings.menus.SettingCategory;
+import me.mykindos.betterpvp.core.settings.menus.buttons.EnumSettingsButton;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -24,12 +26,14 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
         super(9, 2);
 
         final Description sidebarDescription = Description.builder().icon(lang -> {
-            final boolean setting = (boolean) client.getProperty(ClientProperty.SIDEBAR_ENABLED).orElse(false);
-            final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            final SidebarMode mode = SidebarMode.parse(client.getProperty(ClientProperty.SIDEBAR_MODE).orElse(null));
+            final NamedTextColor color = mode == SidebarMode.DISABLED ? NamedTextColor.RED : NamedTextColor.GREEN;
             return ItemView.builder()
                     .material(Material.IRON_BARS)
                     .displayName(Translations.component("clans.menu.settings.button.sidebar.name").color(color))
                     .lore(Translations.component("clans.menu.settings.button.sidebar.lore").color(NamedTextColor.GRAY))
+                    .lore(Translations.component("clans.menu.settings.button.sidebar.mode",
+                            Component.text(mode.name(), color)).color(NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
@@ -38,7 +42,7 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
         fill(0, 9, Menu.BACKGROUND_GUI_ITEM, false);
         setItem(4, new BackButton(previous));
 
-        addItems(new SettingsButton(client, ClientProperty.SIDEBAR_ENABLED, sidebarDescription));
+        addItems(new EnumSettingsButton(client, ClientProperty.SIDEBAR_MODE, SidebarMode.HUD, sidebarDescription));
 
         final Description mapLocationsDescription = Description.builder().icon(lang -> {
             final boolean setting = (boolean) client.getProperty(ClientProperty.MAP_POINTS_OF_INTEREST).orElse(false);

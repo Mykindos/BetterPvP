@@ -36,6 +36,10 @@ public class BossBarOverlay {
 
     private final Object lock = new Object();
 
+    // The per-overlay outputs behind the last name we pushed. Re-rendering them every tick is unavoidable
+    // (the providers hold the state), but if nothing changed we skip the rebuild and the name packet.
+    private List<Component> lastOutputs = List.of();
+
     /**
      * Adds an overlay to the list.
      *
@@ -90,7 +94,7 @@ public class BossBarOverlay {
         final Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
         if (player == null) return;
 
-        Component combined = null;
+        final List<Component> outputs = new ArrayList<>();
         synchronized (lock) {
             for (DisplayObject<Component> overlay : overlays) {
                 Component component = overlay.getProvider().apply(gamer);
@@ -100,20 +104,34 @@ public class BossBarOverlay {
                     timed.startTime();
                 }
 
-                if (combined == null) {
-                    combined = component;
-                } else {
-                    combined = combined.append(SEPARATOR).append(component);
-                }
+                outputs.add(component);
             }
         }
 
-        if (combined == null) {
-            combined = Component.empty();
-        }
-
-        bar.name(combined);
         bar.addViewer(player);
+
+        // Skip the rebuild and name packet when nothing changed; memoised providers hit the reference fast-path.
+        if (unchanged(outputs, lastOutputs)) {
+            return;
+        }
+        lastOutputs = outputs;
+
+        Component combined = Component.empty();
+        for (int i = 0; i < outputs.size(); i++) {
+            combined = i == 0 ? outputs.get(i) : combined.append(SEPARATOR).append(outputs.get(i));
+        }
+        bar.name(combined);
+    }
+
+    /** Element-wise equality with a reference fast-path, so unchanged overlays never deep-compare. */
+    private static boolean unchanged(List<Component> a, List<Component> b) {
+        if (a.size() != b.size()) return false;
+        for (int i = 0; i < a.size(); i++) {
+            final Component x = a.get(i);
+            final Component y = b.get(i);
+            if (x != y && !x.equals(y)) return false;
+        }
+        return true;
     }
 
     /** Removes expired/invalid overlays from the list. */

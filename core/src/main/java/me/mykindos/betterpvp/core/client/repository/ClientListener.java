@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
+import me.mykindos.betterpvp.core.framework.sidebar.SidebarMode;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -256,9 +257,12 @@ public class ClientListener implements Listener {
             client.saveProperty(chatEnabledProperty, true);
         }
 
-        Optional<Boolean> sidebarOptional = client.getProperty(ClientProperty.SIDEBAR_ENABLED);
-        if (sidebarOptional.isEmpty()) {
-            client.saveProperty(ClientProperty.SIDEBAR_ENABLED, true);
+        Optional<Object> sidebarModeOptional = client.getProperty(ClientProperty.SIDEBAR_MODE);
+        if (sidebarModeOptional.isEmpty()) {
+            client.saveProperty(ClientProperty.SIDEBAR_MODE, SidebarMode.HUD.name());
+        } else if (!(sidebarModeOptional.get() instanceof String)) {
+            // Convert a cached legacy boolean value (true -> HUD, false -> DISABLED)
+            client.saveProperty(ClientProperty.SIDEBAR_MODE, SidebarMode.parse(sidebarModeOptional.get()).name());
         }
 
         Optional<Boolean> tipsOptional = client.getProperty(ClientProperty.TIPS_ENABLED);

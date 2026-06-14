@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
 import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
+import me.mykindos.betterpvp.clans.display.ClanHudInfo;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
@@ -123,6 +124,7 @@ public class Clans extends BPvPPlugin {
             var sidebarController = injector.getInstance(SidebarController.class);
             if (clansSidebar.isEnabled()) {
                 sidebarController.setDefaultProvider(gamer -> new Sidebar(gamer, getConfig().getString("server.sidebar.title"), SidebarType.GENERAL));
+                sidebarController.setHudProvider(injector.getInstance(ClanHudInfo.class)::render);
             }
 
             var leaderboardLoader = injector.getInstance(ClansLeaderboardLoader.class);
