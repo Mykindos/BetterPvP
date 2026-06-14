@@ -9,17 +9,9 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-
-import java.util.Objects;
 
 @BPvPListener
 @Singleton
@@ -63,17 +55,5 @@ public class OffhandListener implements Listener {
                 return;
             }
         }
-        actionBar(gamer);
     }
-
-    private void actionBar(Gamer gamer) {
-        gamer.getActionBar().add(4, new TimedComponent(
-                2.0,
-                false,
-                gmr -> Component.text("No action to trigger", NamedTextColor.RED)
-        ));
-        final Player player = Objects.requireNonNull(gamer.getPlayer());
-        new SoundEffect(Sound.UI_BUTTON_CLICK, 0.8f, 1f).play(player);
-    }
-
 }
