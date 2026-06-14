@@ -27,11 +27,15 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.pagination.LorePageService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,16 +47,29 @@ import java.util.Optional;
 @BPvPListener
 @Singleton
 @PluginAdapter("packetevents")
-public class ItemPacketRemapper implements PacketListener {
+public class ItemPacketRemapper implements PacketListener, Listener {
 
+    private final Core core;
     private final ItemFactory itemFactory;
     private final LorePageService lorePageService;
 
     @Inject
     private ItemPacketRemapper(Core core, ItemFactory itemFactory, LorePageService lorePageService) {
+        this.core = core;
         this.itemFactory = itemFactory;
         this.lorePageService = lorePageService;
         PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.LOW);
+    }
+
+    @EventHandler
+    public void onGameModeChange(PlayerGameModeChangeEvent event) {
+        // A gamemode change does not resend the inventory, so the client keeps the views it was last sent.
+        // Those are now stale: entering creative they lack the embedded canonical bytes (the first edit would
+        // strip a custom item to a vanilla fallback), and leaving creative they're missing the cosmetics
+        // (hats / role placeholders) that we suppress in creative. Resend next tick - once the new gamemode
+        // has actually applied - so every remapper re-renders each item for the correct mode.
+        final Player player = event.getPlayer();
+        UtilServer.runTaskLater(core, player::updateInventory, 1L);
     }
 
     // Map to
@@ -83,37 +100,17 @@ public class ItemPacketRemapper implements PacketListener {
     }
 
     private void onCreativeAction(PacketReceiveEvent event) {
-        WrapperPlayClientCreativeInventoryAction packet = new WrapperPlayClientCreativeInventoryAction(event);
+        final WrapperPlayClientCreativeInventoryAction packet = new WrapperPlayClientCreativeInventoryAction(event);
         final ItemStack stack = packet.getItemStack();
         if (stack.isEmpty()) {
             return;
         }
 
-        Player player = event.getPlayer();
-        final org.bukkit.inventory.ItemStack inPlace = player.getOpenInventory().getItem(packet.getSlot());
-        final Optional<org.bukkit.inventory.ItemStack> converted = itemFactory.convertItemStack(SpigotConversionUtil.toBukkitItemStack(stack));
-        converted.ifPresent(itemStack -> packet.setItemStack(SpigotConversionUtil.fromBukkitItemStack(itemStack)));
-
-        if (inPlace == null) {
-            return;
-        }
-
-        final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(inPlace);
-        if (itemOpt.isEmpty()) {
-            return;
-        }
-
-        final ItemInstance item = itemOpt.get();
-        final Locale locale = player.locale();
-        final org.bukkit.inventory.ItemStack existing = SpigotConversionUtil.toBukkitItemStack(stack);
-        // The client echoes back the localized item we sent it, so compare against the view rendered into
-        // the same locale.
-        final org.bukkit.inventory.ItemStack view = Translations.renderItemStack(item.getView().get(), locale);
-        if (existing.equals(view)) {
-            event.setCancelled(true);
-        } else {
-            packet.setItemStack(mapTo(stack, player));
-        }
+        // Creative players are sent their real items (see mapTo), so the echo is already canonical and this is
+        // a lossless round-trip. Normalizing also tidies up items dragged in fresh from the creative palette.
+        final org.bukkit.inventory.ItemStack incoming = SpigotConversionUtil.toBukkitItemStack(stack);
+        itemFactory.convertItemStack(incoming)
+                .ifPresent(itemStack -> packet.setItemStack(SpigotConversionUtil.fromBukkitItemStack(itemStack)));
     }
 
     private void onCollectItem(PacketSendEvent event) {
@@ -200,17 +197,6 @@ public class ItemPacketRemapper implements PacketListener {
             return;
         }
 
-        // We have to do this for creative players because when they receive a SetSlot packet they take it as a true
-        // source of truth. This means that the player does not send any feedback packets but the item that is seen
-        // is what is converted back to the original item. To avoid this, we send them the true item THEN update it,
-        // because the other packets don't cause this
-        if (event.getPlayer() instanceof Player player
-                && player.getGameMode().equals(GameMode.CREATIVE)
-                && packet.getSlot() != 45) { // #updateInventory calls SetSlot packet so this would make it an infinitely recursive call
-            player.updateInventory();
-            return;
-        }
-
         final Player viewer = event.getPlayer() instanceof Player player ? player : null;
         packet.setItem(mapTo(packet.getItem(), viewer));
     }
@@ -244,6 +230,14 @@ public class ItemPacketRemapper implements PacketListener {
                     return protocolItemStack; // nothing translatable to resolve
                 }
                 return SpigotConversionUtil.fromBukkitItemStack(localized);
+            }
+
+            // Creative is a source-of-truth gamemode: the player's own inventory echoes back whatever we send
+            // and the server stores it verbatim, so a styled view would round-trip and overwrite the canonical
+            // item (breaking it, or vanishing on click). Send creative players their real item instead. Menus
+            // (already-named items) take the branch above and keep the styled view; survival is unaffected.
+            if (viewer != null && viewer.getGameMode() == GameMode.CREATIVE) {
+                return protocolItemStack;
             }
 
             // Bare custom items: expand into their (unresolved) view, then localize for the recipient.

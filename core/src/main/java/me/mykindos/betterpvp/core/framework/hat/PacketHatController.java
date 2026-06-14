@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -77,6 +78,12 @@ public class PacketHatController {
     }
 
     Optional<ItemStack> getHatItem(Player player) {
+        // Creative is a source-of-truth gamemode: any cosmetic we draw over the helmet slot gets echoed back
+        // and materialized over the real item. Don't render hats for creative players at all.
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            return Optional.empty();
+        }
+
         ItemStack itemStack = providerFunction.apply(player);
         if (itemStack != null) {
             final ItemStack helmet = player.getInventory().getHelmet();

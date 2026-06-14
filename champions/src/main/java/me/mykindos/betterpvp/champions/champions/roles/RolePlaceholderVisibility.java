@@ -4,6 +4,7 @@ import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
+import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -22,7 +23,15 @@ public class RolePlaceholderVisibility {
     }
 
     public boolean shouldRender(LivingEntity wearer) {
-        return (!(wearer instanceof Player player) || combatFeaturesService.isActive(player)) && !hidden.contains(wearer);
+        if (hidden.contains(wearer)) {
+            return false;
+        }
+        if (wearer instanceof Player player) {
+            // Creative is a source-of-truth gamemode: the placeholder we draw into an empty armor slot gets
+            // echoed back and materialized as a real item. Don't render placeholders for creative players.
+            return player.getGameMode() != GameMode.CREATIVE && combatFeaturesService.isActive(player);
+        }
+        return true;
     }
 
     public void setVisible(LivingEntity wearer, boolean visible) {
