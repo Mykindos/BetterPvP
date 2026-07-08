@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipe;
+import me.mykindos.betterpvp.core.imbuement.MirrorOfKalandraImbuementRecipe;
 import me.mykindos.betterpvp.core.imbuement.SocketableImbuementRecipe;
 import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -13,6 +14,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -175,17 +177,23 @@ public class ImbuementPedestalRecipeExecutor {
         // Play completion sound
         new SoundEffect(Sound.ITEM_TOTEM_USE, 1.5f, 0.4f).play(pedestalLocation);
 
+        // Mirror of Kalandra consumes the mirror and yields the original item plus its copy
+        if (recipe instanceof MirrorOfKalandraImbuementRecipe mirrorRecipe) {
+            for (ItemInstance output : mirrorRecipe.duplicate(currentItems)) {
+                ItemStack outputStack = output.createItemStack();
+                explosionCenter.getWorld().dropItem(explosionCenter, outputStack,
+                        item -> launchTowardsNearestPlayer(item, pedestalLocation, explosionCenter));
+            }
+
+            displayManager.clearAllFlyingItems();
+            isExecutingRecipe = false;
+            return;
+        }
+
         // Drop the primary result towards the nearest player
         ItemStack primaryResult = createPrimaryResult(recipe, currentItems);
-        explosionCenter.getWorld().dropItem(explosionCenter, primaryResult, item -> {
-            Player nearestPlayer = findNearestPlayer(pedestalLocation);
-            if (nearestPlayer != null) {
-                Vector direction = nearestPlayer.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
-                direction.multiply(0.3); // Gentle throw
-                direction.add(new Vector(0, 0.3, 0));
-                item.setVelocity(direction);
-            }
-        });
+        explosionCenter.getWorld().dropItem(explosionCenter, primaryResult,
+                item -> launchTowardsNearestPlayer(item, pedestalLocation, explosionCenter));
 
         // Drop secondary results (only for standard recipes)
         if (recipe instanceof StandardImbuementRecipe standardRecipe) {
@@ -209,6 +217,20 @@ public class ImbuementPedestalRecipeExecutor {
             return runeRecipe.applyRuneToItems(currentItems).createItemStack();
         } else {
             return recipe.createResult().getPrimaryResult().createItemStack();
+        }
+    }
+
+    /**
+     * Gives a dropped item a gentle velocity towards the nearest player, so results fly to whoever
+     * triggered the recipe rather than dropping straight down onto the pedestal.
+     */
+    private void launchTowardsNearestPlayer(@NotNull Item item, @NotNull Location pedestalLocation, @NotNull Location explosionCenter) {
+        Player nearestPlayer = findNearestPlayer(pedestalLocation);
+        if (nearestPlayer != null) {
+            Vector direction = nearestPlayer.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
+            direction.multiply(0.3); // Gentle throw
+            direction.add(new Vector(0, 0.3, 0));
+            item.setVelocity(direction);
         }
     }
 
