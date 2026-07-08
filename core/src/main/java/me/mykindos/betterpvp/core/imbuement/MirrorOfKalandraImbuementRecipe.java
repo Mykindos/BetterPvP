@@ -2,14 +2,18 @@ package me.mykindos.betterpvp.core.imbuement;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.framework.blockbreak.component.ToolComponent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.RuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDItem;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.item.impl.MirrorOfKalandra;
+import me.mykindos.betterpvp.core.item.model.ArmorItem;
+import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -51,7 +55,16 @@ public class MirrorOfKalandraImbuementRecipe extends ImbuementRecipe {
      * item that carries durability. This deliberately excludes stackable materials and the mirror.
      */
     public static boolean isDuplicable(@NotNull ItemInstance item) {
-        if (item.getBaseItem() instanceof MirrorOfKalandra) {
+        final BaseItem baseItem = item.getBaseItem();
+        if (baseItem instanceof MirrorOfKalandra) {
+            return false;
+        }
+
+        if (!(baseItem instanceof ArmorItem)
+                && !(baseItem instanceof WeaponItem)
+                && !(baseItem instanceof RuneItem)
+                && item.getComponent(ToolComponent.class).isEmpty()) {
+            // Not a tool, armour piece, weapon or rune, and has no durability component; not duplicable.
             return false;
         }
 
