@@ -1168,6 +1168,11 @@ public class ClansWorldListener extends ClanListener {
     public void onPistonExtend(BlockPistonExtendEvent event) {
         if (event.isCancelled()) return;
 
+        if(event.getBlocks().stream().anyMatch(block -> block.getType() == Material.NOTE_BLOCK)) {
+            event.setCancelled(true);
+            return;
+        }
+
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
         if (clanOptional.isEmpty()) {
             event.setCancelled(true);
