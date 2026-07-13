@@ -1071,6 +1071,18 @@ public class ClansWorldListener extends ClanListener {
         UtilMessage.message(event.getPlayer(), "Clans", "Your <yellow>Bucket</yellow> broke!");
     }
 
+    @EventHandler
+    public void onLavaPlace(PlayerInteractEvent event) {
+        if (event.getItem() == null) return;
+        if (!event.getItem().getType().equals(Material.LAVA_BUCKET)) return;
+        final Client client = this.clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating()) return;
+
+        event.setUseItemInHand(Event.Result.DENY);
+        event.getPlayer().getInventory().remove(Material.LAVA_BUCKET);
+        UtilMessage.message(event.getPlayer(), "Clans", "Your <yellow>Bucket</yellow> broke!");
+    }
+
     private final ConcurrentLinkedQueue<Clan> clanPdcQueue = new ConcurrentLinkedQueue<>();
 
     @EventHandler
@@ -1155,6 +1167,11 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onPistonExtend(BlockPistonExtendEvent event) {
         if (event.isCancelled()) return;
+
+        if(event.getBlocks().stream().anyMatch(block -> block.getType() == Material.NOTE_BLOCK)) {
+            event.setCancelled(true);
+            return;
+        }
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
         if (clanOptional.isEmpty()) {

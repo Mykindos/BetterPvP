@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableItem;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
+import me.mykindos.betterpvp.core.item.impl.MirrorOfKalandra;
 import org.bukkit.NamespacedKey;
 import org.reflections.Reflections;
 
@@ -30,17 +32,21 @@ public class ImbuementRecipeBootstrap {
     private final ItemRegistry itemRegistry;
     private final ItemFactory itemFactory;
     private final ImbuementRecipeRegistry imbuementRecipeRegistry;
+    private final UUIDManager uuidManager;
     private final Core core;
 
     @Inject
-    private ImbuementRecipeBootstrap(ItemRegistry itemRegistry, ItemFactory itemFactory, ImbuementRecipeRegistry imbuementRecipeRegistry, Core core) {
+    private ImbuementRecipeBootstrap(ItemRegistry itemRegistry, ItemFactory itemFactory, ImbuementRecipeRegistry imbuementRecipeRegistry, UUIDManager uuidManager, Core core) {
         this.itemRegistry = itemRegistry;
         this.itemFactory = itemFactory;
         this.imbuementRecipeRegistry = imbuementRecipeRegistry;
+        this.uuidManager = uuidManager;
         this.core = core;
     }
 
     public void register() {
+        registerMirrorRecipe();
+
         final Reflections reflections = new Reflections(PACKAGE);
         final Set<Class<? extends SocketableItem>> subTypes = reflections.getSubTypesOf(SocketableItem.class);
         final List<SocketableItem> socketables = new ArrayList<>();
@@ -57,6 +63,13 @@ public class ImbuementRecipeBootstrap {
         }
 
         itemRegistry.addRegisterCallback((key, item) -> registerRecipe(itemRegistry, item, socketables));
+    }
+
+    private void registerMirrorRecipe() {
+        final MirrorOfKalandra mirror = core.getInjector().getInstance(MirrorOfKalandra.class);
+        final NamespacedKey key = new NamespacedKey("core", "mirror_of_kalandra_duplication");
+        imbuementRecipeRegistry.registerRecipe(key,
+                new MirrorOfKalandraImbuementRecipe(itemFactory, mirror, uuidManager, itemRegistry));
     }
 
     private void registerRecipe(ItemRegistry itemRegistry, BaseItem baseItem, List<SocketableItem> socketables) {
