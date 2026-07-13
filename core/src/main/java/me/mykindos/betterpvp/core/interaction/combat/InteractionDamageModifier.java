@@ -9,7 +9,9 @@ import me.mykindos.betterpvp.core.combat.modifiers.DamageModifier;
 import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierResult;
 import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
+import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.Interaction;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 
 /**
  * Base class for item interaction-based damage modifiers
@@ -53,6 +55,8 @@ public class InteractionDamageModifier implements DamageModifier {
     
     @Override
     public String getName() {
+        if (interaction instanceof DisplayedInteraction displayedInteraction)
+            return UtilFormat.getTextFromComponent(displayedInteraction.getDisplayName());
         return interaction.getName();
     }
     
