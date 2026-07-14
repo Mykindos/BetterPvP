@@ -4,9 +4,6 @@
 package me.mykindos.betterpvp.champions.database.jooq;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsCombatStats;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
@@ -19,6 +16,8 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKdrByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKillsByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopKillstreakByClass;
 import me.mykindos.betterpvp.champions.database.jooq.tables.GetTopRatingByClass;
+import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRolePlaytimeSnapshot;
+import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaSkillKdrSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetChampionsDataRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopDeathsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopHighestKillstreakByClassRecord;
@@ -26,13 +25,15 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKdrByC
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillsByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopKillstreakByClassRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.GetTopRatingByClassRecord;
-
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -425,6 +426,16 @@ public class Public extends SchemaImpl {
     }
 
     /**
+     * The table <code>public.grafana_role_playtime_snapshot</code>.
+     */
+    public final GrafanaRolePlaytimeSnapshot GRAFANA_ROLE_PLAYTIME_SNAPSHOT = GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT;
+
+    /**
+     * The table <code>public.grafana_skill_kdr_snapshot</code>.
+     */
+    public final GrafanaSkillKdrSnapshot GRAFANA_SKILL_KDR_SNAPSHOT = GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT;
+
+    /**
      * No further instances allowed
      */
     private Public() {
@@ -451,7 +462,9 @@ public class Public extends SchemaImpl {
             GetTopKdrByClass.GET_TOP_KDR_BY_CLASS,
             GetTopKillsByClass.GET_TOP_KILLS_BY_CLASS,
             GetTopKillstreakByClass.GET_TOP_KILLSTREAK_BY_CLASS,
-            GetTopRatingByClass.GET_TOP_RATING_BY_CLASS
+            GetTopRatingByClass.GET_TOP_RATING_BY_CLASS,
+            GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT,
+            GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT
         );
     }
 }

@@ -102,6 +102,7 @@ public class Champions extends BPvPPlugin {
             var uuidManager = injector.getInstance(UUIDManager.class);
             uuidManager.loadObjectsFromNamespace("champions");
 
+
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflections.getTypesAnnotatedWith(PluginAdapters.class));
 
