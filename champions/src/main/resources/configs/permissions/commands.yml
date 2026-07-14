@@ -1,0 +1,4 @@
+skills:
+  requiredRank: PLAYER
+  enabled: true
+  seeOtherPlayerSkillsRank: MODERATOR

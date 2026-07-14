@@ -14,9 +14,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ClanMember {
 
-    UUID uuid;
-    MemberRank rank;
-    String clientName;
+    private UUID uuid;
+    private MemberRank rank;
+    private String clientName;
 
     public boolean hasRank(MemberRank memberRank) {
         return this.rank.getPrivilege() >= memberRank.getPrivilege();
@@ -65,10 +65,10 @@ public class ClanMember {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof ClanMember clanMember))
+        if (!(obj instanceof ClanMember clanMember))
             return false;
 
-        return this.uuid.equals(clanMember.getUuid());
+        return this.getUuid().equals(clanMember.getUuid());
     }
 
     @Override

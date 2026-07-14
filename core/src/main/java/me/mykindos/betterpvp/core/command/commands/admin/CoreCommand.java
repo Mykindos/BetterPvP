@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCoreCommandLoader;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
@@ -52,6 +53,9 @@ public class CoreCommand extends Command implements IConsoleCommand {
         private Core core;
 
         @Inject
+        private BrigadierCoreCommandLoader brigadierCoreCommandLoader;
+
+        @Inject
         private CoreCommandLoader commandLoader;
 
         @Inject
@@ -86,6 +90,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
             core.reload();
             core.getReloadables().forEach(Reloadable::reload);
 
+            brigadierCoreCommandLoader.reload();
             commandLoader.reload(core.getClass().getPackageName());
             tipManager.reloadTips(core);
             resourcePackHandler.reload();
