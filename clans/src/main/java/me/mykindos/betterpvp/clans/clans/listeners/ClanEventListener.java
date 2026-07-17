@@ -930,7 +930,7 @@ public class ClanEventListener extends ClanListener {
         final Clan target = event.getTargetClan();
 
         final ClanRelation clanToTargetRelation = this.clanManager.getRelation(clan, target);
-        final ClanRelation targetToClanRelation = this.clanManager.getRelation(clan, target);
+        final ClanRelation targetToClanRelation = this.clanManager.getRelation(target, clan);
 
         if (clan.isEnemy(target)) {
 
