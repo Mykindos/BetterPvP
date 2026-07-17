@@ -138,7 +138,7 @@ public class BattlebindProjectile extends LinkProjectile {
 
         skill.bind(caster, hit, level);
 
-        UtilMessage.message(hit, skill.getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
-        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(hit.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(hit, skill.getClassType().getDisplayName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(caster, hit), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(hit, caster), skill.getDisplayName().color(NamedTextColor.GREEN));
     }
 }

@@ -200,8 +200,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 b.setMetadata("isTetherBat", new FixedMetadataValue(champions, true));
             });
 
-            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.tether-shot.tethered", Component.text(enemy.getName(), NamedTextColor.YELLOW));
-            UtilMessage.message(enemy, getClassType().getDisplayName(), "champions.skill.ranger.tether-shot.tethered-by", Component.text(player.getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.tether-shot.tethered", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(enemy, player));
+            UtilMessage.message(enemy, getClassType().getDisplayName(), "champions.skill.ranger.tether-shot.tethered-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, enemy));
 
             bat.setLeashHolder(enemy);
 
@@ -361,8 +361,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
         player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
 
-        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(enemy.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-        UtilMessage.message(enemy, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(enemy, player), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(enemy, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, enemy), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @EventHandler

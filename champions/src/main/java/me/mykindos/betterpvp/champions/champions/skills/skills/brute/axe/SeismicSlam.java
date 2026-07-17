@@ -171,7 +171,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             double damage = calculateDamage(player, target, data);
             UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), damage, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, damagee), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             }
         }
 

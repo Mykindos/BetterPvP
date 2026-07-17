@@ -54,7 +54,8 @@ import java.util.function.IntToDoubleFunction;
 public abstract class Skill implements IChampionsSkill {
 
     protected final Champions champions;
-    protected final ChampionsManager championsManager;
+
+    public final ChampionsManager championsManager;
 
     private boolean enabled;
     private int maxLevel;
@@ -421,6 +422,7 @@ public abstract class Skill implements IChampionsSkill {
 
     /**
      * Called when a skill is updated via {@link SkillUpdateEvent event}
+     *
      * @param player
      * @param gamer
      */
@@ -489,7 +491,7 @@ public abstract class Skill implements IChampionsSkill {
 
         // If its a passive that has no action, return standard level
         // Passives such as intimidation and backstab do not gain additional levels from boosters
-        if(this.getType().isPassive() && !(this instanceof ToggleSkill)) {
+        if (this.getType().isPassive() && !(this instanceof ToggleSkill)) {
             return level;
         }
 

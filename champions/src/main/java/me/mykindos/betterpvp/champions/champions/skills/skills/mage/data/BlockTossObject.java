@@ -39,7 +39,6 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
@@ -328,13 +327,13 @@ public final class BlockTossObject {
                         new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
                         damage,
                         skill.getName()));
-                UtilMessage.message(ent, skill.getName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
+                UtilMessage.message(ent, skill.getName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(caster, ent), skill.getDisplayName().color(NamedTextColor.GREEN));
             }
         }
 
         if (!damaged.isEmpty()) {
             Component nameList = Component.join(net.kyori.adventure.text.JoinConfiguration.separator(Component.text(", ")),
-                    damaged.stream().map(player -> Component.text(player.getName(), NamedTextColor.YELLOW)).toList());
+                    damaged.stream().map(player -> this.skill.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, caster)).toList());
             UtilMessage.message(caster, skill.getName(), "champions.skill.hit-target", nameList, skill.getDisplayName().color(NamedTextColor.GREEN));
             caster.playSound(caster.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0F, 1.0F);
         }

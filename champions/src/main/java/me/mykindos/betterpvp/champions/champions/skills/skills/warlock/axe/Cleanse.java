@@ -129,7 +129,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             healthReduction += getHealthReductionPerPlayerAffected(level);
 
             championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
-            UtilMessage.message(ally, "core.prefix.cleanse", "champions.skill.warlock.cleanse.cleansed", Component.text(player.getName(), NamedTextColor.GREEN));
+            UtilMessage.message(ally, "core.prefix.cleanse", "champions.skill.warlock.cleanse.cleansed", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, ally));
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
 

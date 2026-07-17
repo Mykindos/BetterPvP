@@ -196,9 +196,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             championsManager.getEffects().addEffect(target, damager, EffectTypes.SPEED, getSpeedStrength(level), (long) (getDuration(level) * 1000L));
         }
 
-        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-        if (!damager.equals(target) && target instanceof Player targetPlayer) {
-            UtilMessage.message(targetPlayer, getClassType().getDisplayName(), "champions.skill.hit-by-alt", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(target, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        if (!damager.equals(target)) {
+            UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by-alt", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damager, target), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         }
 
     }
@@ -220,8 +220,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                     event.addModifier(new SkillDamageModifier.Flat(this, getExtraDamage(level)));
                     iterator.remove();
                     event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
-                    UtilMessage.message(event.getDamager(), getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(event.getDamagee().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-                    UtilMessage.message(event.getDamagee(), getClassType().getDisplayName(), "champions.skill.hit-by-alt", Component.text(event.getDamager().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                    UtilMessage.message(event.getDamager(), getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(event.getDamagee(), event.getDamager()), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                    UtilMessage.message(event.getDamagee(), getClassType().getDisplayName(), "champions.skill.hit-by-alt", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(event.getDamager(), event.getDamagee()), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
                 }
             }
         }
