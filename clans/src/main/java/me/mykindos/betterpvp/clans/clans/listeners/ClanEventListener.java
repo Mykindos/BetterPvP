@@ -146,7 +146,7 @@ public class ClanEventListener extends ClanListener {
             Player memberPlayer = Bukkit.getPlayer(member.getUuid());
             if (memberPlayer != null) {
                 UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.claim.success-clan",
-                        Component.text(player.getName(), NamedTextColor.YELLOW),
+                        this.clanManager.getPlayerName(ClanRelation.SELF, player),
                         Component.text(stringChunk, NamedTextColor.YELLOW)
                 );
             }
@@ -235,7 +235,9 @@ public class ClanEventListener extends ClanListener {
         final String chunkString = UtilWorld.chunkToFile(chunk);
         final String chunkToPrettyString = UtilWorld.chunkToPrettyString(chunk);
 
-        UtilMessage.message(player, "clans.prefix", "clans.command.clan.unclaim.success-self", Component.text(chunkToPrettyString, NamedTextColor.YELLOW));
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.unclaim.success-self",
+                Component.text(chunkToPrettyString, NamedTextColor.YELLOW)
+        );
 
         targetClan.getMembers().forEach(member -> {
             if (member.getUuid().equals(player.getUniqueId())) return;
@@ -477,7 +479,10 @@ public class ClanEventListener extends ClanListener {
             }
         });
 
-        UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.invite.success-target", Component.text(player.getName(), NamedTextColor.YELLOW), Component.text(clan.getName(), NamedTextColor.YELLOW));
+        UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.invite.success-target",
+                this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player),
+                this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+        );
 
         final Component inviteMessage = Translations.component("clans.command.clan.invite.accept-link")
                 .clickEvent(ClickEvent.runCommand("/c join " + clan.getName()))
@@ -502,12 +507,16 @@ public class ClanEventListener extends ClanListener {
 
         if (!client.isAdministrating()) {
             if (!this.inviteHandler.isInvited(gamer, clan, "Invite")) {
-                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.not-invited", this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan));
+                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.not-invited",
+                        this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+                );
                 return;
             }
 
             if (clan.getSquadCount() >= this.maxClanMembers) {
-                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.limit", this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan));
+                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.limit",
+                        this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+                );
                 return;
             }
 
@@ -575,7 +584,9 @@ public class ClanEventListener extends ClanListener {
             }
         });
 
-        UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.success-self", Component.text(clan.getName(), NamedTextColor.YELLOW));
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.success-self",
+                this.clanManager.getClanShortName(ClanRelation.SELF, clan)
+        );
 
         log.info("{} ({}) joined {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_JOIN")
                 .addClientContext(player)
@@ -1119,7 +1130,9 @@ public class ClanEventListener extends ClanListener {
         final Player player = event.getPlayer();
 
         if (event.getPlayer().getLocation().getY() > maxCoreY) {
-            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.set-core.too-high", Component.text(maxCoreY, NamedTextColor.YELLOW));
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.set-core.too-high",
+                    Component.text(maxCoreY, NamedTextColor.YELLOW)
+            );
             return;
         }
 
@@ -1197,7 +1210,9 @@ public class ClanEventListener extends ClanListener {
 
         final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
         if (memberPlayer != null) {
-            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.promote.success-target", Component.text(member.getRank().getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.promote.success-target",
+                    Component.text(member.getRank().getName(), NamedTextColor.YELLOW)
+            );
         }
     }
 
@@ -1233,7 +1248,9 @@ public class ClanEventListener extends ClanListener {
 
         final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
         if (memberPlayer != null) {
-            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.demote.success-target", Component.text(member.getRank().getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.demote.success-target",
+                    Component.text(member.getRank().getName(), NamedTextColor.YELLOW)
+            );
         }
     }
 
