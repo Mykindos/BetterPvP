@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableHandler;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
+import me.mykindos.betterpvp.core.displayname.DisplayNameService;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 
@@ -28,12 +29,12 @@ public class ChampionsManager {
     private final EffectManager effects;
     private final EnergyService energy;
     private final ThrowableHandler throwables;
-    private final DisplayNameProvider displayNameProvider;
+    private final DisplayNameService displayNameService;
 
     @Inject
     public ChampionsManager(ClientManager clientManager, ChampionsSkillManager skills, RoleManager roles, BuildManager builds,
                             CooldownManager cooldowns, EffectManager effects, EnergyService energy, ThrowableHandler throwables,
-                            DisplayNameProvider displayNameProvider) {
+                            DisplayNameService displayNameService) {
         this.clientManager = clientManager;
         this.skills = skills;
         this.roles = roles;
@@ -42,6 +43,6 @@ public class ChampionsManager {
         this.effects = effects;
         this.energy = energy;
         this.throwables = throwables;
-        this.displayNameProvider = displayNameProvider;
+        this.displayNameService = displayNameService;
     }
 }

@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -103,7 +102,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                     VelocityData velocityData = new VelocityData(velocity, 1.0D, true, 0.0D, 0.25D, 4.0D, true);
                     UtilVelocity.velocity(target, player, velocityData);
                     UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), getName()));
-                    UtilMessage.message(target, getName(), "champions.skill.brute.whirlwind-sword.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN));
+                    UtilMessage.message(target, getName(), "champions.skill.brute.whirlwind-sword.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN));
                 }
 
             }

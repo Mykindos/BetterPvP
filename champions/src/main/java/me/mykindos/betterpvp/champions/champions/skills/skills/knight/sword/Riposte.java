@@ -24,7 +24,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -141,7 +140,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
             UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             if (ent instanceof Player target) {
-                UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.knight.riposte.target-used", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
+                UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.knight.riposte.target-used", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             }
 
             active.remove(player.getUniqueId());

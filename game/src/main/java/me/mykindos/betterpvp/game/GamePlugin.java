@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.displayname.DisplayNameService;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.game.achievements.loader.GameAchievementLoader;
 import me.mykindos.betterpvp.game.command.loader.GameCommandLoader;
+import me.mykindos.betterpvp.game.displayname.GameDisplayNameProvider;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.listener.state.GameMapHandler;
 import me.mykindos.betterpvp.game.framework.listener.state.TransitionHandler;
@@ -71,6 +73,8 @@ public final class GamePlugin extends BPvPPlugin {
 
         injector = core.getInjector().createChildInjector(new GlobalInjectorModule(this), new ConfigInjectorModule(this, fields));
         injector.injectMembers(this);
+
+        injector.getInstance(DisplayNameService.class).setProvider(injector.getInstance(GameDisplayNameProvider.class));
 
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:game-migrations/postgres", "game");
         Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Game"));

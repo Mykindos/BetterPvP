@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.injector;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.OptionalBinder;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.filter.IFilterService;
@@ -11,7 +10,7 @@ import me.mykindos.betterpvp.core.chat.ignore.impl.DefaultIgnoreService;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.PostgresDatabaseConnection;
 import me.mykindos.betterpvp.core.displayname.CoreDisplayNameProvider;
-import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
+import me.mykindos.betterpvp.core.displayname.DisplayNameService;
 import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRules;
 import me.mykindos.betterpvp.core.framework.blockbreak.global.GlobalBlockBreakRulesImpl;
 import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgressService;
@@ -38,8 +37,8 @@ public class CoreInjectorModule extends AbstractModule {
     protected void configure() {
         bind(Core.class).toInstance(plugin);
 
-        OptionalBinder.newOptionalBinder(binder(), DisplayNameProvider.class).setDefault().to(CoreDisplayNameProvider.class);
         bind(CoreDisplayNameProvider.class);
+        bind(DisplayNameService.class).asEagerSingleton();
 
         bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
         bind(IFilterService.class).to(DatabaseFilterService.class);
