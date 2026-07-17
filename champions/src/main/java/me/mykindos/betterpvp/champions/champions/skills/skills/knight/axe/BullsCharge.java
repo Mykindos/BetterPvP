@@ -134,9 +134,9 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
-                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damager, damagee), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(damager, damagee), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
 
-                UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damagee, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(damagee, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
                 running.remove(damager.getUniqueId());
             }
         }

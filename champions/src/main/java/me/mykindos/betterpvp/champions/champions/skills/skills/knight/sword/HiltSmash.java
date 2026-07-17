@@ -25,7 +25,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -159,9 +158,9 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
             UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.knight.hilt-smash.failed", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 1.0F, 0.0F);
         } else {
-            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
-            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(ent, player), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(ent, player), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             UtilDamage.doDamage(new DamageEvent(ent, player, null, new SkillDamageCause(this), getDamage(level), getName()));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
         }

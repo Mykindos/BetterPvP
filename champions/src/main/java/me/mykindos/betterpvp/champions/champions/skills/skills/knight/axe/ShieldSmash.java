@@ -21,7 +21,6 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -152,7 +151,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             }
 
             // Inform them
-            UtilMessage.message(ent, "core.prefix.skill", "champions.skill.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(ent, "core.prefix.skill", "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN));
         }
 
         if (hit) { // entity hit

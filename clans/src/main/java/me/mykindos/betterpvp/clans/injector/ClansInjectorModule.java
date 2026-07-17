@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
 import me.mykindos.betterpvp.clans.displayname.ClansDisplayNameProvider;
+<<<<<<< HEAD
 import me.mykindos.betterpvp.clans.world.island.CrewAllocationPolicy;
 import me.mykindos.betterpvp.clans.world.island.InstanceAllocationPolicy;
 import me.mykindos.betterpvp.clans.world.island.IslandAllocator;
@@ -23,6 +24,8 @@ import me.mykindos.betterpvp.clans.world.travel.guard.AllocatingTravelGuard;
 import me.mykindos.betterpvp.clans.world.travel.guard.AlreadyOnIslandTravelGuard;
 import me.mykindos.betterpvp.clans.world.travel.guard.CombatTravelGuard;
 import me.mykindos.betterpvp.clans.world.travel.guard.DepartingTravelGuard;
+=======
+>>>>>>> d4a6abc87 (refactor(displayname): centralize display name resolution)
 
 public class ClansInjectorModule extends AbstractModule {
 

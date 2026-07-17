@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Location;
@@ -135,8 +134,8 @@ public class AxeProjectile extends Projectile {
                 new SkillDamageCause(skill, false, DamageCause.DEFAULT_DELAY, true).withBukkitCause(PROJECTILE),
                 damage,
                 skill.getName()));
-        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", this.skill.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damagee, caster), skill.getDisplayName().color(NamedTextColor.GREEN));
-        UtilMessage.message(damagee, skill.getClassType().getDisplayName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(caster, damagee), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(damagee, caster), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(damagee, skill.getClassType().getDisplayName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(caster, damagee), skill.getDisplayName().color(NamedTextColor.GREEN));
     }
 
     @Override

@@ -24,7 +24,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -171,7 +170,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             double damage = calculateDamage(player, target, data);
             UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), damage, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, damagee), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, damagee), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
             }
         }
 

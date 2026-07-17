@@ -29,7 +29,6 @@ import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -178,10 +177,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
 
-        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(target, player), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(target, player), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         UtilDamage.doDamage(new DamageEvent(target, player, null, new SkillDamageCause(this), getDamage(level), "Takedown"));
 
-        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         UtilDamage.doDamage(new DamageEvent(player, target, null, new SkillDamageCause(this), getRecoilDamage(level), "Takedown Recoil"));
 
         long duration = (long) (getDuration(level) * 1000L);

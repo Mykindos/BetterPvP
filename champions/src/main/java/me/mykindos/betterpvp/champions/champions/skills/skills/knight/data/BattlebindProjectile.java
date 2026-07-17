@@ -5,9 +5,12 @@ import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+<<<<<<< HEAD
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.LinkProjectile;
 import net.kyori.adventure.text.Component;
+=======
+>>>>>>> d4a6abc87 (refactor(displayname): centralize display name resolution)
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -136,8 +139,11 @@ public class BattlebindProjectile extends LinkProjectile {
         event.setDamageDelay(0);
         UtilDamage.doDamage(event);
 
+<<<<<<< HEAD
         skill.bind(caster, hit, level);
 
+=======
+>>>>>>> d4a6abc87 (refactor(displayname): centralize display name resolution)
         UtilMessage.message(hit, skill.getClassType().getDisplayName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(caster, hit), skill.getDisplayName().color(NamedTextColor.GREEN));
         UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(hit, caster), skill.getDisplayName().color(NamedTextColor.GREEN));
     }
