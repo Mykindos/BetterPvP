@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.game.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.game.GamePlugin;
+import me.mykindos.betterpvp.game.displayname.GameDisplayNameProvider;
 import me.mykindos.betterpvp.game.framework.GameRegistry;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.listener.state.GameMapHandler;
@@ -30,6 +33,8 @@ public class GlobalInjectorModule extends AbstractModule {
     protected void configure() {
         // Bind plugin
         bind(GamePlugin.class).toInstance(plugin);
+
+        OptionalBinder.newOptionalBinder(binder(), DisplayNameProvider.class).setBinding().to(GameDisplayNameProvider.class);
 
         // Bind map providers
         bind(MappedWorld.class).annotatedWith(Names.named("Waiting Lobby")).toProvider(WaitingLobbyProvider.class);
