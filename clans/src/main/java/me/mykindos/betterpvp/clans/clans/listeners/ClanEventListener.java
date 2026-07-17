@@ -402,14 +402,12 @@ public class ClanEventListener extends ClanListener {
 
         Player player = event.getPlayer();
         if (player != null) {
-            ClanRelation clanRelation = this.clanManager.getRelation(clan, this.clanManager.getClanByPlayer(player).orElse(null));
-
             clan.getMembers().forEach(clanMember -> {
                 if (!clanMember.isOnline()) {
                     offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                             OfflineMessage.Action.CLAN_DISBAND,
                             "Your clan %s was disbanded by %s.",
-                            this.clanManager.getClanShortName(ClanRelation.SELF, clan), this.clanManager.getPlayerName(clanRelation, player)
+                            this.clanManager.getClanShortName(ClanRelation.SELF, clan), this.clanManager.getPlayerName(ClanRelation.SELF, player)
                     );
                 } else {
                     Objects.requireNonNull(clanMember.getPlayer()).closeInventory();
@@ -991,7 +989,7 @@ public class ClanEventListener extends ClanListener {
         final Clan target = event.getTargetClan();
 
         final ClanRelation clanToTargetRelation = this.clanManager.getRelation(clan, target);
-        final ClanRelation targetToClanRelation = this.clanManager.getRelation(clan, target);
+        final ClanRelation targetToClanRelation = this.clanManager.getRelation(target, clan);
 
         this.inviteHandler.removeInvite(clan, target, "Neutral");
         this.inviteHandler.removeInvite(target, clan, "Neutral");
@@ -1169,7 +1167,7 @@ public class ClanEventListener extends ClanListener {
                 Component.text(UtilWorld.locationToString(player.getLocation()), NamedTextColor.YELLOW)
         );
 
-        log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
+        log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getId(),
                         UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
 
