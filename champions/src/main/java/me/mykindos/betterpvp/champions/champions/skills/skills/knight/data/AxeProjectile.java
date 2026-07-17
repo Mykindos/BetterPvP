@@ -135,8 +135,8 @@ public class AxeProjectile extends Projectile {
                 new SkillDamageCause(skill, false, DamageCause.DEFAULT_DELAY, true).withBukkitCause(PROJECTILE),
                 damage,
                 skill.getName()));
-        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(damagee.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
-        UtilMessage.message(damagee, skill.getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", this.skill.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damagee, caster), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(damagee, skill.getClassType().getDisplayName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(caster, damagee), skill.getDisplayName().color(NamedTextColor.GREEN));
     }
 
     @Override

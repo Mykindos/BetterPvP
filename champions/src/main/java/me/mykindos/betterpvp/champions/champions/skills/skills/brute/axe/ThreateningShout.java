@@ -183,7 +183,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                                         getDamage(level),
                                         "Threatening Shout"));
                                 championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                                UtilMessage.message(player, getName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
+                                UtilMessage.message(player, getName(), "champions.skill.hit-target", ThreateningShout.this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(target, player), getDisplayName().color(NamedTextColor.GREEN));
                                 damagedEntities.add(target);
                             }
                         }

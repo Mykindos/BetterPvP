@@ -101,14 +101,14 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         if (active.contains(damager.getUniqueId())) {
             event.addReason("Concussion");
             if (championsManager.getEffects().hasEffect(damagee, EffectTypes.CONCUSSED)) {
-                UtilMessage.message(damager, getName(), "champions.skill.assassin.concussion.already-concussed", Component.text(damagee.getName(), NamedTextColor.GREEN));
+                UtilMessage.message(damager, getName(), "champions.skill.assassin.concussion.already-concussed", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damagee, damager));
                 return;
             }
 
             championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
 
-            UtilMessage.message(damager, getName(), "champions.skill.assassin.concussion.gave", Component.text(damagee.getName(), NamedTextColor.GREEN));
-            UtilMessage.message(damagee, getName(), "champions.skill.assassin.concussion.received", Component.text(damager.getName(), NamedTextColor.GREEN));
+            UtilMessage.message(damager, getName(), "champions.skill.assassin.concussion.gave", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damagee, damager));
+            UtilMessage.message(damagee, getName(), "champions.skill.assassin.concussion.received", this.championsManager.getDisplayNameProvider().getDisplayNameAsComponent(damager, damagee));
             active.remove(damager.getUniqueId());
         }
     }
